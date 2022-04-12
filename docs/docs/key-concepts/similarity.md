@@ -4,10 +4,12 @@
 
 Similarity analysis is based on the relative locations of utterances in embedding space. This
 analysis can be quite powerful given that **no trained ML model is needed**; only a dataset needs to
-be provided.
+be supplied.
 
-Within Azimuth, different similarity analyses are conducted to determine how similar utterances are
-within a class, across classes, and so on.
+Within Azimuth, different similarity analyses are provided to determine how similar utterances are
+within a class, across classes, and so on. This can help indicate whether classes are well-defined,
+or whether changes should be made to improve the dataset, such as by redefining classes,
+relabeling or omitting data, or augmenting the dataset.
 
 ## Where is this used in Azimuth?
 
@@ -52,12 +54,12 @@ come from the same or different classes. When most of its **neighboring utteranc
 different class**, it might indicate a mislabeling issue, overlapping classes, data drift, or simply
 a difficult utterance to predict.
 
-Two [:material-link: Smart Tags](./smart-tags.md) highlight these sorts of utterances, based on the **label
-heterogeneity of the neighborhood** in each dataset split (training or evaluation). If 90% or more
-of an utterance's most similar data samples (neighbors) in a dataset split belong to a different
-class, it will be tagged as `few_similar_train` and/or `few_similar_eval`, based on which dataset
-split is being examined. (E.g., an utterance in the test set will be compared to its neighbors in
-both the training and evaluation dataset splits.)
+Two [:material-link: Smart Tags](./smart-tags.md) highlight these sorts of utterances, based on
+the **label heterogeneity of the neighborhood** in each dataset split (training or evaluation). If
+90% or more of an utterance's most similar data samples (neighbors) in a dataset split belong to a
+different class, it will be tagged as `few_similar_train` and/or `few_similar_eval`, based on which
+dataset split is being examined. (E.g., an utterance in the test set will be compared to its
+neighbors in both the training and evaluation dataset splits.)
 
 ### Configuration
 
