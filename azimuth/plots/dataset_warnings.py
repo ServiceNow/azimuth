@@ -61,7 +61,7 @@ def min_nb_samples_plot(
 
     fig.update_layout(
         title="Number of samples per class in both sets",
-        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + len(train_nb_sample) * 23,
+        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + max(len(train_nb_sample), 6) * 23,
     )
     fig.add_vline(x=threshold, line_width=1, line_dash="dot", line_color=Colors.Orange)
     fig.add_annotation(
@@ -233,7 +233,7 @@ def class_representation(
 
     fig.update_layout(
         title="Delta in class representation between both sets",
-        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + len(train_nb_sample) * 23,
+        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + max(len(train_nb_sample), 6) * 23,
     )
 
     fig.update_xaxes(
