@@ -95,9 +95,7 @@ const MetricsDataGrid = (props: Props) => {
                   classes.column
                 )}
               >
-                {cell.value !== null && cell.value !== undefined
-                  ? formatter(cell.value)
-                  : "-"}
+                {cell.value !== null ? formatter(cell.value) : "-"}
               </Typography>
             ))}
           </React.Fragment>

@@ -14,8 +14,8 @@ class SimilarUtterance(AliasModel):
     index: int
     utterance: str
     label: str
-    postprocessed_prediction: Optional[str] = None
-    postprocessed_confidence: Optional[float] = None
+    postprocessed_prediction: Optional[str] = Field(..., nullable=True)
+    postprocessed_confidence: Optional[float] = Field(..., nullable=True)
     similarity: float
 
 

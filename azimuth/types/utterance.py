@@ -26,8 +26,10 @@ class ModelSaliency(AliasModel):
 
 class Utterance(AliasModel):
     index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
-    model_prediction: Optional[ModelPrediction] = Field(None, title="Model prediction")
-    model_saliency: Optional[ModelSaliency] = Field(None, title="Model saliency")
+    model_prediction: Optional[ModelPrediction] = Field(
+        ..., title="Model prediction", nullable=True
+    )
+    model_saliency: Optional[ModelSaliency] = Field(..., title="Model saliency", nullable=True)
     smart_tags: List[SmartTag] = Field(..., title="Smart tags")
     data_action: DataAction = Field(..., title="Data action tag")
     label: str = Field(..., title="Label")
