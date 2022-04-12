@@ -32,10 +32,10 @@ information is computed.
 [:material-link: Similarity Analysis](similarity.md) provides more information on how similarity is
 computed.
 
-* `few_similar_train`: The utterance has very few similar utterances from the same class in the
-  training set.
-* `few_similar_eval`: The utterance has very few similar utterances from the same class in the
-  evaluation set.
+* `conflicting_neighbors_train`: The utterance has very few similar utterances from the same class
+  in the training set.
+* `conflicting_neighbors_eval`: The utterance has very few similar utterances from the same class in
+  the evaluation set.
 * `no_close_train`: The closest utterance in the training set has a similarity below 0.5.
 * `no_close_eval`: The closest utterance in the evaluation set has a similarity below 0.5.
 

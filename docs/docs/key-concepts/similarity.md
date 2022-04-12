@@ -48,7 +48,7 @@ predict.
 As such, two [smart tags](./smart-tags.md) highlight the trickiest utterances, based on the **label
 heterogeneity of the neighborhood** in each set (training or evaluation). If an utterance has 90% or
 more of its most similar examples in a set belonging to a different class, it will be tagged
-as `few_similar_train` and/or `few_similar_eval`, based on which set it is.
+as `conflicting_neighbors_train` and/or `conflicting_neighbors_eval`, based on which set it is.
 
 ### Configuration
 

@@ -96,21 +96,21 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
             eval_dm if self.dataset_split_name == DatasetSplitName.eval else train_dm
         )
 
-        few_similar_tags = {}
+        conflicting_neighbors_tags = {}
         no_close_tags = {}
-        for split_name, tagname_few_similar, tagname_no_close in zip(
+        for split_name, tagname_conflicting_neighbors, tagname_no_close in zip(
             [DatasetSplitName.train, DatasetSplitName.eval],
-            [SmartTag.few_similar_train, SmartTag.few_similar_eval],
+            [SmartTag.conflicting_neighbors_train, SmartTag.conflicting_neighbors_eval],
             [SmartTag.no_close_train, SmartTag.no_close_eval],
         ):
             if split_name not in self.available_dataset_splits:
                 continue
-            few_similar_tags[split_name] = self.get_few_similar_tag(
+            conflicting_neighbors_tags[split_name] = self.get_conflicting_neighbors_tag(
                 labels=dm.get_dataset_split().select(indices)[self.config.columns.label],
                 neighbors=neighbors[split_name],
                 dm=self.get_dataset_split_manager(split_name),
-                threshold=similarity_config.few_similar_threshold,
-                tag_name=tagname_few_similar,
+                threshold=similarity_config.conflicting_neighbors_threshold,
+                tag_name=tagname_conflicting_neighbors,
             )
             no_close_tags[split_name] = self.get_no_close_tag(
                 neighbors=neighbors[split_name],
@@ -122,25 +122,27 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
         for (
             train_neighbors,
             eval_neighbors,
-            few_similar_train,
-            few_similar_eval,
+            conflicting_neighbors_train,
+            conflicting_neighbors_eval,
             no_close_train,
             no_close_eval,
         ) in zip(
             neighbors[DatasetSplitName.train],
             neighbors[DatasetSplitName.eval],
-            few_similar_tags.get(DatasetSplitName.train, []),
-            few_similar_tags[DatasetSplitName.eval],
+            conflicting_neighbors_tags.get(DatasetSplitName.train, []),
+            conflicting_neighbors_tags[DatasetSplitName.eval],
             no_close_tags[DatasetSplitName.train],
             no_close_tags[DatasetSplitName.eval],
         ):
             results.append(
                 TaggingResponse(
                     tags={
-                        SmartTag.few_similar_train: False
-                        if few_similar_train is None
-                        else few_similar_train[SmartTag.few_similar_train],
-                        SmartTag.few_similar_eval: few_similar_eval[SmartTag.few_similar_eval],
+                        SmartTag.conflicting_neighbors_train: False
+                        if conflicting_neighbors_train is None
+                        else conflicting_neighbors_train[SmartTag.conflicting_neighbors_train],
+                        SmartTag.conflicting_neighbors_eval: conflicting_neighbors_eval[
+                            SmartTag.conflicting_neighbors_eval
+                        ],
                         SmartTag.no_close_train: no_close_train[SmartTag.no_close_train],
                         SmartTag.no_close_eval: no_close_eval[SmartTag.no_close_eval],
                     },
@@ -181,7 +183,7 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
         for col_name in res[0].adds.keys():
             dm.add_column(key=col_name, features=[r.adds[col_name] for r in res])
 
-    def get_few_similar_tag(
+    def get_conflicting_neighbors_tag(
         self,
         labels: List[int],
         neighbors: List[List[Tuple[int, float]]],
@@ -189,7 +191,7 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
         threshold: float,
         tag_name: SmartTag,
     ) -> List[Dict[SmartTag, bool]]:
-        """Compute the `few_similar_train` and `few_similar_eval` tags.
+        """Compute the `conflicting_neighbors_train` and `conflicting_neighbors_eval` tags.
 
         Given a list of examples, determine whether a sufficient number
          of their neighbors have the same label. If this is not the case, tag them with the

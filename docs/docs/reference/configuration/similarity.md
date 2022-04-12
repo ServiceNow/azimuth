@@ -11,7 +11,7 @@ enabled later on in the application.
     ```python
     class SimilarityOptions(BaseModel):
         faiss_encoder: str = "all-MiniLM-L12-v2"
-        few_similar_threshold: float = 0.9
+        conflicting_neighbors_threshold: float = 0.9
         no_close_threshold: float = 0.5
     ```
 

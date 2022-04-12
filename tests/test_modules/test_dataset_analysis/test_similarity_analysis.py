@@ -29,7 +29,7 @@ def test_neighbors(simple_text_config, dask_client, monkeypatch, simple_table_ke
     dask_client.run(
         lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
     )
-    simple_text_config.similarity.few_similar_threshold = 0.1
+    simple_text_config.similarity.conflicting_neighbors_threshold = 0.1
     mod = NeighborsTaggingModule(DatasetSplitName.eval, simple_text_config)
     res = mod.compute_on_dataset_split()
 
@@ -47,8 +47,8 @@ def test_neighbors(simple_text_config, dask_client, monkeypatch, simple_table_ke
     # Check that the first item is indeed the real index
     assert IDX in examples[DatasetColumn.row_idx]
 
-    assert any(mod.get_dataset_split()[SmartTag.few_similar_train])
-    assert any(mod.get_dataset_split()[SmartTag.few_similar_eval])
+    assert any(mod.get_dataset_split()[SmartTag.conflicting_neighbors_train])
+    assert any(mod.get_dataset_split()[SmartTag.conflicting_neighbors_eval])
     assert "neighbors_eval" in mod.get_dataset_split().column_names
     assert "no_close_train" in mod.get_dataset_split().column_names
     mod.clear_cache()
