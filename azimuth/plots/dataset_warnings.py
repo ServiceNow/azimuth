@@ -111,37 +111,40 @@ def min_nb_samples_plot(
         xanchor="left",
         yanchor="middle",
         showarrow=False,
-        font=dict(color=Colors.Orange, size=AXIS_FONT_SIZE),
     )
 
     fig.add_annotation(
         x=X_LEFT_LEGEND,
         yshift=y_legend_2,
         text="◓",
+        font=dict(color=Colors.Orange),
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
         yshift=y_legend_3,
         text="◒",
+        font=dict(color=Colors.Orange),
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
         yshift=y_legend_4,
         text="◓",
+        font=dict(color=Colors.Orange),
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
         yshift=y_legend_4,
         text="◒",
+        font=dict(color=Colors.Orange),
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
         yshift=y_legend_1,
-        text="<b>Warning due to:",
+        text="Warning due to:",
         **common_args,
     )
     fig.add_annotation(
@@ -300,7 +303,7 @@ def class_representation(
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
         yshift=y_legend,
-        text="Warning",
+        text="warning",
         font=dict(color=Colors.Text, size=AXIS_FONT_SIZE),
         **common_args,
     )
