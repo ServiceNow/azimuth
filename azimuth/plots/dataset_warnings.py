@@ -15,6 +15,8 @@ from azimuth.utils.plots import (
     PAPER_MARGINS,
     X_LEFT_LEGEND,
     X_RIGHT_LEGEND,
+    Y_LEGEND_LINE_1,
+    Y_LEGEND_LINE_HEIGHT,
     Colors,
     fig_default,
     shorten_cls_names,
@@ -97,12 +99,13 @@ def min_nb_samples_plot(
         if eval_nb_sample[label] < threshold:
             fig.add_annotation(text="◓", **common_args)
 
-    y_legend_1 = 0.76
-    y_legend_2 = 0.7
-    y_legend_3 = 0.64
-    y_legend_4 = 0.58
+    y_legend_1 = Y_LEGEND_LINE_1 + 3 * Y_LEGEND_LINE_HEIGHT
+    y_legend_2 = Y_LEGEND_LINE_1 + 4 * Y_LEGEND_LINE_HEIGHT
+    y_legend_3 = Y_LEGEND_LINE_1 + 5 * Y_LEGEND_LINE_HEIGHT
+    y_legend_4 = Y_LEGEND_LINE_1 + 6 * Y_LEGEND_LINE_HEIGHT
 
     common_args = dict(
+        y=1,
         xref="paper",
         yref="paper",
         xanchor="left",
@@ -113,49 +116,49 @@ def min_nb_samples_plot(
 
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend_2,
+        yshift=y_legend_2,
         text="◓",
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend_2,
+        yshift=y_legend_2,
         text="◒",
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend_3,
+        yshift=y_legend_3,
         text="◒",
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend_4,
+        yshift=y_legend_4,
         text="◓",
         **common_args,
     )
     fig.add_annotation(
-        x=X_RIGHT_LEGEND,
-        y=y_legend_1,
+        x=X_LEFT_LEGEND,
+        yshift=y_legend_1,
         text="<b>Warning due to:",
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend_2,
+        yshift=y_legend_2,
         text="both sets",
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend_3,
+        yshift=y_legend_3,
         text="training set",
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend_4,
+        yshift=y_legend_4,
         text="evaluation set",
         **common_args,
     )
@@ -277,9 +280,10 @@ def class_representation(
                 showarrow=False,
             )
 
-    y_legend = 0.7
+    y_legend = Y_LEGEND_LINE_1 + 3 * Y_LEGEND_LINE_HEIGHT
 
     common_args = dict(
+        y=1,
         xref="paper",
         yref="paper",
         xanchor="left",
@@ -289,14 +293,14 @@ def class_representation(
 
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend,
+        yshift=y_legend,
         text="⬤",
         font=dict(color=Colors.Orange, size=AXIS_FONT_SIZE - 3),
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend,
+        yshift=y_legend,
         text="Warning",
         font=dict(color=Colors.Text, size=AXIS_FONT_SIZE),
         **common_args,
