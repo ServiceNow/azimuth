@@ -83,7 +83,7 @@ const Tokens: React.FC<TokensProps> = ({
           nextToken?.startsWith("##") ? classes.noSpaceAfter : ""
         )}
       >
-        <Box component="span" color="black" bgcolor={backgroundColor}>
+        <Box component="span" bgcolor={backgroundColor}>
           {currentToken.replace(/^##/, "")}
         </Box>
       </Box>
