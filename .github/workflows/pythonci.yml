@@ -13,38 +13,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8"]
+        python-version: [ "3.8" ]
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v1
-      with:
-        python-version: 3.8
-    - uses: Gr1N/setup-poetry@v7
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pypoetry/virtualenvs
-        key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-    - run: poetry --version
-    - name: Install dependencies
-      run: |
-        poetry config virtualenvs.create false
-        poetry install --no-interaction --no-ansi
-    - name: Test with pytest/flake8/mypy
-      run: |
-        make test
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - uses: Gr1N/setup-poetry@v7
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - run: poetry --version
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-ansi
+      - name: Test with pytest/flake8/mypy
+        run: |
+          make test
 
   frontend:
     name: Build frontend
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: webapp
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.1.1
         with:
@@ -63,5 +61,5 @@ jobs:
           yarn install
 
       - name: Frontend tests
-      run: |
-        make test
+        run: |
+          make test
