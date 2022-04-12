@@ -1,0 +1,17 @@
+{
+  "name": "Tweet Emojis",
+  "pipelines": null,
+  "dataset": {
+    "class_name": "datasets.load_dataset",
+    "args": [
+      "tweet_eval",
+      "emoji"
+    ]
+  },
+  "columns": {
+    "text_input": "text",
+    "label": "label"
+  },
+  "rejection_class": null,
+  "model_contract": "hf_text_classification"
+}

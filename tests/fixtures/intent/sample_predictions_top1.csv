@@ -1,0 +1,7 @@
+utterance,label,Pred1,Pred1Score
+Potato,NO_INTENT,NO_INTENT,0.987
+Order pizza,NO_INTENT,NO_INTENT,0.811
+Problem with phone,PhoneProblem,PhoneProblem,0.986
+To the park!,NO_INTENT,PhoneProblem,0.986
+Walk to the forest,NO_INTENT,NO_INTENT
+phone not turning on,PhoneProblem,NO_INTENT,0.6

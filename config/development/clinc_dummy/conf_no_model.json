@@ -1,0 +1,15 @@
+{
+  "name": "CLINC Dummy no model",
+  "pipelines": null,
+  "dataset": {
+    "class_name": "loading_resources.load_CLINC150_data",
+    "remote": "/azimuth_shr",
+    "kwargs": {
+      "python_loader": "/azimuth_shr/data/CLINC150.py",
+      "full_path": "/azimuth_shr/files/clinc_dummy/clinc_data_dummy.json"
+    }
+  },
+  "saliency_layer": "distilbert.embeddings.word_embeddings",
+  "model_contract": "hf_text_classification",
+  "rejection_class": "NO_INTENT"
+}

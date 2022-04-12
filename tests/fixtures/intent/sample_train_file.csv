@@ -1,0 +1,9 @@
+utterance,label
+Phone is broken,PhoneProblem
+ticket status,CheckStatus
+door access,Access
+Printer jammed,PrinterIssue
+Phone is locked,PhoneProblem
+printer has no ink,PrinterIssue
+Cant access 4th floor,Access
+What is the status of my ticket,CheckStatus

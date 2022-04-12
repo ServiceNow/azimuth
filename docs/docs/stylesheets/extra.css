@@ -1,0 +1,25 @@
+[data-md-color-scheme="slate"] {
+    --md-primary-fg-color: #039BE5;
+    --md-accent-fg-color: #63CCFF;
+}
+
+[data-md-color-scheme="default"] {
+    --md-primary-fg-color: #039BE5;
+    --md-accent-fg-color: #63CCFF;
+}
+
+.correct_predicted {
+    color: #00B686;
+}
+
+.correct_rejected {
+    color: #456857;
+}
+
+.incorrect_rejected {
+    color: #FD9700;
+}
+
+.incorrect_predicted {
+    color: #E32437;
+}

@@ -1,0 +1,69 @@
+# Copyright ServiceNow, Inc. 2021 – 2022
+# This source code is licensed under the Apache 2.0 license found in the LICENSE file
+# in the root directory of this source tree.
+
+import numpy as np
+from sklearn.preprocessing import normalize
+
+import azimuth.modules.dataset_analysis.similarity_analysis as faiss_mod
+from azimuth.dataset_split_manager import FEATURE_FAISS
+from azimuth.modules.dataset_analysis.similarity_analysis import NeighborsTaggingModule
+from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
+from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types.tag import SmartTag
+
+IDX = 3
+
+
+class MockedTransformer:
+    def __init__(self, name, num_features: int = 123):
+        self.num_features = num_features
+
+    def encode(self, x, *args, **kwargs):
+        return normalize(np.random.rand(len(x), self.num_features), axis=1, norm="l1")
+
+
+def test_neighbors(simple_text_config, dask_client, monkeypatch, simple_table_key):
+    monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    # Mock SentenceTransformer on all workers.
+    dask_client.run(
+        lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    )
+    simple_text_config.similarity.few_similar_threshold = 0.1
+    mod = NeighborsTaggingModule(DatasetSplitName.eval, simple_text_config)
+    res = mod.compute_on_dataset_split()
+
+    dm = mod.get_dataset_split_manager()
+    # Confirm correct length; indices=None should return the result on all indices
+    assert (
+        len(res) == dm.num_rows
+    ), f"Length of result ({len(res)}) does not match length of full dataset"
+    mod.save_result(res, dm)
+
+    ds = dm.dataset_split_with_index(simple_table_key)
+    embd = np.array(ds["features"][IDX]).reshape([1, -1]).astype(np.float32)
+    # The FAISS exists!
+    scores, examples = ds.get_nearest_examples(FEATURE_FAISS, embd, k=5)
+    # Check that the first item is indeed the real index
+    assert IDX in examples[DatasetColumn.row_idx]
+
+    assert any(mod.get_dataset_split()[SmartTag.few_similar_train])
+    assert any(mod.get_dataset_split()[SmartTag.few_similar_eval])
+    assert "neighbors_eval" in mod.get_dataset_split().column_names
+    assert "no_close_train" in mod.get_dataset_split().column_names
+    mod.clear_cache()
+
+    # Reloading the dataset_split, FAISS is still there.
+    ds = mod.get_dataset_split_manager().dataset_split_with_index(simple_table_key)
+    _ = ds.get_nearest_examples(FEATURE_FAISS, embd, k=5)
+
+    # Confirm that module works with subset of indices
+    indices_subset = [1, 2, 3]
+    mod_idx_subset = NeighborsTaggingModule(
+        DatasetSplitName.eval, simple_text_config, mod_options=ModuleOptions(indices=indices_subset)
+    )
+    res = mod_idx_subset.compute_on_dataset_split()
+    assert len(res) == len(
+        indices_subset
+    ), f"Length of result ({len(res)}) does not match length of indices ({len(indices_subset)})"
+    # Would currently fail on mod.save_result() because of indices (length) mismatch

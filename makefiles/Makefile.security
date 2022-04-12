@@ -1,0 +1,10 @@
+SRC_FOLDER    ?= ./azimuth
+REPORT_FOLDER ?= ./reports
+
+./reports/security/bandit/:
+	 @mkdir -p ./reports/security/bandit/
+
+bandit: ./reports/security/bandit/ ## SECURITY - Run bandit
+	poetry run bandit ${SRC_FOLDER}/* -r -x "*.pyi,*/_generated/*,*__pycache__*" -v -ll -f json > ${REPORT_FOLDER}/security/bandit/index.json
+
+.PHONY: bandit

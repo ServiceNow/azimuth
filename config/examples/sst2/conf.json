@@ -1,0 +1,21 @@
+{
+  "name": "Sentiment Analysis",
+  "pipelines": [
+    {
+      "model": {
+        "class_name": "loading_resources.load_hf_text_classif_pipeline",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "checkpoint_path": "distilbert-base-uncased-finetuned-sst-2-english"
+        }
+      }
+    }
+  ],
+  "dataset": {
+    "class_name": "loading_resources.load_sst2_dataset",
+    "remote": "/azimuth_shr"
+  },
+  "rejection_class": null,
+  "saliency_layer": "distilbert.embeddings.word_embeddings",
+  "model_contract": "hf_text_classification"
+}

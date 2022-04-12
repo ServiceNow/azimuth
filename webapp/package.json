@@ -1,0 +1,64 @@
+{
+  "name": "azimuth",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.7.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/material": "^5.5.1",
+    "@mui/styles": "^5.5.1",
+    "@mui/system": "^5.5.1",
+    "@mui/x-data-grid": "^5.6.1",
+    "@reduxjs/toolkit": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "framer-motion": "^4.1.17",
+    "lodash": "^4.17.21",
+    "plotly.js": "^1.58.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-hook-form": "^6.11.5",
+    "react-plotly.js": "^2.5.1",
+    "react-redux": "^7.2.4",
+    "react-router-dom": "^5",
+    "react-scripts": "^4.0.3",
+    "react-toastify": "^7.0.4"
+  },
+  "scripts": {
+    "start": "PORT=3005 react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject",
+    "types": "rm -f src/types/generated/generatedTypes.ts && openapi-typescript http://localhost:8091/openapi.json --output src/types/generated/generatedTypes.ts"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
+    "@types/jest": "^26.0.23",
+    "@types/lodash": "^4.14.170",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-plotly.js": "^2.2.4",
+    "@types/react-router-dom": "^5",
+    "http-proxy-middleware": "^1.0.6",
+    "msw": "^0.30.1",
+    "openapi-typescript": "^4.0.1",
+    "react-app-rewired": "^2.1.5",
+    "typescript": "^4.5.2"
+  },
+  "engines": {
+    "node": ">=14.17.5 <18.0.0"
+  },
+  "license": "Apache-2.0"
+}

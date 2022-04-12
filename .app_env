@@ -1,0 +1,6 @@
+REGISTRY=azimuth
+BACKEND_VERSION=latest
+FRONTEND_VERSION=latest
+DEVICE=cpu
+STAGE=production
+CFG_PATH=/config/examples/sst2/conf.json

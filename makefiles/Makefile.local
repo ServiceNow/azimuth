@@ -1,0 +1,60 @@
+
+config_folder = "local_configs"
+pwd := $(shell pwd)
+
+define UPDATE_CONFIG_PYSCRIPT
+from collections.abc import Sequence
+import json, os
+from pathlib import Path
+root_dir = Path("$(pwd)") # wrap a Path around literal set by make
+shr_path = Path(root_dir) / "azimuth_shr"
+print(f"""
+Root dir= {root_dir}
+shr dir= {shr_path}
+""")
+local_config_dir = root_dir / $(config_folder)
+all_local_configs = list(local_config_dir.glob('**/conf*.json'))
+possible_swap = ['/azimuth_shr', '/cache', '/config']
+def replace_value(v):
+    if isinstance(v, dict):
+        return {k:replace_value(vi) for k,vi in v.items()}
+    elif isinstance(v, str):
+        if any(v.startswith(ps) for ps in possible_swap):
+            return str(root_dir / v[1:])  # Remove the first frontslash
+        else:
+            # Another string we do not wish to change.
+            return v
+    elif isinstance(v, Sequence):
+        return [replace_value(vi) for vi in v]
+    else:
+        # Nothing to do
+        return v
+for config_path in all_local_configs:
+    print(f"Replacing paths in {config_path}")
+    with open(config_path, "r") as f:
+        cfg = json.load(f)
+        if 'artifact_path' not in cfg:
+        	cfg['artifact_path'] = '/cache'
+        cfg = replace_value(cfg)
+        if "use_cuda" in cfg:
+        	cfg["use_cuda"] = "auto"
+    with open(config_path, "w") as f:
+        json.dump(cfg, f, indent=4)
+endef
+export UPDATE_CONFIG_PYSCRIPT
+
+.PHONY: local_configs
+local_configs:
+	cp -R config/ "./$(config_folder)/"
+	poetry run python -c "$$UPDATE_CONFIG_PYSCRIPT";
+
+.PHONY: launch.local
+launch.local:
+	poetry run python runner.py ${CFG_PATH}
+
+.PHONY: clean
+clean:
+	mkdir -p ./cache
+	rm -rf ./cache/$(TARGET)*
+	rm -rf /tmp/azimuth_test_cache || true
+	find ./azimuth_shr -name 'cache' -exec rm -rf {} +

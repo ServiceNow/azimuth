@@ -1,0 +1,66 @@
+.PHONY: format
+format:
+	if [ -n "${POETRY_ACTIVE}" ]; then make _format $(LINT_FILES); else poetry run make _format $(LINT_FILES); fi
+
+.PHONY: _format
+_format:
+	black $(LINT_FILES)
+	isort --profile black $(LINT_FILES)
+	$(MAKE) lint
+
+test: lint mypy unit-test
+
+LINT_FILES := azimuth tests azimuth_shr
+BANDIT_FILES := $(filter-out tests%,$(LINT_FILES))
+
+.PHONY: lint
+lint:
+	@# calling make _lint within poetry make it so that we only init poetry once
+	if [ -n "${POETRY_ACTIVE}" ]; then make _lint $(LINT_FILES); else poetry run make _lint $(LINT_FILES); fi
+
+.PHONY: _lint
+_lint:
+	flake8 $(LINT_FILES)
+	bandit -r -v -ll $(BANDIT_FILES)
+
+.PHONY: mypy
+mypy:
+	poetry run mypy azimuth
+
+
+unit-test:
+	poetry run pytest tests --durations 5 --cov azimuth --cov-config=tests/.coveragerc
+
+test-doc:
+	poetry run python tests/test_documentation.py
+
+
+requirements.txt: poetry.lock
+	poetry export --without-hashes -f requirements.txt > requirements.txt
+
+export GIT_BRANCH ?= $(shell git branch --show-current 2>/dev/null)
+export GIT_TAG    ?= $(shell git tag -l --contains $(GIT_BRANCH) 2>/dev/null)
+export AZ_VERSION ?= $(GIT_TAG)
+export DIRECTORY  ?= .
+
+ifeq "$(GIT_BRANCH)" "master"
+  CHECK_CHANGES_DIFF_ARGS ?= HEAD^..HEAD
+else
+  CHECK_CHANGES_DIFF_TARGET ?= origin/master
+  CHECK_CHANGES_DIFF_ARGS ?= $(CHECK_CHANGES_DIFF_TARGET)...HEAD
+endif
+
+.PHONY: check-changes
+check-changes:
+	@if ! git diff --exit-code --quiet $(CHECK_CHANGES_DIFF_ARGS) -- $(DIRECTORY) ; then echo "true"; fi
+
+
+.PHONY: image.testbackend
+image.testbackend:
+	docker run --rm -t $(REGISTRY)/$(IMAGE)_$(DEVICE):$(TAG)$(TAG_EXT) make test
+
+.PHONY: image.testfrontend
+image.testfrontend:
+	docker run --rm \
+		-t ${REGISTRY}/azimuth_app:$(TAG)$(TAG_EXT) \
+		make test

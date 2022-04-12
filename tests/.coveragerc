@@ -1,0 +1,19 @@
+[report]
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+    nocov
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+    abstractmethod
+    __repr__
+    # exclude lines where cuda is called on anything:
+    cuda\(
+
+fail_under = 80
+show_missing = True
+
+[run]
+source =
+    azimuth
+data_file = tests/coverage_reports/.coverage

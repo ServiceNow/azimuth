@@ -1,0 +1,26 @@
+{
+  "name": "Configurable fake dataset",
+  "pipelines": [
+    {
+      "model": {
+        "class_name": "tests.test_loading_resources.config_structured_output",
+        "kwargs": {
+          "num_classes": 50
+        }
+      },
+      "postprocessors": null
+    }
+  ],
+  "dataset": {
+    "class_name": "tests.test_loading_resources.get_custom_dataset",
+    "kwargs": {
+      "length": 1000,
+      "num_classes": 50
+    }
+  },
+  "behavioral_testing": null,
+  "similarity": null,
+  "rejection_class": null,
+  "saliency_layer": "distilbert.embeddings.word_embeddings",
+  "model_contract": "custom_text_classification"
+}

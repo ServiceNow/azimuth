@@ -1,0 +1,17 @@
+{
+  "name": "Tweet Climate",
+  "pipelines": null,
+  "dataset": {
+    "class_name": "datasets.load_dataset",
+    "args": [
+      "tweet_eval",
+      "stance_climate"
+    ]
+  },
+  "columns": {
+    "text_input": "text",
+    "label": "label"
+  },
+  "rejection_class": "none",
+  "model_contract": "hf_text_classification"
+}

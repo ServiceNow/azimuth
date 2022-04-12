@@ -1,0 +1,10 @@
+FROM squidfunk/mkdocs-material as building
+RUN pip install sphinx_rtd_theme sphinx_automodapi numpydoc
+COPY . /docs
+WORKDIR /docs
+RUN mkdocs build
+
+FROM python:3.9.5-slim
+COPY --from=0 /docs/site .
+EXPOSE 8080
+CMD ["python", "-m", "http.server", "8080"]

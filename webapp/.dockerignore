@@ -1,0 +1,3 @@
+# must be kept in sync with parent directory .dockerignore
+node_modules
+build

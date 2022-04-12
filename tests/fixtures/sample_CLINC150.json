@@ -1,0 +1,122 @@
+{
+  "oos_val": [
+    [
+      "is cnn really fake news",
+      "oos"
+    ],
+    [
+      "why is there fake news",
+      "oos"
+    ]
+  ],
+  "val": [
+    [
+      "put one hundred and seventy five bucks in my wells fargo checking account from my citibank savings account",
+      "transfer"
+    ],
+    [
+      "move two hundred dollars to my chase savings account to my wells fargo checking account",
+      "transfer"
+    ],
+    [
+      "how many days until i get my payment",
+      "payday"
+    ],
+    [
+      "what was the last check date",
+      "payday"
+    ],
+    [
+      "will i have to wait a long time to receive my new credit card after i lost my old one",
+      "replacement_card_duration"
+    ],
+    [
+      "what transactions did i put on my visa last month",
+      "transactions"
+    ]
+  ],
+  "oos_train": [
+    [
+      "how do you say hi in french",
+      "oos"
+    ],
+    [
+      "in england how do they say subway",
+      "oos"
+    ]
+  ],
+  "train": [
+    [
+      "put one hundred and seventy five bucks in my wells fargo checking account from my citibank savings account",
+      "transfer"
+    ],
+    [
+      "move two hundred dollars to my chase savings account to my wells fargo checking account",
+      "transfer"
+    ],
+    [
+      "how many days until i get my payment",
+      "payday"
+    ],
+    [
+      "what was the last check date",
+      "payday"
+    ],
+    [
+      "will i have to wait a long time to receive my new credit card after i lost my old one",
+      "replacement_card_duration"
+    ],
+    [
+      "how long should i expect to wait for my replacement credit card",
+      "replacement_card_duration"
+    ],
+    [
+      "what transactions did i put on my visa last month",
+      "transactions"
+    ],
+    [
+      "what transactions have i accrued buying dog food",
+      "transactions"
+    ]
+  ],
+  "test": [
+    [
+      "put one hundred and seventy five bucks in my wells fargo checking account from my citibank savings account",
+      "transfer"
+    ],
+    [
+      "move two hundred dollars to my chase savings account to my wells fargo checking account",
+      "transfer"
+    ],
+    [
+      "how many days until i get my payment",
+      "payday"
+    ],
+    [
+      "what was the last check date",
+      "payday"
+    ],
+    [
+      "will i have to wait a long time to receive my new credit card after i lost my old one",
+      "replacement_card_duration"
+    ],
+    [
+      "how long should i expect to wait for my replacement credit card",
+      "replacement_card_duration"
+    ],
+    [
+      "what transactions did i put on my visa last month",
+      "transactions"
+    ]
+  ],
+  "oos_test": [
+    [
+      "is cnn really fake news",
+      "oos"
+    ],
+    [
+      "why is there fake news",
+      "oos"
+    ]
+  ]
+}

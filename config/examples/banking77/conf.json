@@ -1,0 +1,27 @@
+{
+  "name": "Banking 77",
+  "pipelines": [
+    {
+      "model": {
+        "class_name": "loading_resources.load_hf_text_classif_pipeline",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "checkpoint_path": "mrm8488/distilroberta-finetuned-banking77"
+        }
+      }
+    }
+  ],
+  "dataset": {
+    "class_name": "datasets.load_dataset",
+    "args": [
+      "banking77"
+    ]
+  },
+  "columns": {
+    "text_input": "text",
+    "label": "label"
+  },
+  "rejection_class": null,
+  "saliency_layer": "roberta.embeddings.word_embeddings",
+  "model_contract": "hf_text_classification"
+}

@@ -1,0 +1,13 @@
+azimuth_shr/local_files
+azimuth_shr/files
+azimuth_shr/sentence_transformers
+azimuth_shr/tfhub
+cache
+dist
+.coverage*
+
+# Must be kept in sync with webapp/.dockerignore
+webapp/node_modules
+webapp/build
+webapp/Makefile
+webapp/.npmrc
