@@ -12,6 +12,7 @@ from azimuth.types.dataset_warnings import DatasetWarningPlots
 from azimuth.types.general.alias_model import PlotSpecification
 from azimuth.utils.plots import (
     AXIS_FONT_SIZE,
+    PAPER_MARGINS,
     X_LEFT_LEGEND,
     X_RIGHT_LEGEND,
     Colors,
@@ -60,7 +61,7 @@ def min_nb_samples_plot(
 
     fig.update_layout(
         title="Number of samples per class in both sets",
-        height=78 + len(train_nb_sample) * 23,
+        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + len(train_nb_sample) * 23,
     )
     fig.add_vline(x=threshold, line_width=1, line_dash="dot", line_color=Colors.Orange)
     fig.add_annotation(
@@ -232,7 +233,7 @@ def class_representation(
 
     fig.update_layout(
         title="Delta in class representation between both sets",
-        height=78 + len(train_nb_sample) * 23,
+        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + len(train_nb_sample) * 23,
     )
 
     fig.update_xaxes(
