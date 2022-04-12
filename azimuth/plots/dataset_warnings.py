@@ -399,7 +399,11 @@ def create_histogram_mean_std(
             )
         )
 
-    fig.update_layout(barmode="overlay", title="Histogram of utterances per token count")
+    fig.update_layout(
+        barmode="overlay",
+        title="Histogram of utterances per token count",
+        height=500,
+    )
     fig.update_yaxes(
         tickformat=",.0%",
         zerolinecolor=Colors.Axis,

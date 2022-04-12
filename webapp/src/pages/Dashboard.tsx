@@ -12,7 +12,7 @@ import { Link, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
 
-const DEFAULT_PREVIEW_CONTENT_HEIGHT = 520;
+const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
 
 const Dashboard = () => {
   const { jobId } = useParams<{ jobId: string }>();
