@@ -2,9 +2,9 @@ name: Python CI
 
 on:
   push:
-    branches: [ master, azimuth ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   backend:

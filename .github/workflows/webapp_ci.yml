@@ -2,9 +2,10 @@ name: Webapp CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ master, azimuth ]
+    branches: [ main, dev ]
+
 
 jobs:
 
