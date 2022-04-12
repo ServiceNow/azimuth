@@ -5,6 +5,7 @@
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
+from pydantic import Field
 from pydantic.types import StrictFloat, StrictInt
 
 from azimuth.types.general.alias_model import AliasModel, PlotSpecification
@@ -17,7 +18,7 @@ class FormatType(str, Enum):
 
 
 class DatasetDistributionComparisonValue(AliasModel):
-    value: Optional[Union[StrictInt, StrictFloat]]
+    value: Optional[Union[StrictInt, StrictFloat]] = Field(..., nullable=True)
     alert: bool
 
 
@@ -29,7 +30,7 @@ class DatasetDistributionComparison(AliasModel):
 
 class DatasetWarningPlots(AliasModel):
     overall: PlotSpecification
-    per_class: Optional[Dict[str, PlotSpecification]]
+    per_class: Optional[Dict[str, PlotSpecification]] = Field(..., nullable=True)
 
 
 class DatasetWarning(AliasModel):

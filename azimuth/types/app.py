@@ -32,7 +32,7 @@ class DatasetInfoResponse(AliasModel):
     train_class_distribution: List[int] = Field(..., title="Training set class distribution")
     startup_tasks: Dict[str, Any] = Field(..., title="Startup tasks status")
     default_threshold: Optional[List[Optional[float]]] = Field(
-        None, title="Initial threshold set in config per pipeline."
+        ..., title="Initial threshold set in config per pipeline.", nullable=True
     )
     model_contract: SupportedModelContract = Field(..., title="Model Contract in the config.")
     prediction_available: bool = Field(..., title="Indicator if prediction values are available.")
@@ -44,7 +44,7 @@ class DatasetInfoResponse(AliasModel):
     )
     similarity_available: bool = Field(..., title="Indicator if similarities are available.")
     postprocessing_editable: Optional[List[bool]] = Field(
-        ..., title="Indicator if postprocessing can be " "overwrited."
+        ..., title="Indicator if postprocessing can be overwritten.", nullable=True
     )
 
 

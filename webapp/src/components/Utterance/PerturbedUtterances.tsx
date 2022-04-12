@@ -105,8 +105,7 @@ export const perturbedUtterancesColumns: Column<Row>[] = [
     renderCell: ({ value, row }: GridCellParams<number, Row>) => (
       <Tooltip
         title={`Confidence Delta: ${
-          // Generated type says undefined, but we truly receive null
-          row.confidenceDelta === null || row.confidenceDelta === undefined
+          row.confidenceDelta === null
             ? "N/A"
             : formatRatioAsPercentageString(row.confidenceDelta)
         }`}

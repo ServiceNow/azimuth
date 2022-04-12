@@ -82,7 +82,7 @@ const Dashboard = () => {
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) &&
-        data?.postprocessingEditable[pipeline.pipelineIndex] && (
+        data?.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
             to={`/${jobId}/thresholds${searchString}`}
