@@ -6,9 +6,12 @@ from typing import List
 
 TITLE_FONT_SIZE = 20
 AXIS_FONT_SIZE = 14
-MAX_HEIGHT = 425
-X_LEFT_LEGEND = 1.04
+MARGIN = 32
+PAPER_MARGINS = dict(t=54 + MARGIN, b=AXIS_FONT_SIZE + MARGIN, r=180, l=180)
+X_LEFT_LEGEND = 1.037
 X_RIGHT_LEGEND = 1.08
+Y_LEGEND_LINE_1 = -17
+Y_LEGEND_LINE_HEIGHT = -21
 SANKEY_PALETTE = [
     "#B8D8E9",
     "#83A8BC",
@@ -61,7 +64,7 @@ def fig_default(fig):
         font_family="Gilroy",
         font_size=AXIS_FONT_SIZE,
         font_color=Colors.Text,
-        margin=dict(t=80, b=30, r=180, l=180),
+        margin=PAPER_MARGINS,
         width=1000,
     )
     fig.update_xaxes(tickfont_size=AXIS_FONT_SIZE, fixedrange=True)

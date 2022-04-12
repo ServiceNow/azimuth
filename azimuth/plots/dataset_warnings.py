@@ -12,8 +12,11 @@ from azimuth.types.dataset_warnings import DatasetWarningPlots
 from azimuth.types.general.alias_model import PlotSpecification
 from azimuth.utils.plots import (
     AXIS_FONT_SIZE,
+    PAPER_MARGINS,
     X_LEFT_LEGEND,
     X_RIGHT_LEGEND,
+    Y_LEGEND_LINE_1,
+    Y_LEGEND_LINE_HEIGHT,
     Colors,
     fig_default,
     shorten_cls_names,
@@ -42,25 +45,25 @@ def min_nb_samples_plot(
 
     fig.add_bar(
         y=[cls_names[x] for x in order],
-        x=train_nb_sample[order],
-        name="training set",
-        width=0.4,
-        offset=-0.4,
-    )
-
-    fig.add_bar(
-        y=[cls_names[x] for x in order],
         x=eval_nb_sample[order],
         name="evaluation set",
         width=0.4,
         offset=0,
     )
 
+    fig.add_bar(
+        y=[cls_names[x] for x in order],
+        x=train_nb_sample[order],
+        name="training set",
+        width=0.4,
+        offset=-0.4,
+    )
+
     fig.update_traces(orientation="h")
 
     fig.update_layout(
         title="Number of samples per class in both sets",
-        height=78 + len(train_nb_sample) * 23,
+        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + max(len(train_nb_sample), 6) * 23,
     )
     fig.add_vline(x=threshold, line_width=1, line_dash="dot", line_color=Colors.Orange)
     fig.add_annotation(
@@ -96,66 +99,70 @@ def min_nb_samples_plot(
         if eval_nb_sample[label] < threshold:
             fig.add_annotation(text="◓", **common_args)
 
-    y_legend_1 = 0.76
-    y_legend_2 = 0.7
-    y_legend_3 = 0.64
-    y_legend_4 = 0.58
+    y_legend_1 = Y_LEGEND_LINE_1 + 3 * Y_LEGEND_LINE_HEIGHT
+    y_legend_2 = Y_LEGEND_LINE_1 + 4 * Y_LEGEND_LINE_HEIGHT
+    y_legend_3 = Y_LEGEND_LINE_1 + 5 * Y_LEGEND_LINE_HEIGHT
+    y_legend_4 = Y_LEGEND_LINE_1 + 6 * Y_LEGEND_LINE_HEIGHT
 
     common_args = dict(
+        y=1,
         xref="paper",
         yref="paper",
         xanchor="left",
         yanchor="middle",
         showarrow=False,
-        font=dict(color=Colors.Orange, size=AXIS_FONT_SIZE),
     )
 
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend_2,
+        yshift=y_legend_2,
         text="◓",
+        font=dict(color=Colors.Orange),
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend_2,
+        yshift=y_legend_3,
         text="◒",
+        font=dict(color=Colors.Orange),
         **common_args,
     )
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend_3,
-        text="◒",
-        **common_args,
-    )
-    fig.add_annotation(
-        x=X_LEFT_LEGEND,
-        y=y_legend_4,
+        yshift=y_legend_4,
         text="◓",
+        font=dict(color=Colors.Orange),
+        **common_args,
+    )
+    fig.add_annotation(
+        x=X_LEFT_LEGEND,
+        yshift=y_legend_4,
+        text="◒",
+        font=dict(color=Colors.Orange),
+        **common_args,
+    )
+    fig.add_annotation(
+        x=X_LEFT_LEGEND,
+        yshift=y_legend_1,
+        text="Warning due to:",
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend_1,
-        text="<b>Warning due to:",
+        yshift=y_legend_2,
+        text="evaluation set",
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend_2,
-        text="both sets",
-        **common_args,
-    )
-    fig.add_annotation(
-        x=X_RIGHT_LEGEND,
-        y=y_legend_3,
+        yshift=y_legend_3,
         text="training set",
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend_4,
-        text="evaluation set",
+        yshift=y_legend_4,
+        text="both sets",
         **common_args,
     )
 
@@ -194,17 +201,6 @@ def class_representation(
 
     fig.add_bar(
         y=[cls_names[x] for x in order],
-        x=train_dist_norm[order],
-        text=train_nb_sample[order],
-        name="training set",
-        xaxis="x2",
-        hoverinfo="x+y+text",
-        width=0.4,
-        offset=-0.4,
-    )
-
-    fig.add_bar(
-        y=[cls_names[x] for x in order],
         x=eval_dist_norm[order],
         text=eval_nb_sample[order],
         name="evaluation set",
@@ -212,7 +208,17 @@ def class_representation(
         hoverinfo="x+y+text",
         width=0.4,
         offset=0,
-        marker=dict(color=1),
+    )
+
+    fig.add_bar(
+        y=[cls_names[x] for x in order],
+        x=train_dist_norm[order],
+        text=train_nb_sample[order],
+        name="training set",
+        xaxis="x2",
+        hoverinfo="x+y+text",
+        width=0.4,
+        offset=-0.4,
     )
 
     fig.add_bar(
@@ -232,7 +238,7 @@ def class_representation(
 
     fig.update_layout(
         title="Delta in class representation between both sets",
-        height=78 + len(train_nb_sample) * 23,
+        height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + max(len(train_nb_sample), 6) * 23,
     )
 
     fig.update_xaxes(
@@ -276,9 +282,10 @@ def class_representation(
                 showarrow=False,
             )
 
-    y_legend = 0.7
+    y_legend = Y_LEGEND_LINE_1 + 3 * Y_LEGEND_LINE_HEIGHT
 
     common_args = dict(
+        y=1,
         xref="paper",
         yref="paper",
         xanchor="left",
@@ -288,15 +295,15 @@ def class_representation(
 
     fig.add_annotation(
         x=X_LEFT_LEGEND,
-        y=y_legend,
+        yshift=y_legend,
         text="⬤",
         font=dict(color=Colors.Orange, size=AXIS_FONT_SIZE - 3),
         **common_args,
     )
     fig.add_annotation(
         x=X_RIGHT_LEGEND,
-        y=y_legend,
-        text="Warning",
+        yshift=y_legend,
+        text="warning",
         font=dict(color=Colors.Text, size=AXIS_FONT_SIZE),
         **common_args,
     )
@@ -349,29 +356,12 @@ def create_histogram_mean_std(
     eval_mean = eval_stats[0]
     eval_std = eval_stats[1]
 
-    if train_count_norm.max() != 0:
-        fig.add_bar(
-            x=list(range(1, len(train_count_norm) + 1)),
-            y=train_count_norm,
-            name="training set",
-            marker=dict(color=Colors.DataViz1),
-        )
-
-        fig.add_scatter(
-            x=[np.round(train_mean, 2)],
-            y=[max_y * 1.07],
-            name="train_mean_std",
-            error_x=dict(type="constant", value=np.round(train_std, 2)),
-            hoverinfo="x",
-            marker=dict(color=Colors.DataViz1),
-        )
-
     if eval_count_norm.max() != 0:
         fig.add_bar(
             x=list(range(1, len(eval_count_norm) + 1)),
             y=eval_count_norm,
             name="evaluation set",
-            marker=dict(color=Colors.DataViz2, opacity=0.6),
+            marker=dict(color=Colors.DataViz1),
         )
 
         fig.add_scatter(
@@ -379,6 +369,23 @@ def create_histogram_mean_std(
             y=[max_y * 1.14],
             name="eval_mean_std",
             error_x=dict(type="constant", value=np.round(eval_std, 2)),
+            hoverinfo="x",
+            marker=dict(color=Colors.DataViz1),
+        )
+
+    if train_count_norm.max() != 0:
+        fig.add_bar(
+            x=list(range(1, len(train_count_norm) + 1)),
+            y=train_count_norm,
+            name="training set",
+            marker=dict(color=Colors.DataViz2, opacity=0.5),
+        )
+
+        fig.add_scatter(
+            x=[np.round(train_mean, 2)],
+            y=[max_y * 1.07],
+            name="train_mean_std",
+            error_x=dict(type="constant", value=np.round(train_std, 2)),
             hoverinfo="x",
             marker=dict(color=Colors.DataViz2),
         )
@@ -398,7 +405,11 @@ def create_histogram_mean_std(
             )
         )
 
-    fig.update_layout(barmode="overlay", title="Histogram of utterances per token count")
+    fig.update_layout(
+        barmode="overlay",
+        title="Histogram of utterances per token count",
+        height=500,
+    )
     fig.update_yaxes(
         tickformat=",.0%",
         zerolinecolor=Colors.Axis,
