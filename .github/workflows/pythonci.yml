@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master, azimuth ]
   pull_request:
-    branches: [ master, azimuth ]
+    branches: [ main ]
 
 jobs:
   backend:

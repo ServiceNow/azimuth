@@ -2,7 +2,7 @@ name: Webapp CI
 
 on:
   push:
-    branches: [ master, azimuth ]
+    branches: [ main ]
   pull_request:
     branches: [ master, azimuth ]
 
