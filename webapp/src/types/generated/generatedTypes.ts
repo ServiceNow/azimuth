@@ -130,7 +130,14 @@ export interface components {
       uncertainty?: components["schemas"]["UncertaintyOptions"];
       saliency_layer?: string;
       metrics?: { [key: string]: components["schemas"]["MetricDefinition"] };
-      perturbation_testing?: components["schemas"]["PerturbationTestingOptions"];
+      behavioral_testing?: components["schemas"]["BehavioralTestingOptions"];
+    };
+    BehavioralTestingOptions: {
+      neutral_token?: components["schemas"]["NeutralTokenOptions"];
+      punctuation?: components["schemas"]["PunctuationTestOptions"];
+      fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
+      typo?: components["schemas"]["TypoTestOptions"];
+      seed?: number;
     };
     ColumnConfiguration: {
       text_input?: string;
@@ -418,7 +425,10 @@ export interface components {
       | "IncorrectAndPredicted"
       | "IncorrectAndRejected";
     /** An enumeration. */
-    PerturbationTestFailureReason: "PredClass" | "PredConfThreshold" | "NA";
+    PerturbationTestFailureReason:
+      | "Different predicted class."
+      | "Confidence too far from original."
+      | "NA";
     /** An enumeration. */
     PerturbationTestFamily: "Fuzzy Matching" | "Punctuation";
     /** An enumeration. */
@@ -448,13 +458,6 @@ export interface components {
       trainFailedCount: number;
       trainConfidenceDelta: number;
       example: components["schemas"]["PerturbedUtteranceExample"];
-    };
-    PerturbationTestingOptions: {
-      neutral_token?: components["schemas"]["NeutralTokenOptions"];
-      punctuation?: components["schemas"]["PunctuationTestOptions"];
-      fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
-      typo?: components["schemas"]["TypoTestOptions"];
-      seed?: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -560,7 +563,7 @@ export interface components {
     };
     SimilarityOptions: {
       faiss_encoder?: string;
-      few_similar_threshold?: number;
+      conflicting_neighbors_threshold?: number;
       no_close_threshold?: number;
     };
     /** An enumeration. */
@@ -571,8 +574,8 @@ export interface components {
       | "missing_subj"
       | "missing_obj"
       | "missing_verb"
-      | "few_similar_train"
-      | "few_similar_eval"
+      | "conflicting_neighbors_train"
+      | "conflicting_neighbors_eval"
       | "no_close_train"
       | "no_close_eval"
       | "failed_punctuation"
