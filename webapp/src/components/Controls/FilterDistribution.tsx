@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import { motion } from "framer-motion";
 import { CountPerFilterValue } from "types/api";
@@ -30,7 +30,6 @@ const FilterDistribution: React.FC<Props> = ({ maxCount, filter }) => {
   const { outcomeCount, utteranceCount } = filter;
 
   const classes = useStyles();
-  const theme = useTheme();
 
   const transition = { type: "tween" };
 
@@ -44,7 +43,9 @@ const FilterDistribution: React.FC<Props> = ({ maxCount, filter }) => {
         role="figure"
         initial={false}
         transition={transition}
-        bgcolor={(theme) => theme.palette.primary.light}
+        bgcolor={
+          outcomeCount ? undefined : (theme) => theme.palette.primary.light
+        }
       >
         {outcomeCount &&
           ALL_OUTCOMES.map((outcome) => (
