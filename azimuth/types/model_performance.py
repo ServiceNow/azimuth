@@ -27,7 +27,7 @@ class MetricsAPIResponse(MetricsResponseCommonFields):
 
 
 class MetricsModuleResponse(MetricsResponseCommonFields):
-    ece_plot_args: Optional[Tuple] = Field(..., title="ECE args for the plot")
+    ece_plot_args: Optional[Tuple]
 
 
 class UtteranceCountPerFilterValue(AliasModel):
