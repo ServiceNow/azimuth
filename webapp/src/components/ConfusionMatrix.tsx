@@ -98,6 +98,53 @@ const ConfusionMatrix: React.FC<Props> = ({
   // This is fine since all values will be 0 anyway in this case.
   const maxCount = Math.max(...confusionMatrix.flat()) || 1;
 
+  const renderCell = (value: number, rowIndex: number, columnIndex: number) => (
+    <Box
+      key={`column-${columnIndex} row-${rowIndex}`}
+      boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
+      gridRow={rowIndex + CONFUSION_ROW_OFFSET + 1}
+      gridColumn={columnIndex + CONFUSION_COLUMN_OFFSET + 1}
+      height="100%"
+      overflow="hidden"
+      width="100%"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        backgroundColor: alpha(
+          theme.palette[
+            rowIndex === columnIndex
+              ? columnIndex === classOptions.length - 1
+                ? OUTCOME_COLOR.CorrectAndRejected
+                : OUTCOME_COLOR.CorrectAndPredicted
+              : columnIndex === classOptions.length - 1
+              ? OUTCOME_COLOR.IncorrectAndRejected
+              : OUTCOME_COLOR.IncorrectAndPredicted
+          ].main,
+          value / maxCount
+        ),
+      }}
+    >
+      {value > 0 && (
+        <Typography
+          fontSize={12}
+          color={(theme) =>
+            theme.palette.common[value > 0.7 ? "white" : "black"]
+          }
+        >
+          {(value * 100).toFixed(0)}
+          <Typography
+            component="span"
+            fontSize="0.75em"
+            sx={{ verticalAlign: "0.25em" }}
+          >
+            %
+          </Typography>
+        </Typography>
+      )}
+    </Box>
+  );
+
   return (
     <Box
       alignItems="center"
@@ -148,6 +195,12 @@ const ConfusionMatrix: React.FC<Props> = ({
             overscrollBehaviorX: "contain",
           }}
         >
+          {confusionMatrix.flatMap((row, rowIndex) =>
+            row.map((value, columnIndex) =>
+              renderCell(value, rowIndex, columnIndex)
+            )
+          )}
+
           {classOptions.flatMap((classOption, i) => [
             <Typography
               key={`column-${i}`}
@@ -187,55 +240,6 @@ const ConfusionMatrix: React.FC<Props> = ({
               {classOption}
             </Typography>,
           ])}
-
-          {confusionMatrix.flatMap((row, rowIndex) =>
-            row.map((value, columnIndex) => (
-              <Box
-                key={`column-${columnIndex} row-${rowIndex}`}
-                boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
-                gridRow={rowIndex + CONFUSION_ROW_OFFSET + 1}
-                gridColumn={columnIndex + CONFUSION_COLUMN_OFFSET + 1}
-                height="100%"
-                overflow="hidden"
-                width="100%"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  backgroundColor: alpha(
-                    theme.palette[
-                      rowIndex === columnIndex
-                        ? columnIndex === row.length - 1
-                          ? OUTCOME_COLOR.CorrectAndRejected
-                          : OUTCOME_COLOR.CorrectAndPredicted
-                        : columnIndex === row.length - 1
-                        ? OUTCOME_COLOR.IncorrectAndRejected
-                        : OUTCOME_COLOR.IncorrectAndPredicted
-                    ].main,
-                    value / maxCount
-                  ),
-                }}
-              >
-                {value > 0 && (
-                  <Typography
-                    fontSize={12}
-                    color={(theme) =>
-                      theme.palette.common[value > 0.7 ? "white" : "black"]
-                    }
-                  >
-                    {(value * 100).toFixed(0)}
-                    <Typography
-                      component="span"
-                      fontSize="0.75em"
-                      sx={{ verticalAlign: "0.25em" }}
-                    >
-                      %
-                    </Typography>
-                  </Typography>
-                )}
-              </Box>
-            ))
-          )}
 
           <Box
             className={classNames(
