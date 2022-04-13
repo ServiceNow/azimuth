@@ -43,8 +43,9 @@ from [HuggingFace (HF)](http://www.huggingface.co). Verify that your setup is wo
 
 1. In the terminal, from the `azimuth` folder, execute:
     ```
-    make launch
+    make DEVICE=cpu compose
     ```
+    to enable gpus, use `DEVICE=gpu`.
 2. The **app will be accessible** at [http://0.0.0.0:8080](http://0.0.0.0:8080) after a few seconds
    of waiting. The screen will indicate that the start-up tasks have started. When it is completed,
    the application will be **loaded**. The [User Guide](../user-guide/index.md) section walks you
