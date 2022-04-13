@@ -175,7 +175,11 @@ class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
         nb_bins = self.mod_options.nb_bins
         ths = np.linspace(0, 1, nb_bins, endpoint=False)
         result = []
-        for th in tqdm(ths, desc=f"{self.task_name} on {self.dataset_split_name} set"):
+        for th in tqdm(
+            ths,
+            desc=f"{self.task_name} on {self.dataset_split_name} set "
+            f"for pipeline {self.mod_options.pipeline_index}",
+        ):
             outcomes_mod = OutcomesModule(
                 dataset_split_name=self.dataset_split_name,
                 config=self.config,
