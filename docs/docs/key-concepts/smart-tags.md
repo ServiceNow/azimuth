@@ -4,9 +4,9 @@ When Azimuth is launched, smart tags are computed automatically (or loaded from 
 on all utterances, on both training and evaluation sets.
 
 Conceptually, smart tags are
-**meta-data on the utterance and/or its prediction**. It narrows down data samples that may require
-**further action and investigation**. Different families of smart tags exist, based on the different
-types of analyses that Azimuth provides.
+**meta-data on the utterance and/or its prediction**. They help to narrow down data samples to
+identify those that may require **further action and investigation**. Different families of smart
+tags exist, based on the different types of analyses that Azimuth provides.
 
 !!! tip
 
@@ -21,8 +21,8 @@ information is computed.
 
 * `multiple_sentences`: The number of sentences is above 1. All other syntactic smart tags will be
   disabled when this is the case.
-* `long_sentence`: The nb of tokens is above 15.
-* `short_sentence`: The nb of tokens is below or equal to 3.
+* `long_sentence`: The number of tokens is above 15.
+* `short_sentence`: The number of tokens is less than or equal to 3.
 * `missing_subj`: The sentence is missing a subject.
 * `missing_verb`: The sentence is missing a verb.
 * `missing_obj`: The sentence is missing an object.
@@ -36,8 +36,10 @@ computed.
   in the training set.
 * `conflicting_neighbors_eval`: The utterance has very few (or no) neighbors from the same class in
   the evaluation set.
-* `no_close_train`: The closest utterance in the training set has a similarity below 0.5.
-* `no_close_eval`: The closest utterance in the evaluation set has a similarity below 0.5.
+* `no_close_train`: The closest utterance in the training set has a cosine similarity below a
+  threshold (default = 0.5).
+* `no_close_eval`: The closest utterance in the evaluation set has a cosine similarity below a
+  threshold (default = 0.5).
 
 [:material-link: Uncertainty Quantification](uncertainty.md) provides more details on how the
 uncertainty is estimated.
@@ -59,4 +61,4 @@ and the labels.
 
 * `correct_top_3`: The top 1 prediction is not the right one, but the right one is in the top 3.
 * `correct_low_conf`: The top 1 prediction was the right one, but its confidence is below the
-  threshold therefore the rejection class was predicted.
+  threshold, and thus the rejection class was predicted.

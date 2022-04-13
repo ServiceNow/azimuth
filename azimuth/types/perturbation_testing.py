@@ -5,6 +5,8 @@
 from enum import Enum
 from typing import List, Optional
 
+from pydantic import Field
+
 from azimuth.types.general.alias_model import AliasModel, ModuleResponse
 
 
@@ -112,7 +114,7 @@ class PerturbedUtteranceAbstract(AliasModel):
     perturbations: List[str]
     perturbation_type: PerturbationType
     confidence: float
-    confidence_delta: Optional[float]
+    confidence_delta: Optional[float] = Field(..., nullable=True)
     failed: bool
     failure_reason: PerturbationTestFailureReason
 

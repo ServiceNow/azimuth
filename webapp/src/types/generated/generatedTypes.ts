@@ -213,7 +213,7 @@ export interface components {
      * that all fields are represented correctly.
      */
     DatasetDistributionComparisonValue: {
-      value?: Partial<number> & Partial<number>;
+      value: (Partial<number> & Partial<number>) | null;
       alert: boolean;
     };
     /**
@@ -228,13 +228,13 @@ export interface components {
       evalClassDistribution: number[];
       trainClassDistribution: number[];
       startupTasks: { [key: string]: any };
-      defaultThreshold?: number[];
+      defaultThreshold: number[] | null;
       modelContract: components["schemas"]["SupportedModelContract"];
       predictionAvailable: boolean;
       perturbationTestingAvailable: boolean;
       availableDatasetSplits: components["schemas"]["AvailableDatasetSplits"];
       similarityAvailable: boolean;
-      postprocessingEditable: boolean[];
+      postprocessingEditable: boolean[] | null;
     };
     /** An enumeration. */
     DatasetSplitName: "eval" | "train" | "all";
@@ -264,7 +264,9 @@ export interface components {
      */
     DatasetWarningPlots: {
       overall: components["schemas"]["PlotSpecification"];
-      perClass?: { [key: string]: components["schemas"]["PlotSpecification"] };
+      perClass: {
+        [key: string]: components["schemas"]["PlotSpecification"];
+      } | null;
     };
     DatasetWarningsOptions: {
       min_num_per_class?: number;
@@ -325,7 +327,7 @@ export interface components {
       utteranceCount: number;
       customMetrics: { [key: string]: number };
       ece: number;
-      ecePlot?: components["schemas"]["PlotSpecification"];
+      ecePlot: components["schemas"]["PlotSpecification"] | null;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -497,7 +499,7 @@ export interface components {
       perturbations: string[];
       perturbationType: components["schemas"]["PerturbationType"];
       confidence: number;
-      confidenceDelta?: number;
+      confidenceDelta: number | null;
       failed: boolean;
       failureReason: components["schemas"]["PerturbationTestFailureReason"];
       prediction: string;
@@ -550,8 +552,8 @@ export interface components {
       index: number;
       utterance: string;
       label: string;
-      postprocessedPrediction?: string;
-      postprocessedConfidence?: number;
+      postprocessedPrediction: string | null;
+      postprocessedConfidence: number | null;
       similarity: number;
     };
     /**
@@ -668,8 +670,8 @@ export interface components {
     Utterance: {
       /** Row index computed by Azimuth.. */
       index: number;
-      modelPrediction?: components["schemas"]["ModelPrediction"];
-      modelSaliency?: components["schemas"]["ModelSaliency"];
+      modelPrediction: components["schemas"]["ModelPrediction"] | null;
+      modelSaliency: components["schemas"]["ModelSaliency"] | null;
       smartTags: components["schemas"]["SmartTag"][];
       dataAction: components["schemas"]["DataAction"];
       label: string;

@@ -1,14 +1,17 @@
 # Key Concepts
 
 Azimuth leverages different analyses and concepts to enhance the process of **dataset analysis and
-error analysis**. The notion of **smart tags** is the most important concept that unifies the
-others.
+error analysis**.
+
+The notion of **smart tags** is the most important concept, as it unifies most of the other
+analyses.
 
 ## Smart Tags
 
 Smart tags are assigned to utterances by Azimuth when the app is launched. They can be seen as
-**meta-data on the utterance and/or its prediction**. It aims at **guiding the error analysis**
-process, identifying interesting data samples which may require
+**meta-data on the utterance and/or its prediction**. The goal is to **guide the error analysis
+process**, identifying interesting
+data samples which may require
 **further action and investigation**. Different families of smart tags exist, based on the different
 types of analyses that Azimuth provides.
 
@@ -16,10 +19,10 @@ types of analyses that Azimuth provides.
 
     Examples of smart tag **families**:
 
-    * **syntax** tags: identifies utterances with an abnormal syntax.
+    * **syntax** tags: identifies utterances with an abnormal or notable syntax.
     * **behavioral testing** tags: identifies utterances which failed at least one behavioral test.
 
-    Examples of **specific** smart tags:
+    Examples of **individual** smart tags:
 
     * `long_sentences` identifies utterances with more than 15 tokens.
     * `failed_punctuation` identifies utterances that failed at least one punctuation test.
@@ -36,7 +39,7 @@ sample.
 
     Examples of **proposed actions**:
 
-    * `relabel` to identify data samples which label should be changed.
+    * `relabel` to identify data samples whose labels should be changed.
     * `remove` to identify data samples that should be removed from the dataset.
 
 A dedicated page on [:material-link: Proposed Actions](proposed-actions.md) gives the full list of
@@ -45,7 +48,7 @@ available actions.
 ## Prediction Outcomes
 
 Another key concept used through the application is the notion of prediction outcomes. It acts as a
-**metric of success** for a given utterance prediction. More details are available
+**metric of success** for a given prediction. More details are available
 in [:material-link: Prediction outcomes](outcomes.md).
 
 * :material-circle:{ .correct_predicted } **Correct & Predicted**
@@ -55,8 +58,8 @@ in [:material-link: Prediction outcomes](outcomes.md).
 
 ## Analyses
 
-In Azimuth different types of analysis are provided. There is a dedicated section for each in the documentation. Almost all of them (except saliency maps) are
-linked to smart tags.
+In Azimuth, different types of analysis are provided. Each analysis has a dedicated section in the
+documentation. Almost all of them (except saliency maps) are linked to smart tags.
 
 1. [:material-link: Syntax Analysis](syntax-analysis.md)
 2. [:material-link: Similarity Analysis](similarity.md)
@@ -70,7 +73,7 @@ linked to smart tags.
 TODO STILL IN PROGRESS
 
 While going through the dataset and the model predictions in Azimuth, you may encounter issues in
-your dataset that would need fixing. These issues can be in both the evaluation set or the training
+your dataset that may need fixing. These issues could be in both the evaluation set or the training
 set.
 
 Some samples might be simply noisy, either the utterance itself or the label. In that case, you can
