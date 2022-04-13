@@ -160,47 +160,45 @@ const ConfusionMatrix: React.FC<Props> = ({
             gridRow={CONFUSION_ROW_OFFSET}
           />
 
-          {classOptions.map((prediction, column) => (
+          {classOptions.flatMap((classOption, i) => [
             <Typography
-              key={`column-${column}`}
+              key={`column-${i}`}
               className={classNames(
                 classes.gridLabel,
                 classes.columnLabel,
                 classes.verticalLabel,
                 classes.topStickyCell,
                 predictionFilters &&
-                  !predictionFilters.includes(prediction) &&
+                  !predictionFilters.includes(classOption) &&
                   classes.filteredLabel
               )}
               variant="caption"
               sx={{
-                gridColumn: column + CONFUSION_COLUMN_OFFSET + 1,
+                gridColumn: i + CONFUSION_COLUMN_OFFSET + 1,
                 gridRow: 1,
               }}
             >
-              {prediction}
-            </Typography>
-          ))}
-          {classOptions.map((label, row) => (
+              {classOption}
+            </Typography>,
             <Typography
-              key={`row-${row}`}
+              key={`row-${i}`}
               className={classNames(
                 classes.gridLabel,
                 classes.rowLabel,
                 classes.leftStickyCell,
                 labelFilters &&
-                  !labelFilters.includes(label) &&
+                  !labelFilters.includes(classOption) &&
                   classes.filteredLabel
               )}
               variant="caption"
               sx={{
-                gridRow: row + CONFUSION_ROW_OFFSET + 1,
+                gridRow: i + CONFUSION_ROW_OFFSET + 1,
                 gridColumn: 1,
               }}
             >
-              {label}
-            </Typography>
-          ))}
+              {classOption}
+            </Typography>,
+          ])}
 
           {confusionMatrix.flatMap((row, rowIndex) =>
             row.map((value, columnIndex) => (
