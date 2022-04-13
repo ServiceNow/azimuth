@@ -72,7 +72,7 @@ def test_get_config(app: FastAPI):
         "saliency_layer": "distilbert.embeddings.word_embeddings",
         "similarity": {
             "faiss_encoder": "all-MiniLM-L12-v2",
-            "few_similar_threshold": 0.9,
+            "conflicting_neighbors_threshold": 0.9,
             "no_close_threshold": 0.5,
         },
         "uncertainty": {"high_epistemic_threshold": 0.1, "iterations": 1},
