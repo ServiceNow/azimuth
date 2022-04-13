@@ -1,4 +1,4 @@
-import { alpha, Box, Typography, useTheme } from "@mui/material";
+import { alpha, Box, Theme, Typography, useTheme } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { getConfusionMatrixEndpoint } from "services/api";
@@ -54,11 +54,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     minHeight: "100%",
     minWidth: "100%",
-    "&:hover": {
-      width: "auto",
-      height: "auto",
-      overflow: "initial",
-    },
   },
   rowLabel: {
     textAlign: "right",
@@ -87,6 +82,13 @@ const ConfusionMatrix: React.FC<Props> = ({
   const classes = useStyles();
   const theme = useTheme();
 
+  const hoverStyle = (theme: Theme) => ({
+    backgroundColor: alpha(
+      theme.palette.secondary.main,
+      theme.palette.action.selectedOpacity
+    ),
+  });
+
   const { data: { confusionMatrix } = { confusionMatrix: [] } } =
     getConfusionMatrixEndpoint.useQuery({
       jobId,
@@ -102,6 +104,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   const renderCell = (value: number, rowIndex: number, columnIndex: number) => (
     <Box
       key={`column-${columnIndex} row-${rowIndex}`}
+      className={`column-${columnIndex} row-${rowIndex}`}
       gridColumn={columnIndex + CONFUSION_COLUMN_OFFSET + 1}
       gridRow={rowIndex + CONFUSION_ROW_OFFSET + 1}
       width="100%"
@@ -201,6 +204,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             <Typography
               key={`column-${i}`}
               className={classNames(
+                `column-${i}`,
                 classes.gridLabel,
                 classes.columnLabel,
                 classes.verticalLabel,
@@ -213,6 +217,10 @@ const ConfusionMatrix: React.FC<Props> = ({
               sx={{
                 gridColumn: i + CONFUSION_COLUMN_OFFSET + 1,
                 gridRow: 1,
+                [`&:hover, .column-${i}:hover ~ &`]: {
+                  height: "auto",
+                  overflow: "initial",
+                },
               }}
             >
               {classOption}
@@ -220,6 +228,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             <Typography
               key={`row-${i}`}
               className={classNames(
+                `row-${i}`,
                 classes.gridLabel,
                 classes.rowLabel,
                 classes.leftStickyCell,
@@ -231,6 +240,10 @@ const ConfusionMatrix: React.FC<Props> = ({
               sx={{
                 gridRow: i + CONFUSION_ROW_OFFSET + 1,
                 gridColumn: 1,
+                [`&:hover, .row-${i}:hover ~ &`]: {
+                  width: "auto",
+                  overflow: "initial",
+                },
               }}
             >
               {classOption}
@@ -242,6 +255,9 @@ const ConfusionMatrix: React.FC<Props> = ({
               width="100%"
               height="100%"
               boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
+              sx={{
+                pointerEvents: "none",
+              }}
             />,
             <Box
               key={`grid-row-${i}`}
@@ -250,6 +266,33 @@ const ConfusionMatrix: React.FC<Props> = ({
               width="100%"
               height="100%"
               boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
+              sx={{
+                pointerEvents: "none",
+              }}
+            />,
+            <Box
+              key={`hover-column-${i}`}
+              gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
+              gridRow={`1 / -1`}
+              position="sticky"
+              width="100%"
+              height="100%"
+              sx={{
+                pointerEvents: "none",
+                [`.column-${i}:hover ~ &`]: hoverStyle,
+              }}
+            />,
+            <Box
+              key={`hover-row-${i}`}
+              gridColumn={`1 / -1`}
+              gridRow={i + CONFUSION_ROW_OFFSET + 1}
+              position="sticky"
+              width="100%"
+              height="100%"
+              sx={{
+                pointerEvents: "none",
+                [`.row-${i}:hover ~ &`]: hoverStyle,
+              }}
             />,
           ])}
 
