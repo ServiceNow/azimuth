@@ -24,7 +24,6 @@ type Props = {
 const useStyles = makeStyles((theme) => ({
   corner: {
     backgroundColor: theme.palette.background.paper,
-    zIndex: 12,
     width: "100%",
     height: "100%",
   },
@@ -58,7 +57,6 @@ const useStyles = makeStyles((theme) => ({
       width: "auto",
       height: "auto",
       overflow: "initial",
-      zIndex: "1",
     },
   },
   rowLabel: {
@@ -150,16 +148,6 @@ const ConfusionMatrix: React.FC<Props> = ({
             overscrollBehaviorX: "contain",
           }}
         >
-          <Box
-            className={classNames(
-              classes.corner,
-              classes.topStickyCell,
-              classes.leftStickyCell
-            )}
-            gridColumn={CONFUSION_COLUMN_OFFSET}
-            gridRow={CONFUSION_ROW_OFFSET}
-          />
-
           {classOptions.flatMap((classOption, i) => [
             <Typography
               key={`column-${i}`}
@@ -248,6 +236,16 @@ const ConfusionMatrix: React.FC<Props> = ({
               </Box>
             ))
           )}
+
+          <Box
+            className={classNames(
+              classes.corner,
+              classes.topStickyCell,
+              classes.leftStickyCell
+            )}
+            gridColumn={CONFUSION_COLUMN_OFFSET}
+            gridRow={CONFUSION_ROW_OFFSET}
+          />
         </Box>
       </Box>
     </Box>
