@@ -1,4 +1,4 @@
-import { alpha, Box, Theme, Typography, useTheme } from "@mui/material";
+import { alpha, Box, Theme, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { getConfusionMatrixEndpoint } from "services/api";
@@ -80,7 +80,6 @@ const ConfusionMatrix: React.FC<Props> = ({
   labelFilters,
 }) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   const hoverStyle = (theme: Theme) => ({
     backgroundColor: alpha(
@@ -112,7 +111,7 @@ const ConfusionMatrix: React.FC<Props> = ({
       display="flex"
       alignItems="center"
       justifyContent="center"
-      sx={{
+      sx={(theme) => ({
         backgroundColor: alpha(
           theme.palette[
             rowIndex === columnIndex
@@ -125,7 +124,7 @@ const ConfusionMatrix: React.FC<Props> = ({
           ].main,
           value / maxCount
         ),
-      }}
+      })}
     >
       {value > 0 && (
         <Typography
@@ -254,7 +253,7 @@ const ConfusionMatrix: React.FC<Props> = ({
               gridRow={`2 / -1`}
               width="100%"
               height="100%"
-              boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
+              boxShadow={(theme) => `0 0 0 0.35px ${theme.palette.divider}`}
               sx={{
                 pointerEvents: "none",
               }}
@@ -265,7 +264,7 @@ const ConfusionMatrix: React.FC<Props> = ({
               gridRow={i + CONFUSION_ROW_OFFSET + 1}
               width="100%"
               height="100%"
-              boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
+              boxShadow={(theme) => `0 0 0 0.35px ${theme.palette.divider}`}
               sx={{
                 pointerEvents: "none",
               }}
