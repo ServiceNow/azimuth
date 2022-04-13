@@ -1,4 +1,4 @@
-import { alpha, Box, Popover, Typography, useTheme } from "@mui/material";
+import { alpha, Box, Typography, useTheme } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { getConfusionMatrixEndpoint } from "services/api";
@@ -96,31 +96,9 @@ const ConfusionMatrix: React.FC<Props> = ({
       ...pipeline,
     });
 
-  const [cellPopover, setCellPopover] = React.useState<{
-    element: HTMLElement;
-    value: number;
-    prediction: string;
-    label: string;
-  } | null>(null);
-
-  const handleCellPopoverOpen = (
-    element: HTMLElement,
-    value: number,
-    prediction: string,
-    label: string
-  ) => {
-    setCellPopover({ element, value, prediction, label });
-  };
-
-  const handleCellPopoverClose = () => {
-    setCellPopover(null);
-  };
-
   // Set to 1 if the maxCount is 0 so we don't divide by 0.
   // This is fine since all values will be 0 anyway in this case.
   const maxCount = Math.max(...confusionMatrix.flat()) || 1;
-
-  const cellPopoverOpen = Boolean(cellPopover?.element);
 
   return (
     <>
@@ -252,15 +230,6 @@ const ConfusionMatrix: React.FC<Props> = ({
                       value / maxCount
                     ),
                   }}
-                  onMouseEnter={(event) =>
-                    handleCellPopoverOpen(
-                      event.currentTarget,
-                      value,
-                      classOptions[columnIndex],
-                      classOptions[rowIndex]
-                    )
-                  }
-                  onMouseLeave={handleCellPopoverClose}
                 >
                   {value > 0 && (
                     <Typography
@@ -285,32 +254,6 @@ const ConfusionMatrix: React.FC<Props> = ({
           </Box>
         </Box>
       </Box>
-      <Popover
-        id="cell-mouse-over-popover"
-        className={classes.cellPopover}
-        classes={{
-          paper: classes.popoverPaper,
-        }}
-        open={cellPopoverOpen}
-        anchorEl={cellPopover?.element}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        onClose={handleCellPopoverClose}
-        disableRestoreFocus
-      >
-        <Typography variant="caption">Value:</Typography>
-        <Typography>{cellPopover?.value.toFixed(2)}</Typography>
-        <Typography variant="caption">Label:</Typography>
-        <Typography>{cellPopover?.label}</Typography>
-        <Typography variant="caption">Prediction:</Typography>
-        <Typography>{cellPopover?.prediction}</Typography>
-      </Popover>
     </>
   );
 };
