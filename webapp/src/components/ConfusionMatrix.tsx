@@ -9,7 +9,8 @@ import { classNames } from "utils/helpers";
 
 const CONFUSION_ROW_OFFSET = 1;
 const CONFUSION_COLUMN_OFFSET = 1;
-const LABEL_WIDTH = 13;
+const LABEL_LENGTH = "104px";
+const CELL_SIZE = "28px";
 
 type Props = {
   jobId: string;
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: "default",
     width: "100%",
     height: "100%",
-    lineHeight: 3,
+    lineHeight: CELL_SIZE,
     backgroundColor: theme.palette.background.paper,
     minHeight: "100%",
     minWidth: "100%",
@@ -101,12 +102,10 @@ const ConfusionMatrix: React.FC<Props> = ({
   const renderCell = (value: number, rowIndex: number, columnIndex: number) => (
     <Box
       key={`column-${columnIndex} row-${rowIndex}`}
-      boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
-      gridRow={rowIndex + CONFUSION_ROW_OFFSET + 1}
       gridColumn={columnIndex + CONFUSION_COLUMN_OFFSET + 1}
-      height="100%"
-      overflow="hidden"
+      gridRow={rowIndex + CONFUSION_ROW_OFFSET + 1}
       width="100%"
+      height="100%"
       display="flex"
       alignItems="center"
       justifyContent="center"
@@ -158,10 +157,8 @@ const ConfusionMatrix: React.FC<Props> = ({
       <Box
         alignItems="center"
         display="grid"
-        gridTemplateColumns={`${theme.spacing(3)} ${theme.spacing(
-          LABEL_WIDTH
-        )}`}
-        gridTemplateRows={`${theme.spacing(3)} ${theme.spacing(LABEL_WIDTH)}`}
+        gridTemplateColumns={`${CELL_SIZE} ${LABEL_LENGTH}`}
+        gridTemplateRows={`${CELL_SIZE} ${LABEL_LENGTH}`}
         justifyItems="center"
         minHeight={200}
         minWidth={200}
@@ -178,14 +175,11 @@ const ConfusionMatrix: React.FC<Props> = ({
         </Typography>
         <Box
           alignItems="center"
-          display="inline-grid"
-          gridAutoColumns={theme.spacing(3.5)}
-          gridAutoFlow="row"
-          gridAutoRows={theme.spacing(3.5)}
+          display="grid"
           gridColumn="2 / span 2"
           gridRow="2 / span 2"
-          gridTemplateRows={theme.spacing(LABEL_WIDTH)}
-          gridTemplateColumns={theme.spacing(LABEL_WIDTH)}
+          gridTemplateColumns={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
+          gridTemplateRows={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
           height="100%"
           justifyItems="center"
           overflow="scroll"
@@ -196,8 +190,10 @@ const ConfusionMatrix: React.FC<Props> = ({
           }}
         >
           {confusionMatrix.flatMap((row, rowIndex) =>
-            row.map((value, columnIndex) =>
-              renderCell(value, rowIndex, columnIndex)
+            row.flatMap((value, columnIndex) =>
+              value > 0 || rowIndex === columnIndex
+                ? [renderCell(value, rowIndex, columnIndex)]
+                : []
             )
           )}
 
@@ -239,6 +235,22 @@ const ConfusionMatrix: React.FC<Props> = ({
             >
               {classOption}
             </Typography>,
+            <Box
+              key={`grid-column-${i}`}
+              gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
+              gridRow={`2 / -1`}
+              width="100%"
+              height="100%"
+              boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
+            />,
+            <Box
+              key={`grid-row-${i}`}
+              gridColumn={`2 / -1`}
+              gridRow={i + CONFUSION_ROW_OFFSET + 1}
+              width="100%"
+              height="100%"
+              boxShadow={`0 0 0 0.35px ${theme.palette.divider}`}
+            />,
           ])}
 
           <Box
