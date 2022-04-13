@@ -10,11 +10,10 @@ from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.types.general.dataset import DatasetSplitName
 from azimuth.types.tag import ALL_PREDICTION_TAGS, ALL_STANDARD_TAGS
+from azimuth.utils.conversion import Hash
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.project import load_dataset_from_config
 from azimuth.utils.validation import assert_not_none
-
-Hash = int
 
 
 class ArtifactManager:

@@ -24,8 +24,8 @@ def test_get_status(app: FastAPI) -> None:
     data = resp.json()
     assert data["startupTasksReady"] is True
     assert all(
-        status in ["not_started", "finished"] for status in data["startupTasksStatus"].values()
-    )
+        [status in ["not_started", "finished"] for status in data["startupTasksStatus"].values()]
+    ), data
 
 
 def test_get_dataset_info(app: FastAPI) -> None:
@@ -35,7 +35,7 @@ def test_get_dataset_info(app: FastAPI) -> None:
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     statuses = data.pop("startupTasks")
-    assert all(status in ["not_started", "finished"] for status in statuses.values())
+    assert all([status in ["not_started", "finished"] for status in statuses.values()]), statuses
 
     assert data == {
         "availableDatasetSplits": {"eval": True, "train": True},

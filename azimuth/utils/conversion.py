@@ -11,12 +11,14 @@ import numpy as np
 import orjson
 from starlette.responses import JSONResponse
 
+Hash = str
+
 
 def flatten(lst: List[List]) -> List:
     return sum(lst, [])
 
 
-def md5_hash(d):
+def md5_hash(d) -> Hash:
     """Hash any structure!
     No Security because we use it only to get a unique id.
     """
