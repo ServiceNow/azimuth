@@ -2,11 +2,12 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import abc
-from typing import Any, List, Protocol, Tuple, cast, runtime_checkable
+from typing import Any, List, Protocol, Tuple, Union, cast, runtime_checkable
 
 import numpy as np
 import tensorflow
 import torch
+import transformers
 from datasets import Dataset
 from scipy.special import softmax
 from scipy.stats import entropy
@@ -35,6 +36,15 @@ class PipelineOutputProtocol(Protocol):
     model_output: PostProcessingIO
     # output after passing through post-processing: pre-processed texts, logits, probs, preds
     postprocessor_output: PostProcessingIO
+
+
+SupportedOutput = Union[
+    PipelineOutputProtocol,
+    np.ndarray,  # Shape [N, num_classes]
+    torch.Tensor,  # Shape [N, num_classes]
+    tensorflow.Tensor,
+    transformers.file_utils.ModelOutput,
+]
 
 
 class TextClassificationModule(ModelContractModule, abc.ABC):
@@ -150,7 +160,7 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         else:
             raise ValueError(
                 "Can't handle this type of Model output,"
-                " expecting List of predictions, ModelOutput or numpy array."
+                f" expecting {SupportedOutput}."
                 f" Got {type(model_out)}, {model_out}"
             )
         return out
