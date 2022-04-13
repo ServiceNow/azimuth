@@ -14,7 +14,7 @@ In Azimuth, behavioral tests are automatically executed when launching the tool,
 dataset and model.
 
 * The details of all the tests that were computed for a given utterance are shown in the
-  [:material-link: Utterance Details](../user-guide/exploration-space/utterance-details),
+  [:material-link: Utterance Details](../user-guide/exploration-space/utterance-details).
 * A summary of each test for all utterances in both dataset splits (training and evaluation) is
   available in the
   [:material-link: Behavioral Testing Summary](../user-guide/behavioral-testing-summary.md).

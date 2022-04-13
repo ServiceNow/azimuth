@@ -4,7 +4,7 @@
 
 Uncertainty estimation is a field of machine learning that aims to determine when a model is
 uncertain of its prediction. By nature, deep learning models are overconfident and their predictions
-are not trustworthy[^1] . It is possible for a model to output a prediction with high
+are not trustworthy[^1]. It is possible for a model to output a prediction with high
 confidence and still be uncertain.
 
 Uncertainty is split into two distinct sources: data uncertainty and model uncertainty. Data
