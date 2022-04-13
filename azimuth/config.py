@@ -162,7 +162,7 @@ class BehavioralTestingOptions(BaseModel):
 
 class SimilarityOptions(BaseModel):
     faiss_encoder: str = "all-MiniLM-L12-v2"
-    # Threshold to use when finding similar neighbors.
+    # Threshold to use when finding conflicting neighbors.
     conflicting_neighbors_threshold: float = 0.9
     no_close_threshold: float = 0.5  # Set low to minimize impact
 
