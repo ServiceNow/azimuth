@@ -6,18 +6,16 @@ on:
   pull_request:
     branches: [ main, dev ]
 
-
 jobs:
-
   frontend:
     name: Build frontend
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: webapp
-
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.1.1
         with:
