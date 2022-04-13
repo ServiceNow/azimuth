@@ -22,6 +22,7 @@ from filelock import FileLock
 from azimuth.config import AzimuthConfig, AzimuthValidationError, CommonFieldsConfig
 from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag, Tag
+from azimuth.utils.conversion import md5_hash
 from azimuth.utils.validation import assert_not_none
 
 log = structlog.get_logger("DatasetSplitManager")
@@ -36,15 +37,18 @@ class PredictionTableKey:
     temperature: Optional[float]
     use_bma: bool
     pipeline_index: Optional[int]
+    pipeline_config_hash: str
 
     @classmethod
     def from_pipeline_index(cls, index: int, config: AzimuthConfig, use_bma: bool = False):
         pipelines = assert_not_none(config.pipelines)
+        pipeline_config_hash = md5_hash(pipelines[index].dict())
         return PredictionTableKey(
             threshold=pipelines[index].threshold,
             temperature=pipelines[index].temperature,
             use_bma=use_bma,
             pipeline_index=index,
+            pipeline_config_hash=pipeline_config_hash,
         )
 
 

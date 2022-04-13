@@ -10,6 +10,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 ### Changed
+- Cache folder name is not based on `model_contract` anymore.
+- Prediction table name are now based on the hash of the selected pipeline.
 
 ### Deprecated/Breaking Changes
 

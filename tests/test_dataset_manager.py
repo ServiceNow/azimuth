@@ -218,13 +218,22 @@ def test_multi_tables(a_text_dataset, simple_text_config, simple_table_key):
     dm.add_column_to_prediction_table(
         "prediction",
         np.random.randn(len(ds), 10).tolist(),
-        PredictionTableKey(threshold=0.1, temperature=21, use_bma=False, pipeline_index=0),
+        PredictionTableKey(
+            threshold=0.1,
+            temperature=21,
+            use_bma=False,
+            pipeline_index=0,
+            pipeline_config_hash="potato",
+        ),
     )
     # Check that the table exists
     assert (
-        PredictionTableKey(0.1, 21, False, pipeline_index=0) in dm._prediction_tables
+        PredictionTableKey(0.1, 21, False, pipeline_index=0, pipeline_config_hash="potato")
+        in dm._prediction_tables
         and "prediction"
-        in dm._prediction_tables[PredictionTableKey(0.1, 21, False, pipeline_index=0)].column_names
+        in dm._prediction_tables[
+            PredictionTableKey(0.1, 21, False, pipeline_index=0, pipeline_config_hash="potato")
+        ].column_names
     )
 
     dm.add_column_to_prediction_table(
@@ -237,7 +246,9 @@ def test_multi_tables(a_text_dataset, simple_text_config, simple_table_key):
     assert "prediction2" in ds.column_names
     assert "prediction" not in ds.column_names
     # Check that the new column was not added to the previous dataset.
-    ds = dm.dataset_split_with_predictions(PredictionTableKey(0.1, 21, False, 0))
+    ds = dm.dataset_split_with_predictions(
+        PredictionTableKey(0.1, 21, False, 0, pipeline_config_hash="potato")
+    )
     assert "prediction" in ds.column_names
     assert "prediction2" not in ds.column_names
 

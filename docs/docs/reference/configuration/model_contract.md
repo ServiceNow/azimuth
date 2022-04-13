@@ -4,6 +4,8 @@ Fields that describe how Azimuth interacts with the pipelines are described here
 
 ```python
 class ModelContractConfig:
+    # Which model_contract the application is using.
+    model_contract: SupportedModelContract
     # Model object definition.
     pipelines: Optional[List[PipelineDefinition]] = None
     # Uncertainty configuration
@@ -13,6 +15,20 @@ class ModelContractConfig:
     # Custom HuggingFace metrics
     metrics: Dict[str, MetricDefinition] = ...
 ```
+
+### Model Contract (Mandatory)
+
+For now, we expect everyone will likely use one of either `hf_text_classification` or
+`custom_text_classification`. See our [API Contract](../api/pipeline.md) for more information.
+
+- `hf_text_classification` supports PyTorch classifier models (feedforward neural networks).
+    - An example is provided in the repo under `config/examples/banking77`.
+- `custom_text_classification` supports TensorFlow models with a GUSE or ELM embedding
+  followed by a feedforward neural network.
+    - Saliency values are not available with this contract, as the model uses a sentence embedding.
+
+In the future, when supporting new ML tasks, such as AI Search or vision tasks, this field will
+support additional values to accommodate different data and model types.
 
 ### Pipelines
 

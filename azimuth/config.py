@@ -188,8 +188,6 @@ class ProjectConfig(BaseSettings):
     name: str = Field("New project", env="NAME")
     # Dataset object definition.
     dataset: CustomObject
-    # Which model_contract the application is using.
-    model_contract: SupportedModelContract
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
@@ -232,12 +230,14 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
                 **self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True)
             ).dict()
         )
-        path = pjoin(self.artifact_path, f"{self.name}_{self.model_contract}_{md5[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{md5[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
 
 
 class ModelContractConfig(CommonFieldsConfig):
+    # Which model_contract the application is using.
+    model_contract: SupportedModelContract
     # Model object definition.
     pipelines: Optional[List[PipelineDefinition]] = None
     # Uncertainty configuration
