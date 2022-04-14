@@ -3,6 +3,7 @@
 # in the root directory of this source tree.
 import json
 import time
+from pprint import pprint
 
 import pytest
 from fastapi import FastAPI
@@ -71,6 +72,17 @@ def app() -> FastAPI:
         time.sleep(1)
         resp = client.get("/status")
     task_manager = me_app.get_task_manager()
+    mods_are_done = [
+        status not in ["not_started", "finished"]
+        for status in resp.json()["startupTasksStatus"].values()
+    ]
+    if any(mods_are_done):
+        exceptions = {
+            k: None if v.future is None else v.future.exception()
+            for k, v in task_manager.current_tasks.items()
+        }
+        pprint(exceptions)
+
     while task_manager.is_locked:
         time.sleep(1)
     yield _app
@@ -78,7 +90,6 @@ def app() -> FastAPI:
 
 @pytest.fixture(scope="function")
 def app_not_started(app) -> FastAPI:
-
     startup_tasks = me_app.get_startup_tasks()
 
     class ModuleThatWillNeverEnd:
