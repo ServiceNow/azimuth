@@ -1,36 +1,15 @@
-import { CircularProgress, Typography } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import noData from "assets/launch.svg";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { getStatusEndpoint } from "services/api";
 import Loading from "./Loading";
 
-const useStyles = makeStyles(() => ({
-  container: {
-    display: "grid",
-    justifyContent: "center",
-    alignContent: "center",
-    width: "100%",
-    height: "75vh",
-  },
-  content: {
-    width: 600,
-    textAlign: "center",
-  },
-  image: {
-    width: 400,
-    display: "block",
-    margin: "auto",
-  },
-}));
-
 type Props = {
   children: React.ReactNode;
 };
 
 const StatusCheck: React.FC<Props> = ({ children }) => {
-  const classes = useStyles();
   const { jobId } = useParams<{ jobId: string }>();
   const { data: status, refetch } = getStatusEndpoint.useQuery({ jobId });
 
@@ -47,20 +26,28 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
 
   if (!status.startupTasksReady) {
     return (
-      <div className={classes.container}>
-        <div className={classes.content}>
-          <img
-            className={classes.image}
-            src={noData}
-            alt="Startup tasks still in progress"
-          />
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+        height="75vh"
+      >
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={4}
+          width={600}
+        >
+          <img src={noData} alt="Startup tasks still in progress" width={400} />
           <CircularProgress size="3rem" />
-          <Typography variant="h2">
+          <Typography variant="h2" align="center">
             The startup tasks are still in progress. Grab a coffee and we will
             auto-refresh for you.
           </Typography>
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   }
 
