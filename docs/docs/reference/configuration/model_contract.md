@@ -13,7 +13,7 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
 
 
     class ModelContractConfig:
-        model_contract: SupportedModelContract # (1)
+        model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification # (1)
         pipelines: Optional[List[PipelineDefinition]] = None # (2)
         uncertainty: UncertaintyOptions = UncertaintyOptions() # (3)
         saliency_layer: Optional[str] = None # (4)
@@ -60,6 +60,8 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
 ## Model Contract
 
 :orange_circle: **Mandatory field** with an ML pipeline.
+
+**Default value**: `hf_text_classification`
 
 The model contract will be determined based on the model type. More details on what model contract
 to select based on the model is available
