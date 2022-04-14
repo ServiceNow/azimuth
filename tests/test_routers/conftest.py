@@ -56,7 +56,7 @@ def app() -> FastAPI:
         name="sentiment-analysis",
         dataset=DATASET_CFG,
         pipelines=[FAST_TEST_CFG],
-        artifact_path="/tmp/azimuth_test_cache",
+        artifact_path="/tmp/azimuth_test_cache_potato",
         batch_size=16,
         use_cuda=False,
         model_contract="custom_text_classification",
