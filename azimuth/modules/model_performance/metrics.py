@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Sequence
 import numpy as np
 from datasets import Dataset, Metric
 from sklearn.exceptions import UndefinedMetricWarning
+from tqdm import tqdm
 
 from azimuth.config import AzimuthConfig, ModelContractConfig
 from azimuth.modules.base_classes.aggregation_module import (
@@ -192,45 +193,65 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
         dm = self.get_dataset_split_manager()
         ds = self.get_dataset_split()
 
-        label_filters = {
-            class_name: self.edit_filter(self.mod_options.filters, label=i)
-            for i, class_name in enumerate(dm.class_names)
-        }
-        prediction_filters = {
-            class_name: self.edit_filter(self.mod_options.filters, prediction=i)
-            for i, class_name in enumerate(dm.class_names)
-        }
-        data_action_filters = {
-            data_action: self.edit_filter(self.mod_options.filters, data_action=data_action)
-            for data_action in ALL_DATA_ACTION_FILTERS
-        }
-        smart_tag_filters = {
-            smart_tag: self.edit_filter(self.mod_options.filters, smart_tag=smart_tag)
-            for smart_tag in ALL_SMART_TAG_FILTERS
-        }
-        outcomes_filters: Dict[str, Sequence[DatasetFilters]] = {
-            outcome: self.edit_filter(self.mod_options.filters, outcome=outcome)
-            for outcome in ALL_OUTCOMES
-        }
+        with tqdm(total=5) as pbar:
+            pbar.set_description(
+                f"MetricsPerFilter on {self.dataset_split_name} "
+                f"set for pipeline {self.mod_options.pipeline_index}"
+            )
+
+            label_filters = {
+                class_name: self.edit_filter(self.mod_options.filters, label=i)
+                for i, class_name in enumerate(dm.class_names)
+            }
+            metrics_per_label = sorted_by_utterance_count_with_last(
+                self.get_metrics_for_filter(label_filters), dm.rejection_class_idx
+            )
+            pbar.update()
+
+            prediction_filters = {
+                class_name: self.edit_filter(self.mod_options.filters, prediction=i)
+                for i, class_name in enumerate(dm.class_names)
+            }
+            metrics_per_prediction = sorted_by_utterance_count_with_last(
+                self.get_metrics_for_filter(prediction_filters),
+                dm.rejection_class_idx,
+            )
+            pbar.update()
+
+            data_action_filters = {
+                data_action: self.edit_filter(self.mod_options.filters, data_action=data_action)
+                for data_action in ALL_DATA_ACTION_FILTERS
+            }
+            metrics_per_data_action = sorted_by_utterance_count_with_last(
+                self.get_metrics_for_filter(data_action_filters),
+                -1,
+            )
+            pbar.update()
+
+            smart_tag_filters = {
+                smart_tag: self.edit_filter(self.mod_options.filters, smart_tag=smart_tag)
+                for smart_tag in ALL_SMART_TAG_FILTERS
+            }
+            metrics_per_smart_tag = sorted_by_utterance_count_with_last(
+                self.get_metrics_for_filter(smart_tag_filters), -1
+            )
+            pbar.update()
+
+            outcomes_filters: Dict[str, Sequence[DatasetFilters]] = {
+                outcome: self.edit_filter(self.mod_options.filters, outcome=outcome)
+                for outcome in ALL_OUTCOMES
+            }
+            metrics_per_outcome = self.get_metrics_for_filter(outcomes_filters)
+            pbar.update()
 
         return [
             MetricsPerFilterModuleResponse(
                 metrics_per_filter=MetricsPerFilter(
-                    label=sorted_by_utterance_count_with_last(
-                        self.get_metrics_for_filter(label_filters), dm.rejection_class_idx
-                    ),
-                    prediction=sorted_by_utterance_count_with_last(
-                        self.get_metrics_for_filter(prediction_filters),
-                        dm.rejection_class_idx,
-                    ),
-                    data_action=sorted_by_utterance_count_with_last(
-                        self.get_metrics_for_filter(data_action_filters),
-                        -1,
-                    ),
-                    smart_tag=sorted_by_utterance_count_with_last(
-                        self.get_metrics_for_filter(smart_tag_filters), -1
-                    ),
-                    outcome=self.get_metrics_for_filter(outcomes_filters),
+                    label=metrics_per_label,
+                    prediction=metrics_per_prediction,
+                    data_action=metrics_per_data_action,
+                    smart_tag=metrics_per_smart_tag,
+                    outcome=metrics_per_outcome,
                 ),
                 utterance_count=len(ds),
             )

@@ -38,8 +38,8 @@ class SmartTag(str, Enum):
     no_obj = "missing_obj"
     no_verb = "missing_verb"
     # Similar
-    few_similar_train = "few_similar_train"
-    few_similar_eval = "few_similar_eval"
+    conflicting_neighbors_train = "conflicting_neighbors_train"
+    conflicting_neighbors_eval = "conflicting_neighbors_eval"
     no_close_train = "no_close_train"
     no_close_eval = "no_close_eval"
     # Perturbation testing

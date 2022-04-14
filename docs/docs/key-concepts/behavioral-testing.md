@@ -5,21 +5,21 @@
 Performing behavioral testing on ML models was first introduced in the **checklist** paper
 ([Ribeiro, Marco Tulio, et al., 2020](https://arxiv.org/abs/2005.04118)[^1]). Behavioral tests
 provide an assessment of the model **robustness to small modifications to the input**. Proper
-behavioral testing can help in detecting bias or other potential harmful features which may not be
-otherwise obvious.
+behavioral testing can help in detecting bias or other potential harmful aspects of the model that
+may not be otherwise obvious.
 
 ## Where is this used in Azimuth?
 
 In Azimuth, behavioral tests are automatically executed when launching the tool, using the provided
 dataset and model.
 
-* In the [Utterance Details](../user-guide/exploration-space/utterance-details), the details of all
-  the tests that were computed for a given utterance are shown.
-* A summary of each test for all utterances in both sets (training and evaluation) is available in
-  the
-  [Behavioral Testing Summary](../user-guide/behavioral-testing-summary.md).
-* Finally, a [Smart Tag](smart-tags.md) is generated for each utterance where at least one test of
-  each family fails.
+* The details of all the tests that were computed for a given utterance are shown in the
+  [:material-link: Utterance Details](../user-guide/exploration-space/utterance-details).
+* A summary of each test for all utterances in both dataset splits (training and evaluation) is
+  available in the
+  [:material-link: Behavioral Testing Summary](../user-guide/behavioral-testing-summary.md).
+* Finally, a [:material-link: Smart Tag](smart-tags.md) is generated for each utterance for which at
+  least one test of each family has failed.
 
 ## How is it computed?
 
@@ -44,27 +44,32 @@ The tests can fail for two reasons.
     | Azimuth is the best tool!!! | `negative` | YES   |
 
 * The test will fail if the **confidence** associated with the predicted class of the modified
-  utterance is **too far** (based on a threshold) from the confidence of the original utterance. By
-  default, the threshold is set to 1, meaning the tests will never fail due to a change in
-  confidence for the same predicted class.
+  utterance is **too different** (based on a threshold) from the confidence of the original
+  utterance. By default, the threshold is set to 1, meaning the tests will never fail due to a
+  change in confidence for the same predicted class.
 
 ??? example
-
-    Examples with a threshold set at 0.1.
 
     | Original Utterance       | Predicted Class      | Confidence |
     |--------------------------|----------------------|------------|
     | Azimuth is the best tool | `positive` | 95% |
 
+    Threshold set to 0.1:
+
     | Modified Utterance         | Predicted Class           | Confidence | Test fails? |
     |--------------------------|----------------------|-----------|-----------|
     | Hello Azimuth is the best tool  | `positive` | 82% | YES   |
-    | Azimuth is the best TOOL | `positive` | 82% |NO   |
+
+    Threshold set to 1:
+
+    | Modified Utterance         | Predicted Class           | Confidence | Test fails? |
+    |--------------------------|----------------------|-----------|-----------|
+    | Hello Azimuth is the best tool  | `positive` | 82% | NO   |
 
 ### Available Tests
 
-All tests are _invariant_ (the modification should not change the predicted class) and assess the _
-robustness_ of the model.
+All tests are _invariant_ (the modification should not change the predicted class) and assess the
+_robustness_ of the model.
 
 * The tool currently has 2 families of tests: `Fuzzy Matching` and `Punctuation`.
 * For each test, different modification types can be applied (`Insertion`, `Deletion`, etc.)
@@ -96,11 +101,13 @@ robustness_ of the model.
     * `Expansion`: Expand relevant expressions, if present.
 
 #### Punctuation
+
 * `Question Mark`: Adds/Deletes/Replaces question marks.
     * `Deletion`: Removes the ending question mark, if present.
-    * `Replacement`: Replaces the ending punctuation sign ('.', '!', ','), if present, by a
-    question mark.
-    * `PostInsertion`: Adds an ending question mark when the utterance does not end with a punctuation sign.
+    * `Replacement`: Replaces the ending punctuation sign ('.', '!', ','), if present, by a question
+      mark.
+    * `PostInsertion`: Adds an ending question mark when the utterance does not end with a
+      punctuation sign.
 
 * `Ending period`: Same logic as the `Question Mark` test, with a period.
     * `Deletion`: Removes the ending period, if present.
@@ -118,7 +125,7 @@ robustness_ of the model.
 
 ### Configuration
 
-[Behavioral Testing Configuration](../reference/configuration/behavioral_testing.md)
+[:material-link: Behavioral Testing Configuration](../reference/configuration/behavioral_testing.md)
 details how to change some parameters, such as the lists of neutral tokens, the number of typos and
 the threshold confidence delta above which the tests should fail.
 

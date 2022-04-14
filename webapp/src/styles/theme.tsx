@@ -32,7 +32,7 @@ const customTheme: Theme = createTheme({
     secondary: {
       light: "#63CCFF",
       main: "#03A9F4",
-      dark: "006DB3",
+      dark: "#006DB3",
       contrastText: "white",
     },
     success: {

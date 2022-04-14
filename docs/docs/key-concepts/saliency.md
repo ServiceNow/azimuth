@@ -1,38 +1,38 @@
-# Saliency Map
+# Saliency Maps
 
 ## What is it?
 
-Saliency map is a **feature-based explainability** (XAI) method, available for gradient-based ML
-models. Its role is to estimate how much each **variable contributes to the model prediction** for a
-given data sample. In the case of NLP, variables are usually tokens or words.
+A saliency map is a **feature-based explainability** (XAI) method that is available for
+gradient-based ML models. Its role is to estimate how much **each variable contributes to the model
+prediction** for a given data sample. In the case of NLP, variables are usually tokens or words.
 
 ### Literature
 
-In NLP, the current state-of-the-art models (Transformers) are **black boxes**. It’s not
-trivial to understand why they make mistakes or why they are right.
+In NLP, the current state-of-the-art models (Transformers) are **black boxes**. It’s not trivial to
+understand why they make mistakes or why they are right.
 
 Saliency maps first became popular for computer vision problems, where the results would be a
-'heatmap' of the most contributing pixels. There has been recent growing interest in saliency maps
-as an XAI technique for NLP:
+heatmap of the most contributing pixels. There has been recent growing interest in saliency maps as
+an XAI technique for NLP:
 
 * [Wallace et al.](https://arxiv.org/abs/1909.09251)[^1] in their AllenNLP toolkit implement vanilla
   gradient, integrated gradients, and smoothGrad for several NLP tasks and mostly pre-BERT models.
 * [Han et al.](https://arxiv.org/abs/2005.06676)[^2] use gradient-based saliency maps for sentiment
   analysis and NLI on BERT.
 * [Atanasova et al.](https://arxiv.org/abs/2009.13295)[^3] evaluate different saliency techniques on
-  a variety of models including BERT-based.
-* [Bastings and Filippova](https://arxiv.org/abs/2010.05607)[^4] argue to use saliency maps over
+  a variety of models including BERT-based models.
+* [Bastings and Filippova](https://arxiv.org/abs/2010.05607)[^4] argue for using saliency maps over
   attention-based explanations when determining the input tokens most relevant to a prediction.
-  Their end-user is a model developer, not a user of the system.
+  Their end-user is a model developer, rather than a user of the system.
 
 !!! note
 
-    Apart from saliency map, other feature-based XAI techniques exist, such as SHAP or LIME.
+    Apart from saliency maps, other feature-based XAI techniques exist, such as SHAP or LIME.
 
 ## Where is this used in Azimuth?
 
-In Azimuth, we display the saliency map on a specific utterance to show the importance of each token
-in the model prediction. When available, it is both displayed in
+In Azimuth, we display a saliency map over a specific utterance to show the importance of each token
+to the model prediction. When available, it is both displayed in
 the [Utterance Details](../user-guide/exploration-space/utterance-details.md) and in
 the [Utterances Table](../user-guide/exploration-space/utterance-details.md).
 
@@ -43,21 +43,20 @@ the [Utterances Table](../user-guide/exploration-space/utterance-details.md).
 
 !!! example
 
-    In this example, "assistance" is the most contributing word for predicting `transfer`,
-    followed by "moving".
+    In this example, `assistance` is the word that contributes the most to the prediction
+    `transfer`, followed by `moving`.
 
 ## How is it computed?
 
 We use the technique `Vanilla Gradient`, shown to satisfy **input invariance**
-in [Kindermans et al.](https://arxiv.org/abs/1711.00867)[^5]. We simply **back-propagate the
-gradient**
-to the input layer of the network, in our case, the word-embedding layer. We then take the `L2` norm
-to aggregate the gradients across all dimensions of the layer to get to the saliency value for each
-token.
+in [Kindermans et al.](https://arxiv.org/abs/1711.00867)[^5] We simply **backpropagate the
+gradient** to the input layer of the network: in our case, the word-embedding layer. We then take
+the L2 norm to aggregate the gradients across all dimensions of the layer to determine the saliency
+value for each token.
 
 !!! note
 
-    Saliency map is only available for models that have gradients. Additionally, their input layer
+    Saliency maps are only available for models that have gradients. Additionally, their input layer
     needs to be a token-embedding layer, so that the gradients can be computed per token. For
     example, a sentence embedder cannot back-propagate the gradients with sufficient granularity in
     the utterance.

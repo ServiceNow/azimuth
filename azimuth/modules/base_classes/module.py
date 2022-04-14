@@ -93,7 +93,11 @@ class Module(DaskModule[ConfigScope]):
         batches = [num_rows[i : i + batch_size] for i in range(0, len(ds), batch_size)]
 
         result = []
-        for batch in tqdm(batches, desc=f"{self.task_name} on {self.dataset_split_name} set"):
+        for batch in tqdm(
+            batches,
+            desc=f"{self.task_name} on {self.dataset_split_name} set "
+            f"for pipeline {self.mod_options.pipeline_index}",
+        ):
             result += self.compute(ds.select(batch))
         return result
 
