@@ -53,4 +53,5 @@ export const OUTCOME_PRETTY_NAMES = {
   IncorrectAndPredicted: "Incorrect & Predicted",
 } as const;
 
-export const PREDICTION_CONFIDENCE_FAILURE_REASON = "PredConfThreshold";
+export const PREDICTION_CONFIDENCE_FAILURE_REASON =
+  "Confidence too far from original.";

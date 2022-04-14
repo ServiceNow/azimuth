@@ -14,7 +14,7 @@ import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig } from "types/api";
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
-  "perturbation_testing",
+  "behavioral_testing",
   "similarity",
 ];
 
@@ -46,7 +46,7 @@ const Settings: React.FC = () => {
       <FormControl sx={{ width: "100%" }}>
         <FormGroup>
           <FormControlLabel
-            control={switchNullOrDefault("perturbation_testing")}
+            control={switchNullOrDefault("behavioral_testing")}
             label="Perturbation testing"
           />
           <FormControlLabel
