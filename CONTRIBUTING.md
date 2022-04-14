@@ -9,13 +9,14 @@ This document should be able to guide contributors in their different types of c
 
 ## Get your environment setup
 
-Azimuth is split in two components and we need to be setup on both of them:
-
-* [Setup backend environment](https://servicenow.github.io/azimuth/development/setup/#install-dependencies)
-* [Setup frontend environment](https://snow-baal-docs.job.console.elementai.com/development/setup/#front-end)
+Azimuth is split in two components.
+Go to our [Setup](https://servicenow.github.io/azimuth/development/setup) to get setup on both the frontend and backend.
 
 
-When everything is setup, you can refer to the [Launching](https://snow-baal-docs.job.console.elementai.com/development/launching)
+It is encouraged to be familiar with our [development best practices](https://servicenow.github.io/azimuth/development/dev-practices/).
+
+
+When everything is set up, you can refer to the [Launching](https://servicenow.github.io/azimuth/development/launching)
 section to launch Azimuth locally or on Docker.
 
 ## How to submit a bug report

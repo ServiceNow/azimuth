@@ -84,7 +84,7 @@ Docker is needed for different tasks such as releasing and updating the document
     * Install [PyCharm](https://www.jetbrains.com/pycharm/download/#section=mac).
     * In PyCharm preferences, you can add your existing python virtual environment as the "Python Interpreter", pointing where what `poetry run which python` prints.
 * If developing in front end, we recommend installing Visual Studio Code:
-    * [:material-link: Install Visual Studio Code](https://code.visualstudio.com/download)
+    * [Install Visual Studio Code](https://code.visualstudio.com/download)
     * A pre-defined configuration is available in the repo, to help development. Two things to do:
         * View > Extensions > search for `esbenp.prettier-vscode` and install it. That's the official `Code formatter using prettier` by publisher `Prettier`.
         * File > Open Workspace from File > select [`azimuth.code-workspace`](https://github.com/ServiceNow/azimuth/blob/master/azimuth.code-workspace), which will set up two folders: `webapp` and `.` (for the rest). In the `webapp` folder, [`webapp/.vscode/settings.json`](https://github.com/ServiceNow/azimuth/blob/master/webapp/.vscode/settings.json) will configure Prettier to format your files on save.
