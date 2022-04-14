@@ -12,6 +12,5 @@
     "text_input": "text",
     "label": "label"
   },
-  "rejection_class": "none",
-  "model_contract": "hf_text_classification"
+  "rejection_class": "none"
 }

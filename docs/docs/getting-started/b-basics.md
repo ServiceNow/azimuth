@@ -35,6 +35,15 @@ specifies which dataset and pipelines to load in the app, as well as other varia
 **customization** of the app. Most attributes have **default values** and don't need to be
 explicitly defined in each config. The **full reference** is [here](../reference/index.md).
 
+## Clearing the Cache
+
+Azimuth keeps all artifacts in caching folders so that if you close the app and re-launch, it will
+load quickly. Once you are done with your analysis, you can delete the cache by running:
+
+```
+make clean
+```
+
 ## Verify your Setup
 
 Out-of-the-box, Azimuth can run on a **demo data and model**

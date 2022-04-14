@@ -190,7 +190,7 @@ class ProjectConfig(BaseSettings):
     # Dataset object definition.
     dataset: CustomObject
     # Which model_contract the application is using.
-    model_contract: SupportedModelContract
+    model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
