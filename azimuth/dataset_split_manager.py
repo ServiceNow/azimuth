@@ -37,18 +37,17 @@ class PredictionTableKey:
     temperature: Optional[float]
     use_bma: bool
     pipeline_index: Optional[int]
-    pipeline_config_hash: str
+    pipeline_config_hash: str = ""
 
     @classmethod
     def from_pipeline_index(cls, index: int, config: AzimuthConfig, use_bma: bool = False):
         pipelines = assert_not_none(config.pipelines)
-        pipeline_config_hash = md5_hash(pipelines[index].dict())
+        md5_hash(pipelines[index].dict())
         return PredictionTableKey(
             threshold=pipelines[index].threshold,
             temperature=pipelines[index].temperature,
             use_bma=use_bma,
             pipeline_index=index,
-            pipeline_config_hash=pipeline_config_hash,
         )
 
 
