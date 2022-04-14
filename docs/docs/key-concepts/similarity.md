@@ -8,8 +8,8 @@ be supplied.
 
 Within Azimuth, different similarity analyses are provided to determine how similar utterances are
 within a class, across classes, and so on. This can help indicate whether classes are well-defined,
-or whether changes should be made to improve the dataset, such as by redefining classes,
-relabeling or omitting data, or augmenting the dataset.
+or whether changes should be made to improve the dataset, such as by redefining classes, relabeling
+or omitting data, or augmenting the dataset.
 
 ## Where is this used in Azimuth?
 
@@ -57,13 +57,14 @@ a difficult utterance to predict.
 Two [:material-link: Smart Tags](./smart-tags.md) highlight these sorts of utterances, based on
 the **label heterogeneity of the neighborhood** in each dataset split (training or evaluation). If
 90% or more of an utterance's most similar data samples (neighbors) in a dataset split belong to a
-different class, it will be tagged as `conflicting_neighbors_train` and/or `conflicting_neighbors_eval`,
-based on which dataset split is being examined. (E.g., an utterance in the test set will be compared to its
-neighbors in both the training and evaluation dataset splits.)
+different class, it will be tagged as `conflicting_neighbors_train`
+and/or `conflicting_neighbors_eval`, based on which dataset split is being examined. (E.g., an
+utterance in the test set will be compared to its neighbors in both the training and evaluation
+dataset splits.)
 
 ### Configuration
 
-[:material-link: Similarity Analysis Configuration](../reference/configuration/similarity.md)
+[:material-link: Similarity Analysis Configuration](../reference/configuration/analyses/similarity.md)
 details how to change the encoder for the embeddings on which similarity is computed, as well as the
 two thresholds used to determine the smart tags.
 

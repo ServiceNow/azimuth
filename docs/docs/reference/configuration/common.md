@@ -1,30 +1,51 @@
-# Common fields
+# Common Fields Config
 
-```python
-class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
-    """Fields that can be modified without affecting caching."""
+These fields are generic and can be adapted based on the user's machine.
 
-    # Where to store artifacts. (HDF5 files,  HF datasets, Dask config)
-    artifact_path: str = "/cache"
-    # Batch size to use during inference.
-    batch_size: int = 32
-    # Will use CUDA and will need GPUs if set to True.
-    # If "auto" we check if CUDA is available.
-    use_cuda: Union[Literal["auto"], bool] = "auto"
-```
+=== "Class Definition"
 
-### Artifact Path
+    ```python
+    class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
+        """"""
+        artifact_path: str = "/cache"
+        batch_size: int = 32
+        use_cuda: Union[Literal["auto"], bool] = "auto"
+    ```
 
-If you are launching the app locally, you can use `/cache` as the artifact path, which is
-available in the Docker Image. In any case, be sure that this value is available inside Docker by looking at the `docker-compose.yml` file.
+=== "Config Example"
 
+    Example to append to the config to override the default `batch_size`.
 
-### Batch Size
+    ```json
+    {
+      "batch_size": 64,
+    }
+    ```
 
-A higher batch size will make computation faster, depending on the memory available on your machine. The default is set
-to `32`.
+## Artifact Path
 
-### Use Cuda
+:blue_circle: **Default value**: `/cache`
 
-If cuda is available on your machine, set to `true`, otherwise `false`.
-Can also be set to "auto" and let the user-code take care of it.
+Where to store the caching artifacts (`HDF5` files and HF datasets). The value needs to be available
+inside Docker (see `docker-compose.yml`). `/cache` is available by default on the docker image.
+
+!!! tip
+
+    If Azimuth is run without Docker, the cache needs to be a path with write access (`/cache` will not
+    work).
+
+## Batch Size
+
+:blue_circle: **Default value**: 32
+
+Batch size to use during inference. A higher batch size will make computation faster, depending on
+the memory available on your machine.
+
+## Use Cuda
+
+:blue_circle: **Default value**: `auto`
+
+If cuda is available on your machine, set to `true`, otherwise `false`. Can also be set to "auto"
+and let the user-code take care of it.
+
+--8<-- "includes/abbreviations.md"

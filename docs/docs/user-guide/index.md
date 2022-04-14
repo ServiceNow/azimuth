@@ -7,12 +7,25 @@ different sections to get a deeper understanding of the dataset and the model.
 
 !!! info
 
-    The top banner contains useful information and links, such as the **project name** from the
-    config file. The [**settings**](settings.md) :gear: allow to enable/disable
-    different analyses. A link to the support Slack channel and to the documentation is available
-    in the help :material-help-circle: option.
+    Azimuth can be launched without any pipelines. All the information related to the pipelines
+    (prediction, behavioral testing and so on) will then be unavailable on all screens. It can also be
+    launched with multiple pipelines. Use the dropdown in the top banner to switch between
+    pipelines.
 
 ![Screenshot](../_static/images/dashboard/dashboard.png)
+
+## Top Banner
+
+The top banner contains useful information and links.
+
+* The **project name** from the config file is shown.
+* A dropdown :material-arrow-down-drop-circle-outline: allows you to select the different pipelines
+  defined in the config. It also allows you to select no pipelines.
+* The [**settings**](settings.md) :gear: allow you to enable/disable different analyses.
+* A link to the support Slack channel and to the documentation is available in the help
+  :material-help-circle: option.
+
+![Screenshot](../_static/images/dashboard/top-banner.png)
 
 !!! tip
 
@@ -37,7 +50,7 @@ to [:material-link: Dataset Class Distribution Analysis](dataset-warnings.md).
 
 ## Performance Analysis
 
-The Performance Analysis section summarizes the model performance in terms of the [**
+The Performance Analysis section summarizes the model performance in terms of the [**prediction
 outcomes**](../key-concepts/outcomes.md) and **metrics** available in Azimuth. Change the value in
 the dropdown :material-arrow-down-drop-circle-outline: to see the metrics broken down per label,
 predicted class, or smart tag. Use the toggle to alternate between the performance on the training
@@ -85,9 +98,9 @@ information on tests and the option to export the results.
 ## Post-processing Analysis
 
 The Post-processing Analysis provides an assessment of the performance of one post-processing step:
-the thresholding. The visualization shows the [outcome](../key-concepts/outcomes.md) count on the
-evaluation set for different thresholds. Click `View Details` to see the plot full screen
-in [:material-link: Post-processing Analysis](post-processing-analysis.md).
+the thresholding. The visualization shows the prediction [outcome](../key-concepts/outcomes.md)
+count on the evaluation set for different thresholds. Click `View Details` to see the plot full
+screen in [:material-link: Post-processing Analysis](post-processing-analysis.md).
 
 ![Screenshot](../_static/images/dashboard/post-processing-analysis.png)
 

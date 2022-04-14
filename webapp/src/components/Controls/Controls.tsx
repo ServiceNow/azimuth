@@ -270,7 +270,7 @@ const Controls: React.FC<Props> = ({
           <Box marginTop={1} sx={{ overflowY: "auto", overflowX: "hidden" }}>
             <>
               <FilterSelector
-                label="Outcome"
+                label="Prediction Outcome"
                 maxCount={maxCount}
                 searchValue={searchValue}
                 selectedOptions={filters.outcomes || []}

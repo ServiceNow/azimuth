@@ -11,7 +11,7 @@ from azimuth.types.general.array_type import Array
 class PostProcessingIO(AliasModel):
     texts: List[str]
     logits: Array[float]
-    preds: Array[float]
+    preds: Array[int]
     probs: Array[float]
 
     @property

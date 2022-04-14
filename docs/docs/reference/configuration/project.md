@@ -1,73 +1,142 @@
-# Project configuration
+# Project Config
 
-This section describes high-level features about the project.
+The project configuration contains mandatory fields that specify the dataset to load in Azimuth.
 
-```python
-class ProjectConfig(BaseSettings):
-    # Name of the current project.
-    name: str = Field("New project", env="NAME")
-    # Dataset object definition.
-    dataset: CustomObject
-    # Which model_contract the application is using.
-    model_contract: SupportedModelContract
-    # Column names config in dataset
-    columns: ColumnConfiguration = ColumnConfiguration()
-    # Name of the rejection class.
-    rejection_class: Optional[str] = "NO_INTENT"
-```
+=== "Class Definition"
 
-### Name (Mandatory)
+    ```python
+    from typing import Optional
 
-Any name can be set for the config. For example, it can represent the name of the dataset
-and/or the model. Ex: `AskUbuntu Model v4`.
+    from pydantic import BaseSettings, Field
 
-### Dataset (Mandatory)
+    from azimuth.config import ColumnConfiguration, CustomObject
 
-This field describes which datasets we are using. Azumuth will load this description at runtime.
-For example to load `banking77`, we would assign:
+    class ProjectConfig(BaseSettings):
+        name: str = Field("New project", env="NAME")
+        dataset: CustomObject
+        columns: ColumnConfiguration = ColumnConfiguration()
+        rejection_class: Optional[str] = "REJECTION_CLASS"
+    ```
 
-```json
-"dataset": {
-    "class_name": "datasets.load_dataset",
-    "args": [
-      "banking77"
-    ]
-  },
-```
-To load more complex datasets, please refer to our [Dataset API Contract](../api/dataset.md).
+=== "Config Example"
 
-### Model Contract (Mandatory)
+    ```json
+    {
+      "name": "Banking77 Model v4",
+      "dataset": {
+        "class_name": "datasets.load_dataset",
+        "args": [
+          "banking77"
+        ]
+      },
+      "columns": {
+        "text_input": "text",
+        "label": "target"
+      },
+      "rejection_class": "NA",
+    }
+    ```
 
-For now, we expect everyone will likely use one of either `hf_text_classification` or
-`custom_text_classification`. See our [API Contract](../api/pipeline.md) for more information.
+## Name
 
-- `hf_text_classification` supports PyTorch classifier models (feedforward neural networks).
-    - An example is provided in the repo under `config/examples/banking77`.
-- `custom_text_classification` supports TensorFlow models with a GUSE or ELM embedding
-  followed by a feedforward neural network.
-    - Saliency values are not available with this contract, as the model uses a sentence embedding.
+:yellow_circle: **Default value**: `New project`
 
-In the future, when supporting new ML tasks, such as AI Search or vision tasks, this field will
-support additional values to accommodate different data and model types.
+**Environment Variable**: `NAME`
 
-### Columns name
+Any name can be set for the config. For example, it can represent the name of the dataset and/or the
+model. Ex: `Banking77 Model v4`.
 
-This tells Azimuth which columns from the datasets to read from.
-Azimuth requires `text_input` and `label` to be present.
+## Dataset
 
-```python
-class ColumnConfiguration(BaseModel):
-    # Column for the preprocessed text input
-    text_input: str = "utterance"
-    # Optional Column for the raw text input
-    raw_text_input: str = "utterance_raw"
-    # Features column for the label
-    label: str = "label"
-    # Optional column to specify whether an example has failed preprocessing.
-    failed_parsing_reason: str = "failed_parsing_reason"
-```
+:red_circle: **Mandatory field**
 
-### Rejection class
+To define which dataset to load in the application, Azimuth
+uses [:material-link: Custom Objects](../custom-objects/index.md).
 
-The field `rejection_class` in the config is validated and requires the class to be present in the dataset.
-If your dataset doesn't have a "rejection_class" class, set the value to `None`.
+If the dataset is already on HuggingFace, you can use
+the [`datasets.load_dataset`](https://huggingface.co/docs/datasets/loading) from HF, as shown in the
+example below. If you have your own dataset, you will need to create your own custom object, as
+explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
+
+=== "Custom Object Definition"
+
+    ```python
+    from typing import Any, Dict, List, Optional, Union
+
+    from pydantic import BaseModel, Field
+
+    class CustomObject(BaseModel):
+        class_name: str = Field(..., title="Class name to load")
+        args: List[Union["CustomObject", Any]] = []
+        kwargs: Dict[str, Union["CustomObject", Any]] = {}
+        remote: Optional[str] = None # (1)
+    ```
+
+    1. Absolute path to `class_name`.
+
+=== "Config Example with HF"
+
+    Example to load [`banking77`](https://huggingface.co/datasets/banking77) from HF.
+
+    ```json
+    {
+      "dataset": {
+        "class_name": "datasets.load_dataset",
+        "args": [
+          "banking77"
+        ]
+      }
+    }
+    ```
+
+## Columns
+
+:yellow_circle: **Default value**: `ColumnConfiguration()`
+
+All dataset column names are configurable. The mandatory columns and their descriptions are as
+follows:
+
+| Field name | Default   | Description                                                       |
+|------------|-----------|-------------------------------------------------------------------|
+| `text_input` | `utterance` | The preprocessed utterance.                                       |
+| `label`      | `label`     | The class label for the utterance, as type `datasets.ClassLabel`. |
+
+=== "Class Definition"
+
+    ```python
+    from pydantic import BaseModel
+
+    class ColumnConfiguration(BaseModel):
+        text_input: str = "utterance" # (1)
+        raw_text_input: str = "utterance_raw" # (2)
+        label: str = "label" # (3)
+        failed_parsing_reason: str = "failed_parsing_reason" # (4)
+    ```
+
+    1. Column for the text input that will be send to the pipeline.
+    2. Optional column for the raw text input (before any pre-processing). Unused at the moment.
+    3. Features column for the label
+    4. Optional column to specify whether an example has failed preprocessing. Unused at the moment.
+
+=== "Config Example"
+
+    Example to override the default column values.
+
+    ```json
+    {
+      "columns": {
+        "text_input": "text",
+        "label": "target"
+      }
+    }
+    ```
+
+## Rejection class
+
+:yellow_circle: **Default value**: `REJECTION_CLASS`
+
+The field `rejection_class` requires the class to be present in the dataset. If your dataset doesn't
+have a rejection class, set the value to `null`. More details on the rejection class is available
+in [Prediction Outcomes](../../key-concepts/outcomes.md).
+
+--8<-- "includes/abbreviations.md"

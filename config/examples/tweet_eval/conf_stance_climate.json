@@ -1,6 +1,5 @@
 {
   "name": "Tweet Climate",
-  "pipelines": null,
   "dataset": {
     "class_name": "datasets.load_dataset",
     "args": [
@@ -12,5 +11,6 @@
     "text_input": "text",
     "label": "label"
   },
-  "rejection_class": "none"
+  "rejection_class": "none",
+  "pipelines": null
 }
