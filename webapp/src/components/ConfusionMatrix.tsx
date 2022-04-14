@@ -9,7 +9,7 @@ import { classNames } from "utils/helpers";
 
 const CONFUSION_ROW_OFFSET = 1;
 const CONFUSION_COLUMN_OFFSET = 1;
-const LABEL_LENGTH = "104px";
+const LABEL_LENGTH = "112px";
 const CELL_SIZE = "28px";
 
 type Props = {
@@ -50,17 +50,16 @@ const useStyles = makeStyles((theme) => ({
     cursor: "default",
     width: "100%",
     height: "100%",
-    lineHeight: CELL_SIZE,
     backgroundColor: theme.palette.background.paper,
     minHeight: "100%",
     minWidth: "100%",
   },
   rowLabel: {
     textAlign: "right",
-    paddingRight: theme.spacing(1),
+    padding: theme.spacing(1),
   },
   columnLabel: {
-    paddingTop: theme.spacing(1),
+    padding: theme.spacing(1),
   },
   cellPopover: {
     pointerEvents: "none",
