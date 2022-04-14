@@ -93,6 +93,7 @@ nav:
           - reference/configuration/similarity.md
           - reference/configuration/dataset_warnings.md
   - Development:
+      - development/index.md
       - development/setup.md
-      - development/contributing.md
+      - development/dev-practices.md
       - development/launching.md
