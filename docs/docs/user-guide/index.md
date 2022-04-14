@@ -8,7 +8,7 @@ different sections to get a deeper understanding of the dataset and the model.
 !!! info
 
     Azimuth can be launched without any pipelines. All the information related to the pipelines
-    (prediction, behavioral testing and so on) will not be available in all screens. It can also be
+    (prediction, behavioral testing and so on) will then be unavailable on all screens. It can also be
     launched with multiple pipelines. Use the dropdown in the top banner to switch between
     pipelines.
 
@@ -19,9 +19,9 @@ different sections to get a deeper understanding of the dataset and the model.
 The top banner contains useful information and links.
 
 * The **project name** from the config file is shown.
-* A dropdown :material-arrow-down-drop-circle-outline: allows to select the different pipelines
-  defined in the config. It also allows to select no pipelines.
-* The [**settings**](settings.md) :gear: allow to enable/disable different analyses.
+* A dropdown :material-arrow-down-drop-circle-outline: allows you to select the different pipelines
+  defined in the config. It also allows you to select no pipelines.
+* The [**settings**](settings.md) :gear: allow you to enable/disable different analyses.
 * A link to the support Slack channel and to the documentation is available in the help
   :material-help-circle: option.
 

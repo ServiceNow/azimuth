@@ -12,7 +12,7 @@ to see more information on each metric.
 
 ![Screenshot](../../_static/images/exploration-space/metrics.png)
 
-* The first tile correspond to the performance based on [**prediction
+* The first tile corresponds to the performance based on [**prediction
   outcomes**](../../key-concepts/outcomes.md):
     * :material-circle:{ .correct_predicted } **Correct & Predicted**
     * :material-circle:{ .correct_rejected } **Correct & Rejected**

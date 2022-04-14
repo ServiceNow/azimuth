@@ -20,14 +20,14 @@ panel. Both training and evaluation sets can be explored.
 !!! tip
 
     Don't forget the pipeline dropdown in the top banner to see how the performance of different
-    pipelines compare. This space also exists without selecting any pipelines to perform dataset
+    pipelines compare. This space also exists without selecting any pipelines, to perform dataset
     analysis.
 
 ### [Performance Overview](performance-overview.md)
 
 * Assess the quality of the metrics for any given subset of the data.
-* Visualize the distribution of the confidences score, according to the prediction outcome.
-* See the most important words from the utterances, according to the prediction outcome.
+* Visualize the distribution of the confidence scores, according to prediction outcome.
+* See the most important words from the utterances, according to prediction outcome.
 
 ### [Confusion Matrix](confusion-matrix.md)
 
