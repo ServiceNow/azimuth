@@ -3,6 +3,7 @@ import noData from "assets/void.svg";
 import PerturbationTestingPreview from "components/Analysis/PerturbationTestingPreview";
 import PreviewCard from "components/Analysis/PreviewCard";
 import WarningsPreview from "components/Analysis/WarningsPreview";
+import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
 import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
 import ThresholdPlot from "components/ThresholdPlot";
@@ -48,7 +49,9 @@ const Dashboard = () => {
           variant="contained"
           component={Link}
           to={`/${jobId}/dataset_splits/eval/performance_overview${searchString}`}
+          sx={{ gap: 1 }}
         >
+          <Telescope fontSize="large" />
           Go to exploration space
         </Button>
       </Box>
