@@ -33,7 +33,8 @@ exists:
 The Azimuth config file **contains all the information** to launch and customize Azimuth. It
 specifies which dataset and pipelines to load in the app, as well as other variables that control
 **customization** of the app. Most attributes have **default values** and don't need to be
-explicitly defined in each config. The **full reference** is [here](../reference/index.md).
+explicitly defined in each config. The [:material-link: **
+Configuration**](../reference/configuration/index.md) reference details all available fields.
 
 ## Verify your Setup
 
@@ -48,7 +49,8 @@ from [HuggingFace (HF)](http://www.huggingface.co). Verify that your setup is wo
 2. The **app will be accessible** at [http://0.0.0.0:8080](http://0.0.0.0:8080) after a few seconds
    of waiting. The screen will indicate that the start-up tasks have started. When it is completed,
    the application will be **loaded**. The [User Guide](../user-guide/index.md) section walks you
-   through all the screens.
+   through all the screens, and the [Key Concepts](../key-concepts/index.md) explains the high-level
+   concepts used throughout the application.
 
 !!! success
 

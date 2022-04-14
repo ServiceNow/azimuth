@@ -79,19 +79,22 @@ nav:
       - user-guide/settings.md
   - Reference:
       - reference/index.md
-      - API Contract:
-          - reference/api/index.md
-          - reference/api/pipeline.md
-          - reference/api/dataset.md
-          - reference/api/metric.md
       - Configuration:
           - reference/configuration/index.md
           - reference/configuration/project.md
-          - reference/configuration/common.md
           - reference/configuration/model_contract.md
-          - reference/configuration/behavioral_testing.md
-          - reference/configuration/similarity.md
-          - reference/configuration/dataset_warnings.md
+          - reference/configuration/common.md
+          - Analyses Customization:
+              - reference/configuration/analyses/index.md
+              - reference/configuration/analyses/behavioral_testing.md
+              - reference/configuration/analyses/similarity.md
+              - reference/configuration/analyses/dataset_warnings.md
+      - Custom Objects:
+          - reference/custom-objects/index.md
+          - reference/custom-objects/dataset.md
+          - reference/custom-objects/model.md
+          - reference/custom-objects/postprocessors.md
+          - reference/custom-objects/metric.md
   - Development:
       - development/setup.md
       - development/contributing.md

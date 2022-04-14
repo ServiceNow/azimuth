@@ -118,7 +118,7 @@ robustness_ of the model.
 
 ### Configuration
 
-[Behavioral Testing Configuration](../reference/configuration/behavioral_testing.md)
+[Behavioral Testing Configuration](../reference/configuration/analyses/behavioral_testing.md)
 details how to change some parameters, such as the lists of neutral tokens, the number of typos and
 the threshold confidence delta above which the tests should fail.
 

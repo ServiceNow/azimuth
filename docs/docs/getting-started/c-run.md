@@ -5,20 +5,21 @@ Docker. Different dataset and text classification models can be supported in Azi
 
 The **simplest scenario** is if you have a [**HuggingFace (HF)**](http://www.huggingface.co)
 **dataset** and **model**. For the sake of simplicity, we explain the instructions to run the app
-with this scenario. If your use case is more complex, the following resources will show you how
-to **adapt the instructions** accordingly.
+with this scenario. However, you will quickly need to learn
+about [Custom Objects](../reference/custom-objects/index.md) and the configuration details to launch
+more complex use cases.
 
-* Your data is **not a HF Dataset**? TODO
-* Your model is **not a HF pipeline**? TODO
-* You don't have a model, just a **file with saved predictions**? TODO
-* Your data or model **cannot be moved** to `azimuth/azimuth_shr`? TODO
-* Complete the list TODO
+* The [Project Config](../reference/configuration/project.md) explains in more details some
+  mandatory fields in the config, such as the `name`, `dataset`, the `columns` and
+  the `rejection_class`.
+* The [Model Contract Config](../reference/configuration/project.md) details how to define
+  the `pipelines`, the `model_contract` and the `saliency_layer`, amongst other fields.
 
 ## 1. Prepare the Config File
 
-**Start from an existing config** and **edit** the relevant fields to adapt it to your dataset and
-models. An example with an [HuggingFace (HF)](http://www.huggingface.co) dataset and model is
-available in `azimuth/config/hf_example/conf.json` (also shown below).
+**Start from an existing config ** and **edit** the relevant fields to adapt it to your dataset and
+models. Examples with an [HuggingFace (HF)](http://www.huggingface.co)
+dataset and model are available in `config/examples` (also shown below).
 
 1. Put your model checkpoint under the folder `azimuth/azimuth_shr`. TODO Explain more
 2. In `azimuth/config`, copy `hf_example/conf.json` to a new folder with your project name.
@@ -57,7 +58,8 @@ available in `azimuth/config/hf_example/conf.json` (also shown below).
     "text_input": "text",
     "label": "intent"
   },
-  "rejection_class": "oos" # (10)
+  "rejection_class": "oos", # (10)
+  "saliency_layer": "distilbert.embeddings.word_embeddings", # (11)
 }
 ```
 
@@ -71,6 +73,7 @@ available in `azimuth/config/hf_example/conf.json` (also shown below).
 8. `kwargs` to send to the `class_name`.
 9. Specify the name of the dataset columns, such as the column wit the utterance and the label.
 10. Specify the value if a rejection option is present in the classes.
+11. Name of the layer on which to compute saliency maps.
 
 ## 2. Running the App
 
@@ -86,11 +89,14 @@ available in `azimuth/config/hf_example/conf.json` (also shown below).
 4. The **app will be accessible** at `http://0.0.0.0:8080` after a few seconds of waiting. The
    start-up tasks will start.
 
-## Advanced Settings [Optional]
+## Advanced Settings
 
 ### Additional Config Fields
 
-TODO
+The [:material-link: **
+Configuration**](../reference/configuration/index.md) reference details all additional fields that
+can be set, such as changing how behavioral tests are executed, the similarity analysis encoder, the
+batch size and so on.
 
 ### Environment variables
 
@@ -98,9 +104,9 @@ No matter where you launch the app from, you can always configure some options t
 variables. They are all redundant with the config attributes, so you can set them in either place.
 They are the following:
 
-* Specify the threshold (X) of your model by passing `TH` (ex: `TH=0.6` or `NaN` if there is no
+* Specify the threshold of your model by passing `TH` (ex: `TH=0.6` or `NaN` if there is no
   threshold) in the command. If multiple pipelines are defined, the threshold will apply to all.
-* Similarly, pass `TEMP=Y` (ex: `TEMP=3`) to set the temperature (Y) of the model.
+* Similarly, pass `TEMP=Y` (ex: `TEMP=3`) to set the temperature of the model.
 * Disable behavioral tests and similarity by passing respectively `BEHAVIORAL_TESTING=null` and
   `SIMILARITY=null`.
 * Specify the name of the project, passing `NAME`.

@@ -52,7 +52,7 @@ as `few_similar_train` and/or `few_similar_eval`, based on which set it is.
 
 ### Configuration
 
-[:material-link: Similarity Analysis Configuration](../reference/configuration/similarity.md)
+[:material-link: Similarity Analysis Configuration](../reference/configuration/analyses/similarity.md)
 details how to change the encoder to compute the similarity, and the two thresholds used to
 determine the smart tags.
 
