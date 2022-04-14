@@ -3,7 +3,6 @@
 # in the root directory of this source tree.
 import json
 import time
-from pprint import pprint
 
 import pytest
 from fastapi import FastAPI
@@ -51,12 +50,12 @@ def wait_for_startup_after(app):
 
 
 @pytest.fixture(scope="session")
-def app() -> FastAPI:
+def app(tmp_path) -> FastAPI:
     router_config = AzimuthConfig(
         name="sentiment-analysis",
         dataset=DATASET_CFG,
         pipelines=[FAST_TEST_CFG],
-        artifact_path="/tmp/azimuth_test_cache_potato",
+        artifact_path=str(tmp_path),
         batch_size=16,
         use_cuda=False,
         model_contract="custom_text_classification",
@@ -72,17 +71,6 @@ def app() -> FastAPI:
         time.sleep(1)
         resp = client.get("/status")
     task_manager = me_app.get_task_manager()
-    mods_are_done = [
-        status not in ["not_started", "finished"]
-        for status in resp.json()["startupTasksStatus"].values()
-    ]
-    if any(mods_are_done):
-        exceptions = {
-            k: None if v.future is None else v.future.exception()
-            for k, v in task_manager.current_tasks.items()
-        }
-        pprint(exceptions)
-        raise ValueError(exceptions)
 
     while task_manager.is_locked:
         time.sleep(1)
