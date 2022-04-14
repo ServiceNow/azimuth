@@ -1,4 +1,5 @@
-# Contributing
+# Development Pratices
+
 ## New Branch
 When starting a new branch, it needs to start with `pr/`.
 We don't have a convention in our team for the rest of the name.

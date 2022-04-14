@@ -42,4 +42,4 @@ default is 3 for both) respectively.
 ## Configuration
 
 All thresholds mentioned (`X`/`Y`/`Z`/`W`) can be modified in the config file, as explained
-in [:material-link: Dataset Warnings Configuration](../reference/configuration/dataset_warnings.md).
+in [:material-link: Dataset Warnings Configuration](../reference/configuration/analyses/dataset_warnings.md).

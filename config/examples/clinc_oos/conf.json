@@ -1,16 +1,5 @@
 {
   "name": "CLINC-151",
-  "pipelines": [
-    {
-      "model": {
-        "class_name": "loading_resources.load_hf_text_classif_pipeline",
-        "remote": "/azimuth_shr",
-        "kwargs": {
-          "checkpoint_path": "transformersbook/distilbert-base-uncased-distilled-clinc"
-        }
-      }
-    }
-  ],
   "dataset": {
     "class_name": "datasets.load_dataset",
     "args": [
@@ -23,6 +12,17 @@
     "label": "intent"
   },
   "rejection_class": "oos",
-  "saliency_layer": "distilbert.embeddings.word_embeddings",
-  "model_contract": "hf_text_classification"
+  "model_contract": "hf_text_classification",
+  "pipelines": [
+    {
+      "model": {
+        "class_name": "loading_resources.load_hf_text_classif_pipeline",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "checkpoint_path": "transformersbook/distilbert-base-uncased-distilled-clinc"
+        }
+      }
+    }
+  ],
+  "saliency_layer": "distilbert.embeddings.word_embeddings"
 }
