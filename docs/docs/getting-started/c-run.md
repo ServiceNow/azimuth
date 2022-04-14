@@ -3,6 +3,12 @@
 This page guides you through the process of running the app on your data and pipelines, using
 Docker. Different dataset and text classification models can be supported in Azimuth.
 
+!!! info
+
+    Azimuth supports specifying **no pipelines**, to only perform dataset analysis. It also supports
+    supplying **mulitple pipelines**, to allow for quick comparison. However, only one dataset per
+    config is allowed.
+
 The **simplest scenario** is if you have a [**HuggingFace (HF)**](http://www.huggingface.co)
 **dataset** and **model**. For the sake of simplicity, we explain the instructions to run the app
 with this scenario. If your use case is more complex, the following resources will show you how

@@ -12,7 +12,7 @@ to see more information on each metric.
 
 ![Screenshot](../../_static/images/exploration-space/metrics.png)
 
-* The first tile correspond to the performance based on [**
+* The first tile correspond to the performance based on [**prediction
   outcomes**](../../key-concepts/outcomes.md):
     * :material-circle:{ .correct_predicted } **Correct & Predicted**
     * :material-circle:{ .correct_rejected } **Correct & Rejected**
@@ -25,7 +25,7 @@ to see more information on each metric.
 
 ## Confidence Histogram
 
-The Confidence Histogram displays the distribution of model confidences, grouped-by [**
+The Confidence Histogram displays the distribution of model confidences, grouped-by [**prediction
 outcomes**](../../key-concepts/outcomes.md). The threshold, if set in
 the [:material-link: Project Configuration](../../reference/configuration/project.md), is displayed
 on the plot.

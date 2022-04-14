@@ -1,9 +1,9 @@
 import {
-  CircularProgress,
   alpha,
+  Box,
+  CircularProgress,
   Tooltip,
   Typography,
-  Box,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
@@ -18,12 +18,12 @@ const yTicks = Array.from(Array(yIntervals + 1), (_, i) => 1 - i / yIntervals);
 
 const majorGridLines: { [y: number]: { tooltip: string; label: string } } = {
   0.9: {
-    tooltip: "Red bar should not exceed this line to meet goals",
-    label: "Max Incorrect",
+    tooltip: "Red bar should ideally not exceed this line",
+    label: "Target for Incorrect & Predicted",
   },
   0.7: {
-    tooltip: "Green bar should exceed this line to meet goals",
-    label: "Min Correct",
+    tooltip: "Green bars should ideally exceed this line",
+    label: "Target for Correct",
   },
 };
 
