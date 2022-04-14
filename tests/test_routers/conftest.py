@@ -82,6 +82,7 @@ def app() -> FastAPI:
             for k, v in task_manager.current_tasks.items()
         }
         pprint(exceptions)
+        raise ValueError(exceptions)
 
     while task_manager.is_locked:
         time.sleep(1)
