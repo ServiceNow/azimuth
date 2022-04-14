@@ -74,6 +74,8 @@ const SimilarUtterances: React.FC<Props> = ({
     {
       field: "similarity",
       headerName: "Similarity",
+      description:
+        "Cosine similarity (1 indicates the utterance is identical while 0 indicates it is unrelated)", // tooltip
       valueFormatter: (params) => (params.value as number).toFixed(2),
       sortable: false,
       align: "center",

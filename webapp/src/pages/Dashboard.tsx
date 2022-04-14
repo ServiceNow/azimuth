@@ -12,7 +12,7 @@ import { Link, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
 
-const DEFAULT_PREVIEW_CONTENT_HEIGHT = 520;
+const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
 
 const Dashboard = () => {
   const { jobId } = useParams<{ jobId: string }>();
@@ -82,7 +82,7 @@ const Dashboard = () => {
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) &&
-        data?.postprocessingEditable[pipeline.pipelineIndex] && (
+        data?.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
             to={`/${jobId}/thresholds${searchString}`}

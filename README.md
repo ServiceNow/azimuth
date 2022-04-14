@@ -12,39 +12,53 @@
 
 ## Overview
 
-Azimuth is an application that helps model developers better understand their dataset and their model results by
-performing thorough error analyses. It currently only supports text classification use cases.
+Azimuth is an open source application that helps AI practitioners and data scientists better
+**understand their dataset and model predictions** by performing thorough **dataset** and **error
+analyses**. The application leverages different tools, including robustness tests, semantic
+similarity analysis and saliency maps, unified by concepts such as **smart tags** and **proposed
+actions**. It currently only supports **text classification use cases**.
 
-Our [documentation](https://servicenow.github.io/azimuth) contains details how to launch the application and its main
-features.
+Our [documentation](https://servicenow.github.io/azimuth) contains all the instructions and
+references to use Azimuth.
 
-### Quick start
+### Documentation Structure
 
-To get the application running, we can use a pretrained model from [HuggingFace](huggingface.co).
+* [Getting Started](https://servicenow.github.io/azimuth/getting-started)
+  contains all the instructions to **install** and **launch** the app.
+* [Key Concepts](https://servicenow.github.io/azimuth/key-concepts) explains the different
+  **concepts and analyses** that are provided in Azimuth to perform dataset and error analysis.
+* [User Guide](https://servicenow.github.io/azimuth/user-guide) goes **screen per screen** to
+  explain the different **interactions and visualizations** available.
+* [Reference](https://servicenow.github.io/azimuth/reference) details the config file and the
+  different **contracts** which allow **configuring** Azimuth with different datasets and pipelines.
+* [Development](https://servicenow.github.io/azimuth/development) guides on how to develop and
+  **contribute** to the repo.
 
-In `config/nlp_text_classification/banking77/conf.json` you will find an example of an Azimuth configuration file. For
-more information on our configuration file, see
-our [Documentation](https://servicenow.github.io/azimuth/getting-started/config/).
+## Quick start
 
-If you have Docker installed, run the following to launch Azimuth for the `banking77` data and model:
+Follow the instructions in [Getting Started](https://servicenow.github.io/azimuth/getting-started)
+to install the requirements, including Docker.
 
-`make DEVICE=cpu CFG_PATH=/config/nlp_text_classification/banking77/conf.json launch`
+Different configuration examples are provided in `config/examples`, leveraging pretrained models
+from [HuggingFace](https://huggingface.co).
+The [Reference](https://servicenow.github.io/azimuth/reference) details what a configuration file
+contains. You can launch one of the examples by making:
 
-To get Azimuth running with a gpu simply set `DEVICE=gpu` instead.
+```
+make CFG_PATH=/config/examples/banking77/conf.json compose
+```
 
-If you don't have Docker installed, please refer
-to [Getting Started](https://servicenow.github.io/azimuth/getting-started/install/).
+Once the startup tasks are completed, you will be able to access Azimuth at http://0.0.0.0:8080. To
+learn more about Azimuth's features, refer to
+our [Key Concepts](https://servicenow.github.io/azimuth/key-concepts) and
+our [User Guide](https://servicenow.github.io/azimuth/user-guide).
 
-Once the startup tasks are completed, you will be able to access Azimuth. To learn more about Azimuth's features, refer
-to our [User Guide](https://servicenow.github.io/azimuth/user-guide/dashboard/).
-
-To use your own dataset or model, please refer
-to [Getting Started](https://servicenow.github.io/azimuth/getting-started/install/).
+To use your own dataset and models, please refer to
+[Run on Your Use Case](https://servicenow.github.io/azimuth/getting-started/getting-started/c-run/).
 
 ## How to Develop
 
-Our Development documentation can be found [here](https://servicenow.github.io/azimuth/development/setup). We document
-our big technical decisions on our [wiki](https://github.com/ServiceNow/azimuth/wiki/Technical-Design-Decisions).
+Our Development documentation can be found [here](https://servicenow.github.io/azimuth/development).
 
 ### Code Documentation
 
@@ -58,17 +72,11 @@ add other `README` files in appropriate places, and don't forget to edit them if
 ### Repo Structure
 
 ```bash
-├── config
-│   └── Config files for different data/models
-├── docs
-│   └── User documentation
-├── tests
-│   └── Unit/integration tests
 ├── azimuth
-│   ├── functional
-│   │   └── Capabilities outside of Modules.
 │   ├── modules
 │   │   └── Where core capabilities are implemented
+│   ├── plots
+│   │   └── Plotting functions
 │   ├── routers
 │   │   └── FastAPI routers
 │   ├── types
@@ -77,6 +85,12 @@ add other `README` files in appropriate places, and don't forget to edit them if
 │   │   └── Extra utilities
 ├── azimuth_shr
 │   └── Custom code that is shareable.
+├── config
+│   └── Config files for different data/models
+├── docs
+│   └── User documentation
+├── tests
+│   └── Unit/integration tests
 ├── docker-compose.yml # Where the config and images are specified.
 ├── docker-compose-gpu.yml # Extension to use Azimuth with gpus.
 └── runner.py # Application entrypoint.

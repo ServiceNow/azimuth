@@ -130,7 +130,14 @@ export interface components {
       uncertainty?: components["schemas"]["UncertaintyOptions"];
       saliency_layer?: string;
       metrics?: { [key: string]: components["schemas"]["MetricDefinition"] };
-      perturbation_testing?: components["schemas"]["PerturbationTestingOptions"];
+      behavioral_testing?: components["schemas"]["BehavioralTestingOptions"];
+    };
+    BehavioralTestingOptions: {
+      neutral_token?: components["schemas"]["NeutralTokenOptions"];
+      punctuation?: components["schemas"]["PunctuationTestOptions"];
+      fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
+      typo?: components["schemas"]["TypoTestOptions"];
+      seed?: number;
     };
     ColumnConfiguration: {
       text_input?: string;
@@ -206,7 +213,7 @@ export interface components {
      * that all fields are represented correctly.
      */
     DatasetDistributionComparisonValue: {
-      value?: Partial<number> & Partial<number>;
+      value: (Partial<number> & Partial<number>) | null;
       alert: boolean;
     };
     /**
@@ -221,13 +228,13 @@ export interface components {
       evalClassDistribution: number[];
       trainClassDistribution: number[];
       startupTasks: { [key: string]: any };
-      defaultThreshold?: number[];
+      defaultThreshold: number[] | null;
       modelContract: components["schemas"]["SupportedModelContract"];
       predictionAvailable: boolean;
       perturbationTestingAvailable: boolean;
       availableDatasetSplits: components["schemas"]["AvailableDatasetSplits"];
       similarityAvailable: boolean;
-      postprocessingEditable: boolean[];
+      postprocessingEditable: boolean[] | null;
     };
     /** An enumeration. */
     DatasetSplitName: "eval" | "train" | "all";
@@ -257,7 +264,9 @@ export interface components {
      */
     DatasetWarningPlots: {
       overall: components["schemas"]["PlotSpecification"];
-      perClass?: { [key: string]: components["schemas"]["PlotSpecification"] };
+      perClass: {
+        [key: string]: components["schemas"]["PlotSpecification"];
+      } | null;
     };
     DatasetWarningsOptions: {
       min_num_per_class?: number;
@@ -318,7 +327,7 @@ export interface components {
       utteranceCount: number;
       customMetrics: { [key: string]: number };
       ece: number;
-      ecePlot?: components["schemas"]["PlotSpecification"];
+      ecePlot: components["schemas"]["PlotSpecification"] | null;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -418,7 +427,10 @@ export interface components {
       | "IncorrectAndPredicted"
       | "IncorrectAndRejected";
     /** An enumeration. */
-    PerturbationTestFailureReason: "PredClass" | "PredConfThreshold" | "NA";
+    PerturbationTestFailureReason:
+      | "Different predicted class."
+      | "Confidence too far from original."
+      | "NA";
     /** An enumeration. */
     PerturbationTestFamily: "Fuzzy Matching" | "Punctuation";
     /** An enumeration. */
@@ -448,13 +460,6 @@ export interface components {
       trainFailedCount: number;
       trainConfidenceDelta: number;
       example: components["schemas"]["PerturbedUtteranceExample"];
-    };
-    PerturbationTestingOptions: {
-      neutral_token?: components["schemas"]["NeutralTokenOptions"];
-      punctuation?: components["schemas"]["PunctuationTestOptions"];
-      fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
-      typo?: components["schemas"]["TypoTestOptions"];
-      seed?: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -494,7 +499,7 @@ export interface components {
       perturbations: string[];
       perturbationType: components["schemas"]["PerturbationType"];
       confidence: number;
-      confidenceDelta?: number;
+      confidenceDelta: number | null;
       failed: boolean;
       failureReason: components["schemas"]["PerturbationTestFailureReason"];
       prediction: string;
@@ -547,8 +552,8 @@ export interface components {
       index: number;
       utterance: string;
       label: string;
-      postprocessedPrediction?: string;
-      postprocessedConfidence?: number;
+      postprocessedPrediction: string | null;
+      postprocessedConfidence: number | null;
       similarity: number;
     };
     /**
@@ -560,7 +565,7 @@ export interface components {
     };
     SimilarityOptions: {
       faiss_encoder?: string;
-      few_similar_threshold?: number;
+      conflicting_neighbors_threshold?: number;
       no_close_threshold?: number;
     };
     /** An enumeration. */
@@ -571,8 +576,8 @@ export interface components {
       | "missing_subj"
       | "missing_obj"
       | "missing_verb"
-      | "few_similar_train"
-      | "few_similar_eval"
+      | "conflicting_neighbors_train"
+      | "conflicting_neighbors_eval"
       | "no_close_train"
       | "no_close_eval"
       | "failed_punctuation"
@@ -665,8 +670,8 @@ export interface components {
     Utterance: {
       /** Row index computed by Azimuth.. */
       index: number;
-      modelPrediction?: components["schemas"]["ModelPrediction"];
-      modelSaliency?: components["schemas"]["ModelSaliency"];
+      modelPrediction: components["schemas"]["ModelPrediction"] | null;
+      modelSaliency: components["schemas"]["ModelSaliency"] | null;
       smartTags: components["schemas"]["SmartTag"][];
       dataAction: components["schemas"]["DataAction"];
       label: string;

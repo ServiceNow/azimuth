@@ -292,7 +292,7 @@ export const api = createApi({
         const tags = new Set<Tag>();
         // Invalidate DatasetInfo only after the query is fulfilled,
         // otherwise the response is not up to date or even fails.
-        if ("perturbation_testing" in partialConfig) {
+        if ("behavioral_testing" in partialConfig) {
           tags.add("Status");
           tags.add("PerturbationTestingSummary");
           tags.add("PerturbedUtterances");
@@ -314,9 +314,9 @@ export const api = createApi({
         );
         const patchDatasetInfo = dispatch(
           api.util.updateQueryData("getDatasetInfo", { jobId }, (draft) => {
-            if ("perturbation_testing" in partialConfig) {
+            if ("behavioral_testing" in partialConfig) {
               draft.perturbationTestingAvailable = Boolean(
-                partialConfig.perturbation_testing
+                partialConfig.behavioral_testing
               );
             }
             if ("similarity" in partialConfig) {

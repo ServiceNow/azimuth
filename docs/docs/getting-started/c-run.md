@@ -90,10 +90,10 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 2. Set `CFG_PATH="/config/my_project/conf.json"` with the **location of the config**.
     * The initial `/` is required as your local config folder will be mounted on the Docker
       container at the root.
-    * If you do not specify any `CFG_PATH`, i.e `make launch`, the default demo will launch.
+    * If you do not specify any `CFG_PATH`, i.e `make compose`, the default demo will launch.
 3. Execute the following **command**:
     ```
-    make launch
+    make compose
     ```
 4. The **app will be accessible** at `http://0.0.0.0:8080` after a few minutes of waiting. The
    start-up tasks will start.

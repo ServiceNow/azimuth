@@ -45,7 +45,7 @@ the memory available on your machine.
 
 :blue_circle: **Default value**: `auto`
 
-Azimuth will use CUDA and will need GPUs if set to True. If "auto", Azimuth will check if CUDA is
-available.
+If cuda is available on your machine, set to `true`, otherwise `false`. Can also be set to "auto"
+and let the user-code take care of it.
 
 --8<-- "includes/abbreviations.md"

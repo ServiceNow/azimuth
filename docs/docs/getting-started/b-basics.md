@@ -44,9 +44,10 @@ from [HuggingFace (HF)](http://www.huggingface.co). Verify that your setup is wo
 
 1. In the terminal, from the `azimuth` folder, execute:
     ```
-    make launch
+    make DEVICE=$DEVICE compose
     ```
-2. The **app will be accessible at [http://0.0.0.0:8080](http://0.0.0.0:8080)** after a few minutes
+   where `$DEVICE` is one of `gpu` or `cpu`. If none provided, `cpu` will be used.
+2. The **app will be accessible** at [http://0.0.0.0:8080](http://0.0.0.0:8080) after a few minutes
    of waiting. The screen will indicate that the start-up tasks have started. When it is completed,
    the application will be loaded.
 3. Skim the [:material-link: Key Concepts](../key-concepts/index.md) section to get a high-level

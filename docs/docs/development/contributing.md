@@ -56,12 +56,3 @@ We have a template for when you open a PR.
 Follow instructions and check the boxes to acknowledge that you have done the required steps.
 Regarding the `CHANGELOG.md`, you will need to add your changes only if it is visible for the end-users.
 This helps us when building the release notes.
-
-## Running experiments
-* To run experiments, you can add or run existing notebooks in the `experiments` folder, using the
-command: `poetry run jupyter notebook`
-* To launch a notebook in the Toolkit: `make notebook`
-
-!!! note
-    We usually commit notebooks without the cell outputs.
-    Some notebooks may not run anymore based on code changes.

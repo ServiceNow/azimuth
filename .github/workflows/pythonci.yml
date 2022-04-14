@@ -1,33 +1,35 @@
-name: Python package
+name: Python CI
 
 on:
   push:
-    branches: [ master, azimuth ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ master, azimuth ]
+    branches: [ main, dev ]
 
 jobs:
-  build:
+  backend:
 
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8"]
+        python-version: [ "3.8" ]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-        source $HOME/.poetry/env
-        echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-        poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
-    - name: Test with pytest/flake8/mypy
-      run: |
-        make test
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - uses: Gr1N/setup-poetry@v7
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - run: poetry --version
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-ansi
+      - name: Test with pytest/flake8/mypy
+        run: |
+          make test
