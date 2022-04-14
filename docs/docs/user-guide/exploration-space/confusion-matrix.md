@@ -7,10 +7,11 @@ given label.
 
 !!! tip
 
-    The [outcomes](../../key-concepts/outcomes.md) colors are shown on the confusion matrix.
+    The prediction [outcomes](../../key-concepts/outcomes.md) colors are shown on the confusion
+    matrix.
 
 ![Screenshot](../../_static/images/exploration-space/confusion-matrix.png)
 
 !!! example
 
-    In this example, 45% of utterances labeled as `bill_due` were predicted as `bill_balance`.
+    In this example, 55% of utterances labeled as `bill_due` were predicted as `bill_balance`.

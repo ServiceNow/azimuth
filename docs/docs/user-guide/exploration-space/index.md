@@ -6,16 +6,28 @@ trigger further work to improve the model's performance.
 
 ![Screenshot](../../_static/images/exploration-space/performance-overview.png)
 
+!!! tip
+
+    Access this space through the header of the dashboard.
+
+    ![Screenshot](../../_static/images/dashboard/top-banner.png)
+
 ## Views
 
 Interact with the Exploration Space in different views. Filter the data on any view with the control
 panel. Both training and evaluation sets can be explored.
 
+!!! tip
+
+    Don't forget the pipeline dropdown in the top banner to see how the performance of different
+    pipelines compare. This space also exists without selecting any pipelines, to perform dataset
+    analysis.
+
 ### [Performance Overview](performance-overview.md)
 
 * Assess the quality of the metrics for any given subset of the data.
-* Visualize the distribution of the confidences score, according to the outcome.
-* See the most important words from the utterances, according to the outcome.
+* Visualize the distribution of the confidence scores, according to prediction outcome.
+* See the most important words from the utterances, according to prediction outcome.
 
 ### [Confusion Matrix](confusion-matrix.md)
 
@@ -42,7 +54,7 @@ All views are affected by the control panel.
 
 ### Evaluation Set and Training Set
 
-![Screenshot](../../_static/images/control-panel/train-eval-toggle.png){: style="width:400px"}
+![Screenshot](../../_static/images/control-panel/dataset-toggle.png){: style="width:400px"}
 
 Explore the views on both the evaluation and the training set by clicking the toggle. Clicking on a
 tab will update the view.
@@ -55,10 +67,12 @@ filters are listed below.
 
 #### Filter Categories
 
+![Screenshot](../../_static/images/control-panel/utterances-search.png){: style="width:200px"}
+
 * **Search a particular string** to filter utterances that contains it.
 * Filter predictions based on their **confidence value**. You can specify a minimum and a maximum
   value.
-* Filter predictions according to their [**outcomes**](../../key-concepts/outcomes.md).
+* Filter predictions according to their prediction [**outcomes**](../../key-concepts/outcomes.md).
 * Filter by **labeled class** (the target).
 * Filter by **predicted class**.
 * Filter by [**smart tags**](../../key-concepts/smart-tags.md).
@@ -68,9 +82,9 @@ filters are listed below.
 
 ##### Bars Distribution
 
-* The bar distributions to the right of the filters show
-  the [outcome](../../key-concepts/outcomes.md) count for a given filter. Selecting or deselecting
-  filters update the bars based on the current selection.
+* The bar distributions to the right of the filters show the
+  prediction [outcome](../../key-concepts/outcomes.md) count for a given filter. Selecting or
+  deselecting filters update the bars based on the current selection.
   ![Screenshot](../../_static/images/control-panel/bar-distribution.png){: style="width:400px"}
 
 ##### Filters Selection
