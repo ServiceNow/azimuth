@@ -1,79 +1,94 @@
 # About Us
 
-We started developing Azimuth at the beginning of 2021, as an internal tool at Service Now. We are
-open-source since April 2022. Our motivation in developing this tool is to go beyond the traditional
-model quality assessment based solely on high level metrics. We strongly believe that much more can
-be discovered and understood from our dataset and models if we have the right tools, visualizations
-and interfaces. We hope you agree and that you enjoy Azimuth!
+We started developing Azimuth :material-telescope: at the beginning of 2021, as an internal tool at
+ServiceNow. We are open-source since April 2022. Our motivation in developing this tool is to go
+beyond the traditional model quality assessment based solely on high level metrics. We strongly
+believe that much more can be discovered and understood from our dataset and models if we have the
+right tools, visualizations and interfaces. We hope this can be helpful to you, and that you enjoy
+Azimuth! :smiley:
 
 ## The Team
 
 ### Main Contributors
 
-![](_static/images/development/team/fred.png){ width=200 align=left }
+=== "Frédéric Branchaud-Charron"
 
-Fred works as an Applied Research Scientist specializing in Bayesian deep learning, active learning
-and uncertainty estimation. In addition to maintaining Azimuth, he also maintains BaaL, a Bayesian
-active learning library.
+    ![](_static/images/development/team/fred.png){ width=200 align=left }
 
-[:material-github: Dref360](https://github.com/Dref360)
+    Fred works as an Applied Research Scientist specializing in Bayesian deep learning, active learning
+    and uncertainty estimation. In addition to maintaining Azimuth, he also maintains BaaL, a Bayesian
+    active learning library.
 
-<br>
-<br>
-
-![](_static/images/development/team/gab.jpg){ width=200 align=left }
-
-Gab is an Applied Research Scientist, interested in explainability, uncertainty and topics related
-to building trust in AI. She's involved in maintaining the back end, designing the interfaces and
-the documentation. She's been dreaming about building a tool like Azimuth for a few years now.
-
-[:material-github: gabegma](https://github.com/gabegma)
+    [:material-github: Dref360](https://github.com/Dref360)
 
 <br>
-<br>
 
-![Joseph Marinier](_static/images/development/team/joseph.png){ width=200 align=left } Fred works as
-an Applied Research Scientist specializing in Bayesian deep learning, active learning and
-uncertainty estimation. In addition to maintaining Azimuth, he also maintains BaaL, a Bayesian
-active learning library.
+=== "Gabrielle Gauthier-Melançon"
 
-[:material-github: JosephMarinier](https://github.com/JosephMarinier)
+    ![](_static/images/development/team/gab.jpg){ width=200 align=left }
 
-<br>
-<br>
+    Gab is an Applied Research Scientist, interested in explainability, uncertainty and topics related
+    to building trust in AI. She's involved in maintaining the back end, designing the user interface
+    and documenting Azimuth. She's been dreaming about building a tool like Azimuth for a few years now.
 
-![Lindsay Brin](_static/images/development/team/lindsay.jpeg){ width=200 align=left } Lindsay is an
-Applied Research Scientist working in explainability and NLU, who loves the concept of representing
-language in mathematical space. Her journey through data analysis, modeling, and visualization
-started with research in biogeochemistry and ecosystem ecology.
-
-[:material-github: lindsaydbrin](https://github.com/lindsaydbrin)
+    [:material-github: gabegma](https://github.com/gabegma)
 
 <br>
-<br>
 
-![Chris Tyler](_static/images/development/team/fred.png){ width=200 align=left } Fred works as an
-Applied Research Scientist specializing in Bayesian deep learning, active learning and uncertainty
-estimation. In addition to maintaining Azimuth, he also maintains BaaL, a Bayesian active learning
-library.
+=== "Joseph Marinier"
 
-[:material-github: christyler3030](https://github.com/christyler3030)
+    ![Joseph Marinier](_static/images/development/team/joseph.jpg){ width=200 align=left } Joseph is a
+    full-stack developer who enjoys designing and engineering solutions to a large variety of problems.
+    His main contribution to Azimuth has been in the front end.
 
-<br>
-<br>
-
-![Nandhini Babu](_static/images/development/team/nandhini.png){ width=200 align=left } Nandhini is a
-developer at Service Now who joined the ATG team in January 2022. She's mostly contributing on the
-front-end. Her overall experience is around web development.
-
-[:material-github: Dref360](https://github.com/Dref360)
+    [:material-github: JosephMarinier](https://github.com/JosephMarinier)
 
 <br>
+
+=== "Lindsay Brin"
+
+    ![Lindsay Brin](_static/images/development/team/lindsay.jpeg){ width=200 align=left } Lindsay is an
+    Applied Research Scientist working in explainability and NLU, who loves the concept of representing
+    language in mathematical space. Her journey through data analysis, modeling, and visualization
+    started with research in biogeochemistry and ecosystem ecology.
+
+    [:material-github: lindsaydbrin](https://github.com/lindsaydbrin)
+
+<br>
+
+=== "Chris Tyler"
+
+    ![Chris Tyler](_static/images/development/team/chris.png){ width=200 align=left } Chris is a software
+    developer with a background in physics and an interest in everything. He has contributed to the
+    design and development of the Azimuth user interface.
+
+    [:material-github: christyler3030](https://github.com/christyler3030)
+
+<br>
+
+=== "Nandhini Babu"
+
+    ![Nandhini Babu](_static/images/development/team/nandhini.png){ width=200 align=left } Nandhini is a
+    developer at ServiceNow who joined the ATG team in January 2022. She's mostly contributing on the
+    front end. Her overall experience is around web development.
+
+    [:material-github: nandhinibsn](https://github.com/nandhinibsn)
+
 <br>
 
 ### Designers
 
-### Special thanks!
+We can also count on the support from amazing designers.
+
+=== "Karine Grande"
+
+    ![Karine Grande](_static/images/development/team/karine.png){ width=200 align=left }
+    Karine is a Product Designer working on experiences that use AI/ML technology. In addition of
+    helping on the design side of Azimuth, she worked on projects about data labelling,
+    classification, summarization and forecasting, and is currently working on document processing
+    and data extraction.
+
+## Special Thanks
 
 Thank you to all others who helped us developing this!
 
