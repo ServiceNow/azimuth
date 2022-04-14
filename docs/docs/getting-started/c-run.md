@@ -81,9 +81,8 @@ available in `azimuth/config/hf_example/conf.json` (also shown below).
     * If you do not specify any `CFG_PATH`, i.e `make compose`, the default demo will launch.
 3. Execute the following **command**:
     ```
-    make DEVICE=cpu compose
+    make compose
     ```
-   to enable gpus, use `DEVICE=gpu`.
 4. The **app will be accessible** at `http://0.0.0.0:8080` after a few seconds of waiting. The
    start-up tasks will start.
 
