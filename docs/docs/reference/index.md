@@ -1,9 +1,10 @@
-# References
+# Reference
 
-Our references are split in two sections:
+Our reference is split in two sections:
 
-1. [:material-link: API Contract](./api/index.md)
-    1. Describe the API Azimuth expects to work with when using custom pipelines, datasets or
-       metrics.
-2. [:material-link: Configuration file](./configuration/index.md)
-    1. Information about the different fields in the Azimuth configuration.
+1. [:material-link: Configuration](./configuration/index.md) provides detailed information about the
+   different fields in the Azimuth configuration that allow to define the dataset, the pipelines and
+   different customization.
+
+2. [:material-link: Custom Objects](custom-objects/index.md) describes how to create custom objects
+   that allow to add your own datasets, pipelines and metrics.

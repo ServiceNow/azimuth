@@ -1,6 +1,5 @@
 {
   "name": "Tweet Climate",
-  "pipelines": null,
   "dataset": {
     "class_name": "datasets.load_dataset",
     "args": [
@@ -13,5 +12,6 @@
     "label": "label"
   },
   "rejection_class": "none",
-  "model_contract": "hf_text_classification"
+  "model_contract": "hf_text_classification",
+  "pipelines": null
 }

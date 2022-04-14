@@ -21,8 +21,8 @@ current focus is on text classification.
 * [:material-link: User Guide](user-guide/index.md) goes **screen per screen** to explain the
   different
   **interactions and visualizations** available.
-* [:material-link: Reference](reference/index.md) details the config file and the different **
-  contracts** which allow **configuring** Azimuth with different datasets and pipelines.
+* [:material-link: Reference](reference/index.md) details the config file and the custom objects
+  which allow **configuring** Azimuth with different datasets and pipelines.
 * [:material-link: Development](development/setup.md) guides on how to develop and **contribute** to
   the repo.
 

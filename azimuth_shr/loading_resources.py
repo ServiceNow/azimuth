@@ -54,9 +54,9 @@ def load_sst2_dataset() -> DatasetDict:
     datasets = load_dataset("glue", "sst2")
     datasets["validation"] = datasets["validation"].rename_column("sentence", "utterance")
     datasets["train"] = datasets["train"].rename_column("sentence", "utterance")
-    # Cutting training set from 60k to 10k.
+    # Cutting training set from 60k to 1k.
     return DatasetDict(
-        {"train": datasets["train"].select(np.arange(10000)), "validation": datasets["validation"]}
+        {"train": datasets["train"].select(np.arange(1000)), "validation": datasets["validation"]}
     )
 
 

@@ -1,20 +1,22 @@
-# Behavioral Testing
+# Behavioral Testing Config
 
-[:material-link: Behavioral Testing](../../key-concepts/behavioral-testing.md) in the Key Concepts
-section explains how the different configuration attributes will affect the tests results.
+:blue_circle: **Default value:** `BehavioralTestingOptions()`
+
+**Environment Variable**: `BEHAVIORAL_TESTING`
+
+[:material-link: Behavioral Testing](../../../key-concepts/behavioral-testing.md) in the Key
+Concepts section explains how the different configuration attributes will affect the tests results.
 
 If your machine does not have a lot of computing power, `behavioral_testing` can be set to `null`.
 It can be enabled later on in the application.
 
-=== "Available Attributes"
+=== "Class Definition"
 
     ```python
-    class BehavioralTestingOptions(BaseModel):
-        neutral_token: NeutralTokenOptions = NeutralTokenOptions()
-        punctuation: PunctuationTestOptions = PunctuationTestOptions()
-        fuzzy_matching: FuzzyMatchingTestOptions = FuzzyMatchingTestOptions()
-        typo: TypoTestOptions = TypoTestOptions()
-        seed: int = 300
+    from typing import List
+
+    from pydantic import BaseModel
+
 
     class NeutralTokenOptions(BaseModel):
         threshold: float = 1  # (5)
@@ -31,8 +33,16 @@ It can be enabled later on in the application.
 
 
     class TypoTestOptions(BaseModel):
-        threshold: float = 1   # (2)
-        nb_typos_per_utterance: int = 1 # (1)
+        threshold: float = 1  # (2)
+        nb_typos_per_utterance: int = 1  # (1)
+
+
+    class BehavioralTestingOptions(BaseModel):
+        neutral_token: NeutralTokenOptions = NeutralTokenOptions()
+        punctuation: PunctuationTestOptions = PunctuationTestOptions()
+        fuzzy_matching: FuzzyMatchingTestOptions = FuzzyMatchingTestOptions()
+        typo: TypoTestOptions = TypoTestOptions()
+        seed: int = 300
     ```
 
     1. Ex: if `nb_typos_per_utterance` = 2, this will create 2 tests per utterance, one with 1 typo and
@@ -42,7 +52,7 @@ It can be enabled later on in the application.
     4. Threshold that defines the confidence gap above which the test will fail.
     5. Threshold that defines the confidence gap above which the test will fail.
 
-=== "Modifying Values in the Config"
+=== "Config Example"
 
     For example, if the user wants to change the threshold for the punctuation test:
 
@@ -59,5 +69,9 @@ It can be enabled later on in the application.
 === "Disabling Behavioral Testing"
 
     ```json
-    {"behavioral_testing": null}
+    {
+      "behavioral_testing": null
+    }
     ```
+
+--8<-- "includes/abbreviations.md"

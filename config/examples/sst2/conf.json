@@ -1,5 +1,11 @@
 {
   "name": "Sentiment Analysis",
+  "dataset": {
+    "class_name": "loading_resources.load_sst2_dataset",
+    "remote": "/azimuth_shr"
+  },
+  "rejection_class": null,
+  "model_contract": "hf_text_classification",
   "pipelines": [
     {
       "model": {
@@ -11,11 +17,5 @@
       }
     }
   ],
-  "dataset": {
-    "class_name": "loading_resources.load_sst2_dataset",
-    "remote": "/azimuth_shr"
-  },
-  "rejection_class": null,
-  "saliency_layer": "distilbert.embeddings.word_embeddings",
-  "model_contract": "hf_text_classification"
+  "saliency_layer": "distilbert.embeddings.word_embeddings"
 }
