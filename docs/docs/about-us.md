@@ -15,9 +15,9 @@ Azimuth! :smiley:
 
     ![](_static/images/development/team/fred.png){ width=200 align=left }
 
-    Fred works as an Applied Research Scientist specializing in Bayesian deep learning, active learning
-    and uncertainty estimation. In addition to maintaining Azimuth, he also maintains BaaL, a Bayesian
-    active learning library.
+    Fred works as an Applied Research Scientist specializing in Bayesian deep learning, active
+    learning and uncertainty estimation. In addition to maintaining Azimuth, he also maintains BaaL,
+    a Bayesian active learning library.
 
     [:material-github: Dref360](https://github.com/Dref360)
 
@@ -27,9 +27,10 @@ Azimuth! :smiley:
 
     ![](_static/images/development/team/gab.jpg){ width=200 align=left }
 
-    Gab is an Applied Research Scientist, interested in explainability, uncertainty and topics related
-    to building trust in AI. She's involved in maintaining the back end, designing the user interface
-    and documenting Azimuth. She's been dreaming about building a tool like Azimuth for a few years now.
+    Gab is an Applied Research Scientist, interested in explainability, uncertainty and topics
+    related to building trust in AI. She's involved in maintaining the back end, designing the user
+    interface and documenting Azimuth. She's been dreaming about building a tool like Azimuth for a
+    few years now.
 
     [:material-github: gabegma](https://github.com/gabegma)
 
@@ -37,9 +38,9 @@ Azimuth! :smiley:
 
 === "Joseph Marinier"
 
-    ![Joseph Marinier](_static/images/development/team/joseph.jpg){ width=200 align=left } Joseph is a
-    full-stack developer who enjoys designing and engineering solutions to a large variety of problems.
-    His main contribution to Azimuth has been in the front end.
+    ![Joseph Marinier](_static/images/development/team/joseph.jpg){ width=200 align=left } Joseph
+    is a full-stack developer who enjoys designing and engineering solutions to a large variety of
+    problems. His main contribution to Azimuth has been in the front end.
 
     [:material-github: JosephMarinier](https://github.com/JosephMarinier)
 
@@ -47,10 +48,10 @@ Azimuth! :smiley:
 
 === "Lindsay Brin"
 
-    ![Lindsay Brin](_static/images/development/team/lindsay.jpeg){ width=200 align=left } Lindsay is an
-    Applied Research Scientist working in explainability and NLU, who loves the concept of representing
-    language in mathematical space. Her journey through data analysis, modeling, and visualization
-    started with research in biogeochemistry and ecosystem ecology.
+    ![Lindsay Brin](_static/images/development/team/lindsay.jpeg){ width=200 align=left } Lindsay
+    is an Applied Research Scientist working in explainability and NLU, who loves the concept of
+    representing language in mathematical space. Her journey through data analysis, modeling, and
+    visualization started with research in biogeochemistry and ecosystem ecology.
 
     [:material-github: lindsaydbrin](https://github.com/lindsaydbrin)
 
@@ -58,9 +59,9 @@ Azimuth! :smiley:
 
 === "Chris Tyler"
 
-    ![Chris Tyler](_static/images/development/team/chris.png){ width=200 align=left } Chris is a software
-    developer with a background in physics and an interest in everything. He has contributed to the
-    design and development of the Azimuth user interface.
+    ![Chris Tyler](_static/images/development/team/chris.png){ width=200 align=left } Chris is a
+    software developer with a background in physics and an interest in everything. He has
+    contributed to the design and development of the Azimuth user interface.
 
     [:material-github: christyler3030](https://github.com/christyler3030)
 
@@ -68,9 +69,9 @@ Azimuth! :smiley:
 
 === "Nandhini Babu"
 
-    ![Nandhini Babu](_static/images/development/team/nandhini.png){ width=200 align=left } Nandhini is a
-    developer at ServiceNow who joined the ATG team in January 2022. She's mostly contributing on the
-    front end. Her overall experience is around web development.
+    ![Nandhini Babu](_static/images/development/team/nandhini.png){ width=200 align=left } Nandhini
+    is a developer at ServiceNow who joined the ATG team in January 2022. She's mostly contributing
+    on the front end. Her overall experience is around web development.
 
     [:material-github: nandhinibsn](https://github.com/nandhinibsn)
 
