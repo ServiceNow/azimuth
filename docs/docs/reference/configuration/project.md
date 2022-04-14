@@ -72,7 +72,7 @@ explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
         remote: Optional[str] = None # (1)
     ```
 
-    1. Relative path to `class_name`.
+    1. Absolute path to `class_name`.
 
 === "Config Example with HF"
 

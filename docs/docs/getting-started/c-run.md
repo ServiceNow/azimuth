@@ -80,7 +80,7 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 6. If the pipeline is a `HF` pipeline, use this `model_contract`.
 7. Multiples ML pipelines can be listed to be available in the webapp.
 8. If this a `HF` pipeline, use this `class_name`.
-9. Change only if the class is not in `/azimuth_shr`.
+9. Change only if `class_name` is not found in `/azimuth_shr`.
 10. `kwargs` to send to the class. Only `checkpoint_path` if you use the class above.
 11. Name of the layer on which to compute saliency maps.
 

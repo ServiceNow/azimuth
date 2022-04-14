@@ -34,7 +34,7 @@ def load_your_dataset(azimuth_config: AzimuthConfig, **kwargs) -> DatasetDict:
 ### Dataset splits
 
 Azimuth expects the `train` and one of `validation` or `test` splits to be available. If
-both `validation` and `test` are available, we will pick the former.
+both `validation` and `test` are available, we will pick the former. The `train` is not mandatory for Azimuth to run.
 
 ## Column names and rejection class
 

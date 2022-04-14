@@ -108,7 +108,7 @@ launched without any pipeline.
 
     1. Add a name to the pipeline to easily recognize it from the webapp.
     Ex: `distilbert-base-uncased-th-0.9`
-    2. Azimuth offers a default custom object for HF pipelines. See the config example.
+    2. Azimuth offers a helper function for HF pipelines. See the config example.
     3. The default postprocessors in Azimuth is a temperature of 1 and a threshold of 0.5. They
     can be changed (Ex: `postprocessors: [{"temperature": 3}]`), disabled (`postprocessors: null`),
     or replaced with new ones defined with custom objects.
