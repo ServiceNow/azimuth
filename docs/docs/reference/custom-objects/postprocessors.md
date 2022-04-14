@@ -86,7 +86,7 @@ class MyPipelineOutput(BaseModel):
 ### In the Config
 
 `{"postprocessors": null}` should then be added to the config, to avoid re-postprocessing in
-Azimuth. s
+Azimuth.
 ## User-Defined Postprocessors
 
 Similarly to a model and a dataset, users can add their own postprocessors in Azimuth with custom

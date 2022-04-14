@@ -14,7 +14,7 @@ other type of dataset or model.
 
 ## What is a Custom Object?
 
-A `CustomObject` is simply a path to a function and its arguments. When users supply their functions
+A Custom Object is simply a path to a function and its arguments. When users supply their functions
 and classes, they should be added to `azimuth_shr`, as it is already mounted at startup on the
 Docker image.
 
@@ -31,7 +31,7 @@ class CustomObject(BaseModel):
     remote: Optional[str] = None  # (1)
 ```
 
-1. Relative path to `class_name`.
+1. Absolute path to `class_name`.
 
 `class_name` is the name of the function or class that is located in `remote`. `args` and `kwargs`
 will be sent to the function/class.
