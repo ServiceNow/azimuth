@@ -45,7 +45,9 @@ markdown_extensions:
       emoji_generator: !!python/name:materialx.emoji.to_svg
       # Page tree
 nav:
-  - Home: index.md
+  - Home:
+      - index.md
+      - about-us.md
   - Getting Started:
       - getting-started/index.md
       - getting-started/a-install.md
