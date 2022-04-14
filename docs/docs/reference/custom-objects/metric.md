@@ -3,65 +3,37 @@
 Azimuth builds upon
 the [HuggingFace Metric API](https://huggingface.co/docs/datasets/loading_metrics.html). Please
 refer to [HuggingFace Metric Hub](https://github.com/huggingface/datasets/tree/master/metrics)
-that details all available metrics.
+that details all available metrics that can be added to Azimuth.
 
 ## Metric definition
 
 A metric definition is a simple [Custom Object](../index.md) that loads a HuggingFace metric.
 
-The metric custom object has an extra-field `additional_kwargs` that will be pass to the `compute`
+The metric custom object has an extra-field `additional_kwargs` that will be pass to the `compute()`
 function of the HuggingFace metric. This will be required for some metrics, as shown in the example
 with precision and recall below.
 
-```python
-from typing import Dict
+=== "Metric Definition"
 
-from pydantic import Field
+    ```python
+    from typing import Dict
 
-from azimuth.config import CustomObject
+    from pydantic import Field
 
-
-class MetricDefinition(CustomObject):
-    additional_kwargs: Dict = Field(
-        default_factory=dict,
-        title="Additional kwargs",
-        description="Keyword arguments supplied to `compute`.",
-    )
-```
-
-### (Advanced) Custom Metrics
-
-For more experienced users, HuggingFace presents how to create custom metrics in
-this [:material-link:tutorial](https://huggingface.co/docs/datasets/v2.0.0/en/how_to_metrics).
-
-For custom metrics, Azimuth supplies probabilities when possible. The `compute` method must follow
-this signature:
-
-```python
-from typing import Any, Dict, List
-
-import numpy as np
+    from azimuth.config import CustomObject
 
 
-def _compute(
-        self,
-        predictions: List[int],  # (1)
-        references: List[int],  # (2)
-        probabilities: np.ndarray,  # (3)
-) -> Dict[str, Any]:  # (4)
-    ...
-```
+    class MetricDefinition(CustomObject):
+        additional_kwargs: Dict = Field(
+            default_factory=dict,
+            title="Additional kwargs",
+            description="Keyword arguments supplied to `compute`.",
+        )
+    ```
 
-1. Predicted labels.
-2. Ground truth labels.
-3. Probabilities computed by the pipeline.
-4. A dictionary with the computed values.
+=== "Config Example"
 
-## Example
-
-By default, Azimuth loads Precision and Recall with `average=weighted`:
-
-=== "Configuration file"
+    By default, Azimuth loads Precision and Recall with `average=weighted`:
 
     ``` json
     {
@@ -87,5 +59,33 @@ By default, Azimuth loads Precision and Recall with `average=weighted`:
       }
     }
     ```
+
+### Custom Metrics
+
+For more experienced users, HuggingFace presents how to create custom metrics in
+this [tutorial](https://huggingface.co/docs/datasets/v2.0.0/en/how_to_metrics).
+
+For custom metrics, Azimuth supplies probabilities when possible. The `compute` method must follow
+this signature:
+
+```python
+from typing import Any, Dict, List
+
+import numpy as np
+
+
+def _compute(
+        self,
+        predictions: List[int],  # (1)
+        references: List[int],  # (2)
+        probabilities: np.ndarray,  # (3)
+) -> Dict[str, Any]:  # (4)
+    ...
+```
+
+1. Predicted labels (1 class per sample).
+2. Ground truth labels.
+3. Probabilities computed by the pipeline.
+4. A dictionary with the computed values.
 
 --8<-- "includes/abbreviations.md"

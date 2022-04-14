@@ -61,7 +61,9 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
 
 :orange_circle: **Mandatory field** with an ML pipeline.
 
-The model contract will be determined based on the model type.
+The model contract will be determined based on the model type. More details on what model contract
+to select based on the model is available
+in [:material-link: Define a Model](../custom-objects/model.md).
 
 * `hf_text_classification` supports `transformers.Pipeline` from HF. Examples are provided in the
   repo under `config/examples`.
@@ -69,9 +71,6 @@ The model contract will be determined based on the model type.
   Azimuth will be unavailable, such as saliency maps.
 * `file_based_text_classification` supports reading the predictions from a file. A lot of features
   from Azimuth will be unavailable, such as behavioral testing and saliency maps.
-
-More details on what model contract to select based on the model is available
-in [:material-link: Define a Model](../custom-objects/model.md).
 
 ## Pipelines
 
@@ -95,8 +94,8 @@ launched without any pipeline.
 
     class PipelineDefinition(BaseSettings):
         name: str # (1)
-        model: CustomObject
-        postprocessors: Optional[List[
+        model: CustomObject # (2)
+        postprocessors: Optional[List[ # (3)
             Union[TemperatureScaling, ThresholdConfig, CustomObject]]] = Field(
             [
                 TemperatureScaling(temperature=1.0),
@@ -105,8 +104,12 @@ launched without any pipeline.
         )
     ```
 
-    1. Add a name to the pipeline to be able to recognize in the webapp what pipeline it is.
+    1. Add a name to the pipeline to easily recognize it from the webapp.
     Ex: `distilbert-base-uncased-th-0.9`
+    2. Azimuth offers a default custom object for HF pipelines. See the config example.
+    3. The default postprocessors in Azimuth is a temperature of 1 and a threshold of 0.5. They
+    can be changed (Ex: `postprocessors: [{"temperature": 3}]`), disabled (`postprocessors: null`),
+    or replaced with new ones defined with custom objects.
 
 === "Config Example"
 
@@ -135,18 +138,21 @@ launched without any pipeline.
 
 === "No Pipelines"
 
+    This will launch Azimuth without any pipelines. Dataset Analysis is still available.
+
     ```json
     {
       "pipelines": null
     }
     ```
 
-Both the model and the postprocessors are defined with [**Custom Objects**](index.md).
+Both the model and the postprocessors are defined with [:material-link: **Custom
+Objects**](index.md).
 
 * **`model`** allows to define a model. The model can be a HuggingFace pipeline, or any callable.
   The model can even include its own
   post-processing. [:material-link: Defining a Model](../custom-objects/model.md)
-  details how to do that with [Custom Objects](../custom-objects/index.md).
+  details how to do that with custom objects.
 * **`postprocessors`** defines the postprocessors. Azimuth offers some default values for
   temperature scaling and thresholding. Users can also provide their own postprocessor functions, or
   disabled them (`postprocessors: null`).
@@ -165,9 +171,11 @@ Both the model and the postprocessors are defined with [**Custom Objects**](inde
 :blue_circle: **Default value**: `UncertaintyOptions()`
 
 Azimuth has some simple uncertainty estimation capabilities. By default, they are disabled given
-that it can be computationally expensive. On any model, we can provide the entropy of the
-predictions which is an approximation of the predictive uncertainty. In addition, we can tag high
-epistemic items above a threshold. More information on how we compute uncertainty is available
+that it can be computationally expensive.
+
+On any model, we can provide the entropy of the predictions which is an approximation of the
+predictive uncertainty. In addition, we can tag high epistemic items above a threshold. More
+information on how we compute uncertainty is available
 in [:material-link: Uncertainty Estimation](../../key-concepts/uncertainty.md).
 
 === "Class Definition"
@@ -190,8 +198,8 @@ in [:material-link: Uncertainty Estimation](../../key-concepts/uncertainty.md).
     ```json
     {
       "uncertainty": {
-            "iterations": 20
-        }
+        "iterations": 20
+      }
     }
     ```
 
@@ -199,18 +207,23 @@ in [:material-link: Uncertainty Estimation](../../key-concepts/uncertainty.md).
 
 :yellow_circle: **Default value**: `None`
 
-If using a Pytorch model, saliency maps can be available. For that, the name of the embedding layer
-to compute the [:material-link: Saliency Maps](../../key-concepts/saliency.md) need to be specified.
+If using a Pytorch model, [:material-link: Saliency Maps](../../key-concepts/saliency.md) can be
+available. Specify the name of the embedding layer on which to compute them.
 
 Example: `distilbert.embeddings.word_embeddings`.
 
 ## Metrics
 
-:blue_circle: **Default value**: Precision and Recall. See in the example below.
+:blue_circle: **Default value**: Precision and Recall. See in the config example below.
 
-By default, Azimuth will compute Precision and Recall on the dataset. You can add metrics available
-on the [HuggingFace Metric Hub](https://github.com/huggingface/datasets/tree/master/metrics), or
-create your own, as detailed in [:material-link: Defining Metrics](../custom-objects/metric.md).
+By default, Azimuth will compute Precision and Recall on the dataset. `metrics` leverages custom
+objects, with an additional field which allow defining `kwargs`
+to be sent to the metric `compute()` function.
+
+You can add metrics available from
+the [HuggingFace Metric Hub](https://github.com/huggingface/datasets/tree/master/metrics), or create
+your own, as detailed in [:material-link: Defining Metrics](../custom-objects/metric.md)
+.
 
 === "Metric Definition"
 
@@ -226,7 +239,7 @@ create your own, as detailed in [:material-link: Defining Metrics](../custom-obj
         additional_kwargs: Dict = Field(
             default_factory=dict,
             title="Additional kwargs",
-            description="Keyword arguments supplied to `compute`.",
+            description="Keyword arguments supplied to `compute`",
         )
     ```
 

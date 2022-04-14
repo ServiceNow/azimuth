@@ -7,16 +7,16 @@ pipeline, and the Dataset function will return the dataset.
 Our primary integration is through [HuggingFace](https://huggingface.co/), but Azimuth supports any
 other type of dataset or model.
 
-* [Defining Datasets](dataset.md)
-* [Defining a Model](model.md)
-* [Defining Postprocessors](postprocessors.md)
-* [Defining Metrics](metric.md)
+* [:material-link: Defining Datasets](dataset.md)
+* [:material-link: Defining a Model](model.md)
+* [:material-link: Defining Postprocessors](postprocessors.md)
+* [:material-link: Defining Metrics](metric.md)
 
 ## What is a Custom Object?
 
-A `CustomObject` is simply a path to a function and its arguments. When users supply their custom
-object functions and classes, they should be added to `azimuth_shr`, as it is already mounted at
-startup on the Docker image.
+A `CustomObject` is simply a path to a function and its arguments. When users supply their functions
+and classes, they should be added to `azimuth_shr`, as it is already mounted at startup on the
+Docker image.
 
 ```python
 from typing import Any, Dict, List, Optional, Union
@@ -38,9 +38,9 @@ will be sent to the function/class.
 
 ### Example
 
-Here is in example of two Custom Objects. In `azimuth_shr/loading_resources.py`, we will add two
+Here is in example of two custom objects. In `azimuth_shr/loading_resources.py`, we will add two
 functions which will load a model and a dataset. The configuration file will then be defined as
-follows.
+shown in config example.
 
 === "`azimuth_shr/loading_resources.py`"
 

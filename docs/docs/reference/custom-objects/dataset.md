@@ -1,8 +1,8 @@
 # Defining Dataset
 
 In [:material-link: Project Config](../configuration/project.md) is described how a dataset needs to
-be defined with a [Custom Object](index.md) in the config. This section details how to define
-the `class_name`, `args` and `kwargs` defined in the custom object.
+be defined with a [:material-link: Custom Object](index.md) in the config. This section details how
+to define the `class_name`, `args` and `kwargs` defined in the custom object.
 
 ## Dataset Definition
 

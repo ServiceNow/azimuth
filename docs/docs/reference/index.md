@@ -7,4 +7,4 @@ Our reference is split in two sections:
    different customization.
 
 2. [:material-link: Custom Objects](custom-objects/index.md) describes how to create custom objects
-   that allow to create your own datasets, pipelines and metrics.
+   that allow to add your own datasets, pipelines and metrics.

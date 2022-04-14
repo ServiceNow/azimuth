@@ -1,7 +1,6 @@
 # Project Config
 
-The project configuration contains mandatory fields that determine the dataset that should be loaded
-in Azimuth.
+The project configuration contains mandatory fields that specify the dataset to load in Azimuth.
 
 === "Class Definition"
 
@@ -23,7 +22,7 @@ in Azimuth.
 
     ```json
     {
-      "name": "AskUbuntu Model v4",
+      "name": "Banking77 Model v4",
       "dataset": {
         "class_name": "datasets.load_dataset",
         "args": [
@@ -45,18 +44,19 @@ in Azimuth.
 **Environment Variable**: `NAME`
 
 Any name can be set for the config. For example, it can represent the name of the dataset and/or the
-model. Ex: `AskUbuntu Model v4`.
+model. Ex: `Banking77 Model v4`.
 
 ## Dataset
 
 :red_circle: **Mandatory field**
 
 To define which dataset to load in the application, Azimuth
-uses [Custom Objects](../custom-objects/index.md).
+uses [:material-link: Custom Objects](../custom-objects/index.md).
 
-If the dataset is already on HuggingFace, you can use the `datasets.load_dataset` from HF, as shown
-in the example below. If you have your own dataset, you will need to create your own custom object,
-as explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
+If the dataset is already on HuggingFace, you can use
+the [`datasets.load_dataset`](https://huggingface.co/docs/datasets/loading) from HF, as shown in the
+example below. If you have your own dataset, you will need to create your own custom object, as
+explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
 
 === "Custom Object Definition"
 
@@ -98,8 +98,8 @@ follows:
 
 | Field name | Default   | Description                                                       |
 |------------|-----------|-------------------------------------------------------------------|
-| text_input | utterance | The preprocessed utterance.                                       |
-| label      | label     | The class label for the utterance, as type `datasets.ClassLabel`. |
+| `text_input` | `utterance` | The preprocessed utterance.                                       |
+| `label`      | `label`     | The class label for the utterance, as type `datasets.ClassLabel`. |
 
 === "Class Definition"
 
@@ -135,8 +135,8 @@ follows:
 
 :yellow_circle: **Default value**: `REJECTION_CLASS`
 
-The field `rejection_class` in the config is validated and requires the class to be present in the
-dataset. If your dataset doesn't have a rejection class, set the value to `null`. More details on
-the rejection class is available in [Prediction Outcomes](../../key-concepts/outcomes.md).
+The field `rejection_class` requires the class to be present in the dataset. If your dataset doesn't
+have a rejection class, set the value to `null`. More details on the rejection class is available
+in [Prediction Outcomes](../../key-concepts/outcomes.md).
 
 --8<-- "includes/abbreviations.md"

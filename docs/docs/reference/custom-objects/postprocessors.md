@@ -9,14 +9,15 @@ By default, Azimuth applies thresholding at 0.5. It also supports Temperature Sc
 Azimuth provides shortcuts to override the threshold and the temperature. Add this as postprocessors
 in the `PipelineDefinition`.
 
-- For Temperature Scaling : `"postprocessors": [{"temperature": 1}]`
-- For Thresholding : `"postprocessors": [{"threshold": 0.5}]`
+- For Temperature Scaling : `{"postprocessors": [{"temperature": 1}]}`
+- For Thresholding : `{"postprocessors": [{"threshold": 0.5}]}`
 
 ## Model with its own postprocessing
 
-If your model already includes postprocessing, as explained in [Define a Model](model.md), the model
-prediction signature needs to have a specific output `PipelineOutputProtocol`, that will contain
-both the predictions from the model, and the post-processed predictions.
+If your model already includes postprocessing, as explained
+in [:material-link: Define a Model](model.md), the model prediction signature needs to have a
+specific output, `PipelineOutputProtocol`, that will contain both the predictions from the model,
+and the post-processed predictions.
 
 ```python
 from typing import Protocol
@@ -27,11 +28,12 @@ from azimuth.utils.ml.postprocessing import PostProcessingIO
 class PipelineOutputProtocol(Protocol):
     """Class containing result of a batch"""
 
-    # model output without passing through post-processing stage: texts, logits, probs, preds
-    model_output: PostProcessingIO
-    # output after passing through post-processing: pre-processed texts, logits, probs, preds
-    postprocessor_output: PostProcessingIO
+    model_output: PostProcessingIO  # (1)
+    postprocessor_output: PostProcessingIO  # (2)
 ```
+
+1. model output before passing through post-processing stage: texts, logits, probs, preds
+2. output after passing through post-processing: pre-processed texts, logits, probs, preds
 
 `PostProcessingIO` is defined as the following.
 
@@ -43,11 +45,16 @@ from azimuth.types.general.array_type import Array
 
 
 class PostProcessingIO(AliasModel):
-    texts: List[str]
-    logits: Array[float]
-    preds: Array[float]
-    probs: Array[float]
+    texts: List[str]  # (1)
+    logits: Array[float]  # (2)
+    preds: Array[int]  # (3)
+    probs: Array[float]  # (4)
 ```
+
+1. The utterance text. Length of `N`
+2. Logits of the model. Shape of `(N, C)`
+3. Predicted class, `argmax`of probabilities. Shape of `(N, 1)`
+4. Probabilities of the model # Shape of `(N, C)`
 
 In your code, you don't have to extend `PipelineOutputProtocol` or `PostProcessingIO`; you can use
 your own library, and as long as the fields match, Azimuth will accept it. This is done so that our
@@ -78,16 +85,16 @@ class MyPipelineOutput(BaseModel):
 
 ### In the Config
 
-`"postprocessors": null` should then be added to the config, to avoid re-postprocessing in Azimuth.
-
+`{"postprocessors": null}` should then be added to the config, to avoid re-postprocessing in
+Azimuth. s
 ## User-Defined Postprocessors
 
-Similarly to a model and a dataset, users can add their own postprocessors in Azimuth. However, some
-typing needs to be respected for Azimuth to handle it.
+Similarly to a model and a dataset, users can add their own postprocessors in Azimuth with custom
+objects. However, some typing needs to be respected for Azimuth to handle it.
 
-First, the post-processing class needs to `PostProcessingIO` as both input and output. To get
-consistent results, all values need to be updated by the post-processors. For example, if a
-postprocessor modifies the `logits`, it must recompute `probs` as well.
+First, the post-processing class needs `PostProcessingIO`, as defined above, as both input and
+output. To get consistent results, all values need to be updated by the post-processors. For
+example, if a postprocessor modifies the `logits`, it must recompute `probs` as well.
 
 The API for a postprocessor is the following:
 
@@ -99,7 +106,8 @@ def __call__(self, post_processing_io: PostProcessingIO) -> PostProcessingIO:
     ...
 ```
 
-You can also extend `azimuth.utils.ml.postprocessing.Postprocessing` to write your postprocessor.
+You can also extend `azimuth.utils.ml.postprocessing.Postprocessing` to write your own
+postprocessor.
 
 ### Example
 
@@ -118,7 +126,8 @@ Let's define a postprocessor that will do Temperature scaling:
         def __call__(self, post_processing_io: PostProcessingIO) -> PostProcessingIO:
             new_logits = post_processing_io.logits / self.temperature
             confidences = (
-                softmax(new_logits, axis=1) if post_processing_io.is_multiclass else expit(new_logits)
+                softmax(new_logits, axis=1) if post_processing_io.is_multiclass
+                                            else expit(new_logits)
             )
             return PostProcessingIO(
                 texts=post_processing_io.texts,

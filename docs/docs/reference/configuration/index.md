@@ -3,11 +3,11 @@
 The Azimuth configuration allows defining different fields, some mandatory, that will customize
 Azimuth.
 
-We grouped the fields in **class scopes** based on what they control. All classes inherit from one
+We grouped the fields in config scopes based on what they control. All classes inherit from one
 another in a chain, the last one being `AzimuthConfig`, which contains all fields.
 
-To help with understanding the mandatory fields in the config, we added the following legend
-throughout the reference.
+To help with detecting the mandatory fields in the config, the following legend is shown throughout
+the reference.
 
 * :red_circle: : **Mandatory** fields in the config.
 * :orange_circle: : Only **mandatory** if Azimuth is used to analyze **models**, and not just a

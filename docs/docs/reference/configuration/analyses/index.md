@@ -23,7 +23,7 @@ different attributes that can be defined.
 
 === "Config Example"
 
-    This will desable both behavioral testing and similarity analysis in Azimuth.
+    This will disable both behavioral testing and similarity analysis in Azimuth.
 
     ```json
     {

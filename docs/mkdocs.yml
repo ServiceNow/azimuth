@@ -51,8 +51,6 @@ nav:
       - getting-started/a-install.md
       - getting-started/b-basics.md
       - getting-started/c-run.md
-      - Changelog:
-          - Releases v.2: getting-started/changelog/v2.md
   - Key Concepts:
       - key-concepts/index.md
       - key-concepts/smart-tags.md

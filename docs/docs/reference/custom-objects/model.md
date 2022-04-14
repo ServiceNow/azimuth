@@ -2,11 +2,13 @@
 
 A model is defined as a function that takes an utterance as input and outputs a `SupportedOutput`
 (defined below). Some models will output probabilities, whereas other models are "pipelines" which
-include post-processing steps. Azimuth supports all these use cases.
+include post-processing steps. Azimuth supports both these use cases. The `model_contract` field
+from the config will determine how Azimuth will interface with the model, as detailed in this
+section.
 
 ## Model Definition
 
-In the config, the custom object for the model defines the class that will call the model.
+In the config, the custom object for the model defines the class that will load the model.
 
 ```python
 from typing import Union, Callable
@@ -16,20 +18,22 @@ from transformers import Pipeline
 from azimuth.config import AzimuthConfig
 
 
-def load_model(azimuth_config: AzimuthConfig,
-               **kwargs) -> Union[Pipeline, Callable]:
+def load_model(azimuth_config: AzimuthConfig, **kwargs) -> Union[Pipeline,
+                                                                 Callable]:
     ...
 ```
 
-The specific model definition will impact the `model_contract` that will be used.
+The output of the function (`transformers.Pipeline` or `Callable`) will determine
+the `model_contract` that should be used.
 
-When a `transformers.Pipeline` from HF is returned, we expect it to contain `tokenizer: Tokenizer`
+When a [`transformers.Pipeline`](https://huggingface.co/docs/transformers/main_classes/pipelines)
+from HF is returned, we expect it to contain `tokenizer: Tokenizer`
 and `model: nn.Module`.
 
 ## Model Prediction Signature
 
-Based on the model contract, the model prediction signature will change, as detailed in the model
-contract section. However, the supported outputs are the same for all model contracts.
+The inputs of the model prediction signature will change based on the `model_contract`. However, the
+supported outputs are the same for all model contracts.
 
 ### Supported Output
 
@@ -49,12 +53,15 @@ SupportedOutput = Union[np.ndarray,
                         PipelineOutputProtocol]
 ```
 
-1. Tensor from TensorFlow is also supported.
+1. `Tensor` from `TensorFlow` is also supported.
 
-If the model does not have its own postprocessing, the supported output should be one of the first 3
-outputs listed above.
+If the model does not have its own postprocessing, the supported output should be one of the 3 first
+outputs listed above, as shown in the example below.
 
 #### Example
+
+Assuming the following function, the table below shows how to transform `probs` in the 3 first
+supported outputs.
 
 ```python
 import numpy as np
@@ -73,17 +80,17 @@ probs = softmax(np.random.rand(NUM_SAMPLES, NUM_CLASSES), -1)
 | `ModelOutput`| `SequenceClassifierOutput(logits=torch.log(probs))`  | NA |
 
 If your model already includes post-processing, or if you decide to create your own post-processing
-in Azimuth, it will need to output a `PipelineOutputProtocol`. More details can be found
-in [Define Postprocessors](postprocessors.md).
+in Azimuth (we already support thresholding and temperature scaling), it will need to output
+a `PipelineOutputProtocol`. More details can be found in [Define Postprocessors](postprocessors.md).
 
 ## Model contracts
 
-To differentiate between the different types of pipelines, Azimuth uses a field named
+To differentiate between the different types of models, Azimuth uses a field named
 `model_contract`.
 
 | `model_contract`                 | Model type | Framework |
 |----------------------------------|------------|-----------|
-| `hf_text_classification` | HuggingFace Pipeline | Pytorch   |
+| `hf_text_classification` | HuggingFace Pipeline | Supported by HF   |
 | `custom_text_classification` | Callable   | Any       |
 | `file_based_text_classification` | Callable   | Any       |
 
@@ -150,9 +157,7 @@ This is how we would load a pretrained BERT model using this API:
                                    azimuth_config: AzimuthConfig) -> Pipeline:
         model = AutoModelForSequenceClassification.from_pretrained(checkpoint_path)
         tokenizer = AutoTokenizer.from_pretrained(checkpoint_path, use_fast=False)
-
         device = 0 if _should_use_cuda(azimuth_config) else -1
-
 
         return TextClassificationPipeline(
             model=model, tokenizer=tokenizer, device=device,
@@ -229,7 +234,8 @@ For models coming from other frameworks, the loading function returns a `Callabl
 === "azimuth_shr/loading_resources.py"
 
     ``` python
-    def load_keras_model(checkpoint_path: str, azimuth_config: AzimuthConfig) -> Callable:
+    def load_keras_model(checkpoint_path: str,
+                         azimuth_config: AzimuthConfig) -> Callable:
         model = tf.keras.models.load_model(checkpoint_path)
         return model
     ```
@@ -257,10 +263,9 @@ For models coming from other frameworks, the loading function returns a `Callabl
 |----------------------------------|------------|-----------|
 | `file_based_text_classification` | Callable   | Any       |
 
-Azimuth can also work without a model, but with predictions supplied in a file. To do so, we will
-provide the row index of each utterance along with the sentence. The user should use the row index
-as we will call the model with modified utterances. The predictions should be **after**
-postprocessing.
+Azimuth can also work without a model, but with predictions supplied in a file. To do so, when
+calling the prediction function, Azimuth will provide the row index of each utterance along with the
+sentence. The predictions should be **after** postprocessing.
 
 #### Model Definition
 
@@ -276,14 +281,15 @@ from azimuth.modules.model_contracts.text_classification import SupportedOutput
 from azimuth.types.general.dataset import DatasetSplitName
 
 
-def __call__(utterances: Dict[str, Any], dataset_split_name: DatasetSplitName) -> SupportedOutput:
+def __call__(utterances: Dict[str, Any],
+             dataset_split_name: DatasetSplitName) -> SupportedOutput:
     ...
 ```
 
 where the `utterances` have the following keys:
 
-1. `row_idx`: the indices for each row
-2. `utterance`: as defined in `AzimuthConfig.columns.text_input`, the utterances.
+1. `row_idx`: the indices for each row.
+2. `utterance`: utterances as defined in `AzimuthConfig.columns.text_input`.
 
 #### Disabled features
 
