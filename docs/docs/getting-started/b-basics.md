@@ -36,6 +36,15 @@ specifies which dataset and pipelines to load in the app, as well as other varia
 defined in each config. The [:material-link: **
 Configuration**](../reference/configuration/index.md) reference details all available fields.
 
+## Clearing the Cache
+
+Azimuth keeps all artifacts in caching folders so that if you close the app and re-launch, it will
+load quickly. Once you are done with your analysis, you can delete the cache by running:
+
+```
+make clean
+```
+
 ## Verify your Setup
 
 Out-of-the-box, Azimuth can run on different **demo data and models**

@@ -14,7 +14,7 @@ The top section shows the utterance details:
 * **Label**: The utterance's labeled class (the target).
 * **Predictions**:
     * The **top 3** predictions for this utterance are shown.
-    * The top prediction is highlighted using the outcome color.
+    * The top prediction is highlighted using the prediction outcome color.
         * If the top prediction was converted to the rejection class based on the threshold, it will
           be added as a 4th element at the top.
 * **Smart tags** (where applicable): An automatically computed tag highlighting a certain

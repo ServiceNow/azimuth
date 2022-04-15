@@ -238,7 +238,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
 
 class ModelContractConfig(CommonFieldsConfig):
     # Which model_contract the application is using.
-    model_contract: SupportedModelContract
+    model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification
     # Model object definition.
     pipelines: Optional[List[PipelineDefinition]] = None
     # Uncertainty configuration
