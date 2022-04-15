@@ -72,8 +72,9 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         Returns:
             Dictionary with different alerts
         """
-        train_dist = train_mng.class_distribution()
-        eval_dist = eval_mng.class_distribution()
+        train_dist = train_mng.class_distribution(labels_only=True)
+        eval_dist = eval_mng.class_distribution(labels_only=True)
+        class_names = train_mng.get_class_names(labels_only=True)
         min_num_per_class = self.config.dataset_warnings.min_num_per_class
         alert_train_nb_min: List[bool] = train_dist < min_num_per_class
         alert_eval_nb_min: List[bool] = eval_dist < min_num_per_class
@@ -96,7 +97,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Integer,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=train_mng.class_names[i],
+                        name=class_names[i],
                         alert=alert_nb_min[i],
                         data=[
                             DatasetDistributionComparisonValue(
@@ -113,7 +114,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                     train_dist,
                     eval_dist,
                     min_num_per_class,
-                    train_mng.class_names,
+                    class_names,
                 ),
             ),
             DatasetWarning(
@@ -125,7 +126,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Percentage,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=train_mng.class_names[i],
+                        name=class_names[i],
                         alert=alert_norm[i],
                         data=[
                             DatasetDistributionComparisonValue(
@@ -142,7 +143,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                     eval_dist_norm,
                     divergence_norm,
                     max_delta_representation,
-                    train_mng.class_names,
+                    class_names,
                 ),
             ),
         ]
@@ -161,10 +162,11 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
 
         """
         train_ds, eval_ds = train_mng.get_dataset_split(), eval_mng.get_dataset_split()
-        train_dist = train_mng.class_distribution()
-        cls_index = np.arange(len(train_mng.class_names))
+        train_dist = train_mng.class_distribution(labels_only=True)
+        class_names = train_mng.get_class_names(labels_only=True)
+        cls_index = np.arange(train_mng.get_num_classes(labels_only=True))
 
-        # Get token lenght and other (see screen 3b)
+        # Get token length and other (see screen 3b)
         train_df = pd.DataFrame(
             {
                 DatasetColumn.token_count: train_ds[DatasetColumn.token_count],
@@ -240,7 +242,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Decimal,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=train_mng.class_names[i],
+                        name=class_names[i],
                         alert=alert_norm[i],
                         data=[
                             DatasetDistributionComparisonValue(
@@ -264,7 +266,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                     eval_overall,
                     divergence_mean,
                     divergence_std,
-                    train_mng.class_names,
+                    class_names,
                 ),
             )
         ]

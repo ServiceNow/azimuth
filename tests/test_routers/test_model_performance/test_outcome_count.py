@@ -23,4 +23,4 @@ def test_get_outcome_count_per_filter(app: FastAPI) -> None:
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
-    assert "label" in metrics and len(metrics["label"]) == 2
+    assert "label" in metrics and len(metrics["label"]) == 3

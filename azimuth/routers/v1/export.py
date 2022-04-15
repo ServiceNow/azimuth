@@ -182,11 +182,11 @@ def make_utterance_level_result(
     ):
         for test in test_results:
             yield PerturbedUtteranceDetailedResult(
-                original_prediction=dm.class_names[
+                original_prediction=dm.get_class_names()[
                     utterance[DatasetColumn.postprocessed_prediction]
                 ],
                 original_utterance=utterance[dm.config.columns.text_input],
                 original_confidence=utterance[DatasetColumn.postprocessed_confidences][0],
-                label=dm.class_names[utterance[dm.config.columns.label]],
-                **{**test.dict(), **{"prediction": dm.class_names[test.prediction]}},
+                label=dm.get_class_names()[utterance[dm.config.columns.label]],
+                **{**test.dict(), **{"prediction": dm.get_class_names()[test.prediction]}},
             ).dict()

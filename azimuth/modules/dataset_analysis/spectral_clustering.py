@@ -78,7 +78,7 @@ class SpectralClusteringModule(AggregationModule[SimilarityConfig]):
         train_dm = self.get_dataset_split_manager(DatasetSplitName.train)
         train_features = np.array(self._get_features(DatasetSplitName.train))
         labels = np.array(train_dm.get_dataset_split()[self.config.columns.label])
-        n_class = train_dm.num_classes
+        n_class = train_dm.get_num_classes()
 
         similarities = lambda k: np.array(
             pairwise_distances(train_features[labels == k], train_features, metric=dist_name)

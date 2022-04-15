@@ -115,7 +115,9 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
 
         # Reconstruct pipeline_out and all_epistemic
         dm = self.get_dataset_split_manager()
-        pipeline_out = np.zeros((len(batch[DatasetColumn.row_idx]), dm.num_classes))
+        pipeline_out = np.zeros(
+            (len(batch[DatasetColumn.row_idx]), dm.get_num_classes(labels_only=True))
+        )
         epistemic_all = []
         for idx, pred in enumerate(predictions):
             pipeline_out[idx, :] = pred.model_output.probs

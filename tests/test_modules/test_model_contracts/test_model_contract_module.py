@@ -69,8 +69,8 @@ def test_high_epistemic_tag(simple_text_config, simple_table_key):
     mocked_output = PostProcessingIO(
         texts=["this is a sentence."],
         preds=np.zeros(1),
-        probs=np.zeros((1, dm.num_classes)),
-        logits=np.zeros((1, dm.num_classes)),
+        probs=np.zeros((1, dm.get_num_classes())),
+        logits=np.zeros((1, dm.get_num_classes())),
     )
     predictions = [
         PredictionResponse(
@@ -120,23 +120,23 @@ def test_pred_smart_tags(text_config_CLINC150, clinc_table_key):
 
     random_label = 0  # Not in label_list. Top prediction for incorrect examples below.
 
-    correct_probs = np.zeros(dm.num_classes)
+    correct_probs = np.zeros(dm.get_num_classes())
     correct_probs[label_list[0]] = 0.9
 
-    correct_top_3_probs = np.zeros(dm.num_classes)
+    correct_top_3_probs = np.zeros(dm.get_num_classes())
     correct_top_3_probs[random_label] = 0.9
     correct_top_3_probs[label_list[1]] = 0.1
 
-    correct_low_conf_probs = np.zeros(dm.num_classes)
+    correct_low_conf_probs = np.zeros(dm.get_num_classes())
     correct_low_conf_probs[label_list[2]] = 0.2
 
     # Incorrect prediction; label NO_INTENT; NO_INTENT IN TOP3
-    incorrect_no_intent_probs = np.zeros(dm.num_classes)
+    incorrect_no_intent_probs = np.zeros(dm.get_num_classes())
     incorrect_no_intent_probs[random_label] = 0.9
     incorrect_no_intent_probs[label_list[3]] = 0.1
 
     # Model is wrong, but prediction after threshold becomes NO_INTENT; label NO_INTENT
-    correct_no_intent_probs = np.zeros(dm.num_classes)
+    correct_no_intent_probs = np.zeros(dm.get_num_classes())
     correct_no_intent_probs[random_label] = 0.2
 
     model_output = np.array(
