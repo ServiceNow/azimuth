@@ -36,7 +36,6 @@ class PredictionTableKey:
     temperature: Optional[float]
     use_bma: bool
     pipeline_index: Optional[int]
-    pipeline_config_hash: str = ""
 
     @classmethod
     def from_pipeline_index(cls, index: int, config: AzimuthConfig, use_bma: bool = False):
