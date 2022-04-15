@@ -1,10 +1,10 @@
 # About Us
 
 We started developing Azimuth :material-telescope: at the beginning of 2021, as an internal tool at
-ServiceNow. We are open-source since April 2022. Our motivation in developing this tool is to go
-beyond the traditional model quality assessment based solely on high level metrics. We strongly
+ServiceNow. We are open source since April 2022. Our motivation in developing this tool is to go
+beyond the traditional model quality assessment based solely on high-level metrics. We strongly
 believe that much more can be discovered and understood from our dataset and models if we have the
-right tools, visualizations and interfaces. We hope this can be helpful to you, and that you enjoy
+right tools, visualizations, and interfaces. We hope this can be helpful to you, and that you enjoy
 Azimuth! :smiley:
 
 ## The Team
@@ -24,7 +24,7 @@ a Bayesian active learning library.
 </div>
 <div markdown style="display: inline-block;">
 
-![Gabrielle Gauthier-Melançon](_static/images/development/team/gab.jpg){ width=200 align=left }
+![Gabrielle Gauthier-Melançon](_static/images/development/team/gab.PNG){ width=200 align=left }
 
 #### Gabrielle Gauthier-Melançon [:material-github: gabegma](https://github.com/gabegma)
 
@@ -51,8 +51,7 @@ problems. His main contribution to Azimuth has been in the front end.
 
 #### Lindsay Brin [:material-github: lindsaydbrin](https://github.com/lindsaydbrin)
 
-Lindsay
-is an Applied Research Scientist working in explainability and NLU, who loves the concept of
+Lindsay is an Applied Research Scientist working in explainability and NLU, who loves the concept of
 representing language in mathematical space. Her journey through data analysis, modeling, and
 visualization started with research in biogeochemistry and ecosystem ecology.
 
@@ -74,16 +73,27 @@ contributed to the design and development of the Azimuth user interface.
 
 #### Nandhini Babu [:material-github: nandhinibsn](https://github.com/nandhinibsn)
 
-Nandhini
-is a developer at ServiceNow who joined the ATG team in January 2022. She's mostly contributing
+Nandhini is a developer at ServiceNow who joined Azimuth in January 2022. She's mostly contributing
 on the front end. Her overall experience is around web development.
 
 </div>
 
 ### Designers
 
-We can also count on the support from amazing designers.
+We can also count on the support of amazing designers.
 
+<div markdown style="display: inline-block;">
+
+![Di Le](_static/images/development/team/di.png){ width=200 align=left }
+
+#### Di Le
+
+Bio coming soon! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas orci dui, rutrum
+eget dictum ac, iaculis ut nulla. Pellentesque maximus odio quam, at finibus augue maximus nec.
+Aliquam volutpat elementum mi non vulputate. Duis eu laoreet felis. Donec eleifend sed ex eget
+bibendum.
+
+</div>
 <div markdown style="display: inline-block;">
 
 ![Karine Grande](_static/images/development/team/karine.png){ width=200 align=left }
@@ -91,9 +101,8 @@ We can also count on the support from amazing designers.
 #### Karine Grande
 
 Karine is a Product Designer working on experiences that use AI/ML technology. In addition of
-helping on the design side of Azimuth, she worked on projects about data labelling,
-classification, summarization and forecasting, and is currently working on document processing
-and data extraction.
+helping on the design side of Azimuth, she worked on projects about data labelling, classification,
+summarization and forecasting, and is currently working on document processing and data extraction.
 
 </div>
 
