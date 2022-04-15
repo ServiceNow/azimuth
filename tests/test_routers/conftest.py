@@ -50,12 +50,12 @@ def wait_for_startup_after(app):
 
 
 @pytest.fixture(scope="session")
-def app(tmp_path) -> FastAPI:
+def app(tmpdir_factory) -> FastAPI:
     router_config = AzimuthConfig(
         name="sentiment-analysis",
         dataset=DATASET_CFG,
         pipelines=[FAST_TEST_CFG],
-        artifact_path=str(tmp_path),
+        artifact_path=str(tmpdir_factory.mktemp("app")),
         batch_size=16,
         use_cuda=False,
         model_contract="custom_text_classification",

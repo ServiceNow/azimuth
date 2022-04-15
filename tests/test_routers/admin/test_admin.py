@@ -5,9 +5,9 @@ from starlette.testclient import TestClient
 def test_get_config(app: FastAPI):
     client = TestClient(app)
     res = client.get("/admin/config").json()
+    res.pop("artifact_path")
 
     assert res == {
-        "artifact_path": "/tmp/azimuth_test_cache",
         "batch_size": 16,
         "columns": {
             "failed_parsing_reason": "failed_parsing_reason",

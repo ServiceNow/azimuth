@@ -192,7 +192,6 @@ class Module(DaskModule[ConfigScope]):
             threshold=self.get_threshold(),
             use_bma=use_bma,
             pipeline_index=self.mod_options.pipeline_index,
-            pipeline_config_hash=md5_hash(current_pipeline.dict()),
         )
         return table_key
 
