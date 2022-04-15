@@ -12,6 +12,5 @@
     "label": "label"
   },
   "rejection_class": "none",
-  "model_contract": "hf_text_classification",
   "pipelines": null
 }
