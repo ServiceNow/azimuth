@@ -42,7 +42,7 @@ def default_cluster(large=False) -> SpecCluster:
             n_workers=2,
             local_directory=tmp_file,
             threads_per_worker=1,
-            # Bigger mem on Toolkit to accomodate large ONNX models,
+            # Bigger mem to accomodate large models,
             # "auto" doesnt work well.
             memory_limit="12GB" if large else "6GB",
         )

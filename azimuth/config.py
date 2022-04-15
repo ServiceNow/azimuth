@@ -231,7 +231,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
                 **self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True)
             ).dict()
         )
-        path = pjoin(self.artifact_path, f"{self.name}_{md5[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{md5[:10]}")
         os.makedirs(path, exist_ok=True)
         return path
 

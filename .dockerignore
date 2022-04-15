@@ -2,6 +2,7 @@ azimuth_shr/local_files
 azimuth_shr/files
 azimuth_shr/sentence_transformers
 azimuth_shr/tfhub
+azimuth_shr/cached_models
 cache
 dist
 .coverage*

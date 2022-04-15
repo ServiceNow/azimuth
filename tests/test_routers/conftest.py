@@ -74,7 +74,7 @@ def app(tmpdir_factory) -> FastAPI:
 
     while task_manager.is_locked:
         time.sleep(1)
-    yield _app
+    return _app
 
 
 @pytest.fixture(scope="function")
