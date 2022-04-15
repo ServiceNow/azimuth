@@ -5,8 +5,8 @@ Follow the steps to **install** the necessary items, and **download Azimuth**.
 !!! tip
 
     You can also use Azimuth by git cloning the repo and running locally. It is slightly more
-    complex but it allows you to get the latest features and edit the code. The instructions are
-    [here](../development/index.md).
+    complex, but it allows you to get the latest features and edit the code. The instructions are in
+    [Development](../development/index.md).
 
 ## Requirements
 

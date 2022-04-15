@@ -28,8 +28,12 @@ current focus is on text classification.
 
 ## :octicons-question-16: Support
 
-* Join the [Slack channel :material-slack:](https://join.slack.com/t/newworkspace-5wx1461/shared_invite/zt-16x8eqt1h-ho3Hh6ilcN7FpZyLkjr9oA) to ask questions and engage with the community.
-* File issues in our [GitHub repo :material-github:](https://github.com/ServiceNow/azimuth/issues/new/choose).
-* Learn how to contribute in the [Contribute]() section. # TODO
+* Join
+  the [Slack channel :material-slack:](https://join.slack.com/t/newworkspace-5wx1461/shared_invite/zt-16x8eqt1h-ho3Hh6ilcN7FpZyLkjr9oA)
+  to ask questions and engage with the community.
+* File issues in
+  our [GitHub repo :material-github:](https://github.com/ServiceNow/azimuth/issues/new/choose).
+* Learn how to contribute
+  in [CONTRIBUTING.MD](https://github.com/ServiceNow/azimuth/blob/main/CONTRIBUTING.md) section.
 
 --8<-- "includes/abbreviations.md"

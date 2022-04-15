@@ -8,7 +8,3 @@ dataset and models.
    on your dataset and model format.
 3. [Run on Your Use Case](c-run.md) goes through the steps on how to prepare your config file and
    run Azimuth on a simple use case.
-
-!!! tip
-
-    For information on the release versions, see the [release notes](changelog/v2.md).

@@ -67,22 +67,3 @@ documentation. Almost all of them (except saliency maps) are linked to smart tag
 4. [:material-link: Almost Correct](outcomes.md)
 5. [:material-link: Uncertainty Quantification](uncertainty.md)
 6. [:material-link: Saliency Maps](saliency.md)
-
-## Proposed Workflow
-
-TODO STILL IN PROGRESS
-
-While going through the dataset and the model predictions in Azimuth, you may encounter issues in
-your dataset that may need fixing. These issues could be in both the evaluation set or the training
-set.
-
-Some samples might be simply noisy, either the utterance itself or the label. In that case, you can
-identify the **relabel** action or **remove** action. After exporting the annotations, you can send
-the list of utterances to relabel to your data labeler. You may remove the noisy data samples
-yourself.
-
-Some other utterances might seem like they belong to a new class that is not currently part of the
-list of classes. It might not be clear at first if the new class is worth adding, so as you explore
-the dataset, you can add annotate the utterances with **consider new class**. When done going
-through the dataset, you can filter all utterances with that proposed action, and see if there is a
-clear pattern emerging, that would justify adding the new class to the dataset.
