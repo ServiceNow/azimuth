@@ -48,7 +48,9 @@ The [Reference](https://servicenow.github.io/azimuth/reference) details what a c
 contains. You can launch one of the examples by making:
 
 ```
-make CFG_PATH=/config/examples/banking77/conf.json compose
+pip install gdown
+make download_demo
+make CFG_PATH=/config/development/clinc/conf.json compose
 ```
 
 Once the startup tasks are completed, you will be able to access Azimuth at http://0.0.0.0:8080. To
