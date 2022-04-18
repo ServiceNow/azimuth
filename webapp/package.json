@@ -30,6 +30,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
+    "fix": "make npm.audit.fix",
     "types": "rm -f src/types/generated/generatedTypes.ts && openapi-typescript http://localhost:8091/openapi.json --output src/types/generated/generatedTypes.ts"
   },
   "eslintConfig": {
