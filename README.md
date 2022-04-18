@@ -1,13 +1,14 @@
 <p align="center">
+  <br>
+  <img width=50% src="docs/docs/_static/logo.svg">
+  <br>
+  <br>
   <a href="https://join.slack.com/t/newworkspace-5wx1461/shared_invite/zt-16x8eqt1h-ho3Hh6ilcN7FpZyLkjr9oA">
     <img alt="Slack" src="https://img.shields.io/badge/slack-chat-green.svg?logo=slack"/>
   </a>
   <a href="./LICENSE">
     <img alt="Licence" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/>
   </a>
-  <br>
-  <br>
-  <img width=50% src="docs/docs/_static/logo.svg">
   <br>
   <br>
   Azimuth, an open-source dataset and error analysis tool for text classification, with love from ServiceNow.
