@@ -3,7 +3,6 @@
 # in the root directory of this source tree.
 
 import os
-import pickle
 import time
 from collections import OrderedDict
 from copy import deepcopy
@@ -84,7 +83,7 @@ class DatasetSplitManager:
         self._save_path = pjoin(self._base_dataset_path, "cache_ds.arrow")
         self._malformed_path = pjoin(self._base_dataset_path, "malformed_ds.arrow")
         self._index_path = pjoin(self._base_dataset_path, "index.faiss")
-        self._features_path = pjoin(self._base_dataset_path, "features.faiss")
+        self._features_path = pjoin(self._base_dataset_path, "features.faiss.npy")
         self._file_lock = pjoin(self._hf_path, f"{name}.lock")
         self.last_update = -1
         # Load the dataset_split from disk.
@@ -409,7 +408,7 @@ class DatasetSplitManager:
                 string_factory="Flat",
             )
             self._base_dataset_split.save_faiss_index(FEATURE_FAISS, file=self._index_path)
-            pickle.dump(self._base_dataset_split[FEATURES], open(self._features_path, "wb"))
+            np.save(self._features_path, self._base_dataset_split[FEATURES], allow_pickle=False)
             self._base_dataset_split.drop_index(FEATURE_FAISS)
             self._base_dataset_split = self._base_dataset_split.remove_columns(FEATURES)
 
@@ -425,8 +424,7 @@ class DatasetSplitManager:
 
         """
         ds: Dataset = deepcopy(self.get_dataset_split(table_key))
-        # nosec - this is trusted data
-        ds = ds.add_column(FEATURES, pickle.load(open(self._features_path, "rb")))  # nosec
+        ds = ds.add_column(FEATURES, np.load(self._features_path, allow_pickle=False).tolist())
         ds.load_faiss_index(FEATURE_FAISS, self._index_path)
         return ds
 
