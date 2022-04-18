@@ -40,7 +40,7 @@ being involved in designing the user interface, documenting it, and maintaining 
 #### Joseph Marinier [:material-github:](https://github.com/JosephMarinier) [:material-linkedin:](https://www.linkedin.com/in/josephmarinier/)
 
 Joseph is a full-stack developer who enjoys designing and engineering solutions to a large variety
-of problems. His main contribution to Azimuth has been leading the front end development.
+of problems. His main contribution to Azimuth has been leading the frontend development.
 
 </div>
 <div markdown style="display: inline-block;">
