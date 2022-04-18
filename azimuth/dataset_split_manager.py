@@ -469,11 +469,11 @@ class DatasetSplitManager:
     def rejection_class_idx(self):
         if self.config.rejection_class is None:
             # This is a dataset without a rejection class in the classes, like SST2.
-            # We know that the index is the last one, we put it there in `self.class_names`.
             return self.get_class_names().index(REJECTION_CLASS)
-        if self.config.rejection_class not in self.get_class_names():
+        if self.config.rejection_class not in self.get_class_names(labels_only=True):
             raise AzimuthValidationError(
-                f"Expected {self.config.rejection_class} in {self.get_class_names()}."
+                f"Expected {self.config.rejection_class} in"
+                f" {self.get_class_names(labels_only=True)}."
                 f" If your dataset does not have rejection class,"
                 f" you can set `rejection_class=None` in the configuration."
                 f" Otherwise set `rejection_class` to the class associated with no prediction."
