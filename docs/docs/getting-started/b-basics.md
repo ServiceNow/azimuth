@@ -53,7 +53,10 @@ from [HuggingFace (HF)](http://www.huggingface.co). Verify that your setup is wo
 
 1. In the terminal, from the `azimuth` folder, execute:
     ```
-    make DEVICE=$DEVICE compose
+    # Download the demo data
+    make download_demo
+    # Run our demo on CLINC
+    make DEVICE=$DEVICE CFG_PATH=/config/development/clinc/conf.json compose
     ```
    where `$DEVICE` is one of `gpu` or `cpu`. If none provided, `cpu` will be used.
 2. The **app will be accessible** at [http://0.0.0.0:8080](http://0.0.0.0:8080) after a few minutes
