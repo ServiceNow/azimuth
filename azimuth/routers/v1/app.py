@@ -109,7 +109,7 @@ def get_dataset_info(
 
     return DatasetInfoResponse(
         project_name=config.name,
-        class_names=eval_dm.class_names,
+        class_names=eval_dm.get_class_names(),
         data_actions=ALL_DATA_ACTIONS,
         smart_tags=ALL_SMART_TAGS,
         eval_class_distribution=eval_dm.class_distribution().tolist(),
@@ -150,7 +150,7 @@ def custom_metrics_info(
     for metric_name, metric_obj_def in config.metrics.items():
         met: Metric = load_custom_object(
             metric_obj_def,
-            label_list=dm.class_names,
+            label_list=dm.get_class_names(),
             rejection_class_idx=dm.rejection_class_idx,
             force_kwargs=True,  # Set True here as load_metrics has **kwargs.
         )

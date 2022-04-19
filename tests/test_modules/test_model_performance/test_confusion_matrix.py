@@ -18,9 +18,9 @@ def test_confusion_matrix(simple_text_config, apply_mocked_startup_task):
 
     [json_output] = mod.compute_on_dataset_split()
 
-    assert json_output.confusion_matrix.shape == (dm.num_classes, dm.num_classes)
-    # A row sums to one.
-    assert np.allclose(json_output.confusion_matrix.sum(-1), 1.0)
+    assert json_output.confusion_matrix.shape == (dm.get_num_classes(), dm.get_num_classes())
+    # All row sums to one except the last one because it is rejection class
+    assert np.allclose(json_output.confusion_matrix.sum(-1)[:-1], 1.0)
 
     mod_filter = ConfusionMatrixModule(
         DatasetSplitName.eval,

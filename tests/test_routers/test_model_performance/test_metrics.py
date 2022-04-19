@@ -41,4 +41,4 @@ def test_get_metrics_per_filter(app: FastAPI) -> None:
     assert data["metricsOverall"][0] == dict(**common_metric_response, filterValue="overall")
 
     metrics_per_filter = data.pop("metricsPerFilter")
-    assert "label" in metrics_per_filter and len(metrics_per_filter["label"]) == 2
+    assert "label" in metrics_per_filter and len(metrics_per_filter["label"]) == 3

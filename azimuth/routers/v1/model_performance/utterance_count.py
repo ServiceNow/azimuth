@@ -64,7 +64,7 @@ def get_count_per_filter(
     )
     ds = dataset_split_manager.get_dataset_split_with_class_names(table_key=table_key)
     ds = filter_dataset_split(ds, named_filters, config)
-    class_names = dataset_split_manager.class_names
+    class_names = dataset_split_manager.get_class_names()
     if pipeline_index is not None:
         prediction_counter = merge_counters(
             get_default_counter(class_names), Counter(ds[DatasetColumn.postprocessed_prediction])

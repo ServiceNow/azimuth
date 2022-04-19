@@ -38,7 +38,7 @@ def get_top_words(
 ) -> TopWordsResponse:
 
     mod_options = ModuleOptions(
-        filters=named_filters.to_dataset_filters(dataset_split_manager.class_names),
+        filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
         force_no_saliency=pipeline_index is None,
     )

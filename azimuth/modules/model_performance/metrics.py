@@ -107,13 +107,13 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
         for metric_name, metric_obj_def in self.config.metrics.items():
             met: Metric = load_custom_object(
                 metric_obj_def,
-                label_list=dm.class_names,
+                label_list=dm.get_class_names(),
                 rejection_class_idx=dm.rejection_class_idx,
                 force_kwargs=True,  # Set True here as load_metrics has **kwargs.
             )
             accept_probabilities = "probabilities" in inspect.signature(met._compute).parameters
             extra_kwargs = (
-                dict(probabilities=make_probabilities(ds, dm.num_classes))
+                dict(probabilities=make_probabilities(ds, dm.get_num_classes(labels_only=True)))
                 if accept_probabilities
                 else {}
             )
@@ -201,7 +201,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
 
             label_filters = {
                 class_name: self.edit_filter(self.mod_options.filters, label=i)
-                for i, class_name in enumerate(dm.class_names)
+                for i, class_name in enumerate(dm.get_class_names())
             }
             metrics_per_label = sorted_by_utterance_count_with_last(
                 self.get_metrics_for_filter(label_filters), dm.rejection_class_idx
@@ -210,7 +210,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
 
             prediction_filters = {
                 class_name: self.edit_filter(self.mod_options.filters, prediction=i)
-                for i, class_name in enumerate(dm.class_names)
+                for i, class_name in enumerate(dm.get_class_names())
             }
             metrics_per_prediction = sorted_by_utterance_count_with_last(
                 self.get_metrics_for_filter(prediction_filters),

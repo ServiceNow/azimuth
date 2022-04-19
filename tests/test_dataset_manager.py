@@ -92,10 +92,16 @@ def test_class_distribution(a_text_dataset, simple_text_config):
         dataset_split=a_text_dataset,
     )
 
-    class_distribution = ds_mng.class_distribution()
+    class_distribution = ds_mng.class_distribution(labels_only=True)
     assert len(class_distribution) == num_classes
     assert sum(class_distribution) == len(a_text_dataset)
-    assert len(ds_mng.class_names) == num_classes
+    assert len(ds_mng.get_class_names(labels_only=True)) == num_classes
+
+    # We add REJECTION_CLASS even if its not in the dataset.
+    class_distribution = ds_mng.class_distribution(labels_only=False)
+    assert len(class_distribution) == num_classes + 1
+    assert sum(class_distribution) == len(a_text_dataset)
+    assert len(ds_mng.get_class_names(labels_only=False)) == num_classes + 1
 
 
 def test_to_csv(text_dm_with_tags, simple_table_key):
@@ -126,7 +132,7 @@ def test_to_csv(text_dm_with_tags, simple_table_key):
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()
 
-    assert df["label"][0] in text_dm_with_tags.class_names
+    assert df["label"][0] in text_dm_with_tags.get_class_names()
     assert (
         df[DatasetColumn.postprocessed_prediction][
             text_dm_with_tags._base_dataset_split[DatasetColumn.postprocessed_prediction].index(-1)
@@ -157,7 +163,7 @@ def test_to_csv_no_model(text_dm_with_tags):
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()
 
-    assert df["label"][0] in text_dm_with_tags.class_names
+    assert df["label"][0] in text_dm_with_tags.get_class_names()
 
 
 @pytest.mark.parametrize("column_name", ["failed_parsing", "malformed"])
@@ -311,7 +317,7 @@ def test_rejection_class_check(simple_text_config, a_text_dataset):
         initial_tags=[],
         dataset_split=a_text_dataset,
     )
-    assert dm.rejection_class_idx == -1
+    assert dm.rejection_class_idx == 2
     simple_text_config.rejection_class = "negative"
     dm = DatasetSplitManager(
         DatasetSplitName.eval,

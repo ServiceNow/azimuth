@@ -17,7 +17,7 @@ from azimuth.types.general.module_options import ModuleOptions
 @pytest.mark.parametrize("remove_one_class", [True, False])
 @pytest.mark.parametrize("rejection_class", [True, False])
 def test_compute_on_dataset_split(
-    simple_text_config, apply_mocked_startup_task, rejection_class, remove_one_class
+    simple_text_config, apply_mocked_startup_task, rejection_class, remove_one_class, monkeypatch
 ):
     mod = DatasetWarningsModule(
         dataset_split_name=DatasetSplitName.all,
@@ -25,15 +25,19 @@ def test_compute_on_dataset_split(
     )
 
     if rejection_class:
-        add_rejection_class(mod)
-        assert "NO_INTENT" in mod.get_dataset_split_manager(DatasetSplitName.eval).class_names
+        add_rejection_class(mod, monkeypatch=monkeypatch)
+        assert "NO_INTENT" in mod.get_dataset_split_manager(DatasetSplitName.eval).get_class_names(
+            labels_only=True
+        )
     if remove_one_class:
         original_length = len(mod.get_dataset_split(DatasetSplitName.eval))
         remove_one_cls(mod)
         assert original_length > len(mod.get_dataset_split(DatasetSplitName.eval))
 
     output = mod.compute_on_dataset_split()[0].warning_groups
-    num_classes = len(mod.get_dataset_split_manager(DatasetSplitName.eval).class_names)
+    num_classes = mod.get_dataset_split_manager(DatasetSplitName.eval).get_num_classes(
+        labels_only=True
+    )
 
     assert isinstance(output, List)
 
@@ -69,22 +73,26 @@ def test_compute_on_dataset_split(
     assert tokens.columns == ["mean", "std"]
     assert len(tokens.plots.overall.data) > 0
     assert tokens.plots.overall.layout
-    assert all([len(p.data) > 0 for p in tokens.plots.per_class.values()])
+    assert all([len(p.data) > 0 for cls_name, p in tokens.plots.per_class.items()])
     assert all([p.layout for p in tokens.plots.per_class.values()])
 
 
-def add_rejection_class(mod):
+def add_rejection_class(mod, monkeypatch):
     # Adding a rejection class
-    eval_ds: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.eval)
-    train_ds: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.train)
-    eval_ds._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
-    train_ds._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
-    train_ds._base_dataset_split.features["label"].num_classes += 1  # Should be 3?
-    eval_ds._base_dataset_split.features["label"].num_classes += 1  # Should be 3?
-    augmented = eval_ds._base_dataset_split.map(
+    eval_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.eval)
+    train_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.train)
+    eval_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
+    train_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
+    eval_dm._base_dataset_split = eval_dm._base_dataset_split.map(
         lambda u, i: {"label": 2 if i % 10 == 0 else u["label"]}, with_indices=True
     )
-    mod.get_dataset_split_manager(DatasetSplitName.eval)._base_dataset_split = augmented
+    dms = {
+        DatasetSplitName.eval: eval_dm,
+        DatasetSplitName.train: train_dm,
+    }
+    # Modifying the config reset the ArtifactManager, which we do not want.
+    monkeypatch.setattr(mod, "get_dataset_split_manager", lambda s: dms[s])
+    mod.config.rejection_class = "NO_INTENT"
 
 
 def remove_one_cls(mod):

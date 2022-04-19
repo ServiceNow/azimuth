@@ -43,7 +43,7 @@ def get_outcome_count_per_threshold(
     pipeline_index: int = Depends(require_pipeline_index),
 ) -> List[OutcomeCountPerThresholdValue]:
     mod_options = ModuleOptions(
-        filters=named_filters.to_dataset_filters(dataset_split_manager.class_names),
+        filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
     )
 
@@ -77,7 +77,7 @@ def get_outcome_count_per_filter(
     pipeline_index: int = Depends(require_pipeline_index),
 ) -> OutcomeCountPerFilterResponse:
     mod_options = ModuleOptions(
-        filters=named_filters.to_dataset_filters(dataset_split_manager.class_names),
+        filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
     )
 

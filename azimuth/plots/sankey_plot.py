@@ -44,7 +44,7 @@ def make_sankey_plot(
     sim: np.ndarray = 1.0 - response.difference
     diff = response.difference
     sim_shape: int = sim.shape[0]
-    class_names = dataset_manager.class_names[:sim_shape]
+    class_names = dataset_manager.get_class_names(labels_only=True)[:sim_shape]
     colors = take(cycle(SANKEY_PALETTE), sim_shape)
     for i, j in product(np.arange(sim_shape), np.arange(sim_shape)):
         if i == j:

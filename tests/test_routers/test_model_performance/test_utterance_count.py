@@ -13,14 +13,14 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
-    assert "label" in metrics and len(metrics["label"]) == 2
+    assert "label" in metrics and len(metrics["label"]) == 3
     assert "smartTag" in metrics and sum([v["utteranceCount"] for v in metrics["smartTag"]]) > 0
 
     resp = client.get("/dataset_splits/eval/utterance_count/per_filter")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
-    assert "label" in metrics and len(metrics["label"]) == 2
+    assert "label" in metrics and len(metrics["label"]) == 3
     assert metrics["prediction"] is None and metrics["outcome"] is None
 
     resp = client.get(
@@ -29,6 +29,7 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
-    assert "label" in metrics and len(metrics["label"]) == 2
-    assert metrics["label"][0]["utteranceCount"] == data["utteranceCount"]
-    assert metrics["label"][1]["utteranceCount"] == 0
+    assert "label" in metrics and len(metrics["label"]) == 3
+    assert metrics["label"][0]["utteranceCount"] == 0  # Rejection class
+    assert metrics["label"][1]["utteranceCount"] == data["utteranceCount"]  # Positive
+    assert metrics["label"][2]["utteranceCount"] == 0  # Negative
