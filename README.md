@@ -7,7 +7,7 @@
   </a>
   <br>
   <br>
-  <img width=50% src="docs/docs/_static/logo.svg">
+  <img width=50% src="docs/docs/_static/azimuth_logo_universal_color.png">
   <br>
   <br>
   Azimuth, an open-source dataset and error analysis tool for text classification, with love from ServiceNow.
@@ -37,15 +37,12 @@ references to use Azimuth.
 * [Development](https://servicenow.github.io/azimuth/development) guides on how to develop and
   **contribute** to the repo.
 
-## Quick start
+## Run Our Demo
 
-Follow the instructions in [Getting Started](https://servicenow.github.io/azimuth/getting-started)
-to install the requirements, including Docker.
-
-Different configuration examples are provided in `config/examples`, leveraging pretrained models
-from [HuggingFace](https://huggingface.co).
-The [Reference](https://servicenow.github.io/azimuth/reference) details what a configuration file
-contains. You can launch one of the examples by making:
+After installing the requirements, as explained
+in [Installation](https://servicenow.github.io/azimuth/getting-started/a-install/), run the
+following command to run the demo. More details
+in [Learn Basics](https://servicenow.github.io/azimuth/getting-started/b-basics/).
 
 ```
 pip install gdown
@@ -53,17 +50,17 @@ make download_demo
 make CFG_PATH=/config/development/clinc/conf.json compose
 ```
 
-Once the startup tasks are completed, you will be able to access Azimuth at http://0.0.0.0:8080. To
-learn more about Azimuth's features, refer to
+Once the startup tasks are completed, you will be able to access Azimuth at `http://0.0.0.0:8080`.
+To learn more about Azimuth's features, refer to
 our [Key Concepts](https://servicenow.github.io/azimuth/key-concepts) and
 our [User Guide](https://servicenow.github.io/azimuth/user-guide).
 
 To use your own dataset and models, please refer to
 [Run on Your Use Case](https://servicenow.github.io/azimuth/getting-started/getting-started/c-run/).
 
-## How to Develop
+## How to Contribute?
 
-Our Development documentation can be found [here](https://servicenow.github.io/azimuth/development).
+Refer to our [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ### Code Documentation
 
