@@ -2,7 +2,7 @@
 
 ## Understanding the Application Folder
 
-In the Azimuth folder downloaded and unzipped at [step A](a-install.md), the following structure
+In the downloaded Azimuth folder from [step A](a-install.md), the following structure
 exists:
 
 ```bash
