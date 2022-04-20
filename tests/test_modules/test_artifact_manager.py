@@ -1,9 +1,8 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from azimuth.modules import Module
-from azimuth.modules.base_classes.artifact_manager import ArtifactManager
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.modules.base_classes import ArtifactManager, Module
+from azimuth.types import DatasetSplitName
 
 
 def test_artifact_manager(simple_text_config, file_text_config_top1):

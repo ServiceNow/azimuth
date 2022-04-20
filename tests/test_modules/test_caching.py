@@ -9,16 +9,19 @@ import h5py
 import pytest
 
 from azimuth.config import PerturbationTestingScope
-from azimuth.modules import Module
-from azimuth.modules.base_classes.aggregation_module import (
+from azimuth.modules.base_classes import (
     AggregationModule,
     FilterableModule,
+    IndexableModule,
+    Module,
 )
 from azimuth.modules.base_classes.caching import HDF5FileOpenerWithRetry
-from azimuth.modules.base_classes.indexable_module import IndexableModule
-from azimuth.types.general.alias_model import ModuleResponse
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import DatasetFilters, ModuleOptions
+from azimuth.types import (
+    DatasetFilters,
+    DatasetSplitName,
+    ModuleOptions,
+    ModuleResponse,
+)
 
 
 @pytest.mark.parametrize(

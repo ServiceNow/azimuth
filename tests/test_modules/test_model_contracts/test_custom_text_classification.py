@@ -1,12 +1,8 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from azimuth.modules.model_contracts.custom_classification import (
-    CustomTextClassificationModule,
-)
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.modules.model_contracts import CustomTextClassificationModule
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
 
 
 def test_loading_model(guse_text_config):

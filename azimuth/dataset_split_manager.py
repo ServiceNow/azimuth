@@ -19,7 +19,7 @@ from datasets import ClassLabel, Dataset, concatenate_datasets
 from filelock import FileLock
 
 from azimuth.config import AzimuthConfig, AzimuthValidationError, CommonFieldsConfig
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag, Tag
 from azimuth.utils.validation import assert_not_none
 

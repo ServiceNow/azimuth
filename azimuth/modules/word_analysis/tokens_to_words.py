@@ -8,12 +8,10 @@ from typing import List, Tuple, cast
 from datasets import Dataset
 
 from azimuth.config import ModelContractConfig
-from azimuth.modules.base_classes.indexable_module import IndexableModule
+from azimuth.modules.base_classes import IndexableModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import DatasetColumn, ModuleOptions, SupportedMethod
 from azimuth.types.task import SaliencyResponse
 from azimuth.types.word_analysis import TokensToWordsResponse
 

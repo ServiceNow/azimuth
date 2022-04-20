@@ -7,7 +7,7 @@ from datasets import Dataset
 """
 These comes from Azimuth codebase. You can access them from user-defined modules.
 """
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.utils.object_loader import load_custom_object
 
 MAX_PREDS = 5

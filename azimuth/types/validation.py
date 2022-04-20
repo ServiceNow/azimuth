@@ -1,6 +1,6 @@
 from typing import List
 
-from azimuth.types.general.alias_model import AliasModel
+from azimuth.types import AliasModel
 
 
 class ValidationResponse(AliasModel):

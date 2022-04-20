@@ -8,8 +8,7 @@ from sklearn.preprocessing import normalize
 import azimuth.modules.dataset_analysis.similarity_analysis as faiss_mod
 from azimuth.dataset_split_manager import FEATURE_FAISS
 from azimuth.modules.dataset_analysis.similarity_analysis import NeighborsTaggingModule
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions
 from azimuth.types.tag import SmartTag
 
 IDX = 3

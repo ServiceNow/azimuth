@@ -6,7 +6,7 @@ from typing import List
 
 from pydantic import Field
 
-from azimuth.types.general.alias_model import AliasModel, ModuleResponse
+from azimuth.types import AliasModel, ModuleResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO
 
 

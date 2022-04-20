@@ -9,9 +9,8 @@ from fastapi import APIRouter, Depends
 from azimuth.app import get_all_dataset_split_managers, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.task_manager import TaskManager
+from azimuth.types import DatasetSplitName, SupportedModule
 from azimuth.types.dataset_warnings import DatasetWarningGroup, DatasetWarningsResponse
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.modules import SupportedModule
 from azimuth.utils.routers import get_last_update, get_standard_task_result
 
 router = APIRouter()

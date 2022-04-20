@@ -6,11 +6,10 @@ from sklearn.metrics import pairwise_distances
 from spectral_metric.estimator import CumulativeGradientEstimator
 
 from azimuth.config import SimilarityConfig
-from azimuth.modules.base_classes.aggregation_module import AggregationModule
+from azimuth.modules.base_classes import AggregationModule
 from azimuth.modules.dataset_analysis.similarity_analysis import FAISSModule
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.array_type import Array
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.types import Array, DatasetSplitName
 from azimuth.types.similarity_analysis import FAISSResponse
 from azimuth.types.spectral_clustering import SpectralClusteringResponse
 

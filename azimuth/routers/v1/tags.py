@@ -10,7 +10,7 @@ from starlette.status import HTTP_400_BAD_REQUEST
 from azimuth.app import get_dataset_split_manager_mapping, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.types import DatasetSplitName
 from azimuth.types.tag import (
     DataActionMapping,
     DataActionResponse,

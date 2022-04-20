@@ -8,8 +8,8 @@ import numpy as np
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
+from azimuth.types import PlotSpecification
 from azimuth.types.dataset_warnings import DatasetWarningPlots
-from azimuth.types.general.alias_model import PlotSpecification
 from azimuth.utils.plots import (
     AXIS_FONT_SIZE,
     PAPER_MARGINS,

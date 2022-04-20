@@ -9,9 +9,12 @@ from fastapi import APIRouter, Depends
 from azimuth.app import get_dataset_split_manager, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions, NamedDatasetFilters
-from azimuth.types.general.modules import SupportedModule
+from azimuth.types import (
+    DatasetSplitName,
+    ModuleOptions,
+    NamedDatasetFilters,
+    SupportedModule,
+)
 from azimuth.types.model_performance import (
     ConfidenceBinDetails,
     ConfidenceHistogramResponse,

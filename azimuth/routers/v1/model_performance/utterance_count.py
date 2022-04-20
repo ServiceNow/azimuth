@@ -9,8 +9,7 @@ from fastapi import APIRouter, Depends
 from azimuth.app import get_config, get_dataset_split_manager
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import NamedDatasetFilters
+from azimuth.types import DatasetColumn, NamedDatasetFilters
 from azimuth.types.model_performance import (
     UtteranceCountPerFilter,
     UtteranceCountPerFilterResponse,

@@ -6,12 +6,7 @@ from typing import Dict, List, Optional, Tuple
 
 from pydantic import Field
 
-from azimuth.types.general.alias_model import (
-    AliasModel,
-    ModuleResponse,
-    PlotSpecification,
-)
-from azimuth.types.general.array_type import Array
+from azimuth.types import AliasModel, Array, ModuleResponse, PlotSpecification
 from azimuth.types.outcomes import OutcomeName
 
 

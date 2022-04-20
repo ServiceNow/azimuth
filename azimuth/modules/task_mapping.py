@@ -18,7 +18,7 @@ from azimuth.modules.model_performance import (
 )
 from azimuth.modules.utilities import validation
 from azimuth.modules.word_analysis import tokens_to_words, top_words
-from azimuth.types.general.modules import SupportedMethod, SupportedModule
+from azimuth.types import SupportedMethod, SupportedModule
 
 # Uses raw indices and needs access to the model.
 model_contract_methods = {

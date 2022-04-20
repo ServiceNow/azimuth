@@ -15,7 +15,7 @@ from azimuth.modules.dataset_analysis.spectral_clustering import (
     SCALING_FACTOR,
     take,
 )
-from azimuth.types.general.alias_model import PlotSpecification
+from azimuth.types import PlotSpecification
 from azimuth.types.spectral_clustering import SpectralClusteringResponse
 from azimuth.utils.plots import SANKEY_PALETTE
 

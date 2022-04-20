@@ -6,8 +6,7 @@ from azimuth.modules.perturbation_testing import (
     PerturbationTestingModule,
     PerturbationTestingSummaryModule,
 )
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
 
 
 def test_perturbation_testing_summary(tiny_text_config, dask_client):

@@ -6,8 +6,7 @@ from typing import List, Optional, Tuple
 
 from pydantic import Field
 
-from azimuth.types.general.alias_model import AliasModel, ModuleResponse
-from azimuth.types.general.array_type import Array
+from azimuth.types import AliasModel, Array, ModuleResponse
 
 
 class SimilarUtterance(AliasModel):

@@ -2,11 +2,9 @@ from typing import List
 
 from distributed import get_client
 
-from azimuth.modules.base_classes.indexable_module import IndexableModule
+from azimuth.modules.base_classes import IndexableModule
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.alias_model import ModuleResponse
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions, ModuleResponse
 
 
 class Potato(ModuleResponse):

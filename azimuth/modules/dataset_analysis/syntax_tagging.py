@@ -10,9 +10,8 @@ from spacy.lang.en import English
 
 from azimuth.config import CommonFieldsConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes.indexable_module import DatasetResultModule
-from azimuth.types.general.alias_model import ModuleResponse
-from azimuth.types.general.dataset import DatasetColumn
+from azimuth.modules.base_classes import DatasetResultModule
+from azimuth.types import DatasetColumn, ModuleResponse
 from azimuth.types.tag import ALL_SYNTAX_TAGS, SmartTag, TaggingResponse
 
 

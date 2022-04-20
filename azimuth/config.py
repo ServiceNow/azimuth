@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 import structlog
 from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, validator
 
-from azimuth.types.general.modules import SupportedModelContract
+from azimuth.types import SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 
 log = structlog.get_logger(__file__)

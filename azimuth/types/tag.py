@@ -7,8 +7,7 @@ from typing import Any, Dict, List
 
 from pydantic import Field
 
-from azimuth.types.general.alias_model import AliasModel, ModuleResponse
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.types import AliasModel, DatasetSplitName, ModuleResponse
 
 
 class DataActionMapping(AliasModel):

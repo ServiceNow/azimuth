@@ -11,8 +11,8 @@ from datasets import Dataset
 
 from azimuth.config import ModelContractConfig
 from azimuth.modules.model_contracts.text_classification import TextClassificationModule
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import GradientCalculation, ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
+from azimuth.types.general.module_options import GradientCalculation
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.mc_dropout import MCDropout
 from azimuth.utils.ml.saliency import (

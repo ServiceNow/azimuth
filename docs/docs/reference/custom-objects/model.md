@@ -278,7 +278,7 @@ file-based models.
 from typing import Any, Dict
 
 from azimuth.modules.model_contracts.text_classification import SupportedOutput
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.types import DatasetSplitName
 
 
 def __call__(utterances: Dict[str, Any],

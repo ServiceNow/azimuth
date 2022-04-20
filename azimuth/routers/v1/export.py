@@ -21,9 +21,12 @@ from azimuth.app import (
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedModule
+from azimuth.types import (
+    DatasetColumn,
+    DatasetSplitName,
+    ModuleOptions,
+    SupportedModule,
+)
 from azimuth.types.perturbation_testing import (
     PerturbationTestSummary,
     PerturbedUtteranceDetailedResult,

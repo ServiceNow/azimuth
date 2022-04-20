@@ -7,8 +7,7 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from azimuth.types.general.alias_model import AliasModel
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import AliasModel, SupportedMethod
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import DataAction, SmartTag
 

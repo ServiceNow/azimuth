@@ -9,15 +9,9 @@ from datasets import Dataset, DatasetDict
 from distributed import Variable
 
 from azimuth.config import CustomObject
-from azimuth.modules import Module
-from azimuth.modules.base_classes.aggregation_module import AggregationModule
-from azimuth.modules.base_classes.indexable_module import IndexableModule
-from azimuth.modules.model_contracts.hf_text_classification import (
-    HFTextClassificationModule,
-)
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.modules.base_classes import AggregationModule, IndexableModule, Module
+from azimuth.modules.model_contracts import HFTextClassificationModule
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
 
 
 def test_ds_loading(simple_text_config):

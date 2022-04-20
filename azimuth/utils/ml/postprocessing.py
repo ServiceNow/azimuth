@@ -4,8 +4,7 @@ from typing import List
 import numpy as np
 from scipy.special import expit, softmax
 
-from azimuth.types.general.alias_model import AliasModel
-from azimuth.types.general.array_type import Array
+from azimuth.types import AliasModel, Array
 
 
 class PostProcessingIO(AliasModel):

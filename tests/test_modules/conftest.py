@@ -4,7 +4,7 @@
 
 import pytest
 
-from azimuth.modules.base_classes.artifact_manager import ArtifactManager
+from azimuth.modules.base_classes import ArtifactManager
 
 
 @pytest.fixture(autouse=True)

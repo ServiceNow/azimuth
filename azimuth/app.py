@@ -14,11 +14,10 @@ from starlette.status import HTTP_404_NOT_FOUND
 from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config, parse_args
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules import Module
+from azimuth.modules.base_classes import Module
 from azimuth.modules.utilities.validation import ValidationModule
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.types.validation import ValidationResponse
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan

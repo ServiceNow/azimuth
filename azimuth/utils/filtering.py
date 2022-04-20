@@ -6,8 +6,7 @@ from typing import Union
 from datasets import Dataset
 
 from azimuth.config import ProjectConfig
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import DatasetFilters, NamedDatasetFilters
+from azimuth.types import DatasetColumn, DatasetFilters, NamedDatasetFilters
 from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
 
 

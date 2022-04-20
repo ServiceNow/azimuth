@@ -8,7 +8,7 @@ from transformers import AutoTokenizer
 
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.types import DatasetSplitName
 from azimuth.types.tag import ALL_PREDICTION_TAGS, ALL_STANDARD_TAGS
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.project import load_dataset_from_config

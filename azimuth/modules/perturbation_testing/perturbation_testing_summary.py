@@ -8,11 +8,10 @@ from typing import List, Optional
 import pandas as pd
 
 from azimuth.config import PerturbationTestingScope
-from azimuth.modules.base_classes.aggregation_module import ComparisonModule
+from azimuth.modules.base_classes import ComparisonModule
 from azimuth.modules.perturbation_testing import PerturbationTestingModule
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.types.perturbation_testing import (
     PerturbationTestFailureReason,
     PerturbationTestFamily,

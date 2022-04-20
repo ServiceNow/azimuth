@@ -8,12 +8,9 @@ import pytest
 import torch
 from datasets import Dataset
 
-from azimuth.modules.model_contracts.hf_text_classification import (
-    HFTextClassificationModule,
-)
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import GradientCalculation, ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.modules.model_contracts import HFTextClassificationModule
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
+from azimuth.types.general.module_options import GradientCalculation
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.saliency import find_word_embeddings_layer
 

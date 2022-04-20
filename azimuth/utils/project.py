@@ -13,8 +13,7 @@ from azimuth.config import (
     SimilarityConfig,
 )
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.modules import SupportedModelContract
+from azimuth.types import DatasetSplitName, SupportedModelContract
 from azimuth.types.tag import ALL_PREDICTION_TAGS, ALL_STANDARD_TAGS
 from azimuth.utils.object_loader import load_custom_object
 

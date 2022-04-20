@@ -7,7 +7,7 @@ import datasets
 import numpy as np
 import pandas as pd
 
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.word_analysis import (
     TokensToWordsResponse,
     TopWordsImportanceCriteria,

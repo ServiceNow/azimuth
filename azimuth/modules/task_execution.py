@@ -8,8 +8,8 @@ import structlog
 from dask.context import thread_state
 from distributed import get_client, rejoin, secede
 
-from azimuth.modules import Module
-from azimuth.types.general.alias_model import ModuleResponse
+from azimuth.modules.base_classes import Module
+from azimuth.types import ModuleResponse
 
 log = structlog.get_logger(__name__)
 

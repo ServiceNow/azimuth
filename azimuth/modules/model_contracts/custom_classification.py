@@ -6,7 +6,7 @@ from typing import Callable, List
 import structlog
 from datasets import Dataset
 
-from azimuth.modules.base_classes.indexable_module import ModelContractModule
+from azimuth.modules.base_classes import ModelContractModule
 from azimuth.modules.model_contracts.text_classification_no_saliency import (
     TextClassificationNoSaliencyModule,
 )
