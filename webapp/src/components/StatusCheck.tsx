@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import noData from "assets/launch.svg";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -41,7 +41,6 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
           width={600}
         >
           <img src={noData} alt="Startup tasks still in progress" width={400} />
-          <CircularProgress size="3rem" />
           <Typography variant="h2" align="center">
             The startup tasks are still in progress. Grab a coffee and we will
             auto-refresh for you.
