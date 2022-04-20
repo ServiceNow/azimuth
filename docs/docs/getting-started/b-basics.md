@@ -54,8 +54,9 @@ Out-of-the-box, Azimuth can run on different demo data and models
 from [HuggingFace (HF)](http://www.huggingface.co). Verify that your setup is working correctly by
 running a demo.
 
-1. In the terminal, from the `azimuth` folder, execute the following to download the demo data and
-   model. Our demo is using a subset of
+1. In the terminal, from the `azimuth` folder, execute the following commands. The first one
+   installs the Google Drive downloading library. The second command downloads from Google Drive the
+   demo data and model. Our demo is using a subset of
    the [`clinc_oos` dataset](https://huggingface.co/datasets/clinc_oos) from HuggingFace, with only
    16 classes.
     ```
