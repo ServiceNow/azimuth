@@ -1,6 +1,6 @@
 # Welcome to the Azimuth Documentation!
 
-![Logo](_static/logo.svg)
+![Logo](_static/azimuth_logo_universal_color.png){: style="width:650px"}
 
 Azimuth is an open source application that helps AI practitioners and data scientists better
 **understand their dataset and model predictions** by performing thorough **dataset** and **error
@@ -34,6 +34,6 @@ current focus is on text classification.
 * File issues in
   our [GitHub repo :material-github:](https://github.com/ServiceNow/azimuth/issues/new/choose).
 * Learn how to contribute
-  in [CONTRIBUTING.MD](https://github.com/ServiceNow/azimuth/blob/main/CONTRIBUTING.md) section.
+  in [CONTRIBUTING.md](https://github.com/ServiceNow/azimuth/blob/main/CONTRIBUTING.md).
 
 --8<-- "includes/abbreviations.md"

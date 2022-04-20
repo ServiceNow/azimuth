@@ -1,12 +1,12 @@
 {
-  "name": "CLINC",
+  "name": "CLINC Demo",
   "pipelines": [
     {
       "model": {
         "class_name": "loading_resources.load_hf_text_classif_pipeline",
         "remote": "/azimuth_shr",
         "kwargs": {
-          "checkpoint_path": "/azimuth_shr/files/clinc/CLINC150_trained_model"
+          "checkpoint_path": "/azimuth_shr/files/clinc-demo/CLINC150_trained_model"
         }
       }
     }
@@ -16,7 +16,7 @@
     "remote": "/azimuth_shr",
     "kwargs": {
       "python_loader": "/azimuth_shr/data/CLINC150.py",
-      "full_path": "/azimuth_shr/files/clinc/oos-eval/data/data_demo.json"
+      "full_path": "/azimuth_shr/files/clinc-demo/oos-eval/data/data_demo.json"
     }
   },
   "batch_size": 64,
