@@ -1,5 +1,6 @@
 site_name: Azimuth documentation
 repo_url: https://github.com/ServiceNow/azimuth
+edit_uri: edit/main/docs/docs/
 plugins:
   - search
 theme:
