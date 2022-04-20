@@ -5,7 +5,7 @@
 import os
 import time
 from collections import OrderedDict
-from copy import deepcopy
+from copy import copy, deepcopy
 from dataclasses import asdict, dataclass
 from glob import glob
 from os.path import join as pjoin
@@ -22,6 +22,8 @@ from azimuth.config import AzimuthConfig, AzimuthValidationError, CommonFieldsCo
 from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag, Tag
 from azimuth.utils.validation import assert_not_none
+
+REJECTION_CLASS = "REJECTION_CLASS"
 
 log = structlog.get_logger("DatasetSplitManager")
 
@@ -174,8 +176,8 @@ class DatasetSplitManager:
         # which is possible in postprocessed_prediction
         # if a rejection class is missing from the classes.
         class_names = [
-            *self.class_names,
-            self.config.rejection_class or "REJECTION_CLASS",
+            *self.get_class_names(),
+            self.config.rejection_class or REJECTION_CLASS,
         ]  # so class_names[-1] returns "REJECTION_CLASS"
         ds = self.get_dataset_split(table_key=table_key)
         col_names = ds.column_names
@@ -341,8 +343,12 @@ class DatasetSplitManager:
         tags: List[Dict[str, bool]] = df.to_dict(orient="records")
         return tags
 
-    def class_distribution(self):
+    def class_distribution(self, labels_only=False):
         """Compute the class distribution for a dataset_split.
+
+        Args:
+            labels_only: If true, will filter out REJECTION_CLASS
+                if it was added by Azimuth.
 
         Returns:
             Array[int], count for each class.
@@ -353,7 +359,7 @@ class DatasetSplitManager:
         )
         class_distribution_dict = dict(zip(class_distribution[0], class_distribution[1]))
 
-        for x in range(self._base_dataset_split.features[self.config.columns.label].num_classes):
+        for x in range(self.get_num_classes(labels_only=labels_only)):
             if x not in class_distribution_dict:
                 class_distribution_dict[x] = 0
 
@@ -428,27 +434,49 @@ class DatasetSplitManager:
         ds.load_faiss_index(FEATURE_FAISS, self._index_path)
         return ds
 
-    @property
-    def class_names(self):
-        return self._base_dataset_split.features[self.config.columns.label].names
+    def get_class_names(self, labels_only=False):
+        """
+        Get class names.
 
-    @property
-    def num_classes(self):
-        return len(self.class_names)
+        Args:
+            labels_only: If true, will filter out REJECTION_CLASS
+                if it was added by Azimuth.
+
+        Returns:
+            List of class names.
+        """
+        cls_names = copy(self._base_dataset_split.features[self.config.columns.label].names)
+        if self.config.rejection_class is None and not labels_only:
+            cls_names.append(REJECTION_CLASS)
+        return cls_names
+
+    def get_num_classes(self, labels_only=False):
+        """
+        Get number of classes.
+
+        Args:
+            labels_only: If true, will filter out REJECTION_CLASS
+                if it was added by Azimuth.
+
+        Returns:
+            Number of classes.
+        """
+        return len(self.get_class_names(labels_only=labels_only))
 
     @property
     def rejection_class_idx(self):
         if self.config.rejection_class is None:
             # This is a dataset without a rejection class in the classes, like SST2.
-            return -1
-        if self.config.rejection_class not in self.class_names:
+            return self.get_class_names().index(REJECTION_CLASS)
+        if self.config.rejection_class not in self.get_class_names(labels_only=True):
             raise AzimuthValidationError(
-                f"Expected {self.config.rejection_class} in {self.class_names}."
+                f"Expected {self.config.rejection_class} in"
+                f" {self.get_class_names(labels_only=True)}."
                 f" If your dataset does not have rejection class,"
                 f" you can set `rejection_class=None` in the configuration."
                 f" Otherwise set `rejection_class` to the class associated with no prediction."
             )
-        return self.class_names.index(self.config.rejection_class)
+        return self.get_class_names().index(self.config.rejection_class)
 
     def _get_prediction_table(self, table_key: PredictionTableKey) -> Dataset:
         """Return the prediction table associated with `table_key`.

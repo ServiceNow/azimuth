@@ -130,10 +130,11 @@ def config_structured_output(num_classes, threshold=0.8):
         postprocessor_output: PostProcessingIO
 
     class StructuredOutput:
-        def __init__(self, num_classes, threshold):
+        def __init__(self, num_classes, threshold, no_prediction_idx):
             self.rng = np.random.RandomState(2022)
             self.num_classes = num_classes
             self.threshold = threshold
+            self.no_prediction_idx = no_prediction_idx
 
         def __call__(self, utterances: List[str], num_workers=0, batch_size=32) -> MyOutputFormat:
             # Random logits based on the first letter
@@ -151,7 +152,9 @@ def config_structured_output(num_classes, threshold=0.8):
             postprocessed_logits = initial_logits / 5
             postprocessed_probs = softmax(postprocessed_logits, -1)
             preds = np.where(
-                postprocessed_logits.max(-1) > self.threshold, postprocessed_probs.argmax(-1), -1
+                postprocessed_logits.max(-1) > self.threshold,
+                postprocessed_probs.argmax(-1),
+                self.no_prediction_idx,
             )
             postprocessed = PostProcessingIO(
                 texts=utterances,
@@ -161,7 +164,7 @@ def config_structured_output(num_classes, threshold=0.8):
             )
             return MyOutputFormat(model_output=initial_preds, postprocessor_output=postprocessed)
 
-    return StructuredOutput(num_classes, threshold)
+    return StructuredOutput(num_classes, threshold, no_prediction_idx=num_classes)
 
 
 def get_custom_dataset(length, num_classes, azimuth_config) -> DatasetDict:
@@ -172,7 +175,8 @@ def get_custom_dataset(length, num_classes, azimuth_config) -> DatasetDict:
     def gen_text():
         return "".join(rng.choice(list(string.ascii_uppercase + string.digits), size=10))
 
-    classes = [f"class_{i}" for i in range(num_classes)]
+    classes = {i: f"class_{i}" for i in range(num_classes)}
+    inverse_mapping = {v: k for k, v in classes.items()}
 
     ds_dict = DatasetDict(
         train=Dataset.from_dict(
@@ -189,4 +193,5 @@ def get_custom_dataset(length, num_classes, azimuth_config) -> DatasetDict:
         ),
     )
     ds_dict = ds_dict.class_encode_column(label_column)
+    ds_dict.align_labels_with_mapping(inverse_mapping, label_column=label_column)
     return ds_dict

@@ -39,7 +39,7 @@ def test_get_dataset_info(app: FastAPI) -> None:
 
     assert data == {
         "availableDatasetSplits": {"eval": True, "train": True},
-        "classNames": ["negative", "positive"],
+        "classNames": ["negative", "positive", "REJECTION_CLASS"],
         "defaultThreshold": [None],
         "modelContract": "custom_text_classification",
         "perturbationTestingAvailable": True,
@@ -49,8 +49,8 @@ def test_get_dataset_info(app: FastAPI) -> None:
         "dataActions": ALL_DATA_ACTIONS,
         "similarityAvailable": True,
         "smartTags": ALL_SMART_TAGS,
-        "evalClassDistribution": [22, 20],
-        "trainClassDistribution": [23, 19],
+        "evalClassDistribution": [22, 20, 0],
+        "trainClassDistribution": [23, 19, 0],
     }
 
 

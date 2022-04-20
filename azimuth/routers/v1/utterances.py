@@ -107,7 +107,7 @@ def get_utterances(
     ):
         sort_by = UtterancesSortableColumn.index
 
-    dataset_filters = named_filters.to_dataset_filters(dataset_split_manager.class_names)
+    dataset_filters = named_filters.to_dataset_filters(dataset_split_manager.get_class_names())
     table_key = (
         PredictionTableKey.from_pipeline_index(
             pipeline_index,
@@ -262,7 +262,7 @@ def get_perturbed_utterances(
 
     named_response = [
         PerturbedUtteranceWithClassNames(
-            prediction=dataset_split_manager.class_names[r.prediction],
+            prediction=dataset_split_manager.get_class_names()[r.prediction],
             **r.dict(exclude={"prediction"}),
         )
         for r in response

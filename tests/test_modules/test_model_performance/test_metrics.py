@@ -170,12 +170,12 @@ def test_outcome_count_per_filter(simple_text_config, apply_mocked_startup_task)
     assert (
         res.count_per_filter.label[0].filter_value
         == res_filter_0.count_per_filter.label[0].filter_value
-        == dm.class_names[dm.rejection_class_idx]
+        == dm.get_class_names()[dm.rejection_class_idx]
     )
     assert (
         res.count_per_filter.prediction[0].filter_value
         == res_filter_0.count_per_filter.prediction[0].filter_value
-        == dm.class_names[dm.rejection_class_idx]
+        == dm.get_class_names()[dm.rejection_class_idx]
     )
     assert (
         res.count_per_filter.smart_tag[0].filter_value
@@ -211,11 +211,11 @@ def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
     assert result.utterance_count == ds_len
     prediction_metrics = result.metrics_per_filter.prediction
     assert sum([mf_v.utterance_count for mf_v in prediction_metrics]) == ds_len
-    assert len(prediction_metrics) == dm.num_classes
+    assert len(prediction_metrics) == dm.get_num_classes()
 
     label_metrics = result.metrics_per_filter.label
     assert sum([mf_v.utterance_count for mf_v in label_metrics]) == ds_len
-    assert len(label_metrics) == dm.num_classes
+    assert len(label_metrics) == dm.get_num_classes()
 
     smart_tag_metrics = result.metrics_per_filter.smart_tag
     assert sum([mf_v.utterance_count for mf_v in smart_tag_metrics]) == ds_len

@@ -30,10 +30,11 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             ds[self.config.columns.label],
         )
         ds_mng = self.get_dataset_split_manager()
+        class_ids = list(range(ds_mng.get_num_classes()))
         cf = confusion_matrix(
             y_true=labels,
             y_pred=predictions,
-            labels=range(len(ds_mng.class_names)),
+            labels=class_ids,
             normalize="true",
         )
         return [ConfusionMatrixResponse(confusion_matrix=cf)]

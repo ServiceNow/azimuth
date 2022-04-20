@@ -37,7 +37,7 @@ def get_confusion_matrix(
     pipeline_index: int = Depends(require_pipeline_index),
 ) -> ConfusionMatrixResponse:
     mod_options = ModuleOptions(
-        filters=named_filters.to_dataset_filters(dataset_split_manager.class_names),
+        filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
     )
 
