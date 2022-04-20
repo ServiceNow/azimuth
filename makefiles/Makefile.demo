@@ -11,3 +11,4 @@ download_demo: check-gdown
 	$(shell tar -xvf clinc-demo.tar.gz)
 	$(shell mkdir -p azimuth_shr/files)
 	$(shell mv clinc-demo azimuth_shr/files/clinc-demo)
+	$(shell rm ./clinc-demo.tar.gz)

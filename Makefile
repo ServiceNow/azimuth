@@ -38,6 +38,7 @@ build_be:
 build_fe:
 	docker build \
 		--target $(STAGE) \
+		-t $(REGISTRY)/$(IMAGE)_app:$(TAG)$(TAG_EXT) \
 		webapp/.
 
 .PHONY: compose

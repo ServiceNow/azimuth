@@ -18,6 +18,11 @@ use cases.
 
 ## 1. Prepare the Config File
 
+!!! tip
+
+    You haven't run our demo yet? You might want to verify your setup before feeding your own model
+    and dataset. Go back to [B. Learn Basics](b-basics.md).
+
 **Start from an existing config ** and **edit** the relevant fields to adapt it to your dataset and
 models. Examples with an [HuggingFace (HF)](http://www.huggingface.co)
 dataset and model are available in `config/examples` (`CLINC` is also shown below).
@@ -93,10 +98,9 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 ## 2. Running the App
 
 1. In the terminal, go the `azimuth` **root directory**.
-2. Set `CFG_PATH="/config/my_project/conf.json"` with the **location of the config**.
+2. Set `CFG_PATH=/config/my_project/conf.json` with the **location of the config**.
     * The initial `/` is required as your local config folder will be mounted on the Docker
       container at the root.
-    * If you do not specify any `CFG_PATH`, i.e `make compose`, the default demo will launch.
 3. Execute the following **command**:
     ```
     make compose
@@ -125,6 +129,8 @@ They are the following:
 * Disable behavioral tests and similarity by passing respectively `BEHAVIORAL_TESTING=null` and
   `SIMILARITY=null`.
 * Specify the name of the project, passing `NAME`.
+* You can specify the device on which to run Azimuth, with `DEVICE` being one of `gpu` or `cpu`. If
+  none is provided, `cpu` will be used. Ex: `DEVICE=gpu`.
 
 !!! note
 
