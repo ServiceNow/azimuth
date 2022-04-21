@@ -5,8 +5,6 @@
   <br>
   <a href="https://servicenow.github.io/azimuth">
     <img alt="Documentation" src="https://github.com/ServiceNow/azimuth/actions/workflows/docs_cd.yml/badge.svg"/></a>
-  <a href="https://join.slack.com/t/newworkspace-5wx1461/shared_invite/zt-16x8eqt1h-ho3Hh6ilcN7FpZyLkjr9oA">
-    <img alt="Slack" src="https://img.shields.io/badge/slack-chat-green.svg?logo=slack"/></a>
   <a href="./LICENSE">
     <img alt="Licence" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
   <a href="https://github.com/ServiceNow/azimuth/actions/workflows/pythonci.yml">
