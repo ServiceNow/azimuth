@@ -4,13 +4,14 @@
 
 import numpy as np
 
-from azimuth.modules.model_contracts.file_based_text_classification import (
-    FileBasedTextClassificationModule,
-)
+from azimuth.modules.model_contracts import FileBasedTextClassificationModule
 from azimuth.modules.word_analysis.top_words import TopWordsModule
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import DatasetFilters, ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import (
+    DatasetFilters,
+    DatasetSplitName,
+    ModuleOptions,
+    SupportedMethod,
+)
 from azimuth.types.word_analysis import TokensToWordsResponse
 
 ALL_WORDS = [

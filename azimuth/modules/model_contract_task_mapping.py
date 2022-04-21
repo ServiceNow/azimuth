@@ -4,19 +4,13 @@
 from typing import Mapping, Optional, Type
 
 from azimuth.config import ModelContractConfig
-from azimuth.modules.base_classes.indexable_module import ModelContractModule
-from azimuth.modules.model_contracts.custom_classification import (
+from azimuth.modules.base_classes import ModelContractModule
+from azimuth.modules.model_contracts import (
     CustomTextClassificationModule,
-)
-from azimuth.modules.model_contracts.file_based_text_classification import (
     FileBasedTextClassificationModule,
-)
-from azimuth.modules.model_contracts.hf_text_classification import (
     HFTextClassificationModule,
 )
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedModelContract
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModelContract
 
 # Black formats this in a way where the line is too long.
 # fmt: off

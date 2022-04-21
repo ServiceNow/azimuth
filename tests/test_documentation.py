@@ -13,7 +13,7 @@ from pprint import pprint
 from pydantic.main import BaseModel
 
 import azimuth
-from azimuth.modules import Module
+from azimuth.modules.base_classes import Module
 
 ROOT_MODULE = os.path.dirname(azimuth.__file__)
 

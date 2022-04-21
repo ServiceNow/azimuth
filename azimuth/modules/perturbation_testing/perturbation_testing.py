@@ -9,11 +9,14 @@ from datasets import Dataset
 
 from azimuth.config import PerturbationTestingScope
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes.indexable_module import DatasetResultModule
+from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import (
+    DatasetColumn,
+    DatasetSplitName,
+    ModuleOptions,
+    SupportedMethod,
+)
 from azimuth.types.perturbation_testing import (
     PRETTY_PERTURBATION_TYPES,
     PerturbationTestClass,

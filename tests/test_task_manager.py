@@ -6,16 +6,19 @@ import time
 
 import pytest
 
-from azimuth.modules import Module
+from azimuth.modules.base_classes import Module
 from azimuth.modules.task_mapping import model_contract_methods
 from azimuth.task_manager import TaskManager, TaskManagerLockedException
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import DatasetFilters, ModuleOptions
-from azimuth.types.general.modules import SupportedMethod, SupportedModule
+from azimuth.types import (
+    DatasetFilters,
+    DatasetSplitName,
+    ModuleOptions,
+    SupportedMethod,
+    SupportedModule,
+)
 
 
 def test_get_all_task(text_task_manager):
-
     # We can find a task
     key, mod = text_task_manager.get_task(
         SupportedMethod.Inputs,

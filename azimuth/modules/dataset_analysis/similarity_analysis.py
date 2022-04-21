@@ -15,14 +15,9 @@ from tqdm import tqdm
 
 from azimuth.config import SimilarityConfig, SimilarityOptions
 from azimuth.dataset_split_manager import FEATURE_FAISS, DatasetSplitManager
-from azimuth.modules.base_classes.indexable_module import (
-    DatasetResultModule,
-    IndexableModule,
-)
+from azimuth.modules.base_classes import DatasetResultModule, IndexableModule
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.array_type import Array
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import Array, DatasetColumn, DatasetSplitName, ModuleOptions
 from azimuth.types.similarity_analysis import FAISSResponse
 from azimuth.types.tag import SmartTag, TaggingResponse
 from azimuth.utils.validation import assert_not_none

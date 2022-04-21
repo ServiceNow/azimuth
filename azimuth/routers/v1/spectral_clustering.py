@@ -6,9 +6,7 @@ from azimuth.app import get_all_dataset_split_managers, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.plots.sankey_plot import make_sankey_plot
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.alias_model import PlotSpecification
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.modules import SupportedModule
+from azimuth.types import DatasetSplitName, PlotSpecification, SupportedModule
 from azimuth.types.spectral_clustering import SpectralClusteringResponse
 from azimuth.utils.routers import get_standard_task_result
 

@@ -10,15 +10,16 @@ from datasets import Dataset
 
 from azimuth.config import PipelineDefinition
 from azimuth.dataset_split_manager import PredictionTableKey
-from azimuth.modules.model_contracts.custom_classification import (
+from azimuth.modules.model_contracts import (
     CustomTextClassificationModule,
-)
-from azimuth.modules.model_contracts.hf_text_classification import (
     HFTextClassificationModule,
 )
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import (
+    DatasetColumn,
+    DatasetSplitName,
+    ModuleOptions,
+    SupportedMethod,
+)
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO

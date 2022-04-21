@@ -9,9 +9,7 @@ import numpy as np
 import pytest
 
 from azimuth.config import MetricDefinition
-from azimuth.modules.model_contracts.hf_text_classification import (
-    HFTextClassificationModule,
-)
+from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.modules.model_performance.metrics import (
     MetricsModule,
     MetricsPerFilterModule,
@@ -22,9 +20,12 @@ from azimuth.modules.model_performance.outcome_count import (
 )
 from azimuth.modules.model_performance.outcomes import OutcomesModule
 from azimuth.plots.ece import make_ece_figure
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import DatasetFilters, ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import (
+    DatasetFilters,
+    DatasetSplitName,
+    ModuleOptions,
+    SupportedMethod,
+)
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
 

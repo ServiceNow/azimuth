@@ -13,7 +13,7 @@ from datasets import ClassLabel, Dataset, Features, Value
 
 from azimuth.config import AzimuthValidationError
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import ALL_STANDARD_TAGS, ALL_TAGS
 
 

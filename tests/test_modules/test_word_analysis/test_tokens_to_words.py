@@ -5,8 +5,7 @@
 import numpy as np
 
 from azimuth.modules.word_analysis.tokens_to_words import TokensToWordsModule
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.types.task import SaliencyResponse
 
 

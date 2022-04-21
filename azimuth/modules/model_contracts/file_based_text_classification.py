@@ -10,9 +10,7 @@ from azimuth.modules.model_contracts.text_classification_no_saliency import (
     TextClassificationNoSaliencyModule,
 )
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import DatasetColumn, ModuleOptions, SupportedMethod
 from azimuth.types.task import PredictionResponse
 
 

@@ -7,7 +7,7 @@ import pytest
 from pydantic import BaseModel, ValidationError
 from pydantic.schema import schema
 
-from azimuth.types.general.array_type import Array
+from azimuth.types import Array
 
 
 class MyModel(BaseModel):

@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Union
 from pydantic import Field
 from pydantic.types import StrictFloat, StrictInt
 
-from azimuth.types.general.alias_model import AliasModel, PlotSpecification
+from azimuth.types import AliasModel, PlotSpecification
 
 
 class FormatType(str, Enum):

@@ -10,8 +10,7 @@ import pytest
 
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.dataset_analysis.dataset_warnings import DatasetWarningsModule
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
 
 
 @pytest.mark.parametrize("remove_one_class", [True, False])

@@ -8,11 +8,10 @@ from typing import List, Tuple
 import numpy as np
 
 from azimuth.config import ModelContractConfig
-from azimuth.modules.base_classes.aggregation_module import FilterableModule
+from azimuth.modules.base_classes import FilterableModule
 from azimuth.modules.task_execution import get_task_result
 from azimuth.modules.word_analysis.tokens_to_words import TokensToWordsModule
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetColumn, ModuleOptions
 from azimuth.types.word_analysis import (
     TokensToWordsResponse,
     TopWordsImportanceCriteria,

@@ -7,13 +7,9 @@ from tqdm import tqdm
 
 from azimuth.config import AzimuthConfig, ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes.aggregation_module import (
-    AggregationModule,
-    FilterableModule,
-)
+from azimuth.modules.base_classes import AggregationModule, FilterableModule
 from azimuth.modules.model_performance.outcomes import OutcomesModule
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetColumn, ModuleOptions
 from azimuth.types.model_performance import (
     OutcomeCountPerFilter,
     OutcomeCountPerFilterResponse,

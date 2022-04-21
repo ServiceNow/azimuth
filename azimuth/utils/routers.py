@@ -14,12 +14,15 @@ from starlette.status import (
 from azimuth.app import get_config, get_ready_flag, get_startup_tasks, get_task_manager
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules import Module
+from azimuth.modules.base_classes import Module
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.alias_model import PaginationParams
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions, NamedDatasetFilters
-from azimuth.types.general.modules import SupportedTask
+from azimuth.types import (
+    DatasetSplitName,
+    ModuleOptions,
+    NamedDatasetFilters,
+    PaginationParams,
+    SupportedTask,
+)
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import DataAction, SmartTag
 from azimuth.utils.project import predictions_available

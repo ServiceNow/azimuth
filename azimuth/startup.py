@@ -13,12 +13,11 @@ from distributed import Future
 
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes.dask_module import DaskModule
-from azimuth.modules.base_classes.indexable_module import DatasetResultModule
+from azimuth.modules.base_classes import DaskModule, DatasetResultModule
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import (
+from azimuth.types import (
+    DatasetSplitName,
+    ModuleOptions,
     SupportedMethod,
     SupportedModule,
     SupportedTask,

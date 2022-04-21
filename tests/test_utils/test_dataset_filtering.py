@@ -5,8 +5,7 @@ import math
 
 import pytest
 
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import DatasetFilters
+from azimuth.types import DatasetColumn, DatasetFilters
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import ALL_SMART_TAGS, DataAction, SmartTag
 from azimuth.utils.filtering import filter_dataset_split

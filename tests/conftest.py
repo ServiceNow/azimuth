@@ -18,11 +18,11 @@ from azimuth.config import (
     TypoTestOptions,
 )
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
-from azimuth.modules.base_classes.artifact_manager import ArtifactManager
+from azimuth.modules.base_classes import ArtifactManager
 from azimuth.modules.task_mapping import model_contract_methods, modules
 from azimuth.startup import START_UP_THREAD_NAME
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,

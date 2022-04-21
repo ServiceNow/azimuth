@@ -13,8 +13,7 @@ from distributed import Client, Event, Future, rejoin, secede
 
 from azimuth.config import CommonFieldsConfig
 from azimuth.modules.base_classes.caching import HDF5CacheMixin
-from azimuth.types.general.alias_model import ModuleResponse
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.types import DatasetSplitName, ModuleResponse
 from azimuth.utils.logs import TimerLogging
 
 log = structlog.get_logger()

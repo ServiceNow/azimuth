@@ -10,9 +10,8 @@ from datasets import Dataset
 
 from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes.aggregation_module import FilterableModule
-from azimuth.modules.base_classes.indexable_module import DatasetResultModule
-from azimuth.types.general.dataset import DatasetColumn
+from azimuth.modules.base_classes import DatasetResultModule, FilterableModule
+from azimuth.types import DatasetColumn
 from azimuth.types.model_performance import (
     ConfidenceBinDetails,
     ConfidenceHistogramResponse,

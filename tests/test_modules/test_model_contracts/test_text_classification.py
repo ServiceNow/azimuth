@@ -12,15 +12,11 @@ from datasets import Dataset
 from transformers.file_utils import ModelOutput
 
 from azimuth.config import AzimuthConfig, PipelineDefinition
-from azimuth.modules.model_contracts.file_based_text_classification import (
+from azimuth.modules.model_contracts import (
     FileBasedTextClassificationModule,
-)
-from azimuth.modules.model_contracts.hf_text_classification import (
     HFTextClassificationModule,
 )
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO, TemperatureScaling
 

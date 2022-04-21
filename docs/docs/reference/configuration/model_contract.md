@@ -9,7 +9,7 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
 
     from azimuth.config import MetricDefinition, PipelineDefinition,
         UncertaintyOptions
-    from azimuth.types.general.modules import SupportedModelContract
+    from azimuth.types import SupportedModelContract
 
 
     class ModelContractConfig:

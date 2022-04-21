@@ -5,10 +5,9 @@ from datasets import Dataset
 from transformers import TextClassificationPipeline
 
 from azimuth.config import ModelContractConfig
-from azimuth.modules.base_classes.aggregation_module import AggregationModule
+from azimuth.modules.base_classes import AggregationModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod, SupportedModelContract
+from azimuth.types import ModuleOptions, SupportedMethod, SupportedModelContract
 from azimuth.types.validation import ValidationResponse
 from azimuth.utils.validation import assert_not_none
 

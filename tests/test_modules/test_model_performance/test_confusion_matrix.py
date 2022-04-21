@@ -5,8 +5,7 @@
 import numpy as np
 
 from azimuth.modules.model_performance.confusion_matrix import ConfusionMatrixModule
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import DatasetFilters, ModuleOptions
+from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
 
 
 def test_confusion_matrix(simple_text_config, apply_mocked_startup_task):

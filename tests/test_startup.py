@@ -8,13 +8,14 @@ from datasets import Dataset, DatasetDict
 
 from azimuth.app import get_ready_flag, initialize_managers
 from azimuth.config import CustomObject
-from azimuth.modules.model_contracts.hf_text_classification import (
-    HFTextClassificationModule,
-)
+from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.startup import on_end, startup_tasks
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod, SupportedModule
+from azimuth.types import (
+    DatasetSplitName,
+    ModuleOptions,
+    SupportedMethod,
+    SupportedModule,
+)
 from azimuth.utils.project import load_dataset_split_managers_from_config
 
 

@@ -13,8 +13,7 @@ from azimuth.app import get_config, get_task_manager
 from azimuth.config import AzimuthConfig
 from azimuth.modules.perturbation_testing import PerturbationTestingModule
 from azimuth.task_manager import TaskManager
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import DatasetSplitName, SupportedMethod
 from azimuth.types.perturbation_testing import (
     PRETTY_PERTURBATION_TYPES,
     PerturbationTestFailureReason,

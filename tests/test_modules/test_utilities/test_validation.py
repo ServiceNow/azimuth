@@ -1,7 +1,6 @@
 from azimuth.config import CustomObject
 from azimuth.modules.utilities.validation import ValidationModule
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
 
 
 class ExceptionRaiserOnInit:

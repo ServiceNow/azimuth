@@ -5,12 +5,8 @@ from typing import List, cast
 
 import numpy as np
 
-from azimuth.modules.model_contracts.file_based_text_classification import (
-    FileBasedTextClassificationModule,
-)
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.modules.model_contracts import FileBasedTextClassificationModule
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 
 

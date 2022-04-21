@@ -23,8 +23,8 @@ from typing import List
 
 from datasets import Dataset
 
-from azimuth.modules.base_classes.module import Module
-from azimuth.types.general.alias_model import ModuleResponse
+from azimuth.modules.base_classes import Module
+from azimuth.types import ModuleResponse
 
 
 class YourModule(Module):
@@ -182,9 +182,9 @@ See the example above how you would get the results of another module from `MyMo
 ```python
 from typing import List
 
-from azimuth.modules.base_classes.module import Module
+from azimuth.modules.base_classes import Module
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.alias_model import ModuleResponse
+from azimuth.types import ModuleResponse
 
 
 class AnotherModule(Module):

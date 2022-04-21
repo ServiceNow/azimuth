@@ -6,9 +6,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import Field
 
-from azimuth.types.general.alias_model import AliasModel
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.modules import SupportedModelContract
+from azimuth.types import AliasModel, DatasetSplitName, SupportedModelContract
 from azimuth.types.perturbation_testing import PerturbationTestSummary
 from azimuth.types.tag import DataAction, SmartTag
 

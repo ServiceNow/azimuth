@@ -12,7 +12,7 @@ import structlog
 from filelock import FileLock
 from retrying import RetryError, retry
 
-from azimuth.types.general.alias_model import ModuleResponse
+from azimuth.types import ModuleResponse
 from azimuth.utils.conversion import from_pickle_bytes, to_pickle_bytes
 
 log = structlog.get_logger(__name__)

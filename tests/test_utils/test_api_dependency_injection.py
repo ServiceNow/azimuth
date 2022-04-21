@@ -3,7 +3,7 @@ from fastapi import HTTPException
 
 from azimuth import app
 from azimuth.app import get_all_dataset_split_managers, get_dataset_split_manager
-from azimuth.types.general.dataset import DatasetSplitName
+from azimuth.types import DatasetSplitName
 
 eval_split = "eval_split"
 train_split = "train_split"

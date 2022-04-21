@@ -13,12 +13,9 @@ from scipy.special import softmax
 from scipy.stats import entropy
 from transformers.file_utils import ModelOutput
 
-from azimuth.modules.base_classes.indexable_module import ModelContractModule
+from azimuth.modules.base_classes import ModelContractModule
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types.general.alias_model import InputResponse
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.types import DatasetColumn, InputResponse, ModuleOptions, SupportedMethod
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO
 from azimuth.utils.project import postprocessing_editable

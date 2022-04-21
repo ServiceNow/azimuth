@@ -7,12 +7,8 @@ from typing import List, Optional
 
 from datasets import Dataset
 
-from azimuth.modules import ExpirableMixin
-from azimuth.modules.base_classes.dask_module import ConfigScope
-from azimuth.modules.base_classes.module import Module
-from azimuth.types.general.alias_model import ModuleResponse
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.modules.base_classes import ConfigScope, ExpirableMixin, Module
+from azimuth.types import DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.utils.filtering import filter_dataset_split
 
 

@@ -3,7 +3,7 @@
 # in the root directory of this source tree.
 
 from azimuth.modules.dataset_analysis.syntax_tagging import SyntaxTaggingModule
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag
 
 

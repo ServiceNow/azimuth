@@ -8,8 +8,8 @@ from datasets import Dataset
 from sklearn.metrics import confusion_matrix
 
 from azimuth.config import ModelContractConfig
-from azimuth.modules.base_classes.aggregation_module import FilterableModule
-from azimuth.types.general.dataset import DatasetColumn
+from azimuth.modules.base_classes import FilterableModule
+from azimuth.types import DatasetColumn
 from azimuth.types.model_performance import ConfusionMatrixResponse
 from azimuth.utils.validation import assert_not_none
 

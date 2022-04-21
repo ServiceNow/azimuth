@@ -4,8 +4,7 @@
 from azimuth.modules.perturbation_testing.perturbation_testing import (
     PerturbationTestingModule,
 )
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions
 from azimuth.types.perturbation_testing import (
     PerturbationTestClass,
     PerturbationTestFailureReason,

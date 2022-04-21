@@ -14,11 +14,8 @@ from azimuth.config import (
     PipelineDefinition,
 )
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
-from azimuth.modules.base_classes.artifact_manager import ArtifactManager
-from azimuth.modules.base_classes.dask_module import ConfigScope, DaskModule
-from azimuth.types.general.alias_model import ModuleResponse
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
+from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.utils.conversion import md5_hash
 from azimuth.utils.validation import assert_not_none
 

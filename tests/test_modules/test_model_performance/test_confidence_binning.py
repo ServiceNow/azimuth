@@ -9,8 +9,7 @@ from azimuth.modules.model_performance.confidence_binning import (
     ConfidenceBinIndexModule,
     ConfidenceHistogramModule,
 )
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import DatasetFilters, ModuleOptions
+from azimuth.types import DatasetColumn, DatasetFilters, DatasetSplitName, ModuleOptions
 
 UNKNOWN_TARGET = [3]
 BIN_GAP = 0.06

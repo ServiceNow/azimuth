@@ -17,17 +17,15 @@ from azimuth.app import (
 )
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules import Module
+from azimuth.modules.base_classes import Module
 from azimuth.task_manager import TaskManager
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.types.app import (
     AvailableDatasetSplits,
     DatasetInfoResponse,
     PerturbationTestingSummary,
     StatusResponse,
 )
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedModule
 from azimuth.types.perturbation_testing import (
     PerturbationTestingMergedResponse,
     PerturbationTestingSummaryResponse,

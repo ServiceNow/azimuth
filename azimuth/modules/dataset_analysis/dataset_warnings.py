@@ -9,12 +9,13 @@ import pandas as pd
 
 from azimuth.config import DatasetWarningConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes.aggregation_module import ComparisonModule
+from azimuth.modules.base_classes import ComparisonModule
 from azimuth.plots.dataset_warnings import (
     class_representation,
     min_nb_samples_plot,
     nb_tokens_plot,
 )
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.dataset_warnings import (
     DatasetDistributionComparison,
     DatasetDistributionComparisonValue,
@@ -23,7 +24,6 @@ from azimuth.types.dataset_warnings import (
     DatasetWarningsResponse,
     FormatType,
 )
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
 
 
 class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):

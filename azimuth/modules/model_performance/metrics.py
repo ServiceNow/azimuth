@@ -13,16 +13,12 @@ from sklearn.exceptions import UndefinedMetricWarning
 from tqdm import tqdm
 
 from azimuth.config import AzimuthConfig, ModelContractConfig
-from azimuth.modules.base_classes.aggregation_module import (
-    AggregationModule,
-    FilterableModule,
-)
+from azimuth.modules.base_classes import AggregationModule, FilterableModule
 from azimuth.modules.model_performance.confidence_binning import (
     ConfidenceHistogramModule,
 )
 from azimuth.plots.ece import make_ece_figure
-from azimuth.types.general.dataset import DatasetColumn
-from azimuth.types.general.module_options import DatasetFilters, ModuleOptions
+from azimuth.types import DatasetColumn, DatasetFilters, ModuleOptions
 from azimuth.types.model_performance import (
     MetricsAPIResponse,
     MetricsModuleResponse,

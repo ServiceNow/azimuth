@@ -4,12 +4,8 @@
 
 import numpy as np
 
-from azimuth.modules.model_contracts.hf_text_classification import (
-    HFTextClassificationModule,
-)
-from azimuth.types.general.dataset import DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.modules.model_contracts import HFTextClassificationModule
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.utils.ml.mc_dropout import MCDropout
 
 

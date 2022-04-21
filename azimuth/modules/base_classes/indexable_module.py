@@ -10,12 +10,15 @@ from datasets import Dataset
 
 from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules import Module
-from azimuth.modules.base_classes.dask_module import ConfigScope
-from azimuth.types.general.alias_model import InputResponse, ModuleResponse
-from azimuth.types.general.dataset import DatasetColumn, DatasetSplitName
-from azimuth.types.general.module_options import ModuleOptions
-from azimuth.types.general.modules import SupportedMethod
+from azimuth.modules.base_classes import ConfigScope, Module
+from azimuth.types import (
+    DatasetColumn,
+    DatasetSplitName,
+    InputResponse,
+    ModuleOptions,
+    ModuleResponse,
+    SupportedMethod,
+)
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO
