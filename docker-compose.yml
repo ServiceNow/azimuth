@@ -17,6 +17,8 @@ services:
     - ./config:/config
     - ./azimuth_shr:/azimuth_shr
     - ./cache:/cache
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   web:
     image: "${REGISTRY}/azimuth_app:${FRONTEND_VERSION}"
     command:
@@ -26,3 +28,5 @@ services:
       - "PORT=8080"
     ports:
       - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

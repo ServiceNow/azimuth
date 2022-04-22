@@ -6,7 +6,7 @@
     "remote": "/azimuth_shr",
     "kwargs": {
       "python_loader": "/azimuth_shr/data/CLINC150.py",
-      "full_path": "/azimuth_shr/files/clinc_dummy/clinc_data_dummy.json"
+      "full_path": "/azimuth_shr/files/clinc-demo/oos-eval/data/clinc_data_dummy.json"
     }
   },
   "saliency_layer": "distilbert.embeddings.word_embeddings",

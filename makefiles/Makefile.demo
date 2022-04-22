@@ -8,7 +8,8 @@ endif
 .PHONY: download_demo
 download_demo: check-gdown
 	$(shell python -c "import gdown; gdown.download('https://drive.google.com/uc?id=1LmP_Y1KGxiOOJrTkXjocLnOgSmhqDRzk', output='./clinc-demo.tar.gz', quiet=False, fuzzy=True)")
-	$(shell tar -xvf clinc-demo.tar.gz)
-	$(shell mkdir -p azimuth_shr/files)
-	$(shell mv clinc-demo azimuth_shr/files/clinc-demo)
-	$(shell rm ./clinc-demo.tar.gz)
+	tar -xf clinc-demo.tar.gz
+	mkdir -p azimuth_shr/files
+	mv clinc-demo azimuth_shr/files/clinc-demo
+	rm ./clinc-demo.tar.gz
+	@echo "Successfully downloaded demo files"

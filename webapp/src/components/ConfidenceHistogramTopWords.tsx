@@ -22,8 +22,10 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
   filters,
   pipeline,
 }) => {
-  const { jobId, datasetSplitName } =
-    useParams<{ jobId: string; datasetSplitName: DatasetSplitName }>();
+  const { jobId, datasetSplitName } = useParams<{
+    jobId: string;
+    datasetSplitName: DatasetSplitName;
+  }>();
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 

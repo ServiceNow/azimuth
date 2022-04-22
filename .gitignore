@@ -6,6 +6,7 @@ local_configs
 tmp
 cache
 *.lock
+*.swp
 !poetry.lock
 !yarn.lock
 
