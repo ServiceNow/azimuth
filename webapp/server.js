@@ -1,18 +1,8 @@
 /*eslint-env node*/
 const express = require("express");
 const app = express();
-const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const path = require("path");
-
-const corsConfig = {
-  methods: "GET,POST,PUT,DELETE",
-  origin: "*",
-  credentials: true,
-};
-
-// Configure express.
-app.use(cors(corsConfig));
 
 app.use(
   "/api/local",
