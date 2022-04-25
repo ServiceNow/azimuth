@@ -57,7 +57,7 @@ our [Key Concepts](https://servicenow.github.io/azimuth/key-concepts) and
 our [User Guide](https://servicenow.github.io/azimuth/user-guide).
 
 To use your own dataset and models, please refer to
-[Run on Your Use Case](https://servicenow.github.io/azimuth/getting-started/getting-started/c-run/).
+[Run on Your Use Case](https://servicenow.github.io/azimuth/getting-started/c-run/).
 
 ## How to Contribute?
 
