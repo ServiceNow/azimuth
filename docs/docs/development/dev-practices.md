@@ -1,13 +1,12 @@
 # Development Pratices
 
 ## New Branch
-When starting a new branch, it needs to start with `pr/`.
-We don't have a convention in our team for the rest of the name.
+When starting a new branch, we don't have a convention for the name.
 You can use your initials or your surname, and/or include the issue number according to your preference.
 It should at the very least include a short description of the issue.
 
 !!! example
-    `pr/fred/fixing-poetry`, `pr/ME-345/fixing-poetry`, `pr/fixing-poetry`...
+    `pr/fred/fixing-poetry`, `AZ-345/fixing-poetry`, `ggm/fixing-poetry`...
 
 ## Committing
 We try to commit regularly, so it is easy to revert partial changes.
