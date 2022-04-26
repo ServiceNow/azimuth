@@ -22,7 +22,7 @@ def test_response(simple_multipipeline_text_config):
             pred_1.postprocessed_output.preds.item(),
         )
 
-        assert tags.one_model_disagrees == (pred_cls_0 != pred_cls_1)
+        assert tags.one_model_disagrees == (pred_cls_0 != pred_cls_1), (pred_cls_0, pred_cls_1)
         assert tags.all_models_wrong == (pred_cls_0 != pred_0.label and pred_cls_1 != pred_1.label)
 
 

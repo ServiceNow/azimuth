@@ -25,10 +25,10 @@ class PredictionComparisonModule(DatasetResultModule[ModelContractConfig]):
         ]
         result = []
         for predictions in zip(*preds_per_pipeline):
-            one_model_disagrees = all(
+            all_models_wrong = all(
                 pred.postprocessed_output.preds.item() != pred.label for pred in predictions
             )
-            all_models_wrong = (
+            one_model_disagrees = (
                 len(set(pred.postprocessed_output.preds.item() for pred in predictions)) > 1
             )
             result.append(
