@@ -29,7 +29,7 @@ These fields are generic and can be adapted based on the user's machine.
 Where to store the caching artifacts (`HDF5` files and HF datasets). The value needs to be available
 inside Docker (see `docker-compose.yml`). `/cache` is available by default on the docker image.
 
-!!! tip
+!!! tip "Not using Docker?"
 
     If Azimuth is run without Docker, the cache needs to be a path with write access (`/cache` will not
     work).

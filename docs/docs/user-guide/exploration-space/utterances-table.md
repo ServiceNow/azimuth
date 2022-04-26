@@ -8,14 +8,14 @@ includes information such as smart tags and proposed actions, if applicable.
 To see **more details on an utterance**, click any row, which will open
 the [:material-link: Utterance Details](utterance-details.md) page.
 
-!!! tip
+!!! tip "Open in a new tab"
 
     :fontawesome-solid-up-right-from-square: Open the utterance details in a new tab or in a new
     window using the ++ctrl++ or ++cmd++ + click or right-click menu.
 
 ## Table Content
 
-!!! tip
+!!! tip "Sort the table"
 
     :material-sort: Click a column header to sort the table by the column values. Each click
     rotates between ascending order, descending order, and no sorting.
@@ -56,7 +56,7 @@ taken. [Proposed Actions](../../key-concepts/proposed-actions.md) are explained 
 section. The actions are done outside the app. Export the proposed actions in a `.csv` file and use
 the list to resolve the utterance issues. The exported file also contains the smart tags.
 
-!!! tip
+!!! tip "Apply in batch"
 
     Proposed actions can be applied in **batches** by selecting multiple rows (or selecting all
     based on the current search) and applying the change.

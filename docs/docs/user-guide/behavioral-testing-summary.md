@@ -24,7 +24,7 @@ detailed information on the tests.
 - The last column shows one **example** from the dataset of the modifications that were made on the
   original utterance.
 
-!!! tip
+!!! tip "Sort the table"
 
     :material-sort: Click the failure rate headers to sort the values in ascending or descending
     order.

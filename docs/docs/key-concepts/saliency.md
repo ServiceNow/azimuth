@@ -25,7 +25,7 @@ an XAI technique for NLP:
   attention-based explanations when determining the input tokens most relevant to a prediction.
   Their end-user is a model developer, rather than a user of the system.
 
-!!! note
+!!! note "Other XAI techniques"
 
     Apart from saliency maps, other feature-based XAI techniques exist, such as SHAP or LIME.
 
@@ -41,7 +41,7 @@ the [Utterances Table](../user-guide/exploration-space/utterance-details.md).
   <figcaption>Saliency map of a specific utterance.</figcaption>
 </figure>
 
-!!! example
+!!! example "Saliency example"
 
     In this example, `assistance` is the word that contributes the most to the prediction
     `transfer`, followed by `moving`.
@@ -54,7 +54,7 @@ gradient** to the input layer of the network: in our case, the word-embedding la
 the L2 norm to aggregate the gradients across all dimensions of the layer to determine the saliency
 value for each token.
 
-!!! note
+!!! note "Saliency maps are only supported for certain models"
 
     Saliency maps are only available for models that have gradients. Additionally, their input layer
     needs to be a token-embedding layer, so that the gradients can be computed per token. For

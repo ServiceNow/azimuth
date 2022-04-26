@@ -32,7 +32,7 @@ on the plot.
 
 ![Screenshot](../../_static/images/exploration-space/confidence-histogram.png)
 
-!!! tip
+!!! tip "Assess the distribution"
 
     Assess the confidence distribution by looking at the shape of the curve,
     the min and max values, and the ratio in each bin. Look at the histogram
@@ -48,7 +48,7 @@ filtered utterances.
 
 ![Screenshot](../../_static/images/exploration-space/word-cloud.png){: style="width:400px"}
 
-!!! note
+!!! note "What does the word cloud count?"
 
     If [saliency maps](../../key-concepts/saliency.md) are available, the word clouds show the count
     of **salient words**. A word is considered salient in an utterance if the sum of its tokens'

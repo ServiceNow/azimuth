@@ -15,7 +15,7 @@ data samples which may require
 **further action and investigation**. Different families of smart tags exist, based on the different
 types of analyses that Azimuth provides.
 
-!!! example
+!!! example "Smart tag examples"
 
     Examples of smart tag **families**:
 
@@ -35,9 +35,7 @@ While smart tags are computed automatically and cannot be changed, proposed acti
 that can be added by the user to identify a proposed action that should be done on a specific data
 sample.
 
-!!! example
-
-    Examples of **proposed actions**:
+!!! example "Proposed actions examples"
 
     * `relabel` to identify data samples whose labels should be changed.
     * `remove` to identify data samples that should be removed from the dataset.

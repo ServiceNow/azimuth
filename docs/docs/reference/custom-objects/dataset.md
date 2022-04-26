@@ -19,9 +19,9 @@ def load_your_dataset(azimuth_config: AzimuthConfig, **kwargs) -> DatasetDict:
     ...
 ```
 
-!!! tip
+!!! tip "Your don't have a HuggingFace `Dataset`?"
 
-    If your dataset is not a HuggingFace Dataset, you can convert it easily using the following
+    If your dataset is not a HuggingFace `Dataset`, you can convert it easily using the following
     resources from HuggingFace:
 
     1. [from local files](https://huggingface.co/docs/datasets/loading#local-and-remote-files)

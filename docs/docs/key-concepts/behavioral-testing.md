@@ -32,39 +32,37 @@ The tests can fail for two reasons.
 * The test will fail if the **predicted class** for the modified utterance is **different** from the
   predicted class of the original utterance.
 
-??? example
+    ??? example "Failing examples"
+        | Original Utterance       | Predicted Class      |
+        |--------------------------|----------------------|
+        | Azimuth is the best tool | `positive` |
 
-    | Original Utterance       | Predicted Class      |
-    |--------------------------|----------------------|
-    | Azimuth is the best tool | `positive` |
-
-    | Modified Utterance         | Predicted Class   | Test fails? |
-    |--------------------------|----------------------|-----------|
-    | Hello Azimuth is the best tool  | `positive` | NO   |
-    | Azimuth is the best tool!!! | `negative` | YES   |
+        | Modified Utterance         | Predicted Class   | Test fails? |
+        |--------------------------|----------------------|-----------|
+        | Hello Azimuth is the best tool  | `positive` | NO   |
+        | Azimuth is the best tool!!! | `negative` | YES   |
 
 * The test will fail if the **confidence** associated with the predicted class of the modified
   utterance is **too different** (based on a threshold) from the confidence of the original
   utterance. By default, the threshold is set to 1, meaning the tests will never fail due to a
   change in confidence for the same predicted class.
 
-??? example
+    ??? example "Failing examples"
+        | Original Utterance       | Predicted Class      | Confidence |
+        |--------------------------|----------------------|------------|
+        | Azimuth is the best tool | `positive` | 95% |
 
-    | Original Utterance       | Predicted Class      | Confidence |
-    |--------------------------|----------------------|------------|
-    | Azimuth is the best tool | `positive` | 95% |
+        Threshold set to 0.1:
 
-    Threshold set to 0.1:
+        | Modified Utterance         | Predicted Class           | Confidence | Test fails? |
+        |--------------------------|----------------------|-----------|-----------|
+        | Hello Azimuth is the best tool  | `positive` | 82% | YES   |
 
-    | Modified Utterance         | Predicted Class           | Confidence | Test fails? |
-    |--------------------------|----------------------|-----------|-----------|
-    | Hello Azimuth is the best tool  | `positive` | 82% | YES   |
+        Threshold set to 1:
 
-    Threshold set to 1:
-
-    | Modified Utterance         | Predicted Class           | Confidence | Test fails? |
-    |--------------------------|----------------------|-----------|-----------|
-    | Hello Azimuth is the best tool  | `positive` | 82% | NO   |
+        | Modified Utterance         | Predicted Class           | Confidence | Test fails? |
+        |--------------------------|----------------------|-----------|-----------|
+        | Hello Azimuth is the best tool  | `positive` | 82% | NO   |
 
 ### Available Tests
 

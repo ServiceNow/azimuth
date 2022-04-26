@@ -5,7 +5,7 @@ When starting a new branch, we don't have a convention for the name.
 You can use your initials or your surname, and/or include the issue number according to your preference.
 It should at the very least include a short description of the issue.
 
-!!! example
+!!! example "Branch name examples"
     `pr/fred/fixing-poetry`, `AZ-345/fixing-poetry`, `ggm/fixing-poetry`...
 
 ## Committing
@@ -26,7 +26,7 @@ We have different hooks which will run `mypy`, reorder imports, clean unnecessar
 - `mypy` errors will never prevent a commit, but it will print the errors so that you can fix
     them if you introduced a new one.
 
-!!! tip
+!!! info "How to temporarily disable pre-commits?"
     For a specific commit, you can avoid running the pre-commits with the flag `--no-verify`. If you do this, make sure to run `pre-commit run --all-files` before opening a PR, which will run the pre-commit on all files.
 
 
@@ -41,12 +41,12 @@ make test     # It will check for formatting issues, run mypy and all unit tests
 
 You can also only run specific tests, using `poetry run pytest {path_to_test.py}`.
 
-!!! tip
+!!! tip "Clean cache for routers test"
     For tests in `tests/test_routers`, we run the startup task **once** and save the result
     in `/tmp/azimuth_test_cache`. When modifying Modules,
     you need to clean it manually or by running `make clean`.
 
-!!! tip
+!!! tip "Regularly launch the app"
     Even when all unit tests pass, it may happen that some new issues arise when launching the app.
     When doing important code changes, it is crucial to launch the app and see if the behavior is as expected.
     Details on launching the app are available [here](launching.md).

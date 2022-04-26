@@ -5,7 +5,7 @@
 Explore the different analyses and tools of Azimuth using the dashboard. Navigate through the
 different sections to get a deeper understanding of the dataset and the model.
 
-!!! info
+!!! info "Use Azimuth with no pipeline, or with multiple ones"
 
     Azimuth can be launched without any pipelines. All the information related to the pipelines
     (prediction, behavioral testing and so on) will then be unavailable on all screens. It can also be
@@ -26,7 +26,7 @@ The top banner contains useful information and links.
 
 ![Screenshot](../_static/images/dashboard/top-banner.png)
 
-!!! tip
+!!! tip "Don't miss out on the exploration space!"
 
     :fontawesome-brands-wpexplorer: At the top, access the
     [**Exploration Space**](exploration-space/index.md) to explore and interact with the utterances
@@ -55,7 +55,7 @@ the dropdown :material-arrow-down-drop-circle-outline: to see the metrics broken
 predicted class, or smart tag. Use the toggle to alternate between the performance on the training
 set or on the evaluation set.
 
-!!! tip
+!!! tip "Sort the table"
 
     :material-sort: Click a column header to sort the values in ascending or descending order.
     The default order is descending by the number of utterances, except for
@@ -63,7 +63,7 @@ set or on the evaluation set.
 
 ![Screenshot](../_static/images/dashboard/performance-analysis.png)
 
-!!! tip
+!!! tip "Go to the exploration space to interact with metrics"
 
     :fontawesome-brands-wpexplorer: The same metrics are available on the
     [:material-link: Exploration Space](exploration-space/index.md), where you can filter by any
@@ -80,7 +80,7 @@ evaluation set. Select `View details` to get
 to [:material-link: Behavioral Testing Summary](behavioral-testing-summary.md), which provides more
 information on tests and the option to export the results.
 
-!!! tip
+!!! tip "Scrollable table"
 
     :octicons-sort-desc-16: The data is ordered in descending order by failure rate. The table is
     scrollable.
@@ -103,7 +103,7 @@ screen in [:material-link: Post-processing Analysis](post-processing-analysis.md
 
 ![Screenshot](../_static/images/dashboard/post-processing-analysis.png)
 
-!!! note
+!!! note "Only available for some configs"
 
     This section is only available when the threshold is known and can be edited.
     This means it is unavailable for file-based configs, and for pipelines with their own
