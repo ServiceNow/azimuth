@@ -6,24 +6,32 @@ In the downloaded Azimuth folder from [step A](a-install.md), the following stru
 exists:
 
 ```bash
+├── azimuth
+│   └── # Back End # (7)
 ├── azimuth_shr
 │   └── # User dataset, models, and code # (1)
 ├── config
 │   └── # User configs # (2)
+├── webapp
+│   └── # Front End # (8)
 ├── .app_env  # (3)
 ├── docker-compose.yml  # (4)
 ├── Makefile  # (5)
 └── README.md # (6)
 ```
 
-1. Where to put your data, your model and the user code, if relevant.
+1. Where to put your data, model and code, if relevant. `azimuth_shr` stands for
+   azimuth shared, because it contains user artifacts that are shared with the application. Azimuth
+   provides default artifacts already to load common dataset and models.
 2. Where to put all configs. Example configs are provided.
 3. Default values for env vars.
 4. Where the config and Docker images are specified.
 5. Available commands to use Azimuth.
 6. Instructions to launch the application.
+7. Only available when cloning the repo.
+8. Only available when cloning the repo.
 
-!!! note
+!!! note "Where to put your data, code and configs?"
 
     `config` and `azimuth_shr` are two folders where you will put different artifacts before you
     can run Azimuth on your dataset and models. They get mounted automatically on the Docker image.
@@ -33,8 +41,8 @@ exists:
 The Azimuth config file contains all the information to launch and customize Azimuth. It specifies
 which dataset and pipelines to load in the app, as well as other variables that allow for
 customization of the app. Most fields have default values and don't need to be explicitly defined in
-each config. The [:material-link: **
-Configuration**](../reference/configuration/index.md) reference details all available fields.
+each config. The [:material-link: Configuration](../reference/configuration/index.md) reference
+details all available fields.
 
 Different configuration examples are provided in the repo under `config/examples`, leveraging
 pretrained models from [HuggingFace](https://huggingface.co).
@@ -63,6 +71,11 @@ running a demo.
     pip install gdown
     make download_demo
     ```
+
+    ??? fail "You cannot install `gdown`?"
+        Look at the following
+        [:material-github: Discussion](https://github.com/ServiceNow/azimuth/discussions/46) to
+        download the data manually.
 
 2. Run **our dummy or full demo** (option a. or b.), based on how much time you have. If it is the
    first time that you are running the command, it will take additional time to download the Docker

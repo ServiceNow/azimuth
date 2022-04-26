@@ -75,7 +75,7 @@ add other `README` files in appropriate places, and don't forget to edit them if
 ### Repo Structure
 
 ```bash
-├── azimuth
+├── azimuth  # Back End
 │   ├── modules
 │   │   └── Where core capabilities are implemented
 │   ├── plots
@@ -94,6 +94,8 @@ add other `README` files in appropriate places, and don't forget to edit them if
 │   └── User documentation
 ├── tests
 │   └── Unit/integration tests
+├── webapp
+│   └── Front End
 ├── docker-compose.yml # Where the config and images are specified.
 ├── docker-compose-gpu.yml # Extension to use Azimuth with gpus.
 └── runner.py # Application entrypoint.
