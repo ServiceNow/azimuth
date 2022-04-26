@@ -3,7 +3,7 @@
 ## Install Dependencies
 
 ### Install `pyenv` (MacOS)
-We use `python 3.8.9` for the back end in our repo.
+We use `python 3.8.9` for the back end in our repo, but `python >= 3.8` should work in general.
 You should use `pyenv` to set up the right `python` version for the project.
 
 * Install [`brew`](https://brew.sh/) (if not already installed).
@@ -21,7 +21,7 @@ You should use `pyenv` to set up the right `python` version for the project.
     ```shell
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init --path)"
+    eval "$(pyenv init -)"
     ```
 * Run `zsh` to open a new shell (with the updated `~/.zshrc`).
     ```shell
@@ -32,7 +32,7 @@ You should use `pyenv` to set up the right `python` version for the project.
     python --version
     ```
 
-    ???+ fail "If it doesn't match..."
+    ??? fail "If it doesn't match..."
         It might be due to a wrong ordering in your `$PATH`. Print it and make sure that `$PYENV_ROOT/bin` is at the beginning. Edit `~/.zshrc` accordingly.
         ```shell
         echo $PATH
@@ -47,7 +47,7 @@ We use `poetry` as our dependency manager for the back end.
     poetry run python --version
     ```
 
-    ???+ fail "If it prints a warning mentioning another python version..."
+    ??? fail "If it prints a warning mentioning another python version..."
         You might need to force `poetry` to use the right python environment.
         ```shell
         poetry env use $(which python)
@@ -58,10 +58,10 @@ We use `poetry` as our dependency manager for the back end.
     poetry install
     ```
 
-### Docker
+### Docker (Optional)
 Docker is needed for different tasks such as releasing and updating the documentation. However, it won't be needed at first to develop and launch the app. You can skip this step and wait until you are required to use it.
 
-* Install [`Docker Desktop`](https://www.docker.com/products/docker-desktop). You might need to ask for a license. If you are using a Mac, check Apple logo > About This Mac to know if you have a `Mac with Intel Chip` or a `Mac with Apple Chip`.
+* Install [`Docker Desktop`](https://www.docker.com/products/docker-desktop). If you are using a Mac, check "Apple logo" > "About This Mac" to know if you have a `Mac with Intel Chip` or a `Mac with Apple Chip`.
 
 ### Front End
 - Install [`Node.js`](https://nodejs.org).

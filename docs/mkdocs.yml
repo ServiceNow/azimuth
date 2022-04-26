@@ -99,5 +99,5 @@ nav:
   - Development:
       - development/index.md
       - development/setup.md
-      - development/dev-practices.md
       - development/launching.md
+      - development/dev-practices.md
