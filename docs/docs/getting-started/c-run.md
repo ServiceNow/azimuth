@@ -29,8 +29,8 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 
 1. Put your model checkpoint (results
    of [.save_pretained()](https://huggingface.co/docs/transformers/main_classes/model#transformers.PreTrainedModel.save_pretrained))
-   under the folder `azimuth/azimuth_shr`.
-2. In `azimuth/config`, copy `config/examples/clinc_oos/conf.json` to a new folder with your project
+   under the folder `azimuth_shr`.
+2. In `config`, copy `config/examples/clinc_oos/conf.json` to a new folder with your project
    name. Ex: `config/my_project/conf.json`.
 3. Edit the config:
     1. `name`: put your project name.
