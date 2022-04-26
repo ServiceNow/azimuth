@@ -121,6 +121,38 @@ def simple_text_config(tmp_path):
 
 
 @pytest.fixture
+def simple_multipipeline_text_config(tmp_path):
+    return AzimuthConfig(
+        name="sentiment-analysis",
+        dataset=DATASET_CFG,
+        pipelines=[MODEL_CFG, HIGH_THRESHOLD_MODEL],
+        artifact_path=str(tmp_path),
+        batch_size=10,
+        use_cuda="auto",
+        model_contract="hf_text_classification",
+        saliency_layer="distilbert.embeddings.word_embeddings",
+        rejection_class=None,
+        behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
+    )
+
+
+@pytest.fixture
+def simple_no_pipeline_text_config(tmp_path):
+    return AzimuthConfig(
+        name="sentiment-analysis",
+        dataset=DATASET_CFG,
+        pipelines=None,
+        artifact_path=str(tmp_path),
+        batch_size=10,
+        use_cuda="auto",
+        model_contract="hf_text_classification",
+        saliency_layer="distilbert.embeddings.word_embeddings",
+        rejection_class=None,
+        behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
+    )
+
+
+@pytest.fixture
 def simple_table_key(simple_text_config):
     return PredictionTableKey.from_pipeline_index(
         0,

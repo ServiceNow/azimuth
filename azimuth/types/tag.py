@@ -49,6 +49,9 @@ class SmartTag(str, Enum):
     # Prediction
     correct_top_3 = "correct_top_3"
     correct_low_conf = "correct_low_conf"
+    # Model Comparison
+    one_model_disagrees = "one_model_disagrees"
+    all_models_wrong = "all_models_wrong"
     # Always last for sorting purposes
     no_smart_tag = "NO_SMART_TAGS"
 
@@ -75,6 +78,8 @@ ALL_PREDICTION_TAGS = [
     SmartTag.correct_low_conf,
     SmartTag.correct_top_3,
     SmartTag.high_epistemic_uncertainty,
+    SmartTag.one_model_disagrees,
+    SmartTag.all_models_wrong,
 ]
 ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 
