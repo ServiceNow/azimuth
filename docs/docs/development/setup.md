@@ -3,7 +3,7 @@
 ## Install Dependencies
 
 ### Install `pyenv` (MacOS)
-We use `python 3.8.9` for the back end in our repo, but `python >= 3.7` should work in general.
+We use `python 3.8.9` for the back end in our repo, but `python >= 3.8` should work in general.
 You should use `pyenv` to set up the right `python` version for the project.
 
 * Install [`brew`](https://brew.sh/) (if not already installed).
