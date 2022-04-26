@@ -30,9 +30,11 @@ utterances, the utterance ID refers to the column `row_idx`.
 Utterances appear as available in the dataset provided. Hover over the utterances to display the
 **copy button :material-content-copy:**.
 
-If available, the utterances are overlaid with saliency maps, highlighting the most important tokens
-for the model's prediction. For more information on how these values are calculated
-see [Saliency Map](../../key-concepts/saliency.md).
+If available, the utterances are overlaid with **saliency maps**, highlighting the most important
+tokens for the model's prediction. You can see the raw saliency values when hovering on the
+utterance tokens in the [:material-link: Utterance Details](utterance-details.md) only. For more
+information on how these values are calculated
+see [:material-link: Saliency Map](../../key-concepts/saliency.md).
 
 ![Screenshot](../../_static/images/exploration-space/copy-to-clipboard.png){: style="width:400px"}
 
