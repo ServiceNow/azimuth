@@ -5,14 +5,10 @@ from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKe
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types import AliasModel, ModuleOptions, ModuleResponse, SupportedMethod
+from azimuth.types import ModuleOptions, ModuleResponse, SupportedMethod
+from azimuth.types.pipeline_comparison import PredictionComparisonResponse
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse
-
-
-class PredictionComparisonResponse(AliasModel):
-    one_model_disagrees: bool
-    all_models_wrong: bool
 
 
 class PredictionComparisonModule(DatasetResultModule[ModelContractConfig]):
