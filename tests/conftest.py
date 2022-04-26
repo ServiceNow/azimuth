@@ -15,7 +15,6 @@ from azimuth.config import (
     AzimuthConfig,
     BehavioralTestingOptions,
     NeutralTokenOptions,
-    PipelineDefinition,
     TypoTestOptions,
 )
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
@@ -110,7 +109,7 @@ def simple_text_config(tmp_path):
     return AzimuthConfig(
         name="sentiment-analysis",
         dataset=DATASET_CFG,
-        pipelines=[PipelineDefinition(**MODEL_CFG)],
+        pipelines=[deepcopy(MODEL_CFG)],
         artifact_path=str(tmp_path),
         batch_size=10,
         use_cuda="auto",
@@ -126,7 +125,7 @@ def simple_multipipeline_text_config(tmp_path):
     return AzimuthConfig(
         name="sentiment-analysis",
         dataset=DATASET_CFG,
-        pipelines=[PipelineDefinition(**MODEL_CFG), PipelineDefinition(**HIGH_THRESHOLD_MODEL)],
+        pipelines=[deepcopy(MODEL_CFG), deepcopy(HIGH_THRESHOLD_MODEL)],
         artifact_path=str(tmp_path),
         batch_size=10,
         use_cuda="auto",
