@@ -64,6 +64,11 @@ running a demo.
     make download_demo
     ```
 
+    ??? fail "You cannot install `gdown`?"
+        Look at the following
+        [:material-github: Discussion](https://github.com/ServiceNow/azimuth/discussions/46) to
+        download the data manually.
+
 2. Run **our dummy or full demo** (option a. or b.), based on how much time you have. If it is the
    first time that you are running the command, it will take additional time to download the Docker
    image (~15 min). If you have access to GPUs, you can add to the command `DEVICE=gpu` (default
