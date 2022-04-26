@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Not released]
 
 ### Added
+- New Smart Tag `all_models_wrong` and `one_model_disagrees` as a first step for pipeline comparison.
 
 ### Changed
 
