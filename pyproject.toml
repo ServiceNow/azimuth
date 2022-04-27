@@ -25,7 +25,7 @@ tensorflow-estimator = "~2.7.0"
 onnx = "^1.9.0"
 onnxruntime-extensions = "^0.3.1"
 onnxruntime = "^1.8.1"
-spectral-metric = "^0.1.0"
+spectral-metric = "^0.5.0"
 scipy = "^1.6.3"
 
 ####
