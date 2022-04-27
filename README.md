@@ -14,6 +14,10 @@
   Azimuth, an open-source dataset and error analysis tool for text classification, with love from ServiceNow.
 </p>
 
+<p align="center">
+  <img width=60% src="docs/docs/_static/images/exploration-space/performance-overview.png">
+</p>
+
 ## Overview
 
 Azimuth is an open source application that helps AI practitioners and data scientists better
