@@ -107,6 +107,11 @@ env = ["DASK_DISTRIBUTED__WORKER__DAEMON=False"]
 [tool.black]
 line-length = 100
 
+[tool.isort]
+profile = "black"
+skip = ["__init__.py"]
+filter_files = true
+
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 python_version = 3.8

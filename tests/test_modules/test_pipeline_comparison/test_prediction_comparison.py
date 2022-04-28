@@ -1,3 +1,5 @@
+import pytest
+
 from azimuth.dataset_split_manager import PredictionTableKey
 from azimuth.modules.pipeline_comparison.prediction_comparison import (
     PredictionComparisonModule,
@@ -15,6 +17,8 @@ def test_response(simple_multipipeline_text_config):
     result = module.compute_on_dataset_split()
     predictions_0 = module._get_predictions(0)
     predictions_1 = module._get_predictions(1)
+    assert any(tags.pipeline_disagreement for tags in result)
+    assert any(tags.incorrect_for_all_pipelines for tags in result)
 
     for pred_0, pred_1, tags in zip(predictions_0, predictions_1, result):
         pred_cls_0, pred_cls_1 = (
@@ -22,8 +26,10 @@ def test_response(simple_multipipeline_text_config):
             pred_1.postprocessed_output.preds.item(),
         )
 
-        assert tags.one_model_disagrees == (pred_cls_0 != pred_cls_1), (pred_cls_0, pred_cls_1)
-        assert tags.all_models_wrong == (pred_cls_0 != pred_0.label and pred_cls_1 != pred_1.label)
+        assert tags.pipeline_disagreement == (pred_cls_0 != pred_cls_1), (pred_cls_0, pred_cls_1)
+        assert tags.incorrect_for_all_pipelines == (
+            pred_cls_0 != pred_0.label and pred_cls_1 != pred_1.label
+        )
 
 
 def test_less_than_two_pipeline(simple_text_config, simple_no_pipeline_text_config):
@@ -32,8 +38,8 @@ def test_less_than_two_pipeline(simple_text_config, simple_no_pipeline_text_conf
             dataset_split_name=DatasetSplitName.eval,
             config=cfg,
         )
-        result = module.compute_on_dataset_split()
-        assert not any(tags.one_model_disagrees or tags.all_models_wrong for tags in result)
+        with pytest.raises(ValueError, match="less than two pipelines"):
+            module.compute_on_dataset_split()
 
 
 def test_save_results(simple_multipipeline_text_config):
@@ -42,12 +48,14 @@ def test_save_results(simple_multipipeline_text_config):
     )
     dm = module.get_dataset_split_manager()
     preds = [
-        PredictionComparisonResponse(one_model_disagrees=i < 10, all_models_wrong=i < 15)
+        PredictionComparisonResponse(
+            pipeline_disagreement=i < 10, incorrect_for_all_pipelines=i < 15
+        )
         for i in range(dm.num_rows)
     ]
     module.save_result(preds, dm)
-    assert SmartTag.one_model_disagrees not in dm.get_dataset_split(None)
-    assert SmartTag.all_models_wrong not in dm.get_dataset_split(None)
+    assert SmartTag.pipeline_disagreement not in dm.get_dataset_split(None)
+    assert SmartTag.incorrect_for_all_pipelines not in dm.get_dataset_split(None)
 
     # Check that the tag is applied to all prediction tables.
     for pipeline_index in range(len(simple_multipipeline_text_config.pipelines)):
@@ -56,5 +64,6 @@ def test_save_results(simple_multipipeline_text_config):
         )
         ds = dm.get_dataset_split(table_key)
         assert (
-            sum(ds[SmartTag.one_model_disagrees]) == 10 and sum(ds[SmartTag.all_models_wrong]) == 15
+            sum(ds[SmartTag.pipeline_disagreement]) == 10
+            and sum(ds[SmartTag.incorrect_for_all_pipelines]) == 15
         )
