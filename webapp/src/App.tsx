@@ -30,6 +30,7 @@ import Threshold from "pages/Threshold";
 import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
 import Settings from "pages/Settings";
+import NotFound from "pages/NotFound";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -74,57 +75,68 @@ export default class App extends React.Component<Props> {
                     <Route path="/:jobId">
                       <StatusCheck>
                         <PipelineCheck>
-                          <Route path="/:jobId" exact>
-                            <BasicLayout maxWidth="md">
-                              <Dashboard />
-                            </BasicLayout>
-                          </Route>
-                          <Route path="/:jobId/settings" exact>
-                            <BasicLayout>
-                              <Settings />
-                            </BasicLayout>
-                          </Route>
-                          <Route
-                            path="/:jobId/dataset_splits/:datasetSplitName"
-                            exact
-                          >
-                            <DatasetSplitRedirect />
-                          </Route>
-                          <Route
-                            path="/:jobId/dataset_splits/:datasetSplitName/:mainView"
-                            exact
-                          >
-                            <Exploration />
-                          </Route>
-                          <Route
-                            path="/:jobId/behavioral_testing_summary"
-                            exact
-                          >
-                            <BasicLayout>
-                              <PerturbationTestingSummary />
-                            </BasicLayout>
-                          </Route>
-                          <Route path="/:jobId/thresholds" exact>
-                            <BasicLayout>
-                              <Threshold />
-                            </BasicLayout>
-                          </Route>
-                          <Route
-                            path="/:jobId/dataset_class_distribution_analysis"
-                            exact
-                          >
-                            <BasicLayout>
-                              <WarningsOverview />
-                            </BasicLayout>
-                          </Route>
-                          <Route
-                            path="/:jobId/dataset_splits/:datasetSplitName/utterances/:utteranceId"
-                            exact
-                          >
-                            <BasicLayout>
-                              <UtteranceDetail />
-                            </BasicLayout>
-                          </Route>
+                          <Switch>
+                            <Route path="/:jobId" exact>
+                              <BasicLayout maxWidth="md">
+                                <Dashboard />
+                              </BasicLayout>
+                            </Route>
+                            <Route path="/:jobId/settings" exact>
+                              <BasicLayout>
+                                <Settings />
+                              </BasicLayout>
+                            </Route>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName"
+                              exact
+                            >
+                              <DatasetSplitRedirect />
+                            </Route>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/:mainView"
+                              exact
+                            >
+                              <Exploration />
+                            </Route>
+                            <Route
+                              path="/:jobId/behavioral_testing_summary"
+                              exact
+                            >
+                              <BasicLayout>
+                                <PerturbationTestingSummary />
+                              </BasicLayout>
+                            </Route>
+                            <Route path="/:jobId/thresholds" exact>
+                              <BasicLayout>
+                                <Threshold />
+                              </BasicLayout>
+                            </Route>
+                            <Route
+                              path="/:jobId/dataset_class_distribution_analysis"
+                              exact
+                            >
+                              <BasicLayout>
+                                <WarningsOverview />
+                              </BasicLayout>
+                            </Route>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/utterances/:utteranceId"
+                              exact
+                            >
+                              <BasicLayout>
+                                <UtteranceDetail />
+                              </BasicLayout>
+                            </Route>
+                            <Route>
+                              {() => {
+                                if (onRouteNotFound) {
+                                  onRouteNotFound();
+                                  return null;
+                                }
+                                return <NotFound />;
+                              }}
+                            </Route>
+                          </Switch>
                         </PipelineCheck>
                       </StatusCheck>
                     </Route>
@@ -134,7 +146,7 @@ export default class App extends React.Component<Props> {
                           onRouteNotFound();
                           return null;
                         }
-                        return <p>404 Not Found</p>;
+                        return <NotFound />;
                       }}
                     </Route>
                   </Switch>
