@@ -67,5 +67,5 @@ and the labels.
 
 Smart tags that are computed based on the difference between pipelines predictions.
 
-* `all_models_wrong`: When all pipelines give the wrong prediction.
-* `one_model_disagrees`: When at least one of the models disagrees with the others.
+* `incorrect_for_all_pipelines`: When all pipelines give the wrong prediction.
+* `pipeline_disagreement`: When at least one of the pipelines disagrees with the others.
