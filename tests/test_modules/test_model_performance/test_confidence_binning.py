@@ -10,15 +10,19 @@ from azimuth.modules.model_performance.confidence_binning import (
     ConfidenceHistogramModule,
 )
 from azimuth.types import DatasetColumn, DatasetFilters, DatasetSplitName, ModuleOptions
+from azimuth.types.outcomes import OutcomeName
+from tests.utils import save_predictions
 
 UNKNOWN_TARGET = [3]
 BIN_GAP = 0.06
 
 
-def test_confidence_histogram(simple_text_config, apply_mocked_startup_task):
+def test_confidence_histogram(tiny_text_config_postprocessors):
+    save_predictions(tiny_text_config_postprocessors)
+
     mod = ConfidenceHistogramModule(
         DatasetSplitName.eval,
-        simple_text_config,
+        tiny_text_config_postprocessors,
         mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
     )
     out = mod.compute_on_dataset_split()[0].details_all_bins
@@ -33,6 +37,47 @@ def test_confidence_histogram(simple_text_config, apply_mocked_startup_task):
         for v in out
         if sum(v.outcome_count.values()) > 0
     )
+
+    mod_without_postprocessing = ConfidenceHistogramModule(
+        DatasetSplitName.eval,
+        tiny_text_config_postprocessors,
+        mod_options=ModuleOptions(
+            filters=DatasetFilters(labels=[0]), pipeline_index=0, without_postprocessing=True
+        ),
+    )
+    out_without_postprocessing = mod_without_postprocessing.compute_on_dataset_split()[
+        0
+    ].details_all_bins
+
+    # Confidences should be lower with postprocessing
+    mean_with_post = np.mean(
+        [v.mean_bin_confidence for v in out if sum(v.outcome_count.values()) > 0]
+    )
+    mean_without_post = np.mean(
+        [
+            v.mean_bin_confidence
+            for v in out_without_postprocessing
+            if sum(v.outcome_count.values()) > 0
+        ]
+    )
+    assert mean_without_post > mean_with_post
+
+    # REJECTION_CLASS should be predicted more with postprocessing
+    count_rej_class_with_post = sum(
+        [
+            v.outcome_count[OutcomeName.CorrectAndRejected]
+            + v.outcome_count[OutcomeName.IncorrectAndRejected]
+            for v in out
+        ]
+    )
+    count_rej_class_without_post = sum(
+        [
+            v.outcome_count[OutcomeName.CorrectAndRejected]
+            + v.outcome_count[OutcomeName.IncorrectAndRejected]
+            for v in out_without_postprocessing
+        ]
+    )
+    assert count_rej_class_with_post > count_rej_class_without_post
 
 
 def test_confidence_histogram_empty(simple_text_config, apply_mocked_startup_task):

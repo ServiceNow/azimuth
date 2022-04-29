@@ -10,15 +10,21 @@ from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
+from azimuth.modules.task_execution import get_task_result
 from azimuth.types import DatasetColumn, SupportedMethod
 from azimuth.types.outcomes import OutcomeName
+from azimuth.types.task import PredictionResponse
 from azimuth.utils.validation import assert_not_none
 
 
 class OutcomesModule(DatasetResultModule[ModelContractConfig]):
     """Computes the outcome for each utterance in the dataset split."""
 
-    allowed_mod_options = DatasetResultModule.allowed_mod_options | {"threshold", "pipeline_index"}
+    allowed_mod_options = DatasetResultModule.allowed_mod_options | {
+        "threshold",
+        "pipeline_index",
+        "without_postprocessing",
+    }
 
     def _compute_outcome(self, prediction: int, label: int) -> OutcomeName:
         dm = self.get_dataset_split_manager()
@@ -32,20 +38,26 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
         else:
             return OutcomeName.IncorrectAndPredicted
 
-    def _get_postprocessed_predictions(self) -> ndarray:
+    def _get_predictions(self) -> ndarray:
         mod_options = self.mod_options.copy(deep=True)
         mod_options.model_contract_method_name = SupportedMethod.PostProcess
+        mod_options.without_postprocessing = False  # Reset for prediction task
         mod_options.indices = self.get_indices()
-        postprocessing_task = model_contract_task_mapping(
+        prediction_task = model_contract_task_mapping(
             dataset_split_name=self.dataset_split_name,
             config=self.config,
             mod_options=mod_options,
         )
-        postprocessed_predictions = postprocessing_task.compute_on_dataset_split()
+        pred_result = get_task_result(
+            task_module=prediction_task, result_type=List[PredictionResponse]
+        )
 
         predictions = np.zeros(len(mod_options.indices))
-        for idx, pred in enumerate(postprocessed_predictions):
-            predictions[idx] = pred.postprocessed_output.preds
+        for idx, pred in enumerate(pred_result):
+            if self.mod_options.without_postprocessing:
+                predictions[idx] = pred.model_output.preds
+            else:
+                predictions[idx] = pred.postprocessed_output.preds
 
         return predictions
 
@@ -57,12 +69,11 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
 
         """
         ds = assert_not_none(self.get_dataset_split())
-        postprocessed_predictions = self._get_postprocessed_predictions()
+        predictions = self._get_predictions()
         labels = ds["label"]
 
         outcomes_list: List[OutcomeName] = [
-            self._compute_outcome(y_pred, label)
-            for y_pred, label in zip(postprocessed_predictions, labels)
+            self._compute_outcome(y_pred, label) for y_pred, label in zip(predictions, labels)
         ]
 
         return outcomes_list

@@ -5,7 +5,6 @@ from collections import defaultdict
 from typing import List
 
 import numpy as np
-import structlog
 from datasets import Dataset
 
 from azimuth.config import ModelContractConfig
@@ -21,23 +20,16 @@ from azimuth.utils.validation import assert_not_none
 
 CONFIDENCE_BINS_COUNT = 20
 
-log = structlog.get_logger()
+
+def get_confidence_interval() -> np.ndarray:
+    return np.linspace(0, 1, CONFIDENCE_BINS_COUNT + 1)
 
 
-class ConfidenceBinningTask:
-    """Common functions to modules related to confidence bins."""
-
-    @staticmethod
-    def get_outcome_mask(ds: Dataset, outcome: OutcomeName) -> List[bool]:
-        return [utterance_outcome == outcome for utterance_outcome in ds[DatasetColumn.outcome]]
-
-    @staticmethod
-    def get_confidence_interval() -> np.ndarray:
-        return np.linspace(0, 1, CONFIDENCE_BINS_COUNT + 1)
-
-
-class ConfidenceHistogramModule(FilterableModule[ModelContractConfig], ConfidenceBinningTask):
+class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
     """Return a confidence histogram of the predictions."""
+
+    def get_outcome_mask(self, outcome: OutcomeName) -> List[bool]:
+        return [utterance_outcome == outcome for utterance_outcome in self.get_outcomes()]
 
     def compute_on_dataset_split(self) -> List[ConfidenceHistogramResponse]:  # type: ignore
         """Compute the confidence histogram with CONFIDENCE_BINS_COUNT bins on the dataset split.
@@ -46,14 +38,14 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig], Confidenc
             List of the confidence bins with their confidence and the outcome count.
 
         """
-        bins = self.get_confidence_interval()
+        bins = get_confidence_interval()
 
         ds: Dataset = assert_not_none(self.get_dataset_split())
 
         result = []
         if len(ds) > 0:
             # Get the bin index for each prediction.
-            confidences = np.max(ds[DatasetColumn.postprocessed_confidences], axis=1)
+            confidences = np.max(self.get_confidences_from_ds(), axis=1)
             bin_indices = np.floor(confidences * CONFIDENCE_BINS_COUNT)
 
             # Create the records. We drop the last bin as it's the maximum.
@@ -62,7 +54,7 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig], Confidenc
                 outcome_count = defaultdict(int)
                 for outcome in ALL_OUTCOMES:
                     outcome_count[outcome] = np.logical_and(
-                        bin_mask, self.get_outcome_mask(ds, outcome)
+                        bin_mask, self.get_outcome_mask(outcome)
                     ).sum()
                 mean_conf = (
                     0 if bin_mask.sum() == 0 else np.nan_to_num(confidences[bin_mask].mean())
@@ -90,7 +82,7 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig], Confidenc
         return [ConfidenceHistogramResponse(details_all_bins=result)]
 
 
-class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig], ConfidenceBinningTask):
+class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig]):
     """Return confidence bin indices for the selected dataset split."""
 
     allowed_mod_options = DatasetResultModule.allowed_mod_options | {"threshold", "pipeline_index"}
@@ -102,7 +94,7 @@ class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig], Confide
             List of bin indices for all utterances.
 
         """
-        self.get_confidence_interval()
+        get_confidence_interval()
         ds = assert_not_none(self.get_dataset_split())
 
         bin_indices: List[int] = (

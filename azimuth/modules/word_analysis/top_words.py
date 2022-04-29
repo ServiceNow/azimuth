@@ -11,7 +11,7 @@ from azimuth.config import ModelContractConfig
 from azimuth.modules.base_classes import FilterableModule
 from azimuth.modules.task_execution import get_task_result
 from azimuth.modules.word_analysis.tokens_to_words import TokensToWordsModule
-from azimuth.types import DatasetColumn, ModuleOptions
+from azimuth.types import ModuleOptions
 from azimuth.types.word_analysis import (
     TokensToWordsResponse,
     TopWordsImportanceCriteria,
@@ -109,7 +109,7 @@ class TopWordsModule(FilterableModule[ModelContractConfig]):
         important_words_errors = []
 
         tokenizer = self.artifact_manager.get_tokenizer()
-        is_error = np.array(dataset_split[DatasetColumn.postprocessed_prediction]) != np.array(
+        is_error = np.array(self.get_predictions_from_ds()) != np.array(
             dataset_split[self.config.columns.label]
         )
 

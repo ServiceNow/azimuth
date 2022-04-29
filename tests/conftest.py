@@ -172,19 +172,17 @@ def simple_text_config_no_train(tmp_path):
 
 
 @pytest.fixture
-def tiny_text_config(tmp_path):
-    return AzimuthConfig(
-        name="sentiment-analysis",
-        dataset=TINY_DATASET_CFG,
-        pipelines=[MODEL_CFG],
-        artifact_path=str(tmp_path),
-        batch_size=10,
-        use_cuda="auto",
-        model_contract="hf_text_classification",
-        saliency_layer="distilbert.embeddings.word_embeddings",
-        rejection_class=None,
-        behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
-    )
+def tiny_text_config(simple_text_config):
+    tiny_cfg = simple_text_config.copy(deep=True, update=dict(dataset=TINY_DATASET_CFG))
+    return tiny_cfg
+
+
+@pytest.fixture
+def tiny_text_config_postprocessors(tiny_text_config):
+    tiny_cfg_postprocessors = tiny_text_config.copy(deep=True)
+    tiny_cfg_postprocessors.pipelines[0].postprocessors[-1].threshold = 0.9
+    tiny_cfg_postprocessors.pipelines[0].postprocessors[0].temperature = 3
+    return tiny_cfg_postprocessors
 
 
 @pytest.fixture

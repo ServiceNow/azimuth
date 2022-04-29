@@ -63,6 +63,7 @@ class ModuleOptions(AliasModel):
     pipeline_index: Optional[int] = Field(
         None, title="Pipeline Index", description="What is the pipeline we are requesting."
     )
+    without_postprocessing: bool = Field(False, title="Get predictions without postprocessing")
     gradient_calculation: GradientCalculation = Field(
         GradientCalculation.L2, title="Gradient calculation"
     )

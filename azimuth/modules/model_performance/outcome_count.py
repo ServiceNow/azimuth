@@ -46,7 +46,7 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
         """
         outcome_count_per_class: Dict[Tuple[str, OutcomeName], int] = defaultdict(int)
 
-        for utterance_class, outcome in zip(ds[dataset_column], ds[DatasetColumn.outcome]):
+        for utterance_class, outcome in zip(ds[dataset_column], self.get_outcomes()):
             outcome_count_per_class[(dm.get_class_names()[utterance_class], outcome)] += 1
 
         return sorted_by_utterance_count_with_last(
@@ -73,7 +73,7 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
         all_tags = dm.get_tags(
             indices=assert_is_list(ds[DatasetColumn.row_idx]), table_key=self._get_table_key()
         )
-        for utterance_tags, outcome in zip(all_tags, ds[DatasetColumn.outcome]):
+        for utterance_tags, outcome in zip(all_tags, self.get_outcomes()):
             no_tag = True
             for filter_, tagged in utterance_tags.items():
                 if tagged and filter_ in filters[:-1]:
@@ -86,8 +86,7 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
             self.get_outcome_count(outcome_count_per_tag, filters), -1
         )
 
-    @classmethod
-    def get_outcome_count_per_outcome(cls, ds: Dataset) -> List[OutcomeCountPerFilterValue]:
+    def get_outcome_count_per_outcome(self, ds: Dataset) -> List[OutcomeCountPerFilterValue]:
         """Compute outcome count per outcome.
 
         Args:
@@ -97,7 +96,7 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
             List of Outcome Count for each outcome.
 
         """
-        outcome_count = defaultdict(int, Counter(ds[DatasetColumn.outcome]))
+        outcome_count = defaultdict(int, Counter(self.get_outcomes()))
         empty_outcome_count = {outcome: 0 for outcome in OutcomeName}
 
         metrics = [
