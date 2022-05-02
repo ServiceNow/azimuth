@@ -3,7 +3,7 @@
 This page guides you through the process of running the app on your data and pipelines, using
 Docker. Different dataset and text classification models can be supported in Azimuth.
 
-!!! info "Launch Azimuth with no pipeline, or with multiple ones"
+!!! info "Launch Azimuth with no pipeline, or with multiple pipelines"
 
     Azimuth supports specifying **no pipelines**, to only perform dataset analysis. It also supports
     supplying **mulitple pipelines**, to allow for quick comparison. However, only one dataset per

@@ -17,7 +17,7 @@ trigger further work to improve the model's performance.
 Interact with the Exploration Space in different views. Filter the data on any view with the control
 panel. Both training and evaluation sets can be explored.
 
-!!! tip "Pipeline Dropdown"
+!!! tip "Pipeline dropdown"
 
     Don't forget the pipeline dropdown in the top banner to see how the performance of different
     pipelines compare. This space also exists without selecting any pipelines, to perform dataset

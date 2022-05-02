@@ -41,7 +41,7 @@ make test     # It will check for formatting issues, run mypy and all unit tests
 
 You can also only run specific tests, using `poetry run pytest {path_to_test.py}`.
 
-!!! tip "Clean cache for routers test"
+!!! tip "Clean cache for routers tests"
     For tests in `tests/test_routers`, we run the startup task **once** and save the result
     in `/tmp/azimuth_test_cache`. When modifying Modules,
     you need to clean it manually or by running `make clean`.

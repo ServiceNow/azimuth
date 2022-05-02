@@ -35,7 +35,7 @@ While smart tags are computed automatically and cannot be changed, proposed acti
 that can be added by the user to identify a proposed action that should be done on a specific data
 sample.
 
-!!! example "Proposed actions examples"
+!!! example "Proposed action examples"
 
     * `relabel` to identify data samples whose labels should be changed.
     * `remove` to identify data samples that should be removed from the dataset.

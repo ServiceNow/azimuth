@@ -5,7 +5,7 @@
 Explore the different analyses and tools of Azimuth using the dashboard. Navigate through the
 different sections to get a deeper understanding of the dataset and the model.
 
-!!! info "Use Azimuth with no pipeline, or with multiple ones"
+!!! info "Use Azimuth with no pipeline, or with multiple pipelines"
 
     Azimuth can be launched without any pipelines. All the information related to the pipelines
     (prediction, behavioral testing and so on) will then be unavailable on all screens. It can also be
