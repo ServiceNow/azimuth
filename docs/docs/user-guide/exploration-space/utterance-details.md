@@ -49,7 +49,7 @@ more information, see [:material-link: Behavioral Tests](../../key-concepts/beha
 
 ![Screenshot](../../_static/images/exploration-space/utterance-details-behavioral-tests.png)
 
-!!! note
+!!! note "Only available when a pipeline is defined"
 
-    Behavioral tests are only available when a model is available. As such, the tab will be
+    Behavioral tests are only available when a pipeline is available. As such, the tab will be
     empty for file-based configurations.

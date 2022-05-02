@@ -5,9 +5,9 @@ defined as the number of utterances with a given label that are predicted as ano
 number of utterances is then **normalized** according to the total number of utterances with the
 given label.
 
-!!! tip
+!!! tip "Outcome colors"
 
-    The prediction [outcomes](../../key-concepts/outcomes.md) colors are shown on the confusion
+    The prediction [outcome](../../key-concepts/outcomes.md) colors are shown on the confusion
     matrix.
 
 ![Screenshot](../../_static/images/exploration-space/confusion-matrix.png)

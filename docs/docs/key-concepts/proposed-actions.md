@@ -22,7 +22,3 @@ Five proposed actions are currently supported:
   similarly labeled utterances should be added.
 * **Investigate**: The action is not yet clear, but the data point should be further
   investigated/discussed, within Azimuth or outside the tool.
-
-!!! tip
-
-    Read the [:material-link: key concepts introduction](index.md) to get a general understanding of how proposed actions can be used in combination with smart tags.

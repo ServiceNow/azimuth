@@ -99,7 +99,7 @@ running a demo.
    screen allows you to do, the [:material-link: User Guide](../user-guide/index.md) section walks
    you through all the available interactions on each screen.
 
-!!! success
+!!! success "Successful demo"
 
     Now that the demo is working, you can adapt the config to make it work on your dataset and
     model. **Proceed to [:material-link: C. Run on Your Use Case](c-run.md)**.

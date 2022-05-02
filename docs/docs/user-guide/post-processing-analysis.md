@@ -11,7 +11,7 @@ predictions, are displayed on the plot.
 
 ![Screenshot](../_static/images/threshold-comparison.png)
 
-!!! note
+!!! note "Only available for some configs"
 
     This section is only available when the threshold is known and can be edited.
     This means it is unavailable for file-based configs, and for pipelines with their own

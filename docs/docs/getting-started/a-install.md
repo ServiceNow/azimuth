@@ -16,7 +16,7 @@ Follow the steps to **install** the necessary items, and **download Azimuth**.
 3. **Download Azimuth**'s latest release.
     1. On [GitHub :material-github:](https://github.com/ServiceNow/azimuth), git clone our repo.
 
-!!! success
+!!! success "Installation completed"
 
     **Congratulations**! You have installed the necessary items and installed Azimuth. **Proceed
     to [Learn Basics](b-basics.md)**.

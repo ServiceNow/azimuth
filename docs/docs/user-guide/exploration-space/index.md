@@ -6,7 +6,7 @@ trigger further work to improve the model's performance.
 
 ![Screenshot](../../_static/images/exploration-space/performance-overview.png)
 
-!!! tip
+!!! tip "Access from dashboard"
 
     Access this space through the header of the dashboard.
 
@@ -17,7 +17,7 @@ trigger further work to improve the model's performance.
 Interact with the Exploration Space in different views. Filter the data on any view with the control
 panel. Both training and evaluation sets can be explored.
 
-!!! tip
+!!! tip "Pipeline dropdown"
 
     Don't forget the pipeline dropdown in the top banner to see how the performance of different
     pipelines compare. This space also exists without selecting any pipelines, to perform dataset
@@ -44,7 +44,7 @@ panel. Both training and evaluation sets can be explored.
 
 All views are affected by the control panel.
 
-!!! tip
+!!! tip "Share and save the filters"
 
     :material-share: The control panel selection can be saved and shared by using the url,
     which contains the selected filters and options.
