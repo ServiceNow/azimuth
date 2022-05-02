@@ -87,7 +87,7 @@ information on tests and the option to export the results.
 
 ![Screenshot](../_static/images/dashboard/behavioral-testing.png)
 
-!!! note
+!!! note "File-based configurations"
 
     With file-based configurations, the behavioral tests are generated and can be exported.
     However, since the tool does not have access to the model, predictions cannot be made for the
