@@ -43,8 +43,7 @@ the [Utterances Table](../user-guide/exploration-space/utterance-details.md).
 
 !!! example "Saliency example"
 
-    In this example, `assistance` is the word that contributes the most to the prediction
-    `transfer`, followed by `moving`.
+    In this example, `bill` is the word that contributes the most to the prediction `bill_balance`.
 
 ## How is it computed?
 
