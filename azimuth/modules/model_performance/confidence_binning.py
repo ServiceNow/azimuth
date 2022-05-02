@@ -21,10 +21,6 @@ from azimuth.utils.validation import assert_not_none
 CONFIDENCE_BINS_COUNT = 20
 
 
-def get_confidence_interval() -> np.ndarray:
-    return np.linspace(0, 1, CONFIDENCE_BINS_COUNT + 1)
-
-
 class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
     """Return a confidence histogram of the predictions."""
 
@@ -38,7 +34,7 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
             List of the confidence bins with their confidence and the outcome count.
 
         """
-        bins = get_confidence_interval()
+        bins = np.linspace(0, 1, CONFIDENCE_BINS_COUNT + 1)
 
         ds: Dataset = assert_not_none(self.get_dataset_split())
 
@@ -94,7 +90,6 @@ class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig]):
             List of bin indices for all utterances.
 
         """
-        get_confidence_interval()
         ds = assert_not_none(self.get_dataset_split())
 
         bin_indices: List[int] = (
