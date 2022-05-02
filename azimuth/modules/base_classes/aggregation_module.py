@@ -83,7 +83,7 @@ class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
         return cast(List[List[float]], confidences)
 
     def get_outcomes(self) -> List[OutcomeName]:
-        """Get outcomes according to the module options (with our without postprocessing).
+        """Get outcomes according to the module options (with or without postprocessing).
 
         Returns: List of Outcomes
         """
