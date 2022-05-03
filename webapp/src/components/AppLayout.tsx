@@ -22,9 +22,6 @@ const useStyles = makeStyles((theme) => ({
 
     minHeight: 0,
     overflow: "hidden",
-    "& a": {
-      textDecoration: "none",
-    },
     display: "flex",
     flexDirection: "column",
   },

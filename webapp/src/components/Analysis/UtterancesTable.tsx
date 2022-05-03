@@ -111,7 +111,7 @@ const UtterancesTable: React.FC<Props> = ({
   const classes = useStyles();
   const theme = useTheme();
 
-  const { page, sort, descending } = pagination;
+  const { page = 1, sort, descending } = pagination;
 
   const getUtterancesQueryState = {
     jobId,
@@ -119,10 +119,8 @@ const UtterancesTable: React.FC<Props> = ({
     ...filters,
     sort,
     descending,
-    ...(page !== undefined && {
-      limit: PAGE_SIZE,
-      offset: (page - 1) * PAGE_SIZE,
-    }),
+    limit: PAGE_SIZE,
+    offset: (page - 1) * PAGE_SIZE,
     ...pipeline,
   };
 

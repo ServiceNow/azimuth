@@ -20,7 +20,7 @@ export type QueryFilterState = {
 };
 
 export type QueryPaginationState = {
-  page: number;
+  page?: number;
   sort?: UtterancesSortableColumn;
   descending?: true;
 };
