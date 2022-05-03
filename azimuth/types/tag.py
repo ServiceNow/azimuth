@@ -53,6 +53,14 @@ class SmartTag(str, Enum):
     no_smart_tag = "NO_SMART_TAGS"
 
 
+class SmartTagFamily(str, Enum):
+    almost_correct = "almost_correct"
+    perturbation_testing = "perturbation_testing"
+    similarity = "similarity"
+    syntactic = "syntactic"
+    uncertainty_estimation = "uncertainty_estimation"
+
+
 Tag = str
 ALL_DATA_ACTION_FILTERS = [a.value for a in DataAction]
 ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a is not DataAction.no_action]
@@ -77,6 +85,22 @@ ALL_PREDICTION_TAGS = [
     SmartTag.high_epistemic_uncertainty,
 ]
 ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
+
+SMART_TAGS_FAMILY_MAPPING = {
+    SmartTagFamily.uncertainty_estimation: [SmartTag.high_epistemic_uncertainty],
+    SmartTagFamily.syntactic: ALL_SYNTAX_TAGS,
+    SmartTagFamily.almost_correct: [SmartTag.correct_top_3, SmartTag.correct_low_conf],
+    SmartTagFamily.similarity: [
+        SmartTag.conflicting_neighbors_train,
+        SmartTag.conflicting_neighbors_eval,
+        SmartTag.no_close_train,
+        SmartTag.no_close_eval,
+    ],
+    SmartTagFamily.perturbation_testing: [
+        SmartTag.failed_punctuation,
+        SmartTag.failed_fuzzy_matching,
+    ],
+}
 
 
 class TaggingResponse(ModuleResponse):

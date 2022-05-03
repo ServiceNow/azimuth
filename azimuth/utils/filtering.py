@@ -65,7 +65,8 @@ def filter_dataset_split(
         # We do OR for outcomes.
         dataset_split = dataset_split.filter(lambda x: x[DatasetColumn.outcome] in filters.outcomes)
     if len(filters.smart_tags) > 0:
-        # We do AND for smart tags.
+        # For each smart tag family, we do OR, but AND between families
+        # If None, it is none of them.
         dataset_split = dataset_split.filter(
             lambda x: all(
                 ((not any(x[v] for v in ALL_SMART_TAGS)) if v is SmartTag.no_smart_tag else x[v])

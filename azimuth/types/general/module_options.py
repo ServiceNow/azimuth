@@ -3,13 +3,13 @@
 # in the root directory of this source tree.
 
 from enum import Enum
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import Field
 
 from azimuth.types import AliasModel, SupportedMethod
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import DataAction, SmartTag
+from azimuth.types.tag import DataAction, SmartTag, SmartTagFamily
 
 
 class AbsDatasetFilters(AliasModel):
@@ -17,7 +17,7 @@ class AbsDatasetFilters(AliasModel):
     confidence_max: float = 1
     data_actions: List[DataAction] = []
     outcomes: List[OutcomeName] = []
-    smart_tags: List[SmartTag] = []
+    smart_tags: Dict[SmartTagFamily, Optional[List[SmartTag]]] = []
     utterance: Optional[str]  # Must contain this subset.
 
 
