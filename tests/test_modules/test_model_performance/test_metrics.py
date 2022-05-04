@@ -22,11 +22,12 @@ from azimuth.plots.ece import make_ece_figure
 from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
-from tests.utils import save_predictions
+from tests.utils import save_outcomes, save_predictions
 
 
 def test_metrics(tiny_text_config_postprocessors):
     save_predictions(tiny_text_config_postprocessors)
+    save_outcomes(tiny_text_config_postprocessors)
 
     metrics_mod = MetricsModule(
         dataset_split_name=DatasetSplitName.eval,
@@ -81,25 +82,15 @@ def test_outcomes(file_text_config_no_intent):
     res = mod.compute_on_dataset_split()
 
     # Outcome determined from the values in sample_predictions_top1.csv
-    expected_result = [
-        OutcomeName.CorrectAndRejected,
-        OutcomeName.CorrectAndRejected,
-        OutcomeName.CorrectAndPredicted,
-        OutcomeName.IncorrectAndPredicted,
-        OutcomeName.CorrectAndRejected,
-        OutcomeName.IncorrectAndRejected,
+    # Results are the same with and without postprocessing with File-based.
+    assert res == [
+        (OutcomeName.CorrectAndRejected, OutcomeName.CorrectAndRejected),
+        (OutcomeName.CorrectAndRejected, OutcomeName.CorrectAndRejected),
+        (OutcomeName.CorrectAndPredicted, OutcomeName.CorrectAndPredicted),
+        (OutcomeName.IncorrectAndPredicted, OutcomeName.IncorrectAndPredicted),
+        (OutcomeName.CorrectAndRejected, OutcomeName.CorrectAndRejected),
+        (OutcomeName.IncorrectAndRejected, OutcomeName.IncorrectAndRejected),
     ]
-    assert res == expected_result
-
-    mod_post = OutcomesModule(
-        DatasetSplitName.eval,
-        file_text_config_no_intent,
-        mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
-    )
-    res_post = mod_post.compute_on_dataset_split()
-
-    # Results will be the same with FileBased
-    assert res == res_post
 
 
 def test_empty_ds(simple_text_config, dask_client):
@@ -150,6 +141,7 @@ def test_outcome_count_per_threshold(tiny_text_config, dask_client):
 
 def test_outcome_count_per_filter(tiny_text_config_postprocessors):
     save_predictions(tiny_text_config_postprocessors)
+    save_outcomes(tiny_text_config_postprocessors)
 
     mod = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,

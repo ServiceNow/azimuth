@@ -11,7 +11,7 @@ from azimuth.modules.model_performance.confidence_binning import (
 )
 from azimuth.types import DatasetColumn, DatasetFilters, DatasetSplitName, ModuleOptions
 from azimuth.types.outcomes import OutcomeName
-from tests.utils import save_predictions
+from tests.utils import save_outcomes, save_predictions
 
 UNKNOWN_TARGET = [3]
 BIN_GAP = 0.06
@@ -19,6 +19,7 @@ BIN_GAP = 0.06
 
 def test_confidence_histogram(tiny_text_config_postprocessors):
     save_predictions(tiny_text_config_postprocessors)
+    save_outcomes(tiny_text_config_postprocessors)
 
     mod = ConfidenceHistogramModule(
         DatasetSplitName.eval,

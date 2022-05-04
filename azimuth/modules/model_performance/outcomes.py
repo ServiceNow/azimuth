@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from numpy import ndarray
@@ -23,7 +23,6 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
     allowed_mod_options = DatasetResultModule.allowed_mod_options | {
         "threshold",
         "pipeline_index",
-        "without_postprocessing",
     }
 
     def _compute_outcome(self, prediction: int, label: int) -> OutcomeName:
@@ -38,10 +37,9 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
         else:
             return OutcomeName.IncorrectAndPredicted
 
-    def _get_predictions(self) -> ndarray:
+    def _get_predictions(self, without_postprocessing: bool) -> ndarray:
         mod_options = self.mod_options.copy(deep=True)
         mod_options.model_contract_method_name = SupportedMethod.PostProcess
-        mod_options.without_postprocessing = False  # Reset for prediction task
         mod_options.indices = self.get_indices()
         prediction_task = model_contract_task_mapping(
             dataset_split_name=self.dataset_split_name,
@@ -54,31 +52,39 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
 
         predictions = np.zeros(len(mod_options.indices))
         for idx, pred in enumerate(pred_result):
-            if self.mod_options.without_postprocessing:
+            if without_postprocessing:
                 predictions[idx] = pred.model_output.preds
             else:
                 predictions[idx] = pred.postprocessed_output.preds
 
         return predictions
 
-    def compute_on_dataset_split(self) -> List[OutcomeName]:  # type: ignore
-        """Compute outcomes for a set of predictions.
+    def compute_on_dataset_split(self) -> List[Tuple[OutcomeName, OutcomeName]]:  # type: ignore
+        """Compute outcomes for a set of predictions, both with and without postprocessing.
 
         Returns:
-            List of outcomes for each utterance in the dataset split.
+            List of tuple for each utterance with the model outcome and the postprocessed outcome.
 
         """
         ds = assert_not_none(self.get_dataset_split())
-        predictions = self._get_predictions()
         labels = ds["label"]
 
-        outcomes_list: List[OutcomeName] = [
-            self._compute_outcome(y_pred, label) for y_pred, label in zip(predictions, labels)
+        model_predictions = self._get_predictions(without_postprocessing=True)
+        model_outcomes: List[OutcomeName] = [
+            self._compute_outcome(y_pred, label) for y_pred, label in zip(model_predictions, labels)
         ]
 
-        return outcomes_list
+        postprocessed_predictions = self._get_predictions(without_postprocessing=False)
+        postprocessed_outcomes: List[OutcomeName] = [
+            self._compute_outcome(y_pred, label)
+            for y_pred, label in zip(postprocessed_predictions, labels)
+        ]
 
-    def _save_result(self, res: List[OutcomeName], dm: DatasetSplitManager):  # type: ignore
+        return list(zip(model_outcomes, postprocessed_outcomes))
+
+    def _save_result(  # type: ignore
+        self, res: List[Tuple[OutcomeName, OutcomeName]], dm: DatasetSplitManager
+    ):
         """Save the outcomes in the dataset_split.
 
         Args:
@@ -86,4 +92,11 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
             dm: the dataset_split manager used to get `res`.
         """
         table_key = assert_not_none(self._get_table_key())
-        dm.add_column_to_prediction_table(DatasetColumn.outcome, res, table_key=table_key)
+        dm.add_column_to_prediction_table(
+            DatasetColumn.model_outcome, [outcomes[0] for outcomes in res], table_key=table_key
+        )
+        dm.add_column_to_prediction_table(
+            DatasetColumn.postprocessed_outcome,
+            [outcomes[1] for outcomes in res],
+            table_key=table_key,
+        )

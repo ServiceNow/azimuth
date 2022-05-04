@@ -191,14 +191,16 @@ def a_text_dataset():
 
 
 @pytest.fixture
-def text_dm_with_tags(simple_text_config):
-    ds = load_dataset_from_config(simple_text_config)[DatasetSplitName.eval]
+def text_dm_with_tags(simple_text_config_high_threshold):
+    # Using high threshold so there are differences between model and postprocessed results.
+    ds = load_dataset_from_config(simple_text_config_high_threshold)[DatasetSplitName.eval]
     # Some prediction
     ds = ds.map(
         lambda x, i: {
-            DatasetColumn.model_predictions: [i % 2],
-            DatasetColumn.model_confidences: [i / len(ds)],
-            DatasetColumn.postprocessed_confidences: [i / len(ds)],
+            DatasetColumn.model_predictions: [i % 2, 1 - i % 2],
+            DatasetColumn.model_confidences: [1 - i / len(ds), i / len(ds)],
+            # So they are smaller than model_confidences
+            DatasetColumn.postprocessed_confidences: [1 - i / (2 * len(ds)), i / (2 * len(ds))],
             DatasetColumn.confidence_bin_idx: np.random.randint(1, 20),
         },
         with_indices=True,
@@ -206,11 +208,11 @@ def text_dm_with_tags(simple_text_config):
 
     def compute_outcome(prediction, label):
         if prediction == label:
-            if prediction > simple_text_config.pipelines[0].threshold:
+            if prediction > simple_text_config_high_threshold.pipelines[0].threshold:
                 return OutcomeName.CorrectAndPredicted
             else:
                 return OutcomeName.CorrectAndRejected
-        elif prediction <= simple_text_config.pipelines[0].threshold:
+        elif prediction <= simple_text_config_high_threshold.pipelines[0].threshold:
             return OutcomeName.IncorrectAndRejected
         else:
             return OutcomeName.IncorrectAndPredicted
@@ -219,9 +221,12 @@ def text_dm_with_tags(simple_text_config):
         lambda x: {
             DatasetColumn.postprocessed_prediction: x[DatasetColumn.model_predictions][0]
             if x[DatasetColumn.postprocessed_confidences][0]
-            > simple_text_config.pipelines[0].threshold
+            > simple_text_config_high_threshold.pipelines[0].threshold
             else -1,
-            DatasetColumn.outcome: compute_outcome(
+            DatasetColumn.model_outcome: compute_outcome(
+                x[DatasetColumn.model_confidences][0], x["label"]
+            ),
+            DatasetColumn.postprocessed_outcome: compute_outcome(
                 x[DatasetColumn.postprocessed_confidences][0], x["label"]
             ),
         }
@@ -239,7 +244,7 @@ def text_dm_with_tags(simple_text_config):
 
     dm = DatasetSplitManager(
         DatasetSplitName.eval,
-        simple_text_config,
+        simple_text_config_high_threshold,
         initial_tags=ALL_STANDARD_TAGS,
         initial_prediction_tags=ALL_PREDICTION_TAGS,
         dataset_split=ds,
@@ -330,7 +335,7 @@ def apply_mocked_startup_task(simple_text_config):
             (DatasetColumn.model_confidences, lambda: [0.4, 0.6]),
             (DatasetColumn.postprocessed_confidences, lambda: [0.4, 0.6]),
             (DatasetColumn.token_count, lambda: np.random.randint(5, 12)),
-            (DatasetColumn.outcome, lambda: random.choice([r for r in OutcomeName])),
+            (DatasetColumn.postprocessed_outcome, lambda: random.choice([r for r in OutcomeName])),
         ]
         dms = load_dataset_split_managers_from_config(config)
         for dm in dms.values():

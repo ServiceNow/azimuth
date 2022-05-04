@@ -42,7 +42,7 @@ def test_dataset_filtering_errors(text_dm_with_tags, simple_text_config, simple_
     ds = ds.rename_column(DatasetColumn.postprocessed_prediction, "col1")
     ds = ds.rename_column("label", "col2")
     ds = ds.rename_column(text_dm_with_tags.config.columns.text_input, "col3")
-    ds = ds.rename_column(DatasetColumn.outcome, "col4")
+    ds = ds.rename_column(DatasetColumn.postprocessed_outcome, "col4")
     ds = ds.rename_column(DatasetColumn.postprocessed_confidences, "col5")
 
     with pytest.raises(ValueError) as e:
@@ -67,7 +67,7 @@ def test_dataset_filtering_errors(text_dm_with_tags, simple_text_config, simple_
             DatasetFilters(outcomes=[OutcomeName.IncorrectAndRejected]),
             config=text_dm_with_tags.config,
         )
-    assert DatasetColumn.outcome in str(e.value)
+    assert DatasetColumn.postprocessed_outcome in str(e.value)
 
     with pytest.raises(KeyError) as e:
         _ = filter_dataset_split(
@@ -147,6 +147,22 @@ def test_dataset_filtering_mutually_exclusive(text_dm_with_tags, simple_table_ke
         config=text_dm_with_tags.config,
     )
     assert len(ds_filtered) == 0
+
+
+def test_dataset_filtering_without_postprocessing(text_dm_with_tags, simple_table_key):
+    ds = text_dm_with_tags.get_dataset_split(simple_table_key)
+    ds_filtered_with_postprocessing = filter_dataset_split(
+        ds,
+        DatasetFilters(predictions=[0]),
+        config=text_dm_with_tags.config,
+    )
+    ds_filtered_without_postprocessing = filter_dataset_split(
+        ds,
+        DatasetFilters(predictions=[0]),
+        config=text_dm_with_tags.config,
+        without_postprocessing=True,
+    )
+    assert len(ds_filtered_with_postprocessing) != len(ds_filtered_without_postprocessing)
 
 
 if __name__ == "__main__":

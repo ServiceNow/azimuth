@@ -8,6 +8,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Not released]
 
 ### Added
+- Ability to get predictions without postprocessing in the exploration space. (Only back end for
+  now)
 
 ### Changed
 

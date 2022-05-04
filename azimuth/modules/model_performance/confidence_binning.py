@@ -25,7 +25,7 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
     """Return a confidence histogram of the predictions."""
 
     def get_outcome_mask(self, outcome: OutcomeName) -> List[bool]:
-        return [utterance_outcome == outcome for utterance_outcome in self.get_outcomes()]
+        return [utterance_outcome == outcome for utterance_outcome in self._get_outcomes_from_ds()]
 
     def compute_on_dataset_split(self) -> List[ConfidenceHistogramResponse]:  # type: ignore
         """Compute the confidence histogram with CONFIDENCE_BINS_COUNT bins on the dataset split.
@@ -41,7 +41,7 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
         result = []
         if len(ds) > 0:
             # Get the bin index for each prediction.
-            confidences = np.max(self.get_confidences_from_ds(), axis=1)
+            confidences = np.max(self._get_confidences_from_ds(), axis=1)
             bin_indices = np.floor(confidences * CONFIDENCE_BINS_COUNT)
 
             # Create the records. We drop the last bin as it's the maximum.

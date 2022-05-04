@@ -7,16 +7,8 @@ from typing import List, Optional, cast
 
 from datasets import Dataset
 
-from azimuth.config import ModelContractConfig
 from azimuth.modules.base_classes import ConfigScope, ExpirableMixin, Module
-from azimuth.modules.task_execution import get_task_result
-from azimuth.types import (
-    DatasetColumn,
-    DatasetFilters,
-    DatasetSplitName,
-    ModuleOptions,
-    ModuleResponse,
-)
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.types.outcomes import OutcomeName
 from azimuth.utils.filtering import filter_dataset_split
 
@@ -66,14 +58,24 @@ class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
         ds = super().get_dataset_split(name)
         return filter_dataset_split(ds, filters=self.mod_options.filters, config=self.config)
 
-    def get_predictions_from_ds(self) -> List[int]:
+    def _get_predictions_from_ds(self) -> List[int]:
+        """Get predicted classes according to the module options (with or without postprocessing).
+
+        Returns: List of Predictions
+        """
         ds = self.get_dataset_split()
         if self.mod_options.without_postprocessing:
             return cast(List[int], [preds[0] for preds in ds[DatasetColumn.model_predictions]])
         else:
             return cast(List[int], ds[DatasetColumn.postprocessed_prediction])
 
-    def get_confidences_from_ds(self) -> List[List[float]]:
+    def _get_confidences_from_ds(self) -> List[List[float]]:
+        """Get confidences according to the module options (with or without postprocessing).
+
+        Notes: Confidences are sorted according to their values (not the class id).
+
+        Returns: List of Confidences
+        """
         ds = self.get_dataset_split()
         confidences = (
             ds[DatasetColumn.model_confidences]
@@ -82,20 +84,15 @@ class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
         )
         return cast(List[List[float]], confidences)
 
-    def get_outcomes(self) -> List[OutcomeName]:
+    def _get_outcomes_from_ds(self) -> List[OutcomeName]:
         """Get outcomes according to the module options (with or without postprocessing).
 
         Returns: List of Outcomes
         """
-        # Reset filters as outcomes don't take any, and send indices instead
-        mod_options = self.mod_options.copy(deep=True)
-        mod_options.filters = DatasetFilters()
-        mod_options.indices = self.get_indices()
-
-        # Avoid circular import
-        from azimuth.modules.model_performance.outcomes import OutcomesModule
-
-        outcome_task = OutcomesModule(
-            self.dataset_split_name, cast(ModelContractConfig, self.config), mod_options
+        ds = self.get_dataset_split()
+        outcomes = (
+            ds[DatasetColumn.model_outcome]
+            if self.mod_options.without_postprocessing
+            else ds[DatasetColumn.postprocessed_outcome]
         )
-        return get_task_result(task_module=outcome_task, result_type=List[OutcomeName])
+        return cast(List[OutcomeName], outcomes)

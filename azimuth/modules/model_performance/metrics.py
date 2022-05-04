@@ -62,7 +62,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
             return [BASE_RESPONSE]
 
         utterance_count = len(indices)
-        outcome_count = Counter(self.get_outcomes())
+        outcome_count = Counter(self._get_outcomes_from_ds())
         outcome_count.update({outcome: 0 for outcome in ALL_OUTCOMES})
 
         # Compute ECE
@@ -96,7 +96,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
                 metric_values[metric_name] = assert_not_none(
                     first_value(
                         met.compute(
-                            predictions=self.get_predictions_from_ds(),
+                            predictions=self._get_predictions_from_ds(),
                             references=ds[self.config.columns.label],
                             **extra_kwargs,
                         )
@@ -145,7 +145,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
         probs = np.zeros([len(ds), num_classes])
         for idx, (confidences, predictions) in enumerate(
             zip(
-                self.get_confidences_from_ds(),
+                self._get_confidences_from_ds(),
                 ds[DatasetColumn.model_predictions],
             )
         ):

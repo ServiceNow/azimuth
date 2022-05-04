@@ -109,7 +109,7 @@ class TopWordsModule(FilterableModule[ModelContractConfig]):
         important_words_errors = []
 
         tokenizer = self.artifact_manager.get_tokenizer()
-        is_error = np.array(self.get_predictions_from_ds()) != np.array(
+        is_error = np.array(self._get_predictions_from_ds()) != np.array(
             dataset_split[self.config.columns.label]
         )
 

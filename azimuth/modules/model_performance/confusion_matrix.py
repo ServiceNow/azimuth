@@ -25,7 +25,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
         """
         ds: Dataset = assert_not_none(self.get_dataset_split())
         predictions, labels = (
-            self.get_predictions_from_ds(),
+            self._get_predictions_from_ds(),
             ds[self.config.columns.label],
         )
         ds_mng = self.get_dataset_split_manager()
