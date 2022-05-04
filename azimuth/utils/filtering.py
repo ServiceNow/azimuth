@@ -76,7 +76,9 @@ def filter_dataset_split(
             if tags_in_family is SmartTag.no_smart_tag:
                 tags_associated: List[SmartTag] = SMART_TAGS_FAMILY_MAPPING[family]
                 dataset_split = dataset_split.filter(
-                    lambda x: not any(x[tag] for tag in tags_associated)
+                    lambda x: not any(
+                        x[tag] for tag in tags_associated if tag != SmartTag.no_smart_tag
+                    )
                 )
             else:
                 dataset_split = dataset_split.filter(

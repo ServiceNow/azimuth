@@ -231,7 +231,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
             smart_tag_filters: Dict[SmartTagFamily, Dict[str, DatasetFilters]] = {
                 tag_family: {
                     smart_tag: self.edit_filter(
-                        self.mod_options.filters, smart_tag={tag_family: smart_tag}
+                        self.mod_options.filters, smart_tag={tag_family: [smart_tag]}
                     )
                     for smart_tag in tags
                 }

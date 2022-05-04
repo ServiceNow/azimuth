@@ -219,7 +219,10 @@ def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
     assert len(label_metrics) == dm.get_num_classes()
 
     smart_tag_metrics = result.metrics_per_filter.smart_tag
-    assert sum([mf_v.utterance_count for mf_v in smart_tag_metrics]) == ds_len
+    assert all(
+        sum([mf_v.utterance_count for mf_v in family_tags]) == ds_len
+        for family_tags in smart_tag_metrics.values()
+    )
     assert len(smart_tag_metrics) == len(ALL_SMART_TAGS)
 
     data_action_metrics = result.metrics_per_filter.data_action
