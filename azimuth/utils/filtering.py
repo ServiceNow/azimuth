@@ -1,13 +1,18 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Union
+from typing import List, Union
 
 from datasets import Dataset
 
 from azimuth.config import ProjectConfig
 from azimuth.types import DatasetColumn, DatasetFilters, NamedDatasetFilters
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
+from azimuth.types.tag import (
+    ALL_DATA_ACTIONS,
+    SMART_TAGS_FAMILY_MAPPING,
+    DataAction,
+    SmartTag,
+)
 
 
 def filter_dataset_split(
@@ -67,10 +72,14 @@ def filter_dataset_split(
     if len(filters.smart_tags) > 0:
         # For each smart tag family, we do OR, but AND between families
         # If None, it is none of them.
-        dataset_split = dataset_split.filter(
-            lambda x: all(
-                ((not any(x[v] for v in ALL_SMART_TAGS)) if v is SmartTag.no_smart_tag else x[v])
-                for v in filters.smart_tags
-            )
-        )
+        for family, tags_in_family in filters.smart_tags.items():
+            if tags_in_family is SmartTag.no_smart_tag:
+                tags_associated: List[SmartTag] = SMART_TAGS_FAMILY_MAPPING[family]
+                dataset_split = dataset_split.filter(
+                    lambda x: not any(x[tag] for tag in tags_associated)
+                )
+            else:
+                dataset_split = dataset_split.filter(
+                    lambda x: any(x[tag] for tag in tags_in_family)
+                )
     return dataset_split

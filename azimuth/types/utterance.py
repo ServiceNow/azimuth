@@ -2,13 +2,13 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import Field
 
 from azimuth.types import AliasModel
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import DataAction, SmartTag
+from azimuth.types.tag import DataAction, SmartTag, SmartTagFamily
 
 
 class ModelPrediction(AliasModel):
@@ -30,7 +30,7 @@ class Utterance(AliasModel):
         ..., title="Model prediction", nullable=True
     )
     model_saliency: Optional[ModelSaliency] = Field(..., title="Model saliency", nullable=True)
-    smart_tags: List[SmartTag] = Field(..., title="Smart tags")
+    smart_tags: Dict[SmartTagFamily, List[SmartTag]] = Field(..., title="Smart tags")
     data_action: DataAction = Field(..., title="Data action tag")
     label: str = Field(..., title="Label")
     utterance: str = Field(..., title="Utterance")

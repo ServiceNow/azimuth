@@ -87,18 +87,27 @@ ALL_PREDICTION_TAGS = [
 ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 
 SMART_TAGS_FAMILY_MAPPING = {
-    SmartTagFamily.uncertainty_estimation: [SmartTag.high_epistemic_uncertainty],
-    SmartTagFamily.syntactic: ALL_SYNTAX_TAGS,
-    SmartTagFamily.almost_correct: [SmartTag.correct_top_3, SmartTag.correct_low_conf],
+    SmartTagFamily.uncertainty_estimation: [
+        SmartTag.high_epistemic_uncertainty,
+        SmartTag.no_smart_tag,
+    ],
+    SmartTagFamily.syntactic: ALL_SYNTAX_TAGS + [SmartTag.no_smart_tag],
+    SmartTagFamily.almost_correct: [
+        SmartTag.correct_top_3,
+        SmartTag.correct_low_conf,
+        SmartTag.no_smart_tag,
+    ],
     SmartTagFamily.similarity: [
         SmartTag.conflicting_neighbors_train,
         SmartTag.conflicting_neighbors_eval,
         SmartTag.no_close_train,
         SmartTag.no_close_eval,
+        SmartTag.no_smart_tag,
     ],
     SmartTagFamily.perturbation_testing: [
         SmartTag.failed_punctuation,
         SmartTag.failed_fuzzy_matching,
+        SmartTag.no_smart_tag,
     ],
 }
 

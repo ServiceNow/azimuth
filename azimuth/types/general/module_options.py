@@ -17,7 +17,7 @@ class AbsDatasetFilters(AliasModel):
     confidence_max: float = 1
     data_actions: List[DataAction] = []
     outcomes: List[OutcomeName] = []
-    smart_tags: Dict[SmartTagFamily, Optional[List[SmartTag]]] = []
+    smart_tags: Dict[SmartTagFamily, List[SmartTag]] = {}
     utterance: Optional[str]  # Must contain this subset.
 
 
