@@ -77,33 +77,30 @@ const TopWords: React.FC<Props> = ({
             No word count data.
           </Typography>
         ) : (
-          wordCounts.map((wordCount, index) => (
+          wordCounts.map(({ word, count }, index) => (
             <Link
               key={index}
               component={RouterLink}
               to={`${baseUrl}${constructSearchString({
                 ...filters,
-                utterance: wordCount.word,
+                utterance: word,
                 ...pagination,
                 ...pipeline,
               })}`}
               color={theme.palette[palette].dark}
               display="block"
               fontSize={`${Math.max(
-                maxFontSizeInEm * wordCount.count * normalizingScaleFactor,
+                maxFontSizeInEm * count * normalizingScaleFactor,
                 minFontSizeInEm
               )}em`}
               marginLeft={1}
               marginRight={1}
               sx={{
-                opacity: Math.max(
-                  wordCount.count * normalizingScaleFactor,
-                  minOpacity
-                ),
+                opacity: Math.max(count * normalizingScaleFactor, minOpacity),
               }}
               whiteSpace="nowrap"
             >
-              {`${wordCount.word} (${wordCount.count})`}
+              {`${word} (${count})`}
             </Link>
           ))
         )}
