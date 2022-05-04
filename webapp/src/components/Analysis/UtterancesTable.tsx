@@ -336,7 +336,7 @@ const UtterancesTable: React.FC<Props> = ({
   const searchString = constructSearchString(pipeline);
   const RowLink = (props: RowProps<Row>) => (
     <Link
-      style={{ color: "unset" }}
+      style={{ color: "unset", textDecoration: "unset" }}
       to={`/${jobId}/dataset_splits/${datasetSplitName}/utterances/${props.row.id}${searchString}`}
     >
       <GridRow {...props} />
