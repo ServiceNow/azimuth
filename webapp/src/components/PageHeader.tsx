@@ -100,7 +100,7 @@ const PageHeader = () => {
           name: "Settings",
         },
         {
-          pathname: `/${jobId}/threshold`,
+          pathname: `/${jobId}/thresholds`,
           name: "Threshold Comparison",
         },
         {
