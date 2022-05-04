@@ -5,7 +5,11 @@ import BinLabel from "components/ConfidenceHistogram/BinLabel";
 import BinThresholdMarker from "components/ConfidenceHistogram/BinThresholdMarker";
 import Loading from "components/Loading";
 import React, { useMemo } from "react";
-import { ConfidenceBinDetails, Outcome } from "types/api";
+import {
+  ConfidenceBinDetails,
+  ConfidenceHistogramResponse,
+  Outcome,
+} from "types/api";
 
 const getBinHeights = ({ outcomeCount }: ConfidenceBinDetails) => [
   outcomeCount.CorrectAndRejected + outcomeCount.CorrectAndPredicted,
@@ -15,25 +19,23 @@ const getBinHeights = ({ outcomeCount }: ConfidenceBinDetails) => [
 type Props = {
   isFetching: boolean;
   error?: string;
-  bins?: ConfidenceBinDetails[];
+  data?: ConfidenceHistogramResponse;
   confidenceMin: number;
   confidenceMax: number;
   filteredOutcomes: readonly Outcome[];
-  threshold?: number;
 };
 
 const ConfidenceHistogram: React.FC<Props> = ({
   isFetching,
   error,
-  bins,
+  data,
   confidenceMin,
   confidenceMax,
   filteredOutcomes,
-  threshold,
 }) => {
   const max = useMemo(() => {
-    return bins ? Math.max(...bins.flatMap(getBinHeights)) : 0;
-  }, [bins]);
+    return data ? Math.max(...data.bins.flatMap(getBinHeights)) : 0;
+  }, [data]);
 
   return (
     <Box flex={1} height="100%" paddingTop={3} position="relative">
@@ -63,14 +65,14 @@ const ConfidenceHistogram: React.FC<Props> = ({
             }}
           >
             <BinLabel>0%</BinLabel>
-            {bins?.flatMap((bin, index) => [
+            {data?.bins.flatMap((bin, index, { length }) => [
               <BinColumn
                 key={index * 2}
                 bin={bin}
                 max={max}
                 filteredOutcomes={
-                  confidenceMin <= index / bins.length &&
-                  (index + 1) / bins.length <= confidenceMax
+                  confidenceMin <= index / length &&
+                  (index + 1) / length <= confidenceMax
                     ? filteredOutcomes
                     : []
                 }
@@ -81,11 +83,13 @@ const ConfidenceHistogram: React.FC<Props> = ({
                 ]}
               />,
               <BinLabel key={index * 2 + 1}>
-                {`${Math.round((100 / bins.length) * (index + 1))}%`}
+                {`${Math.round((100 / length) * (index + 1))}%`}
               </BinLabel>,
             ])}
           </Box>
-          {threshold && <BinThresholdMarker threshold={threshold} />}
+          {data && data.confidenceThreshold !== null && (
+            <BinThresholdMarker threshold={data.confidenceThreshold} />
+          )}
         </>
       )}
       {isFetching && (

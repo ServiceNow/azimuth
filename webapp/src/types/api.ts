@@ -5,6 +5,8 @@ export type AvailableDatasetSplits =
   components["schemas"]["AvailableDatasetSplits"];
 export type ConfidenceBinDetails =
   components["schemas"]["ConfidenceBinDetails"];
+export type ConfidenceHistogramResponse =
+  components["schemas"]["ConfidenceHistogramResponse"];
 // TODO Fix generated type (problem with python "Array" types)
 export type ConfusionMatrixOperation =
   paths["/dataset_splits/{dataset_split_name}/confusion_matrix"]["get"] & {

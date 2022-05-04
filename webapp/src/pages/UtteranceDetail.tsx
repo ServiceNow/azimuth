@@ -166,9 +166,9 @@ const UtteranceDetail = () => {
                     {utterance.modelPrediction.postprocessedPrediction}
                   </span>
                   {isPipelineSelected(pipeline) &&
-                    datasetInfo?.defaultThreshold &&
+                    utterancesResponse?.confidenceThreshold !== null &&
                     ` (< ${formatRatioAsPercentageString(
-                      datasetInfo.defaultThreshold[pipeline.pipelineIndex]
+                      utterancesResponse.confidenceThreshold
                     )})`}
                 </Typography>
               )}

@@ -2,8 +2,6 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 
-from typing import List
-
 from fastapi import APIRouter, Depends, Query
 
 from azimuth.app import get_dataset_split_manager, get_task_manager
@@ -15,10 +13,7 @@ from azimuth.types import (
     NamedDatasetFilters,
     SupportedModule,
 )
-from azimuth.types.model_performance import (
-    ConfidenceBinDetails,
-    ConfidenceHistogramResponse,
-)
+from azimuth.types.model_performance import ConfidenceHistogramResponse
 from azimuth.utils.routers import (
     build_named_dataset_filters,
     get_standard_task_result,
@@ -35,7 +30,7 @@ TAGS = ["Confidence Histogram v1"]
     summary="Get confidence histogram values",
     description="Get all confidence bins with their confidence and the outcome count",
     tags=TAGS,
-    response_model=List[ConfidenceBinDetails],
+    response_model=ConfidenceHistogramResponse,
 )
 def get_confidence_histogram(
     dataset_split_name: DatasetSplitName,
@@ -46,7 +41,7 @@ def get_confidence_histogram(
     without_postprocessing: bool = Query(
         False, title="Without Postprocessing", alias="withoutPostprocessing"
     ),
-) -> List[ConfidenceBinDetails]:
+) -> ConfidenceHistogramResponse:
     mod_options = ModuleOptions(
         filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
@@ -61,4 +56,4 @@ def get_confidence_histogram(
         last_update=dataset_split_manager.last_update,
     )[0]
 
-    return result.details_all_bins
+    return result

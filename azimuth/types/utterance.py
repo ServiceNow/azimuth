@@ -40,6 +40,9 @@ class Utterance(AliasModel):
 class GetUtterancesResponse(AliasModel):
     utterances: List[Utterance] = Field(..., title="Utterances")
     utterance_count: int = Field(..., title="Utterance count")
+    confidence_threshold: Optional[float] = Field(
+        ..., title="Confidence threshold in selected pipeline (if any)", nullable=True
+    )
 
     class Config:
         schema_extra = {

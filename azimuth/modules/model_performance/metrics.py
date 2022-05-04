@@ -70,7 +70,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
             config=self.config,
             mod_options=self.mod_options,
         )
-        bins = conf_hist_mod.compute_on_dataset_split()[0].details_all_bins
+        bins = conf_hist_mod.compute_on_dataset_split()[0].bins
         ece, acc, expected = compute_ece_from_bins(bins)
         count_per_bin = [sum(b.outcome_count.values()) for b in bins]
 
