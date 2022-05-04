@@ -83,7 +83,7 @@ const TopWords: React.FC<Props> = ({
               component={RouterLink}
               to={`${baseUrl}${constructSearchString({
                 ...filters,
-                utterance: word,
+                utterance: filters.utterance === word ? undefined : word,
                 ...pagination,
                 ...pipeline,
               })}`}
