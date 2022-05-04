@@ -38,13 +38,13 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
 
         ds: Dataset = assert_not_none(self.get_dataset_split())
 
-        result = []
         if len(ds) > 0:
             # Get the bin index for each prediction.
             confidences = np.max(self._get_confidences_from_ds(), axis=1)
             bin_indices = np.floor(confidences * CONFIDENCE_BINS_COUNT)
 
             # Create the records. We drop the last bin as it's the maximum.
+            result = []
             for bin_index, bin_min_value in enumerate(bins[:-1]):
                 bin_mask = bin_indices == bin_index
                 outcome_count = defaultdict(int)
@@ -65,15 +65,15 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
                 )
         else:
             # Create empty bins
-            for bin_index, bin_min_value in enumerate(bins[:-1]):
-                result.append(
-                    ConfidenceBinDetails(
-                        bin_index=bin_index,
-                        bin_confidence=0,
-                        mean_bin_confidence=0,
-                        outcome_count={outcome: 0 for outcome in ALL_OUTCOMES},
-                    )
+            result = [
+                ConfidenceBinDetails(
+                    bin_index=bin_index,
+                    bin_confidence=0,
+                    mean_bin_confidence=0,
+                    outcome_count={outcome: 0 for outcome in ALL_OUTCOMES},
                 )
+                for bin_index, bin_min_value in enumerate(bins[:-1])
+            ]
 
         return [ConfidenceHistogramResponse(details_all_bins=result)]
 
