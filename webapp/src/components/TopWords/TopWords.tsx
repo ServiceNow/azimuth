@@ -97,6 +97,8 @@ const TopWords: React.FC<Props> = ({
               marginRight={1}
               sx={{
                 opacity: Math.max(count * normalizingScaleFactor, minOpacity),
+                textDecorationStyle:
+                  filters.utterance === word ? "double" : undefined,
               }}
               whiteSpace="nowrap"
             >
