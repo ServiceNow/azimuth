@@ -56,7 +56,7 @@ export const convertSearchParamsToFilterState = (
 export const convertSearchParamsToPaginationState = (
   q: URLSearchParams
 ): QueryPaginationState => ({
-  page: str2num(q.get(PAGE)) || 1,
+  page: str2num(q.get(PAGE)),
   sort: (q.get(SORT) || undefined) as UtterancesSortableColumn | undefined,
   descending: q.get(DESCENDING) !== null || undefined,
 });

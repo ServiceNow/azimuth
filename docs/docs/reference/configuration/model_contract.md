@@ -161,7 +161,7 @@ Objects**](index.md).
   [:material-link: Defining Postprocessors](../custom-objects/postprocessors.md) details the
   different use cases.
 
-!!! tip
+!!! tip "Beginner users should start with simple use cases"
 
     Beginner users should aim to use Azimuth's default supported `postprocessors`: temperature
     scaling and thresholding. We provide shortcuts to override the default values.

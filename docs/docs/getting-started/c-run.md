@@ -3,7 +3,7 @@
 This page guides you through the process of running the app on your data and pipelines, using
 Docker. Different dataset and text classification models can be supported in Azimuth.
 
-!!! info
+!!! info "Launch Azimuth with no pipeline, or with multiple pipelines"
 
     Azimuth supports specifying **no pipelines**, to only perform dataset analysis. It also supports
     supplying **mulitple pipelines**, to allow for quick comparison. However, only one dataset per
@@ -18,7 +18,7 @@ use cases.
 
 ## 1. Prepare the Config File
 
-!!! tip
+!!! tip "Run our demo first"
 
     You haven't run our demo yet? You might want to verify your setup before feeding your own model
     and dataset. Go back to [B. Learn Basics](b-basics.md).
@@ -42,14 +42,14 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
     5. Edit the `saliency_layer` so it is the name of the input layer of the model. It should be set
        to `null` if your model is not from PyTorch or without a word-embedding layer.
 
-!!! tip
+    !!! tip "Links to full reference"
 
-    If you need more details on some of these fields:
+        If you need more details on some of these fields:
 
-      * The [:material-link: Project Config](../reference/configuration/project.md) explains in more
-        details `name`, `dataset`, `columns` and `rejection_class`.
-      * The [:material-link: Model Contract Config](../reference/configuration/project.md) details
-        how to define `pipelines`, `model_contract` and `saliency_layer`.
+          * The [:material-link: Project Config](../reference/configuration/project.md) explains in
+            more details `name`, `dataset`, `columns` and `rejection_class`.
+          * The [:material-link: Model Contract Config](../reference/configuration/project.md)
+            details how to define `pipelines`, `model_contract` and `saliency_layer`.
 
 ```yaml
 {
@@ -132,7 +132,7 @@ They are the following:
 * You can specify the device on which to run Azimuth, with `DEVICE` being one of `gpu` or `cpu`. If
   none is provided, `cpu` will be used. Ex: `DEVICE=gpu`.
 
-!!! note
+!!! note "Config file prevails over environment variables"
 
     Remember that the values above are defined in the config too. If conflicting values are defined,
     values from the config file will prevail.

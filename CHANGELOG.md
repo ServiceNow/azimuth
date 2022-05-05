@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Ability to get predictions without postprocessing in the exploration space. (Only back end for
   now)
+- Links on top words to filter utterances that contain it.
 
 ### Changed
 

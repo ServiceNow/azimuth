@@ -8,10 +8,6 @@ Conceptually, smart tags are
 identify those that may require **further action and investigation**. Different families of smart
 tags exist, based on the different types of analyses that Azimuth provides.
 
-!!! tip
-
-    Read the [:material-link: key concepts introduction](index.md) to get a general understanding of how smart tags can be used.
-
 The current list of supported smart tags is detailed below.
 
 ## Syntactic Information
