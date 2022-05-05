@@ -62,6 +62,12 @@ PERTURBATION_TESTING_TASKS = [
     Startup("perturbation_testing", SupportedModule.PerturbationTesting, run_on_all_pipelines=True)
 ]
 
+PIPELINE_COMPARISON_TASKS = [
+    Startup(
+        "prediction_comparison", SupportedModule.PredictionComparison, run_on_all_pipelines=False
+    )
+]
+
 BASE_PREDICTION_TASKS = [
     Startup("prediction", SupportedMethod.Predictions, run_on_all_pipelines=True),
     Startup("saliency", SupportedMethod.Saliency, run_on_all_pipelines=True),
@@ -176,6 +182,8 @@ def startup_tasks(
             start_up_tasks += PERTURBATION_TESTING_TASKS
         if task_manager.config.uncertainty.iterations > 1:
             start_up_tasks += BMA_PREDICTION_TASKS
+        if config.pipelines is not None and len(config.pipelines) > 1:
+            start_up_tasks += PIPELINE_COMPARISON_TASKS
     if similarity_available(task_manager.config):
         start_up_tasks += SIMILARITY_TASKS
 

@@ -58,3 +58,10 @@ and the labels.
 * `correct_top_3`: The top 1 prediction is not the right one, but the right one is in the top 3.
 * `correct_low_conf`: The top 1 prediction was the right one, but its confidence is below the
   threshold, and thus the rejection class was predicted.
+
+## Pipeline Comparison
+
+Smart tags that are computed based on the difference between pipelines predictions.
+
+* `incorrect_for_all_pipelines`: When all pipelines give the wrong prediction.
+* `pipeline_disagreement`: When at least one of the pipelines disagrees with the others.
