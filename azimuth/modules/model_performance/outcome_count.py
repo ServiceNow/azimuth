@@ -186,7 +186,7 @@ class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
                 ),
             )
             outcomes = outcomes_mod.compute_on_dataset_split()
-            postprocessed_outcomes = [outcome_tuple[1] for outcome_tuple in outcomes]
+            postprocessed_outcomes = [outcome.postprocessed_outcome for outcome in outcomes]
             result.append(
                 OutcomeCountPerThresholdValue(
                     threshold=th,

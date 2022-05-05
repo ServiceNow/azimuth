@@ -204,7 +204,8 @@ const UtterancesTable: React.FC<Props> = ({
   };
 
   const renderOutcome = ({ row }: GridCellParams<undefined, Row>) =>
-    row.modelPrediction && outcomeIcon(row.modelPrediction.outcome);
+    row.modelPrediction &&
+    outcomeIcon(row.modelPrediction.postprocessedOutcome);
 
   const renderSmartTags = ({ row }: GridCellParams<undefined, Row>) => (
     <HoverableDataCell>

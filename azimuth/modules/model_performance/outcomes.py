@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 from numpy import ndarray
@@ -12,7 +12,7 @@ from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.modules.task_execution import get_task_result
 from azimuth.types import DatasetColumn, SupportedMethod
-from azimuth.types.outcomes import OutcomeName
+from azimuth.types.outcomes import OutcomeName, OutcomeResponse
 from azimuth.types.task import PredictionResponse
 from azimuth.utils.validation import assert_not_none
 
@@ -25,14 +25,14 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
         "pipeline_index",
     }
 
-    def _compute_outcome(self, prediction: int, label: int) -> OutcomeName:
-        dm = self.get_dataset_split_manager()
+    @classmethod
+    def compute_outcome(cls, prediction: int, label: int, rejection_class_idx) -> OutcomeName:
         if prediction == label:
-            if label == dm.rejection_class_idx:
+            if label == rejection_class_idx:
                 return OutcomeName.CorrectAndRejected
             else:
                 return OutcomeName.CorrectAndPredicted
-        elif prediction == dm.rejection_class_idx:
+        elif prediction == rejection_class_idx:
             return OutcomeName.IncorrectAndRejected
         else:
             return OutcomeName.IncorrectAndPredicted
@@ -59,32 +59,37 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
 
         return predictions
 
-    def compute_on_dataset_split(self) -> List[Tuple[OutcomeName, OutcomeName]]:  # type: ignore
+    def compute_on_dataset_split(self) -> List[OutcomeResponse]:  # type: ignore
         """Compute outcomes for a set of predictions, both with and without postprocessing.
 
         Returns:
             List of tuple for each utterance with the model outcome and the postprocessed outcome.
 
         """
+        dm = self.get_dataset_split_manager()
         ds = assert_not_none(self.get_dataset_split())
         labels = ds["label"]
 
         model_predictions = self._get_predictions(without_postprocessing=True)
         model_outcomes: List[OutcomeName] = [
-            self._compute_outcome(y_pred, label) for y_pred, label in zip(model_predictions, labels)
+            self.compute_outcome(y_pred, label, dm.rejection_class_idx)
+            for y_pred, label in zip(model_predictions, labels)
         ]
 
         postprocessed_predictions = self._get_predictions(without_postprocessing=False)
         postprocessed_outcomes: List[OutcomeName] = [
-            self._compute_outcome(y_pred, label)
+            self.compute_outcome(y_pred, label, dm.rejection_class_idx)
             for y_pred, label in zip(postprocessed_predictions, labels)
         ]
 
-        return list(zip(model_outcomes, postprocessed_outcomes))
+        return [
+            OutcomeResponse(
+                model_outcome=model_outcome, postprocessed_outcome=postprocessed_outcome
+            )
+            for model_outcome, postprocessed_outcome in zip(model_outcomes, postprocessed_outcomes)
+        ]
 
-    def _save_result(  # type: ignore
-        self, res: List[Tuple[OutcomeName, OutcomeName]], dm: DatasetSplitManager
-    ):
+    def _save_result(self, res: List[OutcomeResponse], dm: DatasetSplitManager):  # type: ignore
         """Save the outcomes in the dataset_split.
 
         Args:
@@ -93,10 +98,12 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
         """
         table_key = assert_not_none(self._get_table_key())
         dm.add_column_to_prediction_table(
-            DatasetColumn.model_outcome, [outcomes[0] for outcomes in res], table_key=table_key
+            DatasetColumn.model_outcome,
+            [outcomes.model_outcome for outcomes in res],
+            table_key=table_key,
         )
         dm.add_column_to_prediction_table(
             DatasetColumn.postprocessed_outcome,
-            [outcomes[1] for outcomes in res],
+            [outcomes.postprocessed_outcome for outcomes in res],
             table_key=table_key,
         )

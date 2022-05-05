@@ -20,7 +20,7 @@ from azimuth.modules.model_performance.outcome_count import (
 from azimuth.modules.model_performance.outcomes import OutcomesModule
 from azimuth.plots.ece import make_ece_figure
 from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
-from azimuth.types.outcomes import OutcomeName
+from azimuth.types.outcomes import OutcomeName, OutcomeResponse
 from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
 from tests.utils import save_outcomes, save_predictions
 
@@ -84,12 +84,30 @@ def test_outcomes(file_text_config_no_intent):
     # Outcome determined from the values in sample_predictions_top1.csv
     # Results are the same with and without postprocessing with File-based.
     assert res == [
-        (OutcomeName.CorrectAndRejected, OutcomeName.CorrectAndRejected),
-        (OutcomeName.CorrectAndRejected, OutcomeName.CorrectAndRejected),
-        (OutcomeName.CorrectAndPredicted, OutcomeName.CorrectAndPredicted),
-        (OutcomeName.IncorrectAndPredicted, OutcomeName.IncorrectAndPredicted),
-        (OutcomeName.CorrectAndRejected, OutcomeName.CorrectAndRejected),
-        (OutcomeName.IncorrectAndRejected, OutcomeName.IncorrectAndRejected),
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndRejected,
+            postprocessed_outcome=OutcomeName.CorrectAndRejected,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndRejected,
+            postprocessed_outcome=OutcomeName.CorrectAndRejected,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndPredicted,
+            postprocessed_outcome=OutcomeName.CorrectAndPredicted,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.IncorrectAndPredicted,
+            postprocessed_outcome=OutcomeName.IncorrectAndPredicted,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndRejected,
+            postprocessed_outcome=OutcomeName.CorrectAndRejected,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.IncorrectAndRejected,
+            postprocessed_outcome=OutcomeName.IncorrectAndRejected,
+        ),
     ]
 
 

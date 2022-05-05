@@ -118,7 +118,7 @@ export interface components {
     AzimuthConfig: {
       name?: string;
       dataset: components["schemas"]["CustomObject"];
-      model_contract: components["schemas"]["SupportedModelContract"];
+      model_contract?: components["schemas"]["SupportedModelContract"];
       columns?: components["schemas"]["ColumnConfiguration"];
       rejection_class?: string;
       artifact_path?: string;
@@ -369,7 +369,8 @@ export interface components {
       postprocessedPrediction: string;
       modelConfidences: number[];
       postprocessedConfidences: number[];
-      outcome: components["schemas"]["OutcomeName"];
+      modelOutcome: components["schemas"]["OutcomeName"];
+      postprocessedOutcome: components["schemas"]["OutcomeName"];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -846,6 +847,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        without_postprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -901,6 +903,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        without_postprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -992,6 +995,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        without_postprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -1033,7 +1037,6 @@ export interface operations {
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
-        pipelineIndex?: number;
       };
     };
     responses: {
@@ -1061,6 +1064,7 @@ export interface operations {
         indices?: number[];
         sort?: components["schemas"]["UtterancesSortableColumn"];
         descending?: boolean;
+        without_postprocessing?: boolean;
         confidenceMin?: number;
         confidenceMax?: number;
         labels?: string[];
@@ -1255,6 +1259,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        without_postprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -1288,6 +1293,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        without_postprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;

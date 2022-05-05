@@ -10,6 +10,11 @@ from azimuth.types import DatasetColumn, DatasetFilters, NamedDatasetFilters
 from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
 
 
+def verify_column_is_present(column_name: str, dataset_split: Dataset):
+    if column_name not in dataset_split.column_names:
+        raise ValueError(f"{column_name} not in dataset_split's column names")
+
+
 def filter_dataset_split(
     dataset_split: Dataset,
     filters: Union[DatasetFilters, NamedDatasetFilters],
@@ -37,16 +42,15 @@ def filter_dataset_split(
             if without_postprocessing
             else DatasetColumn.postprocessed_confidences
         )
+        verify_column_is_present(confidence_column, dataset_split)
         dataset_split = dataset_split.filter(
             lambda x: filters.confidence_min <= x[confidence_column][0] <= filters.confidence_max
         )
     if len(filters.labels) > 0:
-        if config.columns.label not in dataset_split.column_names:
-            raise ValueError("label not in dataset_split's column names")
+        verify_column_is_present(config.columns.label, dataset_split)
         dataset_split = dataset_split.filter(lambda x: x[config.columns.label] in filters.labels)
     if filters.utterance is not None:
-        if config.columns.text_input not in dataset_split.column_names:
-            raise ValueError("Text must be in column named utterance")
+        verify_column_is_present(config.columns.text_input, dataset_split)
         by = filters.utterance.lower()
         dataset_split = dataset_split.filter(lambda x: by in x[config.columns.text_input].lower())
     if len(filters.predictions) > 0:
@@ -55,8 +59,7 @@ def filter_dataset_split(
             if without_postprocessing
             else DatasetColumn.postprocessed_prediction
         )
-        if prediction_column not in dataset_split.column_names:
-            raise ValueError(f"{prediction_column} not in dataset_split's column names")
+        verify_column_is_present(prediction_column, dataset_split)
         if without_postprocessing:
             dataset_split = dataset_split.filter(
                 lambda x: x[DatasetColumn.model_predictions][0] in filters.predictions
@@ -79,6 +82,7 @@ def filter_dataset_split(
             if without_postprocessing
             else DatasetColumn.postprocessed_outcome
         )
+        verify_column_is_present(outcome_column, dataset_split)
         # We do OR for outcomes.
         dataset_split = dataset_split.filter(lambda x: x[outcome_column] in filters.outcomes)
     if len(filters.smart_tags) > 0:
