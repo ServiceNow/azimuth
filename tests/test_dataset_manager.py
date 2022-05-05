@@ -127,8 +127,9 @@ def test_to_csv(text_dm_with_tags, simple_table_key):
         < index[DatasetColumn.postprocessed_prediction]
         < index[DatasetColumn.model_confidences]
         < index[DatasetColumn.postprocessed_confidences]
+        < index[DatasetColumn.model_outcome]
+        < index[DatasetColumn.postprocessed_outcome]
         < index[DatasetColumn.confidence_bin_idx]
-        < index[DatasetColumn.outcome]
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()
 

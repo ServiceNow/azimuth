@@ -18,7 +18,7 @@ from azimuth.modules.model_performance.confidence_binning import (
     ConfidenceHistogramModule,
 )
 from azimuth.plots.ece import make_ece_figure
-from azimuth.types import DatasetColumn, DatasetFilters, ModuleOptions
+from azimuth.types import DatasetColumn, DatasetFilters
 from azimuth.types.model_performance import (
     MetricsAPIResponse,
     MetricsModuleResponse,
@@ -51,27 +51,6 @@ def first_value(di: Optional[Dict]) -> Optional[float]:
     return next(iter(di.values()), None)
 
 
-def make_probabilities(dataset: Dataset, num_classes: int) -> np.ndarray:
-    """Make probabilities from dataset columns.
-
-    Args:
-        dataset: Dataset holding predictions and confidence.
-        num_classes: Number of classes
-
-    Returns:
-        Array with shape [len(dataset), num_classes] with probabilities.
-    """
-    probs = np.zeros([len(dataset), num_classes])
-    for idx, (confidences, predictions) in enumerate(
-        zip(
-            dataset[DatasetColumn.postprocessed_confidences],
-            dataset[DatasetColumn.model_predictions],
-        )
-    ):
-        probs[idx] = np.array(confidences)[predictions]
-    return probs
-
-
 class MetricsModule(FilterableModule[ModelContractConfig]):
     """Computes different metrics on each dataset split."""
 
@@ -83,16 +62,14 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
             return [BASE_RESPONSE]
 
         utterance_count = len(indices)
-        outcome_count = Counter(ds[DatasetColumn.outcome])
+        outcome_count = Counter(self._get_outcomes_from_ds())
         outcome_count.update({outcome: 0 for outcome in ALL_OUTCOMES})
 
         # Compute ECE
         conf_hist_mod = ConfidenceHistogramModule(
             dataset_split_name=self.dataset_split_name,
             config=self.config,
-            mod_options=ModuleOptions(
-                filters=self.mod_options.filters, pipeline_index=self.mod_options.pipeline_index
-            ),
+            mod_options=self.mod_options,
         )
         bins = conf_hist_mod.compute_on_dataset_split()[0].details_all_bins
         ece, acc, expected = compute_ece_from_bins(bins)
@@ -109,9 +86,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
             )
             accept_probabilities = "probabilities" in inspect.signature(met._compute).parameters
             extra_kwargs = (
-                dict(probabilities=make_probabilities(ds, dm.get_num_classes(labels_only=True)))
-                if accept_probabilities
-                else {}
+                dict(probabilities=self.make_probabilities()) if accept_probabilities else {}
             )
             extra_kwargs.update(metric_obj_def.additional_kwargs)
             with warnings.catch_warnings():
@@ -121,7 +96,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
                 metric_values[metric_name] = assert_not_none(
                     first_value(
                         met.compute(
-                            predictions=ds["postprocessed_prediction"],
+                            predictions=self._get_predictions_from_ds(),
                             references=ds[self.config.columns.label],
                             **extra_kwargs,
                         )
@@ -157,6 +132,25 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
         fig = plot_args and json.loads(make_ece_figure(*plot_args).to_json())
         res_with_plot = MetricsAPIResponse(**metrics_res.dict(), ece_plot=fig)
         return [res_with_plot]
+
+    def make_probabilities(self) -> np.ndarray:
+        """Make probabilities from dataset columns.
+
+        Returns:
+            Array with shape [len(dataset), num_classes] with probabilities.
+        """
+        ds = self.get_dataset_split()
+        num_classes = self.get_dataset_split_manager().get_num_classes(labels_only=True)
+
+        probs = np.zeros([len(ds), num_classes])
+        for idx, (confidences, predictions) in enumerate(
+            zip(
+                self._get_confidences_from_ds(),
+                ds[DatasetColumn.model_predictions],
+            )
+        ):
+            probs[idx] = np.array(confidences)[predictions]
+        return probs
 
 
 class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):

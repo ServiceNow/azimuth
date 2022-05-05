@@ -1,5 +1,7 @@
 from enum import Enum
 
+from azimuth.types import AliasModel
+
 
 class OutcomeName(str, Enum):
     CorrectAndPredicted = "CorrectAndPredicted"
@@ -14,3 +16,8 @@ ALL_OUTCOMES = [
     OutcomeName.IncorrectAndPredicted,
     OutcomeName.IncorrectAndRejected,
 ]
+
+
+class OutcomeResponse(AliasModel):
+    model_outcome: OutcomeName
+    postprocessed_outcome: OutcomeName

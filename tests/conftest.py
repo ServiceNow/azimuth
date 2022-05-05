@@ -19,6 +19,7 @@ from azimuth.config import (
 )
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager
+from azimuth.modules.model_performance.outcomes import OutcomesModule
 from azimuth.modules.task_mapping import model_contract_methods, modules
 from azimuth.startup import START_UP_THREAD_NAME
 from azimuth.task_manager import TaskManager
@@ -188,6 +189,14 @@ def simple_text_config_high_threshold(tmp_path):
 
 
 @pytest.fixture
+def simple_text_config_with_postprocessors(simple_text_config):
+    simple_text_config_postprocessors = simple_text_config.copy(deep=True)
+    simple_text_config_postprocessors.pipelines[0].postprocessors[-1].threshold = 0.7
+    simple_text_config_postprocessors.pipelines[0].postprocessors[0].temperature = 3
+    return simple_text_config_postprocessors
+
+
+@pytest.fixture
 def simple_text_config_no_train(tmp_path):
     config = deepcopy(DATASET_CFG)
     config["kwargs"]["train"] = False
@@ -206,19 +215,17 @@ def simple_text_config_no_train(tmp_path):
 
 
 @pytest.fixture
-def tiny_text_config(tmp_path):
-    return AzimuthConfig(
-        name="sentiment-analysis",
-        dataset=TINY_DATASET_CFG,
-        pipelines=[MODEL_CFG],
-        artifact_path=str(tmp_path),
-        batch_size=10,
-        use_cuda="auto",
-        model_contract="hf_text_classification",
-        saliency_layer="distilbert.embeddings.word_embeddings",
-        rejection_class=None,
-        behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
-    )
+def tiny_text_config(simple_text_config):
+    tiny_cfg = simple_text_config.copy(deep=True, update=dict(dataset=TINY_DATASET_CFG))
+    return tiny_cfg
+
+
+@pytest.fixture
+def tiny_text_config_postprocessors(tiny_text_config):
+    tiny_cfg_postprocessors = tiny_text_config.copy(deep=True)
+    tiny_cfg_postprocessors.pipelines[0].postprocessors[-1].threshold = 0.9
+    tiny_cfg_postprocessors.pipelines[0].postprocessors[0].temperature = 3
+    return tiny_cfg_postprocessors
 
 
 @pytest.fixture
@@ -227,43 +234,35 @@ def a_text_dataset():
 
 
 @pytest.fixture
-def text_dm_with_tags(simple_text_config):
-    ds = load_dataset_from_config(simple_text_config)[DatasetSplitName.eval]
-    # Some prediction
+def text_dm_with_tags(simple_text_config_with_postprocessors):
+    ds = load_dataset_from_config(simple_text_config_with_postprocessors)[DatasetSplitName.eval]
     ds = ds.map(
         lambda x, i: {
-            DatasetColumn.model_predictions: [i % 2],
-            DatasetColumn.model_confidences: [i / len(ds)],
-            DatasetColumn.postprocessed_confidences: [i / len(ds)],
+            DatasetColumn.model_predictions: [i % 2, 1 - i % 2],
+            DatasetColumn.model_confidences: [i / len(ds), 1 - i / len(ds)],
+            # 0.9 simulates temperature scaling
+            DatasetColumn.postprocessed_confidences: [0.9 * (i / len(ds)), 1 - 0.9 * (i / len(ds))],
             DatasetColumn.confidence_bin_idx: np.random.randint(1, 20),
         },
         with_indices=True,
     )
 
-    def compute_outcome(prediction, label):
-        if prediction == label:
-            if prediction > simple_text_config.pipelines[0].threshold:
-                return OutcomeName.CorrectAndPredicted
-            else:
-                return OutcomeName.CorrectAndRejected
-        elif prediction <= simple_text_config.pipelines[0].threshold:
-            return OutcomeName.IncorrectAndRejected
-        else:
-            return OutcomeName.IncorrectAndPredicted
-
     ds = ds.map(
         lambda x: {
             DatasetColumn.postprocessed_prediction: x[DatasetColumn.model_predictions][0]
             if x[DatasetColumn.postprocessed_confidences][0]
-            > simple_text_config.pipelines[0].threshold
+            > simple_text_config_with_postprocessors.pipelines[0].threshold
             else -1,
-            DatasetColumn.outcome: compute_outcome(
-                x[DatasetColumn.postprocessed_confidences][0], x["label"]
-            ),
         }
     )
     ds = ds.map(
         lambda x: {
+            DatasetColumn.model_outcome: OutcomesModule.compute_outcome(
+                x[DatasetColumn.model_predictions][0], x["label"], -1
+            ),
+            DatasetColumn.postprocessed_outcome: OutcomesModule.compute_outcome(
+                x[DatasetColumn.postprocessed_prediction], x["label"], -1
+            ),
             DatasetColumn.neighbors_train: [
                 [np.random.randint(1, 1000), np.random.rand()] for i in range(0, 20)
             ],
@@ -275,7 +274,7 @@ def text_dm_with_tags(simple_text_config):
 
     dm = DatasetSplitManager(
         DatasetSplitName.eval,
-        simple_text_config,
+        simple_text_config_with_postprocessors,
         initial_tags=ALL_STANDARD_TAGS,
         initial_prediction_tags=ALL_PREDICTION_TAGS,
         dataset_split=ds,
@@ -366,7 +365,7 @@ def apply_mocked_startup_task(simple_text_config):
             (DatasetColumn.model_confidences, lambda: [0.4, 0.6]),
             (DatasetColumn.postprocessed_confidences, lambda: [0.4, 0.6]),
             (DatasetColumn.token_count, lambda: np.random.randint(5, 12)),
-            (DatasetColumn.outcome, lambda: random.choice([r for r in OutcomeName])),
+            (DatasetColumn.postprocessed_outcome, lambda: random.choice([r for r in OutcomeName])),
         ]
         dms = load_dataset_split_managers_from_config(config)
         for dm in dms.values():

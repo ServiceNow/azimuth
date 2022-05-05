@@ -10,64 +10,86 @@ from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
+from azimuth.modules.task_execution import get_task_result
 from azimuth.types import DatasetColumn, SupportedMethod
-from azimuth.types.outcomes import OutcomeName
+from azimuth.types.outcomes import OutcomeName, OutcomeResponse
+from azimuth.types.task import PredictionResponse
 from azimuth.utils.validation import assert_not_none
 
 
 class OutcomesModule(DatasetResultModule[ModelContractConfig]):
     """Computes the outcome for each utterance in the dataset split."""
 
-    allowed_mod_options = DatasetResultModule.allowed_mod_options | {"threshold", "pipeline_index"}
+    allowed_mod_options = DatasetResultModule.allowed_mod_options | {
+        "threshold",
+        "pipeline_index",
+    }
 
-    def _compute_outcome(self, prediction: int, label: int) -> OutcomeName:
-        dm = self.get_dataset_split_manager()
+    @classmethod
+    def compute_outcome(cls, prediction: int, label: int, rejection_class_idx) -> OutcomeName:
         if prediction == label:
-            if label == dm.rejection_class_idx:
+            if label == rejection_class_idx:
                 return OutcomeName.CorrectAndRejected
             else:
                 return OutcomeName.CorrectAndPredicted
-        elif prediction == dm.rejection_class_idx:
+        elif prediction == rejection_class_idx:
             return OutcomeName.IncorrectAndRejected
         else:
             return OutcomeName.IncorrectAndPredicted
 
-    def _get_postprocessed_predictions(self) -> ndarray:
+    def _get_predictions(self, without_postprocessing: bool) -> ndarray:
         mod_options = self.mod_options.copy(deep=True)
         mod_options.model_contract_method_name = SupportedMethod.PostProcess
         mod_options.indices = self.get_indices()
-        postprocessing_task = model_contract_task_mapping(
+        prediction_task = model_contract_task_mapping(
             dataset_split_name=self.dataset_split_name,
             config=self.config,
             mod_options=mod_options,
         )
-        postprocessed_predictions = postprocessing_task.compute_on_dataset_split()
+        pred_result = get_task_result(
+            task_module=prediction_task, result_type=List[PredictionResponse]
+        )
 
         predictions = np.zeros(len(mod_options.indices))
-        for idx, pred in enumerate(postprocessed_predictions):
-            predictions[idx] = pred.postprocessed_output.preds
+        for idx, pred in enumerate(pred_result):
+            if without_postprocessing:
+                predictions[idx] = pred.model_output.preds
+            else:
+                predictions[idx] = pred.postprocessed_output.preds
 
         return predictions
 
-    def compute_on_dataset_split(self) -> List[OutcomeName]:  # type: ignore
-        """Compute outcomes for a set of predictions.
+    def compute_on_dataset_split(self) -> List[OutcomeResponse]:  # type: ignore
+        """Compute outcomes for a set of predictions, both with and without postprocessing.
 
         Returns:
-            List of outcomes for each utterance in the dataset split.
+            List of tuple for each utterance with the model outcome and the postprocessed outcome.
 
         """
+        dm = self.get_dataset_split_manager()
         ds = assert_not_none(self.get_dataset_split())
-        postprocessed_predictions = self._get_postprocessed_predictions()
         labels = ds["label"]
 
-        outcomes_list: List[OutcomeName] = [
-            self._compute_outcome(y_pred, label)
+        model_predictions = self._get_predictions(without_postprocessing=True)
+        model_outcomes: List[OutcomeName] = [
+            self.compute_outcome(y_pred, label, dm.rejection_class_idx)
+            for y_pred, label in zip(model_predictions, labels)
+        ]
+
+        postprocessed_predictions = self._get_predictions(without_postprocessing=False)
+        postprocessed_outcomes: List[OutcomeName] = [
+            self.compute_outcome(y_pred, label, dm.rejection_class_idx)
             for y_pred, label in zip(postprocessed_predictions, labels)
         ]
 
-        return outcomes_list
+        return [
+            OutcomeResponse(
+                model_outcome=model_outcome, postprocessed_outcome=postprocessed_outcome
+            )
+            for model_outcome, postprocessed_outcome in zip(model_outcomes, postprocessed_outcomes)
+        ]
 
-    def _save_result(self, res: List[OutcomeName], dm: DatasetSplitManager):  # type: ignore
+    def _save_result(self, res: List[OutcomeResponse], dm: DatasetSplitManager):  # type: ignore
         """Save the outcomes in the dataset_split.
 
         Args:
@@ -75,4 +97,13 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
             dm: the dataset_split manager used to get `res`.
         """
         table_key = assert_not_none(self._get_table_key())
-        dm.add_column_to_prediction_table(DatasetColumn.outcome, res, table_key=table_key)
+        dm.add_column_to_prediction_table(
+            DatasetColumn.model_outcome,
+            [outcomes.model_outcome for outcomes in res],
+            table_key=table_key,
+        )
+        dm.add_column_to_prediction_table(
+            DatasetColumn.postprocessed_outcome,
+            [outcomes.postprocessed_outcome for outcomes in res],
+            table_key=table_key,
+        )

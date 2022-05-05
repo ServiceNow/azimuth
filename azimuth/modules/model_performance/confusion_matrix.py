@@ -9,7 +9,6 @@ from sklearn.metrics import confusion_matrix
 
 from azimuth.config import ModelContractConfig
 from azimuth.modules.base_classes import FilterableModule
-from azimuth.types import DatasetColumn
 from azimuth.types.model_performance import ConfusionMatrixResponse
 from azimuth.utils.validation import assert_not_none
 
@@ -26,7 +25,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
         """
         ds: Dataset = assert_not_none(self.get_dataset_split())
         predictions, labels = (
-            ds[DatasetColumn.postprocessed_prediction],
+            self._get_predictions_from_ds(),
             ds[self.config.columns.label],
         )
         ds_mng = self.get_dataset_split_manager()
