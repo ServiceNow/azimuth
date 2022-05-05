@@ -24,7 +24,7 @@ from azimuth.types import (
     SupportedTask,
 )
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import DataAction, SmartTag
+from azimuth.types.tag import DataAction, SmartTag, SmartTagFamily
 from azimuth.utils.project import predictions_available
 
 
@@ -39,7 +39,15 @@ def build_named_dataset_filters(
     confidence_max: float = Query(1, title="Maximum confidence", alias="confidenceMax"),
     labels: List[str] = Query([], title="Label"),
     predictions: List[str] = Query([], title="Prediction"),
-    smart_tags: List[SmartTag] = Query([], title="Smart tags", alias="smartTags"),
+    almost_correct: List[SmartTag] = Query([], title="Almost Correct", alias="almostCorrect"),
+    perturbation_testing: List[SmartTag] = Query(
+        [], title="Perturbation Testing", alias="perturbationTesting"
+    ),
+    similarity: List[SmartTag] = Query([], title="Similarity"),
+    uncertainty_estimation: List[SmartTag] = Query(
+        [], title="Uncertainty Estimation", alias="uncertaintyEstimation"
+    ),
+    syntactic: List[SmartTag] = Query([], title="Syntactic"),
     data_actions: List[DataAction] = Query([], title="Data action tags", alias="dataActions"),
     outcomes: List[OutcomeName] = Query([], title="Outcomes", alias="outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
@@ -51,7 +59,11 @@ def build_named_dataset_filters(
         confidence_max: The desired maximum confidence
         labels: The desired class labels
         predictions: The desired class predictions
-        smart_tags: The desired smart tags
+        almost_correct: The desired `almost_correct` smart tags
+        perturbation_testing: The desired `perturbation_testing` smart tags
+        similarity: The desired `similarity` smart tags
+        uncertainty_estimation: The desired `uncertainty_estimation` smart tags
+        syntactic: The desired `syntactic` smart tags
         data_actions: The desired data_action tags
         outcomes: The desired outcomes
         utterance: The substring desired in each utterance
@@ -65,7 +77,13 @@ def build_named_dataset_filters(
         confidence_max=confidence_max,
         labels=labels,
         predictions=predictions,
-        smart_tags=smart_tags,
+        smart_tags={
+            SmartTagFamily.syntactic: syntactic,
+            SmartTagFamily.almost_correct: almost_correct,
+            SmartTagFamily.perturbation_testing: perturbation_testing,
+            SmartTagFamily.similarity: similarity,
+            SmartTagFamily.uncertainty_estimation: uncertainty_estimation,
+        },
         data_actions=data_actions,
         utterance=utterance,
         outcomes=outcomes,
