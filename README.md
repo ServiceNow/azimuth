@@ -5,10 +5,13 @@
   <br>
   <a href="https://servicenow.github.io/azimuth">
     <img alt="Documentation" src="https://github.com/ServiceNow/azimuth/actions/workflows/docs_cd.yml/badge.svg"/></a>
-  <a href="./LICENSE">
-    <img alt="Licence" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
   <a href="https://github.com/ServiceNow/azimuth/actions/workflows/pythonci.yml">
     <img alt="Tests" src="https://github.com/ServiceNow/azimuth/actions/workflows/pythonci.yml/badge.svg"/></a>
+  <a href="./LICENSE">
+    <img alt="Licence" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
+  <a href="https://doi.org/10.5281/zenodo.6511558">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6511558.svg" alt="DOI"></a>
+
   <br>
   <br>
   Azimuth, an open-source dataset and error analysis tool for text classification, with love from ServiceNow.
@@ -105,6 +108,31 @@ add other `README` files in appropriate places, and don't forget to edit them if
 └── runner.py # Application entrypoint.
 ```
 
-# License
+## License
 
 The package is licensed by ServiceNow, Inc. under the Apache 2.0 license. See [LICENSE](LICENSE) for more details.
+
+## Citation
+
+If you have used Azimuth in your projects, you can use the following citation:
+
+```
+@software{azimuth_2022,
+  author    = {Branchaud-Charron, Frederic and
+               Gauthier-Melancon, Gabrielle and
+               Marinier, Joseph and
+               Brin, Lindsay and
+               Tyler, Chris and
+               Le, Di and
+               Grande, Karine and
+               Babu, Nandhini},
+  title     = {{Azimuth, an open-source dataset and error analysis
+                tool for text classification}},
+  month     = may,
+  year      = 2022,
+  publisher = {Zenodo},
+  version   = {2.0.0},
+  doi       = {10.5281/zenodo.6511558},
+  url       = {https://doi.org/10.5281/zenodo.6511558}
+}
+```

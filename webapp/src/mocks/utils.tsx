@@ -13,7 +13,7 @@ export function renderWithRouterAndRedux(
     path = "/",
     route = "/",
     history = createMemoryHistory({ initialEntries: [route] }),
-  }: { path: string; route: string; history?: any }
+  }: { path?: string; route?: string; history?: any } = {}
 ) {
   return {
     ...render(

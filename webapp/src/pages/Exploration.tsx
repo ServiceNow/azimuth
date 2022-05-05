@@ -45,6 +45,8 @@ const Exploration = () => {
     datasetSplitName: DatasetSplitName;
     mainView: MainView;
   }>();
+  const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
+
   const { filters, pagination, pipeline, searchString } = useQueryState();
 
   const history = useHistory();
@@ -115,7 +117,9 @@ const Exploration = () => {
                       pipeline={pipeline}
                     />
                     <ConfidenceHistogramTopWords
+                      baseUrl={baseUrl}
                       filters={filters}
+                      pagination={pagination}
                       pipeline={pipeline}
                     />
                   </>

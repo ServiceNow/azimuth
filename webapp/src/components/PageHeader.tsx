@@ -3,6 +3,7 @@ import {
   Box,
   Breadcrumbs,
   IconButton,
+  Link,
   MenuItem,
   Select,
   Typography,
@@ -10,7 +11,12 @@ import {
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
-import { Link, useHistory, useLocation, useParams } from "react-router-dom";
+import {
+  Link as RouterLink,
+  useHistory,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import { constructSearchString } from "utils/helpers";
@@ -27,13 +33,6 @@ const useStyles = makeStyles((theme) => ({
   label: {
     fontWeight: "bold",
     marginRight: theme.spacing(1),
-  },
-  jobSelector: {
-    textDecoration: "underline",
-  },
-  link: {
-    textDecoration: "underline !important",
-    color: "unset",
   },
 }));
 
@@ -122,7 +121,7 @@ const PageHeader = () => {
             </Typography>
           ) : (
             <Link
-              className={classes.link}
+              component={RouterLink}
               key={name}
               to={`${pathname}${searchString}`}
             >
@@ -133,7 +132,6 @@ const PageHeader = () => {
     [
       jobId,
       utteranceId,
-      classes,
       datasetSplitName,
       mainView,
       location.pathname,
@@ -174,7 +172,7 @@ const PageHeader = () => {
               </>
             )}
             <IconButton
-              component={Link}
+              component={RouterLink}
               size="small"
               color="primary"
               to={`/${jobId}/settings${searchString}`}
