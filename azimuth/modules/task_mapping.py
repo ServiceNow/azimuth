@@ -16,6 +16,7 @@ from azimuth.modules.model_performance import (
     metrics,
     outcome_count,
 )
+from azimuth.modules.pipeline_comparison import prediction_comparison
 from azimuth.modules.utilities import validation
 from azimuth.modules.word_analysis import tokens_to_words, top_words
 from azimuth.types import SupportedMethod, SupportedModule
@@ -46,6 +47,7 @@ modules = {
     SupportedModule.PerturbationTestingMerged: perturbation_testing.PerturbationTestingMergedModule,
     SupportedModule.PerturbationTestingSummary:
         perturbation_testing.PerturbationTestingSummaryModule,
+    SupportedModule.PredictionComparison: prediction_comparison.PredictionComparisonModule,
     SupportedModule.SpectralClustering: spectral_clustering.SpectralClusteringModule,
     SupportedModule.SyntaxTagging: syntax_tagging.SyntaxTaggingModule,
     SupportedModule.TokensToWords: tokens_to_words.TokensToWordsModule,
