@@ -27,7 +27,13 @@ from azimuth.types import (
     SupportedMethod,
 )
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
+from azimuth.types.tag import (
+    ALL_DATA_ACTIONS,
+    ALL_SMART_TAGS,
+    SMART_TAGS_FAMILY_MAPPING,
+    DataAction,
+    SmartTag,
+)
 
 
 def test_metrics(simple_text_config):
@@ -223,7 +229,12 @@ def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
         sum([mf_v.utterance_count for mf_v in family_tags]) == ds_len
         for family_tags in smart_tag_metrics.values()
     )
-    assert len(smart_tag_metrics) == len(ALL_SMART_TAGS)
+    assert len(smart_tag_metrics) == len(SMART_TAGS_FAMILY_MAPPING)
+    # We have FAMILY times NO_SMART_TAG + all smart tags
+    assert (
+        sum(len(smt) for smt in smart_tag_metrics.values())
+        == len(ALL_SMART_TAGS) + len(SMART_TAGS_FAMILY_MAPPING) - 1
+    )
 
     data_action_metrics = result.metrics_per_filter.data_action
     assert sum([mf_v.utterance_count for mf_v in data_action_metrics]) == ds_len

@@ -36,7 +36,9 @@ class UtteranceCountPerFilter(AliasModel):
         ..., title="Prediction", nullable=True
     )
     label: List[UtteranceCountPerFilterValue] = Field(..., title="Label")
-    smart_tag: Dict[SmartTagFamily, UtteranceCountPerFilterValue] = Field(..., title="Smart tag")
+    smart_tag: Dict[SmartTagFamily, List[UtteranceCountPerFilterValue]] = Field(
+        ..., title="Smart tag"
+    )
     data_action: List[UtteranceCountPerFilterValue] = Field(..., title="Data action tag")
     outcome: Optional[List[UtteranceCountPerFilterValue]] = Field(
         ..., title="Outcome", nullable=True
@@ -55,7 +57,9 @@ class OutcomeCountPerFilterValue(UtteranceCountPerFilterValue):
 class OutcomeCountPerFilter(AliasModel):
     prediction: List[OutcomeCountPerFilterValue] = Field(..., title="Prediction")
     label: List[OutcomeCountPerFilterValue] = Field(..., title="Label")
-    smart_tag: Dict[SmartTagFamily, OutcomeCountPerFilterValue] = Field(..., title="Smart tag")
+    smart_tag: Dict[SmartTagFamily, List[OutcomeCountPerFilterValue]] = Field(
+        ..., title="Smart tag"
+    )
     data_action: List[OutcomeCountPerFilterValue] = Field(..., title="Data action tag")
     outcome: List[OutcomeCountPerFilterValue] = Field(..., title="Outcome")
 

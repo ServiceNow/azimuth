@@ -7,7 +7,13 @@ import pytest
 
 from azimuth.types import DatasetColumn, DatasetFilters
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import ALL_SMART_TAGS, DataAction, SmartTag
+from azimuth.types.tag import (
+    ALL_SMART_TAGS,
+    SMART_TAGS_FAMILY_MAPPING,
+    DataAction,
+    SmartTag,
+    SmartTagFamily,
+)
 from azimuth.utils.filtering import filter_dataset_split
 
 
@@ -27,7 +33,9 @@ def test_dataset_filtering(text_dm_with_tags, simple_text_config, simple_table_k
     assert filtered_len(DatasetFilters(labels=[0])) == 22
     assert filtered_len(DatasetFilters(data_actions=[DataAction.relabel])) == 1
     assert filtered_len(DatasetFilters(outcomes=[OutcomeName.IncorrectAndRejected])) == 22
-    assert filtered_len(DatasetFilters(smart_tags=[SmartTag.short])) == 1
+    assert (
+        filtered_len(DatasetFilters(smart_tags={SmartTagFamily.syntactic: [SmartTag.short]})) == 1
+    )
     assert filtered_len(DatasetFilters(utterance="some")) == 2
     assert filtered_len(DatasetFilters(predictions=[1])) == 10
 
@@ -103,7 +111,17 @@ def test_dataset_filtering_multi(text_dm_with_tags, simple_table_key):
     assert num_rejection_class == len(ds_filtered)
 
 
-def test_dataset_filtering_no_smart_tag(text_dm_with_tags, simple_table_key):
+@pytest.mark.parametrize(
+    "family",
+    [
+        SmartTagFamily.syntactic,
+        SmartTagFamily.similarity,
+        SmartTagFamily.perturbation_testing,
+        SmartTagFamily.almost_correct,
+        SmartTagFamily.uncertainty_estimation,
+    ],
+)
+def test_dataset_filtering_no_smart_tag(text_dm_with_tags, simple_table_key, family):
     # Reset all tags to False for the first utterance, to ensure that at least one row is
     # associated with no smart tags.
     [
@@ -116,11 +134,13 @@ def test_dataset_filtering_no_smart_tag(text_dm_with_tags, simple_table_key):
 
     ds_filtered = filter_dataset_split(
         text_dm_with_tags.get_dataset_split(simple_table_key),
-        DatasetFilters(smart_tags=["NO_SMART_TAGS"]),
+        DatasetFilters(smart_tags={family: ["NO_SMART_TAGS"]}),
         config=text_dm_with_tags.config,
     )
     assert len(ds_filtered) > 0
-    assert len(ds_filtered.filter(lambda x: any(x[v] for v in ALL_SMART_TAGS))) == 0
+    assert (
+        len(ds_filtered.filter(lambda x: any(x[v] for v in SMART_TAGS_FAMILY_MAPPING[family]))) == 0
+    )
 
 
 def test_dataset_filtering_confidence(text_dm_with_tags, simple_table_key):
@@ -137,16 +157,6 @@ def test_dataset_filtering_confidence(text_dm_with_tags, simple_table_key):
         )
         == 0
     )
-
-
-def test_dataset_filtering_mutually_exclusive(text_dm_with_tags, simple_table_key):
-    ds = text_dm_with_tags.get_dataset_split(simple_table_key)
-    ds_filtered = filter_dataset_split(
-        ds,
-        DatasetFilters(smart_tags=["NO_SMART_TAGS", "short_sentence"]),
-        config=text_dm_with_tags.config,
-    )
-    assert len(ds_filtered) == 0
 
 
 if __name__ == "__main__":

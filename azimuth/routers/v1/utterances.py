@@ -35,9 +35,9 @@ from azimuth.types.similarity_analysis import (
 )
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
-    ALL_PREDICTION_TAGS,
-    ALL_SMART_TAGS,
+    SMART_TAGS_FAMILY_MAPPING,
     DataAction,
+    SmartTagFamily,
 )
 from azimuth.types.utterance import (
     GetUtterancesResponse,
@@ -206,11 +206,10 @@ def get_utterances(
     else:
         model_saliencies = [None] * len(ds)
 
-    available_tags = (
-        ALL_SMART_TAGS
-        if pipeline_index is not None
-        else set(ALL_SMART_TAGS).difference(ALL_PREDICTION_TAGS)
-    )
+    if pipeline_index is not None:
+        available_families = list(SMART_TAGS_FAMILY_MAPPING.keys())
+    else:
+        available_families = [SmartTagFamily.syntactic, SmartTagFamily.similarity]
     utterances = [
         Utterance(
             index=data[DatasetColumn.row_idx],
@@ -218,7 +217,11 @@ def get_utterances(
                 (t for t, v in tag.items() if t in ALL_DATA_ACTIONS and v),
                 DataAction.no_action,
             ),
-            smart_tags=[t for t, v in tag.items() if t in available_tags and v],
+            smart_tags={
+                family: [t for t in tags_in_family if tag[t]]
+                for family, tags_in_family in SMART_TAGS_FAMILY_MAPPING.items()
+                if family in available_families
+            },
             label=data[dataset_split_manager.config.columns.label],
             utterance=data[dataset_split_manager.config.columns.text_input],
             model_prediction=model_prediction,
