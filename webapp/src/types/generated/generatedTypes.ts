@@ -118,7 +118,7 @@ export interface components {
     AzimuthConfig: {
       name?: string;
       dataset: components["schemas"]["CustomObject"];
-      model_contract: components["schemas"]["SupportedModelContract"];
+      model_contract?: components["schemas"]["SupportedModelContract"];
       columns?: components["schemas"]["ColumnConfiguration"];
       rejection_class?: string;
       artifact_path?: string;
@@ -336,7 +336,9 @@ export interface components {
     MetricsPerFilter: {
       prediction: components["schemas"]["MetricsPerFilterValue"][];
       label: components["schemas"]["MetricsPerFilterValue"][];
-      smartTag: components["schemas"]["MetricsPerFilterValue"][];
+      smartTag: {
+        [key: string]: components["schemas"]["MetricsPerFilterValue"][];
+      };
       dataAction: components["schemas"]["MetricsPerFilterValue"][];
       outcome: components["schemas"]["MetricsPerFilterValue"][];
     };
@@ -391,7 +393,9 @@ export interface components {
     OutcomeCountPerFilter: {
       prediction: components["schemas"]["OutcomeCountPerFilterValue"][];
       label: components["schemas"]["OutcomeCountPerFilterValue"][];
-      smartTag: components["schemas"]["OutcomeCountPerFilterValue"][];
+      smartTag: {
+        [key: string]: components["schemas"]["OutcomeCountPerFilterValue"][];
+      };
       dataAction: components["schemas"]["OutcomeCountPerFilterValue"][];
       outcome: components["schemas"]["OutcomeCountPerFilterValue"][];
     };
@@ -672,7 +676,7 @@ export interface components {
       index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
-      smartTags: components["schemas"]["SmartTag"][];
+      smartTags: { [key: string]: components["schemas"]["SmartTag"][] };
       dataAction: components["schemas"]["DataAction"];
       label: string;
       utterance: string;
@@ -686,7 +690,9 @@ export interface components {
         | components["schemas"]["UtteranceCountPerFilterValue"][]
         | null;
       label: components["schemas"]["UtteranceCountPerFilterValue"][];
-      smartTag: components["schemas"]["UtteranceCountPerFilterValue"][];
+      smartTag: {
+        [key: string]: components["schemas"]["UtteranceCountPerFilterValue"][];
+      };
       dataAction: components["schemas"]["UtteranceCountPerFilterValue"][];
       outcome: components["schemas"]["UtteranceCountPerFilterValue"][] | null;
     };
