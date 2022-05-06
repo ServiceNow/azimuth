@@ -69,10 +69,10 @@ def filter_dataset_split(
     if len(filters.outcomes) > 0:
         # We do OR for outcomes.
         dataset_split = dataset_split.filter(lambda x: x[DatasetColumn.outcome] in filters.outcomes)
-    if len(filters.smart_tags) > 0:
+    for family, tags_in_family in filters.smart_tags.items():
         # For each smart tag family, we do OR, but AND between families
         # If None, it is none of them.
-        for family, tags_in_family in filters.smart_tags.items():
+        if len(tags_in_family) > 0:
             tags_associated: List[SmartTag] = SMART_TAGS_FAMILY_MAPPING[family]
             dataset_split = dataset_split.filter(
                 lambda x: any(
