@@ -6,7 +6,7 @@ We follow an approach named [Git flow](https://www.atlassian.com/git/tutorials/c
 
 * `main`: Should always be working with up-to-date documentation, users will run this branch.
 * `dev`: Integrates new features, documentation can be lacking.
-* `feature/*`: Feature branch
+* `feature/*`: Feature branch than can be merged into `dev` only.
 * `hotfix/*`: Hotfix branches that can be merged into `main`.
 * `release/*`: Not used for now.
 
