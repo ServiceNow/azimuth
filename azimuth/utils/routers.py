@@ -40,8 +40,8 @@ def build_named_dataset_filters(
     labels: List[str] = Query([], title="Label"),
     predictions: List[str] = Query([], title="Prediction"),
     almost_correct: List[SmartTag] = Query([], title="Almost Correct", alias="almostCorrect"),
-    perturbation_testing: List[SmartTag] = Query(
-        [], title="Perturbation Testing", alias="perturbationTesting"
+    behavioral_testing: List[SmartTag] = Query(
+        [], title="Behavioral Testing", alias="behavioralTesting"
     ),
     similarity: List[SmartTag] = Query([], title="Similarity"),
     uncertainty_estimation: List[SmartTag] = Query(
@@ -60,7 +60,7 @@ def build_named_dataset_filters(
         labels: The desired class labels
         predictions: The desired class predictions
         almost_correct: The desired `almost_correct` smart tags
-        perturbation_testing: The desired `perturbation_testing` smart tags
+        behavioral_testing: The desired `behavioral_testing` smart tags
         similarity: The desired `similarity` smart tags
         uncertainty_estimation: The desired `uncertainty_estimation` smart tags
         syntactic: The desired `syntactic` smart tags
@@ -80,7 +80,7 @@ def build_named_dataset_filters(
         smart_tags={
             SmartTagFamily.syntactic: syntactic,
             SmartTagFamily.almost_correct: almost_correct,
-            SmartTagFamily.perturbation_testing: perturbation_testing,
+            SmartTagFamily.behavioral_testing: behavioral_testing,
             SmartTagFamily.similarity: similarity,
             SmartTagFamily.uncertainty_estimation: uncertainty_estimation,
         },

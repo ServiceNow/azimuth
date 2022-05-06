@@ -116,7 +116,7 @@ def test_dataset_filtering_multi(text_dm_with_tags, simple_table_key):
     [
         SmartTagFamily.syntactic,
         SmartTagFamily.similarity,
-        SmartTagFamily.perturbation_testing,
+        SmartTagFamily.behavioral_testing,
         SmartTagFamily.almost_correct,
         SmartTagFamily.uncertainty_estimation,
     ],

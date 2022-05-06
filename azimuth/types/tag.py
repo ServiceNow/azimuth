@@ -55,7 +55,7 @@ class SmartTag(str, Enum):
 
 class SmartTagFamily(str, Enum):
     almost_correct = "almost_correct"
-    perturbation_testing = "perturbation_testing"
+    behavioral_testing = "behavioral_testing"
     similarity = "similarity"
     syntactic = "syntactic"
     uncertainty_estimation = "uncertainty_estimation"
@@ -104,7 +104,7 @@ SMART_TAGS_FAMILY_MAPPING = {
         SmartTag.no_close_eval,
         SmartTag.no_smart_tag,
     ],
-    SmartTagFamily.perturbation_testing: [
+    SmartTagFamily.behavioral_testing: [
         SmartTag.failed_punctuation,
         SmartTag.failed_fuzzy_matching,
         SmartTag.no_smart_tag,
