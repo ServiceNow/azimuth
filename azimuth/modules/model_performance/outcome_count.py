@@ -154,7 +154,7 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
                     data_action=self.get_outcome_count_per_tag(dm, ds, ALL_DATA_ACTION_FILTERS),
                     outcome=self.get_outcome_count_per_outcome(ds),
                     smart_tag={
-                        tag_family: self.get_outcome_count_per_tag(dm, ds, [str(t) for t in tags])
+                        tag_family: self.get_outcome_count_per_tag(dm, ds, [t.value for t in tags])
                         for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
                     },
                 ),
