@@ -74,8 +74,8 @@ def get_count_per_filter(
                 counter_to_count_per_filter_value(label_counter),
                 dataset_split_manager.rejection_class_idx,
             ),
-            smart_tag={
-                family: sorted_by_utterance_count_with_last(
+            **{
+                family.value: sorted_by_utterance_count_with_last(
                     counter_to_count_per_filter_value(counters), -1
                 )
                 for family, counters in smart_tag_counter.items()

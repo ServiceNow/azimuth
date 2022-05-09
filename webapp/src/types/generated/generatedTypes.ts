@@ -336,9 +336,12 @@ export interface components {
     MetricsPerFilter: {
       prediction: components["schemas"]["MetricsPerFilterValue"][];
       label: components["schemas"]["MetricsPerFilterValue"][];
-      smartTag: {
-        [key: string]: components["schemas"]["MetricsPerFilterValue"][];
-      };
+      extremeLength: components["schemas"]["MetricsPerFilterValue"][];
+      partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
+      similarity: components["schemas"]["MetricsPerFilterValue"][];
+      almostCorrect: components["schemas"]["MetricsPerFilterValue"][];
+      behavioralTesting: components["schemas"]["MetricsPerFilterValue"][];
+      uncertaintyEstimation: components["schemas"]["MetricsPerFilterValue"][];
       dataAction: components["schemas"]["MetricsPerFilterValue"][];
       outcome: components["schemas"]["MetricsPerFilterValue"][];
     };
@@ -394,9 +397,12 @@ export interface components {
     OutcomeCountPerFilter: {
       prediction: components["schemas"]["OutcomeCountPerFilterValue"][];
       label: components["schemas"]["OutcomeCountPerFilterValue"][];
-      smartTag: {
-        [key: string]: components["schemas"]["OutcomeCountPerFilterValue"][];
-      };
+      extremeLength: components["schemas"]["OutcomeCountPerFilterValue"][];
+      partialSyntax: components["schemas"]["OutcomeCountPerFilterValue"][];
+      similarity: components["schemas"]["OutcomeCountPerFilterValue"][];
+      almostCorrect: components["schemas"]["OutcomeCountPerFilterValue"][];
+      behavioralTesting: components["schemas"]["OutcomeCountPerFilterValue"][];
+      uncertaintyEstimation: components["schemas"]["OutcomeCountPerFilterValue"][];
       dataAction: components["schemas"]["OutcomeCountPerFilterValue"][];
       outcome: components["schemas"]["OutcomeCountPerFilterValue"][];
     };
@@ -693,9 +699,12 @@ export interface components {
         | components["schemas"]["UtteranceCountPerFilterValue"][]
         | null;
       label: components["schemas"]["UtteranceCountPerFilterValue"][];
-      smartTag: {
-        [key: string]: components["schemas"]["UtteranceCountPerFilterValue"][];
-      };
+      extremeLength: components["schemas"]["UtteranceCountPerFilterValue"][];
+      partialSyntax: components["schemas"]["UtteranceCountPerFilterValue"][];
+      similarity: components["schemas"]["UtteranceCountPerFilterValue"][];
+      almostCorrect: components["schemas"]["UtteranceCountPerFilterValue"][];
+      behavioralTesting: components["schemas"]["UtteranceCountPerFilterValue"][];
+      uncertaintyEstimation: components["schemas"]["UtteranceCountPerFilterValue"][];
       dataAction: components["schemas"]["UtteranceCountPerFilterValue"][];
       outcome: components["schemas"]["UtteranceCountPerFilterValue"][] | null;
     };
