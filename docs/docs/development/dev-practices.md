@@ -1,12 +1,18 @@
 # Development Pratices
 
-## New Branch
-When starting a new branch, we don't have a convention for the name.
-You can use your initials or your surname, and/or include the issue number according to your preference.
-It should at the very least include a short description of the issue.
+## Git flow
 
-!!! example "Branch name examples"
-    `pr/fred/fixing-poetry`, `AZ-345/fixing-poetry`, `ggm/fixing-poetry`...
+We follow an approach named [Git flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow):
+
+* `main`: Should always be working with up-to-date documentation, users will run this branch.
+* `dev`: Integrates new features, documentation can be lacking.
+* `feature/*`: Feature branch than can be merged into `dev` only.
+* `hotfix/*`: Hotfix branches that can be merged into `main`.
+* `release/*`: Not used for now.
+
+Each version has its own tag (:material-tag:`v2.0.0` for example) and release package on Github.
+
+When hotfixes are merged into `main`, they should be ported back into `dev` as well.
 
 ## Committing
 We try to commit regularly, so it is easy to revert partial changes.
