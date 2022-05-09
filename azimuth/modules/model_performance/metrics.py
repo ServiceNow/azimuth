@@ -232,7 +232,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
                 for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
             }
             metrics_per_smart_tag = {
-                tag_family: sorted_by_utterance_count_with_last(
+                tag_family.value: sorted_by_utterance_count_with_last(
                     self.get_metrics_for_filter(filters_for_family), -1
                 )
                 for tag_family, filters_for_family in smart_tag_filters.items()
@@ -252,7 +252,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
                     label=metrics_per_label,
                     prediction=metrics_per_prediction,
                     data_action=metrics_per_data_action,
-                    smart_tag=metrics_per_smart_tag,
+                    **metrics_per_smart_tag,
                     outcome=metrics_per_outcome,
                 ),
                 utterance_count=len(ds),

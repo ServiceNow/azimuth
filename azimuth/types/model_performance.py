@@ -8,7 +8,6 @@ from pydantic import Field
 
 from azimuth.types import AliasModel, Array, ModuleResponse, PlotSpecification
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import SmartTagFamily
 
 
 class MetricsResponseCommonFields(ModuleResponse):
@@ -36,8 +35,17 @@ class UtteranceCountPerFilter(AliasModel):
         ..., title="Prediction", nullable=True
     )
     label: List[UtteranceCountPerFilterValue] = Field(..., title="Label")
-    smart_tag: Dict[SmartTagFamily, List[UtteranceCountPerFilterValue]] = Field(
-        ..., title="Smart tag"
+    extreme_length: List[UtteranceCountPerFilterValue] = Field(..., title="Extreme length")
+    partial_syntax: List[UtteranceCountPerFilterValue] = Field(..., title="Partial syntax")
+    similarity: List[UtteranceCountPerFilterValue] = Field(..., title="Similarity smart tag")
+    almost_correct: List[UtteranceCountPerFilterValue] = Field(
+        ..., title="Almost correct smart tag"
+    )
+    behavioral_testing: List[UtteranceCountPerFilterValue] = Field(
+        ..., title="Behavioral testing smart tag"
+    )
+    uncertainty_estimation: List[UtteranceCountPerFilterValue] = Field(
+        ..., title="Uncertainty estimation smart tag"
     )
     data_action: List[UtteranceCountPerFilterValue] = Field(..., title="Data action tag")
     outcome: Optional[List[UtteranceCountPerFilterValue]] = Field(
@@ -57,8 +65,15 @@ class OutcomeCountPerFilterValue(UtteranceCountPerFilterValue):
 class OutcomeCountPerFilter(AliasModel):
     prediction: List[OutcomeCountPerFilterValue] = Field(..., title="Prediction")
     label: List[OutcomeCountPerFilterValue] = Field(..., title="Label")
-    smart_tag: Dict[SmartTagFamily, List[OutcomeCountPerFilterValue]] = Field(
-        ..., title="Smart tag"
+    extreme_length: List[OutcomeCountPerFilterValue] = Field(..., title="Extreme length")
+    partial_syntax: List[OutcomeCountPerFilterValue] = Field(..., title="Partial syntax")
+    similarity: List[OutcomeCountPerFilterValue] = Field(..., title="Similarity smart tag")
+    almost_correct: List[OutcomeCountPerFilterValue] = Field(..., title="Almost correct smart tag")
+    behavioral_testing: List[OutcomeCountPerFilterValue] = Field(
+        ..., title="Behavioral testing smart tag"
+    )
+    uncertainty_estimation: List[OutcomeCountPerFilterValue] = Field(
+        ..., title="Uncertainty estimation smart tag"
     )
     data_action: List[OutcomeCountPerFilterValue] = Field(..., title="Data action tag")
     outcome: List[OutcomeCountPerFilterValue] = Field(..., title="Outcome")
@@ -76,7 +91,16 @@ class MetricsPerFilterValue(MetricsResponseCommonFields, UtteranceCountPerFilter
 class MetricsPerFilter(AliasModel):
     prediction: List[MetricsPerFilterValue] = Field(..., title="Prediction")
     label: List[MetricsPerFilterValue] = Field(..., title="Label")
-    smart_tag: Dict[SmartTagFamily, List[MetricsPerFilterValue]] = Field(..., title="Smart tag")
+    extreme_length: List[MetricsPerFilterValue] = Field(..., title="Extreme length")
+    partial_syntax: List[MetricsPerFilterValue] = Field(..., title="Partial syntax")
+    similarity: List[MetricsPerFilterValue] = Field(..., title="Similarity smart tag")
+    almost_correct: List[MetricsPerFilterValue] = Field(..., title="Almost correct smart tag")
+    behavioral_testing: List[MetricsPerFilterValue] = Field(
+        ..., title="Behavioral testing smart tag"
+    )
+    uncertainty_estimation: List[MetricsPerFilterValue] = Field(
+        ..., title="Uncertainty estimation smart tag"
+    )
     data_action: List[MetricsPerFilterValue] = Field(..., title="Data action tag")
     outcome: List[MetricsPerFilterValue] = Field(..., title="Outcome")
 
