@@ -41,11 +41,11 @@ def build_named_dataset_filters(
     predictions: List[str] = Query([], title="Prediction"),
     extreme_length: List[SmartTag] = Query([], title="Extreme length"),
     partial_syntax: List[SmartTag] = Query([], title="Syntactic"),
+    similarity: List[SmartTag] = Query([], title="Similarity"),
     almost_correct: List[SmartTag] = Query([], title="Almost Correct", alias="almostCorrect"),
     behavioral_testing: List[SmartTag] = Query(
         [], title="Behavioral Testing", alias="behavioralTesting"
     ),
-    similarity: List[SmartTag] = Query([], title="Similarity"),
     uncertainty_estimation: List[SmartTag] = Query(
         [], title="Uncertainty Estimation", alias="uncertaintyEstimation"
     ),
@@ -62,9 +62,9 @@ def build_named_dataset_filters(
         predictions: The desired class predictions
         extreme_length: The desired `extreme_length` smart tags
         partial_syntax: The desired `partial_syntax` smart tags
+        similarity: The desired `similarity` smart tags
         almost_correct: The desired `almost_correct` smart tags
         behavioral_testing: The desired `behavioral_testing` smart tags
-        similarity: The desired `similarity` smart tags
         uncertainty_estimation: The desired `uncertainty_estimation` smart tags
         data_actions: The desired data_action tags
         outcomes: The desired outcomes
@@ -82,9 +82,9 @@ def build_named_dataset_filters(
         smart_tags={
             SmartTagFamily.extreme_length: extreme_length,
             SmartTagFamily.partial_syntax: partial_syntax,
+            SmartTagFamily.similarity: similarity,
             SmartTagFamily.almost_correct: almost_correct,
             SmartTagFamily.behavioral_testing: behavioral_testing,
-            SmartTagFamily.similarity: similarity,
             SmartTagFamily.uncertainty_estimation: uncertainty_estimation,
         },
         data_actions=data_actions,
