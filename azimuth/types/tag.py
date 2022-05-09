@@ -54,10 +54,11 @@ class SmartTag(str, Enum):
 
 
 class SmartTagFamily(str, Enum):
+    extreme_length = "extreme_length"
+    partial_syntax = "partial_syntax"
     almost_correct = "almost_correct"
     behavioral_testing = "behavioral_testing"
     similarity = "similarity"
-    syntactic = "syntactic"
     uncertainty_estimation = "uncertainty_estimation"
 
 
@@ -87,11 +88,22 @@ ALL_PREDICTION_TAGS = [
 ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 
 SMART_TAGS_FAMILY_MAPPING = {
+    SmartTagFamily.extreme_length: [
+        SmartTag.multi_sent,
+        SmartTag.short,
+        SmartTag.long,
+        SmartTag.no_smart_tag,
+    ],
+    SmartTagFamily.partial_syntax: [
+        SmartTag.no_verb,
+        SmartTag.no_subj,
+        SmartTag.no_obj,
+        SmartTag.no_smart_tag,
+    ],
     SmartTagFamily.uncertainty_estimation: [
         SmartTag.high_epistemic_uncertainty,
         SmartTag.no_smart_tag,
     ],
-    SmartTagFamily.syntactic: ALL_SYNTAX_TAGS + [SmartTag.no_smart_tag],
     SmartTagFamily.almost_correct: [
         SmartTag.correct_top_3,
         SmartTag.correct_low_conf,

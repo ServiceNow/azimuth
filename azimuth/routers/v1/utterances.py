@@ -209,7 +209,11 @@ def get_utterances(
     if pipeline_index is not None:
         available_families = list(SMART_TAGS_FAMILY_MAPPING.keys())
     else:
-        available_families = [SmartTagFamily.syntactic, SmartTagFamily.similarity]
+        available_families = [
+            SmartTagFamily.extreme_length,
+            SmartTagFamily.partial_syntax,
+            SmartTagFamily.similarity,
+        ]
     utterances = [
         Utterance(
             index=data[DatasetColumn.row_idx],

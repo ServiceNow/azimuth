@@ -39,6 +39,8 @@ def build_named_dataset_filters(
     confidence_max: float = Query(1, title="Maximum confidence", alias="confidenceMax"),
     labels: List[str] = Query([], title="Label"),
     predictions: List[str] = Query([], title="Prediction"),
+    extreme_length: List[SmartTag] = Query([], title="Extreme length"),
+    partial_syntax: List[SmartTag] = Query([], title="Syntactic"),
     almost_correct: List[SmartTag] = Query([], title="Almost Correct", alias="almostCorrect"),
     behavioral_testing: List[SmartTag] = Query(
         [], title="Behavioral Testing", alias="behavioralTesting"
@@ -47,7 +49,6 @@ def build_named_dataset_filters(
     uncertainty_estimation: List[SmartTag] = Query(
         [], title="Uncertainty Estimation", alias="uncertaintyEstimation"
     ),
-    syntactic: List[SmartTag] = Query([], title="Syntactic"),
     data_actions: List[DataAction] = Query([], title="Data action tags", alias="dataActions"),
     outcomes: List[OutcomeName] = Query([], title="Outcomes", alias="outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
@@ -59,11 +60,12 @@ def build_named_dataset_filters(
         confidence_max: The desired maximum confidence
         labels: The desired class labels
         predictions: The desired class predictions
+        extreme_length: The desired `extreme_length` smart tags
+        partial_syntax: The desired `partial_syntax` smart tags
         almost_correct: The desired `almost_correct` smart tags
         behavioral_testing: The desired `behavioral_testing` smart tags
         similarity: The desired `similarity` smart tags
         uncertainty_estimation: The desired `uncertainty_estimation` smart tags
-        syntactic: The desired `syntactic` smart tags
         data_actions: The desired data_action tags
         outcomes: The desired outcomes
         utterance: The substring desired in each utterance
@@ -78,7 +80,8 @@ def build_named_dataset_filters(
         labels=labels,
         predictions=predictions,
         smart_tags={
-            SmartTagFamily.syntactic: syntactic,
+            SmartTagFamily.extreme_length: extreme_length,
+            SmartTagFamily.partial_syntax: partial_syntax,
             SmartTagFamily.almost_correct: almost_correct,
             SmartTagFamily.behavioral_testing: behavioral_testing,
             SmartTagFamily.similarity: similarity,
