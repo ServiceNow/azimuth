@@ -5,7 +5,7 @@
 import numpy as np
 
 from azimuth.modules.word_analysis.top_words import TopWordsModule
-from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.types.word_analysis import TokensToWordsResponse
 from tests.utils import save_predictions
 
@@ -42,15 +42,11 @@ def fake_get_words_saliencies(indices):
     return records
 
 
-def test_top_words_with_saliency(
-    monkeypatch, simple_text_config, dask_client, apply_mocked_startup_task
-):
+def test_top_words_with_saliency(tiny_text_config, apply_mocked_startup_task, monkeypatch):
     mod = TopWordsModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=simple_text_config,
-        mod_options=ModuleOptions(
-            filters=DatasetFilters(labels=[0]), top_x=4, pipeline_index=0  # reduce time
-        ),
+        config=tiny_text_config,
+        mod_options=ModuleOptions(top_x=4, pipeline_index=0),
     )
     monkeypatch.setattr(mod, "get_words_saliencies", fake_get_words_saliencies)
     assert mod is not None
@@ -71,7 +67,7 @@ def fake_no_saliency(indices):
     return records
 
 
-def test_top_words_without_saliency(monkeypatch, file_text_config_top1, dask_client):
+def test_top_words_without_saliency(monkeypatch, file_text_config_top1):
     save_predictions(file_text_config_top1)
 
     mod = TopWordsModule(

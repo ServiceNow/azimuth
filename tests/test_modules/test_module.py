@@ -48,17 +48,17 @@ def test_threshold(simple_text_config):
                 model_contract_method_name=SupportedMethod.Inputs, pipeline_index=0
             ),
         ).get_threshold()
-        == 0.5
+        == 0.7
     )
     assert (
         HFTextClassificationModule(
             DatasetSplitName.eval,
             config=simple_text_config,
             mod_options=ModuleOptions(
-                threshold=0.7, model_contract_method_name=SupportedMethod.Inputs, pipeline_index=0
+                threshold=0.9, model_contract_method_name=SupportedMethod.Inputs, pipeline_index=0
             ),
         ).get_threshold()
-        == 0.7
+        == 0.9
     )
 
 

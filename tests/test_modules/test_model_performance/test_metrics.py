@@ -25,13 +25,13 @@ from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, Smar
 from tests.utils import save_outcomes, save_predictions
 
 
-def test_metrics(tiny_text_config_postprocessors):
-    save_predictions(tiny_text_config_postprocessors)
-    save_outcomes(tiny_text_config_postprocessors)
+def test_metrics(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
 
     metrics_mod = MetricsModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=tiny_text_config_postprocessors,
+        config=tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
 
@@ -49,7 +49,7 @@ def test_metrics(tiny_text_config_postprocessors):
     # Changing the filters changes the values.
     metrics_mod_filters = MetricsModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
+        tiny_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(predictions=[1]), pipeline_index=0),
     )
     [metrics_res_filters] = metrics_mod_filters.compute_on_dataset_split()
@@ -60,7 +60,7 @@ def test_metrics(tiny_text_config_postprocessors):
     # Disabling postprocessing changes the values
     metrics_mod_post = MetricsModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
+        tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
     )
     [metrics_res_post] = metrics_mod_post.compute_on_dataset_split()
@@ -111,10 +111,10 @@ def test_outcomes(file_text_config_no_intent):
     ]
 
 
-def test_empty_ds(simple_text_config, dask_client):
+def test_empty_ds(tiny_text_config):
     mod = MetricsModule(
         DatasetSplitName.eval,
-        simple_text_config,
+        tiny_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(labels=[42]), pipeline_index=0),
     )
     _ = mod.get_dataset_split()
@@ -124,7 +124,7 @@ def test_empty_ds(simple_text_config, dask_client):
     assert json_output.utterance_count == 0
 
 
-def test_outcome_count_per_threshold(tiny_text_config, dask_client):
+def test_outcome_count_per_threshold(tiny_text_config):
     nb_bins = 3
     mod = OutcomeCountPerThresholdModule(
         dataset_split_name=DatasetSplitName.eval,
@@ -157,13 +157,13 @@ def test_outcome_count_per_threshold(tiny_text_config, dask_client):
     assert not all(len(set(counts)) == 1 for counts in outcomes_for_all_threshold.values())
 
 
-def test_outcome_count_per_filter(tiny_text_config_postprocessors):
-    save_predictions(tiny_text_config_postprocessors)
-    save_outcomes(tiny_text_config_postprocessors)
+def test_outcome_count_per_filter(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
 
     mod = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,
-        config=tiny_text_config_postprocessors,
+        config=tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
 
@@ -171,7 +171,7 @@ def test_outcome_count_per_filter(tiny_text_config_postprocessors):
 
     mod_filter_0 = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,
-        config=tiny_text_config_postprocessors,
+        config=tiny_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
     )
 
@@ -212,7 +212,7 @@ def test_outcome_count_per_filter(tiny_text_config_postprocessors):
 
     mod_post = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,
-        config=tiny_text_config_postprocessors,
+        config=tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
     )
 
@@ -226,25 +226,24 @@ def test_outcome_count_per_filter(tiny_text_config_postprocessors):
     assert res_post.count_per_filter.smart_tag != res.count_per_filter.smart_tag
 
 
-def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
-    apply_mocked_startup_task(tiny_text_config)
+def test_metrics_per_filter(simple_text_config, apply_mocked_startup_task):
     mf_module = MetricsPerFilterModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=tiny_text_config,
+        config=simple_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
     [result] = mf_module.compute_on_dataset_split()
     ds_len = len(mf_module.get_dataset_split())
-    dm = mf_module.get_dataset_split_manager()
+    num_classes = mf_module.get_dataset_split_manager().get_num_classes()
 
     assert result.utterance_count == ds_len
     prediction_metrics = result.metrics_per_filter.prediction
     assert sum([mf_v.utterance_count for mf_v in prediction_metrics]) == ds_len
-    assert len(prediction_metrics) == dm.get_num_classes()
+    assert len(prediction_metrics) == num_classes
 
     label_metrics = result.metrics_per_filter.label
     assert sum([mf_v.utterance_count for mf_v in label_metrics]) == ds_len
-    assert len(label_metrics) == dm.get_num_classes()
+    assert len(label_metrics) == num_classes
 
     smart_tag_metrics = result.metrics_per_filter.smart_tag
     assert sum([mf_v.utterance_count for mf_v in smart_tag_metrics]) == ds_len

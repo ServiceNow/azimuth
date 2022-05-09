@@ -17,14 +17,15 @@ from azimuth.types import (
     SupportedModule,
 )
 from azimuth.utils.project import load_dataset_split_managers_from_config
+from tests.utils import get_table_key
 
 
-def test_startup_task(simple_text_config_high_threshold, text_task_manager_high_threshold):
-    dms = load_dataset_split_managers_from_config(simple_text_config_high_threshold)
-    mods = startup_tasks(dms, text_task_manager_high_threshold)
+def test_startup_task(tiny_text_config, tiny_text_task_manager):
+    dms = load_dataset_split_managers_from_config(tiny_text_config)
+    mods = startup_tasks(dms, tiny_text_task_manager)
     one_mod = mods["syntax_tags_eval_None"]
     # We lock the task manager
-    assert text_task_manager_high_threshold.is_locked
+    assert tiny_text_task_manager.is_locked
     assert not one_mod.done()
     assert all("train" in k or "eval" in k for k in mods.keys())
     assert all(
@@ -32,11 +33,11 @@ def test_startup_task(simple_text_config_high_threshold, text_task_manager_high_
     ), "Some modules dont have callbacks!"
 
 
-def test_startup_task_fast(simple_text_config, text_task_manager):
-    simple_text_config.behavioral_testing = None
-    simple_text_config.similarity = None
-    dms = load_dataset_split_managers_from_config(simple_text_config)
-    mods = startup_tasks(dms, text_task_manager)
+def test_startup_task_fast(tiny_text_config, tiny_text_task_manager):
+    tiny_text_config.behavioral_testing = None
+    tiny_text_config.similarity = None
+    dms = load_dataset_split_managers_from_config(tiny_text_config)
+    mods = startup_tasks(dms, tiny_text_task_manager)
 
     assert not any(
         mod.task_name in (SupportedModule.PerturbationTesting, SupportedModule.NeighborsTagging)
@@ -44,16 +45,16 @@ def test_startup_task_fast(simple_text_config, text_task_manager):
     )
 
 
-def test_on_end(simple_text_config_high_threshold):
-    dms = load_dataset_split_managers_from_config(simple_text_config_high_threshold)
+def test_on_end(tiny_text_config):
+    dms = load_dataset_split_managers_from_config(tiny_text_config)
     # Test that the dataset_split manager is called.
     mod = HFTextClassificationModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=simple_text_config_high_threshold,
+        config=tiny_text_config,
         mod_options=ModuleOptions(
             pipeline_index=0,
             model_contract_method_name=SupportedMethod.Predictions,
-            indices=[1, 2, 3],
+            indices=[0, 1],
         ),
     )
     res = mod.compute_on_dataset_split()
@@ -67,11 +68,11 @@ def test_on_end(simple_text_config_high_threshold):
     task_manager.clear_worker_cache.assert_called_once()
 
 
-def test_startup_task_no_train(simple_text_config_no_train, text_task_manager):
-    dms = load_dataset_split_managers_from_config(simple_text_config_no_train)
+def test_startup_task_no_train(tiny_text_config_no_train, tiny_text_task_manager):
+    dms = load_dataset_split_managers_from_config(tiny_text_config_no_train)
     assert DatasetSplitName.eval in dms and DatasetSplitName.train in dms
 
-    mods = startup_tasks(dms, text_task_manager)
+    mods = startup_tasks(dms, tiny_text_task_manager)
     assert all("train" not in k or "eval" in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
@@ -79,10 +80,10 @@ def test_startup_task_no_train(simple_text_config_no_train, text_task_manager):
 
 
 @pytest.mark.parametrize("iterations", [20, 1])
-def test_startup_task_bma(simple_text_config, text_task_manager, iterations):
-    simple_text_config.uncertainty.iterations = iterations
-    dms = load_dataset_split_managers_from_config(simple_text_config)
-    mods = startup_tasks(dms, text_task_manager)
+def test_startup_task_bma(tiny_text_config, tiny_text_task_manager, iterations):
+    tiny_text_config.uncertainty.iterations = iterations
+    dms = load_dataset_split_managers_from_config(tiny_text_config)
+    mods = startup_tasks(dms, tiny_text_task_manager)
 
     # Check that we have BMA at some point if iterations > 1
     if iterations == 1:
@@ -91,7 +92,7 @@ def test_startup_task_bma(simple_text_config, text_task_manager, iterations):
         assert any("bma" in mod_name for mod_name in mods.keys())
 
 
-def test_initialize_backbone(simple_text_config, dask_client):
+def test_initialize_backbone(tiny_text_config, dask_client):
     from azimuth.app import (
         get_config,
         get_dataset_split_manager,
@@ -102,11 +103,11 @@ def test_initialize_backbone(simple_text_config, dask_client):
     event = get_ready_flag()
     assert event is None
     assert get_startup_tasks() is None
-    initialize_managers(simple_text_config, cluster=dask_client.cluster)
+    initialize_managers(tiny_text_config, cluster=dask_client.cluster)
     assert get_task_manager().cluster is dask_client.cluster
-    assert get_config() is simple_text_config
-    assert get_dataset_split_manager(DatasetSplitName.train).config is simple_text_config
-    assert get_dataset_split_manager(DatasetSplitName.eval).config is simple_text_config
+    assert get_config() is tiny_text_config
+    assert get_dataset_split_manager(DatasetSplitName.train).config is tiny_text_config
+    assert get_dataset_split_manager(DatasetSplitName.eval).config is tiny_text_config
     assert len(get_startup_tasks()) > 0
     assert not get_ready_flag().is_set()
 
@@ -123,10 +124,11 @@ def my_dataset_fn(valid):
     return DatasetDict(ds).class_encode_column("label")
 
 
-def test_validation_priority(simple_text_config, simple_table_key):
+def test_validation_priority(simple_text_config):
     simple_text_config.dataset = CustomObject(
         **{"class_name": "tests.test_modules.test_module.my_dataset_fn", "kwargs": {"valid": True}}
     )
+    simple_table_key = get_table_key(simple_text_config)
     ds = load_dataset_split_managers_from_config(simple_text_config)[
         DatasetSplitName.eval
     ].get_dataset_split(simple_table_key)

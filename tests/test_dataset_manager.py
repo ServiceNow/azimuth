@@ -15,9 +15,16 @@ from azimuth.config import AzimuthValidationError
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import ALL_STANDARD_TAGS, ALL_TAGS
+from tests.test_loading_resources import load_sst2_dataset
+from tests.utils import generate_mocked_dm, get_table_key
 
 
-def test_dataset_manager_tags(a_text_dataset, simple_text_config, simple_table_key):
+@pytest.fixture
+def a_text_dataset():
+    return load_sst2_dataset()["validation"]
+
+
+def test_dataset_manager_tags(a_text_dataset, simple_text_config):
     tags = ["red", "blue", "orange"]
     ds_mng = DatasetSplitManager(
         DatasetSplitName.eval,
@@ -25,6 +32,7 @@ def test_dataset_manager_tags(a_text_dataset, simple_text_config, simple_table_k
         initial_tags=tags,
         dataset_split=a_text_dataset,
     )
+    simple_table_key = get_table_key(simple_text_config)
     assert os.path.exists(ds_mng._save_path)
     assert all(t in ds_mng.get_dataset_split(simple_table_key).column_names for t in tags)
     assert (np.array(ds_mng.get_dataset_split(simple_table_key)["red"]) == False).all()  # noqa
@@ -104,9 +112,10 @@ def test_class_distribution(a_text_dataset, simple_text_config):
     assert len(ds_mng.get_class_names(labels_only=False)) == num_classes + 1
 
 
-def test_to_csv(text_dm_with_tags, simple_table_key):
-    text_dm_with_tags.config.name = "newName"
-    pt = text_dm_with_tags.save_csv(simple_table_key)
+def test_to_csv(simple_text_config):
+    dm = generate_mocked_dm(simple_text_config)
+    dm.config.name = "newName"
+    pt = dm.save_csv(get_table_key(simple_text_config))
     assert os.path.exists(pt)
 
     name = os.path.basename(pt)
@@ -133,18 +142,22 @@ def test_to_csv(text_dm_with_tags, simple_table_key):
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()
 
-    assert df["label"][0] in text_dm_with_tags.get_class_names()
+    assert df["label"][0] in dm.get_class_names()
+    rejection_class_idx = dm.rejection_class_idx
     assert (
         df[DatasetColumn.postprocessed_prediction][
-            text_dm_with_tags._base_dataset_split[DatasetColumn.postprocessed_prediction].index(-1)
+            dm._base_dataset_split[DatasetColumn.postprocessed_prediction].index(
+                rejection_class_idx
+            )
         ]
         == "REJECTION_CLASS"
     )
 
 
-def test_to_csv_no_model(text_dm_with_tags):
-    text_dm_with_tags.config.name = "newName"
-    pt = text_dm_with_tags.save_csv(table_key=None)
+def test_to_csv_no_model(simple_text_config):
+    dm = generate_mocked_dm(simple_text_config)
+    dm.config.name = "newName"
+    pt = dm.save_csv(table_key=None)
     assert os.path.exists(pt)
 
     name = os.path.basename(pt)
@@ -164,7 +177,7 @@ def test_to_csv_no_model(text_dm_with_tags):
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()
 
-    assert df["label"][0] in text_dm_with_tags.get_class_names()
+    assert df["label"][0] in dm.get_class_names()
 
 
 @pytest.mark.parametrize("column_name", ["failed_parsing", "malformed"])
@@ -210,7 +223,8 @@ def test_malformed(simple_text_config, column_name):
     assert len(dm2._malformed_dataset) == 2
 
 
-def test_multi_tables(a_text_dataset, simple_text_config, simple_table_key):
+def test_multi_tables(a_text_dataset, simple_text_config):
+    simple_table_key = get_table_key(simple_text_config)
     dm = DatasetSplitManager(
         name="potato",
         config=simple_text_config,
@@ -267,7 +281,8 @@ def test_multi_tables(a_text_dataset, simple_text_config, simple_table_key):
         dm.add_column("is_potato2", [])
 
 
-def test_caching(a_text_dataset, simple_text_config, simple_table_key):
+def test_caching(a_text_dataset, simple_text_config):
+    simple_table_key = get_table_key(simple_text_config)
     dm1 = DatasetSplitManager(
         DatasetSplitName.eval,
         config=simple_text_config,

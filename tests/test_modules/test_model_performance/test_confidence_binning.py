@@ -17,14 +17,14 @@ UNKNOWN_TARGET = [3]
 BIN_GAP = 0.06
 
 
-def test_confidence_histogram(tiny_text_config_postprocessors):
-    save_predictions(tiny_text_config_postprocessors)
-    save_outcomes(tiny_text_config_postprocessors)
+def test_confidence_histogram(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
 
     mod = ConfidenceHistogramModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
-        mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
+        tiny_text_config,
+        mod_options=ModuleOptions(pipeline_index=0),
     )
     out = mod.compute_on_dataset_split()[0].details_all_bins
     ds = mod.get_dataset_split()
@@ -41,10 +41,8 @@ def test_confidence_histogram(tiny_text_config_postprocessors):
 
     mod_without_postprocessing = ConfidenceHistogramModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
-        mod_options=ModuleOptions(
-            filters=DatasetFilters(labels=[0]), pipeline_index=0, without_postprocessing=True
-        ),
+        tiny_text_config,
+        mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
     )
     out_without_postprocessing = mod_without_postprocessing.compute_on_dataset_split()[
         0
@@ -94,11 +92,13 @@ def test_confidence_histogram_empty(simple_text_config, apply_mocked_startup_tas
     assert sum(count for v in out for count in v.outcome_count.values()) == 0
 
 
-def test_confidence_bin_idx(simple_text_config, apply_mocked_startup_task):
+def test_confidence_bin_idx(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
     mod = ConfidenceBinIndexModule(
         DatasetSplitName.eval,
-        simple_text_config,
-        mod_options=ModuleOptions(pipeline_index=0, indices=list(range(10))),
+        tiny_text_config,
+        mod_options=ModuleOptions(pipeline_index=0),
     )
     out = mod.compute_on_dataset_split()
     ds = mod.get_dataset_split()

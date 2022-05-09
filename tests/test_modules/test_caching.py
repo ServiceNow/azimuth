@@ -60,8 +60,8 @@ def test_hdf5_caching(data, indices, simple_text_config):
     modified_th_config = deepcopy(simple_text_config)
     # We modify the threshold at both places to be consistent,
     # but in practice only the `kwargs` is used.
-    modified_th_config.pipelines[0].postprocessors[-1].kwargs["threshold"] = 0.8
-    modified_th_config.pipelines[0].postprocessors[-1].threshold = 0.8
+    modified_th_config.pipelines[0].postprocessors[0].kwargs["threshold"] = 0.8
+    modified_th_config.pipelines[0].postprocessors[0].threshold = 0.8
     modified_th_mod = IndexableModule(
         DatasetSplitName.eval, modified_th_config, mod_options=ModuleOptions(indices=indices)
     )

@@ -11,7 +11,7 @@ from starlette.testclient import TestClient
 import azimuth.app as me_app
 from azimuth.app import get_ready_flag
 from azimuth.config import AzimuthConfig
-from tests.conftest import DATASET_CFG, SIMPLE_PERTURBATION_TESTING_CONFIG
+from tests.utils import DATASET_CFG, SIMPLE_PERTURBATION_TESTING_CONFIG
 
 
 def mock_ready_flag_false():

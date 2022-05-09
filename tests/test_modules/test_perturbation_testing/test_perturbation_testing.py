@@ -21,6 +21,7 @@ from azimuth.utils.ml.perturbation_functions import (
     typo,
 )
 from azimuth.utils.ml.perturbation_test import PerturbationTest
+from tests.utils import get_table_key
 
 
 def test_perturbation_testing(simple_text_config):
@@ -184,7 +185,7 @@ def test_contractions(simple_text_config):
     assert "I'm" in results[1].perturbations
 
 
-def test_save(simple_text_config, simple_table_key):
+def test_save(simple_text_config):
     mod = PerturbationTestingModule(
         DatasetSplitName.eval,
         config=simple_text_config,
@@ -214,5 +215,6 @@ def test_save(simple_text_config, simple_table_key):
         for idx in range(dm.num_rows)
     ]
     mod.save_result(res, dm)
+    simple_table_key = get_table_key(simple_text_config)
     assert any(dm.get_dataset_split(simple_table_key)[SmartTag.failed_fuzzy_matching])
     assert any(dm.get_dataset_split(simple_table_key)[SmartTag.failed_punctuation])
