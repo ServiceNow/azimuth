@@ -16,6 +16,8 @@ from azimuth.utils.validation import assert_not_none
 class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
     """Computes the confusion matrix on the specified dataset split."""
 
+    allowed_mod_options = FilterableModule.allowed_mod_options | {"normalized"}
+
     def compute_on_dataset_split(self) -> List[ConfusionMatrixResponse]:  # type: ignore
         """Computes confusion matrix from sklearn.
 
@@ -34,6 +36,6 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             y_true=labels,
             y_pred=predictions,
             labels=class_ids,
-            normalize="true",
+            normalize="true" if self.mod_options.normalized else None,
         )
         return [ConfusionMatrixResponse(confusion_matrix=cf)]

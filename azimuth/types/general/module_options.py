@@ -97,3 +97,4 @@ class ModuleOptions(AliasModel):
         20,
         title="Nb of bins to compute for different modules.",
     )
+    normalized: bool = Field(True, title="Normalize the confusion matrix.")
