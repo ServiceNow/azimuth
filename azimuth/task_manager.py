@@ -1,7 +1,6 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import structlog
@@ -128,7 +127,10 @@ class TaskManager:
         if self._is_locked:
             raise TaskManagerLockedException("Can't get/start tasks when TaskManager is locked!")
         task_cls = self.tasks.get(task_name)
-        mod_options = mod_options or ModuleOptions()
+        if mod_options:
+            mod_options = mod_options.copy(deep=True)
+        else:
+            mod_options = ModuleOptions()
 
         if task_cls is not None:
             # We found the task, we can instantiate it.

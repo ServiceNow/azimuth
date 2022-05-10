@@ -72,7 +72,7 @@ def filter_dataset_split(
         # We do OR for data_action tags.
         dataset_split = dataset_split.filter(
             lambda x: any(
-                ((not any(x[v] for v in ALL_DATA_ACTIONS)) if v is DataAction.no_action else x[v])
+                ((not any(x[v] for v in ALL_DATA_ACTIONS)) if v == DataAction.no_action else x[v])
                 for v in filters.data_actions
             )
         )
@@ -89,7 +89,7 @@ def filter_dataset_split(
         # We do AND for smart tags.
         dataset_split = dataset_split.filter(
             lambda x: all(
-                ((not any(x[v] for v in ALL_SMART_TAGS)) if v is SmartTag.no_smart_tag else x[v])
+                ((not any(x[v] for v in ALL_SMART_TAGS)) if v == SmartTag.no_smart_tag else x[v])
                 for v in filters.smart_tags
             )
         )

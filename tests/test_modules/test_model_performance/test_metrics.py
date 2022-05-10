@@ -21,7 +21,12 @@ from azimuth.modules.model_performance.outcomes import OutcomesModule
 from azimuth.plots.ece import make_ece_figure
 from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
 from azimuth.types.outcomes import OutcomeName, OutcomeResponse
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
+from azimuth.types.tag import (
+    ALL_DATA_ACTION_FILTERS,
+    ALL_SMART_TAG_FILTERS,
+    DataAction,
+    SmartTag,
+)
 from tests.utils import save_outcomes, save_predictions
 
 
@@ -226,10 +231,11 @@ def test_outcome_count_per_filter(tiny_text_config):
     assert res_post.count_per_filter.smart_tag != res.count_per_filter.smart_tag
 
 
-def test_metrics_per_filter(simple_text_config, apply_mocked_startup_task):
+def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
+    apply_mocked_startup_task(tiny_text_config)
     mf_module = MetricsPerFilterModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=simple_text_config,
+        config=tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
     [result] = mf_module.compute_on_dataset_split()
@@ -247,11 +253,11 @@ def test_metrics_per_filter(simple_text_config, apply_mocked_startup_task):
 
     smart_tag_metrics = result.metrics_per_filter.smart_tag
     assert sum([mf_v.utterance_count for mf_v in smart_tag_metrics]) == ds_len
-    assert len(smart_tag_metrics) == len(ALL_SMART_TAGS)
+    assert len(smart_tag_metrics) == len(ALL_SMART_TAG_FILTERS)
 
     data_action_metrics = result.metrics_per_filter.data_action
     assert sum([mf_v.utterance_count for mf_v in data_action_metrics]) == ds_len
-    assert len(data_action_metrics) == len(ALL_DATA_ACTIONS)
+    assert len(data_action_metrics) == len(ALL_DATA_ACTION_FILTERS)
 
     outcome_metrics = result.metrics_per_filter.outcome
     assert sum([mf_v.utterance_count for mf_v in outcome_metrics]) == ds_len

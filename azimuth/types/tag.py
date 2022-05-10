@@ -58,10 +58,10 @@ class SmartTag(str, Enum):
 
 Tag = str
 ALL_DATA_ACTION_FILTERS = [a.value for a in DataAction]
-ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a is not DataAction.no_action]
+ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a != DataAction.no_action]
 
 ALL_SMART_TAG_FILTERS = [a.value for a in SmartTag]
-ALL_SMART_TAGS = [a for a in ALL_SMART_TAG_FILTERS if a is not SmartTag.no_smart_tag]
+ALL_SMART_TAGS = [a for a in ALL_SMART_TAG_FILTERS if a != SmartTag.no_smart_tag]
 
 ALL_TAGS = ALL_SMART_TAGS + ALL_DATA_ACTIONS
 ALL_SYNTAX_TAGS = [

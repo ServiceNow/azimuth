@@ -42,10 +42,10 @@ def fake_get_words_saliencies(indices):
     return records
 
 
-def test_top_words_with_saliency(tiny_text_config, apply_mocked_startup_task, monkeypatch):
+def test_top_words_with_saliency(simple_text_config, apply_mocked_startup_task, monkeypatch):
     mod = TopWordsModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=tiny_text_config,
+        config=simple_text_config,
         mod_options=ModuleOptions(top_x=4, pipeline_index=0),
     )
     monkeypatch.setattr(mod, "get_words_saliencies", fake_get_words_saliencies)

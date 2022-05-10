@@ -110,7 +110,7 @@ def test_dataset_filtering_no_smart_tag(simple_text_config):
 
     ds_filtered = filter_dataset_split(
         dm.get_dataset_split(simple_table_key),
-        DatasetFilters(smart_tags=["NO_SMART_TAGS"]),
+        DatasetFilters(smart_tags=[SmartTag.no_smart_tag]),
         config=dm.config,
     )
     assert len(ds_filtered) > 0

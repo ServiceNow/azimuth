@@ -179,7 +179,7 @@ def test_temperature_scaling(simple_text_config):
                             model=simple_text_config.pipelines[0].model,
                             postprocessors=[
                                 {"temperature": temp},
-                                {"threshold": simple_text_config.pipelines[0].threshold},
+                                {"threshold": simple_text_config.pipelines[-1].threshold},
                             ],
                         )
                     ]

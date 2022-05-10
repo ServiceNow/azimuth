@@ -92,10 +92,10 @@ def simple_text_config(tmp_path):
 def simple_text_config_multi_pipeline(simple_text_config):
     pipeline_cfg_low = deepcopy(PIPELINE_CFG)
     pipeline_cfg_low["name"] = "Low threshold Model"
-    pipeline_cfg_low["postprocessors"][0]["threshold"] = 0.2
+    pipeline_cfg_low["postprocessors"][-1]["threshold"] = 0.2
     pipeline_cfg_high = deepcopy(PIPELINE_CFG)
     pipeline_cfg_high["name"] = "High threshold Model"
-    pipeline_cfg_high["postprocessors"][0]["threshold"] = 0.99
+    pipeline_cfg_high["postprocessors"][-1]["threshold"] = 0.99
     simple_multipipeline_text_config = simple_text_config.copy(
         deep=True, update=dict(pipelines=[pipeline_cfg_low, pipeline_cfg_high])
     )
@@ -184,6 +184,10 @@ def clinc_text_config(simple_text_config):
     clinc_text_config.dataset = DATASET_CLINC150_CFG
     clinc_text_config.rejection_class = "NO_INTENT"
     clinc_text_config.name = "clinc-test"
+    clinc_text_config.pipelines[0].postprocessors[0].temperature = 1
+    clinc_text_config.pipelines[0].postprocessors[0].kwargs["temperature"] = 1
+    clinc_text_config.pipelines[0].postprocessors[-1].threshold = 0.5
+    clinc_text_config.pipelines[0].postprocessors[-1].kwargs["threshold"] = 0.5
     return clinc_text_config
 
 

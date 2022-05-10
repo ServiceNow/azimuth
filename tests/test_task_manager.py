@@ -87,17 +87,18 @@ def test_clearing_cache(tiny_text_config):
 
 def test_expired_task(tiny_text_task_manager):
     current_update = time.time()
+    pipeline_index_option = ModuleOptions(pipeline_index=0)
     _, pred_task = tiny_text_task_manager.get_task(
         SupportedMethod.Predictions,
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=ModuleOptions(pipeline_index=0),
+        mod_options=pipeline_index_option,
     )
     # Get an expirable task
     _, confusion_matrix_task = tiny_text_task_manager.get_task(
         SupportedModule.ConfusionMatrix,
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=ModuleOptions(pipeline_index=0),
+        mod_options=pipeline_index_option,
         last_update=current_update,
     )
     assert not pred_task.done() and not confusion_matrix_task.done()
@@ -108,13 +109,13 @@ def test_expired_task(tiny_text_task_manager):
         SupportedMethod.Predictions,
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=ModuleOptions(pipeline_index=0),
+        mod_options=pipeline_index_option,
     )
     # Get an expirable task
     _, confusion_matrix_task = tiny_text_task_manager.get_task(
         SupportedModule.ConfusionMatrix,
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=ModuleOptions(pipeline_index=0),
+        mod_options=pipeline_index_option,
         last_update=current_update,
     )
     assert pred_task.done() and confusion_matrix_task.done()
@@ -125,13 +126,13 @@ def test_expired_task(tiny_text_task_manager):
         SupportedMethod.Predictions,
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=ModuleOptions(pipeline_index=0),
+        mod_options=pipeline_index_option,
     )
     # Get an expirable task
     _, confusion_matrix_task = tiny_text_task_manager.get_task(
         SupportedModule.ConfusionMatrix,
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=ModuleOptions(pipeline_index=0),
+        mod_options=pipeline_index_option,
         last_update=current_update,
     )
     assert pred_task.done() and not confusion_matrix_task.done()

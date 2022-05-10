@@ -44,7 +44,7 @@ PIPELINE_CFG = {
         "class_name": "tests.test_loading_resources.load_hf_text_classif_pipeline",
         "kwargs": {"checkpoint_path": _CHECKPOINT_PATH},
     },
-    "postprocessors": [{"threshold": 0.7}, {"temperature": 3}],
+    "postprocessors": [{"temperature": 3}, {"threshold": 0.7}],
 }
 DATASET_CFG = {
     "class_name": "tests.test_loading_resources.load_sst2_dataset",
@@ -177,19 +177,18 @@ def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
         initial_prediction_tags=ALL_PREDICTION_TAGS,
         dataset_split=ds,
     )
-    add_every_tag_once(dm)
+    add_tags(dm)
     faiss_features = lambda: np.random.randn(786)
     dm.add_faiss_index([faiss_features() for _ in range(dm.num_rows)])
     return dm
 
 
-def add_every_tag_once(dm):
+def add_tags(dm):
+    def add_all_tags_once(all_tags):
+        for idx, t in enumerate(all_tags):
+            tags = {idx: {t: True}}
+            dm.add_tags(tags, table_key)
+
     table_key = get_table_key(dm.config)
-    # Tags some utterances
-    for idx, t in enumerate(ALL_DATA_ACTIONS):
-        tags = {idx: {t: True}}
-        dm.add_tags(tags, table_key)
-    # Tags some utterances
-    for idx, t in enumerate(ALL_SMART_TAGS):
-        tags = {idx: {t: True}}
-        dm.add_tags(tags, table_key)
+    add_all_tags_once(ALL_DATA_ACTIONS)
+    add_all_tags_once(ALL_SMART_TAGS)
