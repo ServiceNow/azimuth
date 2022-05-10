@@ -52,7 +52,7 @@ def test_confusion_matrix(tiny_text_config_postprocessors):
     mod_not_normalized = ConfusionMatrixModule(
         DatasetSplitName.eval,
         tiny_text_config_postprocessors,
-        mod_options=ModuleOptions(pipeline_index=0, normalized=False),
+        mod_options=ModuleOptions(pipeline_index=0, cf_normalized=False),
     )
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
     assert json_output_not_normalized.confusion_matrix.sum() == dm.num_rows

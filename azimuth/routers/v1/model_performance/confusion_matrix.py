@@ -47,7 +47,7 @@ def get_confusion_matrix(
         filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
         without_postprocessing=without_postprocessing,
-        normalized=normalized,
+        cf_normalized=normalized,
     )
 
     task_result: ConfusionMatrixResponse = get_standard_task_result(

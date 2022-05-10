@@ -12,7 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   now)
 - New Smart Tags `pipeline_disagreement` and `incorrect_for_all_pipelines` as a first step for pipeline comparison.
 - Links on top words to filter utterances that contain it.
-- `/confusion_matrix` now supports `normalized:bool`.
+- `/confusion_matrix` now supports `normalized:bool` to get counts versus normalized confusion matrix.
 
 ### Changed
 

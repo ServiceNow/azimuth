@@ -36,6 +36,6 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             y_true=labels,
             y_pred=predictions,
             labels=class_ids,
-            normalize="true" if self.mod_options.normalized else None,
+            normalize="true" if self.mod_options.cf_normalized else None,
         )
         return [ConfusionMatrixResponse(confusion_matrix=cf)]
