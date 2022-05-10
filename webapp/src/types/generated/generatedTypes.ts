@@ -586,6 +586,8 @@ export interface components {
       | "high_epistemic_uncertainty"
       | "correct_top_3"
       | "correct_low_conf"
+      | "incorrect_for_all_pipelines"
+      | "pipeline_disagreement"
       | "NO_SMART_TAGS";
     /**
      * This model should be used as the base for any model that defines aliases to ensure
