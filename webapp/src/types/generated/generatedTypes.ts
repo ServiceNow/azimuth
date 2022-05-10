@@ -1295,7 +1295,8 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
-        without_postprocessing?: boolean;
+        withoutPostprocessing?: boolean;
+        normalized?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;

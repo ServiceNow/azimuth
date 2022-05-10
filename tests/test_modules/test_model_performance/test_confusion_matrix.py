@@ -47,3 +47,12 @@ def test_confusion_matrix(tiny_text_config):
     # Last column (REJECTION_CLASS) should be not empty by default, but empty without postprocessing
     assert json_output.confusion_matrix.sum(0)[2] > 0
     assert json_output_without_postprocessing.confusion_matrix.sum(0)[2] == 0
+
+    # When not normalized, we get the predictions.
+    mod_not_normalized = ConfusionMatrixModule(
+        DatasetSplitName.eval,
+        tiny_text_config_postprocessors,
+        mod_options=ModuleOptions(pipeline_index=0, cf_normalized=False),
+    )
+    [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
+    assert json_output_not_normalized.confusion_matrix.sum() == dm.num_rows
