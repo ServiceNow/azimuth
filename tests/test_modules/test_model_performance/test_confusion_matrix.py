@@ -51,7 +51,7 @@ def test_confusion_matrix(tiny_text_config):
     # When not normalized, we get the predictions.
     mod_not_normalized = ConfusionMatrixModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
+        tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0, cf_normalized=False),
     )
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
