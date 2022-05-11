@@ -40,7 +40,7 @@ def fake_saliency_record(indices):
     return records
 
 
-def test_get_words(monkeypatch, simple_text_config, dask_client, apply_mocked_startup_task):
+def test_get_words(monkeypatch, simple_text_config, apply_mocked_startup_task):
     mod = TokensToWordsModule(
         dataset_split_name=DatasetSplitName.eval,
         config=simple_text_config,
@@ -57,11 +57,11 @@ def test_get_words(monkeypatch, simple_text_config, dask_client, apply_mocked_st
     assert np.isclose(hello_saliency, json_output[0].saliency[0])
 
 
-def test_top_words_get_tokens_saliencies(simple_text_config, dask_client):
+def test_top_words_get_tokens_saliencies(tiny_text_config):
     mod = TokensToWordsModule(
         DatasetSplitName.eval,
-        simple_text_config,
-        mod_options=ModuleOptions(pipeline_index=0, indices=[1, 2]),
+        tiny_text_config,
+        mod_options=ModuleOptions(pipeline_index=0),
     )
-    rec = mod.get_tokens_saliencies([1, 2])
+    rec = mod.get_tokens_saliencies([0, 1])
     assert len(rec) == 2

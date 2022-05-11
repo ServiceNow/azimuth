@@ -109,11 +109,10 @@ def test_prediction(simple_text_config):
         assert pred_res.postprocessed_output.probs.shape == (1, 2)
 
 
-def test_rejection_class(simple_text_config_high_threshold):
-    # We set the threshold very high because our test model has random weights
+def test_rejection_class(simple_text_config):
     mod = HFTextClassificationModule(
         DatasetSplitName.eval,
-        simple_text_config_high_threshold,
+        simple_text_config,
         mod_options=ModuleOptions(
             model_contract_method_name=SupportedMethod.Predictions,
             pipeline_index=0,
@@ -127,8 +126,7 @@ def test_rejection_class(simple_text_config_high_threshold):
         lambda k: k.postprocessed_output.preds[0] != k.model_output.preds[0], out
     )
     assert all(
-        np.max(pred_response.model_output.probs[0])
-        <= simple_text_config_high_threshold.pipelines[0].threshold
+        np.max(pred_response.model_output.probs[0]) <= simple_text_config.pipelines[0].threshold
         for pred_response in rejected_items
     )
 
@@ -233,10 +231,10 @@ def test_custom_class_saliency(simple_text_config):
     assert not np.allclose(result[1][0].saliency, result[2][0].saliency)
 
 
-def test_load_CLINC150_dataset(text_config_CLINC150):
+def test_load_CLINC150_dataset(clinc_text_config):
     task = HFTextClassificationModule(
         DatasetSplitName.train,
-        text_config_CLINC150,
+        clinc_text_config,
         mod_options=ModuleOptions(model_contract_method_name=SupportedMethod.Predictions),
     )
 

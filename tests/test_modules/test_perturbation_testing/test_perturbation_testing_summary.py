@@ -9,7 +9,7 @@ from azimuth.modules.perturbation_testing import (
 from azimuth.types import DatasetSplitName, ModuleOptions
 
 
-def test_perturbation_testing_summary(tiny_text_config, dask_client):
+def test_perturbation_testing_summary(tiny_text_config):
     mod = PerturbationTestingMergedModule(
         dataset_split_name=DatasetSplitName.all,
         config=tiny_text_config,
@@ -39,12 +39,10 @@ def test_perturbation_testing_summary(tiny_text_config, dask_client):
             assert any(test.name in r.name for r in res)
 
 
-def test_without_train(tiny_text_config, dask_client):
-    tiny_text_config.dataset.kwargs["train"] = False
-
+def test_without_train(tiny_text_config_no_train):
     mod = PerturbationTestingMergedModule(
         dataset_split_name=DatasetSplitName.all,
-        config=tiny_text_config,
+        config=tiny_text_config_no_train,
         mod_options=ModuleOptions(pipeline_index=0),
     )
     [res] = mod.compute_on_dataset_split()
@@ -52,7 +50,7 @@ def test_without_train(tiny_text_config, dask_client):
 
     mod_sum = PerturbationTestingSummaryModule(
         dataset_split_name=DatasetSplitName.all,
-        config=tiny_text_config,
+        config=tiny_text_config_no_train,
         mod_options=ModuleOptions(pipeline_index=0),
     )
 

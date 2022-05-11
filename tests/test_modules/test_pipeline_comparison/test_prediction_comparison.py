@@ -9,10 +9,10 @@ from azimuth.types.pipeline_comparison import PredictionComparisonResponse
 from azimuth.types.tag import SmartTag
 
 
-def test_response(simple_multipipeline_text_config):
+def test_response(simple_text_config_multi_pipeline):
     module = PredictionComparisonModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=simple_multipipeline_text_config,
+        config=simple_text_config_multi_pipeline,
     )
     result = module.compute_on_dataset_split()
     predictions_0 = module._get_predictions(0)
@@ -32,8 +32,8 @@ def test_response(simple_multipipeline_text_config):
         )
 
 
-def test_less_than_two_pipeline(simple_text_config, simple_no_pipeline_text_config):
-    for cfg in (simple_text_config, simple_no_pipeline_text_config):
+def test_less_than_two_pipeline(simple_text_config, tiny_text_config_no_pipeline):
+    for cfg in (simple_text_config, tiny_text_config_no_pipeline):
         module = PredictionComparisonModule(
             dataset_split_name=DatasetSplitName.eval,
             config=cfg,
@@ -42,9 +42,9 @@ def test_less_than_two_pipeline(simple_text_config, simple_no_pipeline_text_conf
             module.compute_on_dataset_split()
 
 
-def test_save_results(simple_multipipeline_text_config):
+def test_save_results(simple_text_config_multi_pipeline):
     module = PredictionComparisonModule(
-        dataset_split_name=DatasetSplitName.eval, config=simple_multipipeline_text_config
+        dataset_split_name=DatasetSplitName.eval, config=simple_text_config_multi_pipeline
     )
     dm = module.get_dataset_split_manager()
     preds = [
@@ -58,9 +58,9 @@ def test_save_results(simple_multipipeline_text_config):
     assert SmartTag.incorrect_for_all_pipelines not in dm.get_dataset_split(None)
 
     # Check that the tag is applied to all prediction tables.
-    for pipeline_index in range(len(simple_multipipeline_text_config.pipelines)):
+    for pipeline_index in range(len(simple_text_config_multi_pipeline.pipelines)):
         table_key = PredictionTableKey.from_pipeline_index(
-            pipeline_index, simple_multipipeline_text_config
+            pipeline_index, simple_text_config_multi_pipeline
         )
         ds = dm.get_dataset_split(table_key)
         assert (

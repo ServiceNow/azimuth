@@ -9,13 +9,13 @@ from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
 from tests.utils import save_predictions
 
 
-def test_confusion_matrix(tiny_text_config_postprocessors):
-    save_predictions(tiny_text_config_postprocessors)
+def test_confusion_matrix(tiny_text_config):
+    save_predictions(tiny_text_config)
 
     # Basic confusion matrix
     mod = ConfusionMatrixModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
+        tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
     [json_output] = mod.compute_on_dataset_split()
@@ -28,7 +28,7 @@ def test_confusion_matrix(tiny_text_config_postprocessors):
     # Filtered confusion matrix
     mod_filter = ConfusionMatrixModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
+        tiny_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
     )
     [json_output_filter] = mod_filter.compute_on_dataset_split()
@@ -39,7 +39,7 @@ def test_confusion_matrix(tiny_text_config_postprocessors):
     # Confusion matrix without postprocessing
     mod_without_postprocessing = ConfusionMatrixModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
+        tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
     )
     [json_output_without_postprocessing] = mod_without_postprocessing.compute_on_dataset_split()
@@ -51,7 +51,7 @@ def test_confusion_matrix(tiny_text_config_postprocessors):
     # When not normalized, we get the predictions.
     mod_not_normalized = ConfusionMatrixModule(
         DatasetSplitName.eval,
-        tiny_text_config_postprocessors,
+        tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0, cf_normalized=False),
     )
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
