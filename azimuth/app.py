@@ -142,6 +142,9 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
     from azimuth.routers.v1.model_performance.utterance_count import (
         router as utterance_count_router,
     )
+    from azimuth.routers.v1.pipeline_comparison.prediction_difference import (
+        router as pred_diff_router,
+    )
     from azimuth.routers.v1.spectral_clustering import (
         router as spectral_clustering_router,
     )
@@ -206,6 +209,11 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
         confusion_matrix_router,
         prefix="/dataset_splits/{dataset_split_name}/confusion_matrix",
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
+    )
+    api_router.include_router(
+        pred_diff_router,
+        prefix="/comparison/prediction_difference",
+        dependencies=[Depends(require_application_ready)],
     )
     app.include_router(api_router)
 
