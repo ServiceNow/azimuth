@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Iterable, List, Optional, Union
+from typing import Dict, List, Optional, Sequence, Union, cast
 
 from datasets import Dataset
 from fastapi import APIRouter, Depends, Query
@@ -12,6 +12,7 @@ from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKe
 from azimuth.types import (
     AliasModel,
     DatasetColumn,
+    DatasetSplitName,
     NamedDatasetFilters,
     PaginationParams,
 )
@@ -25,7 +26,7 @@ router = APIRouter()
 TAGS = ["Prediction Difference v1"]
 
 
-def item(i: Union[int, Iterable[int]]):
+def item(i: Union[int, Sequence[int]]):
     if isinstance(i, int):
         return i
     return i[0]
@@ -44,6 +45,7 @@ class PredictionDifferenceResponse(AliasModel):
 
 @router.get("", response_model=PredictionDifferenceResponse, tags=TAGS)
 def get_difference_in_pred(
+    dataset_split_name: DatasetSplitName,
     named_filters_base: NamedDatasetFilters = Depends(build_named_dataset_filters),
     config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
@@ -112,7 +114,7 @@ def make_utterance(
     index: int,
     table_key: PredictionTableKey,
 ) -> Utterance:
-    data = dataset_with_class_names[index]
+    data = cast(Dict, dataset_with_class_names[index])
     smart_tags = [
         t
         for t, v in dataset_split_manager.get_tags([index], table_key)[0].items()

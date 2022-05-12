@@ -27,13 +27,14 @@ def create_test_app(config) -> FastAPI:
     return me_app.create_app_with("/tmp/config.json", debug=False, profile=False)
 
 
-FAST_TEST_CFG = {
-    "model": {
-        "class_name": "tests.test_loading_resources.config_structured_output",
-        "kwargs": {"num_classes": 2, "threshold": 0.4},
-    },
-    "postprocessors": None,
-}
+def make_fast_model(threshold):
+    return {
+        "model": {
+            "class_name": "tests.test_loading_resources.config_structured_output",
+            "kwargs": {"num_classes": 2, "threshold": threshold},
+        },
+        "postprocessors": None,
+    }
 
 
 @pytest.fixture
@@ -54,7 +55,7 @@ def app() -> FastAPI:
     router_config = AzimuthConfig(
         name="sentiment-analysis",
         dataset=DATASET_CFG,
-        pipelines=[FAST_TEST_CFG],
+        pipelines=[make_fast_model(0.4), make_fast_model(0.9)],
         artifact_path="/tmp/azimuth_test_cache",
         batch_size=16,
         use_cuda=False,
