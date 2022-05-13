@@ -33,6 +33,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
+  QueryPostProcessingState,
 } from "types/models";
 import { downloadDatasetSplit } from "utils/api";
 import {
@@ -97,6 +98,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
+  without_postprocessing: QueryPostProcessingState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
@@ -106,6 +108,7 @@ const UtterancesTable: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
+  without_postprocessing,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -122,6 +125,7 @@ const UtterancesTable: React.FC<Props> = ({
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
     ...pipeline,
+    ...without_postprocessing,
   };
 
   const { data: utterancesResponse, isFetching } =

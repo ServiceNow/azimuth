@@ -4,6 +4,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
+  QueryPostProcessingState,
   QueryState,
 } from "types/models";
 
@@ -53,6 +54,9 @@ export const parseSearchString = (searchString: string) => {
     }),
     pipeline: convertSearchParams<QueryPipelineState>(q, {
       pipelineIndex: convertNumber,
+    }),
+    without_postprocessing: convertSearchParams<QueryPostProcessingState>(q, {
+      without_postprocessing: (s) => s !== null || undefined,
     }),
   };
 };

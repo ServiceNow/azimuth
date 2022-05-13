@@ -13,6 +13,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
+  QueryPostProcessingState,
 } from "types/models";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { motion } from "framer-motion";
@@ -31,6 +32,7 @@ import {
   getUtteranceCountPerFilterEndpoint,
 } from "services/api";
 import DatasetSplitToggler from "./DatasetSplitToggler";
+import SwitchToggler from "./SwitchToggler";
 import FilterSelector from "./FilterSelector";
 import FilterSlider from "./FilterSlider";
 import FilterTextField from "./FilterTextField";
@@ -42,6 +44,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
+  without_postprocessing: QueryPostProcessingState;
   searchString: string;
 };
 
@@ -49,6 +52,7 @@ const Controls: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
+  without_postprocessing,
   searchString,
 }) => {
   const theme = useTheme();
@@ -69,11 +73,13 @@ const Controls: React.FC<Props> = ({
           datasetSplitName,
           ...filters,
           ...pipeline,
+          ...without_postprocessing,
         })
       : getUtteranceCountPerFilterEndpoint.useQuery({
           jobId,
           datasetSplitName,
           ...filters,
+          ...without_postprocessing,
         });
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
@@ -128,6 +134,16 @@ const Controls: React.FC<Props> = ({
 
   const handleDatasetSplitChange = (name: DatasetSplitName) =>
     history.push(`/${jobId}/dataset_splits/${name}/${mainView}${searchString}`);
+
+  const handlePostProcessingToggle = (enable: boolean) =>
+    history.push(
+      `${baseUrl}${constructSearchString({
+        ...filters,
+        ...pagination,
+        ...pipeline,
+        without_postprocessing: enable || undefined,
+      })}`
+    );
 
   const transition = { type: "tween" };
 
@@ -205,6 +221,14 @@ const Controls: React.FC<Props> = ({
             <DatasetSplitToggler
               value={datasetSplitName}
               onChange={handleDatasetSplitChange}
+            />
+          </Box>
+          <Box marginY={1}>
+            <SwitchToggler
+              label="Enable PostProcessing"
+              labelPlacement="start"
+              enable={without_postprocessing && undefined}
+              onChange={handlePostProcessingToggle}
             />
           </Box>
           <Box

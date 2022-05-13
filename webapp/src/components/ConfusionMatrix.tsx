@@ -3,7 +3,11 @@ import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
-import { QueryFilterState, QueryPipelineState } from "types/models";
+import {
+  QueryFilterState,
+  QueryPipelineState,
+  QueryPostProcessingState,
+} from "types/models";
 import { OUTCOME_COLOR } from "utils/const";
 import { classNames } from "utils/helpers";
 
@@ -17,6 +21,7 @@ type Props = {
   datasetSplitName: DatasetSplitName;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
+  without_postprocessing: QueryPostProcessingState;
   classOptions: string[];
   predictionFilters?: string[];
   labelFilters?: string[];
@@ -74,6 +79,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   datasetSplitName,
   filters,
   pipeline,
+  without_postprocessing,
   classOptions,
   predictionFilters,
   labelFilters,
@@ -93,6 +99,7 @@ const ConfusionMatrix: React.FC<Props> = ({
       datasetSplitName,
       ...filters,
       ...pipeline,
+      ...without_postprocessing,
     });
 
   // Set to 1 if the maxCount is 0 so we don't divide by 0.

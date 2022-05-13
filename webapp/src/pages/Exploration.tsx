@@ -47,7 +47,13 @@ const Exploration = () => {
   }>();
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
-  const { filters, pagination, pipeline, searchString } = useQueryState();
+  const {
+    filters,
+    pagination,
+    pipeline,
+    without_postprocessing,
+    searchString,
+  } = useQueryState();
 
   const history = useHistory();
 
@@ -73,6 +79,7 @@ const Exploration = () => {
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
+            without_postprocessing={without_postprocessing}
             searchString={searchString}
           />
           <div className={classes.content}>
@@ -115,12 +122,14 @@ const Exploration = () => {
                       datasetSplitName={datasetSplitName}
                       filters={filters}
                       pipeline={pipeline}
+                      without_postprocessing={without_postprocessing}
                     />
                     <ConfidenceHistogramTopWords
                       baseUrl={baseUrl}
                       filters={filters}
                       pagination={pagination}
                       pipeline={pipeline}
+                      without_postprocessing={without_postprocessing}
                     />
                   </>
                 )}
@@ -134,6 +143,7 @@ const Exploration = () => {
                     classOptions={classOptions}
                     predictionFilters={filters.predictions}
                     labelFilters={filters.labels}
+                    without_postprocessing={without_postprocessing}
                   />
                 )}
               {mainView === "utterances" && (
@@ -144,6 +154,7 @@ const Exploration = () => {
                   pagination={pagination}
                   filters={filters}
                   pipeline={pipeline}
+                  without_postprocessing={without_postprocessing}
                 />
               )}
             </Paper>

@@ -27,6 +27,7 @@ import {
   getUtterancesEndpoint,
 } from "services/api";
 import { DatasetSplitName, Outcome } from "types/api";
+import { QueryPostProcessingState } from "types/models";
 import { ID_TOOLTIP, OUTCOME_COLOR } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { isPipelineSelected } from "utils/helpers";
@@ -77,7 +78,7 @@ const UtteranceDetail = () => {
     datasetSplitName: DatasetSplitName;
   }>();
   const index = Number(utteranceId);
-  const { pipeline } = useQueryState();
+  const { pipeline, without_postprocessing } = useQueryState();
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
@@ -94,6 +95,7 @@ const UtteranceDetail = () => {
     datasetSplitName,
     indices: [index],
     ...pipeline,
+    ...without_postprocessing,
   };
 
   const { data: utterancesResponse, isFetching: utteranceIsFetching } =
