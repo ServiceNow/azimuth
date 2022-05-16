@@ -135,7 +135,7 @@ class TaskManager:
         if task_cls is not None:
             # We found the task, we can instantiate it.
             if isinstance(task_name, SupportedMethod):
-                mod_options.model_contract_method_name = task_name
+                mod_options = mod_options.copy(update={"model_contract_method_name": task_name})
 
             task: DaskModule = task_cls(
                 dataset_split_name=dataset_split_name,

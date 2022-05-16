@@ -30,7 +30,6 @@ from azimuth.types.outcomes import ALL_OUTCOMES
 from azimuth.types.tag import ALL_DATA_ACTION_FILTERS, ALL_SMART_TAG_FILTERS
 from azimuth.utils.ml.ece import compute_ece_from_bins
 from azimuth.utils.ml.model_performance import sorted_by_utterance_count_with_last
-from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.validation import assert_not_none
 
 MAX_PRED = 3
@@ -78,8 +77,9 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
         metric_values = {}
         dm = self.get_dataset_split_manager()
         for metric_name, metric_obj_def in self.config.metrics.items():
-            met: Metric = load_custom_object(
-                metric_obj_def,
+            met: Metric = self.artifact_manager.get_metric(
+                self.config,
+                metric_name,
                 label_list=dm.get_class_names(),
                 rejection_class_idx=dm.rejection_class_idx,
                 force_kwargs=True,  # Set True here as load_metrics has **kwargs.
