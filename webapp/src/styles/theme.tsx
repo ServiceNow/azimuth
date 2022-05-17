@@ -2,7 +2,6 @@ import { Theme } from "@emotion/react";
 import { createTheme } from "@mui/material";
 import withStyles from "@mui/styles/withStyles";
 import "styles/typography/gilroy/gilroy.css";
-import { DEFAULT_SPACING } from "./const";
 
 export const GlobalCss = withStyles({
   "@global": {
@@ -19,7 +18,6 @@ export const GlobalCss = withStyles({
 const defaultTheme = createTheme();
 
 const customTheme: Theme = createTheme({
-  spacing: DEFAULT_SPACING,
   palette: {
     background: {
       default: "#fafafa", // TODO awaiting design input.
