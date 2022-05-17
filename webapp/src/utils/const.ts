@@ -1,9 +1,3 @@
-import {
-  AvailableFilter,
-  QueryPaginationState,
-  QueryPipelineState,
-} from "types/models";
-
 export const DATASET_SPLIT_NAMES = ["eval", "train"] as const;
 
 export const DATASET_SPLIT_PRETTY_NAMES = {
@@ -17,18 +11,6 @@ export const ID_TOOLTIP =
 export const PIPELINE_REQUIRED_TIP = "Unavailable without a pipeline";
 
 export const PAGE_SIZE = 10;
-export const PAGE: keyof QueryPaginationState = "page";
-export const SORT: keyof QueryPaginationState = "sort";
-export const DESCENDING: keyof QueryPaginationState = "descending";
-export const PIPELINE_INDEX: keyof QueryPipelineState = "pipelineIndex";
-export const CONFIDENCE_MAX: AvailableFilter = "confidenceMax";
-export const CONFIDENCE_MIN: AvailableFilter = "confidenceMin";
-export const PREDICTIONS: AvailableFilter = "predictions";
-export const LABELS: AvailableFilter = "labels";
-export const DATA_ACTIONS: AvailableFilter = "dataActions";
-export const OUTCOMES: AvailableFilter = "outcomes";
-export const SMART_TAGS: AvailableFilter = "smartTags";
-export const UTTERANCE: AvailableFilter = "utterance";
 
 export const DATA_ACTION_NONE_VALUE = "NO_ACTION";
 
