@@ -44,7 +44,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
-  without_postprocessing: QueryPostProcessingState;
+  withoutPostprocessing: QueryPostProcessingState;
   searchString: string;
 };
 
@@ -52,7 +52,7 @@ const Controls: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
-  without_postprocessing,
+  withoutPostprocessing,
   searchString,
 }) => {
   const theme = useTheme();
@@ -73,13 +73,13 @@ const Controls: React.FC<Props> = ({
           datasetSplitName,
           ...filters,
           ...pipeline,
-          ...without_postprocessing,
+          ...withoutPostprocessing,
         })
       : getUtteranceCountPerFilterEndpoint.useQuery({
           jobId,
           datasetSplitName,
           ...filters,
-          ...without_postprocessing,
+          ...withoutPostprocessing,
         });
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
@@ -141,7 +141,7 @@ const Controls: React.FC<Props> = ({
         ...filters,
         ...pagination,
         ...pipeline,
-        without_postprocessing: enable || undefined,
+        withoutPostprocessing: enable || undefined,
       })}`
     );
 
@@ -225,9 +225,9 @@ const Controls: React.FC<Props> = ({
           </Box>
           <Box marginY={1}>
             <SwitchToggler
-              label="Enable PostProcessing"
-              labelPlacement="start"
-              enable={without_postprocessing && undefined}
+              label="Disable PostProcessing"
+              labelPlacement="end"
+              enable={withoutPostprocessing.withoutPostprocessing}
               onChange={handlePostProcessingToggle}
             />
           </Box>

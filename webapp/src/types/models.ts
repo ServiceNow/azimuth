@@ -29,7 +29,7 @@ export type QueryPipelineState = {
 };
 
 export type QueryPostProcessingState = {
-  without_postprocessing?: true;
+  withoutPostprocessing?: true;
 };
 
 export type QueryState = QueryFilterState &

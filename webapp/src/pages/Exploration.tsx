@@ -47,13 +47,8 @@ const Exploration = () => {
   }>();
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
-  const {
-    filters,
-    pagination,
-    pipeline,
-    without_postprocessing,
-    searchString,
-  } = useQueryState();
+  const { filters, pagination, pipeline, withoutPostprocessing, searchString } =
+    useQueryState();
 
   const history = useHistory();
 
@@ -79,7 +74,7 @@ const Exploration = () => {
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
-            without_postprocessing={without_postprocessing}
+            withoutPostprocessing={withoutPostprocessing}
             searchString={searchString}
           />
           <div className={classes.content}>
@@ -122,14 +117,14 @@ const Exploration = () => {
                       datasetSplitName={datasetSplitName}
                       filters={filters}
                       pipeline={pipeline}
-                      without_postprocessing={without_postprocessing}
+                      withoutPostprocessing={withoutPostprocessing}
                     />
                     <ConfidenceHistogramTopWords
                       baseUrl={baseUrl}
                       filters={filters}
                       pagination={pagination}
                       pipeline={pipeline}
-                      without_postprocessing={without_postprocessing}
+                      withoutPostprocessing={withoutPostprocessing}
                     />
                   </>
                 )}
@@ -143,7 +138,7 @@ const Exploration = () => {
                     classOptions={classOptions}
                     predictionFilters={filters.predictions}
                     labelFilters={filters.labels}
-                    without_postprocessing={without_postprocessing}
+                    withoutPostprocessing={withoutPostprocessing}
                   />
                 )}
               {mainView === "utterances" && (
@@ -154,7 +149,7 @@ const Exploration = () => {
                   pagination={pagination}
                   filters={filters}
                   pipeline={pipeline}
-                  without_postprocessing={without_postprocessing}
+                  withoutPostprocessing={withoutPostprocessing}
                 />
               )}
             </Paper>

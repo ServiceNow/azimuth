@@ -23,7 +23,7 @@ const SwitchToggler: React.FC<Props> = ({
       <FormControlLabel
         control={
           <Switch
-            checked={enable}
+            checked={enable ?? false}
             onChange={(_, checked) => handleSwitchChange(checked)}
           />
         }

@@ -98,7 +98,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
-  without_postprocessing: QueryPostProcessingState;
+  withoutPostprocessing: QueryPostProcessingState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
@@ -108,7 +108,7 @@ const UtterancesTable: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
-  without_postprocessing,
+  withoutPostprocessing,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -125,7 +125,7 @@ const UtterancesTable: React.FC<Props> = ({
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
     ...pipeline,
-    ...without_postprocessing,
+    ...withoutPostprocessing,
   };
 
   const { data: utterancesResponse, isFetching } =

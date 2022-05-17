@@ -24,7 +24,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: Required<QueryPipelineState>;
-  without_postprocessing: QueryPostProcessingState;
+  withoutPostprocessing: QueryPostProcessingState;
 };
 
 const ConfidenceHistogramTopWords: React.FC<Props> = ({
@@ -32,7 +32,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
-  without_postprocessing,
+  withoutPostprocessing,
 }) => {
   const { jobId, datasetSplitName } = useParams<{
     jobId: string;
@@ -57,7 +57,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
     datasetSplitName,
     ...filtersWithoutBins,
     ...pipeline,
-    ...without_postprocessing,
+    ...withoutPostprocessing,
   });
 
   const threshold = datasetInfo?.defaultThreshold?.[pipeline.pipelineIndex];
@@ -68,7 +68,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
       datasetSplitName,
       ...filters,
       ...pipeline,
-      ...without_postprocessing,
+      ...withoutPostprocessing,
     });
 
   const topWordsCounts = topWords;
