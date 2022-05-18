@@ -117,6 +117,7 @@ const Controls: React.FC<Props> = ({
         ...filters,
         ...pagination,
         ...pipeline,
+        ...withoutPostprocessing,
       })}`
     );
 
