@@ -79,7 +79,6 @@ const Controls: React.FC<Props> = ({
           jobId,
           datasetSplitName,
           ...filters,
-          ...withoutPostprocessing,
         });
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
@@ -107,7 +106,11 @@ const Controls: React.FC<Props> = ({
 
   const handleClearFilters = () => {
     history.push(
-      `${baseUrl}${constructSearchString({ ...pagination, ...pipeline })}`
+      `${baseUrl}${constructSearchString({
+        ...pagination,
+        ...pipeline,
+        withoutPostprocessing: undefined,
+      })}`
     );
   };
 
@@ -224,14 +227,6 @@ const Controls: React.FC<Props> = ({
               onChange={handleDatasetSplitChange}
             />
           </Box>
-          <Box marginY={1} paddingX={1}>
-            <SwitchToggler
-              label="Without PostProcessing"
-              labelPlacement="end"
-              enable={withoutPostprocessing.withoutPostprocessing}
-              onChange={handlePostProcessingToggle}
-            />
-          </Box>
           <Box
             display="flex"
             justifyContent="space-between"
@@ -253,6 +248,14 @@ const Controls: React.FC<Props> = ({
             <Button onClick={handleClearFilters}>Clear filters</Button>
           </Box>
           {divider}
+          <Box margin={1}>
+            <SwitchToggler
+              label="Without PostProcessing"
+              labelPlacement="end"
+              enable={withoutPostprocessing.withoutPostprocessing}
+              onChange={handlePostProcessingToggle}
+            />
+          </Box>
           <FilterTextField
             label="Utterance"
             placeholder="Search utterances"

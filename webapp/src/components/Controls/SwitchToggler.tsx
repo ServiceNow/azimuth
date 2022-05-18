@@ -16,16 +16,13 @@ const SwitchToggler: React.FC<Props> = ({
   enable,
   onChange,
 }) => {
-  const handleSwitchChange = (checked: boolean) => {
-    onChange(checked);
-  };
   return (
     <FormGroup aria-label="position" row>
       <FormControlLabel
         control={
           <Switch
             checked={enable ?? false}
-            onChange={(_, checked) => handleSwitchChange(checked)}
+            onChange={(_, checked) => onChange(checked)}
           />
         }
         label={label}
