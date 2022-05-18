@@ -187,6 +187,9 @@ const UtterancesTable: React.FC<Props> = ({
 
   const getPrediction = ({ row }: GridValueGetterParams<undefined, Row>) => {
     const prediction = row.modelPrediction?.modelPredictions[0];
+    if (withoutPostprocessing.withoutPostprocessing) {
+      return prediction;
+    }
     const postprocessedPrediction =
       row.modelPrediction?.postprocessedPrediction;
     return postprocessedPrediction !== prediction
@@ -194,8 +197,12 @@ const UtterancesTable: React.FC<Props> = ({
       : prediction;
   };
 
+  const prefix = withoutPostprocessing.withoutPostprocessing
+    ? "model"
+    : "postprocessed";
+
   const getConfidence = ({ row }: GridValueGetterParams<undefined, Row>) =>
-    row.modelPrediction?.postprocessedConfidences[0];
+    row.modelPrediction?.[`${prefix}Confidences`][0];
 
   const outcomeIcon = (outcome: Outcome) => {
     const Icon = outcome.includes("Correct") ? CheckIcon : XIcon;
@@ -208,8 +215,7 @@ const UtterancesTable: React.FC<Props> = ({
   };
 
   const renderOutcome = ({ row }: GridCellParams<undefined, Row>) =>
-    row.modelPrediction &&
-    outcomeIcon(row.modelPrediction.postprocessedOutcome);
+    row.modelPrediction && outcomeIcon(row.modelPrediction[`${prefix}Outcome`]);
 
   const renderSmartTags = ({ row }: GridCellParams<undefined, Row>) => (
     <HoverableDataCell>
