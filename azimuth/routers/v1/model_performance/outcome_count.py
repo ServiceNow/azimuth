@@ -4,7 +4,7 @@
 
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from azimuth.app import get_dataset_split_manager, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -78,7 +78,9 @@ def get_outcome_count_per_filter(
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
-    without_postprocessing: bool = False,
+    without_postprocessing: bool = Query(
+        False, title="Without Postprocessing", alias="withoutPostprocessing"
+    ),
 ) -> OutcomeCountPerFilterResponse:
     mod_options = ModuleOptions(
         filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
