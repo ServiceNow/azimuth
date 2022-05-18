@@ -105,7 +105,9 @@ def get_utterances(
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
     pagination: Optional[PaginationParams] = Depends(get_pagination),
-    without_postprocessing: bool = False,
+    without_postprocessing: bool = Query(
+        False, title="Without Postprocessing", alias="withoutPostprocessing"
+    ),
 ) -> GetUtterancesResponse:
     if (
         sort_by in {UtterancesSortableColumn.confidence, UtterancesSortableColumn.prediction}
