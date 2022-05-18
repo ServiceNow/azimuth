@@ -55,8 +55,8 @@ export const parseSearchString = (searchString: string) => {
     pipeline: convertSearchParams<QueryPipelineState>(q, {
       pipelineIndex: convertNumber,
     }),
-    without_postprocessing: convertSearchParams<QueryPostProcessingState>(q, {
-      without_postprocessing: (s) => s !== null || undefined,
+    withoutPostprocessing: convertSearchParams<QueryPostProcessingState>(q, {
+      withoutPostprocessing: (s) => s !== null || undefined,
     }),
   };
 };

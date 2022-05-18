@@ -223,9 +223,9 @@ const Controls: React.FC<Props> = ({
               onChange={handleDatasetSplitChange}
             />
           </Box>
-          <Box marginY={1}>
+          <Box marginY={1} paddingX={1}>
             <SwitchToggler
-              label="Disable PostProcessing"
+              label="Without PostProcessing"
               labelPlacement="end"
               enable={withoutPostprocessing.withoutPostprocessing}
               onChange={handlePostProcessingToggle}

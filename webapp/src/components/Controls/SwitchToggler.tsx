@@ -1,6 +1,7 @@
 import React from "react";
 import { FormGroup, FormControlLabel, Switch } from "@mui/material";
-import { LabelPlacement } from "utils/const";
+
+type LabelPlacement = "top" | "bottom" | "start" | "end";
 
 type Props = {
   label: string;

@@ -138,6 +138,7 @@ const UtterancesTable: React.FC<Props> = ({
       ...filters,
       ...pagination,
       ...pipeline,
+      ...withoutPostprocessing,
       page: page + 1,
     });
     history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
@@ -153,6 +154,7 @@ const UtterancesTable: React.FC<Props> = ({
           ...filters,
           ...pagination,
           ...pipeline,
+          ...withoutPostprocessing,
           sort: model?.field as UtterancesSortableColumn | undefined,
           descending: model?.sort === "desc" || undefined,
         }
