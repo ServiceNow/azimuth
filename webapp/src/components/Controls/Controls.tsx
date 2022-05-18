@@ -10,7 +10,6 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-  AvailableFilter,
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
@@ -116,7 +115,7 @@ const Controls: React.FC<Props> = ({
     );
 
   const handleFilterSelectorChange =
-    <FilterName extends AvailableFilter>(filterName: FilterName) =>
+    <FilterName extends keyof QueryFilterState>(filterName: FilterName) =>
     (filterValue: QueryFilterState[FilterName]) =>
       handleFilterChange({ ...filters, [filterName]: filterValue });
 
