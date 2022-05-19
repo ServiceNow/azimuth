@@ -14,7 +14,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
-  QueryPostProcessingState,
+  QueryPostprocessingState,
   WordCount,
 } from "types/models";
 import { ALL_OUTCOMES } from "utils/const";
@@ -24,7 +24,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: Required<QueryPipelineState>;
-  postprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostprocessingState;
 };
 
 const ConfidenceHistogramTopWords: React.FC<Props> = ({

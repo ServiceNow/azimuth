@@ -3,17 +3,11 @@ import { FormControlLabel, FormControlLabelProps, Switch } from "@mui/material";
 
 type Props = {
   label: string;
-  labelPlacement: FormControlLabelProps["labelPlacement"];
   enable?: true;
   onChange: (toggleValue: boolean) => void;
 };
 
-const SwitchToggler: React.FC<Props> = ({
-  label,
-  labelPlacement,
-  enable,
-  onChange,
-}) => {
+const SwitchToggler: React.FC<Props> = ({ label, enable, onChange }) => {
   return (
     <FormControlLabel
       control={
@@ -23,7 +17,6 @@ const SwitchToggler: React.FC<Props> = ({
         />
       }
       label={label}
-      labelPlacement={labelPlacement}
     />
   );
 };

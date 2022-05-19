@@ -13,7 +13,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
-  QueryPostProcessingState,
+  QueryPostprocessingState,
 } from "types/models";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { motion } from "framer-motion";
@@ -44,7 +44,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
-  postprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostprocessingState;
   searchString: string;
 };
 
@@ -109,7 +109,7 @@ const Controls: React.FC<Props> = ({
       `${baseUrl}${constructSearchString({
         ...pagination,
         ...pipeline,
-        withoutPostprocessing: undefined,
+        ...postprocessing,
       })}`
     );
   };
@@ -227,6 +227,13 @@ const Controls: React.FC<Props> = ({
               onChange={handleDatasetSplitChange}
             />
           </Box>
+          <Box margin={1}>
+            <SwitchToggler
+              label="Without PostProcessing"
+              enable={postprocessing.withoutPostprocessing}
+              onChange={handlePostProcessingToggle}
+            />
+          </Box>
           <Box
             display="flex"
             justifyContent="space-between"
@@ -248,14 +255,6 @@ const Controls: React.FC<Props> = ({
             <Button onClick={handleClearFilters}>Clear filters</Button>
           </Box>
           {divider}
-          <Box margin={1}>
-            <SwitchToggler
-              label="Without PostProcessing"
-              labelPlacement="end"
-              enable={postprocessing.withoutPostprocessing}
-              onChange={handlePostProcessingToggle}
-            />
-          </Box>
           <FilterTextField
             label="Utterance"
             placeholder="Search utterances"

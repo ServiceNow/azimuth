@@ -6,7 +6,7 @@ import { DatasetSplitName } from "types/api";
 import {
   QueryFilterState,
   QueryPipelineState,
-  QueryPostProcessingState,
+  QueryPostprocessingState,
 } from "types/models";
 import { OUTCOME_COLOR } from "utils/const";
 import { classNames } from "utils/helpers";
@@ -21,7 +21,7 @@ type Props = {
   datasetSplitName: DatasetSplitName;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
-  postprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostprocessingState;
   classOptions: string[];
   predictionFilters?: string[];
   labelFilters?: string[];

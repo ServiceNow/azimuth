@@ -6,7 +6,7 @@ import { DatasetSplitName } from "types/api";
 import {
   QueryFilterState,
   QueryPipelineState,
-  QueryPostProcessingState,
+  QueryPostprocessingState,
 } from "types/models";
 import { OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
@@ -59,7 +59,7 @@ type Props = {
   datasetSplitName: DatasetSplitName;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
-  postprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostprocessingState;
 };
 
 const Metrics: React.FC<Props> = ({

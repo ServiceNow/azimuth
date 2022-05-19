@@ -33,7 +33,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
-  QueryPostProcessingState,
+  QueryPostprocessingState,
 } from "types/models";
 import { downloadDatasetSplit } from "utils/api";
 import {
@@ -98,7 +98,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
-  postprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostprocessingState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
