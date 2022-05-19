@@ -98,7 +98,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
-  withoutPostprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostProcessingState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
@@ -108,7 +108,7 @@ const UtterancesTable: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
-  withoutPostprocessing,
+  postprocessing,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -125,7 +125,7 @@ const UtterancesTable: React.FC<Props> = ({
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
     ...pipeline,
-    ...withoutPostprocessing,
+    ...postprocessing,
   };
 
   const { data: utterancesResponse, isFetching } =
@@ -138,7 +138,7 @@ const UtterancesTable: React.FC<Props> = ({
       ...filters,
       ...pagination,
       ...pipeline,
-      ...withoutPostprocessing,
+      ...postprocessing,
       page: page + 1,
     });
     history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
@@ -154,7 +154,7 @@ const UtterancesTable: React.FC<Props> = ({
           ...filters,
           ...pagination,
           ...pipeline,
-          ...withoutPostprocessing,
+          ...postprocessing,
           sort: model?.field as UtterancesSortableColumn | undefined,
           descending: model?.sort === "desc" || undefined,
         }
@@ -187,7 +187,7 @@ const UtterancesTable: React.FC<Props> = ({
 
   const getPrediction = ({ row }: GridValueGetterParams<undefined, Row>) => {
     const prediction = row.modelPrediction?.modelPredictions[0];
-    if (withoutPostprocessing.withoutPostprocessing) {
+    if (postprocessing.withoutPostprocessing) {
       return prediction;
     }
     const postprocessedPrediction =
@@ -197,7 +197,7 @@ const UtterancesTable: React.FC<Props> = ({
       : prediction;
   };
 
-  const prefix = withoutPostprocessing.withoutPostprocessing
+  const prefix = postprocessing.withoutPostprocessing
     ? "model"
     : "postprocessed";
 

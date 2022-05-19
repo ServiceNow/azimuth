@@ -59,7 +59,7 @@ type Props = {
   datasetSplitName: DatasetSplitName;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
-  withoutPostprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostProcessingState;
 };
 
 const Metrics: React.FC<Props> = ({
@@ -67,7 +67,7 @@ const Metrics: React.FC<Props> = ({
   datasetSplitName,
   filters,
   pipeline,
-  withoutPostprocessing,
+  postprocessing,
 }) => {
   const theme = useTheme();
 
@@ -76,7 +76,7 @@ const Metrics: React.FC<Props> = ({
     datasetSplitName,
     ...filters,
     ...pipeline,
-    ...withoutPostprocessing,
+    ...postprocessing,
   });
 
   const { data: metricsInfo } = getCustomMetricInfoEndpoint.useQuery({ jobId });

@@ -21,7 +21,7 @@ type Props = {
   datasetSplitName: DatasetSplitName;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
-  withoutPostprocessing: QueryPostProcessingState;
+  postprocessing: QueryPostProcessingState;
   classOptions: string[];
   predictionFilters?: string[];
   labelFilters?: string[];
@@ -79,7 +79,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   datasetSplitName,
   filters,
   pipeline,
-  withoutPostprocessing,
+  postprocessing,
   classOptions,
   predictionFilters,
   labelFilters,
@@ -99,7 +99,7 @@ const ConfusionMatrix: React.FC<Props> = ({
       datasetSplitName,
       ...filters,
       ...pipeline,
-      ...withoutPostprocessing,
+      ...postprocessing,
     });
 
   // Set to 1 if the maxCount is 0 so we don't divide by 0.

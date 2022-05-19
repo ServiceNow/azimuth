@@ -77,7 +77,7 @@ const UtteranceDetail = () => {
     datasetSplitName: DatasetSplitName;
   }>();
   const index = Number(utteranceId);
-  const { pipeline, withoutPostprocessing } = useQueryState();
+  const { pipeline } = useQueryState();
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
@@ -94,7 +94,6 @@ const UtteranceDetail = () => {
     datasetSplitName,
     indices: [index],
     ...pipeline,
-    ...withoutPostprocessing,
   };
 
   const { data: utterancesResponse, isFetching: utteranceIsFetching } =
