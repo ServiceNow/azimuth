@@ -107,6 +107,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
+            postprocessing={postprocessing}
             wordCounts={correctWordCounts}
             palette="success"
           />
@@ -123,6 +124,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
+            postprocessing={postprocessing}
             wordCounts={errorWordCounts}
             palette="error"
           />
