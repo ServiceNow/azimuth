@@ -34,7 +34,6 @@ import {
   getUtteranceCountPerFilterEndpoint,
 } from "services/api";
 import DatasetSplitToggler from "./DatasetSplitToggler";
-import SwitchToggler from "./SwitchToggler";
 import FilterSelector from "./FilterSelector";
 import FilterSlider from "./FilterSlider";
 import FilterTextField from "./FilterTextField";
