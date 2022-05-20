@@ -3,9 +3,11 @@ import {
   Box,
   Button,
   CircularProgress,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   OutlinedInput,
+  Switch,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -139,7 +141,7 @@ const Controls: React.FC<Props> = ({
   const handleDatasetSplitChange = (name: DatasetSplitName) =>
     history.push(`/${jobId}/dataset_splits/${name}/${mainView}${searchString}`);
 
-  const handlePostProcessingToggle = (enable: boolean) =>
+  const handlePostprocessingChange = (enable: boolean) =>
     history.push(
       `${baseUrl}${constructSearchString({
         ...filters,
@@ -228,10 +230,14 @@ const Controls: React.FC<Props> = ({
             />
           </Box>
           <Box margin={1}>
-            <SwitchToggler
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={postprocessing.withoutPostprocessing ?? false}
+                  onChange={(_, checked) => handlePostprocessingChange(checked)}
+                />
+              }
               label="Without PostProcessing"
-              enable={postprocessing.withoutPostprocessing}
-              onChange={handlePostProcessingToggle}
             />
           </Box>
           <Box
