@@ -33,6 +33,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
+  QueryPostprocessingState,
 } from "types/models";
 import { downloadDatasetSplit } from "utils/api";
 import {
@@ -97,6 +98,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
+  postprocessing: QueryPostprocessingState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
@@ -106,6 +108,7 @@ const UtterancesTable: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
+  postprocessing,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -122,6 +125,7 @@ const UtterancesTable: React.FC<Props> = ({
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
     ...pipeline,
+    ...postprocessing,
   };
 
   const { data: utterancesResponse, isFetching } =
@@ -134,6 +138,7 @@ const UtterancesTable: React.FC<Props> = ({
       ...filters,
       ...pagination,
       ...pipeline,
+      ...postprocessing,
       page: page + 1,
     });
     history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
@@ -149,6 +154,7 @@ const UtterancesTable: React.FC<Props> = ({
           ...filters,
           ...pagination,
           ...pipeline,
+          ...postprocessing,
           sort: model?.field as UtterancesSortableColumn | undefined,
           descending: model?.sort === "desc" || undefined,
         }
@@ -181,6 +187,9 @@ const UtterancesTable: React.FC<Props> = ({
 
   const getPrediction = ({ row }: GridValueGetterParams<undefined, Row>) => {
     const prediction = row.modelPrediction?.modelPredictions[0];
+    if (postprocessing.withoutPostprocessing) {
+      return prediction;
+    }
     const postprocessedPrediction =
       row.modelPrediction?.postprocessedPrediction;
     return postprocessedPrediction !== prediction
@@ -188,8 +197,12 @@ const UtterancesTable: React.FC<Props> = ({
       : prediction;
   };
 
+  const prefix = postprocessing.withoutPostprocessing
+    ? "model"
+    : "postprocessed";
+
   const getConfidence = ({ row }: GridValueGetterParams<undefined, Row>) =>
-    row.modelPrediction?.postprocessedConfidences[0];
+    row.modelPrediction?.[`${prefix}Confidences`][0];
 
   const outcomeIcon = (outcome: Outcome) => {
     const Icon = outcome.includes("Correct") ? CheckIcon : XIcon;
@@ -202,8 +215,7 @@ const UtterancesTable: React.FC<Props> = ({
   };
 
   const renderOutcome = ({ row }: GridCellParams<undefined, Row>) =>
-    row.modelPrediction &&
-    outcomeIcon(row.modelPrediction.postprocessedOutcome);
+    row.modelPrediction && outcomeIcon(row.modelPrediction[`${prefix}Outcome`]);
 
   const renderSmartTags = ({ row }: GridCellParams<undefined, Row>) => (
     <HoverableDataCell>

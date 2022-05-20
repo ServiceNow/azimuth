@@ -28,9 +28,14 @@ export type QueryPipelineState = {
   pipelineIndex?: number;
 };
 
+export type QueryPostprocessingState = {
+  withoutPostprocessing?: true;
+};
+
 export type QueryState = QueryFilterState &
   QueryPaginationState &
-  QueryPipelineState;
+  QueryPipelineState &
+  QueryPostprocessingState;
 
 export type Tags = { [Tag: string]: boolean };
 

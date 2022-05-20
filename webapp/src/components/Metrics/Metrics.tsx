@@ -3,7 +3,11 @@ import { ResponsivePlotWrapper } from "components/PlotWrapper";
 import React from "react";
 import { getMetricsEndpoint, getCustomMetricInfoEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
-import { QueryFilterState, QueryPipelineState } from "types/models";
+import {
+  QueryFilterState,
+  QueryPipelineState,
+  QueryPostprocessingState,
+} from "types/models";
 import { OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import Metric from "./Metric";
@@ -55,6 +59,7 @@ type Props = {
   datasetSplitName: DatasetSplitName;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
+  postprocessing: QueryPostprocessingState;
 };
 
 const Metrics: React.FC<Props> = ({
@@ -62,6 +67,7 @@ const Metrics: React.FC<Props> = ({
   datasetSplitName,
   filters,
   pipeline,
+  postprocessing,
 }) => {
   const theme = useTheme();
 
@@ -70,6 +76,7 @@ const Metrics: React.FC<Props> = ({
     datasetSplitName,
     ...filters,
     ...pipeline,
+    ...postprocessing,
   });
 
   const { data: metricsInfo } = getCustomMetricInfoEndpoint.useQuery({ jobId });

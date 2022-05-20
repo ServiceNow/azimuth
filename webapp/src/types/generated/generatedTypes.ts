@@ -849,7 +849,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
-        without_postprocessing?: boolean;
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -905,7 +905,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
-        without_postprocessing?: boolean;
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -997,7 +997,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
-        without_postprocessing?: boolean;
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -1066,7 +1066,7 @@ export interface operations {
         indices?: number[];
         sort?: components["schemas"]["UtterancesSortableColumn"];
         descending?: boolean;
-        without_postprocessing?: boolean;
+        withoutPostprocessing?: boolean;
         confidenceMin?: number;
         confidenceMax?: number;
         labels?: string[];
@@ -1261,7 +1261,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
-        without_postprocessing?: boolean;
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
