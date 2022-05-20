@@ -7,6 +7,7 @@ import {
   FormControlLabel,
   Tooltip,
   Typography,
+  TypographyProps,
   useTheme,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
@@ -22,6 +23,8 @@ import SeeMoreLess, {
 } from "components/SeeMoreLess";
 
 const MotionArrowDropDownIcon = motion(ArrowDropDownIcon);
+
+const titleTypographyProps: TypographyProps = { variant: "subtitle2" };
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -186,8 +189,6 @@ const FilterSelector = <FilterValue extends string>({
     );
   };
 
-  const title = <Typography variant="subtitle2">{label}</Typography>;
-
   return (
     <>
       <div className={classes.header}>
@@ -204,7 +205,7 @@ const FilterSelector = <FilterValue extends string>({
           />
         </Button>
         {operator === "AND" ? (
-          title
+          <Typography {...titleTypographyProps}>{label}</Typography>
         ) : (
           <FormControlLabel
             className={classes.checkboxGroup}
@@ -219,7 +220,8 @@ const FilterSelector = <FilterValue extends string>({
                 onChange={(_, checked) => handleSelectAll(checked)}
               />
             }
-            label={title}
+            label={label}
+            componentsProps={{ typography: titleTypographyProps }}
           />
         )}
         {selectedOptions.length > 0 && (
