@@ -140,13 +140,13 @@ const Controls: React.FC<Props> = ({
   const handleDatasetSplitChange = (name: DatasetSplitName) =>
     history.push(`/${jobId}/dataset_splits/${name}/${mainView}${searchString}`);
 
-  const handlePostprocessingChange = (enable: boolean) =>
+  const handlePostprocessingChange = (checked: boolean) =>
     history.push(
       `${baseUrl}${constructSearchString({
         ...filters,
         ...pagination,
         ...pipeline,
-        withoutPostprocessing: enable || undefined,
+        withoutPostprocessing: checked || undefined,
       })}`
     );
 
