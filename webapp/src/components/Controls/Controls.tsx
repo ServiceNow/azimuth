@@ -236,7 +236,7 @@ const Controls: React.FC<Props> = ({
                   onChange={(_, checked) => handlePostprocessingChange(checked)}
                 />
               }
-              label="Without PostProcessing"
+              label="Exclude post-processing"
             />
           </Box>
           <Box display="flex" justifyContent="space-between" marginX={1}>
