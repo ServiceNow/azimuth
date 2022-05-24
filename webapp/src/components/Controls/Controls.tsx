@@ -8,6 +8,7 @@ import {
   InputAdornment,
   OutlinedInput,
   Switch,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -229,15 +230,19 @@ const Controls: React.FC<Props> = ({
             />
           </Box>
           <Box margin={1}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={postprocessing.withoutPostprocessing ?? false}
-                  onChange={(_, checked) => handlePostprocessingChange(checked)}
-                />
-              }
-              label="Exclude post-processing"
-            />
+            <Tooltip title="Include or exclude post-processing in predictions and any derived output. This only affects the Exploration Space, and won't affect the smart tags.">
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={postprocessing.withoutPostprocessing ?? false}
+                    onChange={(_, checked) =>
+                      handlePostprocessingChange(checked)
+                    }
+                  />
+                }
+                label="Exclude post-processing"
+              />
+            </Tooltip>
           </Box>
           <Box display="flex" justifyContent="space-between" marginX={1}>
             <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
