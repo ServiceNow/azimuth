@@ -239,13 +239,7 @@ const Controls: React.FC<Props> = ({
               label="Without PostProcessing"
             />
           </Box>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            margin={1}
-            marginBottom={0}
-            marginTop={2}
-          >
+          <Box display="flex" justifyContent="space-between" marginX={1}>
             <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
               <Typography variant="subtitle2">Filters</Typography>
               {isFetchingCountPerFilter ? (
