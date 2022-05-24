@@ -2,12 +2,14 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Generic, List, Optional, Tuple, TypeVar
 
 from pydantic import Field
 
 from azimuth.types import AliasModel, Array, ModuleResponse, PlotSpecification
 from azimuth.types.outcomes import OutcomeName
+
+T = TypeVar("T")
 
 
 class MetricsResponseCommonFields(ModuleResponse):
@@ -30,27 +32,21 @@ class UtteranceCountPerFilterValue(AliasModel):
     filter_value: str = Field(..., title="Filter value")
 
 
-class UtteranceCountPerFilter(AliasModel):
-    prediction: Optional[List[UtteranceCountPerFilterValue]] = Field(
-        ..., title="Prediction", nullable=True
-    )
-    label: List[UtteranceCountPerFilterValue] = Field(..., title="Label")
-    extreme_length: List[UtteranceCountPerFilterValue] = Field(..., title="Extreme length")
-    partial_syntax: List[UtteranceCountPerFilterValue] = Field(..., title="Partial syntax")
-    similarity: List[UtteranceCountPerFilterValue] = Field(..., title="Similarity smart tag")
-    almost_correct: List[UtteranceCountPerFilterValue] = Field(
-        ..., title="Almost correct smart tag"
-    )
-    behavioral_testing: List[UtteranceCountPerFilterValue] = Field(
-        ..., title="Behavioral testing smart tag"
-    )
-    uncertainty_estimation: List[UtteranceCountPerFilterValue] = Field(
-        ..., title="Uncertainty estimation smart tag"
-    )
-    data_action: List[UtteranceCountPerFilterValue] = Field(..., title="Data action tag")
-    outcome: Optional[List[UtteranceCountPerFilterValue]] = Field(
-        ..., title="Outcome", nullable=True
-    )
+class ValuePerFilter(AliasModel, Generic[T]):
+    prediction: Optional[List[T]] = Field(..., title="Prediction", nullable=True)
+    label: List[T] = Field(..., title="Label")
+    extreme_length: List[T] = Field(..., title="Extreme length")
+    partial_syntax: List[T] = Field(..., title="Partial syntax")
+    similarity: List[T] = Field(..., title="Similarity smart tag")
+    almost_correct: List[T] = Field(..., title="Almost correct smart tag")
+    behavioral_testing: List[T] = Field(..., title="Behavioral testing smart tag")
+    uncertainty_estimation: List[T] = Field(..., title="Uncertainty estimation smart tag")
+    data_action: List[T] = Field(..., title="Data action tag")
+    outcome: Optional[List[T]] = Field(..., title="Outcome", nullable=True)
+
+
+class UtteranceCountPerFilter(ValuePerFilter[UtteranceCountPerFilterValue]):
+    pass
 
 
 class UtteranceCountPerFilterResponse(AliasModel):
@@ -62,21 +58,8 @@ class OutcomeCountPerFilterValue(UtteranceCountPerFilterValue):
     outcome_count: Dict[OutcomeName, int] = Field(..., title="Prediction count per outcome")
 
 
-class OutcomeCountPerFilter(AliasModel):
-    prediction: List[OutcomeCountPerFilterValue] = Field(..., title="Prediction")
-    label: List[OutcomeCountPerFilterValue] = Field(..., title="Label")
-    extreme_length: List[OutcomeCountPerFilterValue] = Field(..., title="Extreme length")
-    partial_syntax: List[OutcomeCountPerFilterValue] = Field(..., title="Partial syntax")
-    similarity: List[OutcomeCountPerFilterValue] = Field(..., title="Similarity smart tag")
-    almost_correct: List[OutcomeCountPerFilterValue] = Field(..., title="Almost correct smart tag")
-    behavioral_testing: List[OutcomeCountPerFilterValue] = Field(
-        ..., title="Behavioral testing smart tag"
-    )
-    uncertainty_estimation: List[OutcomeCountPerFilterValue] = Field(
-        ..., title="Uncertainty estimation smart tag"
-    )
-    data_action: List[OutcomeCountPerFilterValue] = Field(..., title="Data action tag")
-    outcome: List[OutcomeCountPerFilterValue] = Field(..., title="Outcome")
+class OutcomeCountPerFilter(ValuePerFilter[OutcomeCountPerFilterValue]):
+    pass
 
 
 class OutcomeCountPerFilterResponse(ModuleResponse):
@@ -88,21 +71,8 @@ class MetricsPerFilterValue(MetricsResponseCommonFields, UtteranceCountPerFilter
     pass
 
 
-class MetricsPerFilter(AliasModel):
-    prediction: List[MetricsPerFilterValue] = Field(..., title="Prediction")
-    label: List[MetricsPerFilterValue] = Field(..., title="Label")
-    extreme_length: List[MetricsPerFilterValue] = Field(..., title="Extreme length")
-    partial_syntax: List[MetricsPerFilterValue] = Field(..., title="Partial syntax")
-    similarity: List[MetricsPerFilterValue] = Field(..., title="Similarity smart tag")
-    almost_correct: List[MetricsPerFilterValue] = Field(..., title="Almost correct smart tag")
-    behavioral_testing: List[MetricsPerFilterValue] = Field(
-        ..., title="Behavioral testing smart tag"
-    )
-    uncertainty_estimation: List[MetricsPerFilterValue] = Field(
-        ..., title="Uncertainty estimation smart tag"
-    )
-    data_action: List[MetricsPerFilterValue] = Field(..., title="Data action tag")
-    outcome: List[MetricsPerFilterValue] = Field(..., title="Outcome")
+class MetricsPerFilter(ValuePerFilter[MetricsPerFilterValue]):
+    pass
 
 
 class MetricsPerFilterModuleResponse(ModuleResponse):
