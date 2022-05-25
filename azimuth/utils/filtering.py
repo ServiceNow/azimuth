@@ -89,7 +89,7 @@ def filter_dataset_split(
         )
         verify_column_is_present(outcome_column, dataset_split)
         # We do OR for outcomes.
-        dataset_split = dataset_split.filter(lambda x: x[DatasetColumn.outcome] in filters.outcomes)
+        dataset_split = dataset_split.filter(lambda x: x[outcome_column] in filters.outcomes)
     for family, tags_in_family in filters.smart_tags.items():
         # For each smart tag family, we do OR, but AND between families
         # If None, it is none of them.
