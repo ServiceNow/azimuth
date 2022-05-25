@@ -7,17 +7,17 @@
         "class_name": "loading_resources.load_hf_text_classif_pipeline",
         "remote": "/azimuth_shr",
         "kwargs": {
-          "checkpoint_path": "/azimuth_shr/files/clinc/CLINC150_trained_model"
+          "checkpoint_path": "/azimuth_shr/files/clinc-demo/CLINC150_trained_model"
         }
       }
     },
     {
+      "name": "DistilBert T=0.7",
       "model": {
-        "name": "DistilBert T=0.7",
         "class_name": "loading_resources.load_hf_text_classif_pipeline",
         "remote": "/azimuth_shr",
         "kwargs": {
-          "checkpoint_path": "/azimuth_shr/files/clinc/CLINC150_trained_model"
+          "checkpoint_path": "/azimuth_shr/files/clinc-demo/CLINC150_trained_model"
         }
       },
       "postprocessors": [

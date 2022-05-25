@@ -105,6 +105,9 @@ def get_utterances(
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
     pagination: Optional[PaginationParams] = Depends(get_pagination),
+    without_postprocessing: bool = Query(
+        False, title="Without Postprocessing", alias="withoutPostprocessing"
+    ),
 ) -> GetUtterancesResponse:
     if (
         sort_by in {UtterancesSortableColumn.confidence, UtterancesSortableColumn.prediction}
@@ -125,6 +128,7 @@ def get_utterances(
         dataset_split_manager.get_dataset_split(table_key),
         dataset_filters,
         dataset_split_manager.config,
+        without_postprocessing,
     )
 
     if len(ds_filtered) == 0:
@@ -172,7 +176,8 @@ def get_utterances(
                 DatasetColumn.postprocessed_confidences,
                 dataset_split_manager.config.columns.label,
                 dataset_split_manager.config.columns.text_input,
-                DatasetColumn.outcome,
+                DatasetColumn.model_outcome,
+                DatasetColumn.postprocessed_outcome,
             ]
         )
         predictions: List[Optional[ModelPrediction]] = [
@@ -181,7 +186,8 @@ def get_utterances(
                 postprocessed_prediction=data[DatasetColumn.postprocessed_prediction],
                 model_confidences=data[DatasetColumn.model_confidences],
                 postprocessed_confidences=data[DatasetColumn.postprocessed_confidences],
-                outcome=data[DatasetColumn.outcome],
+                model_outcome=data[DatasetColumn.model_outcome],
+                postprocessed_outcome=data[DatasetColumn.postprocessed_outcome],
             )
             for data in ds
         ]

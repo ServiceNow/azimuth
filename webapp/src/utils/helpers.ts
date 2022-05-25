@@ -1,30 +1,12 @@
+import _ from "lodash";
 import { toast } from "react-toastify";
 import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
+  QueryPostprocessingState,
   QueryState,
 } from "types/models";
-import {
-  PAGE,
-  SORT,
-  DESCENDING,
-  PREDICTIONS,
-  LABELS,
-  SMART_TAGS,
-  DATA_ACTIONS,
-  CONFIDENCE_MIN,
-  CONFIDENCE_MAX,
-  OUTCOMES,
-  UTTERANCE,
-  PIPELINE_INDEX,
-} from "utils/const";
-import {
-  DataAction,
-  Outcome,
-  SmartTag,
-  UtterancesSortableColumn,
-} from "types/api";
 
 export const classNames = (...args: any[]) => args.filter(Boolean).join(" ");
 
@@ -36,36 +18,48 @@ export const raiseSuccessToast = (message: string) => {
   toast.success(message);
 };
 
-const str2num = (s: string | null) => (s === null ? undefined : Number(s));
+const convertNumber = (s: string | null) =>
+  s === null ? undefined : Number(s);
+
+const convertString = <T extends string>(s: string | null) =>
+  (s as T) || undefined;
+
+const convertStringArray = <T extends string>(s: string | null) =>
+  s?.split(",") as T[] | undefined;
+
+const convertSearchParams = <T>(
+  q: URLSearchParams,
+  conversions: Required<{ [Key in keyof T]: (key: string | null) => T[Key] }>
+): T => _.mapValues(conversions, (convert, name) => convert(q.get(name))) as T;
 
 // This function is dangerous and should be memoized.
 // It is still used in unit tests.
-export const convertSearchParamsToFilterState = (
-  q: URLSearchParams
-): QueryFilterState => ({
-  confidenceMin: str2num(q.get(CONFIDENCE_MIN)),
-  confidenceMax: str2num(q.get(CONFIDENCE_MAX)),
-  labels: q.get(LABELS)?.split(","),
-  predictions: q.get(PREDICTIONS)?.split(","),
-  smartTags: q.get(SMART_TAGS)?.split(",") as SmartTag[] | undefined,
-  dataActions: q.get(DATA_ACTIONS)?.split(",") as DataAction[] | undefined,
-  outcomes: q.get(OUTCOMES)?.split(",") as Outcome[] | undefined,
-  utterance: q.get(UTTERANCE) || undefined,
-});
-
-export const convertSearchParamsToPaginationState = (
-  q: URLSearchParams
-): QueryPaginationState => ({
-  page: str2num(q.get(PAGE)) || 1,
-  sort: (q.get(SORT) || undefined) as UtterancesSortableColumn | undefined,
-  descending: q.get(DESCENDING) !== null || undefined,
-});
-
-export const convertSearchParamsToPipelineState = (
-  q: URLSearchParams
-): QueryPipelineState => ({
-  pipelineIndex: str2num(q.get(PIPELINE_INDEX)),
-});
+export const parseSearchString = (searchString: string) => {
+  const q = new URLSearchParams(searchString);
+  return {
+    filters: convertSearchParams<QueryFilterState>(q, {
+      confidenceMin: convertNumber,
+      confidenceMax: convertNumber,
+      labels: convertStringArray,
+      predictions: convertStringArray,
+      smartTags: convertStringArray,
+      dataActions: convertStringArray,
+      outcomes: convertStringArray,
+      utterance: convertString,
+    }),
+    pagination: convertSearchParams<QueryPaginationState>(q, {
+      page: convertNumber,
+      sort: convertString,
+      descending: (s) => s !== null || undefined,
+    }),
+    pipeline: convertSearchParams<QueryPipelineState>(q, {
+      pipelineIndex: convertNumber,
+    }),
+    postprocessing: convertSearchParams<QueryPostprocessingState>(q, {
+      withoutPostprocessing: (s) => s !== null || undefined,
+    }),
+  };
+};
 
 const joinSearchString = (q: string[]) => (q.length ? `?${q.join("&")}` : "");
 

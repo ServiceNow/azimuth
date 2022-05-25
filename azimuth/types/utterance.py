@@ -16,7 +16,8 @@ class ModelPrediction(AliasModel):
     postprocessed_prediction: str = Field(..., title="Postprocessed prediction")
     model_confidences: List[float] = Field(..., tittle="Model Confidences")
     postprocessed_confidences: List[float] = Field(..., tittle="Postprocessed Confidences")
-    outcome: OutcomeName = Field(..., title="Outcome")
+    model_outcome: OutcomeName = Field(..., title="Model Outcome")
+    postprocessed_outcome: OutcomeName = Field(..., title="Postprocessed Outcome")
 
 
 class ModelSaliency(AliasModel):
@@ -51,7 +52,8 @@ class GetUtterancesResponse(AliasModel):
                             "postprocessedPrediction": 18,
                             "modelConfidences": [0.6, 0.3, 0.1],
                             "postprocessedConfidences": [0.6, 0.3, 0.1],
-                            "outcome": "IncorrectAndPredicted",
+                            "model_outcome": "IncorrectAndPredicted",
+                            "postprocessed_outcome": "IncorrectAndPredicted",
                         },
                         "data_action": None,
                         "smartTags": ["missing_verb"],
@@ -76,7 +78,8 @@ class GetUtterancesResponse(AliasModel):
                             "postprocessedPrediction": 0,
                             "modelConfidences": [0.5, 0.3, 0.2],
                             "postprocessedConfidences": [0.5, 0.3, 0.2],
-                            "outcome": "CorrectAndPredicted",
+                            "model_outcome": "CorrectAndPredicted",
+                            "postprocessed_outcome": "CorrectAndPredicted",
                         },
                         "data_action": None,
                         "smartTags": ["multiple_sentences"],

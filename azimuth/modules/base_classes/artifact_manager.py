@@ -10,6 +10,7 @@ from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.types import DatasetSplitName
 from azimuth.types.tag import ALL_PREDICTION_TAGS, ALL_STANDARD_TAGS
+from azimuth.utils.conversion import md5_hash
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.project import load_dataset_from_config
 from azimuth.utils.validation import assert_not_none
@@ -34,6 +35,7 @@ class ArtifactManager:
         ] = {}
         self.models_mapping: Dict[Hash, Dict[int, Callable]] = {}
         self.tokenizer = None
+        self.metrics = {}
 
     @classmethod
     def get_instance(cls):
@@ -119,6 +121,12 @@ class ArtifactManager:
         if self.tokenizer is None:
             self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
         return self.tokenizer
+
+    def get_metric(self, config, name: str, **kwargs):
+        hash: Hash = md5_hash({**{"name": name}, **kwargs})
+        if hash not in self.metrics:
+            self.metrics[hash] = load_custom_object(config.metrics[name], **kwargs)
+        return self.metrics[hash]
 
     @classmethod
     def clear_cache(cls) -> None:

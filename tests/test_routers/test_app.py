@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from starlette.status import HTTP_200_OK
 from starlette.testclient import TestClient
 
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS
+from azimuth.types.tag import ALL_DATA_ACTION_FILTERS, ALL_SMART_TAG_FILTERS
 
 
 def test_openapi(app: FastAPI):
@@ -46,9 +46,9 @@ def test_get_dataset_info(app: FastAPI) -> None:
         "postprocessingEditable": [False],
         "predictionAvailable": True,
         "projectName": "sentiment-analysis",
-        "dataActions": ALL_DATA_ACTIONS,
+        "dataActions": ALL_DATA_ACTION_FILTERS,
         "similarityAvailable": True,
-        "smartTags": ALL_SMART_TAGS,
+        "smartTags": ALL_SMART_TAG_FILTERS,
         "evalClassDistribution": [22, 20, 0],
         "trainClassDistribution": [23, 19, 0],
     }

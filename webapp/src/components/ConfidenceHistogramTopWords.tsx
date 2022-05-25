@@ -10,17 +10,29 @@ import {
 } from "services/api";
 import TopWords from "components/TopWords/TopWords";
 import TopWordsSkeleton from "components/TopWords/TopWordsSkeleton";
-import { QueryFilterState, QueryPipelineState, WordCount } from "types/models";
+import {
+  QueryFilterState,
+  QueryPaginationState,
+  QueryPipelineState,
+  QueryPostprocessingState,
+  WordCount,
+} from "types/models";
 import { ALL_OUTCOMES } from "utils/const";
 
 type Props = {
+  baseUrl: string;
   filters: QueryFilterState;
+  pagination: QueryPaginationState;
   pipeline: Required<QueryPipelineState>;
+  postprocessing: QueryPostprocessingState;
 };
 
 const ConfidenceHistogramTopWords: React.FC<Props> = ({
+  baseUrl,
   filters,
+  pagination,
   pipeline,
+  postprocessing,
 }) => {
   const { jobId, datasetSplitName } = useParams<{
     jobId: string;
@@ -45,6 +57,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
     datasetSplitName,
     ...filtersWithoutBins,
     ...pipeline,
+    ...postprocessing,
   });
 
   const threshold = datasetInfo?.defaultThreshold?.[pipeline.pipelineIndex];
@@ -55,6 +68,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
       datasetSplitName,
       ...filters,
       ...pipeline,
+      ...postprocessing,
     });
 
   const topWordsCounts = topWords;
@@ -88,7 +102,15 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
         {isFetchingTopWords ? (
           <TopWordsSkeleton />
         ) : (
-          <TopWords wordCounts={correctWordCounts} palette="success" />
+          <TopWords
+            baseUrl={baseUrl}
+            filters={filters}
+            pagination={pagination}
+            pipeline={pipeline}
+            postprocessing={postprocessing}
+            wordCounts={correctWordCounts}
+            palette="success"
+          />
         )}
         <Typography display="inline" align="center" variant="caption">
           Counts of most {topWords?.importanceCriteria ?? "important"} words for
@@ -97,7 +119,15 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
         {isFetchingTopWords ? (
           <TopWordsSkeleton />
         ) : (
-          <TopWords wordCounts={errorWordCounts} palette="error" />
+          <TopWords
+            baseUrl={baseUrl}
+            filters={filters}
+            pagination={pagination}
+            pipeline={pipeline}
+            postprocessing={postprocessing}
+            wordCounts={errorWordCounts}
+            palette="error"
+          />
         )}
       </Box>
     </Box>

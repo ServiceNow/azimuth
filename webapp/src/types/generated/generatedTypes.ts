@@ -371,7 +371,8 @@ export interface components {
       postprocessedPrediction: string;
       modelConfidences: number[];
       postprocessedConfidences: number[];
-      outcome: components["schemas"]["OutcomeName"];
+      modelOutcome: components["schemas"]["OutcomeName"];
+      postprocessedOutcome: components["schemas"]["OutcomeName"];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -589,6 +590,8 @@ export interface components {
       | "high_epistemic_uncertainty"
       | "correct_top_3"
       | "correct_low_conf"
+      | "incorrect_for_all_pipelines"
+      | "pipeline_disagreement"
       | "NO_SMART_TAGS";
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -852,6 +855,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -912,6 +916,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -1013,6 +1018,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -1064,7 +1070,6 @@ export interface operations {
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
-        pipelineIndex?: number;
       };
     };
     responses: {
@@ -1092,6 +1097,7 @@ export interface operations {
         indices?: number[];
         sort?: components["schemas"]["UtterancesSortableColumn"];
         descending?: boolean;
+        withoutPostprocessing?: boolean;
         confidenceMin?: number;
         confidenceMax?: number;
         labels?: string[];
@@ -1291,6 +1297,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        withoutPostprocessing?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
@@ -1329,6 +1336,8 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        withoutPostprocessing?: boolean;
+        normalized?: boolean;
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;

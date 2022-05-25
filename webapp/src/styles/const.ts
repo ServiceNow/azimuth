@@ -5,5 +5,3 @@ export const FILTER_CONTAINER_OPENED_WIDTH = 420;
 export const FILTER_CONTAINER_CLOSED_WIDTH = 36;
 
 export const TOOLTIP_ENTER_DELAY = 500;
-
-export const DEFAULT_SPACING = 8;

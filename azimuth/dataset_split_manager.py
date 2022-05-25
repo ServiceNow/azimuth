@@ -213,8 +213,9 @@ class DatasetSplitManager:
             DatasetColumn.postprocessed_prediction,
             DatasetColumn.model_confidences,
             DatasetColumn.postprocessed_confidences,
+            DatasetColumn.model_outcome,
+            DatasetColumn.postprocessed_outcome,
             DatasetColumn.confidence_bin_idx,
-            DatasetColumn.outcome,
             DatasetColumn.token_count,
             DatasetColumn.neighbors_train,
             DatasetColumn.neighbors_eval,
@@ -303,7 +304,7 @@ class DatasetSplitManager:
         }
         unknown_tag = {k: v for k, v in unknown_tag.items() if len(v) > 0}
         if len(unknown_tag) > 0:
-            raise ValueError(f"Unknown   tags {unknown_tag}")
+            raise ValueError(f"Unknown tags {unknown_tag}")
 
         # Process base tags
         base_tags_present = any(any(tag_values.values()) for tag_values in base_tags.values())

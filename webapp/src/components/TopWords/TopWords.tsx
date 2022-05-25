@@ -1,18 +1,39 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Link, Typography, useTheme } from "@mui/material";
 import useResizeObserver from "hooks/useResizeObserver";
-import { WordCount } from "types/models";
+import {
+  QueryFilterState,
+  QueryPaginationState,
+  QueryPipelineState,
+  QueryPostprocessingState,
+  WordCount,
+} from "types/models";
+import { Link as RouterLink } from "react-router-dom";
+import { constructSearchString } from "utils/helpers";
 
-const maxFontSizeInEm = 3.5;
+const maxFontSizeInEm = 3;
 const minFontSizeInEm = 1.2;
 const minOpacity = 0.6;
 
 type Props = {
+  baseUrl: string;
+  filters: QueryFilterState;
+  pagination: QueryPaginationState;
+  pipeline: QueryPipelineState;
+  postprocessing: QueryPostprocessingState;
   wordCounts: WordCount[];
   palette?: "success" | "error";
 };
 
-const TopWords: React.FC<Props> = ({ wordCounts, palette = "success" }) => {
+const TopWords: React.FC<Props> = ({
+  baseUrl,
+  filters,
+  pagination,
+  pipeline,
+  postprocessing,
+  wordCounts,
+  palette = "success",
+}) => {
   const theme = useTheme();
 
   // It is impossible to know how large the word cloud will end up being so we have to scale it down to fit the parent if it is too big
@@ -60,8 +81,16 @@ const TopWords: React.FC<Props> = ({ wordCounts, palette = "success" }) => {
           </Typography>
         ) : (
           wordCounts.map((wordCount, index) => (
-            <Typography
+            <Link
               key={index}
+              component={RouterLink}
+              to={`${baseUrl}${constructSearchString({
+                ...filters,
+                utterance: wordCount.word,
+                ...pagination,
+                ...pipeline,
+                ...postprocessing,
+              })}`}
               color={theme.palette[palette].dark}
               display="block"
               fontSize={`${Math.max(
@@ -76,9 +105,10 @@ const TopWords: React.FC<Props> = ({ wordCounts, palette = "success" }) => {
                   minOpacity
                 ),
               }}
+              whiteSpace="nowrap"
             >
               {`${wordCount.word} (${wordCount.count})`}
-            </Typography>
+            </Link>
           ))
         )}
       </Box>

@@ -116,7 +116,7 @@ const UtteranceDetail = () => {
   );
 
   const classes = useStyles({
-    outcome: utterance?.modelPrediction?.outcome,
+    outcome: utterance?.modelPrediction?.postprocessedOutcome,
   });
 
   if (!utterance) {

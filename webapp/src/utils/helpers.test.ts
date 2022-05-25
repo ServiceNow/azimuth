@@ -1,13 +1,11 @@
 import {
-  convertSearchParamsToFilterState,
+  parseSearchString,
   constructSearchString,
   constructApiSearchString,
 } from "utils/helpers";
 
 test("convertSearchParamsToFilterState", () => {
-  expect(
-    convertSearchParamsToFilterState(new URLSearchParams(""))
-  ).toStrictEqual({
+  expect(parseSearchString("").filters).toStrictEqual({
     confidenceMin: undefined,
     confidenceMax: undefined,
     labels: undefined,
@@ -17,12 +15,11 @@ test("convertSearchParamsToFilterState", () => {
     outcomes: undefined,
     utterance: undefined,
   });
+
   expect(
-    convertSearchParamsToFilterState(
-      new URLSearchParams(
-        "?labels=1,2&predictions=3,4&smartTags=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
-      )
-    )
+    parseSearchString(
+      "?labels=1,2&predictions=3,4&smartTags=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
+    ).filters
   ).toStrictEqual({
     confidenceMin: undefined,
     confidenceMax: undefined,
@@ -34,9 +31,7 @@ test("convertSearchParamsToFilterState", () => {
     utterance: undefined,
   });
 
-  expect(
-    convertSearchParamsToFilterState(new URLSearchParams("predictions=3"))
-  ).toStrictEqual({
+  expect(parseSearchString("predictions=3").filters).toStrictEqual({
     confidenceMin: undefined,
     confidenceMax: undefined,
     labels: undefined,
@@ -47,9 +42,7 @@ test("convertSearchParamsToFilterState", () => {
     utterance: undefined,
   });
 
-  expect(
-    convertSearchParamsToFilterState(new URLSearchParams("confidenceMin=0"))
-  ).toStrictEqual({
+  expect(parseSearchString("confidenceMin=0").filters).toStrictEqual({
     confidenceMin: 0,
     confidenceMax: undefined,
     labels: undefined,
