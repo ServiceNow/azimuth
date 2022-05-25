@@ -33,20 +33,23 @@ class UtteranceCountPerFilterValue(AliasModel):
     filter_value: str = Field(..., title="Filter value")
 
 
-class ValuePerFilter(AliasModel, GenericModel, Generic[T]):
-    prediction: Optional[List[T]] = Field(..., title="Prediction", nullable=True)
+class ValuePerDatasetFilter(AliasModel, GenericModel, Generic[T]):
     label: List[T] = Field(..., title="Label")
     extreme_length: List[T] = Field(..., title="Extreme length")
     partial_syntax: List[T] = Field(..., title="Partial syntax")
+    data_action: List[T] = Field(..., title="Data action tag")
+
+
+class ValuePerPipelineFilter(AliasModel, GenericModel, Generic[T]):
+    prediction: List[T] = Field(..., title="Prediction")
+    outcome: List[T] = Field(..., title="Outcome")
     similarity: List[T] = Field(..., title="Similarity smart tag")
     almost_correct: List[T] = Field(..., title="Almost correct smart tag")
     behavioral_testing: List[T] = Field(..., title="Behavioral testing smart tag")
     uncertainty_estimation: List[T] = Field(..., title="Uncertainty estimation smart tag")
-    data_action: List[T] = Field(..., title="Data action tag")
-    outcome: Optional[List[T]] = Field(..., title="Outcome", nullable=True)
 
 
-class UtteranceCountPerFilter(ValuePerFilter[UtteranceCountPerFilterValue]):
+class UtteranceCountPerFilter(ValuePerDatasetFilter[UtteranceCountPerFilterValue]):
     pass
 
 
@@ -59,7 +62,10 @@ class OutcomeCountPerFilterValue(UtteranceCountPerFilterValue):
     outcome_count: Dict[OutcomeName, int] = Field(..., title="Prediction count per outcome")
 
 
-class OutcomeCountPerFilter(ValuePerFilter[OutcomeCountPerFilterValue]):
+class OutcomeCountPerFilter(
+    ValuePerDatasetFilter[OutcomeCountPerFilterValue],
+    ValuePerPipelineFilter[OutcomeCountPerFilterValue],
+):
     pass
 
 
@@ -72,7 +78,9 @@ class MetricsPerFilterValue(MetricsResponseCommonFields, UtteranceCountPerFilter
     pass
 
 
-class MetricsPerFilter(ValuePerFilter[MetricsPerFilterValue]):
+class MetricsPerFilter(
+    ValuePerDatasetFilter[MetricsPerFilterValue], ValuePerPipelineFilter[MetricsPerFilterValue]
+):
     pass
 
 

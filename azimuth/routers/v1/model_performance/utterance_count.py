@@ -68,8 +68,6 @@ def get_count_per_filter(
 
     return UtteranceCountPerFilterResponse(
         count_per_filter=UtteranceCountPerFilter(
-            prediction=None,
-            outcome=None,
             label=sorted_by_utterance_count_with_last(
                 counter_to_count_per_filter_value(label_counter),
                 dataset_split_manager.rejection_class_idx,
