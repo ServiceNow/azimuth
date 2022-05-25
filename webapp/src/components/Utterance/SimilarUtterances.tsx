@@ -123,7 +123,7 @@ const SimilarUtterances: React.FC<Props> = ({
   const searchString = constructSearchString(pipeline);
   const RowLink = (props: RowProps<Row>) => (
     <Link
-      style={{ color: "unset" }}
+      style={{ color: "unset", textDecoration: "unset" }}
       to={`${baseUrl}/${props.row.id}${searchString}`}
     >
       <GridRow {...props} />
