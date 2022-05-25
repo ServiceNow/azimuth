@@ -5,6 +5,7 @@
 from typing import Dict, Generic, List, Optional, Tuple, TypeVar
 
 from pydantic import Field
+from pydantic.generics import GenericModel
 
 from azimuth.types import AliasModel, Array, ModuleResponse, PlotSpecification
 from azimuth.types.outcomes import OutcomeName
@@ -32,7 +33,7 @@ class UtteranceCountPerFilterValue(AliasModel):
     filter_value: str = Field(..., title="Filter value")
 
 
-class ValuePerFilter(AliasModel, Generic[T]):
+class ValuePerFilter(AliasModel, GenericModel, Generic[T]):
     prediction: Optional[List[T]] = Field(..., title="Prediction", nullable=True)
     label: List[T] = Field(..., title="Label")
     extreme_length: List[T] = Field(..., title="Extreme length")
