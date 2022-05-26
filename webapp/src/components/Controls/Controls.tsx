@@ -230,7 +230,7 @@ const Controls: React.FC<Props> = ({
             />
           </Box>
           <Box margin={1}>
-            <Tooltip title="Include or exclude post-processing in predictions and any derived output. This only affects the Exploration Space, and won't affect the smart tags.">
+            <Tooltip title="Exclude post-processing in predictions and any derived output. This only affects the Exploration Space, and won't affect the smart tags.">
               <FormControlLabel
                 control={
                   <Switch
