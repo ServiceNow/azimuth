@@ -47,3 +47,8 @@ compose: build launch
 .PHONY: launch
 launch:
 	docker-compose -f docker-compose.yml $(COMPOSE_EXT) --env-file $(ENV_FILE) up
+
+.PHONY: push
+push:
+	docker push $(REGISTRY)/$(IMAGE):$(TAG)_$(DEVICE)$(TAG_EXT)
+	docker push $(REGISTRY)/$(IMAGE)_app:$(TAG)$(TAG_EXT)
