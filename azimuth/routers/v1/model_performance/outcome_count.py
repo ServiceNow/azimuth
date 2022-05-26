@@ -40,13 +40,11 @@ TAGS = ["Outcome Count v1"]
 )
 def get_outcome_count_per_threshold(
     dataset_split_name: DatasetSplitName,
-    named_filters: NamedDatasetFilters = Depends(build_named_dataset_filters),
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
 ) -> List[OutcomeCountPerThresholdValue]:
     mod_options = ModuleOptions(
-        filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
     )
 
