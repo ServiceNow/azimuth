@@ -46,6 +46,9 @@ while incorrect predictions include `Incorrect & Predicted` and `Incorrect & Rej
 clouds change depending on the filters and indicate the frequency of each important word across all
 filtered utterances.
 
+Clicking on a word will filter utterances that contain it. Clicking it a second
+time will clear that search filter, so does the ✗ in the `Search utterances` filter.
+
 ![Screenshot](../../_static/images/exploration-space/word-cloud.png){: style="width:400px"}
 
 !!! note "What does the word cloud count?"

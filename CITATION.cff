@@ -1,0 +1,24 @@
+cff-version: 1.0.0
+message: "If you use Azimuth in your projects, please cite it as below."
+authors:
+- family-names: "Branchaud-Charron"
+  given-names: "Frederic"
+- family-names: "Gauthier-Melancon"
+  given-names: "Gabrielle"
+- family-names: "Marinier"
+  given-names: "Joseph"
+- family-names: "Brin"
+  given-names: "Lindsay"
+- family-names: "Tyler"
+  given-names: "Chris"
+- family-names: "Le"
+  given-names: "Di"
+- family-names: "Grande"
+  given-names: "Karine"
+- family-names: "Babu"
+  given-names: "Nandhini"
+title: "Azimuth, an open-source dataset and error analysis tool for text classification"
+version: 2.0.0
+doi: 10.5281/zenodo.6511558
+date-released: 2022-04-20
+url: "https://github.com/ServiceNow/azimuth"
