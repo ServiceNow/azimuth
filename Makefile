@@ -38,7 +38,7 @@ build_be:
 build_fe:
 	docker build \
 		--target $(STAGE) \
-		-t $(REGISTRY)/$(IMAGE)_app:$(TAG)$(TAG_EXT) \
+		-t $(REGISTRY)/$(IMAGE)-app:$(TAG)$(TAG_EXT) \
 		webapp/.
 
 .PHONY: compose
@@ -51,4 +51,4 @@ launch:
 .PHONY: push
 push:
 	docker push $(REGISTRY)/$(IMAGE):$(TAG)_$(DEVICE)$(TAG_EXT)
-	docker push $(REGISTRY)/$(IMAGE)_app:$(TAG)$(TAG_EXT)
+	docker push $(REGISTRY)/$(IMAGE)-app:$(TAG)$(TAG_EXT)

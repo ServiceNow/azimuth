@@ -20,7 +20,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
   web:
-    image: "${REGISTRY}/azimuth_app:${FRONTEND_VERSION}"
+    image: "${REGISTRY}/azimuth-app:${FRONTEND_VERSION}"
     command:
       - node
       - ./server.js

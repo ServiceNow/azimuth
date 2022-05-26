@@ -62,5 +62,5 @@ image.testbackend:
 .PHONY: image.testfrontend
 image.testfrontend:
 	docker run --rm \
-		-t ${REGISTRY}/azimuth_app:$(TAG)$(TAG_EXT) \
+		-t ${REGISTRY}/azimuth-app:$(TAG)$(TAG_EXT) \
 		make test
