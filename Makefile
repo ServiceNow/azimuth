@@ -1,4 +1,4 @@
-REGISTRY = azimuth
+REGISTRY = servicenowdocker
 IMAGE = azimuth
 TAG = latest
 DEVICE = cpu
@@ -31,7 +31,7 @@ build_be:
 	docker build \
 		--build-arg DEVICE=$(DEVICE) \
 		--build-arg STAGE=$(STAGE) \
-		-t $(REGISTRY)/$(IMAGE)_$(DEVICE):$(TAG)$(TAG_EXT) \
+		-t $(REGISTRY)/$(IMAGE):$(TAG)_$(DEVICE)$(TAG_EXT) \
 		.
 
 .PHONY: build_fe

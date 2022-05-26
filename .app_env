@@ -1,4 +1,4 @@
-REGISTRY=azimuth
+REGISTRY=servicenowdocker
 BACKEND_VERSION=latest
 FRONTEND_VERSION=latest
 DEVICE=cpu
