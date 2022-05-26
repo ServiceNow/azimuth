@@ -965,14 +965,6 @@ export interface operations {
       };
       query: {
         pipelineIndex: number;
-        confidenceMin?: number;
-        confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
-        utterance?: string;
       };
     };
     responses: {
