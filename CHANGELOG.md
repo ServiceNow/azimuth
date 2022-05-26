@@ -16,7 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - added "Without Postprocessing" feature to enable/disable post processing feature on the data
 
 ### Changed
-- Renamed our docker images to use `servicenowdocker` registry on Dockerhub.
+- Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
 
 ### Deprecated/Breaking Changes
 
