@@ -12,9 +12,6 @@ Released changes are shown in the
 
 ### Added
 
-- `/confusion_matrix` now supports `normalized:bool` to get counts versus normalized confusion
-  matrix.
-
 ### Changed
 
 ### Deprecated/Breaking Changes
