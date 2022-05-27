@@ -30,7 +30,7 @@ from azimuth.types.perturbation_testing import (
     PerturbationTestingMergedResponse,
     PerturbationTestingSummaryResponse,
 )
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS
+from azimuth.types.tag import ALL_DATA_ACTION_FILTERS, ALL_SMART_TAG_FILTERS
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.project import (
     perturbation_testing_available,
@@ -108,8 +108,8 @@ def get_dataset_info(
     return DatasetInfoResponse(
         project_name=config.name,
         class_names=eval_dm.get_class_names(),
-        data_actions=ALL_DATA_ACTIONS,
-        smart_tags=ALL_SMART_TAGS,
+        data_actions=ALL_DATA_ACTION_FILTERS,
+        smart_tags=ALL_SMART_TAG_FILTERS,
         eval_class_distribution=eval_dm.class_distribution().tolist(),
         train_class_distribution=training_dm.class_distribution().tolist()
         if training_dm is not None

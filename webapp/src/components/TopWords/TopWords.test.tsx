@@ -9,6 +9,7 @@ test("word distribution", async () => {
       filters={{}}
       pagination={{}}
       pipeline={{}}
+      postprocessing={{}}
       wordCounts={[
         { word: "Poutine", count: 10 },
         { word: "Oreo", count: 5 },

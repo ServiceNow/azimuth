@@ -9,7 +9,6 @@ import numpy as np
 import pytest
 
 from azimuth.config import MetricDefinition
-from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.modules.model_performance.metrics import (
     MetricsModule,
     MetricsPerFilterModule,
@@ -20,40 +19,24 @@ from azimuth.modules.model_performance.outcome_count import (
 )
 from azimuth.modules.model_performance.outcomes import OutcomesModule
 from azimuth.plots.ece import make_ece_figure
-from azimuth.types import (
-    DatasetFilters,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
+from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
+from azimuth.types.outcomes import OutcomeName, OutcomeResponse
+from azimuth.types.tag import (
+    ALL_DATA_ACTION_FILTERS,
+    ALL_SMART_TAG_FILTERS,
+    DataAction,
+    SmartTag,
 )
-from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
+from tests.utils import save_outcomes, save_predictions
 
 
-def test_metrics(simple_text_config):
-    pred_mod = HFTextClassificationModule(
-        dataset_split_name=DatasetSplitName.eval,
-        config=simple_text_config,
-        mod_options=ModuleOptions(
-            pipeline_index=0, model_contract_method_name=SupportedMethod.Predictions
-        ),
-    )
-    pred_res = pred_mod.compute_on_dataset_split()
-    dm = pred_mod.get_dataset_split_manager()
-    pred_mod.save_result(pred_res, dm)
-
-    outcomes_mod = OutcomesModule(
-        dataset_split_name=DatasetSplitName.eval,
-        config=simple_text_config,
-        mod_options=ModuleOptions(pipeline_index=0),
-    )
-    outcomes_res = outcomes_mod.compute_on_dataset_split()
-    dm = outcomes_mod.get_dataset_split_manager()
-    outcomes_mod.save_result(outcomes_res, dm)
+def test_metrics(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
 
     metrics_mod = MetricsModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=simple_text_config,
+        config=tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
 
@@ -68,16 +51,29 @@ def test_metrics(simple_text_config):
     # Check that outcome count match utterance count
     assert sum(metrics_res.outcome_count.values()) == len(ds)
 
-    # Changing the filters change the values.
-    metrics_mod_2 = MetricsModule(
+    # Changing the filters changes the values.
+    metrics_mod_filters = MetricsModule(
         DatasetSplitName.eval,
-        simple_text_config,
+        tiny_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(predictions=[1]), pipeline_index=0),
     )
-    [metrics_res_2] = metrics_mod_2.compute_on_dataset_split()
+    [metrics_res_filters] = metrics_mod_filters.compute_on_dataset_split()
 
-    ds = metrics_mod_2.get_dataset_split()
-    assert metrics_res_2.utterance_count == len(ds)
+    ds = metrics_mod_filters.get_dataset_split()
+    assert metrics_res_filters.utterance_count == len(ds)
+
+    # Disabling postprocessing changes the values
+    metrics_mod_post = MetricsModule(
+        DatasetSplitName.eval,
+        tiny_text_config,
+        mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
+    )
+    [metrics_res_post] = metrics_mod_post.compute_on_dataset_split()
+
+    assert metrics_res_post.ece != metrics_res.ece
+    assert metrics_res_post.outcome_count.values() != metrics_res.outcome_count.values()
+    assert metrics_res_post.custom_metrics["Precision"] != metrics_res.custom_metrics["Precision"]
+    assert metrics_res_post.custom_metrics["Recall"] != metrics_res.custom_metrics["Recall"]
 
 
 def test_outcomes(file_text_config_no_intent):
@@ -91,20 +87,39 @@ def test_outcomes(file_text_config_no_intent):
     res = mod.compute_on_dataset_split()
 
     # Outcome determined from the values in sample_predictions_top1.csv
+    # Results are the same with and without postprocessing with File-based.
     assert res == [
-        OutcomeName.CorrectAndRejected,
-        OutcomeName.CorrectAndRejected,
-        OutcomeName.CorrectAndPredicted,
-        OutcomeName.IncorrectAndPredicted,
-        OutcomeName.CorrectAndRejected,
-        OutcomeName.IncorrectAndRejected,
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndRejected,
+            postprocessed_outcome=OutcomeName.CorrectAndRejected,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndRejected,
+            postprocessed_outcome=OutcomeName.CorrectAndRejected,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndPredicted,
+            postprocessed_outcome=OutcomeName.CorrectAndPredicted,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.IncorrectAndPredicted,
+            postprocessed_outcome=OutcomeName.IncorrectAndPredicted,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.CorrectAndRejected,
+            postprocessed_outcome=OutcomeName.CorrectAndRejected,
+        ),
+        OutcomeResponse(
+            model_outcome=OutcomeName.IncorrectAndRejected,
+            postprocessed_outcome=OutcomeName.IncorrectAndRejected,
+        ),
     ]
 
 
-def test_empty_ds(simple_text_config, dask_client):
+def test_empty_ds(tiny_text_config):
     mod = MetricsModule(
         DatasetSplitName.eval,
-        simple_text_config,
+        tiny_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(labels=[42]), pipeline_index=0),
     )
     _ = mod.get_dataset_split()
@@ -114,7 +129,7 @@ def test_empty_ds(simple_text_config, dask_client):
     assert json_output.utterance_count == 0
 
 
-def test_outcome_count_per_threshold(tiny_text_config, dask_client):
+def test_outcome_count_per_threshold(tiny_text_config):
     nb_bins = 3
     mod = OutcomeCountPerThresholdModule(
         dataset_split_name=DatasetSplitName.eval,
@@ -147,10 +162,13 @@ def test_outcome_count_per_threshold(tiny_text_config, dask_client):
     assert not all(len(set(counts)) == 1 for counts in outcomes_for_all_threshold.values())
 
 
-def test_outcome_count_per_filter(simple_text_config, apply_mocked_startup_task):
+def test_outcome_count_per_filter(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
+
     mod = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,
-        config=simple_text_config,
+        config=tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
 
@@ -158,7 +176,7 @@ def test_outcome_count_per_filter(simple_text_config, apply_mocked_startup_task)
 
     mod_filter_0 = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,
-        config=simple_text_config,
+        config=tiny_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
     )
 
@@ -197,6 +215,21 @@ def test_outcome_count_per_filter(simple_text_config, apply_mocked_startup_task)
     # Assert that for one of the 2 classes, the total will be 0 for the second results.
     assert any(res_filter_0.count_per_filter.label[x].utterance_count == 0 for x in [0, 1])
 
+    mod_post = OutcomeCountPerFilterModule(
+        DatasetSplitName.eval,
+        config=tiny_text_config,
+        mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
+    )
+
+    [res_post] = mod_post.compute_on_dataset_split()
+
+    # Assert results are different without postprocessing
+    assert res_post.count_per_filter.data_action != res.count_per_filter.data_action
+    assert res_post.count_per_filter.label != res.count_per_filter.label
+    assert res_post.count_per_filter.outcome != res.count_per_filter.outcome
+    assert res_post.count_per_filter.prediction != res.count_per_filter.prediction
+    assert res_post.count_per_filter.smart_tag != res.count_per_filter.smart_tag
+
 
 def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
     apply_mocked_startup_task(tiny_text_config)
@@ -207,24 +240,24 @@ def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
     )
     [result] = mf_module.compute_on_dataset_split()
     ds_len = len(mf_module.get_dataset_split())
-    dm = mf_module.get_dataset_split_manager()
+    num_classes = mf_module.get_dataset_split_manager().get_num_classes()
 
     assert result.utterance_count == ds_len
     prediction_metrics = result.metrics_per_filter.prediction
     assert sum([mf_v.utterance_count for mf_v in prediction_metrics]) == ds_len
-    assert len(prediction_metrics) == dm.get_num_classes()
+    assert len(prediction_metrics) == num_classes
 
     label_metrics = result.metrics_per_filter.label
     assert sum([mf_v.utterance_count for mf_v in label_metrics]) == ds_len
-    assert len(label_metrics) == dm.get_num_classes()
+    assert len(label_metrics) == num_classes
 
     smart_tag_metrics = result.metrics_per_filter.smart_tag
     assert sum([mf_v.utterance_count for mf_v in smart_tag_metrics]) == ds_len
-    assert len(smart_tag_metrics) == len(ALL_SMART_TAGS)
+    assert len(smart_tag_metrics) == len(ALL_SMART_TAG_FILTERS)
 
     data_action_metrics = result.metrics_per_filter.data_action
     assert sum([mf_v.utterance_count for mf_v in data_action_metrics]) == ds_len
-    assert len(data_action_metrics) == len(ALL_DATA_ACTIONS)
+    assert len(data_action_metrics) == len(ALL_DATA_ACTION_FILTERS)
 
     outcome_metrics = result.metrics_per_filter.outcome
     assert sum([mf_v.utterance_count for mf_v in outcome_metrics]) == ds_len
@@ -279,7 +312,9 @@ def test_custom_metrics(simple_text_config, apply_mocked_startup_task, threshold
         additional_kwargs={"threshold": threshold},
     )
     metric_module = MetricsModule(
-        dataset_split_name=DatasetSplitName.eval, config=simple_text_config
+        dataset_split_name=DatasetSplitName.eval,
+        config=simple_text_config,
+        mod_options=ModuleOptions(pipeline_index=0),
     )
     out = metric_module.compute_on_dataset_split()[0]
     confidences = np.array(metric_module.get_dataset_split()["postprocessed_confidences"])

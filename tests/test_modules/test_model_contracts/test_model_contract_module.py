@@ -9,7 +9,6 @@ import pytest
 from datasets import Dataset
 
 from azimuth.config import PipelineDefinition
-from azimuth.dataset_split_manager import PredictionTableKey
 from azimuth.modules.model_contracts import (
     CustomTextClassificationModule,
     HFTextClassificationModule,
@@ -23,12 +22,13 @@ from azimuth.types import (
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO
+from tests.utils import get_table_key
 
 
-def test_save_result(simple_text_config_high_threshold):
+def test_save_result(simple_text_config):
     mod = HFTextClassificationModule(
         dataset_split_name=DatasetSplitName.eval,
-        config=simple_text_config_high_threshold,
+        config=simple_text_config,
         mod_options=ModuleOptions(
             model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
         ),
@@ -50,10 +50,8 @@ def test_save_result(simple_text_config_high_threshold):
     )
 
 
-def test_high_epistemic_tag(simple_text_config, simple_table_key):
-    simple_table_key_with_bma = PredictionTableKey.from_pipeline_index(
-        0, simple_text_config, use_bma=True
-    )
+def test_high_epistemic_tag(simple_text_config):
+    simple_table_key_with_bma = get_table_key(simple_text_config, use_bma=True)
     mod = HFTextClassificationModule(
         DatasetSplitName.eval,
         simple_text_config,
@@ -103,13 +101,14 @@ def test_high_epistemic_tag(simple_text_config, simple_table_key):
         == 10
     )
     # With simple_table_key (use_bma is False), we still get 0
+    simple_table_key = get_table_key(simple_text_config)
     assert sum(dm.get_dataset_split(simple_table_key)[SmartTag.high_epistemic_uncertainty]) == 0
 
 
-def test_pred_smart_tags(text_config_CLINC150, clinc_table_key):
+def test_pred_smart_tags(clinc_text_config):
     mod = HFTextClassificationModule(
         DatasetSplitName.eval,
-        text_config_CLINC150,
+        clinc_text_config,
         mod_options=ModuleOptions(
             model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
         ),
@@ -164,6 +163,7 @@ def test_pred_smart_tags(text_config_CLINC150, clinc_table_key):
 
     mod.save_result(res, dm)
 
+    clinc_table_key = get_table_key(clinc_text_config)
     assert SmartTag.correct_top_3 in dm.get_dataset_split(clinc_table_key).column_names
     assert SmartTag.correct_low_conf in dm.get_dataset_split(clinc_table_key).column_names
 
@@ -183,7 +183,8 @@ def test_pred_smart_tags(text_config_CLINC150, clinc_table_key):
     ], "Problem with correct_low_conf smart tag"
 
 
-def test_pred_smart_tags_2class(simple_text_config, simple_table_key):
+def test_pred_smart_tags_2class(simple_text_config):
+    simple_table_key = get_table_key(simple_text_config)
     mod = HFTextClassificationModule(
         DatasetSplitName.eval,
         simple_text_config,

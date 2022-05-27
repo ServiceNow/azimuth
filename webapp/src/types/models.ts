@@ -15,7 +15,6 @@ export type QueryFilterState = {
   smartTags?: SmartTag[];
   dataActions?: DataAction[];
   outcomes?: Outcome[];
-  indices?: number[];
   utterance?: string;
 };
 
@@ -29,11 +28,14 @@ export type QueryPipelineState = {
   pipelineIndex?: number;
 };
 
+export type QueryPostprocessingState = {
+  withoutPostprocessing?: true;
+};
+
 export type QueryState = QueryFilterState &
   QueryPaginationState &
-  QueryPipelineState;
-
-export type AvailableFilter = keyof QueryFilterState;
+  QueryPipelineState &
+  QueryPostprocessingState;
 
 export type Tags = { [Tag: string]: boolean };
 

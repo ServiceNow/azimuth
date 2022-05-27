@@ -3,17 +3,20 @@ import {
   Box,
   Button,
   CircularProgress,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   OutlinedInput,
+  Switch,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
 import {
-  AvailableFilter,
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
+  QueryPostprocessingState,
 } from "types/models";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { motion } from "framer-motion";
@@ -43,6 +46,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
+  postprocessing: QueryPostprocessingState;
   searchString: string;
 };
 
@@ -50,6 +54,7 @@ const Controls: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
+  postprocessing,
   searchString,
 }) => {
   const theme = useTheme();
@@ -70,6 +75,7 @@ const Controls: React.FC<Props> = ({
           datasetSplitName,
           ...filters,
           ...pipeline,
+          ...postprocessing,
         })
       : getUtteranceCountPerFilterEndpoint.useQuery({
           jobId,
@@ -102,7 +108,11 @@ const Controls: React.FC<Props> = ({
 
   const handleClearFilters = () => {
     history.push(
-      `${baseUrl}${constructSearchString({ ...pagination, ...pipeline })}`
+      `${baseUrl}${constructSearchString({
+        ...pagination,
+        ...pipeline,
+        ...postprocessing,
+      })}`
     );
   };
 
@@ -112,11 +122,12 @@ const Controls: React.FC<Props> = ({
         ...filters,
         ...pagination,
         ...pipeline,
+        ...postprocessing,
       })}`
     );
 
   const handleFilterSelectorChange =
-    <FilterName extends AvailableFilter>(filterName: FilterName) =>
+    <FilterName extends keyof QueryFilterState>(filterName: FilterName) =>
     (filterValue: QueryFilterState[FilterName]) =>
       handleFilterChange({ ...filters, [filterName]: filterValue });
 
@@ -129,6 +140,16 @@ const Controls: React.FC<Props> = ({
 
   const handleDatasetSplitChange = (name: DatasetSplitName) =>
     history.push(`/${jobId}/dataset_splits/${name}/${mainView}${searchString}`);
+
+  const handlePostprocessingChange = (checked: boolean) =>
+    history.push(
+      `${baseUrl}${constructSearchString({
+        ...filters,
+        ...pagination,
+        ...pipeline,
+        withoutPostprocessing: checked || undefined,
+      })}`
+    );
 
   const transition = { type: "tween" };
 
@@ -208,13 +229,22 @@ const Controls: React.FC<Props> = ({
               onChange={handleDatasetSplitChange}
             />
           </Box>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            margin={1}
-            marginBottom={0}
-            marginTop={2}
-          >
+          <Box margin={1}>
+            <Tooltip title="Exclude post-processing in predictions and any derived output. This only affects the Exploration Space, and won't affect the smart tags.">
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={postprocessing.withoutPostprocessing ?? false}
+                    onChange={(_, checked) =>
+                      handlePostprocessingChange(checked)
+                    }
+                  />
+                }
+                label="Exclude post-processing"
+              />
+            </Tooltip>
+          </Box>
+          <Box display="flex" justifyContent="space-between" marginX={1}>
             <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
               <Typography variant="subtitle2">Filters</Typography>
               {isFetchingCountPerFilter ? (

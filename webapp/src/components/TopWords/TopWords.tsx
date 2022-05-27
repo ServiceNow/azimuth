@@ -5,6 +5,7 @@ import {
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
+  QueryPostprocessingState,
   WordCount,
 } from "types/models";
 import { Link as RouterLink } from "react-router-dom";
@@ -19,6 +20,7 @@ type Props = {
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
+  postprocessing: QueryPostprocessingState;
   wordCounts: WordCount[];
   palette?: "success" | "error";
 };
@@ -28,6 +30,7 @@ const TopWords: React.FC<Props> = ({
   filters,
   pagination,
   pipeline,
+  postprocessing,
   wordCounts,
   palette = "success",
 }) => {
@@ -86,6 +89,7 @@ const TopWords: React.FC<Props> = ({
                 utterance: filters.utterance === word ? undefined : word,
                 ...pagination,
                 ...pipeline,
+                ...postprocessing,
               })}`}
               color={theme.palette[palette].dark}
               display="block"

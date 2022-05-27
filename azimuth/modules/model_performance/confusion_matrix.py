@@ -9,13 +9,14 @@ from sklearn.metrics import confusion_matrix
 
 from azimuth.config import ModelContractConfig
 from azimuth.modules.base_classes import FilterableModule
-from azimuth.types import DatasetColumn
 from azimuth.types.model_performance import ConfusionMatrixResponse
 from azimuth.utils.validation import assert_not_none
 
 
 class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
     """Computes the confusion matrix on the specified dataset split."""
+
+    allowed_mod_options = FilterableModule.allowed_mod_options | {"cf_normalized"}
 
     def compute_on_dataset_split(self) -> List[ConfusionMatrixResponse]:  # type: ignore
         """Computes confusion matrix from sklearn.
@@ -26,7 +27,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
         """
         ds: Dataset = assert_not_none(self.get_dataset_split())
         predictions, labels = (
-            ds[DatasetColumn.postprocessed_prediction],
+            self._get_predictions_from_ds(),
             ds[self.config.columns.label],
         )
         ds_mng = self.get_dataset_split_manager()
@@ -35,6 +36,6 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             y_true=labels,
             y_pred=predictions,
             labels=class_ids,
-            normalize="true",
+            normalize="true" if self.mod_options.cf_normalized else None,
         )
         return [ConfusionMatrixResponse(confusion_matrix=cf)]

@@ -35,7 +35,7 @@ def test_create_dataset(simple_text_config):
 
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="requires cuda enabled")
-def test_cuda_support(simple_text_config_cuda):
+def test_cuda_support(simple_text_config):
     batch = Dataset.from_dict(
         {
             "utterance": ["I love my life"],
@@ -44,7 +44,7 @@ def test_cuda_support(simple_text_config_cuda):
 
     task = HFTextClassificationModule(
         DatasetSplitName.eval,
-        simple_text_config_cuda,
+        simple_text_config,
         mod_options=ModuleOptions(
             model_contract_method_name=SupportedMethod.Saliency, pipeline_index=0
         ),
@@ -99,12 +99,12 @@ def test_post_process(simple_text_config):
     rejection_class_idx = mod_high.get_dataset_split_manager().rejection_class_idx
     assert np.all([pred.postprocessed_output.preds == rejection_class_idx for pred in res_high])
 
-    # Try with threshold set at None.
+    # Try with threshold set at 0.
     mod_none = HFTextClassificationModule(
         DatasetSplitName.eval,
         simple_text_config,
         mod_options=ModuleOptions(
-            threshold=None,
+            threshold=0,
             model_contract_method_name=SupportedMethod.PostProcess,
             pipeline_index=0,
             indices=indices,
@@ -179,7 +179,7 @@ def test_temperature_scaling(simple_text_config):
                             model=simple_text_config.pipelines[0].model,
                             postprocessors=[
                                 {"temperature": temp},
-                                {"threshold": simple_text_config.pipelines[0].threshold},
+                                {"threshold": simple_text_config.pipelines[-1].threshold},
                             ],
                         )
                     ]

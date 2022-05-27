@@ -10,6 +10,7 @@ from azimuth.dataset_split_manager import FEATURE_FAISS
 from azimuth.modules.dataset_analysis.similarity_analysis import NeighborsTaggingModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions
 from azimuth.types.tag import SmartTag
+from tests.utils import get_table_key
 
 IDX = 3
 
@@ -22,13 +23,15 @@ class MockedTransformer:
         return normalize(np.random.rand(len(x), self.num_features), axis=1, norm="l1")
 
 
-def test_neighbors(simple_text_config, dask_client, monkeypatch, simple_table_key):
+def test_neighbors(simple_text_config, dask_client, monkeypatch):
     monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
     # Mock SentenceTransformer on all workers.
     dask_client.run(
         lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
     )
     simple_text_config.similarity.conflicting_neighbors_threshold = 0.1
+    simple_table_key = get_table_key(simple_text_config)
+
     mod = NeighborsTaggingModule(DatasetSplitName.eval, simple_text_config)
     res = mod.compute_on_dataset_split()
 

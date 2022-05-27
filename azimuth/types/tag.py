@@ -49,16 +49,19 @@ class SmartTag(str, Enum):
     # Prediction
     correct_top_3 = "correct_top_3"
     correct_low_conf = "correct_low_conf"
+    # Pipeline Comparison
+    incorrect_for_all_pipelines = "incorrect_for_all_pipelines"
+    pipeline_disagreement = "pipeline_disagreement"
     # Always last for sorting purposes
     no_smart_tag = "NO_SMART_TAGS"
 
 
 Tag = str
 ALL_DATA_ACTION_FILTERS = [a.value for a in DataAction]
-ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a is not DataAction.no_action]
+ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a != DataAction.no_action]
 
 ALL_SMART_TAG_FILTERS = [a.value for a in SmartTag]
-ALL_SMART_TAGS = [a for a in ALL_SMART_TAG_FILTERS if a is not SmartTag.no_smart_tag]
+ALL_SMART_TAGS = [a for a in ALL_SMART_TAG_FILTERS if a != SmartTag.no_smart_tag]
 
 ALL_TAGS = ALL_SMART_TAGS + ALL_DATA_ACTIONS
 ALL_SYNTAX_TAGS = [
@@ -75,6 +78,8 @@ ALL_PREDICTION_TAGS = [
     SmartTag.correct_low_conf,
     SmartTag.correct_top_3,
     SmartTag.high_epistemic_uncertainty,
+    SmartTag.pipeline_disagreement,
+    SmartTag.incorrect_for_all_pipelines,
 ]
 ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 
