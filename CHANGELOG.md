@@ -5,27 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Released changes are shown in the
+[documentation release notes](docs/docs/getting-started/changelog.md).
+
 ## [Not released]
 
 ### Added
-- Ability to get predictions without postprocessing in the exploration space. (Only back end for
-  now)
-- New Smart Tags `pipeline_disagreement` and `incorrect_for_all_pipelines` as a first step for pipeline comparison.
-- Links on top words to filter utterances that contain it.
-- `/confusion_matrix` now supports `normalized:bool` to get counts versus normalized confusion matrix.
-- added "Without Postprocessing" feature to enable/disable post processing feature on the data
 
 ### Changed
 - Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
 
 ### Deprecated/Breaking Changes
 
-
 ### Removed
 
 ### Fixed
 
 ### Security
-
-Released changes are shown in the
-[documentation release notes](docs/getting-started/release-notes.md).
