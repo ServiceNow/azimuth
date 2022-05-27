@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   backend:
-    image: ${REGISTRY}/azimuth_${DEVICE}:${BACKEND_VERSION}
+    image: ${REGISTRY}/azimuth:${BACKEND_VERSION}_${DEVICE}
     environment:
       - "CFG_PATH=${CFG_PATH}"
       - "SENTENCE_TRANSFORMERS_HOME=/azimuth_shr/sentence_transformers"
@@ -20,7 +20,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
   web:
-    image: "${REGISTRY}/azimuth_app:${FRONTEND_VERSION}"
+    image: "${REGISTRY}/azimuth-app:${FRONTEND_VERSION}"
     command:
       - node
       - ./server.js
