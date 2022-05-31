@@ -68,7 +68,7 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
         """
         dm = self.get_dataset_split_manager()
         ds = assert_not_none(self.get_dataset_split())
-        labels = ds["label"]
+        labels = ds[self.config.columns.label]
 
         model_predictions = self._get_predictions(without_postprocessing=True)
         model_outcomes: List[OutcomeName] = [

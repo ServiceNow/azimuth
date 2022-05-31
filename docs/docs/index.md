@@ -15,7 +15,7 @@ current focus is on text classification.
 ## :material-file-tree: Documentation Structure
 
 * [:material-link: Getting Started](getting-started/index.md) contains all the instructions to **
-  install** and **launch** the app.
+  install** and **launch** the app. It also details the **changelog** of our releases.
 * [:material-link: Key Concepts](key-concepts/index.md) explains the different **concepts and
   analyses** that are provided in Azimuth to perform dataset and error analysis.
 * [:material-link: User Guide](user-guide/index.md) goes **screen per screen** to explain the

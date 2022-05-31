@@ -59,6 +59,16 @@ All views are affected by the control panel.
 Explore the views on both the evaluation and the training set by clicking the toggle. Clicking on a
 tab will update the view.
 
+### Excluding Post-Processing
+
+![Screenshot](../../_static/images/control-panel/exlude-post-processing.png){: style="width:300px"}
+
+By default, the predictions are shown after the ML pipeline, including the model prediction and the
+post-processing steps (temperature scaling, thresholding, or else). To analyze the model predictions
+only, you can exclude the post-processing steps in the exploration space. This will affect the
+displayed predictions, as well as related computations: the metrics, the confidence histogram and
+the confusion matrix. This will not affect the smart tags, as these would be too long to recompute.
+
 ### Filters
 
 Filter the data on any view according to different dimensions of the data, such as the model's
@@ -69,7 +79,7 @@ filters are listed below.
 
 ![Screenshot](../../_static/images/control-panel/utterances-search.png){: style="width:200px"}
 
-* **Search a particular string** to filter utterances that contains it.
+* **Search a particular string** to filter utterances that contain it.
 * Filter predictions based on their **confidence value**. You can specify a minimum and a maximum
   value.
 * Filter predictions according to their prediction [**outcomes**](../../key-concepts/outcomes.md).
@@ -106,3 +116,5 @@ filters are listed below.
 
 * Use the search bar to find specific filters.
   ![Screenshot](../../_static/images/control-panel/filter-search.png){: style="width:400px"}
+
+--8<-- "includes/abbreviations.md"

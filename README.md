@@ -111,28 +111,3 @@ add other `README` files in appropriate places, and don't forget to edit them if
 ## License
 
 The package is licensed by ServiceNow, Inc. under the Apache 2.0 license. See [LICENSE](LICENSE) for more details.
-
-## Citation
-
-If you have used Azimuth in your projects, you can use the following citation:
-
-```
-@software{azimuth_2022,
-  author    = {Branchaud-Charron, Frederic and
-               Gauthier-Melancon, Gabrielle and
-               Marinier, Joseph and
-               Brin, Lindsay and
-               Tyler, Chris and
-               Le, Di and
-               Grande, Karine and
-               Babu, Nandhini},
-  title     = {{Azimuth, an open-source dataset and error analysis
-                tool for text classification}},
-  month     = may,
-  year      = 2022,
-  publisher = {Zenodo},
-  version   = {2.0.0},
-  doi       = {10.5281/zenodo.6511558},
-  url       = {https://doi.org/10.5281/zenodo.6511558}
-}
-```

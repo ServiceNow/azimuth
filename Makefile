@@ -1,4 +1,4 @@
-REGISTRY = azimuth
+REGISTRY = servicenowdocker
 IMAGE = azimuth
 TAG = latest
 DEVICE = cpu
@@ -31,14 +31,14 @@ build_be:
 	docker build \
 		--build-arg DEVICE=$(DEVICE) \
 		--build-arg STAGE=$(STAGE) \
-		-t $(REGISTRY)/$(IMAGE)_$(DEVICE):$(TAG)$(TAG_EXT) \
+		-t $(REGISTRY)/$(IMAGE):$(TAG)_$(DEVICE)$(TAG_EXT) \
 		.
 
 .PHONY: build_fe
 build_fe:
 	docker build \
 		--target $(STAGE) \
-		-t $(REGISTRY)/$(IMAGE)_app:$(TAG)$(TAG_EXT) \
+		-t $(REGISTRY)/$(IMAGE)-app:$(TAG)$(TAG_EXT) \
 		webapp/.
 
 .PHONY: compose
@@ -47,3 +47,8 @@ compose: build launch
 .PHONY: launch
 launch:
 	docker-compose -f docker-compose.yml $(COMPOSE_EXT) --env-file $(ENV_FILE) up
+
+.PHONY: push
+push:
+	docker push $(REGISTRY)/$(IMAGE):$(TAG)_$(DEVICE)$(TAG_EXT)
+	docker push $(REGISTRY)/$(IMAGE)-app:$(TAG)$(TAG_EXT)

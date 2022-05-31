@@ -1,6 +1,6 @@
 # Minimal makefile for Sphinx documentation
 #
-REGISTRY = azimuth
+REGISTRY = servicenowdocker
 IMAGE = azimuth_docs
 
 # Put it first so that "make" without argument is like "make help".

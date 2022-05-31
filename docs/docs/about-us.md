@@ -110,4 +110,4 @@ Thank you to all others who helped us developing this!
   contributions and continuous feedback.
 * Nikola Simic for creating the visual identity of Azimuth.
 * Michael Lanoie for feedback on our documentation.
-* Sean Hugues, Sethu Meiyappan and Francis Ruel for helping us on the path to open sourcing.
+* Sean Hughes, Sethu Meiyappan, and Francis Ruel for helping us on the path to open sourcing.
