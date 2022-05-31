@@ -334,15 +334,15 @@ export interface components {
      * that all fields are represented correctly.
      */
     MetricsPerFilter: {
-      prediction: components["schemas"]["MetricsPerFilterValue"][];
-      outcome: components["schemas"]["MetricsPerFilterValue"][];
       similarity: components["schemas"]["MetricsPerFilterValue"][];
       almostCorrect: components["schemas"]["MetricsPerFilterValue"][];
       behavioralTesting: components["schemas"]["MetricsPerFilterValue"][];
       uncertaintyEstimation: components["schemas"]["MetricsPerFilterValue"][];
-      label: components["schemas"]["MetricsPerFilterValue"][];
+      prediction: components["schemas"]["MetricsPerFilterValue"][];
+      outcome: components["schemas"]["MetricsPerFilterValue"][];
       extremeLength: components["schemas"]["MetricsPerFilterValue"][];
       partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
+      label: components["schemas"]["MetricsPerFilterValue"][];
       dataAction: components["schemas"]["MetricsPerFilterValue"][];
     };
     /**
@@ -395,15 +395,15 @@ export interface components {
      * that all fields are represented correctly.
      */
     OutcomeCountPerFilter: {
-      prediction: components["schemas"]["OutcomeCountPerFilterValue"][];
-      outcome: components["schemas"]["OutcomeCountPerFilterValue"][];
       similarity: components["schemas"]["OutcomeCountPerFilterValue"][];
       almostCorrect: components["schemas"]["OutcomeCountPerFilterValue"][];
       behavioralTesting: components["schemas"]["OutcomeCountPerFilterValue"][];
       uncertaintyEstimation: components["schemas"]["OutcomeCountPerFilterValue"][];
-      label: components["schemas"]["OutcomeCountPerFilterValue"][];
+      prediction: components["schemas"]["OutcomeCountPerFilterValue"][];
+      outcome: components["schemas"]["OutcomeCountPerFilterValue"][];
       extremeLength: components["schemas"]["OutcomeCountPerFilterValue"][];
       partialSyntax: components["schemas"]["OutcomeCountPerFilterValue"][];
+      label: components["schemas"]["OutcomeCountPerFilterValue"][];
       dataAction: components["schemas"]["OutcomeCountPerFilterValue"][];
     };
     /**
@@ -681,16 +681,16 @@ export interface components {
      * that all fields are represented correctly.
      */
     Utterance: {
+      similarity: components["schemas"]["SmartTag"][];
+      almostCorrect: components["schemas"]["SmartTag"][];
+      behavioralTesting: components["schemas"]["SmartTag"][];
+      uncertaintyEstimation: components["schemas"]["SmartTag"][];
+      extremeLength: components["schemas"]["SmartTag"][];
+      partialSyntax: components["schemas"]["SmartTag"][];
       /** Row index computed by Azimuth.. */
       index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
-      extremeLength?: components["schemas"]["SmartTag"][];
-      partialSyntax?: components["schemas"]["SmartTag"][];
-      similarity?: components["schemas"]["SmartTag"][];
-      almostCorrect?: components["schemas"]["SmartTag"][];
-      behavioralTesting?: components["schemas"]["SmartTag"][];
-      uncertaintyEstimation?: components["schemas"]["SmartTag"][];
       dataAction: components["schemas"]["DataAction"];
       label: string;
       utterance: string;
@@ -700,9 +700,9 @@ export interface components {
      * that all fields are represented correctly.
      */
     UtteranceCountPerFilter: {
-      label: components["schemas"]["UtteranceCountPerFilterValue"][];
       extremeLength: components["schemas"]["UtteranceCountPerFilterValue"][];
       partialSyntax: components["schemas"]["UtteranceCountPerFilterValue"][];
+      label: components["schemas"]["UtteranceCountPerFilterValue"][];
       dataAction: components["schemas"]["UtteranceCountPerFilterValue"][];
     };
     /**

@@ -33,20 +33,26 @@ class UtteranceCountPerFilterValue(AliasModel):
     filter_value: str = Field(..., title="Filter value")
 
 
-class ValuePerDatasetFilter(AliasModel, GenericModel, Generic[T]):
-    label: List[T] = Field(..., title="Label")
+class ValuePerDatasetSmartTag(AliasModel, GenericModel, Generic[T]):
     extreme_length: List[T] = Field(..., title="Extreme length")
     partial_syntax: List[T] = Field(..., title="Partial syntax")
-    data_action: List[T] = Field(..., title="Data action tag")
 
 
-class ValuePerPipelineFilter(AliasModel, GenericModel, Generic[T]):
-    prediction: List[T] = Field(..., title="Prediction")
-    outcome: List[T] = Field(..., title="Outcome")
+class ValuePerPipelineSmartTag(AliasModel, GenericModel, Generic[T]):
     similarity: List[T] = Field(..., title="Similarity smart tag")
     almost_correct: List[T] = Field(..., title="Almost correct smart tag")
     behavioral_testing: List[T] = Field(..., title="Behavioral testing smart tag")
     uncertainty_estimation: List[T] = Field(..., title="Uncertainty estimation smart tag")
+
+
+class ValuePerDatasetFilter(ValuePerDatasetSmartTag[T], GenericModel, Generic[T]):
+    label: List[T] = Field(..., title="Label")
+    data_action: List[T] = Field(..., title="Data action tag")
+
+
+class ValuePerPipelineFilter(ValuePerPipelineSmartTag[T], GenericModel, Generic[T]):
+    prediction: List[T] = Field(..., title="Prediction")
+    outcome: List[T] = Field(..., title="Outcome")
 
 
 class UtteranceCountPerFilter(ValuePerDatasetFilter[UtteranceCountPerFilterValue]):

@@ -7,6 +7,10 @@ from typing import List, Optional
 from pydantic import Field
 
 from azimuth.types import AliasModel
+from azimuth.types.model_performance import (
+    ValuePerDatasetSmartTag,
+    ValuePerPipelineSmartTag,
+)
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import DataAction, SmartTag
 
@@ -25,18 +29,12 @@ class ModelSaliency(AliasModel):
     saliencies: List[float] = Field(..., title="Saliency")
 
 
-class Utterance(AliasModel):
+class Utterance(ValuePerDatasetSmartTag[SmartTag], ValuePerPipelineSmartTag[SmartTag]):
     index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
     model_prediction: Optional[ModelPrediction] = Field(
         ..., title="Model prediction", nullable=True
     )
     model_saliency: Optional[ModelSaliency] = Field(..., title="Model saliency", nullable=True)
-    extreme_length: List[SmartTag] = Field([], title="Extreme length smart tag")
-    partial_syntax: List[SmartTag] = Field([], title="Partial syntax smart tag")
-    similarity: List[SmartTag] = Field([], title="Similarity smart tag")
-    almost_correct: List[SmartTag] = Field([], title="Almost correct smart tag")
-    behavioral_testing: List[SmartTag] = Field([], title="Behavioral testing smart tag")
-    uncertainty_estimation: List[SmartTag] = Field([], title="Uncertainty estimation smart tag")
     data_action: DataAction = Field(..., title="Data action tag")
     label: str = Field(..., title="Label")
     utterance: str = Field(..., title="Utterance")
