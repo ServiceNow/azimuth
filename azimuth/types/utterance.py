@@ -12,7 +12,7 @@ from azimuth.types.model_performance import (
     ValuePerPipelineSmartTag,
 )
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import DataAction, SmartTag
+from azimuth.types.tag import DataAction
 
 
 class ModelPrediction(AliasModel):
@@ -29,7 +29,7 @@ class ModelSaliency(AliasModel):
     saliencies: List[float] = Field(..., title="Saliency")
 
 
-class Utterance(ValuePerDatasetSmartTag[SmartTag], ValuePerPipelineSmartTag[SmartTag]):
+class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str]):
     index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
     model_prediction: Optional[ModelPrediction] = Field(
         ..., title="Model prediction", nullable=True

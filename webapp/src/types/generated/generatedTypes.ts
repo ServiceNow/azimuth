@@ -681,12 +681,12 @@ export interface components {
      * that all fields are represented correctly.
      */
     Utterance: {
-      similarity: components["schemas"]["SmartTag"][];
-      almostCorrect: components["schemas"]["SmartTag"][];
-      behavioralTesting: components["schemas"]["SmartTag"][];
-      uncertaintyEstimation: components["schemas"]["SmartTag"][];
-      extremeLength: components["schemas"]["SmartTag"][];
-      partialSyntax: components["schemas"]["SmartTag"][];
+      similarity: string[];
+      almostCorrect: string[];
+      behavioralTesting: string[];
+      uncertaintyEstimation: string[];
+      extremeLength: string[];
+      partialSyntax: string[];
       /** Row index computed by Azimuth.. */
       index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
