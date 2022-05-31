@@ -234,8 +234,9 @@ def get_utterances(
             # Smart tags families
             **{
                 family.value: [t for t in tags_in_family if tag[t]]
-                for family, tags_in_family in SMART_TAGS_FAMILY_MAPPING.items()
                 if family in available_families
+                else []
+                for family, tags_in_family in SMART_TAGS_FAMILY_MAPPING.items()
             },
         )
         for data, tag, model_saliency, model_prediction in zip(
