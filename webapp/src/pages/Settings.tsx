@@ -1,12 +1,12 @@
 import {
   Box,
   Button,
+  Checkbox,
   Container,
   FormControl,
   FormControlLabel,
   FormGroup,
   FormHelperText,
-  Switch,
 } from "@mui/material";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -32,7 +32,7 @@ const Settings: React.FC = () => {
   const resultingConfig = { ...data, ...partialConfig };
 
   const switchNullOrDefault = (field: keyof AzimuthConfig) => (
-    <Switch
+    <Checkbox
       checked={Boolean(resultingConfig[field])}
       disabled={isError || isFetching}
       onChange={(_, checked) =>
