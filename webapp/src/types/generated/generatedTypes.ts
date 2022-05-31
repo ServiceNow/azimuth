@@ -685,7 +685,12 @@ export interface components {
       index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
-      smartTags: { [key: string]: components["schemas"]["SmartTag"][] };
+      extremeLength?: components["schemas"]["SmartTag"][];
+      partialSyntax?: components["schemas"]["SmartTag"][];
+      similarity?: components["schemas"]["SmartTag"][];
+      almostCorrect?: components["schemas"]["SmartTag"][];
+      behavioralTesting?: components["schemas"]["SmartTag"][];
+      uncertaintyEstimation?: components["schemas"]["SmartTag"][];
       dataAction: components["schemas"]["DataAction"];
       label: string;
       utterance: string;

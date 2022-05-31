@@ -94,13 +94,16 @@ def filter_dataset_split(
         # For each smart tag family, we do OR, but AND between families
         # If None, it is none of them.
         if len(tags_in_family) > 0:
-            tags_associated: List[SmartTag] = SMART_TAGS_FAMILY_MAPPING[family]
+            # We add no_smart_tag to all families.
+            tags_associated: List[SmartTag] = SMART_TAGS_FAMILY_MAPPING[family] + [
+                SmartTag.no_smart_tag
+            ]
             dataset_split = dataset_split.filter(
                 lambda x: any(
                     (
-                        (not any(x[tag] for tag in tags_associated))
+                        (not any(x[tag.value] for tag in tags_associated[:-1]))
                         if tag_f is SmartTag.no_smart_tag
-                        else x[tag_f]
+                        else x[tag_f.value]
                     )
                     for tag_f in tags_in_family
                 )

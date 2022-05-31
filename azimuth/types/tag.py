@@ -97,34 +97,28 @@ SMART_TAGS_FAMILY_MAPPING = {
         SmartTag.multi_sent,
         SmartTag.short,
         SmartTag.long,
-        SmartTag.no_smart_tag,
     ],
     SmartTagFamily.partial_syntax: [
         SmartTag.no_verb,
         SmartTag.no_subj,
         SmartTag.no_obj,
-        SmartTag.no_smart_tag,
     ],
     SmartTagFamily.similarity: [
         SmartTag.conflicting_neighbors_train,
         SmartTag.conflicting_neighbors_eval,
         SmartTag.no_close_train,
         SmartTag.no_close_eval,
-        SmartTag.no_smart_tag,
     ],
     SmartTagFamily.almost_correct: [
         SmartTag.correct_top_3,
         SmartTag.correct_low_conf,
-        SmartTag.no_smart_tag,
     ],
     SmartTagFamily.behavioral_testing: [
         SmartTag.failed_punctuation,
         SmartTag.failed_fuzzy_matching,
-        SmartTag.no_smart_tag,
     ],
     SmartTagFamily.uncertainty_estimation: [
         SmartTag.high_epistemic_uncertainty,
-        SmartTag.no_smart_tag,
     ],
 }
 

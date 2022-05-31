@@ -30,6 +30,7 @@ from azimuth.types.outcomes import ALL_OUTCOMES
 from azimuth.types.tag import (
     ALL_DATA_ACTION_FILTERS,
     SMART_TAGS_FAMILY_MAPPING,
+    SmartTag,
     SmartTagFamily,
 )
 from azimuth.utils.ml.ece import compute_ece_from_bins
@@ -227,7 +228,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
                     smart_tag: self.edit_filter(
                         self.mod_options.filters, smart_tag={tag_family: [smart_tag]}
                     )
-                    for smart_tag in tags
+                    for smart_tag in tags + [SmartTag.no_smart_tag]
                 }
                 for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
             }

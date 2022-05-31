@@ -227,15 +227,16 @@ def get_utterances(
                 (t for t, v in tag.items() if t in ALL_DATA_ACTIONS and v),
                 DataAction.no_action,
             ),
-            smart_tags={
-                family: [t for t in tags_in_family if tag[t]]
-                for family, tags_in_family in SMART_TAGS_FAMILY_MAPPING.items()
-                if family in available_families
-            },
             label=data[dataset_split_manager.config.columns.label],
             utterance=data[dataset_split_manager.config.columns.text_input],
             model_prediction=model_prediction,
             model_saliency=model_saliency,
+            # Smart tags families
+            **{
+                family.value: [t for t in tags_in_family if tag[t]]
+                for family, tags_in_family in SMART_TAGS_FAMILY_MAPPING.items()
+                if family in available_families
+            },
         )
         for data, tag, model_saliency, model_prediction in zip(
             ds, tags, model_saliencies, predictions
