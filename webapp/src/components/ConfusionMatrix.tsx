@@ -169,7 +169,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             fontSize="0.75em"
             sx={{ verticalAlign: "0.25em" }}
           >
-            %
+            {normalizedState.normalized ?? `%`}
           </Typography>
         </Typography>
       )}
@@ -186,7 +186,7 @@ const ConfusionMatrix: React.FC<Props> = ({
               onChange={(_, checked) => handleNormalizedStateChange(checked)}
             />
           }
-          label="Normalize Confusion matrix"
+          label="Normalize"
         />
       </Box>
       <Box
