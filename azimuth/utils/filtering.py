@@ -95,7 +95,7 @@ def filter_dataset_split(
         # If None, it is none of them.
         if len(tags_in_family) > 0:
             # We add no_smart_tag to all families.
-            tags_associated: List[SmartTag] = SMART_TAGS_FAMILY_MAPPING[family] + [
+            tags_associated: List[SmartTag] = SMART_TAGS_FAMILY_MAPPING[family] + [  # type: ignore
                 SmartTag.no_smart_tag
             ]
             dataset_split = dataset_split.filter(
@@ -103,7 +103,7 @@ def filter_dataset_split(
                     (
                         (not any(x[tag.value] for tag in tags_associated[:-1]))
                         if tag_f is SmartTag.no_smart_tag
-                        else x[tag_f.value]
+                        else x[tag_f]
                     )
                     for tag_f in tags_in_family
                 )

@@ -9,7 +9,7 @@ from pydantic import Field
 
 from azimuth.types import AliasModel, SupportedMethod
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import DataAction, SmartTag, SmartTagFamily
+from azimuth.types.tag import DataAction
 
 
 class AbsDatasetFilters(AliasModel):
@@ -17,7 +17,7 @@ class AbsDatasetFilters(AliasModel):
     confidence_max: float = 1
     data_actions: List[DataAction] = []
     outcomes: List[OutcomeName] = []
-    smart_tags: Dict[SmartTagFamily, List[SmartTag]] = {}
+    smart_tags: Dict[str, List[str]] = {}
     utterance: Optional[str]  # Must contain this subset.
 
 
