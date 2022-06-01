@@ -5,6 +5,7 @@ plugins:
   - search
 theme:
   name: material
+  custom_dir: overrides
   logo: _static/azimuth_icon_white.svg
   features:
     - navigation.tabs
