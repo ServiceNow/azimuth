@@ -35,7 +35,8 @@ def test_dataset_filtering(simple_text_config):
     assert filtered_len(DatasetFilters(data_actions=[DataAction.relabel])) == 1
     assert filtered_len(DatasetFilters(outcomes=[OutcomeName.IncorrectAndRejected])) == 33
     assert (
-        filtered_len(DatasetFilters(smart_tags={SmartTagFamily.syntactic: [SmartTag.short]})) == 1
+        filtered_len(DatasetFilters(smart_tags={SmartTagFamily.extreme_length: [SmartTag.short]}))
+        == 1
     )
     assert filtered_len(DatasetFilters(utterance="some")) == 2
     assert filtered_len(DatasetFilters(predictions=[1])) == 5
@@ -106,7 +107,8 @@ def test_dataset_filtering_multi(simple_text_config):
 @pytest.mark.parametrize(
     "family",
     [
-        SmartTagFamily.syntactic,
+        SmartTagFamily.extreme_length,
+        SmartTagFamily.partial_syntax,
         SmartTagFamily.similarity,
         SmartTagFamily.behavioral_testing,
         SmartTagFamily.almost_correct,
@@ -160,7 +162,7 @@ def test_dataset_filtering_mutually_exclusive(simple_text_config):
     ds_filtered = filter_dataset_split(
         ds,
         DatasetFilters(
-            smart_tags={SmartTagFamily.extreme_length: ["NO_SMART_TAGS", "short_sentence"]}
+            smart_tags={SmartTagFamily.extreme_length: ["long_sentence", "short_sentence"]}
         ),
         config=dm.config,
     )

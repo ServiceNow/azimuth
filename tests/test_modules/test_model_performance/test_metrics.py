@@ -198,8 +198,8 @@ def test_outcome_count_per_filter(tiny_text_config):
         == dm.get_class_names()[dm.rejection_class_idx]
     )
     assert (
-        res.count_per_filter.smart_tag[0].filter_value
-        == res_filter_0.count_per_filter.smart_tag[0].filter_value
+        res.count_per_filter.extreme_length[0].filter_value
+        == res_filter_0.count_per_filter.extreme_length[0].filter_value
         == SmartTag.no_smart_tag
     )
     assert (
@@ -229,7 +229,7 @@ def test_outcome_count_per_filter(tiny_text_config):
     assert res_post.count_per_filter.label != res.count_per_filter.label
     assert res_post.count_per_filter.outcome != res.count_per_filter.outcome
     assert res_post.count_per_filter.prediction != res.count_per_filter.prediction
-    assert res_post.count_per_filter.smart_tag != res.count_per_filter.smart_tag
+    assert res_post.count_per_filter.extreme_length != res.count_per_filter.extreme_length
 
 
 def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
@@ -252,7 +252,7 @@ def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
     assert sum([mf_v.utterance_count for mf_v in label_metrics]) == ds_len
     assert len(label_metrics) == num_classes
 
-    smart_tag_metrics = result.metrics_per_filter.smart_tag
+    smart_tag_metrics = result.metrics_per_filter.extreme_length
     assert sum([mf_v.utterance_count for mf_v in smart_tag_metrics]) == ds_len
     assert len(smart_tag_metrics) == len(ALL_SMART_TAGS) + len(SMART_TAGS_FAMILY_MAPPING) - 1
 
