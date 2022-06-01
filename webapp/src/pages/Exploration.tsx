@@ -47,8 +47,14 @@ const Exploration = () => {
   }>();
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
-  const { filters, pagination, pipeline, postprocessing, searchString } =
-    useQueryState();
+  const {
+    filters,
+    pagination,
+    pipeline,
+    postprocessing,
+    normalizedState,
+    searchString,
+  } = useQueryState();
 
   const history = useHistory();
 
@@ -76,6 +82,7 @@ const Exploration = () => {
             pipeline={pipeline}
             postprocessing={postprocessing}
             searchString={searchString}
+            normalizedState={normalizedState}
           />
           <div className={classes.content}>
             <Paper
@@ -139,6 +146,7 @@ const Exploration = () => {
                     predictionFilters={filters.predictions}
                     labelFilters={filters.labels}
                     postprocessing={postprocessing}
+                    normalizedState={normalizedState}
                   />
                 )}
               {mainView === "utterances" && (
@@ -150,6 +158,7 @@ const Exploration = () => {
                   filters={filters}
                   pipeline={pipeline}
                   postprocessing={postprocessing}
+                  normalizedState={normalizedState}
                 />
               )}
             </Paper>

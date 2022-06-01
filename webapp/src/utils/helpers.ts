@@ -6,6 +6,7 @@ import {
   QueryPipelineState,
   QueryPostprocessingState,
   QueryState,
+  QueryNormalizedState,
 } from "types/models";
 
 export const classNames = (...args: any[]) => args.filter(Boolean).join(" ");
@@ -57,6 +58,9 @@ export const parseSearchString = (searchString: string) => {
     }),
     postprocessing: convertSearchParams<QueryPostprocessingState>(q, {
       withoutPostprocessing: (s) => s !== null || undefined,
+    }),
+    normalizedState: convertSearchParams<QueryNormalizedState>(q, {
+      normalized: (s) => s === null && undefined,
     }),
   };
 };

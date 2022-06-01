@@ -31,6 +31,7 @@ import {
 } from "types/api";
 import {
   QueryFilterState,
+  QueryNormalizedState,
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
@@ -99,6 +100,7 @@ type Props = {
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
+  normalizedState: QueryNormalizedState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
@@ -109,6 +111,7 @@ const UtterancesTable: React.FC<Props> = ({
   pagination,
   pipeline,
   postprocessing,
+  normalizedState,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -139,6 +142,7 @@ const UtterancesTable: React.FC<Props> = ({
       ...pagination,
       ...pipeline,
       ...postprocessing,
+      ...normalizedState,
       page: page + 1,
     });
     history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
@@ -155,6 +159,7 @@ const UtterancesTable: React.FC<Props> = ({
           ...pagination,
           ...pipeline,
           ...postprocessing,
+          ...normalizedState,
           sort: model?.field as UtterancesSortableColumn | undefined,
           descending: model?.sort === "desc" || undefined,
         }
