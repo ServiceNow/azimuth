@@ -55,7 +55,7 @@ in [Learn Basics](https://servicenow.github.io/azimuth/getting-started/b-basics/
 ```
 pip install gdown
 make download_demo
-make CFG_PATH=/config/development/clinc/conf.json compose
+make CFG_PATH=/config/development/clinc/conf.json launch
 ```
 
 Once the startup tasks are completed, you will be able to access Azimuth at `http://0.0.0.0:8080`.
