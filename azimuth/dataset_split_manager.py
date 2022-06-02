@@ -307,7 +307,7 @@ class DatasetSplitManager:
             raise ValueError(f"Unknown tags {unknown_tag}")
 
         # Process base tags
-        base_tags_present = any(any(tag_values.values()) for tag_values in base_tags.values())
+        base_tags_present = any(len(tag_values) for tag_values in base_tags.values())
         if base_tags_present:
             self._base_dataset_split = self._add_tags_to(self._base_dataset_split, tags=base_tags)
             self._save_base_dataset_split()
