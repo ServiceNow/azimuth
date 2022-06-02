@@ -1,10 +1,19 @@
 REGISTRY = servicenowdocker
 IMAGE = azimuth
 TAG = latest
-DEVICE = cpu
+DEVICE = auto
 STAGE = production
 ENV_FILE = .app_env
 export DOCKER_BUILDKIT ?= 1
+
+ifeq ($(DEVICE),auto)
+	GPU_AVAILABLE=$(shell nvidia-smi 1>/dev/null 2>/dev/null && echo "success")
+	ifeq ($(GPU_AVAILABLE),success)
+		DEVICE=gpu
+	else
+		DEVICE=cpu
+	endif
+endif
 
 ifeq ($(STAGE),production)
     TAG_EXT=

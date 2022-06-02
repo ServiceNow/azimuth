@@ -129,8 +129,8 @@ They are the following:
 * Disable behavioral tests and similarity by passing respectively `BEHAVIORAL_TESTING=null` and
   `SIMILARITY=null`.
 * Specify the name of the project, passing `NAME`.
-* You can specify the device on which to run Azimuth, with `DEVICE` being one of `gpu` or `cpu`. If
-  none is provided, `cpu` will be used. Ex: `DEVICE=gpu`.
+* You can specify the device on which to run Azimuth, with `DEVICE` being one of `auto`, `gpu` or `cpu`. If
+  none is provided, `auto` will be used. Ex: `DEVICE=gpu`.
 
 !!! note "Config file prevails over environment variables"
 
