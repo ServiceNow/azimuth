@@ -103,7 +103,7 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
       container at the root.
 3. Execute the following **command**:
     ```
-    make compose
+    make launch
     ```
 4. The **app will be accessible** at `http://0.0.0.0:8080` after a few minutes of waiting. The
    start-up tasks will start.
