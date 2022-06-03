@@ -9,9 +9,9 @@ export DOCKER_BUILDKIT ?= 1
 ifeq ($(DEVICE),auto)
 	GPU_AVAILABLE=$(shell nvidia-smi 1>/dev/null 2>/dev/null && echo "success")
 	ifeq ($(GPU_AVAILABLE),success)
-		DEVICE=gpu
+		export DEVICE=gpu
 	else
-		DEVICE=cpu
+		export DEVICE=cpu
 	endif
 endif
 
