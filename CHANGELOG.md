@@ -14,7 +14,7 @@ Released changes are shown in the
 
 ### Changed
 - Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
-- Add option DEVICE=auto to automatically run Azimuth on GPU is available.
+- Add option `DEVICE=auto` to automatically run Azimuth on GPU if available.
 
 ### Deprecated/Breaking Changes
 
