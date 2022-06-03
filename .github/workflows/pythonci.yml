@@ -36,4 +36,5 @@ jobs:
         env:
           PYTEST_ADDOPTS: "--color=yes"
         run: |
+          poetry env list --full-path
           make test
