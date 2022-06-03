@@ -31,6 +31,7 @@ jobs:
         run: |
           poetry config virtualenvs.create false
           poetry install --no-interaction --no-ansi
+          poetry env list --full-path
       - name: Test with pytest/flake8/mypy
         env:
           PYTEST_ADDOPTS: "--color=yes"
