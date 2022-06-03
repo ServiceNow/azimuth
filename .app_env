@@ -1,6 +1,6 @@
 REGISTRY=servicenowdocker
 BACKEND_VERSION=latest
 FRONTEND_VERSION=latest
-DEVICE=auto
+DEVICE=cpu
 STAGE=production
 CFG_PATH=/config/examples/sst2/conf.json
