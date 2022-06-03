@@ -38,10 +38,6 @@ export interface paths {
     /** Get the warnings related to the dataset, such as differences between the training and the evaluation set. */
     get: operations["get_dataset_warnings_dataset_warnings_get"];
   };
-  "/spectral_clustering": {
-    /** Get a similarity plot using Spectral clustering and Monte-Carlo sampling. */
-    get: operations["get_spectral_clustering_plot_spectral_clustering_get"];
-  };
   "/dataset_splits/{dataset_split_name}/metrics": {
     /** Get metrics (ECE, outcome count, precision and so on). */
     get: operations["get_metrics_dataset_splits__dataset_split_name__metrics_get"];
@@ -883,17 +879,6 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["DatasetWarningGroup"][];
-        };
-      };
-    };
-  };
-  /** Get a similarity plot using Spectral clustering and Monte-Carlo sampling. */
-  get_spectral_clustering_plot_spectral_clustering_get: {
-    responses: {
-      /** Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["PlotSpecification"];
         };
       };
     };
