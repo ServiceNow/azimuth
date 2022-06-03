@@ -20,5 +20,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Fixed BEHAVIORAL_TESTING environment variable
 
 ### Security
