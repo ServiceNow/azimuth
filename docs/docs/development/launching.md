@@ -94,6 +94,6 @@ yarn start
 ### Launch Using Docker
 * Docker compose will build the images and connect them, using the following command.
   ```
-  make CFG_PATH=/config/examples/.../conf.json compose
+  make CFG_PATH=/config/examples/.../conf.json launch
   ```
   _Note that the path starts with `/config` as we mount `./config:/config`._

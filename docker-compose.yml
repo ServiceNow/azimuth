@@ -9,7 +9,7 @@ services:
       - "TH"
       - "TEMP"
       - "NAME"
-      - "PERTURBATION_TESTING"
+      - "BEHAVIORAL_TESTING"
       - "SIMILARITY"
     ports:
       - "8091:8091"
