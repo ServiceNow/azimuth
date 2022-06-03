@@ -38,7 +38,6 @@ class SupportedModule(SupportedTask):
     PerturbationTestingMerged = "PerturbationTestingMerged"
     PerturbationTestingSummary = "PerturbationTestingSummary"
     PredictionComparison = "PredictionComparison"
-    SpectralClustering = "SpectralClustering"
     SyntaxTagging = "SyntaxTagging"
     TokensToWords = "TokensToWords"
     TopWords = "TopWords"
