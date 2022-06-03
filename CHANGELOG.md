@@ -21,6 +21,7 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Fixed issue where the performance analysis table showed empty results for some smart tags.
 - Fixed BEHAVIORAL_TESTING environment variable
 
 ### Security
