@@ -1,5 +1,24 @@
 # Releases
 
+## [2.1.1] - 2021-06-06
+
+### Changed
+
+- Our Docker images are now available through Docker Hub
+    - Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
+    - Users can now use `make launch` instead of `make compose`.
+- Add option `DEVICE=auto` to automatically run Azimuth on GPU if available. As such, `DEVICE=cpu`
+  or `DEVICE=gpu` does not need to be specified.
+- We added analytics in our documentation, which will add a pop-up to accept cookies when users
+  first access the page.
+
+### Fixed
+
+- Fixed issue where the performance analysis table showed empty results for some smart tags.
+- Fixed `BEHAVIORAL_TESTING` environment variable.
+- Fixed unexpected borders in Performance Analysis table.
+- Fixed proposed actions which couldn't be applied on an utterance in the latest release.
+
 ## [2.1.0] - 2021-05-27
 
 - Ability to get predictions without postprocessing in the exploration space. See section "Excluding
