@@ -80,11 +80,11 @@ export const Table = <Row extends { id: GridRowId }>({
     }}
     sx={{
       border: "none",
-      "& .MuiDataGrid-cell:focus, .MuiDataGrid-cell:focus-within, .MuiDataGrid-columnHeader:focus, .MuiDataGrid-columnHeader:focus-within":
+      "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within, & .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within":
         {
           outline: "none",
         },
-      "& .MuiDataGrid-columnHeaderTitle, .MuiDataGrid-columnHeader": {
+      "& .MuiDataGrid-columnHeaderTitle, & .MuiDataGrid-columnHeader": {
         fontWeight: "bold",
       },
       ...sx,
