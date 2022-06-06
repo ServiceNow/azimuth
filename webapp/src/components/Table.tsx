@@ -65,6 +65,7 @@ export interface Props<Row> extends DataGridProps {
 
 export const Table = <Row extends { id: GridRowId }>({
   components,
+  sx,
   ...props
 }: Props<Row>) => (
   <DataGrid
@@ -86,6 +87,7 @@ export const Table = <Row extends { id: GridRowId }>({
       "& .MuiDataGrid-columnHeaderTitle, .MuiDataGrid-columnHeader": {
         fontWeight: "bold",
       },
+      ...sx,
     }}
     {...props}
   />
