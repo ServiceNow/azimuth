@@ -13,16 +13,11 @@ Released changes are shown in the
 ### Added
 
 ### Changed
-- Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
-- Add option `DEVICE=auto` to automatically run Azimuth on GPU if available.
 
 ### Deprecated/Breaking Changes
 
 ### Removed
 
 ### Fixed
-- Fixed issue where the performance analysis table showed empty results for some smart tags.
-- Fixed BEHAVIORAL_TESTING environment variable
-- Fixed unexpected borders in Performance Analysis table
 
 ### Security
