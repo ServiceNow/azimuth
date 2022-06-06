@@ -17,7 +17,7 @@ import {
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
-  QueryNormalizedState,
+  QueryConfusionMatrixState,
 } from "types/models";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { motion } from "framer-motion";
@@ -49,7 +49,7 @@ type Props = {
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
   searchString: string;
-  normalizedState: QueryNormalizedState;
+  confusionMatrixState: QueryConfusionMatrixState;
 };
 
 const Controls: React.FC<Props> = ({
@@ -58,7 +58,7 @@ const Controls: React.FC<Props> = ({
   pipeline,
   postprocessing,
   searchString,
-  normalizedState,
+  confusionMatrixState,
 }) => {
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState("");
@@ -115,7 +115,7 @@ const Controls: React.FC<Props> = ({
         ...pagination,
         ...pipeline,
         ...postprocessing,
-        ...normalizedState,
+        ...confusionMatrixState,
       })}`
     );
   };
@@ -127,7 +127,7 @@ const Controls: React.FC<Props> = ({
         ...pagination,
         ...pipeline,
         ...postprocessing,
-        ...normalizedState,
+        ...confusionMatrixState,
       })}`
     );
 
@@ -152,7 +152,7 @@ const Controls: React.FC<Props> = ({
         ...filters,
         ...pagination,
         ...pipeline,
-        ...normalizedState,
+        ...confusionMatrixState,
         withoutPostprocessing: checked || undefined,
       })}`
     );

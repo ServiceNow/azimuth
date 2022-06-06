@@ -87,7 +87,7 @@ class MetricsPerFilterAPIResponse(MetricsPerFilterModuleResponse):
 
 class ConfusionMatrixResponse(ModuleResponse):
     confusion_matrix: Array[float] = Field(..., title="Confusion Matrix normalized")
-
+    normalized: bool = Field(..., title="normalized state of Confusion Matrix")
 
 class ConfidenceBinDetails(AliasModel):
     bin_index: int = Field(..., title="Bin index")

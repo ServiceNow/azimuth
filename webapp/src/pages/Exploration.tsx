@@ -52,7 +52,7 @@ const Exploration = () => {
     pagination,
     pipeline,
     postprocessing,
-    normalizedState,
+    confusionMatrixState,
     searchString,
   } = useQueryState();
 
@@ -82,7 +82,7 @@ const Exploration = () => {
             pipeline={pipeline}
             postprocessing={postprocessing}
             searchString={searchString}
-            normalizedState={normalizedState}
+            confusionMatrixState={confusionMatrixState}
           />
           <div className={classes.content}>
             <Paper
@@ -146,7 +146,7 @@ const Exploration = () => {
                     predictionFilters={filters.predictions}
                     labelFilters={filters.labels}
                     postprocessing={postprocessing}
-                    normalizedState={normalizedState}
+                    confusionMatrixState={confusionMatrixState}
                   />
                 )}
               {mainView === "utterances" && (
@@ -158,7 +158,7 @@ const Exploration = () => {
                   filters={filters}
                   pipeline={pipeline}
                   postprocessing={postprocessing}
-                  normalizedState={normalizedState}
+                  confusionMatrixState={confusionMatrixState}
                 />
               )}
             </Paper>

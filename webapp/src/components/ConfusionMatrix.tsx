@@ -12,7 +12,7 @@ import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import {
   QueryFilterState,
-  QueryNormalizedState,
+  QueryConfusionMatrixState,
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
@@ -35,7 +35,7 @@ type Props = {
   classOptions: string[];
   predictionFilters?: string[];
   labelFilters?: string[];
-  normalizedState: QueryNormalizedState;
+  confusionMatrixState: QueryConfusionMatrixState;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -94,7 +94,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   classOptions,
   predictionFilters,
   labelFilters,
-  normalizedState,
+  confusionMatrixState,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -106,14 +106,14 @@ const ConfusionMatrix: React.FC<Props> = ({
     ),
   });
 
-  const { data: { confusionMatrix } = { confusionMatrix: [] } } =
+  const { data: { confusionMatrix, normalized } = { confusionMatrix: [] } } =
     getConfusionMatrixEndpoint.useQuery({
       jobId,
       datasetSplitName,
       ...filters,
       ...pipeline,
       ...postprocessing,
-      ...normalizedState,
+      ...confusionMatrixState,
     });
 
   // Set to 1 if the maxCount is 0 so we don't divide by 0.
@@ -163,13 +163,13 @@ const ConfusionMatrix: React.FC<Props> = ({
             theme.palette.common[value > 0.7 ? "white" : "black"]
           }
         >
-          {(value * 100).toFixed(0)}
+          {normalized ? (value * 100).toFixed(0) : value}
           <Typography
             component="span"
             fontSize="0.75em"
             sx={{ verticalAlign: "0.25em" }}
           >
-            {normalizedState.normalized ?? `%`}
+            {normalized && `%`}
           </Typography>
         </Typography>
       )}
@@ -182,7 +182,7 @@ const ConfusionMatrix: React.FC<Props> = ({
         <FormControlLabel
           control={
             <Switch
-              checked={normalizedState.normalized ?? true}
+              checked={normalized ?? true}
               onChange={(_, checked) => handleNormalizedStateChange(checked)}
             />
           }
