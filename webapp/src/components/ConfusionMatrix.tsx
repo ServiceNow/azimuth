@@ -177,7 +177,15 @@ const ConfusionMatrix: React.FC<Props> = ({
   );
 
   return (
-    <>
+    <Box
+      alignItems="center"
+      display="flex"
+      flexDirection="column"
+      height="100%"
+      justifyContent="center"
+      minHeight={0}
+      width="100%"
+    >
       <Box marginLeft="auto">
         <FormControlLabel
           control={
@@ -191,165 +199,155 @@ const ConfusionMatrix: React.FC<Props> = ({
       </Box>
       <Box
         alignItems="center"
-        display="flex"
-        flexDirection="column"
-        height="100%"
-        justifyContent="center"
-        minHeight={0}
-        width="100%"
+        display="grid"
+        gridTemplateColumns={`${CELL_SIZE} ${LABEL_LENGTH}`}
+        gridTemplateRows={`${CELL_SIZE} ${LABEL_LENGTH}`}
+        justifyItems="center"
+        minHeight={200}
+        minWidth={200}
       >
+        <Typography variant="caption" sx={{ gridRow: 1, gridColumn: 3 }}>
+          Prediction
+        </Typography>
+        <Typography
+          className={classes.verticalLabel}
+          sx={{ gridRow: 3, gridColumn: 1 }}
+          variant="caption"
+        >
+          Label
+        </Typography>
         <Box
           alignItems="center"
           display="grid"
-          gridTemplateColumns={`${CELL_SIZE} ${LABEL_LENGTH}`}
-          gridTemplateRows={`${CELL_SIZE} ${LABEL_LENGTH}`}
+          gridColumn="2 / span 2"
+          gridRow="2 / span 2"
+          gridTemplateColumns={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
+          gridTemplateRows={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
+          height="100%"
           justifyItems="center"
-          minHeight={200}
-          minWidth={200}
+          overflow="scroll"
+          width="100%"
+          sx={{
+            // Stops accidental navigation on horizontal scroll with touch pad
+            overscrollBehaviorX: "contain",
+          }}
         >
-          <Typography variant="caption" sx={{ gridRow: 1, gridColumn: 3 }}>
-            Prediction
-          </Typography>
-          <Typography
-            className={classes.verticalLabel}
-            sx={{ gridRow: 3, gridColumn: 1 }}
-            variant="caption"
-          >
-            Label
-          </Typography>
-          <Box
-            alignItems="center"
-            display="grid"
-            gridColumn="2 / span 2"
-            gridRow="2 / span 2"
-            gridTemplateColumns={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
-            gridTemplateRows={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
-            height="100%"
-            justifyItems="center"
-            overflow="scroll"
-            width="100%"
-            sx={{
-              // Stops accidental navigation on horizontal scroll with touch pad
-              overscrollBehaviorX: "contain",
-            }}
-          >
-            {confusionMatrix.flatMap((row, rowIndex) =>
-              row.flatMap((value, columnIndex) =>
-                value > 0 || rowIndex === columnIndex
-                  ? [renderCell(value, rowIndex, columnIndex)]
-                  : []
-              )
-            )}
+          {confusionMatrix.flatMap((row, rowIndex) =>
+            row.flatMap((value, columnIndex) =>
+              value > 0 || rowIndex === columnIndex
+                ? [renderCell(value, rowIndex, columnIndex)]
+                : []
+            )
+          )}
 
-            {classOptions.flatMap((classOption, i) => [
-              <Typography
-                key={`column-${i}`}
-                className={classNames(
-                  `column-${i}`,
-                  classes.gridLabel,
-                  classes.columnLabel,
-                  classes.verticalLabel,
-                  classes.topStickyCell,
-                  predictionFilters &&
-                    !predictionFilters.includes(classOption) &&
-                    classes.filteredLabel
-                )}
-                variant="caption"
-                sx={{
-                  gridColumn: i + CONFUSION_COLUMN_OFFSET + 1,
-                  gridRow: 1,
-                  [`&:hover, .column-${i}:hover ~ &`]: {
-                    height: "auto",
-                    overflow: "initial",
-                  },
-                }}
-              >
-                {classOption}
-              </Typography>,
-              <Typography
-                key={`row-${i}`}
-                className={classNames(
-                  `row-${i}`,
-                  classes.gridLabel,
-                  classes.rowLabel,
-                  classes.leftStickyCell,
-                  labelFilters &&
-                    !labelFilters.includes(classOption) &&
-                    classes.filteredLabel
-                )}
-                variant="caption"
-                sx={{
-                  gridRow: i + CONFUSION_ROW_OFFSET + 1,
-                  gridColumn: 1,
-                  [`&:hover, .row-${i}:hover ~ &`]: {
-                    width: "auto",
-                    overflow: "initial",
-                  },
-                }}
-              >
-                {classOption}
-              </Typography>,
-              <Box
-                key={`grid-column-${i}`}
-                gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
-                gridRow={`2 / -1`}
-                width="100%"
-                height="100%"
-                boxShadow={(theme) => `0 0 0 0.35px ${theme.palette.divider}`}
-                sx={{
-                  pointerEvents: "none",
-                }}
-              />,
-              <Box
-                key={`grid-row-${i}`}
-                gridColumn={`2 / -1`}
-                gridRow={i + CONFUSION_ROW_OFFSET + 1}
-                width="100%"
-                height="100%"
-                boxShadow={(theme) => `0 0 0 0.35px ${theme.palette.divider}`}
-                sx={{
-                  pointerEvents: "none",
-                }}
-              />,
-              <Box
-                key={`hover-column-${i}`}
-                gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
-                gridRow={`1 / -1`}
-                position="sticky"
-                width="100%"
-                height="100%"
-                sx={{
-                  pointerEvents: "none",
-                  [`.column-${i}:hover ~ &`]: hoverStyle,
-                }}
-              />,
-              <Box
-                key={`hover-row-${i}`}
-                gridColumn={`1 / -1`}
-                gridRow={i + CONFUSION_ROW_OFFSET + 1}
-                position="sticky"
-                width="100%"
-                height="100%"
-                sx={{
-                  pointerEvents: "none",
-                  [`.row-${i}:hover ~ &`]: hoverStyle,
-                }}
-              />,
-            ])}
-
-            <Box
+          {classOptions.flatMap((classOption, i) => [
+            <Typography
+              key={`column-${i}`}
               className={classNames(
-                classes.corner,
+                `column-${i}`,
+                classes.gridLabel,
+                classes.columnLabel,
+                classes.verticalLabel,
                 classes.topStickyCell,
-                classes.leftStickyCell
+                predictionFilters &&
+                  !predictionFilters.includes(classOption) &&
+                  classes.filteredLabel
               )}
-              gridColumn={CONFUSION_COLUMN_OFFSET}
-              gridRow={CONFUSION_ROW_OFFSET}
-            />
-          </Box>
+              variant="caption"
+              sx={{
+                gridColumn: i + CONFUSION_COLUMN_OFFSET + 1,
+                gridRow: 1,
+                [`&:hover, .column-${i}:hover ~ &`]: {
+                  height: "auto",
+                  overflow: "initial",
+                },
+              }}
+            >
+              {classOption}
+            </Typography>,
+            <Typography
+              key={`row-${i}`}
+              className={classNames(
+                `row-${i}`,
+                classes.gridLabel,
+                classes.rowLabel,
+                classes.leftStickyCell,
+                labelFilters &&
+                  !labelFilters.includes(classOption) &&
+                  classes.filteredLabel
+              )}
+              variant="caption"
+              sx={{
+                gridRow: i + CONFUSION_ROW_OFFSET + 1,
+                gridColumn: 1,
+                [`&:hover, .row-${i}:hover ~ &`]: {
+                  width: "auto",
+                  overflow: "initial",
+                },
+              }}
+            >
+              {classOption}
+            </Typography>,
+            <Box
+              key={`grid-column-${i}`}
+              gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
+              gridRow={`2 / -1`}
+              width="100%"
+              height="100%"
+              boxShadow={(theme) => `0 0 0 0.35px ${theme.palette.divider}`}
+              sx={{
+                pointerEvents: "none",
+              }}
+            />,
+            <Box
+              key={`grid-row-${i}`}
+              gridColumn={`2 / -1`}
+              gridRow={i + CONFUSION_ROW_OFFSET + 1}
+              width="100%"
+              height="100%"
+              boxShadow={(theme) => `0 0 0 0.35px ${theme.palette.divider}`}
+              sx={{
+                pointerEvents: "none",
+              }}
+            />,
+            <Box
+              key={`hover-column-${i}`}
+              gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
+              gridRow={`1 / -1`}
+              position="sticky"
+              width="100%"
+              height="100%"
+              sx={{
+                pointerEvents: "none",
+                [`.column-${i}:hover ~ &`]: hoverStyle,
+              }}
+            />,
+            <Box
+              key={`hover-row-${i}`}
+              gridColumn={`1 / -1`}
+              gridRow={i + CONFUSION_ROW_OFFSET + 1}
+              position="sticky"
+              width="100%"
+              height="100%"
+              sx={{
+                pointerEvents: "none",
+                [`.row-${i}:hover ~ &`]: hoverStyle,
+              }}
+            />,
+          ])}
+
+          <Box
+            className={classNames(
+              classes.corner,
+              classes.topStickyCell,
+              classes.leftStickyCell
+            )}
+            gridColumn={CONFUSION_COLUMN_OFFSET}
+            gridRow={CONFUSION_ROW_OFFSET}
+          />
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 
