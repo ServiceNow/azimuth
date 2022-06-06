@@ -16,6 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - added "Without Postprocessing" feature to enable/disable post processing feature on the data
 
 ### Changed
+- Show 20 similar utterances instead of 10 in the Utterance Detail page.
 
 ### Deprecated/Breaking Changes
 
