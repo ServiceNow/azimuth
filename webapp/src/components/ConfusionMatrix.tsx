@@ -35,7 +35,7 @@ type Props = {
   classOptions: string[];
   predictionFilters?: string[];
   labelFilters?: string[];
-  confusionMatrixState: QueryConfusionMatrixState;
+  confusionMatrix: QueryConfusionMatrixState;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -94,7 +94,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   classOptions,
   predictionFilters,
   labelFilters,
-  confusionMatrixState,
+  confusionMatrix,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -106,19 +106,23 @@ const ConfusionMatrix: React.FC<Props> = ({
     ),
   });
 
-  const { data: { confusionMatrix, normalized } = { confusionMatrix: [] } } =
-    getConfusionMatrixEndpoint.useQuery({
-      jobId,
-      datasetSplitName,
-      ...filters,
-      ...pipeline,
-      ...postprocessing,
-      ...confusionMatrixState,
-    });
+  const {
+    data: { confusionMatrix: data, normalized } = {
+      confusionMatrix: [],
+      normalized: true,
+    },
+  } = getConfusionMatrixEndpoint.useQuery({
+    jobId,
+    datasetSplitName,
+    ...filters,
+    ...pipeline,
+    ...postprocessing,
+    ...confusionMatrix,
+  });
 
   // Set to 1 if the maxCount is 0 so we don't divide by 0.
   // This is fine since all values will be 0 anyway in this case.
-  const maxCount = Math.max(...confusionMatrix.flat()) || 1;
+  const maxCount = Math.max(...data.flat()) || 1;
 
   const handleNormalizedStateChange = (checked: boolean) =>
     history.push(
@@ -232,7 +236,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             overscrollBehaviorX: "contain",
           }}
         >
-          {confusionMatrix.flatMap((row, rowIndex) =>
+          {data.flatMap((row, rowIndex) =>
             row.flatMap((value, columnIndex) =>
               value > 0 || rowIndex === columnIndex
                 ? [renderCell(value, rowIndex, columnIndex)]

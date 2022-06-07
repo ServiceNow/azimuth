@@ -62,13 +62,8 @@ const PageHeader = () => {
 
   const history = useHistory();
   const location = useLocation();
-  const {
-    filters,
-    pagination,
-    pipeline,
-    postprocessing,
-    confusionMatrixState,
-  } = useQueryState();
+  const { filters, pagination, pipeline, postprocessing, confusionMatrix } =
+    useQueryState();
 
   // If present, preserve pipelineIndex when navigating, but nothing else
   const searchString = constructSearchString(pipeline);
@@ -80,7 +75,7 @@ const PageHeader = () => {
         ...pagination,
         pipelineIndex,
         ...postprocessing,
-        ...confusionMatrixState,
+        ...confusionMatrix,
       })}`
     );
   };

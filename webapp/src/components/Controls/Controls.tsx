@@ -49,7 +49,7 @@ type Props = {
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
   searchString: string;
-  confusionMatrixState: QueryConfusionMatrixState;
+  confusionMatrix: QueryConfusionMatrixState;
 };
 
 const Controls: React.FC<Props> = ({
@@ -58,7 +58,7 @@ const Controls: React.FC<Props> = ({
   pipeline,
   postprocessing,
   searchString,
-  confusionMatrixState,
+  confusionMatrix,
 }) => {
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState("");
@@ -115,7 +115,7 @@ const Controls: React.FC<Props> = ({
         ...pagination,
         ...pipeline,
         ...postprocessing,
-        ...confusionMatrixState,
+        ...confusionMatrix,
       })}`
     );
   };
@@ -127,7 +127,7 @@ const Controls: React.FC<Props> = ({
         ...pagination,
         ...pipeline,
         ...postprocessing,
-        ...confusionMatrixState,
+        ...confusionMatrix,
       })}`
     );
 
@@ -152,7 +152,7 @@ const Controls: React.FC<Props> = ({
         ...filters,
         ...pagination,
         ...pipeline,
-        ...confusionMatrixState,
+        ...confusionMatrix,
         withoutPostprocessing: checked || undefined,
       })}`
     );

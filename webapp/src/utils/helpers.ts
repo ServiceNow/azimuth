@@ -59,7 +59,7 @@ export const parseSearchString = (searchString: string) => {
     postprocessing: convertSearchParams<QueryPostprocessingState>(q, {
       withoutPostprocessing: (s) => s !== null || undefined,
     }),
-    confusionMatrixState: convertSearchParams<QueryConfusionMatrixState>(q, {
+    confusionMatrix: convertSearchParams<QueryConfusionMatrixState>(q, {
       normalized: (s) => s === null && undefined,
     }),
   };

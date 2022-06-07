@@ -100,7 +100,7 @@ type Props = {
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
-  confusionMatrixState: QueryConfusionMatrixState;
+  confusionMatrix: QueryConfusionMatrixState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
@@ -111,7 +111,7 @@ const UtterancesTable: React.FC<Props> = ({
   pagination,
   pipeline,
   postprocessing,
-  confusionMatrixState,
+  confusionMatrix,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -142,7 +142,7 @@ const UtterancesTable: React.FC<Props> = ({
       ...pagination,
       ...pipeline,
       ...postprocessing,
-      ...confusionMatrixState,
+      ...confusionMatrix,
       page: page + 1,
     });
     history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
@@ -159,7 +159,7 @@ const UtterancesTable: React.FC<Props> = ({
           ...pagination,
           ...pipeline,
           ...postprocessing,
-          ...confusionMatrixState,
+          ...confusionMatrix,
           sort: model?.field as UtterancesSortableColumn | undefined,
           descending: model?.sort === "desc" || undefined,
         }

@@ -58,7 +58,9 @@ def test_confusion_matrix(tiny_text_config):
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
     assert json_output_not_normalized.confusion_matrix.sum() == dm.num_rows
     assert [json_output_not_normalized] == [
-        ConfusionMatrixResponse(confusion_matrix=json_output_not_normalized, normalized=False)
+        ConfusionMatrixResponse(
+            confusion_matrix=json_output_not_normalized.confusion_matrix, normalized=False
+        )
     ]
 
     # When normalized, we get the predictions.
@@ -69,5 +71,7 @@ def test_confusion_matrix(tiny_text_config):
     )
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
     assert [json_output_not_normalized] == [
-        ConfusionMatrixResponse(confusion_matrix=json_output_not_normalized, normalized=True)
+        ConfusionMatrixResponse(
+            confusion_matrix=json_output_not_normalized.confusion_matrix, normalized=True
+        )
     ]
