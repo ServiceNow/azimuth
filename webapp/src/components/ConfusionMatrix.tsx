@@ -167,14 +167,20 @@ const ConfusionMatrix: React.FC<Props> = ({
             theme.palette.common[value / maxCount > 0.7 ? "white" : "black"]
           }
         >
-          {normalized ? (value * 100).toFixed(0) : value}
-          <Typography
-            component="span"
-            fontSize="0.75em"
-            sx={{ verticalAlign: "0.25em" }}
-          >
-            {normalized && `%`}
-          </Typography>
+          {normalized ? (
+            <>
+              {(value * 100).toFixed(0)}
+              <Typography
+                component="span"
+                fontSize="0.75em"
+                sx={{ verticalAlign: "0.25em" }}
+              >
+                %
+              </Typography>
+            </>
+          ) : (
+            value
+          )}
         </Typography>
       )}
     </Box>
