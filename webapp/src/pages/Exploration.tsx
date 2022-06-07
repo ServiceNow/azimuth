@@ -128,6 +128,7 @@ const Exploration = () => {
                     />
                     <ConfidenceHistogramTopWords
                       baseUrl={baseUrl}
+                      confusionMatrix={confusionMatrix}
                       filters={filters}
                       pagination={pagination}
                       pipeline={pipeline}

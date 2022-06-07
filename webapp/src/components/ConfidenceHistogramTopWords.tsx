@@ -11,6 +11,7 @@ import {
 import TopWords from "components/TopWords/TopWords";
 import TopWordsSkeleton from "components/TopWords/TopWordsSkeleton";
 import {
+  QueryConfusionMatrixState,
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
@@ -21,6 +22,7 @@ import { ALL_OUTCOMES } from "utils/const";
 
 type Props = {
   baseUrl: string;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: Required<QueryPipelineState>;
@@ -29,6 +31,7 @@ type Props = {
 
 const ConfidenceHistogramTopWords: React.FC<Props> = ({
   baseUrl,
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
@@ -104,6 +107,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
         ) : (
           <TopWords
             baseUrl={baseUrl}
+            confusionMatrix={confusionMatrix}
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
@@ -121,6 +125,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
         ) : (
           <TopWords
             baseUrl={baseUrl}
+            confusionMatrix={confusionMatrix}
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
