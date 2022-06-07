@@ -164,7 +164,7 @@ const ConfusionMatrix: React.FC<Props> = ({
         <Typography
           fontSize={12}
           color={(theme) =>
-            theme.palette.common[value > 0.7 ? "white" : "black"]
+            theme.palette.common[value / maxCount > 0.7 ? "white" : "black"]
           }
         >
           {normalized ? (value * 100).toFixed(0) : value}
