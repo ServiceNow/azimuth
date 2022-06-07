@@ -29,13 +29,13 @@ const CELL_SIZE = "28px";
 type Props = {
   jobId: string;
   datasetSplitName: DatasetSplitName;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
   postprocessing: QueryPostprocessingState;
   classOptions: string[];
   predictionFilters?: string[];
   labelFilters?: string[];
-  confusionMatrix: QueryConfusionMatrixState;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -88,13 +88,13 @@ const useStyles = makeStyles((theme) => ({
 const ConfusionMatrix: React.FC<Props> = ({
   jobId,
   datasetSplitName,
+  confusionMatrix,
   filters,
   pipeline,
   postprocessing,
   classOptions,
   predictionFilters,
   labelFilters,
-  confusionMatrix,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -114,10 +114,10 @@ const ConfusionMatrix: React.FC<Props> = ({
   } = getConfusionMatrixEndpoint.useQuery({
     jobId,
     datasetSplitName,
+    ...confusionMatrix,
     ...filters,
     ...pipeline,
     ...postprocessing,
-    ...confusionMatrix,
   });
 
   // Set to 1 if the maxCount is 0 so we don't divide by 0.

@@ -44,21 +44,21 @@ import { OUTCOME_PRETTY_NAMES } from "../../utils/const";
 const MotionChevronLeftIcon = motion(ChevronLeftIcon);
 
 type Props = {
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
   searchString: string;
-  confusionMatrix: QueryConfusionMatrixState;
 };
 
 const Controls: React.FC<Props> = ({
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
   postprocessing,
   searchString,
-  confusionMatrix,
 }) => {
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState("");
@@ -112,10 +112,10 @@ const Controls: React.FC<Props> = ({
   const handleClearFilters = () => {
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...pagination,
         ...pipeline,
         ...postprocessing,
-        ...confusionMatrix,
       })}`
     );
   };
@@ -123,11 +123,11 @@ const Controls: React.FC<Props> = ({
   const handleFilterChange = (filters: QueryFilterState) =>
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
         ...pipeline,
         ...postprocessing,
-        ...confusionMatrix,
       })}`
     );
 
@@ -149,10 +149,10 @@ const Controls: React.FC<Props> = ({
   const handlePostprocessingChange = (checked: boolean) =>
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
         ...pipeline,
-        ...confusionMatrix,
         withoutPostprocessing: checked || undefined,
       })}`
     );

@@ -96,22 +96,22 @@ type Props = {
   jobId: string;
   datasetInfo?: DatasetInfoResponse;
   datasetSplitName: DatasetSplitName;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
-  confusionMatrix: QueryConfusionMatrixState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
   jobId,
   datasetInfo,
   datasetSplitName,
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
   postprocessing,
-  confusionMatrix,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -138,11 +138,11 @@ const UtterancesTable: React.FC<Props> = ({
 
   const handlePageChange = (page: number) => {
     const q = constructSearchString({
+      ...confusionMatrix,
       ...filters,
       ...pagination,
       ...pipeline,
       ...postprocessing,
-      ...confusionMatrix,
       page: page + 1,
     });
     history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
@@ -155,11 +155,11 @@ const UtterancesTable: React.FC<Props> = ({
     history.push(
       `/${jobId}/dataset_splits/${datasetSplitName}/utterances${constructSearchString(
         {
+          ...confusionMatrix,
           ...filters,
           ...pagination,
           ...pipeline,
           ...postprocessing,
-          ...confusionMatrix,
           sort: model?.field as UtterancesSortableColumn | undefined,
           descending: model?.sort === "desc" || undefined,
         }

@@ -62,7 +62,7 @@ const PageHeader = () => {
 
   const history = useHistory();
   const location = useLocation();
-  const { filters, pagination, pipeline, postprocessing, confusionMatrix } =
+  const { confusionMatrix, filters, pagination, pipeline, postprocessing } =
     useQueryState();
 
   // If present, preserve pipelineIndex when navigating, but nothing else
@@ -71,11 +71,11 @@ const PageHeader = () => {
   const setPipeline = (pipelineIndex?: number) => {
     history.push(
       `${location.pathname}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
-        pipelineIndex,
         ...postprocessing,
-        ...confusionMatrix,
+        pipelineIndex,
       })}`
     );
   };

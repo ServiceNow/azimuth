@@ -48,11 +48,11 @@ const Exploration = () => {
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
   const {
+    confusionMatrix,
     filters,
     pagination,
     pipeline,
     postprocessing,
-    confusionMatrix,
     searchString,
   } = useQueryState();
 
@@ -77,12 +77,12 @@ const Exploration = () => {
       <div className={classes.container}>
         <div className={classes.layout}>
           <Controls
+            confusionMatrix={confusionMatrix}
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
             postprocessing={postprocessing}
             searchString={searchString}
-            confusionMatrix={confusionMatrix}
           />
           <div className={classes.content}>
             <Paper
@@ -140,13 +140,13 @@ const Exploration = () => {
                   <ConfusionMatrix
                     jobId={jobId}
                     datasetSplitName={datasetSplitName}
+                    confusionMatrix={confusionMatrix}
                     filters={filters}
                     pipeline={pipeline}
                     classOptions={classOptions}
                     predictionFilters={filters.predictions}
                     labelFilters={filters.labels}
                     postprocessing={postprocessing}
-                    confusionMatrix={confusionMatrix}
                   />
                 )}
               {mainView === "utterances" && (
@@ -154,11 +154,11 @@ const Exploration = () => {
                   jobId={jobId}
                   datasetInfo={datasetInfo}
                   datasetSplitName={datasetSplitName}
-                  pagination={pagination}
+                  confusionMatrix={confusionMatrix}
                   filters={filters}
+                  pagination={pagination}
                   pipeline={pipeline}
                   postprocessing={postprocessing}
-                  confusionMatrix={confusionMatrix}
                 />
               )}
             </Paper>
