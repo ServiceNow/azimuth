@@ -6,6 +6,7 @@ import numpy as np
 
 from azimuth.modules.model_performance.confusion_matrix import ConfusionMatrixModule
 from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
+from azimuth.types.model_performance import ConfusionMatrixResponse
 from tests.utils import save_predictions
 
 
@@ -56,3 +57,17 @@ def test_confusion_matrix(tiny_text_config):
     )
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
     assert json_output_not_normalized.confusion_matrix.sum() == dm.num_rows
+    assert [json_output_not_normalized] == [
+        ConfusionMatrixResponse(confusion_matrix=json_output_not_normalized, normalized=False)
+    ]
+
+    # When normalized, we get the predictions.
+    mod_not_normalized = ConfusionMatrixModule(
+        DatasetSplitName.eval,
+        tiny_text_config,
+        mod_options=ModuleOptions(pipeline_index=0, cf_normalized=True),
+    )
+    [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
+    assert [json_output_not_normalized] == [
+        ConfusionMatrixResponse(confusion_matrix=json_output_not_normalized, normalized=True)
+    ]

@@ -50,11 +50,12 @@ def get_confusion_matrix(
         cf_normalized=normalized,
     )
 
-    cf_matrix = get_standard_task_result(
+    task_results: ConfusionMatrixResponse = get_standard_task_result(
         SupportedModule.ConfusionMatrix,
         dataset_split_name,
         task_manager=task_manager,
         mod_options=mod_options,
         last_update=dataset_split_manager.last_update,
     )[0]
-    return ConfusionMatrixResponse(confusion_matrix=cf_matrix.confusion_matrix, normalized=normalized)
+
+    return task_results
