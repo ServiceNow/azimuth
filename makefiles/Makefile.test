@@ -57,10 +57,10 @@ check-changes:
 
 .PHONY: image.testbackend
 image.testbackend:
-	docker run --rm -t $(REGISTRY)/$(IMAGE)_$(DEVICE):$(TAG)$(TAG_EXT) make test
+	docker run --rm -t $(REGISTRY)/$(IMAGE):$(TAG)_$(DEVICE)$(TAG_EXT) make test
 
 .PHONY: image.testfrontend
 image.testfrontend:
 	docker run --rm \
-		-t ${REGISTRY}/azimuth_app:$(TAG)$(TAG_EXT) \
+		-t ${REGISTRY}/azimuth-app:$(TAG)$(TAG_EXT) \
 		make test
