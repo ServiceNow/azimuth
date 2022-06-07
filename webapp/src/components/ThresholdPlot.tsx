@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
+import Description from "components/Description";
 import { getOutcomeCountPerThresholdEndpoint } from "services/api";
 import { QueryPipelineState } from "types/models";
 import { ALL_OUTCOMES, OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
@@ -98,6 +99,13 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
         Distribution of the Predictions on Evaluation Set for Multiple
         Thresholds
       </Typography>
+      <Description
+        text="Assess your predictions based on each confidence threshold to select
+        your optimal model performance confidence threshold, where you have the
+        max correct and the minimum incorrect. "
+        link="/user-guide/"
+      />
+
       <Box display="flex" gap={6} justifyContent="center" width="100%">
         {ALL_OUTCOMES.map((outcome) => (
           <Box key={outcome} display="flex" gap={1} lineHeight={1}>

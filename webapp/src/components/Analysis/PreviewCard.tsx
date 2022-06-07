@@ -1,25 +1,40 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
+import Description from "components/Description";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 type Props = {
   title: string;
+  subtitle?: string;
   to?: string;
+  href?: string;
 };
 
-const PreviewCard: React.FC<Props> = ({ title, to, children }) => (
+const PreviewCard: React.FC<Props> = ({
+  title,
+  subtitle,
+  to,
+  href,
+  children,
+}) => (
   <Paper
     variant="outlined"
-    sx={{ display: "flex", flexDirection: "column", gap: 4, padding: 4 }}
+    sx={{ display: "flex", flexDirection: "column", gap: 2, padding: 4 }}
   >
     <Box display="flex" alignItems="flex-start" justifyContent="space-between">
       <Typography variant="h4">{title}</Typography>
       {to && (
-        <Button color="secondary" variant="outlined" component={Link} to={to}>
+        <Button
+          color="secondary"
+          variant="outlined"
+          component={RouterLink}
+          to={to}
+        >
           View details
         </Button>
       )}
     </Box>
+    {subtitle && href && <Description text={subtitle} link={href} />}
     {children}
   </Paper>
 );
