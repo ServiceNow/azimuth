@@ -86,7 +86,15 @@ BASE_PREDICTION_TASKS = [
     Startup(
         "metrics_by_filter",
         SupportedModule.MetricsPerFilter,
-        dependency_names=["prediction", "outcome_count"],
+        dependency_names=[
+            "prediction",
+            "outcome_count",
+            "prediction_comparison",
+            "perturbation_testing",
+            "neighbors_tags",
+            "prediction_bma",
+            "syntax_tags",
+        ],
         run_on_all_pipelines=True,
     ),
 ]

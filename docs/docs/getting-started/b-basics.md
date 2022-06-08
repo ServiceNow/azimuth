@@ -79,16 +79,15 @@ running a demo.
 
 2. Run **our dummy or full demo** (option a. or b.), based on how much time you have. If it is the
    first time that you are running the command, it will take additional time to download the Docker
-   image (~15 min). If you have access to GPUs, you can add to the command `DEVICE=gpu` (default
-   is `cpu`).
+   image (~15 min).
     1. If you don't have a lot of time and just want to verify your setup, you can run our dummy
        CLINC demo (~2min):
        ```
-       make CFG_PATH=/config/development/clinc_dummy/conf.json compose
+       make CFG_PATH=/config/development/clinc_dummy/conf.json launch
        ```
     2. If you have a bit more time, run our full CLINC demo (~10min):
        ```
-       make CFG_PATH=/config/development/clinc/conf.json compose
+       make CFG_PATH=/config/development/clinc/conf.json launch
        ```
 
 3. The **app will be accessible** at [http://0.0.0.0:8080](http://0.0.0.0:8080) after a few minutes

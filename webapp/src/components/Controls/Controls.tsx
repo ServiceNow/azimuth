@@ -235,6 +235,7 @@ const Controls: React.FC<Props> = ({
                 control={
                   <Switch
                     checked={postprocessing.withoutPostprocessing ?? false}
+                    color="secondary"
                     onChange={(_, checked) =>
                       handlePostprocessingChange(checked)
                     }

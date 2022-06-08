@@ -12,26 +12,6 @@ X_LEFT_LEGEND = 1.037
 X_RIGHT_LEGEND = 1.08
 Y_LEGEND_LINE_1 = -17
 Y_LEGEND_LINE_HEIGHT = -21
-SANKEY_PALETTE = [
-    "#B8D8E9",
-    "#83A8BC",
-    "#FDCC8C",
-    "#FCB11F",
-    "#FCAEAD",
-    "#FF8271",
-    "#C1E5A1",
-    "#558A26",
-    "#FFFFB9",
-    "#FFEB38",
-    "#4C93C3",
-    "#1D5A93",
-    "#D5C1DE",
-    "#B873D8",
-    "#9DD196",
-    "#56D44D",
-    "#A0E8E3",
-    "#45BDB5",
-]
 
 
 class Colors(str, Enum):
