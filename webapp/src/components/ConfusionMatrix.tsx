@@ -109,7 +109,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   const {
     data: { confusionMatrix: data, normalized } = {
       confusionMatrix: [],
-      normalized: true,
+      normalized: confusionMatrix.normalized,
     },
   } = getConfusionMatrixEndpoint.useQuery({
     jobId,
