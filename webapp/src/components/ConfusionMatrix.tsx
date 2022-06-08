@@ -1,13 +1,23 @@
-import { alpha, Box, Theme, Typography } from "@mui/material";
+import {
+  alpha,
+  Box,
+  Theme,
+  Typography,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import {
   QueryFilterState,
+  QueryConfusionMatrixState,
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
+import { useHistory, useLocation } from "react-router-dom";
+import { constructSearchString } from "utils/helpers";
 import { OUTCOME_COLOR } from "utils/const";
 import { classNames } from "utils/helpers";
 
@@ -19,6 +29,7 @@ const CELL_SIZE = "28px";
 type Props = {
   jobId: string;
   datasetSplitName: DatasetSplitName;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
   postprocessing: QueryPostprocessingState;
@@ -77,6 +88,7 @@ const useStyles = makeStyles((theme) => ({
 const ConfusionMatrix: React.FC<Props> = ({
   jobId,
   datasetSplitName,
+  confusionMatrix,
   filters,
   pipeline,
   postprocessing,
@@ -85,7 +97,8 @@ const ConfusionMatrix: React.FC<Props> = ({
   labelFilters,
 }) => {
   const classes = useStyles();
-
+  const history = useHistory();
+  const location = useLocation();
   const hoverStyle = (theme: Theme) => ({
     backgroundColor: alpha(
       theme.palette.secondary.main,
@@ -93,18 +106,33 @@ const ConfusionMatrix: React.FC<Props> = ({
     ),
   });
 
-  const { data: { confusionMatrix } = { confusionMatrix: [] } } =
-    getConfusionMatrixEndpoint.useQuery({
-      jobId,
-      datasetSplitName,
-      ...filters,
-      ...pipeline,
-      ...postprocessing,
-    });
+  const {
+    data: { confusionMatrix: data, normalized } = {
+      confusionMatrix: [],
+      normalized: confusionMatrix.normalized,
+    },
+  } = getConfusionMatrixEndpoint.useQuery({
+    jobId,
+    datasetSplitName,
+    ...confusionMatrix,
+    ...filters,
+    ...pipeline,
+    ...postprocessing,
+  });
 
   // Set to 1 if the maxCount is 0 so we don't divide by 0.
   // This is fine since all values will be 0 anyway in this case.
-  const maxCount = Math.max(...confusionMatrix.flat()) || 1;
+  const maxCount = Math.max(...data.flat()) || 1;
+
+  const handleNormalizedStateChange = (checked: boolean) =>
+    history.push(
+      `${location.pathname}${constructSearchString({
+        ...filters,
+        ...pipeline,
+        ...postprocessing,
+        normalized: checked && undefined,
+      })}`
+    );
 
   const renderCell = (value: number, rowIndex: number, columnIndex: number) => (
     <Box
@@ -136,17 +164,23 @@ const ConfusionMatrix: React.FC<Props> = ({
         <Typography
           fontSize={12}
           color={(theme) =>
-            theme.palette.common[value > 0.7 ? "white" : "black"]
+            theme.palette.common[value / maxCount > 0.7 ? "white" : "black"]
           }
         >
-          {(value * 100).toFixed(0)}
-          <Typography
-            component="span"
-            fontSize="0.75em"
-            sx={{ verticalAlign: "0.25em" }}
-          >
-            %
-          </Typography>
+          {normalized ? (
+            <>
+              {(value * 100).toFixed(0)}
+              <Typography
+                component="span"
+                fontSize="0.75em"
+                sx={{ verticalAlign: "0.25em" }}
+              >
+                %
+              </Typography>
+            </>
+          ) : (
+            value
+          )}
         </Typography>
       )}
     </Box>
@@ -162,6 +196,17 @@ const ConfusionMatrix: React.FC<Props> = ({
       minHeight={0}
       width="100%"
     >
+      <Box marginLeft="auto">
+        <FormControlLabel
+          control={
+            <Switch
+              checked={normalized ?? true}
+              onChange={(_, checked) => handleNormalizedStateChange(checked)}
+            />
+          }
+          label="Normalize"
+        />
+      </Box>
       <Box
         alignItems="center"
         display="grid"
@@ -197,7 +242,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             overscrollBehaviorX: "contain",
           }}
         >
-          {confusionMatrix.flatMap((row, rowIndex) =>
+          {data.flatMap((row, rowIndex) =>
             row.flatMap((value, columnIndex) =>
               value > 0 || rowIndex === columnIndex
                 ? [renderCell(value, rowIndex, columnIndex)]

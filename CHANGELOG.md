@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- A new toggle switch "Normalize" in the confusion matrix page
 
 ### Changed
 - Show 20 similar utterances instead of 10 in the Utterance Detail page.

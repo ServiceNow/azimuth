@@ -31,6 +31,7 @@ import {
 } from "types/api";
 import {
   QueryFilterState,
+  QueryConfusionMatrixState,
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
@@ -95,6 +96,7 @@ type Props = {
   jobId: string;
   datasetInfo?: DatasetInfoResponse;
   datasetSplitName: DatasetSplitName;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
@@ -105,6 +107,7 @@ const UtterancesTable: React.FC<Props> = ({
   jobId,
   datasetInfo,
   datasetSplitName,
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
@@ -135,6 +138,7 @@ const UtterancesTable: React.FC<Props> = ({
 
   const handlePageChange = (page: number) => {
     const q = constructSearchString({
+      ...confusionMatrix,
       ...filters,
       ...pagination,
       ...pipeline,
@@ -151,6 +155,7 @@ const UtterancesTable: React.FC<Props> = ({
     history.push(
       `/${jobId}/dataset_splits/${datasetSplitName}/utterances${constructSearchString(
         {
+          ...confusionMatrix,
           ...filters,
           ...pagination,
           ...pipeline,

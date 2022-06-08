@@ -47,8 +47,14 @@ const Exploration = () => {
   }>();
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
-  const { filters, pagination, pipeline, postprocessing, searchString } =
-    useQueryState();
+  const {
+    confusionMatrix,
+    filters,
+    pagination,
+    pipeline,
+    postprocessing,
+    searchString,
+  } = useQueryState();
 
   const history = useHistory();
 
@@ -71,6 +77,7 @@ const Exploration = () => {
       <div className={classes.container}>
         <div className={classes.layout}>
           <Controls
+            confusionMatrix={confusionMatrix}
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
@@ -121,6 +128,7 @@ const Exploration = () => {
                     />
                     <ConfidenceHistogramTopWords
                       baseUrl={baseUrl}
+                      confusionMatrix={confusionMatrix}
                       filters={filters}
                       pagination={pagination}
                       pipeline={pipeline}
@@ -133,6 +141,7 @@ const Exploration = () => {
                   <ConfusionMatrix
                     jobId={jobId}
                     datasetSplitName={datasetSplitName}
+                    confusionMatrix={confusionMatrix}
                     filters={filters}
                     pipeline={pipeline}
                     classOptions={classOptions}
@@ -146,8 +155,9 @@ const Exploration = () => {
                   jobId={jobId}
                   datasetInfo={datasetInfo}
                   datasetSplitName={datasetSplitName}
-                  pagination={pagination}
+                  confusionMatrix={confusionMatrix}
                   filters={filters}
+                  pagination={pagination}
                   pipeline={pipeline}
                   postprocessing={postprocessing}
                 />
