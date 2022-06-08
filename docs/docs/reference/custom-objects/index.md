@@ -105,4 +105,17 @@ def my_model(num_classes):
     pass
 ```
 
+## Install dependencies at runtime
+
+To avoid needing to modify the Docker image to include your dependencies, Azimuth supports installing dependencies at runtime.
+
+The field `remote` can be one of the following:
+
+1. A package on Pypi
+     1. Example: `remote: "torchvision"`
+2. A folder with `requirements.txt`
+3. A folder with `setup.py`
+
+If none of the above matches, we append `remote` to `PYTHONPATH`, but no dependency will be installed.
+
 --8<-- "includes/abbreviations.md"
