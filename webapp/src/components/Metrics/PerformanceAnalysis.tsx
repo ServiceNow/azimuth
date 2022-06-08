@@ -224,9 +224,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
           "& .MuiDataGrid-columnHeaders": {
             borderBottom: "none",
           },
-          "& .MuiDataGrid-iconSeparator": {
-            display: "none",
-          },
           "& .total": {
             background: (theme) => theme.palette.grey[200],
           },
