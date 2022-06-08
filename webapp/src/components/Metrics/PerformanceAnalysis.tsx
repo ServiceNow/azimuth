@@ -105,16 +105,16 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   };
 
   const NUMBER_COL_DEF = {
-    width: 135,
     type: "number",
     sortComparator: customSort,
   };
 
   const columns: Column<Row>[] = [
     {
-      width: 206,
       field: "filterValue",
       headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
+      flex: 1,
+      minWidth: 200,
       sortComparator: customSort,
       renderHeader: () => (
         <Select
@@ -147,15 +147,17 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     },
     {
       ...NUMBER_COL_DEF,
-      width: 175,
       field: "utteranceCount",
-      headerName: "Nb. of Utterances",
-      description: "Number of Utterances", // tooltip
+      headerName: "Utterance Count",
+      flex: 1,
+      minWidth: 160,
     },
     ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
       ...NUMBER_COL_DEF,
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
+      flex: 1,
+      minWidth: 160,
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       valueFormatter: percentageFormatter,
     })),
@@ -163,6 +165,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
+      flex: 1,
+      minWidth: 80,
       valueGetter: ({ row }) => row.customMetrics[metricName],
       valueFormatter: percentageFormatter,
     })),
@@ -170,6 +174,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "ece",
       headerName: "ECE",
+      flex: 1,
+      minWidth: 80,
       valueFormatter: twoDigitFormatter,
     },
   ];
