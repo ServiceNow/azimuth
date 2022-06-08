@@ -12,6 +12,10 @@ export const GlobalCss = withStyles({
     ".Toastify__toast--error": {
       background: "#c93c36",
     },
+    ".MuiDataGrid-menuList > li:nth-of-type(-n+3)": {
+      // Hide sort options since they are already available via the sorting button
+      display: "none",
+    },
   },
 })(() => null);
 

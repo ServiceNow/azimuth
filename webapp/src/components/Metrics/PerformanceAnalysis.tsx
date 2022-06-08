@@ -114,6 +114,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     {
       width: 206,
       field: "filterValue",
+      headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
       sortComparator: customSort,
       renderHeader: () => (
         <Select
@@ -233,6 +234,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         rows={rows}
         loading={isFetching}
         pageSize={numberVisible}
+        disableColumnMenu={false}
         components={
           rows.length > INITIAL_NUMBER_VISIBLE
             ? {
