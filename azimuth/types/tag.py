@@ -59,10 +59,10 @@ class SmartTag(str, Enum):
 class SmartTagFamily(str, Enum):
     extreme_length = "extreme_length"
     partial_syntax = "partial_syntax"
-    similarity = "similarity"
+    dissimilar = "dissimilar"
     almost_correct = "almost_correct"
     behavioral_testing = "behavioral_testing"
-    uncertainty_estimation = "uncertainty_estimation"
+    uncertain = "uncertain"
 
 
 Tag = str
@@ -103,7 +103,7 @@ SMART_TAGS_FAMILY_MAPPING = {
         SmartTag.no_subj,
         SmartTag.no_obj,
     ],
-    SmartTagFamily.similarity: [
+    SmartTagFamily.dissimilar: [
         SmartTag.conflicting_neighbors_train,
         SmartTag.conflicting_neighbors_eval,
         SmartTag.no_close_train,
@@ -117,7 +117,7 @@ SMART_TAGS_FAMILY_MAPPING = {
         SmartTag.failed_punctuation,
         SmartTag.failed_fuzzy_matching,
     ],
-    SmartTagFamily.uncertainty_estimation: [
+    SmartTagFamily.uncertain: [
         SmartTag.high_epistemic_uncertainty,
     ],
 }

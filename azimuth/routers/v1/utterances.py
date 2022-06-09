@@ -218,7 +218,7 @@ def get_utterances(
         available_families = [
             SmartTagFamily.extreme_length,
             SmartTagFamily.partial_syntax,
-            SmartTagFamily.similarity,
+            SmartTagFamily.dissimilar,
         ]
     utterances = [
         Utterance(

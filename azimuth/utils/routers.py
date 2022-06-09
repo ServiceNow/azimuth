@@ -41,14 +41,12 @@ def build_named_dataset_filters(
     predictions: List[str] = Query([], title="Prediction"),
     extreme_length: List[SmartTag] = Query([], title="Extreme length", alias="extremeLength"),
     partial_syntax: List[SmartTag] = Query([], title="Partial syntax", alias="partialSyntax"),
-    similarity: List[SmartTag] = Query([], title="Similarity"),
+    dissimilar: List[SmartTag] = Query([], title="Dissimilar"),
     almost_correct: List[SmartTag] = Query([], title="Almost correct", alias="almostCorrect"),
     behavioral_testing: List[SmartTag] = Query(
-        [], title="Behavioral Testing", alias="behavioralTesting"
+        [], title="Behavioral testing", alias="behavioralTesting"
     ),
-    uncertainty_estimation: List[SmartTag] = Query(
-        [], title="Uncertainty Estimation", alias="uncertaintyEstimation"
-    ),
+    uncertain: List[SmartTag] = Query([], title="Uncertain"),
     data_actions: List[DataAction] = Query([], title="Data action tags", alias="dataActions"),
     outcomes: List[OutcomeName] = Query([], title="Outcomes", alias="outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
@@ -62,10 +60,10 @@ def build_named_dataset_filters(
         predictions: The desired class predictions
         extreme_length: The desired `extreme_length` smart tags
         partial_syntax: The desired `partial_syntax` smart tags
-        similarity: The desired `similarity` smart tags
+        dissimilar: The desired `dissimilar` smart tags
         almost_correct: The desired `almost_correct` smart tags
         behavioral_testing: The desired `behavioral_testing` smart tags
-        uncertainty_estimation: The desired `uncertainty_estimation` smart tags
+        uncertain: The desired `uncertain` smart tags
         data_actions: The desired data_action tags
         outcomes: The desired outcomes
         utterance: The substring desired in each utterance
@@ -82,10 +80,10 @@ def build_named_dataset_filters(
         smart_tags={
             SmartTagFamily.extreme_length: extreme_length,
             SmartTagFamily.partial_syntax: partial_syntax,
-            SmartTagFamily.similarity: similarity,
+            SmartTagFamily.dissimilar: dissimilar,
             SmartTagFamily.almost_correct: almost_correct,
             SmartTagFamily.behavioral_testing: behavioral_testing,
-            SmartTagFamily.uncertainty_estimation: uncertainty_estimation,
+            SmartTagFamily.uncertain: uncertain,
         },
         data_actions=data_actions,
         utterance=utterance,

@@ -109,10 +109,10 @@ def test_dataset_filtering_multi(simple_text_config):
     [
         SmartTagFamily.extreme_length,
         SmartTagFamily.partial_syntax,
-        SmartTagFamily.similarity,
+        SmartTagFamily.dissimilar,
         SmartTagFamily.behavioral_testing,
         SmartTagFamily.almost_correct,
-        SmartTagFamily.uncertainty_estimation,
+        SmartTagFamily.uncertain,
     ],
 )
 def test_dataset_filtering_no_smart_tag(simple_text_config, family):

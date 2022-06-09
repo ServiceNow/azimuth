@@ -39,10 +39,10 @@ class ValuePerDatasetSmartTag(AliasModel, GenericModel, Generic[T]):
 
 
 class ValuePerPipelineSmartTag(AliasModel, GenericModel, Generic[T]):
-    similarity: List[T] = Field(..., title="Similarity smart tag")
+    dissimilar: List[T] = Field(..., title="Dissimilar smart tag")
     almost_correct: List[T] = Field(..., title="Almost correct smart tag")
     behavioral_testing: List[T] = Field(..., title="Behavioral testing smart tag")
-    uncertainty_estimation: List[T] = Field(..., title="Uncertainty estimation smart tag")
+    uncertain: List[T] = Field(..., title="Uncertain smart tag")
 
 
 class ValuePerDatasetFilter(ValuePerDatasetSmartTag[T], GenericModel, Generic[T]):
