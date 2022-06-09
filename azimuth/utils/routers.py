@@ -39,10 +39,10 @@ def build_named_dataset_filters(
     confidence_max: float = Query(1, title="Maximum confidence", alias="confidenceMax"),
     labels: List[str] = Query([], title="Label"),
     predictions: List[str] = Query([], title="Prediction"),
-    extreme_length: List[SmartTag] = Query([], title="Extreme length"),
-    partial_syntax: List[SmartTag] = Query([], title="Syntactic"),
+    extreme_length: List[SmartTag] = Query([], title="Extreme length", alias="extremeLength"),
+    partial_syntax: List[SmartTag] = Query([], title="Partial syntax", alias="partialSyntax"),
     similarity: List[SmartTag] = Query([], title="Similarity"),
-    almost_correct: List[SmartTag] = Query([], title="Almost Correct", alias="almostCorrect"),
+    almost_correct: List[SmartTag] = Query([], title="Almost correct", alias="almostCorrect"),
     behavioral_testing: List[SmartTag] = Query(
         [], title="Behavioral Testing", alias="behavioralTesting"
     ),

@@ -867,8 +867,8 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        extreme_length?: components["schemas"]["SmartTag"][];
-        partial_syntax?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
         similarity?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
@@ -928,8 +928,8 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        extreme_length?: components["schemas"]["SmartTag"][];
-        partial_syntax?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
         similarity?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
@@ -1017,8 +1017,8 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        extreme_length?: components["schemas"]["SmartTag"][];
-        partial_syntax?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
         similarity?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
@@ -1054,8 +1054,8 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        extreme_length?: components["schemas"]["SmartTag"][];
-        partial_syntax?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
         similarity?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
@@ -1095,8 +1095,8 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        extreme_length?: components["schemas"]["SmartTag"][];
-        partial_syntax?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
         similarity?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
@@ -1296,8 +1296,8 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        extreme_length?: components["schemas"]["SmartTag"][];
-        partial_syntax?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
         similarity?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
@@ -1336,8 +1336,8 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        extreme_length?: components["schemas"]["SmartTag"][];
-        partial_syntax?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
         similarity?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
