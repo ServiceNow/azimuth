@@ -156,9 +156,19 @@ def test_dataset_filtering_confidence(simple_text_config):
     )
 
 
-def test_dataset_filtering_mutually_exclusive(simple_text_config):
+def test_dataset_filtering_smart_tags_uses_or_within_family(simple_text_config):
     dm = generate_mocked_dm(simple_text_config)
     ds = dm.get_dataset_split(get_table_key(simple_text_config))
+    ds_filtered_long_sentence = filter_dataset_split(
+        ds,
+        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["long_sentence"]}),
+        config=dm.config,
+    )
+    ds_filtered_short_sentence = filter_dataset_split(
+        ds,
+        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["short_sentence"]}),
+        config=dm.config,
+    )
     ds_filtered = filter_dataset_split(
         ds,
         DatasetFilters(
@@ -166,7 +176,7 @@ def test_dataset_filtering_mutually_exclusive(simple_text_config):
         ),
         config=dm.config,
     )
-    assert len(ds_filtered) == 0
+    assert len(ds_filtered) == len(ds_filtered_long_sentence) + len(ds_filtered_short_sentence)
 
 
 def test_dataset_filtering_without_postprocessing(simple_text_config):

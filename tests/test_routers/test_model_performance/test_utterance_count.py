@@ -14,23 +14,14 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     data = resp.json()
     metrics = data.pop("countPerFilter")
     assert "label" in metrics and len(metrics["label"]) == 3
-    assert (
-        "smartTag" in metrics
-        and sum(
-            [
-                sum(tag["utteranceCount"] for tag in tag_family)
-                for tag_family in metrics["smartTag"].values()
-            ]
-        )
-        > 0
-    )
+    assert "extremeLength" in metrics and len(metrics["extremeLength"]) > 0
 
     resp = client.get("/dataset_splits/eval/utterance_count/per_filter")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
     assert "label" in metrics and len(metrics["label"]) == 3
-    assert metrics["prediction"] is None and metrics["outcome"] is None
+    assert "prediction" not in metrics and "outcome" not in metrics
 
     resp = client.get(
         "/dataset_splits/eval/utterance_count/per_filter?pipelineIndex=0&labels=positive"
