@@ -105,6 +105,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   };
 
   const NUMBER_COL_DEF = {
+    maxWidth: 221,
     type: "number",
     sortComparator: customSort,
   };
@@ -113,8 +114,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     {
       field: "filterValue",
       headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
-      flex: 1,
-      minWidth: 200,
+      width: 221,
       sortComparator: customSort,
       renderHeader: () => (
         <Select
