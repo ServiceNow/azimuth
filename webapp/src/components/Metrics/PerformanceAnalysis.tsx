@@ -1,11 +1,15 @@
 import React from "react";
 import {
-  GridSortModel,
-  GridValueFormatterParams,
+  GridCellValue,
+  GridColumnMenuContainer,
+  GridColumnMenuProps,
+  GridColumnsMenuItem,
   GridRowSpacingParams,
   GridSortCellParams,
   GridSortDirection,
-  GridCellValue,
+  GridSortModel,
+  GridValueFormatterParams,
+  HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import { Box, MenuItem, Select, Typography } from "@mui/material";
 
@@ -26,13 +30,24 @@ const FOOTER_HEIGHT = 40;
 
 const OVERALL_ROW_ID = -1; // -1 so that the other rows can range from 0 - n-1
 
-type FilterByViewOption = "label" | "prediction" | "smartTag";
-type DataOptions = {
-  [key in FilterByViewOption]: {
-    name: string;
-    metricsPerFilter: MetricsPerFilterValue[];
-  };
-};
+const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
+  <GridColumnMenuContainer
+    hideMenu={hideMenu}
+    currentColumn={currentColumn}
+    open={open}
+  >
+    <HideGridColMenuItem onClick={hideMenu} column={currentColumn} />
+    <GridColumnsMenuItem onClick={hideMenu} column={currentColumn} />
+  </GridColumnMenuContainer>
+);
+
+const OPTIONS = ["label", "prediction", "smartTag"] as const;
+const OPTION_PRETTY_NAME = {
+  label: "Label",
+  prediction: "Prediction",
+  smartTag: "Smart Tag",
+} as const;
+type FilterByViewOption = typeof OPTIONS[number];
 
 type Props = {
   jobId: string;
@@ -63,21 +78,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const handleSortModelChange = (model: GridSortModel) => {
     const [sortModel] = model;
     sortDirectionRef.current = sortModel?.sort;
-  };
-
-  const options: DataOptions = {
-    label: {
-      name: "Label",
-      metricsPerFilter: data?.metricsPerFilter.label || [],
-    },
-    prediction: {
-      name: "Prediction",
-      metricsPerFilter: data?.metricsPerFilter.prediction || [],
-    },
-    smartTag: {
-      name: "Smart Tag",
-      metricsPerFilter: data?.metricsPerFilter.smartTag || [],
-    },
   };
 
   const rows: Row[] = React.useMemo(() => {
@@ -120,15 +120,16 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   };
 
   const NUMBER_COL_DEF = {
-    width: 135,
+    maxWidth: 221,
     type: "number",
     sortComparator: customSort,
   };
 
   const columns: Column<Row>[] = [
     {
-      width: 206,
       field: "filterValue",
+      headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
+      width: 221,
       sortComparator: customSort,
       renderHeader: () => (
         <Select
@@ -151,9 +152,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             )
           }
         >
-          {Object.entries(options).map(([key, option]) => (
+          {OPTIONS.map((key) => (
             <MenuItem key={key} value={key}>
-              {option.name}
+              {OPTION_PRETTY_NAME[key]}
             </MenuItem>
           ))}
         </Select>
@@ -161,15 +162,17 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     },
     {
       ...NUMBER_COL_DEF,
-      width: 175,
       field: "utteranceCount",
-      headerName: "Nb. of Utterances",
-      description: "Number of Utterances", // tooltip
+      headerName: "Utterance Count",
+      flex: 1,
+      minWidth: 160,
     },
     ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
       ...NUMBER_COL_DEF,
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
+      flex: 1,
+      minWidth: 160,
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       valueFormatter: percentageFormatter,
     })),
@@ -177,6 +180,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
+      flex: 1,
+      minWidth: 80,
       valueGetter: ({ row }) => row.customMetrics[metricName],
       valueFormatter: percentageFormatter,
     })),
@@ -184,6 +189,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "ece",
       headerName: "ECE",
+      flex: 1,
+      minWidth: 80,
       valueFormatter: twoDigitFormatter,
     },
   ];
@@ -232,9 +239,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
           "& .MuiDataGrid-columnHeaders": {
             borderBottom: "none",
           },
-          "& .MuiDataGrid-iconSeparator": {
-            display: "none",
-          },
           "& .total": {
             background: (theme) => theme.palette.grey[200],
           },
@@ -248,13 +252,21 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         rows={rows}
         loading={isFetching}
         pageSize={numberVisible}
-        components={
-          rows.length > INITIAL_NUMBER_VISIBLE
+        disableColumnMenu={false}
+        sortingOrder={["desc", "asc"]}
+        components={{
+          ColumnMenu,
+          ...(rows.length > INITIAL_NUMBER_VISIBLE
             ? {
                 Footer,
               }
-            : {}
-        }
+            : {}),
+        }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: columns[1].field, sort: "desc" }],
+          },
+        }}
       />
     </Box>
   );
