@@ -26,13 +26,13 @@ const FOOTER_HEIGHT = 40;
 
 const OVERALL_ROW_ID = -1; // -1 so that the other rows can range from 0 - n-1
 
-type FilterByViewOption = "label" | "prediction" | "smartTag";
-type DataOptions = {
-  [key in FilterByViewOption]: {
-    name: string;
-    metricsPerFilter: MetricsPerFilterValue[];
-  };
-};
+const OPTIONS = ["label", "prediction", "smartTag"] as const;
+const OPTION_PRETTY_NAME = {
+  label: "Label",
+  prediction: "Prediction",
+  smartTag: "Smart Tag",
+} as const;
+type FilterByViewOption = typeof OPTIONS[number];
 
 type Props = {
   jobId: string;
@@ -63,21 +63,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const handleSortModelChange = (model: GridSortModel) => {
     const [sortModel] = model;
     sortDirectionRef.current = sortModel?.sort;
-  };
-
-  const options: DataOptions = {
-    label: {
-      name: "Label",
-      metricsPerFilter: data?.metricsPerFilter.label || [],
-    },
-    prediction: {
-      name: "Prediction",
-      metricsPerFilter: data?.metricsPerFilter.prediction || [],
-    },
-    smartTag: {
-      name: "Smart Tag",
-      metricsPerFilter: data?.metricsPerFilter.smartTag || [],
-    },
   };
 
   const rows: Row[] = React.useMemo(() => {
@@ -151,9 +136,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             )
           }
         >
-          {Object.entries(options).map(([key, option]) => (
+          {OPTIONS.map((key) => (
             <MenuItem key={key} value={key}>
-              {option.name}
+              {OPTION_PRETTY_NAME[key]}
             </MenuItem>
           ))}
         </Select>
