@@ -19,7 +19,7 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     assert "extremeLength" in metrics and len(metrics["extremeLength"]) == 4
     filter_values = {m["filterValue"]: m["utteranceCount"] for m in metrics["extremeLength"]}
     assert SmartTag.no_smart_tag in filter_values
-    # TODO assert filter_values[SmartTag.no_smart_tag] > 0
+    assert filter_values[SmartTag.no_smart_tag] > 0
 
     resp = client.get("/dataset_splits/eval/utterance_count/per_filter")
     assert resp.status_code == HTTP_200_OK, resp.text

@@ -12,8 +12,8 @@ from azimuth.types.tag import (
     SMART_TAGS_FAMILY_MAPPING,
     DataAction,
     SmartTag,
+    SmartTagFamily,
 )
-from azimuth_public.azimuth.types.tag import SmartTagFamily
 
 
 def verify_column_is_present(column_name: str, dataset_split: Dataset):
