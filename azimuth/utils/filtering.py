@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Union
+from typing import Union, cast
 
 from datasets import Dataset
 
@@ -96,7 +96,7 @@ def filter_dataset_split(
         # If None, it is none of them.
         if len(tags_in_family) > 0:
             # We add no_smart_tag to all families.
-            family: SmartTagFamily = key
+            family = cast(SmartTagFamily, key)
             dataset_split = dataset_split.filter(
                 lambda x: any(
                     (

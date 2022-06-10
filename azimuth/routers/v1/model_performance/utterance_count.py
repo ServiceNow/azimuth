@@ -64,11 +64,14 @@ def get_count_per_filter(
     smart_tag_counter: Dict[SmartTagFamily, Counter] = {
         tag_family: Counter(
             **{
-                SmartTag.no_smart_tag.value: sum(
-                    ds.to_pandas()[set(tags).intersection(ds.column_names)].to_numpy().sum(1) == 0
+                SmartTag.no_smart_tag: sum(
+                    ds.to_pandas()[set(tags).intersection(ds.column_names)]  # type: ignore
+                    .to_numpy()
+                    .sum(1)
+                    == 0
                 )
             },
-            **{t.value: sum(ds[t]) if t in ds.column_names else 0 for t in tags},
+            **{t: sum(ds[t]) if t in ds.column_names else 0 for t in tags},
         )
         for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
     }
