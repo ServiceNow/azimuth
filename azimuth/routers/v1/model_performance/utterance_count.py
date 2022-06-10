@@ -18,6 +18,7 @@ from azimuth.types.model_performance import (
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
     SMART_TAGS_FAMILY_MAPPING,
+    SmartTag,
     SmartTagFamily,
 )
 from azimuth.utils.conversion import merge_counters
@@ -61,7 +62,10 @@ def get_count_per_filter(
         get_default_counter(class_names), Counter(ds[config.columns.label])
     )
     smart_tag_counter: Dict[SmartTagFamily, Counter] = {
-        tag_family: Counter(**{t.value: sum(ds[t]) if t in ds.column_names else 0 for t in tags})
+        tag_family: Counter(
+            **{SmartTag.no_smart_tag: 0},  # TODO real value
+            **{t.value: sum(ds[t]) if t in ds.column_names else 0 for t in tags}
+        )
         for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
     }
     data_action_counter: Counter = Counter(**{t: sum(ds[t]) for t in ALL_DATA_ACTIONS})
