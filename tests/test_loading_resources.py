@@ -21,6 +21,7 @@ from transformers import (
 )
 
 from azimuth.config import AzimuthConfig
+from azimuth.utils.ml.seeding import RandomContext
 
 _CURRENT_DIR = "/tmp"
 _MAX_DATASET_LEN = 42
@@ -40,8 +41,10 @@ def load_hf_text_classif_pipeline(checkpoint_path: str, azimuth_config: AzimuthC
     try:
         model = DistilBertForSequenceClassification.from_pretrained(_CURRENT_DIR)
     except OSError:
-        model = DistilBertForSequenceClassification(DistilBertConfig())
-        model.save_pretrained(_CURRENT_DIR)
+        with RandomContext(seed=2022):
+            model = DistilBertForSequenceClassification(DistilBertConfig())
+            model.init_weights()
+            model.save_pretrained(_CURRENT_DIR)
     # As of Jan 6, 2021, pipelines didn't support fast tokenizers
     # See https://github.com/huggingface/transformers/issues/7735
     tokenizer = DistilBertTokenizer.from_pretrained(
