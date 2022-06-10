@@ -1,11 +1,15 @@
 import React from "react";
 import {
-  GridSortModel,
-  GridValueFormatterParams,
+  GridCellValue,
+  GridColumnMenuContainer,
+  GridColumnMenuProps,
+  GridColumnsMenuItem,
   GridRowSpacingParams,
   GridSortCellParams,
   GridSortDirection,
-  GridCellValue,
+  GridSortModel,
+  GridValueFormatterParams,
+  HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import { Box, MenuItem, Select, Typography } from "@mui/material";
 
@@ -25,6 +29,17 @@ const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
 
 const OVERALL_ROW_ID = -1; // -1 so that the other rows can range from 0 - n-1
+
+const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
+  <GridColumnMenuContainer
+    hideMenu={hideMenu}
+    currentColumn={currentColumn}
+    open={open}
+  >
+    <HideGridColMenuItem onClick={hideMenu} column={currentColumn} />
+    <GridColumnsMenuItem onClick={hideMenu} column={currentColumn} />
+  </GridColumnMenuContainer>
+);
 
 const OPTIONS = ["label", "prediction", "smartTag"] as const;
 const OPTION_PRETTY_NAME = {
@@ -239,13 +254,14 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         pageSize={numberVisible}
         disableColumnMenu={false}
         sortingOrder={["desc", "asc"]}
-        components={
-          rows.length > INITIAL_NUMBER_VISIBLE
+        components={{
+          ColumnMenu,
+          ...(rows.length > INITIAL_NUMBER_VISIBLE
             ? {
                 Footer,
               }
-            : {}
-        }
+            : {}),
+        }}
         initialState={{
           sorting: {
             sortModel: [{ field: columns[1].field, sort: "desc" }],
