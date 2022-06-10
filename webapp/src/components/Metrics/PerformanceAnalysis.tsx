@@ -238,6 +238,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         loading={isFetching}
         pageSize={numberVisible}
         disableColumnMenu={false}
+        sortingOrder={["desc", "asc"]}
         components={
           rows.length > INITIAL_NUMBER_VISIBLE
             ? {
@@ -245,6 +246,11 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
               }
             : {}
         }
+        initialState={{
+          sorting: {
+            sortModel: [{ field: columns[1].field, sort: "desc" }],
+          },
+        }}
       />
     </Box>
   );
