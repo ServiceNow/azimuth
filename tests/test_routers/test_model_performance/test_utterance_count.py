@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from starlette.status import HTTP_200_OK
 from starlette.testclient import TestClient
 
+from azimuth.types.tag import SmartTag
+
 
 def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     client = TestClient(app)
@@ -14,14 +16,18 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     data = resp.json()
     metrics = data.pop("countPerFilter")
     assert "label" in metrics and len(metrics["label"]) == 3
-    assert "extremeLength" in metrics and len(metrics["extremeLength"]) > 0
+    assert "extremeLength" in metrics and len(metrics["extremeLength"]) == 4
+    filter_values = {m["filterValue"]: m["utteranceCount"] for m in metrics["extremeLength"]}
+    assert SmartTag.no_smart_tag in filter_values
+    # TODO assert filter_values[SmartTag.no_smart_tag] > 0
 
     resp = client.get("/dataset_splits/eval/utterance_count/per_filter")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
     assert "label" in metrics and len(metrics["label"]) == 3
-    assert "prediction" not in metrics and "outcome" not in metrics
+    assert "extremeLength" in metrics and len(metrics["extremeLength"]) == 4
+    assert "prediction" not in metrics and "outcome" not in metrics and "uncertain" not in metrics
 
     resp = client.get(
         "/dataset_splits/eval/utterance_count/per_filter?pipelineIndex=0&labels=positive"
