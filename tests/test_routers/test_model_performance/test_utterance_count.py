@@ -16,6 +16,7 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     data = resp.json()
     metrics = data.pop("countPerFilter")
     assert "label" in metrics and len(metrics["label"]) == 3
+    assert "dissimilar" in metrics and len(metrics["dissimilar"]) == 5
     assert "extremeLength" in metrics and len(metrics["extremeLength"]) == 4
     filter_values = {m["filterValue"]: m["utteranceCount"] for m in metrics["extremeLength"]}
     assert SmartTag.no_smart_tag in filter_values
@@ -26,6 +27,7 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     data = resp.json()
     metrics = data.pop("countPerFilter")
     assert "label" in metrics and len(metrics["label"]) == 3
+    assert "dissimilar" in metrics and len(metrics["dissimilar"]) == 5
     assert "extremeLength" in metrics and len(metrics["extremeLength"]) == 4
     assert "prediction" not in metrics and "outcome" not in metrics and "uncertain" not in metrics
 
