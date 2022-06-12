@@ -85,7 +85,7 @@ def get_count_per_filter(
             ),
             **{
                 family.value: sorted_by_utterance_count_with_last(
-                    counter_to_count_per_filter_value(counters), -1
+                    counter_to_count_per_filter_value(counters), 0
                 )
                 for family, counters in smart_tag_counter.items()
             },
