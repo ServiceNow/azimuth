@@ -36,10 +36,10 @@ class UtteranceCountPerFilterValue(AliasModel):
 class ValuePerDatasetSmartTag(AliasModel, GenericModel, Generic[T]):
     extreme_length: List[T] = Field(..., title="Extreme length")
     partial_syntax: List[T] = Field(..., title="Partial syntax")
+    dissimilar: List[T] = Field(..., title="Dissimilar smart tag")
 
 
 class ValuePerPipelineSmartTag(AliasModel, GenericModel, Generic[T]):
-    dissimilar: List[T] = Field(..., title="Dissimilar smart tag")
     almost_correct: List[T] = Field(..., title="Almost correct smart tag")
     behavioral_testing: List[T] = Field(..., title="Behavioral testing smart tag")
     uncertain: List[T] = Field(..., title="Uncertain smart tag")
