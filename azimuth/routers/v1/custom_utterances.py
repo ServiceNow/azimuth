@@ -13,7 +13,7 @@ from azimuth.app import get_config, get_task_manager
 from azimuth.config import AzimuthConfig
 from azimuth.modules.perturbation_testing import PerturbationTestingModule
 from azimuth.task_manager import TaskManager
-from azimuth.types import DatasetSplitName, SupportedMethod
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.types.perturbation_testing import (
     PRETTY_PERTURBATION_TYPES,
     PerturbationTestFailureReason,
@@ -22,7 +22,7 @@ from azimuth.types.perturbation_testing import (
 )
 from azimuth.types.task import SaliencyResponse
 from azimuth.utils.conversion import orjson_dumps
-from azimuth.utils.routers import get_custom_task_result, require_available_model
+from azimuth.utils.routers import get_custom_task_result, require_pipeline_index
 
 router = APIRouter()
 
@@ -92,16 +92,17 @@ def get_perturbed_utterances(
     description="Get saliency for custom utterances.",
     tags=TAGS,
     response_model=List[SaliencyResponse],
-    dependencies=[Depends(require_available_model)],
 )
 def get_saliency(
     utterances: List[str] = Query([], title="Utterances"),
+    pipeline_index: int = Depends(require_pipeline_index),
     task_manager: TaskManager = Depends(get_task_manager),
 ) -> List[SaliencyResponse]:
     task_result: List[SaliencyResponse] = get_custom_task_result(
         SupportedMethod.Saliency,
         task_manager=task_manager,
         custom_query={task_manager.config.columns.text_input: utterances},
+        mod_options=ModuleOptions(pipeline_index=pipeline_index),
     )
 
     return task_result

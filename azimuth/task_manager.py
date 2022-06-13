@@ -203,8 +203,8 @@ class TaskManager:
             else:
                 self.current_tasks[key] = task
 
-            if not task.done():
-                task.start_task(self.client, custom_query)
+            # Always start task
+            task.start_task(self.client, custom_query)
             return key, task
         else:
             log.warning("Task not found!", name=task_name)
