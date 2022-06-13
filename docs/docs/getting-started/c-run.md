@@ -103,7 +103,7 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
       container at the root.
 3. Execute the following **command**:
     ```
-    make compose
+    make launch
     ```
 4. The **app will be accessible** at `http://0.0.0.0:8080` after a few minutes of waiting. The
    start-up tasks will start.
@@ -129,8 +129,8 @@ They are the following:
 * Disable behavioral tests and similarity by passing respectively `BEHAVIORAL_TESTING=null` and
   `SIMILARITY=null`.
 * Specify the name of the project, passing `NAME`.
-* You can specify the device on which to run Azimuth, with `DEVICE` being one of `gpu` or `cpu`. If
-  none is provided, `cpu` will be used. Ex: `DEVICE=gpu`.
+* You can specify the device on which to run Azimuth, with `DEVICE` being one of `auto`, `gpu` or `cpu`. If
+  none is provided, `auto` will be used. Ex: `DEVICE=gpu`.
 
 !!! note "Config file prevails over environment variables"
 

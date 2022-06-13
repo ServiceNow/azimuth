@@ -29,7 +29,7 @@ The top section shows the utterance details:
 
 ## Semantically Similar Utterances
 
-The *Semantically Similar Utterances* tab shows the **top 10 most similar utterances** in the
+The *Semantically Similar Utterances* tab shows the **top 20 most similar utterances** in the
 dataset as calculated using sentence embeddings. For more information,
 see [:material-link: Similarity Analysis](../../key-concepts/similarity.md).
 

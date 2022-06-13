@@ -6,7 +6,6 @@ from azimuth.modules import perturbation_testing
 from azimuth.modules.dataset_analysis import (
     dataset_warnings,
     similarity_analysis,
-    spectral_clustering,
     syntax_tagging,
 )
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
@@ -48,7 +47,6 @@ modules = {
     SupportedModule.PerturbationTestingSummary:
         perturbation_testing.PerturbationTestingSummaryModule,
     SupportedModule.PredictionComparison: prediction_comparison.PredictionComparisonModule,
-    SupportedModule.SpectralClustering: spectral_clustering.SpectralClusteringModule,
     SupportedModule.SyntaxTagging: syntax_tagging.SyntaxTaggingModule,
     SupportedModule.TokensToWords: tokens_to_words.TokensToWordsModule,
     SupportedModule.TopWords: top_words.TopWordsModule,

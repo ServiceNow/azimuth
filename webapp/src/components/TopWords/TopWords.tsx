@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Link, Typography, useTheme } from "@mui/material";
 import useResizeObserver from "hooks/useResizeObserver";
 import {
+  QueryConfusionMatrixState,
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
@@ -17,6 +18,7 @@ const minOpacity = 0.6;
 
 type Props = {
   baseUrl: string;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
@@ -27,6 +29,7 @@ type Props = {
 
 const TopWords: React.FC<Props> = ({
   baseUrl,
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
@@ -85,6 +88,7 @@ const TopWords: React.FC<Props> = ({
               key={index}
               component={RouterLink}
               to={`${baseUrl}${constructSearchString({
+                ...confusionMatrix,
                 ...filters,
                 utterance: filters.utterance === word ? undefined : word,
                 ...pagination,

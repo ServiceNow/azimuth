@@ -12,6 +12,7 @@ from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKe
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName
 from azimuth.types.tag import (
+    DataAction,
     DataActionMapping,
     DataActionResponse,
     PostDataActionRequest,
@@ -53,6 +54,10 @@ def post_data_actions(
     task_manager: TaskManager = Depends(get_task_manager),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
 ) -> DataActionResponse:
+    # Remove NO_ACTION as it is only used in filtering.
+    for actions in request_data.data_actions.values():
+        actions.pop(DataAction.no_action, None)
+
     dataset = dataset_split_managers.get(request_data.dataset_split_name)
     if dataset is None:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Dataset not found.")

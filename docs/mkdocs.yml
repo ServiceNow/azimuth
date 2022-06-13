@@ -5,6 +5,7 @@ plugins:
   - search
 theme:
   name: material
+  custom_dir: overrides
   logo: _static/azimuth_icon_white.svg
   features:
     - navigation.tabs
@@ -80,6 +81,7 @@ nav:
           - user-guide/exploration-space/utterances-table.md
           - user-guide/exploration-space/utterance-details.md
       - user-guide/settings.md
+      - user-guide/custom-utterances.md
   - Reference:
       - reference/index.md
       - Configuration:

@@ -18,7 +18,7 @@ authors:
 - family-names: "Babu"
   given-names: "Nandhini"
 title: "Azimuth, an open-source dataset and error analysis tool for text classification"
-version: 2.1.0
+version: 2.1
 doi: 10.5281/zenodo.6511558
 date-released: 2022-05-27
 url: "https://github.com/ServiceNow/azimuth"

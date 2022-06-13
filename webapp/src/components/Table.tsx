@@ -65,9 +65,11 @@ export interface Props<Row> extends DataGridProps {
 
 export const Table = <Row extends { id: GridRowId }>({
   components,
+  sx,
   ...props
 }: Props<Row>) => (
   <DataGrid
+    disableColumnFilter
     disableColumnMenu
     disableSelectionOnClick
     hideFooter={!props.pagination && !components?.Footer}
@@ -79,13 +81,14 @@ export const Table = <Row extends { id: GridRowId }>({
     }}
     sx={{
       border: "none",
-      "& .MuiDataGrid-cell:focus, .MuiDataGrid-cell:focus-within, .MuiDataGrid-columnHeader:focus, .MuiDataGrid-columnHeader:focus-within":
+      "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within, & .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within":
         {
           outline: "none",
         },
-      "& .MuiDataGrid-columnHeaderTitle, .MuiDataGrid-columnHeader": {
+      "& .MuiDataGrid-columnHeaderTitle, & .MuiDataGrid-columnHeader": {
         fontWeight: "bold",
       },
+      ...sx,
     }}
     {...props}
   />

@@ -6,6 +6,7 @@ test("word distribution", async () => {
   renderWithRouterAndRedux(
     <TopWords
       baseUrl="/"
+      confusionMatrix={{}}
       filters={{}}
       pagination={{}}
       pipeline={{}}

@@ -61,7 +61,10 @@ We use `poetry` as our dependency manager for the back end.
 ### Docker (Optional)
 Docker is needed for different tasks such as releasing and updating the documentation. However, it won't be needed at first to develop and launch the app. You can skip this step and wait until you are required to use it.
 
-* Install [`Docker Desktop`](https://www.docker.com/products/docker-desktop). If you are using a Mac, check "Apple logo" > "About This Mac" to know if you have a `Mac with Intel Chip` or a `Mac with Apple Chip`.
+* Install [`Docker Desktop`](https://www.docker.com/products/docker-desktop). If you are using a
+  Mac, check "Apple logo" > "About This Mac" to know if you have a `Mac with Intel Chip` or
+  a `Mac with Apple Chip`.
+* Set the memory to at least 9 GB in Docker > Preference > Resources.
 
 ### Front End
 - Install [`Node.js`](https://nodejs.org).

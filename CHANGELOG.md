@@ -11,8 +11,11 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- A new toggle switch "Normalize" in the confusion matrix page.
+- Possibility to hide columns from the Performance Analysis table.
 
 ### Changed
+- Show 20 similar utterances instead of 10 in the Utterance Detail page.
 - Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
 
 ### Deprecated/Breaking Changes

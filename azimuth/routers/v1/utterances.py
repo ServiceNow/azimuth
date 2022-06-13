@@ -300,7 +300,7 @@ def get_perturbed_utterances(
 def get_similar(
     dataset_split_name: DatasetSplitName,
     index: int,
-    limit: int = Query(10, title="Limit"),
+    limit: int = Query(20, title="Limit"),
     neighbors_dataset_split_name: Optional[DatasetSplitName] = Query(
         None, title="Neighbors dataset split", alias="neighborsDatasetSplitName"
     ),

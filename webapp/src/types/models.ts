@@ -32,10 +32,15 @@ export type QueryPostprocessingState = {
   withoutPostprocessing?: true;
 };
 
+export type QueryConfusionMatrixState = {
+  normalized?: false;
+};
+
 export type QueryState = QueryFilterState &
   QueryPaginationState &
   QueryPipelineState &
-  QueryPostprocessingState;
+  QueryPostprocessingState &
+  QueryConfusionMatrixState;
 
 export type Tags = { [Tag: string]: boolean };
 

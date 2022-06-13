@@ -18,7 +18,7 @@ When hotfixes are merged into `main`, they should be ported back into `dev` as w
 We try to commit regularly, so it is easy to revert partial changes.
 
 ### Front End Types
-If you played with types and routes in the back end, remember to regenerate the front-ent types, using the following command from the webapp folder while the back end is running (see how to launch [here](launching.md)).
+If you played with types and routes in the back end, remember to regenerate the front-end types, using the following command from the webapp folder while the back end is running (see how to launch [here](launching.md)).
 ```
 cd webapp
 yarn types   # while the back end is runnnig

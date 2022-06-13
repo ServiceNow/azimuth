@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "azimuth"
-version = "2.1.0"
+version = "2.1.1"
 description = "Azimuth provides an unified error analysis experience to data scientists."
 readme = "README.md"
 authors = ["Butter-ball team <xaicaps@servicenow.com>"]
@@ -25,7 +25,6 @@ tensorflow-estimator = "~2.7.0"
 onnx = "^1.9.0"
 onnxruntime-extensions = "^0.3.1"
 onnxruntime = "^1.8.1"
-spectral-metric = "^0.5.0"
 scipy = "^1.6.3"
 
 ####

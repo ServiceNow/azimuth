@@ -17,6 +17,7 @@ import {
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
+  QueryConfusionMatrixState,
 } from "types/models";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { motion } from "framer-motion";
@@ -43,6 +44,7 @@ import { OUTCOME_PRETTY_NAMES } from "../../utils/const";
 const MotionChevronLeftIcon = motion(ChevronLeftIcon);
 
 type Props = {
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
@@ -51,6 +53,7 @@ type Props = {
 };
 
 const Controls: React.FC<Props> = ({
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
@@ -109,6 +112,7 @@ const Controls: React.FC<Props> = ({
   const handleClearFilters = () => {
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...pagination,
         ...pipeline,
         ...postprocessing,
@@ -119,6 +123,7 @@ const Controls: React.FC<Props> = ({
   const handleFilterChange = (filters: QueryFilterState) =>
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
         ...pipeline,
@@ -144,6 +149,7 @@ const Controls: React.FC<Props> = ({
   const handlePostprocessingChange = (checked: boolean) =>
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
         ...pipeline,
@@ -235,6 +241,7 @@ const Controls: React.FC<Props> = ({
                 control={
                   <Switch
                     checked={postprocessing.withoutPostprocessing ?? false}
+                    color="secondary"
                     onChange={(_, checked) =>
                       handlePostprocessingChange(checked)
                     }

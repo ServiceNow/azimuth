@@ -142,9 +142,6 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
     from azimuth.routers.v1.model_performance.utterance_count import (
         router as utterance_count_router,
     )
-    from azimuth.routers.v1.spectral_clustering import (
-        router as spectral_clustering_router,
-    )
     from azimuth.routers.v1.tags import router as tags_router
     from azimuth.routers.v1.top_words import router as top_words_router
     from azimuth.routers.v1.utterances import router as utterances_router
@@ -162,11 +159,6 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
     api_router.include_router(
         dataset_warnings_router,
         prefix="/dataset_warnings",
-        dependencies=[Depends(require_application_ready)],
-    )
-    api_router.include_router(
-        spectral_clustering_router,
-        prefix="/spectral_clustering",
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
