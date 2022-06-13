@@ -5,9 +5,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { Info } from "@mui/icons-material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
-import Description from "components/Description";
+import { Description } from "components/Description";
 import { getOutcomeCountPerThresholdEndpoint } from "services/api";
 import { QueryPipelineState } from "types/models";
 import { ALL_OUTCOMES, OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
@@ -98,13 +99,11 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
       <Typography variant="h4" className={classes.title}>
         Distribution of the Predictions on Evaluation Set for Multiple
         Thresholds
+        <Description
+          text="The graph shows max and min correct. You can change the confidence threshold in the config file. "
+          link="/"
+        />
       </Typography>
-      <Description
-        text="Assess your predictions based on each confidence threshold to select
-        your optimal model performance confidence threshold, where you have the
-        max correct and the minimum incorrect. "
-        link="/user-guide/"
-      />
 
       <Box display="flex" gap={6} justifyContent="center" width="100%">
         {ALL_OUTCOMES.map((outcome) => (

@@ -1,5 +1,5 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
-import Description from "components/Description";
+import { Description } from "components/Description";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 
@@ -19,10 +19,13 @@ const PreviewCard: React.FC<Props> = ({
 }) => (
   <Paper
     variant="outlined"
-    sx={{ display: "flex", flexDirection: "column", gap: 2, padding: 4 }}
+    sx={{ display: "flex", flexDirection: "column", gap: 4, padding: 4 }}
   >
     <Box display="flex" alignItems="flex-start" justifyContent="space-between">
-      <Typography variant="h4">{title}</Typography>
+      <Box display="flex" flexDirection="column">
+        <Typography variant="h4">{title}</Typography>
+        {subtitle && href && <Description text={subtitle} link={href} />}
+      </Box>
       {to && (
         <Button
           color="secondary"
@@ -34,7 +37,7 @@ const PreviewCard: React.FC<Props> = ({
         </Button>
       )}
     </Box>
-    {subtitle && href && <Description text={subtitle} link={href} />}
+
     {children}
   </Paper>
 );

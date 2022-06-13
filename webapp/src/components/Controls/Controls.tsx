@@ -40,6 +40,7 @@ import DatasetSplitToggler from "./DatasetSplitToggler";
 import FilterSelector from "./FilterSelector";
 import FilterSlider from "./FilterSlider";
 import FilterTextField from "./FilterTextField";
+import { Description } from "components/Description";
 import {
   OUTCOME_PRETTY_NAMES,
   SMART_TAG_FAMILIES,
@@ -207,6 +208,7 @@ const Controls: React.FC<Props> = ({
           <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
             <TuneIcon />
             <Typography variant="subtitle2">Controls</Typography>
+            <Description link="/user-guide/exploration-space/#filters" />
           </Box>
         )}
         <Button

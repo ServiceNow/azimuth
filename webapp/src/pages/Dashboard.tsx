@@ -5,7 +5,7 @@ import PreviewCard from "components/Analysis/PreviewCard";
 import WarningsPreview from "components/Analysis/WarningsPreview";
 import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
-import Description from "components/Description";
+import { Description } from "components/Description";
 import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
 import ThresholdPlot from "components/ThresholdPlot";
 import useQueryState from "hooks/useQueryState";
@@ -47,9 +47,8 @@ const Dashboard = () => {
         <Box display="flex" flexDirection="column">
           <Typography variant="h2">Dashboard</Typography>
           <Description
-            text="Explore the different analyses, highlighting consequential aspects
-            of your dataset and model. "
-            link="/user-guide/"
+            text="Explore the analyses of your datasets and models. "
+            link="/"
           />
         </Box>
         <Button
@@ -66,9 +65,9 @@ const Dashboard = () => {
       {data?.availableDatasetSplits.train && (
         <PreviewCard
           title="Dataset Class Distribution Analysis"
-          subtitle="Assess if your evaluation set has the same class distribution as the training set. "
+          subtitle="Compare the class distribution of your training and evaluation sets. "
+          href="/dataset-warnings/"
           to={`/${jobId}/dataset_class_distribution_analysis${searchString}`}
-          href="/user-guide/dataset-warnings/"
         >
           <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
             <WarningsPreview jobId={jobId} />
@@ -78,8 +77,8 @@ const Dashboard = () => {
       {isPipelineSelected(pipeline) && (
         <PreviewCard
           title="Performance Analysis"
-          subtitle="Assess model performance through prediction outcomes and metrics. "
-          href="/key-concepts/"
+          subtitle="Assess model performance through prediction metrics. "
+          href="/#performance-analysis"
         >
           <PerformanceAnalysis jobId={jobId} pipeline={pipeline} />
         </PreviewCard>
@@ -87,9 +86,9 @@ const Dashboard = () => {
       {isPipelineSelected(pipeline) && data?.perturbationTestingAvailable && (
         <PreviewCard
           title="Behavioral Testing"
-          subtitle="Assess if your model is robust to small modifications. "
+          subtitle="See how your model handles small modifications. "
           to={`/${jobId}/behavioral_testing_summary${searchString}`}
-          href="/key-concepts/behavioral-testing/"
+          href="/behavioral-testing-summary/"
         >
           <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
             <PerturbationTestingPreview
@@ -104,9 +103,9 @@ const Dashboard = () => {
         data?.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
-            subtitle="View & select your optimal model performance confidence threshold, where you have the max correct and the min incorrect. * change your confidence threshold in the config file. "
+            subtitle="View prediction distribution for multiple thresholds to find the optimal one. "
             to={`/${jobId}/thresholds${searchString}`}
-            href="/user-guide/post-processing-analysis/"
+            href="/post-processing-analysis/"
           >
             <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
               <ThresholdPlot jobId={jobId} pipeline={pipeline} />

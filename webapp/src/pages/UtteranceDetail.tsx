@@ -11,6 +11,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
+import { Description } from "components/Description";
 import Loading from "components/Loading";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import TabPipelineRequired from "components/TabPipelineRequired";
@@ -264,20 +265,36 @@ const UtteranceDetail = () => {
         )}
         <div className={classes.tabContent}>
           {view === "similarity" && (
-            <SimilarUtterances
-              baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
-              baseUtterance={utterance}
-              pipeline={pipeline}
-              utterances={similarUtterances?.utterances || []}
-            />
+            <>
+              <Box paddingBottom={2}>
+                <Description
+                  text="Here are shown the 10 most similar utterances in the dataset as calculated using sentence embeddings. Use the toggle button to alternate whether to search for similar utterances in the evaluation set or in the training set. "
+                  link="/exploration-space/utterance-details/#semantically-similar-utterances"
+                />
+              </Box>
+              <SimilarUtterances
+                baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
+                baseUtterance={utterance}
+                pipeline={pipeline}
+                utterances={similarUtterances?.utterances || []}
+              />
+            </>
           )}
           {view === "perturbedUtterances" && isPipelineSelected(pipeline) && (
-            <PerturbedUtterances
-              jobId={jobId}
-              datasetSplitName={datasetSplitName}
-              pipelineIndex={pipeline.pipelineIndex}
-              index={Number(utteranceId)}
-            />
+            <>
+              <Box paddingBottom={2}>
+                <Description
+                  text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations. "
+                  link="/exploration-space/utterance-details/#behavioral-tests"
+                />
+              </Box>
+              <PerturbedUtterances
+                jobId={jobId}
+                datasetSplitName={datasetSplitName}
+                pipelineIndex={pipeline.pipelineIndex}
+                index={Number(utteranceId)}
+              />
+            </>
           )}
         </div>
       </Paper>
