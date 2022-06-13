@@ -1,6 +1,5 @@
 import {
   Box,
-  Chip,
   Paper,
   Tab,
   Tabs,
@@ -13,6 +12,7 @@ import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
 import Loading from "components/Loading";
+import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import TabPipelineRequired from "components/TabPipelineRequired";
 import PerturbedUtterances from "components/Utterance/PerturbedUtterances";
 import SimilarUtterances from "components/Utterance/SimilarUtterances";
@@ -27,7 +27,12 @@ import {
   getUtterancesEndpoint,
 } from "services/api";
 import { DatasetSplitName, Outcome } from "types/api";
-import { ID_TOOLTIP, OUTCOME_COLOR } from "utils/const";
+import {
+  DATASET_SMART_TAG_FAMILIES,
+  ID_TOOLTIP,
+  OUTCOME_COLOR,
+  SMART_TAG_FAMILIES,
+} from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { isPipelineSelected } from "utils/helpers";
 
@@ -134,6 +139,10 @@ const UtteranceDetail = () => {
     );
   }
 
+  const smartTagFamilies = isPipelineSelected(pipeline)
+    ? SMART_TAG_FAMILIES
+    : DATASET_SMART_TAG_FAMILIES;
+
   return (
     <Box display="flex" flexDirection="column" gap={2} height="100%">
       <Paper variant="outlined" className={classes.utteranceContainer}>
@@ -194,15 +203,17 @@ const UtteranceDetail = () => {
 
         <Typography>Smart Tags</Typography>
         <Box className={classes.tags}>
-          {utterance.smartTags.map((tag) => (
-            <Chip
-              color="primary"
-              variant="outlined"
-              size="small"
-              key={tag}
-              label={tag}
-            />
-          ))}
+          {smartTagFamilies.map(
+            (family) =>
+              utterance[family].length > 0 && (
+                <SmartTagFamilyBadge
+                  key={family}
+                  family={family}
+                  utterance={utterance}
+                  withName
+                />
+              )
+          )}
         </Box>
 
         <Typography>Proposed Action</Typography>

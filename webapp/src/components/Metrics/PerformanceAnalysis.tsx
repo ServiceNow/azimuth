@@ -18,7 +18,12 @@ import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
-import { ALL_OUTCOMES, OUTCOME_PRETTY_NAMES } from "utils/const";
+import {
+  ALL_OUTCOMES,
+  OUTCOME_PRETTY_NAMES,
+  SMART_TAG_FAMILIES,
+  SMART_TAG_FAMILY_PRETTY_NAMES,
+} from "utils/const";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import { formatRatioAsPercentageString } from "utils/format";
@@ -41,11 +46,11 @@ const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
   </GridColumnMenuContainer>
 );
 
-const OPTIONS = ["label", "prediction", "smartTag"] as const;
+const OPTIONS = ["label", "prediction", ...SMART_TAG_FAMILIES] as const;
 const OPTION_PRETTY_NAME = {
   label: "Label",
   prediction: "Prediction",
-  smartTag: "Smart Tag",
+  ...SMART_TAG_FAMILY_PRETTY_NAMES,
 } as const;
 type FilterByViewOption = typeof OPTIONS[number];
 

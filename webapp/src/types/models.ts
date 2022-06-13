@@ -12,7 +12,12 @@ export type QueryFilterState = {
   confidenceMax?: number;
   labels?: string[];
   predictions?: string[];
-  smartTags?: SmartTag[];
+  extremeLength?: SmartTag[];
+  partialSyntax?: SmartTag[];
+  dissimilar?: SmartTag[];
+  almostCorrect?: SmartTag[];
+  behavioralTesting?: SmartTag[];
+  uncertain?: SmartTag[];
   dataActions?: DataAction[];
   outcomes?: Outcome[];
   utterance?: string;

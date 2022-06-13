@@ -2,7 +2,7 @@ import { GetApp, SvgIconComponent } from "@mui/icons-material";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import { Box, Button, Chip, Tooltip, useTheme } from "@mui/material";
+import { Box, Button, Tooltip, useTheme } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -15,6 +15,7 @@ import UtterancesTableFooter from "components/Analysis/UtterancesTableFooter";
 import CopyButton from "components/CopyButton";
 import CheckIcon from "components/Icons/Check";
 import XIcon from "components/Icons/X";
+import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
 import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import UtteranceSaliency from "components/Utterance/UtteranceSaliency";
@@ -38,13 +39,17 @@ import {
 } from "types/models";
 import { downloadDatasetSplit } from "utils/api";
 import {
+  DATASET_SMART_TAG_FAMILIES,
   ID_TOOLTIP,
   OUTCOME_COLOR,
   OUTCOME_PRETTY_NAMES,
   PAGE_SIZE,
+  SMART_TAG_FAMILIES,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
+
+const SMART_TAG_WIDTH = 30;
 
 const useStyles = makeStyles((theme) => ({
   gridContainer: {
@@ -166,17 +171,19 @@ const UtterancesTable: React.FC<Props> = ({
       )}`
     );
 
+  const smartTagFamilies = isPipelineSelected(pipeline)
+    ? SMART_TAG_FAMILIES
+    : DATASET_SMART_TAG_FAMILIES;
+
   const renderHeaderWithFilter = (
     headerName: string,
-    filter?: string[],
+    filtered: boolean,
     Icon?: SvgIconComponent
   ) => (
     <>
       {Icon && <Icon className={classes.headerIcon} />}
       <div className="MuiDataGrid-columnHeaderTitle">{headerName}</div>
-      {filter !== undefined && (
-        <FilterAltOutlinedIcon fontSize="medium" color="success" />
-      )}
+      {filtered && <FilterAltOutlinedIcon fontSize="medium" color="success" />}
     </>
   );
 
@@ -223,18 +230,11 @@ const UtterancesTable: React.FC<Props> = ({
     row.modelPrediction && outcomeIcon(row.modelPrediction[`${prefix}Outcome`]);
 
   const renderSmartTags = ({ row }: GridCellParams<undefined, Row>) => (
-    <HoverableDataCell>
-      {row.smartTags.map((tag) => (
-        <Chip
-          className={classes.chip}
-          color="primary"
-          variant="outlined"
-          size="small"
-          key={tag}
-          label={tag}
-        />
+    <Box display="grid" gridAutoColumns={SMART_TAG_WIDTH} gridAutoFlow="column">
+      {smartTagFamilies.map((family) => (
+        <SmartTagFamilyBadge key={family} family={family} utterance={row} />
       ))}
-    </HoverableDataCell>
+    </Box>
   );
 
   const renderDataAction = ({
@@ -256,7 +256,8 @@ const UtterancesTable: React.FC<Props> = ({
       field: "id",
       headerName: "Id",
       description: ID_TOOLTIP,
-      width: 60,
+      minWidth: 40,
+      width: 40,
       sortable: false,
       align: "center",
       headerAlign: "center",
@@ -283,7 +284,11 @@ const UtterancesTable: React.FC<Props> = ({
     {
       field: "label",
       renderHeader: () =>
-        renderHeaderWithFilter("Label", filters.labels, AdjustIcon),
+        renderHeaderWithFilter(
+          "Label",
+          filters.labels !== undefined,
+          AdjustIcon
+        ),
       flex: 1,
       minWidth: 120,
       renderCell: renderHoverableDataCell,
@@ -294,7 +299,7 @@ const UtterancesTable: React.FC<Props> = ({
       renderHeader: () =>
         renderHeaderWithFilter(
           "Prediction",
-          filters.predictions,
+          filters.predictions !== undefined,
           MultilineChartIcon
         ),
       flex: 1,
@@ -315,7 +320,7 @@ const UtterancesTable: React.FC<Props> = ({
       field: "confidence",
       headerName: "Conf",
       description: "Confidence", // tooltip
-      width: 90,
+      width: 80,
       align: "center",
       headerAlign: "center",
       valueGetter: getConfidence,
@@ -325,18 +330,24 @@ const UtterancesTable: React.FC<Props> = ({
           : undefined,
     },
     {
-      field: "smartTags[]",
+      field: "smartTags",
+      headerName: "Smart Tags",
       renderHeader: () =>
-        renderHeaderWithFilter("Smart Tags", filters.smartTags),
-      flex: 5,
-      minWidth: 160,
+        renderHeaderWithFilter(
+          "Smart Tags",
+          smartTagFamilies.some((family) => filters[family] !== undefined)
+        ),
+      width: 10 + SMART_TAG_WIDTH * smartTagFamilies.length,
       renderCell: renderSmartTags,
       sortable: false,
     },
     {
       field: "dataAction",
       renderHeader: () =>
-        renderHeaderWithFilter("Proposed Action", filters.dataActions),
+        renderHeaderWithFilter(
+          "Proposed Action",
+          filters.dataActions !== undefined
+        ),
       renderCell: renderDataAction,
       width: 192,
     },
