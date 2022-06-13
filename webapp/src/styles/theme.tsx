@@ -151,6 +151,13 @@ const customTheme: Theme = createTheme({
         },
       },
     },
+    MuiTooltip: {
+      styleOverrides: {
+        popper: {
+          pointerEvents: "none",
+        },
+      },
+    },
   },
 });
 
