@@ -81,6 +81,7 @@ nav:
           - user-guide/exploration-space/utterances-table.md
           - user-guide/exploration-space/utterance-details.md
       - user-guide/settings.md
+      - user-guide/custom-utterances.md
   - Reference:
       - reference/index.md
       - Configuration:
