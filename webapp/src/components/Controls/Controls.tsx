@@ -184,16 +184,11 @@ const Controls: React.FC<Props> = ({
   );
 
   return (
-    <Box
+    <Stack
       component={motion.div}
       border="1px solid rgba(0, 0, 0, 0.12)"
       boxSizing="content-box"
-      display="grid"
-      gridTemplateRows={`${theme.spacing(5)} auto ${theme.spacing(
-        6
-      )} auto auto auto`}
       overflow="hidden"
-      alignContent="flex-start"
       sx={{
         borderTopRightRadius: theme.shape.borderRadius,
         borderBottomRightRadius: theme.shape.borderRadius,
@@ -382,7 +377,7 @@ const Controls: React.FC<Props> = ({
           </Box>
         </>
       )}
-    </Box>
+    </Stack>
   );
 };
 
