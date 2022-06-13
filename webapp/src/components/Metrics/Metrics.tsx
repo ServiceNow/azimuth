@@ -86,7 +86,7 @@ const Metrics: React.FC<Props> = ({
   }, [metricsInfo]);
 
   return (
-    <Box display="flex" flexDirection="row" gap={4} overflow="scroll">
+    <Box display="flex" flexDirection="row" gap={4} overflow="auto visible">
       <MetricsCard rowCount={2}>
         {OUTCOMES.map((outcome) => (
           <Metric

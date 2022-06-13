@@ -10,7 +10,7 @@ type Props = {
 const BasicLayout: React.FC<Props> = ({ maxWidth = "xl", children }) => (
   <>
     <PageHeader />
-    <Box height="100%" display="flex" flexDirection="column" overflow="scroll">
+    <Box height="100%" display="flex" flexDirection="column" overflow="auto">
       <Container maxWidth={maxWidth} sx={{ flex: 1, padding: 2 }}>
         {children}
       </Container>
