@@ -13,6 +13,7 @@ Released changes are shown in the
 ### Added
 - A new toggle switch "Normalize" in the confusion matrix page.
 - Possibility to hide columns from the Performance Analysis table.
+- Smart tag families to group similar smart tags.
 
 ### Changed
 - Show 20 similar utterances instead of 10 in the Utterance Detail page.
