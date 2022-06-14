@@ -10,18 +10,12 @@ const CHECK =
 const CIRCLE = "M12,2 A10,10 0,0,0 12,22 A10,10 0,0,0 12,2 Z";
 
 const xy = (r: number, a: number) =>
-  [
-    12 + r * Math.cos((Math.PI * a) / 11),
-    12 + r * Math.sin((Math.PI * a) / 11),
-  ].join();
+  [Math.cos, Math.sin].map((f) => 12 + r * f((Math.PI * (a + 6.5)) / 11));
+const arc = (i: number, r: number, sweep: 0 | 1) =>
+  `${xy(r, 2 * i + 1 - sweep)} A${r},${r} 0,0,${sweep} ${xy(r, 2 * i + sweep)}`;
 const DASHED_CIRCLE = [
   "M12,22 A10,10 0,0,0 12,2 V4 A8,8 0,0,1 12,20 Z",
-  ...Array.from(
-    Array(5),
-    (_, i) =>
-      `M${xy(10, 2 * i + 7.5)} A10,10 0,0,0 ${xy(10, 2 * i + 6.5)}
-      L${xy(8, 2 * i + 6.5)} A8,8 0,0,1 ${xy(8, 2 * i + 7.5)} Z`
-  ),
+  ...Array.from(Array(5), (_, i) => `M${arc(i, 10, 0)} L${arc(i, 8, 1)} Z`),
 ];
 
 const EXTREME_LENGTH =
