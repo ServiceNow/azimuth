@@ -12,9 +12,11 @@ export const Description: React.FC<Props> = ({ text, link }) => {
   return (
     <Typography variant="body2">
       {text}
-      <Link href={`${DOCS_URL + link}`} target="_blank">
-        <Doc sx={{ position: "relative", top: 4 }} />
-      </Link>
+      {link && (
+        <Link href={`${DOCS_URL + link}`} target="_blank">
+          <Doc sx={{ position: "relative", top: 4 }} />
+        </Link>
+      )}
     </Typography>
   );
 };

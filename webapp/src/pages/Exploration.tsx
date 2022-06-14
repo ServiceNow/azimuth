@@ -122,7 +122,7 @@ const Exploration = () => {
                   <>
                     <Description
                       text="Assess the quality of the metrics for any given subset of data. "
-                      link="/exploration-space/#performance-overview"
+                      link="/exploration-space/performance-overview/"
                     />
                     <Metrics
                       jobId={jobId}
@@ -145,7 +145,7 @@ const Exploration = () => {
                 <>
                   <Description
                     text="Visualize the model confusion between each pair of intents. "
-                    link="/exploration-space/#confusion-matrix"
+                    link="/exploration-space/confusion-matrix/"
                   />
                   <ConfusionMatrix
                     jobId={jobId}
@@ -164,7 +164,7 @@ const Exploration = () => {
                 <>
                   <Description
                     text="View insights on individual utterances with details results and annotations. "
-                    link="/exploration-space/#utterances-table"
+                    link="/exploration-space/utterances-table/"
                   />
                   <UtterancesTable
                     jobId={jobId}

@@ -101,7 +101,7 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
         Thresholds
         <Description
           text="The graph shows max and min correct. You can change the confidence threshold in the config file. "
-          link="/"
+          link="/post-processing-analysis/"
         />
       </Typography>
 

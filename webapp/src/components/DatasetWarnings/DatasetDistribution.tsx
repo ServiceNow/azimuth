@@ -11,8 +11,7 @@ interface DescriptionMap {
 }
 
 const WARNING_GROUP_DESCRIPTION: DescriptionMap = {
-  GeneralWarnings:
-    "Use the metrics to assess if the evaluation dataset has the same class distribution as the training set. ",
+  GeneralWarnings: "See class distributions differences. ",
   SyntacticWarnings:
     "Review the arrangement of utterances between your training and testing data. ",
 } as const;

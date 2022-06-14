@@ -146,6 +146,10 @@ const UtteranceDetail = () => {
 
   return (
     <Box display="flex" flexDirection="column" gap={2} height="100%">
+      <Description
+        text="Here are individual utterance details showing saliency per token, semantically similar utterances and how robust the model is to perturbations tests that are automatically generated from this utterance. "
+        link="/exploration-space/utterance-details/"
+      />
       <Paper variant="outlined" className={classes.utteranceContainer}>
         <Tooltip title={ID_TOOLTIP}>
           <Typography>Id</Typography>

@@ -256,6 +256,8 @@ const UtterancesTable: React.FC<Props> = ({
       field: "utterance",
       headerClassName: classes.hideRightSeparator,
       headerName: "Utterance",
+      description:
+        "Utterances from dataset are overlaid with saliency maps, highlighting the most important tokens for the model's prediction.",
       flex: 5,
       minWidth: 406,
       renderCell: renderUtterance,
