@@ -1,16 +1,16 @@
-import { Box, Button, Typography, Link } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import noData from "assets/void.svg";
 import PerturbationTestingPreview from "components/Analysis/PerturbationTestingPreview";
 import PreviewCard from "components/Analysis/PreviewCard";
 import WarningsPreview from "components/Analysis/WarningsPreview";
 import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
-import { Description } from "components/Description";
+import Description from "components/Description";
 import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
 import ThresholdPlot from "components/ThresholdPlot";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
 
@@ -54,7 +54,7 @@ const Dashboard = () => {
         <Button
           color="secondary"
           variant="contained"
-          component={RouterLink}
+          component={Link}
           to={`/${jobId}/dataset_splits/eval/performance_overview${searchString}`}
           sx={{ gap: 1 }}
         >

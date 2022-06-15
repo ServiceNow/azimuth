@@ -1,5 +1,5 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
-import { Description } from "components/Description";
+import Description from "components/Description";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 

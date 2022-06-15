@@ -4,7 +4,7 @@ import MetricsDataGrid from "components/DatasetWarnings/MetricsDataGrid";
 import { ResponsivePlotWrapper, WarningPlot } from "components/PlotWrapper";
 import React from "react";
 import { DatasetWarningGroup } from "types/api";
-import { Description } from "components/Description";
+import Description from "components/Description";
 
 interface DescriptionMap {
   [key: string]: string;

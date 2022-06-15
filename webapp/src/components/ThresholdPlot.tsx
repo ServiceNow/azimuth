@@ -5,10 +5,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Info } from "@mui/icons-material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
-import { Description } from "components/Description";
+import Description from "components/Description";
 import { getOutcomeCountPerThresholdEndpoint } from "services/api";
 import { QueryPipelineState } from "types/models";
 import { ALL_OUTCOMES, OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";

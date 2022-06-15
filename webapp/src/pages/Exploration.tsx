@@ -4,7 +4,7 @@ import UtterancesTable from "components/Analysis/UtterancesTable";
 import ConfidenceHistogramTopWords from "components/ConfidenceHistogramTopWords";
 import ConfusionMatrix from "components/ConfusionMatrix";
 import Controls from "components/Controls/Controls";
-import { Description } from "components/Description";
+import Description from "components/Description";
 import Metrics from "components/Metrics/Metrics";
 import PageHeader from "components/PageHeader";
 import TabPipelineRequired from "components/TabPipelineRequired";

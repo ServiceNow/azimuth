@@ -11,7 +11,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
-import { Description } from "components/Description";
+import Description from "components/Description";
 import Loading from "components/Loading";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import TabPipelineRequired from "components/TabPipelineRequired";

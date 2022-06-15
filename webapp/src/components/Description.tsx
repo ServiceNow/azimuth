@@ -8,7 +8,7 @@ type Props = {
   link?: string;
 };
 
-export const Description: React.FC<Props> = ({ text, link }) => {
+const Description: React.FC<Props> = ({ text, link }) => {
   return (
     <Typography variant="body2">
       {text}
@@ -20,3 +20,5 @@ export const Description: React.FC<Props> = ({ text, link }) => {
     </Typography>
   );
 };
+
+export default React.memo(Description);

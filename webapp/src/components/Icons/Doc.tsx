@@ -2,6 +2,7 @@ import { createSvgIcon } from "@mui/material";
 
 const DocIcon = createSvgIcon(
   <svg
+    data-testid="docIcon"
     width="35"
     height="35"
     viewBox="0 0 60 63"

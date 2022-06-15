@@ -40,7 +40,6 @@ import DatasetSplitToggler from "./DatasetSplitToggler";
 import FilterSelector from "./FilterSelector";
 import FilterSlider from "./FilterSlider";
 import FilterTextField from "./FilterTextField";
-import { Description } from "components/Description";
 import {
   OUTCOME_PRETTY_NAMES,
   SMART_TAG_FAMILIES,
