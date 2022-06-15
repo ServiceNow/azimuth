@@ -65,6 +65,17 @@ class SmartTagFamily(str, Enum):
     uncertain = "uncertain"
 
 
+SMART_TAG_FAMILY_DATASET = [
+    SmartTagFamily.extreme_length,
+    SmartTagFamily.partial_syntax,
+    SmartTagFamily.dissimilar,
+]
+SMART_TAG_FAMILY_PIPELINE = [
+    SmartTagFamily.almost_correct,
+    SmartTagFamily.behavioral_testing,
+    SmartTagFamily.uncertain,
+]
+
 Tag = str
 ALL_DATA_ACTION_FILTERS = [a.value for a in DataAction]
 ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a != DataAction.no_action]

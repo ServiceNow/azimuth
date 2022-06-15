@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
+import typing
 from typing import Dict, Generic, List, Optional, Tuple, TypeVar
 
 from pydantic import Field
@@ -9,6 +9,7 @@ from pydantic.generics import GenericModel
 
 from azimuth.types import AliasModel, Array, ModuleResponse, PlotSpecification
 from azimuth.types.outcomes import OutcomeName
+from azimuth.types.tag import SMART_TAG_FAMILY_DATASET, SMART_TAG_FAMILY_PIPELINE
 
 T = TypeVar("T")
 
@@ -33,16 +34,30 @@ class UtteranceCountPerFilterValue(AliasModel):
     filter_value: str = Field(..., title="Filter value")
 
 
-class ValuePerDatasetSmartTag(AliasModel, GenericModel, Generic[T]):
-    extreme_length: List[T] = Field(..., title="Extreme length")
-    partial_syntax: List[T] = Field(..., title="Partial syntax")
-    dissimilar: List[T] = Field(..., title="Dissimilar smart tag")
+if typing.TYPE_CHECKING:
 
+    class GenericAliasModel(AliasModel, Generic[T]):
+        pass
 
-class ValuePerPipelineSmartTag(AliasModel, GenericModel, Generic[T]):
-    almost_correct: List[T] = Field(..., title="Almost correct smart tag")
-    behavioral_testing: List[T] = Field(..., title="Behavioral testing smart tag")
-    uncertain: List[T] = Field(..., title="Uncertain smart tag")
+    class GenericAliasModelPipeline(AliasModel, Generic[T]):
+        pass
+
+    ValuePerDatasetSmartTag = GenericAliasModel
+    ValuePerPipelineSmartTag = GenericAliasModelPipeline
+
+else:
+    ValuePerDatasetSmartTag = AliasModel.with_fields(
+        "ValuePerDatasetSmartTag",
+        GenericModel,
+        Generic[T],
+        **{k.value: (List[T], Field(..., title=k.value)) for k in SMART_TAG_FAMILY_DATASET}
+    )
+    ValuePerPipelineSmartTag = AliasModel.with_fields(
+        "ValuePerDatasetSmartTag",
+        GenericModel,
+        Generic[T],
+        **{k.value: (List[T], Field(..., title=k.value)) for k in SMART_TAG_FAMILY_PIPELINE}
+    )
 
 
 class ValuePerDatasetFilter(ValuePerDatasetSmartTag[T], GenericModel, Generic[T]):
