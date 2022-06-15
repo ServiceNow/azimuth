@@ -65,7 +65,7 @@ const WarningsPreview: React.FC<{ jobId: string }> = ({ jobId }) => {
               height: "100%",
               display: "flex",
               justifyContent: "center",
-              overflow: "scroll",
+              overflow: "visible auto",
             }}
           >
             {isFetching ? (

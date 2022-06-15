@@ -190,7 +190,7 @@ const ConfusionMatrix: React.FC<Props> = ({
           gridTemplateRows={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
           height="100%"
           justifyItems="center"
-          overflow="scroll"
+          overflow="auto"
           width="100%"
           sx={{
             // Stops accidental navigation on horizontal scroll with touch pad
