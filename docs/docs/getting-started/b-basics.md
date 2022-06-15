@@ -6,6 +6,7 @@ In the downloaded Azimuth folder from [step A](a-install.md), the following stru
 exists:
 
 ```bash
+azimuth  # Root directory
 ├── azimuth
 │   └── # Back End # (7)
 ├── azimuth_shr
@@ -45,7 +46,9 @@ each config. The [:material-link: Configuration](../reference/configuration/inde
 details all available fields.
 
 Different configuration examples are provided in the repo under `config/examples`, leveraging
-pretrained models from [HuggingFace](https://huggingface.co).
+pretrained models from [HuggingFace](https://huggingface.co). In the next
+step, [:material-link: C. Run on Your Use Case](c-run.md), is detailed how to adapt an existing
+config to create your own.
 
 ## Clearing the Cache
 
@@ -62,9 +65,9 @@ Out-of-the-box, Azimuth can run on different demo data and models
 from [HuggingFace (HF)](http://www.huggingface.co). Verify that your setup is working correctly by
 running a demo.
 
-1. In the terminal, from the `azimuth` folder, execute the following commands. The first one
-   installs the Google Drive downloading library. The second command downloads from Google Drive the
-   demo data and model. Our demo is using a subset of
+1. In the terminal, from the `azimuth` folder (the root directory), execute the following commands.
+   The first one installs the Google Drive downloading library. The second command downloads from
+   Google Drive the demo data and model. Our demo is using a subset of
    the [`clinc_oos` dataset](https://huggingface.co/datasets/clinc_oos) from HuggingFace, with only
    16 classes.
     ```
@@ -72,10 +75,10 @@ running a demo.
     make download_demo
     ```
 
-    ??? fail "You cannot install `gdown`?"
-        Look at the following
-        [:material-github: Discussion](https://github.com/ServiceNow/azimuth/discussions/46) to
-        download the data manually.
+   ??? fail "You cannot install `gdown`?"
+   Look at the following
+   [:material-github: Discussion](https://github.com/ServiceNow/azimuth/discussions/46) to download
+   the data manually.
 
 2. Run **our dummy or full demo** (option a. or b.), based on how much time you have. If it is the
    first time that you are running the command, it will take additional time to download the Docker

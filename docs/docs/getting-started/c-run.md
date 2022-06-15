@@ -97,7 +97,7 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 
 ## 2. Running the App
 
-1. In the terminal, go the `azimuth` **root directory**.
+1. In the terminal, go to the `azimuth` **root directory**.
 2. Set `CFG_PATH=/config/my_project/conf.json` with the **location of the config**.
     * The initial `/` is required as your local config folder will be mounted on the Docker
       container at the root.
