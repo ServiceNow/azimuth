@@ -141,7 +141,7 @@ contributed as a content editor and collaborator, helping improve the UX and the
 
 <div markdown style="display: inline-block;">
 
-![Sean Hughes](_static/images/development/team/sean.jpeg){ width=200 align=left }
+![Sean Hughes](_static/images/development/team/sean.png){ width=200 align=left }
 
 #### Sean Hughes [:material-linkedin:](https://www.linkedin.com/in/seanhughes/)
 
