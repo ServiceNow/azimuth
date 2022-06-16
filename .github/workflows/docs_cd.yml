@@ -3,10 +3,8 @@ on:
   push:
     branches:
       - main
-      - features/versioning
     tags:
       - "v*"
-      - "test*"
 jobs:
   deploy:
     runs-on: ubuntu-latest
