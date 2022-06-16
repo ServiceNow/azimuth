@@ -3,11 +3,6 @@
 REGISTRY = servicenowdocker
 IMAGE = azimuth_docs
 
-# Put it first so that "make" without argument is like "make help".
-.PHONY: help
-help:
-	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-
 .PHONY: html
 html:
 	mkdocs build
