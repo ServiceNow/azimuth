@@ -98,7 +98,10 @@ class ConfidenceBinDetails(AliasModel):
 
 
 class ConfidenceHistogramResponse(ModuleResponse):
-    details_all_bins: List[ConfidenceBinDetails] = Field(..., title="Details for all bins")
+    bins: List[ConfidenceBinDetails] = Field(..., title="Details for all bins")
+    confidence_threshold: Optional[float] = Field(
+        ..., title="Confidence threshold in selected pipeline", nullable=True
+    )
 
 
 class OutcomeCountPerThresholdValue(AliasModel):

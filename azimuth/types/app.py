@@ -29,9 +29,6 @@ class DatasetInfoResponse(AliasModel):
     eval_class_distribution: List[int] = Field(..., title="Evaluation set class distribution")
     train_class_distribution: List[int] = Field(..., title="Training set class distribution")
     startup_tasks: Dict[str, Any] = Field(..., title="Startup tasks status")
-    default_threshold: Optional[List[Optional[float]]] = Field(
-        ..., title="Initial threshold set in config per pipeline.", nullable=True
-    )
     model_contract: SupportedModelContract = Field(..., title="Model Contract in the config.")
     prediction_available: bool = Field(..., title="Indicator if prediction values are available.")
     perturbation_testing_available: bool = Field(

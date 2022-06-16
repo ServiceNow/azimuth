@@ -48,6 +48,7 @@ from azimuth.types.utterance import (
 from azimuth.utils.filtering import filter_dataset_split
 from azimuth.utils.project import (
     perturbation_testing_available,
+    postprocessing_known,
     predictions_available,
     saliency_available,
     similarity_available,
@@ -115,6 +116,14 @@ def get_utterances(
     ):
         sort_by = UtterancesSortableColumn.index
 
+    threshold = (
+        config.pipelines[pipeline_index].threshold
+        if config.pipelines is not None
+        and pipeline_index is not None
+        and postprocessing_known(task_manager.config, pipeline_index)
+        else None
+    )
+
     dataset_filters = named_filters.to_dataset_filters(dataset_split_manager.get_class_names())
     table_key = (
         PredictionTableKey.from_pipeline_index(
@@ -133,7 +142,9 @@ def get_utterances(
 
     if len(ds_filtered) == 0:
         # No utterances, empty response.
-        return GetUtterancesResponse(utterances=[], utterance_count=0)
+        return GetUtterancesResponse(
+            utterances=[], utterance_count=0, confidence_threshold=threshold
+        )
 
     ds = dataset_split_manager.get_dataset_split_with_class_names(table_key=table_key).select(
         ds_filtered[DatasetColumn.row_idx]
@@ -160,7 +171,9 @@ def get_utterances(
 
     if len(ds) == 0:
         # No utterances, empty response.
-        return GetUtterancesResponse(utterances=[], utterance_count=utterance_count)
+        return GetUtterancesResponse(
+            utterances=[], utterance_count=utterance_count, confidence_threshold=threshold
+        )
 
     indices_subset = ds[DatasetColumn.row_idx]
     tags = dataset_split_manager.get_tags(indices_subset, table_key=table_key)
@@ -235,7 +248,9 @@ def get_utterances(
         )
     ]
 
-    return GetUtterancesResponse(utterances=utterances, utterance_count=utterance_count)
+    return GetUtterancesResponse(
+        utterances=utterances, utterance_count=utterance_count, confidence_threshold=threshold
+    )
 
 
 @router.get(
