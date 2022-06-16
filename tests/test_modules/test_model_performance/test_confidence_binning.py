@@ -44,9 +44,7 @@ def test_confidence_histogram(tiny_text_config):
         tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
     )
-    out_without_postprocessing = mod_without_postprocessing.compute_on_dataset_split()[
-        0
-    ].details_all_bins
+    out_without_postprocessing = mod_without_postprocessing.compute_on_dataset_split()[0].bins
 
     # Confidences should be lower with postprocessing
     mean_with_post = np.mean(

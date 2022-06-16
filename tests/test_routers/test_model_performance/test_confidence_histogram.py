@@ -246,5 +246,5 @@ def test_get_confidence_histogram(app: FastAPI) -> None:
                 },
             },
         ],
-        "confidenceThreshold": 0.5,
+        "confidenceThreshold": None,
     }
