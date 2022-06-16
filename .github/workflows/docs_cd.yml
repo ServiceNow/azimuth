@@ -27,11 +27,11 @@ jobs:
         if: github.event_name == 'tags'
         run: |
           pip install mkdocs-material mike
-          cd docs && mkdocs build && mike set-default main && mike deploy --push --force $VERSION
+          cd docs && mkdocs build && mike set-default --push main && mike deploy --push --force $VERSION
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
       - name: "on branch"
         if: github.event_name != 'tags'
         run: |
           pip install mkdocs-material mike
-          cd docs && mkdocs build && mike set-default main && mike deploy --push --force main
+          cd docs && mkdocs build && mike set-default --push main && mike deploy --push --force main
