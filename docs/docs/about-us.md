@@ -101,13 +101,55 @@ helping on the design side of Azimuth, she worked on projects about data labelli
 summarization and forecasting, and is currently working on document processing and data extraction.
 
 </div>
+<div markdown style="display: inline-block;">
+
+![Nikola Simic](_static/images/development/team/nikola.jpeg){ width=200 align=left }
+
+#### Nikola Simic [:material-linkedin:](https://www.linkedin.com/in/nikolasimic/)
+
+Nikola is a Senior Product Designer working on products that leverage responsible and ethical AI and
+Machine Learning across the enterprise space. He created the Azimuth visual identity and is
+developing Azimuth's branding and video materials.
+
+</div>
+
+### Other Contributors
+
+<div markdown style="display: inline-block;">
+
+![Orlando Marquez](_static/images/development/team/orlando.jpeg){ width=200 align=left }
+
+#### Orlando Marquez [:material-github:](https://github.com/marquezo) [:material-linkedin:](https://www.linkedin.com/in/orlando-e-marquez-85b141134/)
+
+Orlando is a Lead Applied Research Scientist with a strong background in software engineering. One
+of his passions is shipping state-of-the-art NLP to end-users through rigorous and careful
+experimentation. His early contributions to Azimuth revolved around saliency maps for NLP and
+similarity-based analysis.
+
+</div>
+
+<div markdown style="display: inline-block;">
+
+![Michael Lanoie](_static/images/development/team/michael.jpeg){ width=200 align=left }
+
+#### Michael Lanoie [:material-linkedin:](https://www.linkedin.com/in/michaeldeanlanoie/)
+
+Michael is a technical writer working on product documentation for AI/ML software at ServiceNow. He
+contributed as a content editor and collaborator, helping improve the UX and the documentation.
+
+</div>
+
+<div markdown style="display: inline-block;">
+
+![Sean Hughes](_static/images/development/team/sean.jpeg){ width=200 align=left }
+
+#### Sean Hughes [:material-linkedin:](https://www.linkedin.com/in/seanhughes/)
+
+Sean leads cross-functional AI ecosystem strategy and engagement at ServiceNow, bringing his
+experience in AI developer community development to help the team launch and drive adoption of
+Azimuth.
+</div>
 
 ## Special Thanks
 
-Thank you to all others who helped us developing this!
-
-* Orlando Marquez [:material-github: marquezo](https://github.com/marquezo) for his initial
-  contributions and continuous feedback.
-* Nikola Simic for creating the visual identity of Azimuth.
-* Michael Lanoie for feedback on our documentation.
-* Sean Hughes, Sethu Meiyappan, and Francis Ruel for helping us on the path to open sourcing.
+Thank you Sethu Meiyappan, and Francis Ruel for helping us on the path to open sourcing!
