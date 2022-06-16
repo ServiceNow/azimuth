@@ -2,15 +2,31 @@ name: documentation
 on:
   push:
     branches:
-      - master
       - main
+      - features/versioning
+    tags:
+      - "v*"
+      - "test*"
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - run: pip install mkdocs-material
-      - run: cd docs && mkdocs gh-deploy --force
+      - name: "on tags"
+        if: github.event_name == 'tags'
+        run: |
+          pip install mkdocs-material mike
+          cd docs && mike deploy --push $VERSION
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+      - name: "on tags"
+        if: github.event_name == 'branches'
+        run: |
+          pip install mkdocs-material mike
+          cd docs && mike deploy --push main
