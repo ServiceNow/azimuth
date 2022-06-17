@@ -1,6 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from copy import copy
 from enum import Enum
 from typing import Dict, List, Optional
 
@@ -213,7 +214,7 @@ def get_utterances(
     else:
         model_saliencies = [None] * len(ds)
 
-    available_families = DATASET_SMART_TAG_FAMILIES
+    available_families = copy(DATASET_SMART_TAG_FAMILIES)
     if pipeline_index is not None:
         available_families += PIPELINE_SMART_TAG_FAMILIES
     utterances = [
