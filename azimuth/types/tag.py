@@ -65,12 +65,12 @@ class SmartTagFamily(str, Enum):
     uncertain = "uncertain"
 
 
-SMART_TAG_FAMILY_DATASET = [
+DATASET_SMART_TAG_FAMILIES = [
     SmartTagFamily.extreme_length,
     SmartTagFamily.partial_syntax,
     SmartTagFamily.dissimilar,
 ]
-SMART_TAG_FAMILY_PIPELINE = [
+PIPELINE_SMART_TAG_FAMILIES = [
     SmartTagFamily.almost_correct,
     SmartTagFamily.behavioral_testing,
     SmartTagFamily.uncertain,

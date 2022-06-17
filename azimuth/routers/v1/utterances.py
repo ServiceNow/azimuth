@@ -35,9 +35,10 @@ from azimuth.types.similarity_analysis import (
 )
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
+    DATASET_SMART_TAG_FAMILIES,
+    PIPELINE_SMART_TAG_FAMILIES,
     SMART_TAGS_FAMILY_MAPPING,
     DataAction,
-    SmartTagFamily,
 )
 from azimuth.types.utterance import (
     GetUtterancesResponse,
@@ -212,14 +213,9 @@ def get_utterances(
     else:
         model_saliencies = [None] * len(ds)
 
+    available_families = DATASET_SMART_TAG_FAMILIES
     if pipeline_index is not None:
-        available_families = list(SMART_TAGS_FAMILY_MAPPING.keys())
-    else:
-        available_families = [
-            SmartTagFamily.extreme_length,
-            SmartTagFamily.partial_syntax,
-            SmartTagFamily.dissimilar,
-        ]
+        available_families += PIPELINE_SMART_TAG_FAMILIES
     utterances = [
         Utterance(
             index=data[DatasetColumn.row_idx],

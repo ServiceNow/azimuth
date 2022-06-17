@@ -9,7 +9,7 @@ from pydantic.generics import GenericModel
 
 from azimuth.types import AliasModel, Array, ModuleResponse, PlotSpecification
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import SMART_TAG_FAMILY_DATASET, SMART_TAG_FAMILY_PIPELINE
+from azimuth.types.tag import DATASET_SMART_TAG_FAMILIES, PIPELINE_SMART_TAG_FAMILIES
 
 T = TypeVar("T")
 
@@ -50,13 +50,13 @@ else:
         "ValuePerDatasetSmartTag",
         GenericModel,
         Generic[T],
-        **{k.value: (List[T], Field(..., title=k.value)) for k in SMART_TAG_FAMILY_DATASET}
+        **{k.value: (List[T], Field(...)) for k in DATASET_SMART_TAG_FAMILIES}
     )
     ValuePerPipelineSmartTag = AliasModel.with_fields(
-        "ValuePerDatasetSmartTag",
+        "ValuePerPipelineSmartTag",
         GenericModel,
         Generic[T],
-        **{k.value: (List[T], Field(..., title=k.value)) for k in SMART_TAG_FAMILY_PIPELINE}
+        **{k.value: (List[T], Field(...)) for k in PIPELINE_SMART_TAG_FAMILIES}
     )
 
 
