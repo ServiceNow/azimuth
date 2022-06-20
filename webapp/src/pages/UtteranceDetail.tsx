@@ -209,7 +209,7 @@ const UtteranceDetail = () => {
                 <SmartTagFamilyBadge
                   key={family}
                   family={family}
-                  utterance={utterance}
+                  smartTags={utterance[family]}
                   withName
                 />
               )

@@ -232,7 +232,11 @@ const UtterancesTable: React.FC<Props> = ({
   const renderSmartTags = ({ row }: GridCellParams<undefined, Row>) => (
     <Box display="grid" gridAutoColumns={SMART_TAG_WIDTH} gridAutoFlow="column">
       {smartTagFamilies.map((family) => (
-        <SmartTagFamilyBadge key={family} family={family} utterance={row} />
+        <SmartTagFamilyBadge
+          key={family}
+          family={family}
+          smartTags={row[family]}
+        />
       ))}
     </Box>
   );

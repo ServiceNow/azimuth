@@ -11,16 +11,16 @@ const BADGE_DIAMETER = 14;
 
 const SmartTagFamilyBadge: React.FC<{
   family: typeof SMART_TAG_FAMILIES[number];
-  utterance: Utterance;
+  smartTags: string[];
   withName?: boolean;
-}> = ({ family, utterance, withName }) => (
+}> = ({ family, smartTags, withName }) => (
   <Tooltip
     title={
       <>
         <Typography fontWeight="bold">
-          {utterance[family].length} {SMART_TAG_FAMILY_PRETTY_NAMES[family]}
+          {smartTags.length} {SMART_TAG_FAMILY_PRETTY_NAMES[family]}
         </Typography>
-        {utterance[family].map((tag) => (
+        {smartTags.map((tag) => (
           <Typography key={tag}>{tag}</Typography>
         ))}
       </>
@@ -28,7 +28,7 @@ const SmartTagFamilyBadge: React.FC<{
   >
     <Box>
       <Badge
-        badgeContent={utterance[family].length}
+        badgeContent={smartTags.length}
         color="secondary"
         sx={{
           "& .MuiBadge-badge": {
@@ -43,7 +43,7 @@ const SmartTagFamilyBadge: React.FC<{
       >
         {React.createElement(
           SMART_TAG_FAMILY_ICONS[family],
-          utterance[family].length > 0 ? {} : { sx: { opacity: 0.12 } }
+          smartTags.length > 0 ? {} : { sx: { opacity: 0.12 } }
         )}
       </Badge>
       {withName && (
