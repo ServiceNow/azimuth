@@ -11,7 +11,13 @@ import {
   GridValueFormatterParams,
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
-import { Box, MenuItem, Select, Typography } from "@mui/material";
+import {
+  Box,
+  ListSubheader,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 
 import { getMetricsPerFilterEndpoint } from "services/api";
 import SeeMoreLess, {
@@ -22,6 +28,7 @@ import {
   ALL_OUTCOMES,
   OUTCOME_PRETTY_NAMES,
   SMART_TAG_FAMILIES,
+  SMART_TAG_FAMILY_ICONS,
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
@@ -46,13 +53,15 @@ const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
   </GridColumnMenuContainer>
 );
 
-const OPTIONS = ["label", "prediction", ...SMART_TAG_FAMILIES] as const;
+const BASIC_FILTER_OPTIONS = ["label", "prediction"] as const;
 const OPTION_PRETTY_NAME = {
   label: "Label",
   prediction: "Prediction",
   ...SMART_TAG_FAMILY_PRETTY_NAMES,
 } as const;
-type FilterByViewOption = typeof OPTIONS[number];
+type FilterByViewOption =
+  | typeof BASIC_FILTER_OPTIONS[number]
+  | typeof SMART_TAG_FAMILIES[number];
 
 type Props = {
   jobId: string;
@@ -157,9 +166,16 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             )
           }
         >
-          {OPTIONS.map((key) => (
+          {BASIC_FILTER_OPTIONS.map((key) => (
             <MenuItem key={key} value={key}>
               {OPTION_PRETTY_NAME[key]}
+            </MenuItem>
+          ))}
+          <ListSubheader>Smart Tags</ListSubheader>
+          {SMART_TAG_FAMILIES.map((key) => (
+            <MenuItem key={key} value={key} sx={{ gap: 1 }}>
+              {OPTION_PRETTY_NAME[key]}
+              {React.createElement(SMART_TAG_FAMILY_ICONS[key], {})}
             </MenuItem>
           ))}
         </Select>
