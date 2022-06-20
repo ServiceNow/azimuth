@@ -14,10 +14,12 @@ Released changes are shown in the
 - A new toggle switch "Normalize" in the confusion matrix page.
 - Possibility to hide columns from the Performance Analysis table.
 - Smart tag families to group similar smart tags.
+- F1 as metric by default.
 
 ### Changed
 - Show 20 similar utterances instead of 10 in the Utterance Detail page.
 - Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
+- Use outcomes' icons as headers of the Performance Overview table instead of the outcomes' full names.
 
 ### Deprecated/Breaking Changes
 
