@@ -2,7 +2,7 @@ import { GetApp, SvgIconComponent } from "@mui/icons-material";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import { Box, Button, Tooltip, useTheme } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -13,8 +13,7 @@ import {
 import HoverableDataCell from "components/Analysis/HoverableDataCell";
 import UtterancesTableFooter from "components/Analysis/UtterancesTableFooter";
 import CopyButton from "components/CopyButton";
-import CheckIcon from "components/Icons/Check";
-import XIcon from "components/Icons/X";
+import outcomeIcon from "components/Icons/outcomeIcon";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
 import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
@@ -26,7 +25,6 @@ import {
   DataAction,
   DatasetInfoResponse,
   DatasetSplitName,
-  Outcome,
   Utterance,
   UtterancesSortableColumn,
 } from "types/api";
@@ -41,8 +39,6 @@ import { downloadDatasetSplit } from "utils/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
   ID_TOOLTIP,
-  OUTCOME_COLOR,
-  OUTCOME_PRETTY_NAMES,
   PAGE_SIZE,
   SMART_TAG_FAMILIES,
 } from "utils/const";
@@ -120,7 +116,6 @@ const UtterancesTable: React.FC<Props> = ({
 }) => {
   const history = useHistory();
   const classes = useStyles();
-  const theme = useTheme();
 
   const { page = 1, sort, descending } = pagination;
 
@@ -215,16 +210,6 @@ const UtterancesTable: React.FC<Props> = ({
 
   const getConfidence = ({ row }: GridValueGetterParams<undefined, Row>) =>
     row.modelPrediction?.[`${prefix}Confidences`][0];
-
-  const outcomeIcon = (outcome: Outcome) => {
-    const Icon = outcome.includes("Correct") ? CheckIcon : XIcon;
-    const color = theme.palette[OUTCOME_COLOR[outcome]].main;
-    return (
-      <Tooltip title={OUTCOME_PRETTY_NAMES[outcome]}>
-        <Icon fontSize="large" sx={{ color }} />
-      </Tooltip>
-    );
-  };
 
   const renderOutcome = ({ row }: GridCellParams<undefined, Row>) =>
     row.modelPrediction && outcomeIcon(row.modelPrediction[`${prefix}Outcome`]);

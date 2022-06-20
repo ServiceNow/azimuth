@@ -1,4 +1,10 @@
-import React from "react";
+import {
+  Box,
+  ListSubheader,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import {
   GridCellValue,
   GridColumnMenuContainer,
@@ -11,19 +17,17 @@ import {
   GridValueFormatterParams,
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
-import {
-  Box,
-  ListSubheader,
-  MenuItem,
-  Select,
-  Typography,
-} from "@mui/material";
-
-import { getMetricsPerFilterEndpoint } from "services/api";
+import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
+import outcomeIcon from "components/Icons/outcomeIcon";
 import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
+import { Table, Column } from "components/Table";
+import React from "react";
+import { getMetricsPerFilterEndpoint } from "services/api";
+import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
+import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
   OUTCOME_PRETTY_NAMES,
@@ -31,11 +35,7 @@ import {
   SMART_TAG_FAMILY_ICONS,
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
-import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
-import { QueryPipelineState } from "types/models";
 import { formatRatioAsPercentageString } from "utils/format";
-import { Table, Column } from "../Table";
-import DatasetSplitToggler from "../Controls/DatasetSplitToggler";
 
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
@@ -192,8 +192,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
+      renderHeader: () => outcomeIcon(outcome),
       flex: 1,
-      minWidth: 160,
+      minWidth: 80,
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       valueFormatter: percentageFormatter,
     })),
