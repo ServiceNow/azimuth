@@ -5,8 +5,6 @@ import {
   UtterancesSortableColumn,
 } from "types/api";
 
-export type ApiCallState = "init" | "fetching" | "error" | "done";
-
 export type QueryFilterState = {
   confidenceMin?: number;
   confidenceMax?: number;

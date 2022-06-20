@@ -1,6 +1,5 @@
 import { Badge, Box, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { Utterance } from "types/api";
 import {
   SMART_TAG_FAMILIES,
   SMART_TAG_FAMILY_ICONS,
