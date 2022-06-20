@@ -67,7 +67,13 @@ Docker is needed for different tasks such as releasing and updating the document
 * Set the memory to at least 9 GB in Docker > Preference > Resources.
 
 ### Front End
-- Install [`Node.js`](https://nodejs.org).
+- Install [`Node.js`](https://nodejs.org) version 16. If you need to use different versions of Node on your machine, you may be interested in [NVM](https://github.com/nvm-sh/nvm). Otherwise, the simplest way to install Node on you Mac is to use `Homebrew` (and follow directions to add this version 
+  to your PATH).
+
+    ```shell
+    brew install node@16
+    ```
+
 - Once you've installed `Node`, you can install `yarn`.
 
     ```shell
