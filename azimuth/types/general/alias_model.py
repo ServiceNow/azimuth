@@ -9,6 +9,7 @@ import orjson
 from pydantic import BaseModel, Field
 
 from azimuth.utils.conversion import orjson_dumps
+from azimuth.utils.pydantic_utils import create_model
 
 
 def to_camel_case(string: str) -> str:
@@ -35,6 +36,10 @@ class AliasModel(BaseModel):  # noqa: D205,D415
 
     def no_alias_dict(self, **kwargs: Any) -> Dict[str, Any]:
         return super().dict(by_alias=False, **kwargs)
+
+    @classmethod
+    def with_fields(cls, name, *bases, **field_definitions):
+        return create_model(name, __base__=(cls, *bases), **field_definitions)
 
     class Config:
         allow_population_by_field_name = True

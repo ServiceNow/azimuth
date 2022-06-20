@@ -1,13 +1,19 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Union
+from typing import Union, cast
 
 from datasets import Dataset
 
 from azimuth.config import ProjectConfig
 from azimuth.types import DatasetColumn, DatasetFilters, NamedDatasetFilters
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS, DataAction, SmartTag
+from azimuth.types.tag import (
+    ALL_DATA_ACTIONS,
+    SMART_TAGS_FAMILY_MAPPING,
+    DataAction,
+    SmartTag,
+    SmartTagFamily,
+)
 
 
 def verify_column_is_present(column_name: str, dataset_split: Dataset):
@@ -85,12 +91,21 @@ def filter_dataset_split(
         verify_column_is_present(outcome_column, dataset_split)
         # We do OR for outcomes.
         dataset_split = dataset_split.filter(lambda x: x[outcome_column] in filters.outcomes)
-    if len(filters.smart_tags) > 0:
-        # We do AND for smart tags.
-        dataset_split = dataset_split.filter(
-            lambda x: all(
-                ((not any(x[v] for v in ALL_SMART_TAGS)) if v == SmartTag.no_smart_tag else x[v])
-                for v in filters.smart_tags
+    for key, tags_in_family in filters.smart_tags.items():
+        # For each smart tag family, we do OR, but AND between families
+        # If None, it is none of them.
+        if len(tags_in_family) > 0:
+            # We add no_smart_tag to all families.
+            family = cast(SmartTagFamily, key)
+            dataset_split = dataset_split.filter(
+                lambda x: any(
+                    (
+                        (not any(x[tag.value] for tag in SMART_TAGS_FAMILY_MAPPING[family]))
+                        if tag_f == SmartTag.no_smart_tag
+                        else x[tag_f]
+                    )
+                    for tag_f in tags_in_family
+                )
             )
-        )
+
     return dataset_split

@@ -1,26 +1,27 @@
-import React, { useState } from "react";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
   Box,
   Button,
   Checkbox,
   CircularProgress,
   FormControlLabel,
+  FormControlLabelProps,
   Tooltip,
   Typography,
   TypographyProps,
   useTheme,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
-import { motion } from "framer-motion";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import FilterDistribution from "components/Controls/FilterDistribution";
 import FilterDistributionTooltipContent from "components/Controls/FilterDistributionTooltipContent";
-import { CountPerFilterValue } from "types/api";
-import { TOOLTIP_ENTER_DELAY } from "styles/const";
 import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
+import { motion } from "framer-motion";
+import React from "react";
+import { TOOLTIP_ENTER_DELAY } from "styles/const";
+import { CountPerFilterValue } from "types/api";
 
 const MotionArrowDropDownIcon = motion(ArrowDropDownIcon);
 
@@ -79,9 +80,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type Props<FilterValue> = {
-  label: string;
+  label: FormControlLabelProps["label"];
   maxCount: number;
-  operator?: "AND" | "OR";
   searchValue: string;
   selectedOptions: FilterValue[];
   handleValueChange: (selectedOptions: FilterValue[]) => void;
@@ -93,7 +93,6 @@ type Props<FilterValue> = {
 const FilterSelector = <FilterValue extends string>({
   label,
   maxCount,
-  operator = "OR",
   searchValue,
   selectedOptions,
   handleValueChange,
@@ -104,7 +103,7 @@ const FilterSelector = <FilterValue extends string>({
   const classes = useStyles();
   const theme = useTheme();
 
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   const options = filters?.filter(({ filterValue }) =>
     filterValue.toLowerCase().includes(searchValue.toLowerCase())
@@ -151,10 +150,6 @@ const FilterSelector = <FilterValue extends string>({
               )}
               className={classes.checkbox}
               color="primary"
-              disabled={
-                operator === "AND" &&
-                (isFetching || filter.utteranceCount === 0)
-              }
               name={filter.filterValue}
               onChange={(_, checked) => handleSelect(checked)}
             />
@@ -204,26 +199,21 @@ const FilterSelector = <FilterValue extends string>({
             className={classes.collapseIcon}
           />
         </Button>
-        {operator === "AND" ? (
-          <Typography {...titleTypographyProps}>{label}</Typography>
-        ) : (
-          <FormControlLabel
-            className={classes.checkboxGroup}
-            control={
-              <Checkbox
-                checked={someOptionsAreSelected}
-                className={classes.checkbox}
-                color="primary"
-                disabled={!filters} // so it can't be clicked before options are loaded
-                indeterminate={someOptionsAreSelected && !allOptionsAreSelected}
-                name={label}
-                onChange={(_, checked) => handleSelectAll(checked)}
-              />
-            }
-            label={label}
-            componentsProps={{ typography: titleTypographyProps }}
-          />
-        )}
+        <FormControlLabel
+          className={classes.checkboxGroup}
+          control={
+            <Checkbox
+              checked={someOptionsAreSelected}
+              className={classes.checkbox}
+              color="primary"
+              disabled={!filters} // so it can't be clicked before options are loaded
+              indeterminate={someOptionsAreSelected && !allOptionsAreSelected}
+              onChange={(_, checked) => handleSelectAll(checked)}
+            />
+          }
+          label={label}
+          componentsProps={{ typography: titleTypographyProps }}
+        />
         {selectedOptions.length > 0 && (
           <Typography variant="body2" className={classes.selectedCount}>
             ({selectedOptions.length} selected)
