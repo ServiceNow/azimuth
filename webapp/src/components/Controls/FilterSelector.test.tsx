@@ -72,47 +72,6 @@ test("empty outcome count", async () => {
   expect(screen.getByLabelText("type1")).not.toBeDisabled();
 });
 
-test("empty outcome count with AND", async () => {
-  renderWithTheme(
-    <FilterSelector
-      label="type"
-      maxCount={1}
-      operator="AND"
-      searchValue=""
-      selectedOptions={[]}
-      handleValueChange={() => {}}
-      filters={[
-        {
-          outcomeCount: {
-            CorrectAndPredicted: 0,
-            CorrectAndRejected: 0,
-            IncorrectAndPredicted: 0,
-            IncorrectAndRejected: 0,
-          },
-          utteranceCount: 0,
-          filterValue: "type1",
-        },
-        {
-          outcomeCount: {
-            CorrectAndPredicted: 1,
-            CorrectAndRejected: 0,
-            IncorrectAndPredicted: 0,
-            IncorrectAndRejected: 0,
-          },
-          utteranceCount: 1,
-          filterValue: "type2",
-        },
-      ]}
-      isFetching={false}
-    />
-  );
-
-  expect(screen.getByLabelText("type1")).toBeDisabled();
-  expect(screen.getByLabelText("type2")).not.toBeDisabled();
-
-  expect(screen.queryByLabelText("type")).not.toBeInTheDocument();
-});
-
 test("collapsible filter", async () => {
   renderWithTheme(
     <FilterSelector

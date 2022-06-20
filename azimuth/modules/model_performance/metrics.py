@@ -5,7 +5,7 @@ import inspect
 import json
 import warnings
 from collections import Counter
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional
 
 import numpy as np
 from datasets import Dataset, Metric
@@ -27,7 +27,12 @@ from azimuth.types.model_performance import (
     MetricsPerFilterValue,
 )
 from azimuth.types.outcomes import ALL_OUTCOMES
-from azimuth.types.tag import ALL_DATA_ACTION_FILTERS, ALL_SMART_TAG_FILTERS
+from azimuth.types.tag import (
+    ALL_DATA_ACTION_FILTERS,
+    SMART_TAGS_FAMILY_MAPPING,
+    SmartTag,
+    SmartTagFamily,
+)
 from azimuth.utils.ml.ece import compute_ece_from_bins
 from azimuth.utils.ml.model_performance import sorted_by_utterance_count_with_last
 from azimuth.utils.validation import assert_not_none
@@ -157,7 +162,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
     """Computes the metrics for each filter."""
 
     def get_metrics_for_filter(
-        self, filters_dict: Dict[str, Sequence[DatasetFilters]]
+        self, filters_dict: Dict[str, DatasetFilters]
     ) -> List[MetricsPerFilterValue]:
         """Get metrics for a list of filters.
 
@@ -218,16 +223,24 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
             )
             pbar.update()
 
-            smart_tag_filters = {
-                smart_tag: self.edit_filter(self.mod_options.filters, smart_tag=smart_tag)
-                for smart_tag in ALL_SMART_TAG_FILTERS
+            smart_tag_filters: Dict[SmartTagFamily, Dict[str, DatasetFilters]] = {
+                tag_family: {
+                    smart_tag: self.edit_filter(
+                        self.mod_options.filters, smart_tag={tag_family: [smart_tag]}
+                    )
+                    for smart_tag in tags + [SmartTag.no_smart_tag]
+                }
+                for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
             }
-            metrics_per_smart_tag = sorted_by_utterance_count_with_last(
-                self.get_metrics_for_filter(smart_tag_filters), -1
-            )
+            metrics_per_smart_tag = {
+                tag_family.value: sorted_by_utterance_count_with_last(
+                    self.get_metrics_for_filter(filters_for_family), -1
+                )
+                for tag_family, filters_for_family in smart_tag_filters.items()
+            }
             pbar.update()
 
-            outcomes_filters: Dict[str, Sequence[DatasetFilters]] = {
+            outcomes_filters: Dict[str, DatasetFilters] = {
                 outcome: self.edit_filter(self.mod_options.filters, outcome=outcome)
                 for outcome in ALL_OUTCOMES
             }
@@ -240,7 +253,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
                     label=metrics_per_label,
                     prediction=metrics_per_prediction,
                     data_action=metrics_per_data_action,
-                    smart_tag=metrics_per_smart_tag,
+                    **metrics_per_smart_tag,
                     outcome=metrics_per_outcome,
                 ),
                 utterance_count=len(ds),
@@ -279,5 +292,5 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
         if outcome is not None:
             filter_copy.outcomes.append(outcome)
         if smart_tag is not None:
-            filter_copy.smart_tags.append(smart_tag)
+            filter_copy.smart_tags.update(smart_tag)
         return filter_copy

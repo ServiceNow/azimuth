@@ -19,6 +19,22 @@ export type ConfusionMatrixOperation =
     };
   };
 export type ConfusionMatrixResponse = { confusionMatrix: number[][] };
+// CountPerFilterResponse is basically like OutcomeCountPerFilterResponse | UtteranceCountPerFilterResponse
+// (which would unfortunately lose all OutcomeCountPerFilterResponse's extra fields),
+// but with OutcomeCountPerFilterResponse's extra fields as optional instead.
+export interface CountPerFilterResponse
+  extends UtteranceCountPerFilterResponse {
+  countPerFilter: Partial<
+    Omit<
+      OutcomeCountPerFilterResponse["countPerFilter"],
+      keyof UtteranceCountPerFilterResponse["countPerFilter"]
+    >
+  > &
+    Record<
+      keyof UtteranceCountPerFilterResponse["countPerFilter"],
+      CountPerFilterValue[]
+    >;
+}
 export type CountPerFilterValue = Partial<OutcomeCountPerFilterValue> &
   UtteranceCountPerFilterValue;
 export type DataAction = components["schemas"]["DataAction"];

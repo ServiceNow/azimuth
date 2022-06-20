@@ -18,7 +18,11 @@ from azimuth.types.model_performance import (
     OutcomeCountPerThresholdValue,
 )
 from azimuth.types.outcomes import ALL_OUTCOMES, OutcomeName
-from azimuth.types.tag import ALL_DATA_ACTION_FILTERS, ALL_SMART_TAG_FILTERS
+from azimuth.types.tag import (
+    ALL_DATA_ACTION_FILTERS,
+    SMART_TAGS_FAMILY_MAPPING,
+    SmartTag,
+)
 from azimuth.utils.ml.model_performance import (
     sorted_by_utterance_count,
     sorted_by_utterance_count_with_last,
@@ -152,7 +156,12 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
                     ),
                     data_action=self.get_outcome_count_per_tag(dm, ds, ALL_DATA_ACTION_FILTERS),
                     outcome=self.get_outcome_count_per_outcome(ds),
-                    smart_tag=self.get_outcome_count_per_tag(dm, ds, ALL_SMART_TAG_FILTERS),
+                    **{
+                        family.value: self.get_outcome_count_per_tag(
+                            dm, ds, [t.value for t in tags + [SmartTag.no_smart_tag]]
+                        )
+                        for family, tags in SMART_TAGS_FAMILY_MAPPING.items()
+                    },
                 ),
                 utterance_count=len(ds),
             )
