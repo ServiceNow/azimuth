@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <title>Azimuth documentation</title>
   <script>
-    window.location.replace(window.location.pathname.replace(/(?<=\/azimuth\/)(?!main\/|v\d+\.\d+\/)/, "main/") + window.location.hash);
+    const url = window.location.pathname.replace(/(?<=\/azimuth\/)(?!main\/|v\d+\.\d+\/)/, "main/");
+    if (url != window.location.pathname) {
+      window.location.replace(url + window.location.hash);
+    }
   </script>
 </head>
 <body>
