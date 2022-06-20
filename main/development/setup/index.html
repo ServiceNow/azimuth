@@ -1779,16 +1779,21 @@ You should use <code>pyenv</code> to set up the right <code>python</code> versio
 </ul>
 <h3 id="front-end">Front End</h3>
 <ul>
-<li>Install <a href="https://nodejs.org"><code>Node.js</code></a>.</li>
+<li>
+<p>Install <a href="https://nodejs.org"><code>Node.js</code></a> version 16. If you need to use different versions of Node on your machine, you may be interested in <a href="https://github.com/nvm-sh/nvm">NVM</a>. Otherwise, the simplest way to install Node on you Mac is to use <code>Homebrew</code> (and follow directions to add this version 
+  to your PATH).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>brew install node@16
+</code></pre></div>
+</li>
 <li>
 <p>Once you've installed <code>Node</code>, you can install <code>yarn</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>npm install -g yarn
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>npm install -g yarn
 </code></pre></div>
 </li>
 <li>
 <p>You can then install front-end dependencies, from the webapp folder, using:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span> webapp
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>yarn
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd</span> webapp
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>yarn
 </code></pre></div>
 </li>
 </ul>
@@ -1812,7 +1817,7 @@ You should use <code>pyenv</code> to set up the right <code>python</code> versio
 </ul>
 <h3 id="pre-commit-hooks">Pre-commit Hooks</h3>
 <p>We installed pre-commit hooks which will format automatically your code with each commit. The first time, you need to run the following command.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>poetry run pre-commit install
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>poetry run pre-commit install
 </code></pre></div></p>
 
               
