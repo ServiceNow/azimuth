@@ -2,15 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Redirecting</title>
-  <noscript>
-    <meta http-equiv="refresh" content="1; url=main/" />
-  </noscript>
+  <title>Azimuth documentation</title>
   <script>
-    window.location.replace(window.location.pathname.replace(/(?<=\/azimuth\/)/, "main/") + window.location.hash);
+    window.location.replace(window.location.pathname.replace(/(?<=\/azimuth\/)(?!main\/|v\d+\.\d+\/)/, "main/") + window.location.hash);
   </script>
 </head>
 <body>
-  Redirecting to <a href="main/">main/</a>...
+  <h1>404 - Not found</h1>
+  <p>Go back to <a href="/azimuth/main/">Azimuth documentation</a></p>
 </body>
 </html>
