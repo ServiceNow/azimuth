@@ -134,6 +134,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   };
 
   const NUMBER_COL_DEF = {
+    flex: 1,
+    minWidth: 80,
     maxWidth: 221,
     type: "number",
     sortComparator: customSort,
@@ -185,7 +187,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "utteranceCount",
       headerName: "Utterance Count",
-      flex: 1,
       minWidth: 160,
     },
     ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
@@ -193,8 +194,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
       renderHeader: () => outcomeIcon(outcome),
-      flex: 1,
-      minWidth: 80,
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       valueFormatter: percentageFormatter,
     })),
@@ -202,8 +201,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
-      flex: 1,
-      minWidth: 80,
       valueGetter: ({ row }) => row.customMetrics[metricName],
       valueFormatter: percentageFormatter,
     })),
@@ -211,8 +208,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "ece",
       headerName: "ECE",
-      flex: 1,
-      minWidth: 80,
       valueFormatter: twoDigitFormatter,
     },
   ];
