@@ -17,7 +17,7 @@ import {
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
-import outcomeIcon from "components/Icons/outcomeIcon";
+import OutcomeIcon from "components/Icons/OutcomeIcon";
 import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
@@ -190,7 +190,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
-      renderHeader: () => outcomeIcon(outcome),
+      renderHeader: () => OutcomeIcon({ outcome }),
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       valueFormatter: percentageFormatter,
     })),

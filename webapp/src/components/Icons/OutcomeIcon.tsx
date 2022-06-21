@@ -4,7 +4,7 @@ import XIcon from "components/Icons/X";
 import { Outcome } from "types/api";
 import { OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
 
-const outcomeIcon = (outcome: Outcome) => {
+const OutcomeIcon: React.FC<{ outcome: Outcome }> = ({ outcome }) => {
   const Icon = outcome.includes("Correct") ? CheckIcon : XIcon;
   return (
     <Tooltip title={OUTCOME_PRETTY_NAMES[outcome]}>
@@ -16,4 +16,4 @@ const outcomeIcon = (outcome: Outcome) => {
   );
 };
 
-export default outcomeIcon;
+export default OutcomeIcon;

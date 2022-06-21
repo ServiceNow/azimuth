@@ -13,7 +13,7 @@ import {
 import HoverableDataCell from "components/Analysis/HoverableDataCell";
 import UtterancesTableFooter from "components/Analysis/UtterancesTableFooter";
 import CopyButton from "components/CopyButton";
-import outcomeIcon from "components/Icons/outcomeIcon";
+import OutcomeIcon from "components/Icons/OutcomeIcon";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
 import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
@@ -212,7 +212,8 @@ const UtterancesTable: React.FC<Props> = ({
     row.modelPrediction?.[`${prefix}Confidences`][0];
 
   const renderOutcome = ({ row }: GridCellParams<undefined, Row>) =>
-    row.modelPrediction && outcomeIcon(row.modelPrediction[`${prefix}Outcome`]);
+    row.modelPrediction &&
+    OutcomeIcon({ outcome: row.modelPrediction[`${prefix}Outcome`] });
 
   const renderSmartTags = ({ row }: GridCellParams<undefined, Row>) => (
     <Box display="grid" gridAutoColumns={SMART_TAG_WIDTH} gridAutoFlow="column">
