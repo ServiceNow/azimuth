@@ -12,7 +12,6 @@ import {
   GridColumnsMenuItem,
   GridRowSpacingParams,
   GridSortCellParams,
-  GridSortDirection,
   GridSortModel,
   GridValueFormatterParams,
   HideGridColMenuItem,
@@ -87,12 +86,10 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     ...pipeline,
   });
 
-  //Track table sort direction to keep 'overall' at top
-  const sortDirectionRef = React.useRef<GridSortDirection>();
-  const handleSortModelChange = (model: GridSortModel) => {
-    const [sortModel] = model;
-    sortDirectionRef.current = sortModel?.sort;
-  };
+  // Track table sort model to keep 'overall' at top
+  const [sortModel, setSortModel] = React.useState<GridSortModel>([
+    { field: "utteranceCount", sort: "desc" },
+  ]);
 
   const rows: Row[] = React.useMemo(() => {
     return data
@@ -122,7 +119,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     param1: GridSortCellParams,
     param2: GridSortCellParams
   ) => {
-    const sign = sortDirectionRef.current === "desc" ? 1 : -1;
+    const sign = sortModel[0].sort === "desc" ? 1 : -1;
     //Custom sort to keep 'overall' at top
     if ((param1.id as number) === OVERALL_ROW_ID) return sign;
     if ((param2.id as number) === OVERALL_ROW_ID) return -sign;
@@ -260,7 +257,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             background: (theme) => theme.palette.grey[200],
           },
         }}
-        onSortModelChange={handleSortModelChange}
+        sortModel={sortModel}
+        onSortModelChange={setSortModel}
         getRowClassName={({ id }) => `${id === OVERALL_ROW_ID ? "total" : ""}`}
         getRowSpacing={getRowSpacing}
         autoHeight
@@ -278,11 +276,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
                 Footer,
               }
             : {}),
-        }}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: columns[1].field, sort: "desc" }],
-          },
         }}
       />
     </Box>
