@@ -257,6 +257,11 @@ class ModelContractConfig(CommonFieldsConfig):
             kwargs={"path": "recall"},
             additional_kwargs={"average": "weighted"},
         ),
+        "F1": MetricDefinition(
+            class_name="datasets.load_metric",
+            kwargs={"path": "f1"},
+            additional_kwargs={"average": "weighted"},
+        ),
     }
 
     @validator("pipelines", pre=True)

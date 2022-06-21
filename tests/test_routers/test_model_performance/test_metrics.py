@@ -8,6 +8,7 @@ from starlette.testclient import TestClient
 
 common_metric_response = {
     "customMetrics": {
+        "F1": 0.12349206349206351,
         "Precision": 0.4682539682539682,
         "Recall": 0.07142857142857142,
     },

@@ -1,16 +1,3 @@
-import React from "react";
-import {
-  GridCellValue,
-  GridColumnMenuContainer,
-  GridColumnMenuProps,
-  GridColumnsMenuItem,
-  GridRowSpacingParams,
-  GridSortCellParams,
-  GridSortDirection,
-  GridSortModel,
-  GridValueFormatterParams,
-  HideGridColMenuItem,
-} from "@mui/x-data-grid";
 import {
   Box,
   ListSubheader,
@@ -18,12 +5,28 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-
-import { getMetricsPerFilterEndpoint } from "services/api";
+import {
+  GridCellValue,
+  GridColumnMenuContainer,
+  GridColumnMenuProps,
+  GridColumnsMenuItem,
+  GridRowSpacingParams,
+  GridSortCellParams,
+  GridSortModel,
+  GridValueFormatterParams,
+  HideGridColMenuItem,
+} from "@mui/x-data-grid";
+import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
+import OutcomeIcon from "components/Icons/OutcomeIcon";
 import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
+import { Table, Column } from "components/Table";
+import React from "react";
+import { getMetricsPerFilterEndpoint } from "services/api";
+import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
+import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
   OUTCOME_PRETTY_NAMES,
@@ -31,11 +34,7 @@ import {
   SMART_TAG_FAMILY_ICONS,
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
-import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
-import { QueryPipelineState } from "types/models";
 import { formatRatioAsPercentageString } from "utils/format";
-import { Table, Column } from "../Table";
-import DatasetSplitToggler from "../Controls/DatasetSplitToggler";
 
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
@@ -87,12 +86,10 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     ...pipeline,
   });
 
-  //Track table sort direction to keep 'overall' at top
-  const sortDirectionRef = React.useRef<GridSortDirection>();
-  const handleSortModelChange = (model: GridSortModel) => {
-    const [sortModel] = model;
-    sortDirectionRef.current = sortModel?.sort;
-  };
+  // Track table sort model to keep 'overall' at top
+  const [sortModel, setSortModel] = React.useState<GridSortModel>([
+    { field: "utteranceCount", sort: "desc" },
+  ]);
 
   const rows: Row[] = React.useMemo(() => {
     return data
@@ -122,7 +119,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     param1: GridSortCellParams,
     param2: GridSortCellParams
   ) => {
-    const sign = sortDirectionRef.current === "desc" ? 1 : -1;
+    const sign = sortModel[0].sort === "desc" ? 1 : -1;
     //Custom sort to keep 'overall' at top
     if ((param1.id as number) === OVERALL_ROW_ID) return sign;
     if ((param2.id as number) === OVERALL_ROW_ID) return -sign;
@@ -134,6 +131,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   };
 
   const NUMBER_COL_DEF = {
+    flex: 1,
+    minWidth: 80,
     maxWidth: 221,
     type: "number",
     sortComparator: customSort,
@@ -185,15 +184,13 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "utteranceCount",
       headerName: "Utterance Count",
-      flex: 1,
       minWidth: 160,
     },
     ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
       ...NUMBER_COL_DEF,
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
-      flex: 1,
-      minWidth: 160,
+      renderHeader: () => OutcomeIcon({ outcome }),
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       valueFormatter: percentageFormatter,
     })),
@@ -201,8 +198,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
-      flex: 1,
-      minWidth: 80,
       valueGetter: ({ row }) => row.customMetrics[metricName],
       valueFormatter: percentageFormatter,
     })),
@@ -210,8 +205,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "ece",
       headerName: "ECE",
-      flex: 1,
-      minWidth: 80,
       valueFormatter: twoDigitFormatter,
     },
   ];
@@ -264,7 +257,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             background: (theme) => theme.palette.grey[200],
           },
         }}
-        onSortModelChange={handleSortModelChange}
+        sortModel={sortModel}
+        onSortModelChange={setSortModel}
         getRowClassName={({ id }) => `${id === OVERALL_ROW_ID ? "total" : ""}`}
         getRowSpacing={getRowSpacing}
         autoHeight
@@ -282,11 +276,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
                 Footer,
               }
             : {}),
-        }}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: columns[1].field, sort: "desc" }],
-          },
         }}
       />
     </Box>

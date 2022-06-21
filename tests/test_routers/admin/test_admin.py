@@ -28,6 +28,13 @@ def test_get_config(app: FastAPI):
             "min_num_per_class": 20,
         },
         "metrics": {
+            "F1": {
+                "additional_kwargs": {"average": "weighted"},
+                "args": [],
+                "class_name": "datasets.load_metric",
+                "kwargs": {"path": "f1"},
+                "remote": None,
+            },
             "Precision": {
                 "additional_kwargs": {"average": "weighted"},
                 "args": [],
