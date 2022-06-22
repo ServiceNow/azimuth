@@ -15,6 +15,7 @@ Released changes are shown in the
 - Possibility to hide columns from the Performance Analysis table.
 - Smart tag families to group similar smart tags.
 - F1 as metric by default.
+- Added a one line description on each section of the application with icon navigation to documentation section
 
 ### Changed
 - Show 20 similar utterances instead of 10 in the Utterance Detail page.
