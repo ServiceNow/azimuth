@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 from collections import defaultdict
-from typing import List
+from typing import List, cast
 
 import numpy as np
 from datasets import Dataset
@@ -91,11 +91,11 @@ class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig]):
 
         """
         ds = assert_not_none(self.get_dataset_split())
-
+        postprocessed_confidences = cast(
+            List[List[float]], ds[DatasetColumn.postprocessed_confidences]
+        )
         bin_indices: List[int] = (
-            np.floor(
-                np.max(ds[DatasetColumn.postprocessed_confidences], axis=1) * CONFIDENCE_BINS_COUNT
-            )
+            np.floor(np.max(postprocessed_confidences, axis=1) * CONFIDENCE_BINS_COUNT)
             .astype("int")
             .tolist()
         )
