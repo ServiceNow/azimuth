@@ -200,26 +200,20 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
             <Typography
               gridColumn="end"
               gridRow={`${1 + i} tick`}
-              lineHeight={0}
+              lineHeight={1}
               marginLeft={1}
-              position="relative"
+              marginTop={-1}
             >
-              {majorGridLines[y].label}
-              <Tooltip
-                key={`y label right ${i}`}
-                placement="top"
-                title={majorGridLines[y].tooltip}
-              >
-                <Info
-                  fontSize="small"
-                  sx={{
-                    position: "absolute",
-                    bottom: 5,
-                    marginY: 3,
-                    marginLeft: 0.5,
-                  }}
-                />
-              </Tooltip>
+              <Box display="flex" alignItems="center">
+                {majorGridLines[y].label}
+                <Tooltip
+                  key={`y label right ${i}`}
+                  placement="top"
+                  title={majorGridLines[y].tooltip}
+                >
+                  <Info fontSize="small" sx={{ marginLeft: 1 }} />
+                </Tooltip>
+              </Box>
             </Typography>
           ),
         ])}

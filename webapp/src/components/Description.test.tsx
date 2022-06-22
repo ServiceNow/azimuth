@@ -21,5 +21,5 @@ test("display description with both link and text", async () => {
   const links: HTMLAnchorElement[] = screen.getAllByRole("link");
   expect(links[0].href).toContain("https://servicenow.github.io/azimuth/");
   await screen.findByText("Learn more");
-  expect(document.querySelector("MuiSvgIcon-root")).toBeDefined();
+  await screen.getAllByTestId("InsertLinkIcon");
 });
