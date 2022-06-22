@@ -3,6 +3,10 @@ repo_url: https://github.com/ServiceNow/azimuth
 edit_uri: edit/main/docs/docs/
 plugins:
   - search
+extra:
+  version:
+    provider: mike
+    default: main
 theme:
   name: material
   custom_dir: overrides

@@ -7,7 +7,7 @@ endif
 
 .PHONY: download_demo
 download_demo: check-gdown
-	$(shell python -c "import gdown; gdown.download('https://drive.google.com/uc?id=1LmP_Y1KGxiOOJrTkXjocLnOgSmhqDRzk', output='./clinc-demo.tar.gz', quiet=False, fuzzy=True)")
+	$(shell python -c "import gdown; gdown.download('https://drive.google.com/uc?id=1OR66hyHb8ZSB3LF-kpv0XTZ0uxBJiG-e', output='./clinc-demo.tar.gz', quiet=False, fuzzy=True)")
 	tar -xf clinc-demo.tar.gz
 	mkdir -p azimuth_shr/files
 	mv clinc-demo azimuth_shr/files/clinc-demo
