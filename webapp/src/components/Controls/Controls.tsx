@@ -46,6 +46,7 @@ import {
   SMART_TAG_FAMILY_ICONS,
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
+import Description from "components/Description";
 
 const MotionChevronLeftIcon = motion(ChevronLeftIcon);
 

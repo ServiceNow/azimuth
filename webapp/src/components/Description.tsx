@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Typography, Link } from "@mui/material";
-import Doc from "components/Icons/Doc";
 import LinkIcon from "@mui/icons-material/InsertLink";
 const DOCS_URL = "https://servicenow.github.io/azimuth/user-guide";
 
