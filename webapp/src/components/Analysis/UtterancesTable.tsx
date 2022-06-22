@@ -44,6 +44,7 @@ import {
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
+import Description from "components/Description";
 
 const SMART_TAG_WIDTH = 30;
 
@@ -367,6 +368,10 @@ const UtterancesTable: React.FC<Props> = ({
   return (
     <Box className={classes.gridContainer}>
       <div className={classes.gridHeaderActions}>
+        <Description
+          text="View insights on individual utterances with details results and annotations."
+          link="/exploration-space/utterances-table/"
+        />
         <Button
           className={classes.exportButton}
           onClick={() =>

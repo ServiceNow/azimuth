@@ -6,20 +6,16 @@ import React from "react";
 import { DatasetWarningGroup } from "types/api";
 import Description from "components/Description";
 
-interface DescriptionMap {
-  [key: string]: string;
-}
+const WARNING_GROUP_DESCRIPTION: Record<string, string> = {
+  "General Warnings": "See class distributions differences.",
+  "Syntactic Warnings":
+    "Review the length of utterances between your training and test data.",
+};
 
-const WARNING_GROUP_DESCRIPTION: DescriptionMap = {
-  GeneralWarnings: "See class distributions differences. ",
-  SyntacticWarnings:
-    "Review the arrangement of utterances between your training and testing data. ",
-} as const;
-
-const WARNING_GROUP_DOC_LINK: DescriptionMap = {
-  GeneralWarnings: "/dataset-warnings/#general-warnings",
-  SyntacticWarnings: "/dataset-warnings/#syntactic-warnings",
-} as const;
+const WARNING_GROUP_DOC_LINK: Record<string, string> = {
+  "General Warnings": "/dataset-warnings/#general-warnings",
+  "Syntactic Warnings": "/dataset-warnings/#syntactic-warnings",
+};
 
 type Props = {
   isFetching: boolean;
@@ -45,14 +41,8 @@ const DatasetDistribution: React.FC<Props> = ({
               <Box display="flex" flexDirection="column">
                 <Typography variant="h5">{warningGroup.name}</Typography>
                 <Description
-                  text={
-                    WARNING_GROUP_DESCRIPTION[
-                      warningGroup.name.replace(/\s/g, "")
-                    ]
-                  }
-                  link={
-                    WARNING_GROUP_DOC_LINK[warningGroup.name.replace(/\s/g, "")]
-                  }
+                  text={WARNING_GROUP_DESCRIPTION[warningGroup.name]}
+                  link={WARNING_GROUP_DOC_LINK[warningGroup.name]}
                 />
               </Box>
               {warningGroup.warnings.map((warning, index) => {

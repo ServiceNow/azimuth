@@ -147,7 +147,7 @@ const UtteranceDetail = () => {
   return (
     <Box display="flex" flexDirection="column" gap={2} height="100%">
       <Description
-        text="Here are individual utterance details showing saliency per token, semantically similar utterances and how robust the model is to perturbations tests that are automatically generated from this utterance. "
+        text="Inspect the details of all of the analyses that have been performed on this utterance."
         link="/exploration-space/utterance-details/"
       />
       <Paper variant="outlined" className={classes.utteranceContainer}>
@@ -260,35 +260,36 @@ const UtteranceDetail = () => {
           </Tabs>
         </Box>
         {view === "similarity" && (
-          <Box width={280}>
-            <DatasetSplitToggler
-              value={neighborsDatasetSplitName}
-              onChange={(value) => value && setNeighborsDatasetSplitName(value)}
+          <>
+            <Description
+              text="Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class."
+              link="/exploration-space/utterance-details/#semantically-similar-utterances"
             />
-          </Box>
+
+            <Box width={280}>
+              <DatasetSplitToggler
+                value={neighborsDatasetSplitName}
+                onChange={(value) =>
+                  value && setNeighborsDatasetSplitName(value)
+                }
+              />
+            </Box>
+          </>
         )}
         <div className={classes.tabContent}>
           {view === "similarity" && (
-            <>
-              <Box paddingBottom={2}>
-                <Description
-                  text="Here are shown the 10 most similar utterances in the dataset as calculated using sentence embeddings. Use the toggle button to alternate whether to search for similar utterances in the evaluation set or in the training set. "
-                  link="/exploration-space/utterance-details/#semantically-similar-utterances"
-                />
-              </Box>
-              <SimilarUtterances
-                baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
-                baseUtterance={utterance}
-                pipeline={pipeline}
-                utterances={similarUtterances?.utterances || []}
-              />
-            </>
+            <SimilarUtterances
+              baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
+              baseUtterance={utterance}
+              pipeline={pipeline}
+              utterances={similarUtterances?.utterances || []}
+            />
           )}
           {view === "perturbedUtterances" && isPipelineSelected(pipeline) && (
             <>
               <Box paddingBottom={2}>
                 <Description
-                  text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations. "
+                  text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations."
                   link="/exploration-space/utterance-details/#behavioral-tests"
                 />
               </Box>

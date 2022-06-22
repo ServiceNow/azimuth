@@ -207,7 +207,9 @@ const Controls: React.FC<Props> = ({
           <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
             <TuneIcon />
             <Typography variant="subtitle2">Controls</Typography>
-            <Description link="/exploration-space/#filters" />
+            <Box paddingTop={0.5}>
+              <Description link="/exploration-space/#filters" />
+            </Box>
           </Box>
         )}
         <Button

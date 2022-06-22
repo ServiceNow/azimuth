@@ -47,7 +47,7 @@ const Dashboard = () => {
         <Box display="flex" flexDirection="column">
           <Typography variant="h2">Dashboard</Typography>
           <Description
-            text="Explore the analyses of your datasets and models. "
+            text="Explore the analyses of your datasets and models."
             link="/"
           />
         </Box>
@@ -65,9 +65,13 @@ const Dashboard = () => {
       {data?.availableDatasetSplits.train && (
         <PreviewCard
           title="Dataset Class Distribution Analysis"
-          subtitle="Compare the class distribution of your training and evaluation sets. "
-          href="/dataset-warnings/"
           to={`/${jobId}/dataset_class_distribution_analysis${searchString}`}
+          description={
+            <Description
+              text="Compare the class distribution of your training and evaluation sets."
+              link="/dataset-warnings/"
+            />
+          }
         >
           <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
             <WarningsPreview jobId={jobId} />
@@ -77,8 +81,12 @@ const Dashboard = () => {
       {isPipelineSelected(pipeline) && (
         <PreviewCard
           title="Performance Analysis"
-          subtitle="Assess model performance through prediction metrics. "
-          href="/#performance-analysis"
+          description={
+            <Description
+              text="Assess model performance through prediction metrics."
+              link="/#performance-analysis"
+            />
+          }
         >
           <PerformanceAnalysis jobId={jobId} pipeline={pipeline} />
         </PreviewCard>
@@ -86,9 +94,13 @@ const Dashboard = () => {
       {isPipelineSelected(pipeline) && data?.perturbationTestingAvailable && (
         <PreviewCard
           title="Behavioral Testing"
-          subtitle="See how your model handles small modifications. "
           to={`/${jobId}/behavioral_testing_summary${searchString}`}
-          href="/behavioral-testing-summary/"
+          description={
+            <Description
+              text="Perturbation Tests asses your model's robustness, or how it handles things like misspellings or punctuation changes."
+              link="/behavioral-testing-summary/"
+            />
+          }
         >
           <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
             <PerturbationTestingPreview
@@ -103,9 +115,13 @@ const Dashboard = () => {
         data?.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
-            subtitle="View prediction distribution for multiple thresholds to find the optimal one. "
             to={`/${jobId}/thresholds${searchString}`}
-            href="/post-processing-analysis/"
+            description={
+              <Description
+                text="View prediction distribution for multiple thresholds to find the optimal one. You can change the confidence threshold in the config file."
+                link="/post-processing-analysis/"
+              />
+            }
           >
             <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
               <ThresholdPlot jobId={jobId} pipeline={pipeline} />

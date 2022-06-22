@@ -5,18 +5,11 @@ import { Link as RouterLink } from "react-router-dom";
 
 type Props = {
   title: string;
-  subtitle?: string;
   to?: string;
-  href?: string;
+  description: React.ReactElement<typeof Description>;
 };
 
-const PreviewCard: React.FC<Props> = ({
-  title,
-  subtitle,
-  to,
-  href,
-  children,
-}) => (
+const PreviewCard: React.FC<Props> = ({ title, to, children, description }) => (
   <Paper
     variant="outlined"
     sx={{ display: "flex", flexDirection: "column", gap: 4, padding: 4 }}
@@ -24,7 +17,7 @@ const PreviewCard: React.FC<Props> = ({
     <Box display="flex" alignItems="flex-start" justifyContent="space-between">
       <Box display="flex" flexDirection="column">
         <Typography variant="h4">{title}</Typography>
-        {subtitle && href && <Description text={subtitle} link={href} />}
+        {description}
       </Box>
       {to && (
         <Button

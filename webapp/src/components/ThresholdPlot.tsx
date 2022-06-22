@@ -5,9 +5,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { Info } from "@mui/icons-material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
-import Description from "components/Description";
 import { getOutcomeCountPerThresholdEndpoint } from "services/api";
 import { QueryPipelineState } from "types/models";
 import { ALL_OUTCOMES, OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
@@ -98,10 +98,6 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
       <Typography variant="h4" className={classes.title}>
         Distribution of the Predictions on Evaluation Set for Multiple
         Thresholds
-        <Description
-          text="The graph shows max and min correct. You can change the confidence threshold in the config file. "
-          link="/post-processing-analysis/"
-        />
       </Typography>
 
       <Box display="flex" gap={6} justifyContent="center" width="100%">
@@ -201,20 +197,30 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
             />
           </Box>,
           y in majorGridLines && (
-            <Tooltip
-              key={`y label right ${i}`}
-              placement="top"
-              title={majorGridLines[y].tooltip}
+            <Typography
+              gridColumn="end"
+              gridRow={`${1 + i} tick`}
+              lineHeight={0}
+              marginLeft={1}
+              position="relative"
             >
-              <Typography
-                gridColumn="end"
-                gridRow={`${1 + i} tick`}
-                lineHeight={0}
-                marginLeft={1}
+              {majorGridLines[y].label}
+              <Tooltip
+                key={`y label right ${i}`}
+                placement="top"
+                title={majorGridLines[y].tooltip}
               >
-                {majorGridLines[y].label}
-              </Typography>
-            </Tooltip>
+                <Info
+                  fontSize="small"
+                  sx={{
+                    position: "absolute",
+                    bottom: 5,
+                    marginY: 3,
+                    marginLeft: 0.5,
+                  }}
+                />
+              </Tooltip>
+            </Typography>
           ),
         ])}
         {isFetching ? (

@@ -121,7 +121,7 @@ const Exploration = () => {
                 isPipelineSelected(pipeline) && (
                   <>
                     <Description
-                      text="Assess the quality of the metrics for any given subset of data. "
+                      text="Assess the quality of the metrics for any given subset of data."
                       link="/exploration-space/performance-overview/"
                     />
                     <Metrics
@@ -144,7 +144,7 @@ const Exploration = () => {
               {mainView === "confusion_matrix" && isPipelineSelected(pipeline) && (
                 <>
                   <Description
-                    text="Visualize the model confusion between each pair of intents. "
+                    text="Visualize the model confusion between each pair of intents."
                     link="/exploration-space/confusion-matrix/"
                   />
                   <ConfusionMatrix
@@ -161,22 +161,16 @@ const Exploration = () => {
                 </>
               )}
               {mainView === "utterances" && (
-                <>
-                  <Description
-                    text="View insights on individual utterances with details results and annotations. "
-                    link="/exploration-space/utterances-table/"
-                  />
-                  <UtterancesTable
-                    jobId={jobId}
-                    datasetInfo={datasetInfo}
-                    datasetSplitName={datasetSplitName}
-                    confusionMatrix={confusionMatrix}
-                    filters={filters}
-                    pagination={pagination}
-                    pipeline={pipeline}
-                    postprocessing={postprocessing}
-                  />
-                </>
+                <UtterancesTable
+                  jobId={jobId}
+                  datasetInfo={datasetInfo}
+                  datasetSplitName={datasetSplitName}
+                  confusionMatrix={confusionMatrix}
+                  filters={filters}
+                  pagination={pagination}
+                  pipeline={pipeline}
+                  postprocessing={postprocessing}
+                />
               )}
             </Paper>
           </div>
