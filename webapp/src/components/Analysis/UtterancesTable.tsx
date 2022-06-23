@@ -13,6 +13,7 @@ import {
 import HoverableDataCell from "components/Analysis/HoverableDataCell";
 import UtterancesTableFooter from "components/Analysis/UtterancesTableFooter";
 import CopyButton from "components/CopyButton";
+import Description from "components/Description";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
@@ -44,7 +45,6 @@ import {
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
-import Description from "components/Description";
 
 const SMART_TAG_WIDTH = 30;
 

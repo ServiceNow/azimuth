@@ -1,6 +1,7 @@
-import React from "react";
-import { Box, Typography, Link } from "@mui/material";
 import LinkIcon from "@mui/icons-material/InsertLink";
+import { Box, Typography, Link } from "@mui/material";
+import React from "react";
+
 const DOCS_URL = "https://servicenow.github.io/azimuth/user-guide";
 
 type Props = {

@@ -1,3 +1,4 @@
+import { Info } from "@mui/icons-material";
 import {
   alpha,
   Box,
@@ -5,7 +6,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { Info } from "@mui/icons-material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { getOutcomeCountPerThresholdEndpoint } from "services/api";

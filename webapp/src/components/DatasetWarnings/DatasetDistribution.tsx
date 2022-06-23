@@ -1,10 +1,10 @@
 import { Box, CircularProgress, Paper, Typography } from "@mui/material";
 import DatasetWarning from "components/DatasetWarnings/DatasetWarning";
 import MetricsDataGrid from "components/DatasetWarnings/MetricsDataGrid";
+import Description from "components/Description";
 import { ResponsivePlotWrapper, WarningPlot } from "components/PlotWrapper";
 import React from "react";
 import { DatasetWarningGroup } from "types/api";
-import Description from "components/Description";
 
 const DESCRIPTION = {
   "General Warnings": (
