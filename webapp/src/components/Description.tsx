@@ -10,11 +10,11 @@ type Props = {
 
 const Description: React.FC<Props> = ({ text, link }) => {
   return (
-    <Box display="flex" gap={1} alignContent="center">
+    <Box display="flex" gap={1}>
       {text && <Typography variant="body2">{text}</Typography>}
       {link && (
         <Link
-          href={`${DOCS_URL + link}`}
+          href={DOCS_URL + link}
           variant="body2"
           color="secondary"
           target="_blank"

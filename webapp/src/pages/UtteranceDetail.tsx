@@ -37,6 +37,19 @@ import {
 import { formatRatioAsPercentageString } from "utils/format";
 import { isPipelineSelected } from "utils/helpers";
 
+const UTTERANCE_DETAILS_TAB_DESCRIPTION: Record<string, string> = {
+  similarity:
+    "Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class.",
+  perturbedUtterances:
+    "Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations.",
+};
+
+const UTTERANCE_DETAILS_TAB_DOC: Record<string, string> = {
+  similarity:
+    "/exploration-space/utterance-details/#semantically-similar-utterances",
+  perturbedUtterances: "/exploration-space/utterance-details/#behavioral-tests",
+};
+
 const useStyles = makeStyles<Theme, { outcome?: Outcome }>((theme) => ({
   tags: {
     display: "grid",
@@ -84,20 +97,6 @@ export const UtteranceDetail = () => {
   }>();
   const index = Number(utteranceId);
   const { pipeline } = useQueryState();
-
-  const UTTERANCE_DETAILS_TAB_DESCRIPTION: Record<string, string> = {
-    similarity:
-      "Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class.",
-    perturbedUtterances:
-      "Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations.",
-  };
-
-  const UTTERANCE_DETAILS_TAB_DOC: Record<string, string> = {
-    similarity:
-      "/exploration-space/utterance-details/#semantically-similar-utterances",
-    perturbedUtterances:
-      "/exploration-space/utterance-details/#behavioral-tests",
-  };
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
@@ -273,12 +272,10 @@ export const UtteranceDetail = () => {
             />
           </Tabs>
         </Box>
-        {view && (
-          <Description
-            text={UTTERANCE_DETAILS_TAB_DESCRIPTION[view]}
-            link={UTTERANCE_DETAILS_TAB_DOC[view]}
-          />
-        )}
+        <Description
+          text={UTTERANCE_DETAILS_TAB_DESCRIPTION[view]}
+          link={UTTERANCE_DETAILS_TAB_DOC[view]}
+        />
         {view === "similarity" && (
           <Box width={280}>
             <DatasetSplitToggler
