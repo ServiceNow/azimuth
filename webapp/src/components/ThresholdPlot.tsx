@@ -197,25 +197,21 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
             />
           </Box>,
           y in majorGridLines && (
-            <Tooltip
+            <Box
               key={`y label right ${i}`}
-              placement="top"
-              title={majorGridLines[y].tooltip}
+              gridColumn="end"
+              gridRow={`${1 + i} tick`}
+              display="flex"
+              alignItems="center"
+              height={0}
             >
-              <Typography
-                gridColumn="end"
-                gridRow={`${1 + i} tick`}
-                lineHeight={1}
-                marginLeft={1}
-                marginTop={-1}
-              >
-                {majorGridLines[y].label}
-                <Info
-                  fontSize="small"
-                  sx={{ marginLeft: 1, marginY: "-4px" }}
-                />
-              </Typography>
-            </Tooltip>
+              <Tooltip placement="top" title={majorGridLines[y].tooltip}>
+                <Typography marginLeft={1}>
+                  {majorGridLines[y].label}
+                  <Info fontSize="small" sx={{ marginLeft: 1 }} />
+                </Typography>
+              </Tooltip>
+            </Box>
           ),
         ])}
         {isFetching ? (
