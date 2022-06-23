@@ -6,15 +6,19 @@ import React from "react";
 import { DatasetWarningGroup } from "types/api";
 import Description from "components/Description";
 
-const WARNING_GROUP_DESCRIPTION: Record<string, string> = {
-  "General Warnings": "See class distributions differences.",
-  "Syntactic Warnings":
-    "Review the length of utterances between your training and test data.",
-};
-
-const WARNING_GROUP_DOC_LINK: Record<string, string> = {
-  "General Warnings": "/dataset-warnings/#general-warnings",
-  "Syntactic Warnings": "/dataset-warnings/#syntactic-warnings",
+const DESCRIPTION = {
+  "General Warnings": (
+    <Description
+      text="See class distributions differences."
+      link="/dataset-warnings/#general-warnings"
+    />
+  ),
+  "Syntactic Warnings": (
+    <Description
+      text="Review the length of utterances between your training and test data."
+      link="/dataset-warnings/#syntactic-warnings"
+    />
+  ),
 };
 
 type Props = {
@@ -40,10 +44,7 @@ const DatasetDistribution: React.FC<Props> = ({
             <React.Fragment key={index}>
               <Box display="flex" flexDirection="column">
                 <Typography variant="h5">{warningGroup.name}</Typography>
-                <Description
-                  text={WARNING_GROUP_DESCRIPTION[warningGroup.name]}
-                  link={WARNING_GROUP_DOC_LINK[warningGroup.name]}
-                />
+                {DESCRIPTION[warningGroup.name as keyof typeof DESCRIPTION]}
               </Box>
               {warningGroup.warnings.map((warning, index) => {
                 return (
