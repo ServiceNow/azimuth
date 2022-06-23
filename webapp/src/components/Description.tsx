@@ -1,4 +1,4 @@
-import LinkIcon from "@mui/icons-material/InsertLink";
+import LinkIcon from "@mui/icons-material/Link";
 import { Box, Typography, Link } from "@mui/material";
 import React from "react";
 
