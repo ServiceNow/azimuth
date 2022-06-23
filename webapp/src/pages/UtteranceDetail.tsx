@@ -76,7 +76,7 @@ const useStyles = makeStyles<Theme, { outcome?: Outcome }>((theme) => ({
   },
 }));
 
-const UtteranceDetail = () => {
+export const UtteranceDetail = () => {
   const { jobId, utteranceId, datasetSplitName } = useParams<{
     jobId: string;
     utteranceId: string;
@@ -84,6 +84,20 @@ const UtteranceDetail = () => {
   }>();
   const index = Number(utteranceId);
   const { pipeline } = useQueryState();
+
+  const UTTERANCE_DETAILS_TAB_DESCRIPTION: Record<string, string> = {
+    similarity:
+      "Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class.",
+    perturbedUtterances:
+      "Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations.",
+  };
+
+  const UTTERANCE_DETAILS_TAB_DOC: Record<string, string> = {
+    similarity:
+      "/exploration-space/utterance-details/#semantically-similar-utterances",
+    perturbedUtterances:
+      "/exploration-space/utterance-details/#behavioral-tests",
+  };
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
@@ -259,22 +273,19 @@ const UtteranceDetail = () => {
             />
           </Tabs>
         </Box>
+        {view && (
+          <Description
+            text={UTTERANCE_DETAILS_TAB_DESCRIPTION[view]}
+            link={UTTERANCE_DETAILS_TAB_DOC[view]}
+          />
+        )}
         {view === "similarity" && (
-          <>
-            <Description
-              text="Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class."
-              link="/exploration-space/utterance-details/#semantically-similar-utterances"
+          <Box width={280}>
+            <DatasetSplitToggler
+              value={neighborsDatasetSplitName}
+              onChange={(value) => value && setNeighborsDatasetSplitName(value)}
             />
-
-            <Box width={280}>
-              <DatasetSplitToggler
-                value={neighborsDatasetSplitName}
-                onChange={(value) =>
-                  value && setNeighborsDatasetSplitName(value)
-                }
-              />
-            </Box>
-          </>
+          </Box>
         )}
         <div className={classes.tabContent}>
           {view === "similarity" && (
@@ -286,20 +297,12 @@ const UtteranceDetail = () => {
             />
           )}
           {view === "perturbedUtterances" && isPipelineSelected(pipeline) && (
-            <>
-              <Box paddingBottom={2}>
-                <Description
-                  text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations."
-                  link="/exploration-space/utterance-details/#behavioral-tests"
-                />
-              </Box>
-              <PerturbedUtterances
-                jobId={jobId}
-                datasetSplitName={datasetSplitName}
-                pipelineIndex={pipeline.pipelineIndex}
-                index={Number(utteranceId)}
-              />
-            </>
+            <PerturbedUtterances
+              jobId={jobId}
+              datasetSplitName={datasetSplitName}
+              pipelineIndex={pipeline.pipelineIndex}
+              index={Number(utteranceId)}
+            />
           )}
         </div>
       </Paper>
