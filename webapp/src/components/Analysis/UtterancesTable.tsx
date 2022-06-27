@@ -13,6 +13,7 @@ import {
 import HoverableDataCell from "components/Analysis/HoverableDataCell";
 import UtterancesTableFooter from "components/Analysis/UtterancesTableFooter";
 import CopyButton from "components/CopyButton";
+import Description from "components/Description";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
@@ -256,6 +257,8 @@ const UtterancesTable: React.FC<Props> = ({
       field: "utterance",
       headerClassName: classes.hideRightSeparator,
       headerName: "Utterance",
+      description:
+        "Utterances from dataset are overlaid with saliency maps, highlighting the most important tokens for the model's prediction.",
       flex: 5,
       minWidth: 406,
       renderCell: renderUtterance,
@@ -365,6 +368,10 @@ const UtterancesTable: React.FC<Props> = ({
   return (
     <Box className={classes.gridContainer}>
       <div className={classes.gridHeaderActions}>
+        <Description
+          text="View insights on individual utterances with details results and annotations."
+          link="/exploration-space/utterances-table/"
+        />
         <Button
           className={classes.exportButton}
           onClick={() =>

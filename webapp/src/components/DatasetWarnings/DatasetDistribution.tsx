@@ -1,9 +1,25 @@
 import { Box, CircularProgress, Paper, Typography } from "@mui/material";
 import DatasetWarning from "components/DatasetWarnings/DatasetWarning";
 import MetricsDataGrid from "components/DatasetWarnings/MetricsDataGrid";
+import Description from "components/Description";
 import { ResponsivePlotWrapper, WarningPlot } from "components/PlotWrapper";
 import React from "react";
 import { DatasetWarningGroup } from "types/api";
+
+const DESCRIPTION = {
+  "General Warnings": (
+    <Description
+      text="See class distributions differences."
+      link="/dataset-warnings/#general-warnings"
+    />
+  ),
+  "Syntactic Warnings": (
+    <Description
+      text="Review the length of utterances between your training and test data."
+      link="/dataset-warnings/#syntactic-warnings"
+    />
+  ),
+};
 
 type Props = {
   isFetching: boolean;
@@ -26,7 +42,10 @@ const DatasetDistribution: React.FC<Props> = ({
         <>
           {datasetWarningGroups.map((warningGroup, index) => (
             <React.Fragment key={index}>
-              <Typography variant="h5">{warningGroup.name}</Typography>
+              <Box display="flex" flexDirection="column">
+                <Typography variant="h5">{warningGroup.name}</Typography>
+                {DESCRIPTION[warningGroup.name as keyof typeof DESCRIPTION]}
+              </Box>
               {warningGroup.warnings.map((warning, index) => {
                 return (
                   <Paper

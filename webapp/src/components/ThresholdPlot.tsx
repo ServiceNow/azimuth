@@ -1,3 +1,4 @@
+import { Info } from "@mui/icons-material";
 import {
   alpha,
   Box,
@@ -98,6 +99,7 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
         Distribution of the Predictions on Evaluation Set for Multiple
         Thresholds
       </Typography>
+
       <Box display="flex" gap={6} justifyContent="center" width="100%">
         {ALL_OUTCOMES.map((outcome) => (
           <Box key={outcome} display="flex" gap={1} lineHeight={1}>
@@ -195,20 +197,21 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
             />
           </Box>,
           y in majorGridLines && (
-            <Tooltip
+            <Box
               key={`y label right ${i}`}
-              placement="top"
-              title={majorGridLines[y].tooltip}
+              gridColumn="end"
+              gridRow={`${1 + i} tick`}
+              display="flex"
+              alignItems="center"
+              height={0}
             >
-              <Typography
-                gridColumn="end"
-                gridRow={`${1 + i} tick`}
-                lineHeight={0}
-                marginLeft={1}
-              >
-                {majorGridLines[y].label}
-              </Typography>
-            </Tooltip>
+              <Tooltip placement="top" title={majorGridLines[y].tooltip}>
+                <Typography marginLeft={1}>
+                  {majorGridLines[y].label}
+                  <Info fontSize="small" sx={{ marginLeft: 1 }} />
+                </Typography>
+              </Tooltip>
+            </Box>
           ),
         ])}
         {isFetching ? (

@@ -4,6 +4,7 @@ import UtterancesTable from "components/Analysis/UtterancesTable";
 import ConfidenceHistogramTopWords from "components/ConfidenceHistogramTopWords";
 import ConfusionMatrix from "components/ConfusionMatrix";
 import Controls from "components/Controls/Controls";
+import Description from "components/Description";
 import Metrics from "components/Metrics/Metrics";
 import PageHeader from "components/PageHeader";
 import TabPipelineRequired from "components/TabPipelineRequired";
@@ -119,6 +120,10 @@ const Exploration = () => {
               {mainView === "performance_overview" &&
                 isPipelineSelected(pipeline) && (
                   <>
+                    <Description
+                      text="Assess the quality of the metrics for any given subset of data."
+                      link="/exploration-space/performance-overview/"
+                    />
                     <Metrics
                       jobId={jobId}
                       datasetSplitName={datasetSplitName}
@@ -136,8 +141,12 @@ const Exploration = () => {
                     />
                   </>
                 )}
-              {mainView === "confusion_matrix" &&
-                isPipelineSelected(pipeline) && (
+              {mainView === "confusion_matrix" && isPipelineSelected(pipeline) && (
+                <>
+                  <Description
+                    text="Visualize the model confusion between each pair of intents."
+                    link="/exploration-space/confusion-matrix/"
+                  />
                   <ConfusionMatrix
                     jobId={jobId}
                     datasetSplitName={datasetSplitName}
@@ -149,7 +158,8 @@ const Exploration = () => {
                     labelFilters={filters.labels}
                     postprocessing={postprocessing}
                   />
-                )}
+                </>
+              )}
               {mainView === "utterances" && (
                 <UtterancesTable
                   jobId={jobId}

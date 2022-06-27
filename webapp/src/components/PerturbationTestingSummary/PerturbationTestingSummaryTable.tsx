@@ -110,7 +110,7 @@ const PerturbationTestingSummaryTable: React.FC<Props> = ({
   );
 
   return (
-    <Paper variant="outlined" sx={{ height: "100%", padding: 4 }}>
+    <Paper variant="outlined" sx={{ height: "100%", padding: 4, marginTop: 4 }}>
       <Table
         loading={isLoading || isFetching}
         rows={rows}

@@ -46,6 +46,7 @@ import {
   SMART_TAG_FAMILY_ICONS,
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
+import Description from "components/Description";
 
 const MotionChevronLeftIcon = motion(ChevronLeftIcon);
 
@@ -207,6 +208,7 @@ const Controls: React.FC<Props> = ({
           <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
             <TuneIcon />
             <Typography variant="subtitle2">Controls</Typography>
+            <Description link="/exploration-space/#filters" />
           </Box>
         )}
         <Button
