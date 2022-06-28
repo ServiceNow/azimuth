@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  GridCellParams,
   GridCellValue,
   GridColumnMenuContainer,
   GridColumnMenuProps,
@@ -13,7 +14,6 @@ import {
   GridRowSpacingParams,
   GridSortCellParams,
   GridSortModel,
-  GridValueFormatterParams,
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
@@ -23,12 +23,14 @@ import SeeMoreLess, {
   useMoreLess,
 } from "components/SeeMoreLess";
 import { Table, Column } from "components/Table";
+import { motion } from "framer-motion";
 import React from "react";
 import { getMetricsPerFilterEndpoint } from "services/api";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
+  OUTCOME_COLOR,
   OUTCOME_PRETTY_NAMES,
   SMART_TAG_FAMILIES,
   SMART_TAG_FAMILY_ICONS,
@@ -68,11 +70,6 @@ type Props = {
 };
 
 type Row = MetricsPerFilterValue & { id: number };
-
-const twoDigitFormatter = ({ value }: GridValueFormatterParams) =>
-  isNaN(value as number) ? "--" : (value as number).toFixed(2);
-const percentageFormatter = ({ value }: GridValueFormatterParams) =>
-  formatRatioAsPercentageString(value as number, 1);
 
 const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const [selectedDatasetSplit, setSelectedDatasetSplit] =
@@ -184,28 +181,99 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "utteranceCount",
       headerName: "Utterance Count",
-      minWidth: 160,
+      minWidth: 150,
     },
     ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
       ...NUMBER_COL_DEF,
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
+      minWidth: 105,
       renderHeader: () => OutcomeIcon({ outcome }),
-      valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
-      valueFormatter: percentageFormatter,
+      renderCell: ({ row }: GridCellParams<undefined, Row>) =>
+        isNaN(row.outcomeCount[outcome] / row.utteranceCount) ? (
+          "--%"
+        ) : (
+          <Box
+            display="grid"
+            gridAutoColumns={50}
+            gridAutoFlow="column"
+            alignItems="center"
+          >
+            {formatRatioAsPercentageString(
+              (row.outcomeCount[outcome] / row.utteranceCount) as number,
+              1
+            )}
+            <Box
+              component={motion.div}
+              key={outcome}
+              overflow="auto"
+              height="90%"
+              animate={{
+                width: `${
+                  (100 * row.outcomeCount[outcome]) / row.utteranceCount || 1
+                }%`,
+              }}
+              initial={false}
+              transition={{ type: "tween" }}
+              bgcolor={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
+            />
+          </Box>
+        ),
     })),
     ...customMetricNames.map<Column<Row>>((metricName) => ({
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
-      valueGetter: ({ row }) => row.customMetrics[metricName],
-      valueFormatter: percentageFormatter,
+      minWidth: 105,
+      renderCell: ({ row }: GridCellParams<undefined, Row>) =>
+        isNaN(row.customMetrics[metricName]) ? (
+          "--%"
+        ) : (
+          <Box display="grid" gridAutoColumns={50} gridAutoFlow="column">
+            {formatRatioAsPercentageString(
+              row.customMetrics[metricName] as number,
+              1
+            )}
+            <Box
+              component={motion.div}
+              key={metricName}
+              overflow="auto"
+              height="90%"
+              animate={{
+                width: `${100 * row.customMetrics[metricName] || 1}%`,
+              }}
+              initial={false}
+              transition={{ type: "tween" }}
+              bgcolor="#d5d1e3"
+            />
+          </Box>
+        ),
     })),
     {
       ...NUMBER_COL_DEF,
       field: "ece",
       headerName: "ECE",
-      valueFormatter: twoDigitFormatter,
+      minWidth: 105,
+      renderCell: ({ value }: GridCellParams) =>
+        isNaN(value) ? (
+          "--"
+        ) : (
+          <Box display="grid" gridAutoColumns={50} gridAutoFlow="column">
+            {(value as number).toFixed(2)}
+            <Box
+              component={motion.div}
+              key="ece"
+              overflow="auto"
+              height="90%"
+              animate={{
+                width: `${100 * value || 1}%`,
+              }}
+              initial={false}
+              transition={{ type: "tween" }}
+              bgcolor="#0b012e"
+            />
+          </Box>
+        ),
     },
   ];
 

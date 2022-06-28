@@ -1,9 +1,10 @@
 import { Warning } from "@mui/icons-material";
-import { Tooltip, useTheme } from "@mui/material";
+import { Box, Tooltip, useTheme } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import { GridCellParams, GridRow } from "@mui/x-data-grid";
 import CopyButton from "components/CopyButton";
 import { Column, RowProps, Table } from "components/Table";
+import { motion } from "framer-motion";
 import React from "react";
 import { Link } from "react-router-dom";
 import { SimilarUtterance, Utterance } from "types/api";
@@ -76,7 +77,33 @@ const SimilarUtterances: React.FC<Props> = ({
       headerName: "Similarity",
       description:
         "Cosine similarity (1 indicates the utterance is identical while 0 indicates it is unrelated)", // tooltip
-      valueFormatter: (params) => (params.value as number).toFixed(2),
+      renderCell: ({ value }: GridCellParams) =>
+        isNaN(value) ? (
+          "--%"
+        ) : (
+          <Box
+            display="grid"
+            gridAutoColumns={50}
+            gridAutoFlow="column"
+            alignItems="center"
+          >
+            {(value as number).toFixed(2)}
+            {value > 0 && (
+              <Box
+                component={motion.div}
+                key="similarity"
+                overflow="auto"
+                height="90%"
+                animate={{
+                  width: `${100 * value || 1}%`,
+                }}
+                initial={false}
+                transition={{ type: "tween" }}
+                bgcolor={value > 0.5 ? "#d5d1e3" : "#0b012e"}
+              />
+            )}
+          </Box>
+        ),
       sortable: false,
       align: "center",
       headerAlign: "center",
