@@ -28,7 +28,8 @@
   "scripts": {
     "start": "PORT=3005 react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test --coverage --watchAll=false",
+    "testAll": "react-app-rewired test --coverage --watchAll=false",
+    "test": "react-app-rewired test --coverage",
     "eject": "react-scripts eject",
     "fix": "make npm.audit.fix",
     "types": "rm -f src/types/generated/generatedTypes.ts && openapi-typescript http://localhost:8091/openapi.json --output src/types/generated/generatedTypes.ts"
@@ -65,8 +66,8 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 75,
-        "functions": 75,
+        "branches": 50,
+        "functions": 50,
         "lines": 75,
         "statements": 75
       }
