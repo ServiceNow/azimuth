@@ -80,7 +80,7 @@ const SimilarUtterances: React.FC<Props> = ({
       renderCell: ({ value }: GridCellParams) => (
         <VisualBar
           formattedValue={(value as number).toFixed(2)}
-          width={isNaN(value) || value < 0 ? 0 : value}
+          width={value}
           bgColor={value > 0.5 ? "#d5d1e3" : "#0b012e"}
         />
       ),

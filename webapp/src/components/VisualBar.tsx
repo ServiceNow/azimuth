@@ -23,7 +23,7 @@ const VisualBar: React.FC<Props> = ({ formattedValue, width, bgColor }) => {
         overflow="auto"
         height="90%"
         animate={{
-          width: `${100 * width}%`,
+          width: `${width > 0 ? 100 * width : 0}%`,
         }}
         initial={false}
         transition={{ type: "tween" }}

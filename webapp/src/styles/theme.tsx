@@ -38,6 +38,7 @@ const customTheme: Theme = createTheme({
     },
     info: {
       main: "#456857",
+      light: "#d5d1e3",
     },
     warning: {
       main: "#FD9700",

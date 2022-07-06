@@ -55,6 +55,14 @@ const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
   </GridColumnMenuContainer>
 );
 
+const visualBarPercentage = (value: number, bgColor: string) => (
+  <VisualBar
+    formattedValue={formatRatioAsPercentageString(value, 1)}
+    width={value}
+    bgColor={bgColor}
+  />
+);
+
 const BASIC_FILTER_OPTIONS = ["label", "prediction"] as const;
 const OPTION_PRETTY_NAME = {
   label: "Label",
@@ -129,14 +137,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     );
   };
 
-  const VisualBarPercentage = (value: number, bgColor: string) => (
-    <VisualBar
-      formattedValue={formatRatioAsPercentageString(value as number, 1)}
-      width={isNaN(value) ? 0 : value}
-      bgColor={bgColor}
-    />
-  );
-
   const NUMBER_COL_DEF = {
     flex: 1,
     minWidth: 80,
@@ -199,8 +199,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       headerName: OUTCOME_PRETTY_NAMES[outcome],
       minWidth: 105,
       renderHeader: () => OutcomeIcon({ outcome }),
+      valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       renderCell: ({ row }: GridCellParams<undefined, Row>) =>
-        VisualBarPercentage(
+        visualBarPercentage(
           row.outcomeCount[outcome] / row.utteranceCount,
           theme.palette[OUTCOME_COLOR[outcome]].main
         ),
@@ -210,8 +211,12 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       field: metricName,
       headerName: metricName,
       minWidth: 105,
+      valueGetter: ({ row }) => row.customMetrics[metricName],
       renderCell: ({ row }: GridCellParams<undefined, Row>) =>
-        VisualBarPercentage(row.customMetrics[metricName], "#d5d1e3"),
+        visualBarPercentage(
+          row.customMetrics[metricName],
+          theme.palette.info.light
+        ),
     })),
     {
       ...NUMBER_COL_DEF,
@@ -221,8 +226,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       renderCell: ({ value }: GridCellParams) => (
         <VisualBar
           formattedValue={(value as number).toFixed(2)}
-          width={isNaN(value) ? 0 : value}
-          bgColor="#0b012e"
+          width={value}
+          bgColor={theme.palette.primary.dark}
         />
       ),
     },
