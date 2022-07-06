@@ -132,7 +132,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const VisualBarPercentage = (value: number, bgColor: string) => (
     <VisualBar
       value={formatRatioAsPercentageString(value as number, 1)}
-      width={isNaN(value) ? 0 : 100 * value}
+      width={isNaN(value) ? 0 : value}
       bgColor={bgColor}
     />
   );
@@ -221,7 +221,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       renderCell: ({ value }: GridCellParams) => (
         <VisualBar
           value={(value as number).toFixed(2)}
-          width={isNaN(value) ? 0 : 100 * value}
+          width={isNaN(value) ? 0 : value}
           bgColor="#0b012e"
         />
       ),
