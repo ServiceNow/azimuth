@@ -1,11 +1,10 @@
 import { Warning } from "@mui/icons-material";
-import { Box, Tooltip, useTheme } from "@mui/material";
+import { Tooltip, useTheme } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import { GridCellParams, GridRow } from "@mui/x-data-grid";
 import CopyButton from "components/CopyButton";
 import { Column, RowProps, Table } from "components/Table";
 import VisualBar from "components/VisualBar";
-import { motion } from "framer-motion";
 import React from "react";
 import { Link } from "react-router-dom";
 import { SimilarUtterance, Utterance } from "types/api";

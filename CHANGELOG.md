@@ -21,6 +21,7 @@ Released changes are shown in the
 - Show 20 similar utterances instead of 10 in the Utterance Detail page.
 - Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
 - Use outcomes' icons as headers of the Performance Overview table instead of the outcomes' full names.
+- added a visual bar to the columns of performance analysis table and similarity column in the semantic similar utterances.
 
 ### Deprecated/Breaking Changes
 
