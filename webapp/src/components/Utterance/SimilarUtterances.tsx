@@ -4,6 +4,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import { GridCellParams, GridRow } from "@mui/x-data-grid";
 import CopyButton from "components/CopyButton";
 import { Column, RowProps, Table } from "components/Table";
+import VisualBar from "components/VisualBar";
 import { motion } from "framer-motion";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -80,29 +81,14 @@ const SimilarUtterances: React.FC<Props> = ({
       renderCell: ({ value }: GridCellParams) =>
         isNaN(value) ? (
           "--%"
+        ) : value > 0 ? (
+          <VisualBar
+            value={(value as number).toFixed(2)}
+            width={100 * value || 1}
+            bgColor={value > 0.5 ? "#d5d1e3" : "#0b012e"}
+          />
         ) : (
-          <Box
-            display="grid"
-            gridAutoColumns={50}
-            gridAutoFlow="column"
-            alignItems="center"
-          >
-            {(value as number).toFixed(2)}
-            {value > 0 && (
-              <Box
-                component={motion.div}
-                key="similarity"
-                overflow="auto"
-                height="90%"
-                animate={{
-                  width: `${100 * value || 1}%`,
-                }}
-                initial={false}
-                transition={{ type: "tween" }}
-                bgcolor={value > 0.5 ? "#d5d1e3" : "#0b012e"}
-              />
-            )}
-          </Box>
+          (value as number).toFixed(2)
         ),
       sortable: false,
       align: "center",

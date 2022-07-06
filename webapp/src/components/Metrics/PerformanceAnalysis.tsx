@@ -4,6 +4,7 @@ import {
   MenuItem,
   Select,
   Typography,
+  useTheme,
 } from "@mui/material";
 import {
   GridCellParams,
@@ -23,10 +24,10 @@ import SeeMoreLess, {
   useMoreLess,
 } from "components/SeeMoreLess";
 import { Table, Column } from "components/Table";
-import { motion } from "framer-motion";
+import VisualBar from "components/VisualBar";
 import React from "react";
 import { getMetricsPerFilterEndpoint } from "services/api";
-import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
+import { DatasetSplitName, MetricsPerFilterValue, Outcome } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
@@ -72,6 +73,7 @@ type Props = {
 type Row = MetricsPerFilterValue & { id: number };
 
 const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
+  const theme = useTheme();
   const [selectedDatasetSplit, setSelectedDatasetSplit] =
     React.useState<DatasetSplitName>("eval");
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
@@ -126,6 +128,17 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       v2?.toLocaleString() || ""
     );
   };
+
+  const VisualBarPercentage = (value: number, bgColor: string) =>
+    isNaN(value) ? (
+      "--%"
+    ) : (
+      <VisualBar
+        value={formatRatioAsPercentageString(value as number, 1)}
+        width={100 * value || 1}
+        bgColor={bgColor}
+      />
+    );
 
   const NUMBER_COL_DEF = {
     flex: 1,
@@ -190,34 +203,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       minWidth: 105,
       renderHeader: () => OutcomeIcon({ outcome }),
       renderCell: ({ row }: GridCellParams<undefined, Row>) =>
-        isNaN(row.outcomeCount[outcome] / row.utteranceCount) ? (
-          "--%"
-        ) : (
-          <Box
-            display="grid"
-            gridAutoColumns={50}
-            gridAutoFlow="column"
-            alignItems="center"
-          >
-            {formatRatioAsPercentageString(
-              (row.outcomeCount[outcome] / row.utteranceCount) as number,
-              1
-            )}
-            <Box
-              component={motion.div}
-              key={outcome}
-              overflow="auto"
-              height="90%"
-              animate={{
-                width: `${
-                  (100 * row.outcomeCount[outcome]) / row.utteranceCount || 1
-                }%`,
-              }}
-              initial={false}
-              transition={{ type: "tween" }}
-              bgcolor={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
-            />
-          </Box>
+        VisualBarPercentage(
+          row.outcomeCount[outcome] / row.utteranceCount,
+          theme.palette[OUTCOME_COLOR[outcome]].main
         ),
     })),
     ...customMetricNames.map<Column<Row>>((metricName) => ({
@@ -226,28 +214,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       headerName: metricName,
       minWidth: 105,
       renderCell: ({ row }: GridCellParams<undefined, Row>) =>
-        isNaN(row.customMetrics[metricName]) ? (
-          "--%"
-        ) : (
-          <Box display="grid" gridAutoColumns={50} gridAutoFlow="column">
-            {formatRatioAsPercentageString(
-              row.customMetrics[metricName] as number,
-              1
-            )}
-            <Box
-              component={motion.div}
-              key={metricName}
-              overflow="auto"
-              height="90%"
-              animate={{
-                width: `${100 * row.customMetrics[metricName] || 1}%`,
-              }}
-              initial={false}
-              transition={{ type: "tween" }}
-              bgcolor="#d5d1e3"
-            />
-          </Box>
-        ),
+        VisualBarPercentage(row.customMetrics[metricName], "#d5d1e3"),
     })),
     {
       ...NUMBER_COL_DEF,
@@ -258,21 +225,11 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         isNaN(value) ? (
           "--"
         ) : (
-          <Box display="grid" gridAutoColumns={50} gridAutoFlow="column">
-            {(value as number).toFixed(2)}
-            <Box
-              component={motion.div}
-              key="ece"
-              overflow="auto"
-              height="90%"
-              animate={{
-                width: `${100 * value || 1}%`,
-              }}
-              initial={false}
-              transition={{ type: "tween" }}
-              bgcolor="#0b012e"
-            />
-          </Box>
+          <VisualBar
+            value={(value as number).toFixed(2)}
+            width={100 * value || 1}
+            bgColor="#0b012e"
+          />
         ),
     },
   ];
