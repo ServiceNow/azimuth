@@ -129,16 +129,13 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     );
   };
 
-  const VisualBarPercentage = (value: number, bgColor: string) =>
-    isNaN(value) ? (
-      "--%"
-    ) : (
-      <VisualBar
-        value={formatRatioAsPercentageString(value as number, 1)}
-        width={100 * value || 1}
-        bgColor={bgColor}
-      />
-    );
+  const VisualBarPercentage = (value: number, bgColor: string) => (
+    <VisualBar
+      value={formatRatioAsPercentageString(value as number, 1)}
+      width={isNaN(value) ? 0 : 100 * value}
+      bgColor={bgColor}
+    />
+  );
 
   const NUMBER_COL_DEF = {
     flex: 1,
@@ -221,16 +218,13 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       field: "ece",
       headerName: "ECE",
       minWidth: 105,
-      renderCell: ({ value }: GridCellParams) =>
-        isNaN(value) ? (
-          "--"
-        ) : (
-          <VisualBar
-            value={(value as number).toFixed(2)}
-            width={100 * value || 1}
-            bgColor="#0b012e"
-          />
-        ),
+      renderCell: ({ value }: GridCellParams) => (
+        <VisualBar
+          value={(value as number).toFixed(2)}
+          width={isNaN(value) ? 0 : 100 * value}
+          bgColor="#0b012e"
+        />
+      ),
     },
   ];
 

@@ -78,18 +78,13 @@ const SimilarUtterances: React.FC<Props> = ({
       headerName: "Similarity",
       description:
         "Cosine similarity (1 indicates the utterance is identical while 0 indicates it is unrelated)", // tooltip
-      renderCell: ({ value }: GridCellParams) =>
-        isNaN(value) ? (
-          "--%"
-        ) : value > 0 ? (
-          <VisualBar
-            value={(value as number).toFixed(2)}
-            width={100 * value || 1}
-            bgColor={value > 0.5 ? "#d5d1e3" : "#0b012e"}
-          />
-        ) : (
-          (value as number).toFixed(2)
-        ),
+      renderCell: ({ value }: GridCellParams) => (
+        <VisualBar
+          value={(value as number).toFixed(2)}
+          width={isNaN(value) || value < 0 ? 0 : 100 * value}
+          bgColor={value > 0.5 ? "#d5d1e3" : "#0b012e"}
+        />
+      ),
       sortable: false,
       align: "center",
       headerAlign: "center",
