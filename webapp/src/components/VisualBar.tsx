@@ -3,12 +3,12 @@ import { Box } from "@mui/material";
 import { motion } from "framer-motion";
 
 type Props = {
-  value: string;
+  formattedValue: string;
   width: number;
   bgColor: string;
 };
 
-const VisualBar: React.FC<Props> = ({ value, width, bgColor }) => {
+const VisualBar: React.FC<Props> = ({ formattedValue, width, bgColor }) => {
   return (
     <Box
       display="grid"
@@ -16,10 +16,10 @@ const VisualBar: React.FC<Props> = ({ value, width, bgColor }) => {
       gridAutoFlow="column"
       alignItems="center"
     >
-      {value}
+      {formattedValue}
       <Box
         component={motion.div}
-        key={value}
+        key={formattedValue}
         overflow="auto"
         height="90%"
         animate={{
