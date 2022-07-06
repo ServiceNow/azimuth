@@ -81,7 +81,9 @@ const SimilarUtterances: React.FC<Props> = ({
         <VisualBar
           formattedValue={(value as number).toFixed(2)}
           width={value}
-          bgColor={value > 0.5 ? "#d5d1e3" : "#0b012e"}
+          bgColor={
+            value > 0.5 ? theme.palette.info.light : theme.palette.primary.dark
+          }
         />
       ),
       sortable: false,
