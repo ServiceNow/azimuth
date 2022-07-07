@@ -17,6 +17,12 @@ from azimuth.utils.filtering import filter_dataset_split
 from tests.utils import generate_mocked_dm, get_table_key
 
 
+def test_all_smart_tags_have_a_family():
+    assert sorted(
+        tag.value for family in SMART_TAGS_FAMILY_MAPPING.values() for tag in family
+    ) == sorted(ALL_SMART_TAGS)
+
+
 def test_dataset_filtering(simple_text_config):
     dm = generate_mocked_dm(simple_text_config)
     ds = dm.get_dataset_split(get_table_key(simple_text_config))
