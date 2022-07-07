@@ -51,6 +51,7 @@ export const parseSearchString = (searchString: string) => {
       dissimilar: convertStringArray,
       almostCorrect: convertStringArray,
       behavioralTesting: convertStringArray,
+      pipelineComparison: convertStringArray,
       uncertain: convertStringArray,
       dataActions: convertStringArray,
       outcomes: convertStringArray,

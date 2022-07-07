@@ -15,6 +15,7 @@ export type QueryFilterState = {
   dissimilar?: SmartTag[];
   almostCorrect?: SmartTag[];
   behavioralTesting?: SmartTag[];
+  pipelineComparison?: SmartTag[];
   uncertain?: SmartTag[];
   dataActions?: DataAction[];
   outcomes?: Outcome[];

@@ -339,14 +339,15 @@ export interface components {
      * that all fields are represented correctly.
      */
     MetricsPerFilter: {
-      dissimilar: components["schemas"]["MetricsPerFilterValue"][];
       almostCorrect: components["schemas"]["MetricsPerFilterValue"][];
       behavioralTesting: components["schemas"]["MetricsPerFilterValue"][];
+      pipelineComparison: components["schemas"]["MetricsPerFilterValue"][];
       uncertain: components["schemas"]["MetricsPerFilterValue"][];
       prediction: components["schemas"]["MetricsPerFilterValue"][];
       outcome: components["schemas"]["MetricsPerFilterValue"][];
       extremeLength: components["schemas"]["MetricsPerFilterValue"][];
       partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
+      dissimilar: components["schemas"]["MetricsPerFilterValue"][];
       label: components["schemas"]["MetricsPerFilterValue"][];
       dataAction: components["schemas"]["MetricsPerFilterValue"][];
     };
@@ -400,14 +401,15 @@ export interface components {
      * that all fields are represented correctly.
      */
     OutcomeCountPerFilter: {
-      dissimilar: components["schemas"]["OutcomeCountPerFilterValue"][];
       almostCorrect: components["schemas"]["OutcomeCountPerFilterValue"][];
       behavioralTesting: components["schemas"]["OutcomeCountPerFilterValue"][];
+      pipelineComparison: components["schemas"]["OutcomeCountPerFilterValue"][];
       uncertain: components["schemas"]["OutcomeCountPerFilterValue"][];
       prediction: components["schemas"]["OutcomeCountPerFilterValue"][];
       outcome: components["schemas"]["OutcomeCountPerFilterValue"][];
       extremeLength: components["schemas"]["OutcomeCountPerFilterValue"][];
       partialSyntax: components["schemas"]["OutcomeCountPerFilterValue"][];
+      dissimilar: components["schemas"]["OutcomeCountPerFilterValue"][];
       label: components["schemas"]["OutcomeCountPerFilterValue"][];
       dataAction: components["schemas"]["OutcomeCountPerFilterValue"][];
     };
@@ -686,12 +688,13 @@ export interface components {
      * that all fields are represented correctly.
      */
     Utterance: {
-      dissimilar: string[];
       almostCorrect: string[];
       behavioralTesting: string[];
+      pipelineComparison: string[];
       uncertain: string[];
       extremeLength: string[];
       partialSyntax: string[];
+      dissimilar: string[];
       /** Row index computed by Azimuth.. */
       index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
@@ -707,6 +710,7 @@ export interface components {
     UtteranceCountPerFilter: {
       extremeLength: components["schemas"]["UtteranceCountPerFilterValue"][];
       partialSyntax: components["schemas"]["UtteranceCountPerFilterValue"][];
+      dissimilar: components["schemas"]["UtteranceCountPerFilterValue"][];
       label: components["schemas"]["UtteranceCountPerFilterValue"][];
       dataAction: components["schemas"]["UtteranceCountPerFilterValue"][];
     };
@@ -877,6 +881,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -927,6 +932,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1016,6 +1022,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1053,6 +1060,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1094,6 +1102,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1295,6 +1304,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1335,6 +1345,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
