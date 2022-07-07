@@ -46,6 +46,7 @@ def build_named_dataset_filters(
     behavioral_testing: List[SmartTag] = Query(
         [], title="Behavioral testing", alias="behavioralTesting"
     ),
+    pipeline_comparison: List[SmartTag] = Query([], title="Pipeline comparison"),
     uncertain: List[SmartTag] = Query([], title="Uncertain"),
     data_actions: List[DataAction] = Query([], title="Data action tags", alias="dataActions"),
     outcomes: List[OutcomeName] = Query([], title="Outcomes", alias="outcomes"),
@@ -63,6 +64,7 @@ def build_named_dataset_filters(
         dissimilar: The desired `dissimilar` smart tags
         almost_correct: The desired `almost_correct` smart tags
         behavioral_testing: The desired `behavioral_testing` smart tags
+        pipeline_comparison: The desired `pipeline_comparison` smart tags
         uncertain: The desired `uncertain` smart tags
         data_actions: The desired data_action tags
         outcomes: The desired outcomes
@@ -83,6 +85,7 @@ def build_named_dataset_filters(
             SmartTagFamily.dissimilar: dissimilar,
             SmartTagFamily.almost_correct: almost_correct,
             SmartTagFamily.behavioral_testing: behavioral_testing,
+            SmartTagFamily.pipeline_comparison: pipeline_comparison,
             SmartTagFamily.uncertain: uncertain,
         },
         data_actions=data_actions,

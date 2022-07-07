@@ -62,6 +62,7 @@ class SmartTagFamily(str, Enum):
     dissimilar = "dissimilar"
     almost_correct = "almost_correct"
     behavioral_testing = "behavioral_testing"
+    pipeline_comparison = "pipeline_comparison"
     uncertain = "uncertain"
 
 
@@ -73,6 +74,7 @@ DATASET_SMART_TAG_FAMILIES = [
 PIPELINE_SMART_TAG_FAMILIES = [
     SmartTagFamily.almost_correct,
     SmartTagFamily.behavioral_testing,
+    SmartTagFamily.pipeline_comparison,
     SmartTagFamily.uncertain,
 ]
 
@@ -127,6 +129,9 @@ SMART_TAGS_FAMILY_MAPPING = {
     SmartTagFamily.behavioral_testing: [
         SmartTag.failed_punctuation,
         SmartTag.failed_fuzzy_matching,
+    ],
+    SmartTagFamily.pipeline_comparison: [
+        SmartTag.pipeline_disagreement,
     ],
     SmartTagFamily.uncertain: [
         SmartTag.high_epistemic_uncertainty,

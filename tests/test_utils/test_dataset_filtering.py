@@ -112,6 +112,7 @@ def test_dataset_filtering_multi(simple_text_config):
         SmartTagFamily.dissimilar,
         SmartTagFamily.behavioral_testing,
         SmartTagFamily.almost_correct,
+        SmartTagFamily.pipeline_comparison,
         SmartTagFamily.uncertain,
     ],
 )

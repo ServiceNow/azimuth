@@ -4,6 +4,7 @@ import {
   Dissimilar,
   ExtremeLength,
   PartialSyntax,
+  PipelineComparison,
   Uncertain,
 } from "components/Icons/SmartTagFamily";
 
@@ -58,6 +59,7 @@ export const SMART_TAG_FAMILIES = [
   ...DATASET_SMART_TAG_FAMILIES,
   "almostCorrect",
   "behavioralTesting",
+  "pipelineComparison",
   "uncertain",
 ] as const;
 
@@ -67,6 +69,7 @@ export const SMART_TAG_FAMILY_ICONS = {
   dissimilar: Dissimilar,
   almostCorrect: AlmostCorrect,
   behavioralTesting: BehavioralTesting,
+  pipelineComparison: PipelineComparison,
   uncertain: Uncertain,
 } as const;
 
@@ -76,5 +79,6 @@ export const SMART_TAG_FAMILY_PRETTY_NAMES = {
   dissimilar: "Dissimilar",
   almostCorrect: "Almost Correct",
   behavioralTesting: "Behavioral Testing",
+  pipelineComparison: "Pipeline Comparison",
   uncertain: "Uncertain",
 } as const;
