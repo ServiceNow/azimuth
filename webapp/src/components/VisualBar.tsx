@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 
 type Props = {
   formattedValue: string;
-  width: number;
+  value: number;
   color: string;
 };
 
-const VisualBar: React.FC<Props> = ({ formattedValue, width, color }) => {
+const VisualBar: React.FC<Props> = ({ formattedValue, value, color }) => {
   return (
     <Box
       display="grid"
@@ -23,7 +23,7 @@ const VisualBar: React.FC<Props> = ({ formattedValue, width, color }) => {
         overflow="auto"
         height="90%"
         animate={{
-          width: `${width > 0 ? 100 * width : 0}%`,
+          width: `${value > 0 ? 100 * value : 0}%`,
         }}
         initial={false}
         transition={{ type: "tween" }}

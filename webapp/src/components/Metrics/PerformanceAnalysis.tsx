@@ -58,7 +58,7 @@ const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
 const visualBarPercentage = (value: number, color: string) => (
   <VisualBar
     formattedValue={formatRatioAsPercentageString(value, 1)}
-    width={value}
+    value={value}
     color={color}
   />
 );
@@ -217,7 +217,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       renderCell: ({ value }: GridCellParams<number>) => (
         <VisualBar
           formattedValue={value.toFixed(2)}
-          width={value}
+          value={value}
           color={theme.palette.primary.dark}
         />
       ),

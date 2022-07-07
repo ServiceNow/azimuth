@@ -80,7 +80,7 @@ const SimilarUtterances: React.FC<Props> = ({
       renderCell: ({ value }: GridCellParams<number>) => (
         <VisualBar
           formattedValue={value.toFixed(2)}
-          width={value}
+          value={value}
           color={theme.palette.primary[value > 0.5 ? "light" : "dark"]}
         />
       ),
