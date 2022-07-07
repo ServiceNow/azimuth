@@ -10,12 +10,7 @@ type Props = {
 
 const VisualBar: React.FC<Props> = ({ formattedValue, value, color }) => {
   return (
-    <Box
-      display="grid"
-      gridAutoColumns={50}
-      gridAutoFlow="column"
-      alignItems="center"
-    >
+    <Box display="grid" gridAutoColumns={50} gridAutoFlow="column">
       {formattedValue}
       <Box
         component={motion.div}
