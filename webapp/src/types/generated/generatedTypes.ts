@@ -339,7 +339,6 @@ export interface components {
      * that all fields are represented correctly.
      */
     MetricsPerFilter: {
-      dissimilar: components["schemas"]["MetricsPerFilterValue"][];
       almostCorrect: components["schemas"]["MetricsPerFilterValue"][];
       behavioralTesting: components["schemas"]["MetricsPerFilterValue"][];
       uncertain: components["schemas"]["MetricsPerFilterValue"][];
@@ -347,6 +346,7 @@ export interface components {
       outcome: components["schemas"]["MetricsPerFilterValue"][];
       extremeLength: components["schemas"]["MetricsPerFilterValue"][];
       partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
+      dissimilar: components["schemas"]["MetricsPerFilterValue"][];
       label: components["schemas"]["MetricsPerFilterValue"][];
       dataAction: components["schemas"]["MetricsPerFilterValue"][];
     };
@@ -400,7 +400,6 @@ export interface components {
      * that all fields are represented correctly.
      */
     OutcomeCountPerFilter: {
-      dissimilar: components["schemas"]["OutcomeCountPerFilterValue"][];
       almostCorrect: components["schemas"]["OutcomeCountPerFilterValue"][];
       behavioralTesting: components["schemas"]["OutcomeCountPerFilterValue"][];
       uncertain: components["schemas"]["OutcomeCountPerFilterValue"][];
@@ -408,6 +407,7 @@ export interface components {
       outcome: components["schemas"]["OutcomeCountPerFilterValue"][];
       extremeLength: components["schemas"]["OutcomeCountPerFilterValue"][];
       partialSyntax: components["schemas"]["OutcomeCountPerFilterValue"][];
+      dissimilar: components["schemas"]["OutcomeCountPerFilterValue"][];
       label: components["schemas"]["OutcomeCountPerFilterValue"][];
       dataAction: components["schemas"]["OutcomeCountPerFilterValue"][];
     };
@@ -686,12 +686,12 @@ export interface components {
      * that all fields are represented correctly.
      */
     Utterance: {
-      dissimilar: string[];
       almostCorrect: string[];
       behavioralTesting: string[];
       uncertain: string[];
       extremeLength: string[];
       partialSyntax: string[];
+      dissimilar: string[];
       /** Row index computed by Azimuth.. */
       index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
@@ -707,6 +707,7 @@ export interface components {
     UtteranceCountPerFilter: {
       extremeLength: components["schemas"]["UtteranceCountPerFilterValue"][];
       partialSyntax: components["schemas"]["UtteranceCountPerFilterValue"][];
+      dissimilar: components["schemas"]["UtteranceCountPerFilterValue"][];
       label: components["schemas"]["UtteranceCountPerFilterValue"][];
       dataAction: components["schemas"]["UtteranceCountPerFilterValue"][];
     };
