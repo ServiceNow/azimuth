@@ -4,6 +4,7 @@
 import json
 import time
 
+import nest_asyncio
 import pytest
 from fastapi import FastAPI
 from starlette.testclient import TestClient
@@ -12,6 +13,9 @@ import azimuth.app as me_app
 from azimuth.app import get_ready_flag
 from azimuth.config import AzimuthConfig
 from tests.utils import DATASET_CFG, SIMPLE_PERTURBATION_TESTING_CONFIG
+
+# Fixes issue RuntimeError: This event loop is already running.
+nest_asyncio.apply()  # From https://github.com/encode/starlette/issues/440
 
 
 def mock_ready_flag_false():
