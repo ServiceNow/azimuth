@@ -27,7 +27,7 @@ import { Table, Column } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
 import { getMetricsPerFilterEndpoint } from "services/api";
-import { DatasetSplitName, MetricsPerFilterValue, Outcome } from "types/api";
+import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
