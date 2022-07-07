@@ -132,6 +132,7 @@ SMART_TAGS_FAMILY_MAPPING = {
     ],
     SmartTagFamily.pipeline_comparison: [
         SmartTag.pipeline_disagreement,
+        SmartTag.incorrect_for_all_pipelines,
     ],
     SmartTagFamily.uncertain: [
         SmartTag.high_epistemic_uncertainty,
