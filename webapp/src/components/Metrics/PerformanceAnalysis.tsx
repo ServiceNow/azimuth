@@ -199,22 +199,16 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       headerName: OUTCOME_PRETTY_NAMES[outcome],
       renderHeader: () => OutcomeIcon({ outcome }),
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
-      renderCell: ({ row }: GridCellParams<undefined, Row>) =>
-        visualBarPercentage(
-          row.outcomeCount[outcome] / row.utteranceCount,
-          theme.palette[OUTCOME_COLOR[outcome]].main
-        ),
+      renderCell: ({ value }: GridCellParams<number>) =>
+        visualBarPercentage(value, theme.palette[OUTCOME_COLOR[outcome]].main),
     })),
     ...customMetricNames.map<Column<Row>>((metricName) => ({
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
       valueGetter: ({ row }) => row.customMetrics[metricName],
-      renderCell: ({ row }: GridCellParams<undefined, Row>) =>
-        visualBarPercentage(
-          row.customMetrics[metricName],
-          theme.palette.primary.light
-        ),
+      renderCell: ({ value }: GridCellParams<number>) =>
+        visualBarPercentage(value, theme.palette.primary.light),
     })),
     {
       ...NUMBER_COL_DEF,
