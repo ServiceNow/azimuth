@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 type Props = {
   formattedValue: string;
   width: number;
-  bgColor: string;
+  color: string;
 };
 
-const VisualBar: React.FC<Props> = ({ formattedValue, width, bgColor }) => {
+const VisualBar: React.FC<Props> = ({ formattedValue, width, color }) => {
   return (
     <Box
       display="grid"
@@ -27,7 +27,7 @@ const VisualBar: React.FC<Props> = ({ formattedValue, width, bgColor }) => {
         }}
         initial={false}
         transition={{ type: "tween" }}
-        bgcolor={bgColor}
+        bgcolor={color}
       />
     </Box>
   );

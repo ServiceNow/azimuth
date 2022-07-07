@@ -55,11 +55,11 @@ const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
   </GridColumnMenuContainer>
 );
 
-const visualBarPercentage = (value: number, bgColor: string) => (
+const visualBarPercentage = (value: number, color: string) => (
   <VisualBar
     formattedValue={formatRatioAsPercentageString(value, 1)}
     width={value}
-    bgColor={bgColor}
+    color={color}
   />
 );
 
@@ -139,7 +139,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
 
   const NUMBER_COL_DEF = {
     flex: 1,
-    minWidth: 80,
+    minWidth: 105,
     maxWidth: 221,
     type: "number",
     sortComparator: customSort,
@@ -197,7 +197,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: outcome,
       headerName: OUTCOME_PRETTY_NAMES[outcome],
-      minWidth: 105,
       renderHeader: () => OutcomeIcon({ outcome }),
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
       renderCell: ({ row }: GridCellParams<undefined, Row>) =>
@@ -210,24 +209,22 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
-      minWidth: 105,
       valueGetter: ({ row }) => row.customMetrics[metricName],
       renderCell: ({ row }: GridCellParams<undefined, Row>) =>
         visualBarPercentage(
           row.customMetrics[metricName],
-          theme.palette.info.light
+          theme.palette.primary.light
         ),
     })),
     {
       ...NUMBER_COL_DEF,
       field: "ece",
       headerName: "ECE",
-      minWidth: 105,
-      renderCell: ({ value }: GridCellParams) => (
+      renderCell: ({ value }: GridCellParams<number>) => (
         <VisualBar
-          formattedValue={(value as number).toFixed(2)}
+          formattedValue={value.toFixed(2)}
           width={value}
-          bgColor={theme.palette.primary.dark}
+          color={theme.palette.primary.dark}
         />
       ),
     },
