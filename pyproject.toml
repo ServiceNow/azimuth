@@ -74,6 +74,7 @@ isort = "^5.9.3"
 types-simplejson = "^3.17.0"
 types-filelock = "^0.1.5"
 types-orjson = "^3.6.0"
+fastapi-profiler = "^1.0.0"
 
 # Documentation
 mkdocs = "^1.2.3"
