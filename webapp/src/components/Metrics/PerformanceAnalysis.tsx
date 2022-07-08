@@ -14,6 +14,7 @@ import {
   GridRowSpacingParams,
   GridSortCellParams,
   GridSortModel,
+  gridStringOrNumberComparator,
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
@@ -122,9 +123,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     if ((param2.id as number) === OVERALL_ROW_ID) return -sign;
 
     // Fall back to default sort
-    return (v1?.toLocaleString() || "").localeCompare(
-      v2?.toLocaleString() || ""
-    );
+    return gridStringOrNumberComparator(v1, v2, param1, param2);
   };
 
   const NUMBER_COL_DEF = {

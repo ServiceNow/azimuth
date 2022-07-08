@@ -260,7 +260,7 @@ const UtterancesTable: React.FC<Props> = ({
       description:
         "Utterances from dataset are overlaid with saliency maps, highlighting the most important tokens for the model's prediction.",
       flex: 5,
-      minWidth: 406,
+      minWidth: 413,
       renderCell: renderUtterance,
     },
     {
@@ -342,7 +342,7 @@ const UtterancesTable: React.FC<Props> = ({
           filters.dataActions !== undefined
         ),
       renderCell: renderDataAction,
-      width: 192,
+      width: 155,
     },
   ];
 

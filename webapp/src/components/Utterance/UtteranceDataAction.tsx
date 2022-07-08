@@ -49,7 +49,7 @@ const UtteranceDataAction: React.FC<Props> = ({
         onChange={(e) => setMenuValue(e.target.value as DataAction)}
         onClose={(e) => e.preventDefault()}
         size="small"
-        sx={{ width: 172 }}
+        fullWidth
       >
         {menuItems.map((tag) => (
           <MenuItem key={tag} value={tag} onClick={(e) => e.preventDefault()}>

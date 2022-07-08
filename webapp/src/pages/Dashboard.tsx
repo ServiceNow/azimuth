@@ -13,6 +13,8 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
+import { behavioralTestingDescription } from "./PerturbationTestingSummary";
+import { postprocessingDescription } from "./Threshold";
 
 const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
 
@@ -95,12 +97,7 @@ const Dashboard = () => {
         <PreviewCard
           title="Behavioral Testing"
           to={`/${jobId}/behavioral_testing_summary${searchString}`}
-          description={
-            <Description
-              text="Perturbation Tests asses your model's robustness, or how it handles things like misspellings or punctuation changes."
-              link="/behavioral-testing-summary/"
-            />
-          }
+          description={behavioralTestingDescription}
         >
           <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
             <PerturbationTestingPreview
@@ -116,12 +113,7 @@ const Dashboard = () => {
           <PreviewCard
             title="Post-processing Analysis"
             to={`/${jobId}/thresholds${searchString}`}
-            description={
-              <Description
-                text="View prediction distribution for multiple thresholds to find the optimal one. You can change the confidence threshold in the config file."
-                link="/post-processing-analysis/"
-              />
-            }
+            description={postprocessingDescription}
           >
             <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
               <ThresholdPlot jobId={jobId} pipeline={pipeline} />

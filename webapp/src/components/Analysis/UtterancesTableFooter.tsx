@@ -31,12 +31,17 @@ const UtterancesTableFooter: React.FC<Props> = ({
       <Typography variant="body2" sx={{ marginRight: 1 }}>
         Apply proposed action on {selectedIds.length} rows:
       </Typography>
-      <UtteranceDataAction
-        utteranceIds={selectedIds}
-        confirmationButton
-        allDataActions={allDataActions || []}
-        getUtterancesQueryState={getUtterancesQueryState}
-      />
+      <Box
+        display="flex"
+        width={277} // Width with the longest option augment_with_similar
+      >
+        <UtteranceDataAction
+          utteranceIds={selectedIds}
+          confirmationButton
+          allDataActions={allDataActions || []}
+          getUtterancesQueryState={getUtterancesQueryState}
+        />
+      </Box>
     </Box>
     <CustomPagination />
   </Box>
