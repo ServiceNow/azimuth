@@ -4,12 +4,12 @@
 
 ### Added
 
-- Contextual information has been added to most functionalities, linking directly to the relevant documentation link.
+- Contextual information has been added to most functionalities, linking directly to the relevant documentation.
 - The F1 metric was added as a default metric.
 
 ### Changed
 
-- Smart tags are now grouped in families, so it is easier to parse them. This also impact how filters are displayed.
+- Smart tags are now grouped in families, so it is easier to digest them. This also impacts how filters are displayed.
 - The confusion matrix can be shown with raw values (not just normalized).
 - We now show the top 20, instead of 10, most similar examples in the utterances details.
 - Renamed our docker images to use `servicenowdocker` registry on Docker Hub.

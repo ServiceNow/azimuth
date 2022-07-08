@@ -32,7 +32,7 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
                 class_name="datasets.load_metric",
                 kwargs={"path": "f1"},
                 additional_kwargs={"average": "weighted"},
-        ),
+            ),
         }
     ```
 

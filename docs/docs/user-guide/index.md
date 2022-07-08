@@ -61,7 +61,7 @@ training set or on the evaluation set.
     The default order is descending by the number of utterances, except for
     `NO_PREDICTION`/`NO_SMART_TAGS` which will be first. `overall` always stay at the top.
 
-    :material-dots-vertical: Beside any column header, click the vertical dots to hide the
+    :material-dots-vertical: Beside each column header, click the vertical dots to hide the
     corresponding column, or multiple ones by selecting 'Show columns'. However, the table columns
     will reappear as soon as the table is modified (e.g. sorting) or if the page is refreshed.
 

@@ -4,7 +4,7 @@ The confusion matrix displays the **model confusion between each pair of intents
 defined as the number of utterances with a given label that are predicted as another label.
 
 The toggle "Normalize" in the top right corner allows alternating between normalized and raw values.
-When normalized, the number of utterances are divided according to the total number of utterances
+When normalized, the number of utterances is divided by to the total number of utterances
 with the given label.
 
 !!! tip "Outcome colors"
