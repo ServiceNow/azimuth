@@ -14,9 +14,8 @@ const VisualBar: React.FC<Props> = ({ formattedValue, value, color }) => {
       display="grid"
       gridTemplateColumns="46px auto"
       width="100%"
-      gridAutoFlow="column"
       alignItems="center"
-      textAlign="end"
+      textAlign="right"
       gap={1}
     >
       {formattedValue}
