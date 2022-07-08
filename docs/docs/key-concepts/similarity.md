@@ -37,7 +37,7 @@ the most similar examples are presented in descending order (i.e., most similar 
 the cosine similarity to the selected utterance. A cosine similarity of 1 indicates that the
 utterance is identical, while 0 indicates that it is unrelated.
 
-### Smart Tags
+### Smart Tag Family: Dissimilar
 
 #### No Close Tags
 
@@ -47,7 +47,7 @@ neighbor is below a threshold** (default = 0.5), the utterance gets tagged with
 `no_close_train` and/or `no_close_eval`, according to the dataset split being assessed (training or
 evaluation). Note that this tag is class label-agnostic.
 
-#### Few Similar Tags
+#### Conflicting Neighbors Tags
 
 It can be useful to assess whether the most similar data samples to an utterance (its neighbors)
 come from the same or different classes. When most of its **neighboring utterances are from a

@@ -1,6 +1,8 @@
 # Releases
 
-## [2.1.1] - 2021-06-06
+## [2.2.0] - 2022-07-08
+
+## [2.1.1] - 2022-06-06
 
 ### Changed
 
@@ -19,7 +21,7 @@
 - Fixed unexpected borders in Performance Analysis table.
 - Fixed proposed actions which couldn't be applied on an utterance in the latest release.
 
-## [2.1.0] - 2021-05-27
+## [2.1.0] - 2022-05-27
 
 - Ability to get predictions without postprocessing in the exploration space. See section "Excluding
   Post-Processing" [here](../user-guide/exploration-space/index.md).
@@ -28,6 +30,6 @@
 - Links on top words to filter utterances that contain it. See the section "Word
   Clouds" [here](../user-guide/exploration-space/performance-overview.md).
 
-## [2.0.0] - 2021-04-12
+## [2.0.0] - 2022-04-12
 
 First public release.

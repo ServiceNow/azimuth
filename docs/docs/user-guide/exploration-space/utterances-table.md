@@ -46,8 +46,8 @@ prediction in parentheses.
 
 ### Smart Tags
 
-The table shows smart tags. For more information, see
-[Smart Tags](../../key-concepts/smart-tags.md).
+The table shows smart tag families along with the specific smart tag values. For more
+information, see [Smart Tags](../../key-concepts/smart-tags.md).
 
 ### Proposed Action
 

@@ -52,14 +52,18 @@ to [:material-link: Dataset Class Distribution Analysis](dataset-warnings.md).
 The Performance Analysis section summarizes the model performance in terms of the [**prediction
 outcomes**](../key-concepts/outcomes.md) and **metrics** available in Azimuth. Change the value in
 the dropdown :material-arrow-down-drop-circle-outline: to see the metrics broken down per label,
-predicted class, or smart tag. Use the toggle to alternate between the performance on the training
-set or on the evaluation set.
+predicted class, or smart tag families. Use the toggle to alternate between the performance on the
+training set or on the evaluation set.
 
-!!! tip "Sort the table"
+!!! tip "Sort the table and hide columns"
 
     :material-sort: Click a column header to sort the values in ascending or descending order.
     The default order is descending by the number of utterances, except for
     `NO_PREDICTION`/`NO_SMART_TAGS` which will be first. `overall` always stay at the top.
+
+    :material-dots-vertical: Beside any column header, click the vertical dots to hide the
+    corresponding column, or multiple ones by selecting 'Show columns'. However, the table columns
+    will reappear as soon as the table is modified (e.g. sorting) or if the page is refreshed.
 
 ![Screenshot](../_static/images/dashboard/performance-analysis.png)
 

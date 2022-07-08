@@ -109,7 +109,7 @@ filters are listed below.
 
 ##### Negative filtering
 
-* For smart tags and proposed actions, you can filter based on the **absence of all available
+* For smart tag families and proposed actions, you can filter based on the **absence of all available
   filters** within a category, respectively `NO_SMART_TAGS` and `NO_ACTION`.
 
 ##### Search

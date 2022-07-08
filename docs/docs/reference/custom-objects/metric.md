@@ -11,7 +11,7 @@ A metric definition is a simple [Custom Object](../index.md) that loads a Huggin
 
 The metric custom object has an extra-field `additional_kwargs` that will be pass to the `compute()`
 function of the HuggingFace metric. This will be required for some metrics, as shown in the example
-with precision and recall below.
+with precision, recall and F1 below.
 
 === "Metric Definition"
 
@@ -33,7 +33,7 @@ with precision and recall below.
 
 === "Config Example"
 
-    By default, Azimuth loads Precision and Recall with `average=weighted`:
+    By default, Azimuth loads Precision, Recall and F1 with `average=weighted`:
 
     ``` json
     {
@@ -55,6 +55,15 @@ with precision and recall below.
           "additional_kwargs": {
             "average": "weighted"
           }
+        },
+        "F1": {
+            "class_name":"datasets.load_metric",
+            "kwargs": {
+              "path": "f1"
+            },
+            "additional_kwargs": {
+              "average": "weighted"
+            }
         }
       }
     }

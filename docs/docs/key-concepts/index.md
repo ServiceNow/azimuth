@@ -19,8 +19,8 @@ types of analyses that Azimuth provides.
 
     Examples of smart tag **families**:
 
-    * **syntax** tags: identifies utterances with an abnormal or notable syntax.
-    * **behavioral testing** tags: identifies utterances which failed at least one behavioral test.
+    * **partial syntax**: identifies utterances with a partial syntax, e.g. missing a verb.
+    * **behavioral testing**: identifies utterances which failed at least one behavioral test.
 
     Examples of **individual** smart tags:
 

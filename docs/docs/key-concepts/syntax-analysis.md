@@ -9,7 +9,8 @@ utterances.
 ## Where is this used in Azimuth?
 
 Based on the syntax of each utterance, Azimuth computes syntactic [:material-link: Smart
-Tags](smart-tags.md). Additionally, the **length mismatch plot** in the
+Tags](smart-tags.md) (Extreme Length and Partial Syntax families). Additionally, the
+**length mismatch plot** in the
 [:material-link: Dataset Class Distribution Analysis](../user-guide/dataset-warnings.md) compares
 the length of the utterances in the training set and the evaluation set.
 
