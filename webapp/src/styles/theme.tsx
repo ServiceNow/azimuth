@@ -23,7 +23,7 @@ const customTheme: Theme = createTheme({
       default: "#fafafa", // TODO awaiting design input.
     },
     primary: {
-      light: "#3C3A57",
+      light: "#D5D1E3",
       main: "#252436",
       dark: "#0F0F17",
     },
