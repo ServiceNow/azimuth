@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  GridCellParams,
   GridCellValue,
   GridColumnMenuContainer,
   GridColumnMenuProps,
@@ -13,7 +14,6 @@ import {
   GridRowSpacingParams,
   GridSortCellParams,
   GridSortModel,
-  GridValueFormatterParams,
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
@@ -23,12 +23,14 @@ import SeeMoreLess, {
   useMoreLess,
 } from "components/SeeMoreLess";
 import { Table, Column } from "components/Table";
+import VisualBar from "components/VisualBar";
 import React from "react";
 import { getMetricsPerFilterEndpoint } from "services/api";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
+  OUTCOME_COLOR,
   OUTCOME_PRETTY_NAMES,
   SMART_TAG_FAMILIES,
   SMART_TAG_FAMILY_ICONS,
@@ -68,11 +70,6 @@ type Props = {
 };
 
 type Row = MetricsPerFilterValue & { id: number };
-
-const twoDigitFormatter = ({ value }: GridValueFormatterParams) =>
-  isNaN(value as number) ? "--" : (value as number).toFixed(2);
-const percentageFormatter = ({ value }: GridValueFormatterParams) =>
-  formatRatioAsPercentageString(value as number, 1);
 
 const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const [selectedDatasetSplit, setSelectedDatasetSplit] =
@@ -132,8 +129,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
 
   const NUMBER_COL_DEF = {
     flex: 1,
-    minWidth: 80,
-    maxWidth: 221,
+    minWidth: 120,
+    maxWidth: 220,
     type: "number",
     sortComparator: customSort,
   };
@@ -142,7 +139,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     {
       field: "filterValue",
       headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
-      width: 221,
+      width: 220,
       sortComparator: customSort,
       renderHeader: () => (
         <Select
@@ -184,7 +181,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       ...NUMBER_COL_DEF,
       field: "utteranceCount",
       headerName: "Utterance Count",
-      minWidth: 160,
+      minWidth: 146,
     },
     ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
       ...NUMBER_COL_DEF,
@@ -192,20 +189,38 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       headerName: OUTCOME_PRETTY_NAMES[outcome],
       renderHeader: () => OutcomeIcon({ outcome }),
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
-      valueFormatter: percentageFormatter,
+      renderCell: ({ value }: GridCellParams<number>) => (
+        <VisualBar
+          formattedValue={formatRatioAsPercentageString(value, 1)}
+          value={value}
+          color={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
+        />
+      ),
     })),
     ...customMetricNames.map<Column<Row>>((metricName) => ({
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
       valueGetter: ({ row }) => row.customMetrics[metricName],
-      valueFormatter: percentageFormatter,
+      renderCell: ({ value }: GridCellParams<number>) => (
+        <VisualBar
+          formattedValue={formatRatioAsPercentageString(value, 1)}
+          value={value}
+          color={(theme) => theme.palette.primary.light}
+        />
+      ),
     })),
     {
       ...NUMBER_COL_DEF,
       field: "ece",
       headerName: "ECE",
-      valueFormatter: twoDigitFormatter,
+      renderCell: ({ value }: GridCellParams<number>) => (
+        <VisualBar
+          formattedValue={value.toFixed(2)}
+          value={value}
+          color={(theme) => theme.palette.primary.dark}
+        />
+      ),
     },
   ];
 
