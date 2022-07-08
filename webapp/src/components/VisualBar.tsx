@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, BoxProps } from "@mui/material";
+import { Box, BoxProps, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 
 type Props = {
@@ -8,17 +8,12 @@ type Props = {
   color: BoxProps["bgcolor"];
 };
 
-const VisualBar: React.FC<Props> = ({ formattedValue, value, color }) => {
-  return (
-    <Box
-      display="grid"
-      gridTemplateColumns="46px auto"
-      width="100%"
-      alignItems="center"
-      textAlign="right"
-      gap={1}
-    >
+const VisualBar: React.FC<Props> = ({ formattedValue, value, color }) => (
+  <Box width="100%" display="flex" gap={1}>
+    <Typography align="right" variant="inherit" width={46}>
       {formattedValue}
+    </Typography>
+    <Box flex="1">
       <Box
         component={motion.div}
         key={formattedValue}
@@ -32,7 +27,7 @@ const VisualBar: React.FC<Props> = ({ formattedValue, value, color }) => {
         bgcolor={color}
       />
     </Box>
-  );
-};
+  </Box>
+);
 
 export default React.memo(VisualBar);
