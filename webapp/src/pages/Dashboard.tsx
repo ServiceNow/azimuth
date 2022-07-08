@@ -97,7 +97,7 @@ const Dashboard = () => {
           to={`/${jobId}/behavioral_testing_summary${searchString}`}
           description={
             <Description
-              text="Behavioral Tests asses your model's robustness, or how it handles things like misspellings or punctuation changes."
+              text="Perturbation Tests asses your model's robustness, or how it handles things like misspellings or punctuation changes."
               link="/behavioral-testing-summary/"
             />
           }
