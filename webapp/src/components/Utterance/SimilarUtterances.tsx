@@ -4,7 +4,6 @@ import makeStyles from "@mui/styles/makeStyles";
 import { GridCellParams, GridRow } from "@mui/x-data-grid";
 import CopyButton from "components/CopyButton";
 import { Column, RowProps, Table } from "components/Table";
-import VisualBar from "components/VisualBar";
 import React from "react";
 import { Link } from "react-router-dom";
 import { SimilarUtterance, Utterance } from "types/api";
@@ -77,13 +76,7 @@ const SimilarUtterances: React.FC<Props> = ({
       headerName: "Similarity",
       description:
         "Cosine similarity (1 indicates the utterance is identical while 0 indicates it is unrelated)", // tooltip
-      renderCell: ({ value }: GridCellParams<number>) => (
-        <VisualBar
-          formattedValue={value.toFixed(2)}
-          value={value}
-          color={theme.palette.primary[value > 0.5 ? "light" : "dark"]}
-        />
-      ),
+      valueFormatter: (params) => (params.value as number).toFixed(2),
       sortable: false,
       align: "center",
       headerAlign: "center",
