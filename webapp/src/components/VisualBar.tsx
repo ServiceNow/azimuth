@@ -1,11 +1,11 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, BoxProps } from "@mui/material";
 import { motion } from "framer-motion";
 
 type Props = {
   formattedValue: string;
   value: number;
-  color: string;
+  color: BoxProps["bgcolor"];
 };
 
 const VisualBar: React.FC<Props> = ({ formattedValue, value, color }) => {

@@ -4,7 +4,6 @@ import {
   MenuItem,
   Select,
   Typography,
-  useTheme,
 } from "@mui/material";
 import {
   GridCellParams,
@@ -55,14 +54,6 @@ const ColumnMenu = ({ hideMenu, currentColumn, open }: GridColumnMenuProps) => (
   </GridColumnMenuContainer>
 );
 
-const visualBarPercentage = (value: number, color: string) => (
-  <VisualBar
-    formattedValue={formatRatioAsPercentageString(value, 1)}
-    value={value}
-    color={color}
-  />
-);
-
 const BASIC_FILTER_OPTIONS = ["label", "prediction"] as const;
 const OPTION_PRETTY_NAME = {
   label: "Label",
@@ -81,7 +72,6 @@ type Props = {
 type Row = MetricsPerFilterValue & { id: number };
 
 const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
-  const theme = useTheme();
   const [selectedDatasetSplit, setSelectedDatasetSplit] =
     React.useState<DatasetSplitName>("eval");
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
@@ -199,16 +189,26 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       headerName: OUTCOME_PRETTY_NAMES[outcome],
       renderHeader: () => OutcomeIcon({ outcome }),
       valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
-      renderCell: ({ value }: GridCellParams<number>) =>
-        visualBarPercentage(value, theme.palette[OUTCOME_COLOR[outcome]].main),
+      renderCell: ({ value }: GridCellParams<number>) => (
+        <VisualBar
+          formattedValue={formatRatioAsPercentageString(value, 1)}
+          value={value}
+          color={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
+        />
+      ),
     })),
     ...customMetricNames.map<Column<Row>>((metricName) => ({
       ...NUMBER_COL_DEF,
       field: metricName,
       headerName: metricName,
       valueGetter: ({ row }) => row.customMetrics[metricName],
-      renderCell: ({ value }: GridCellParams<number>) =>
-        visualBarPercentage(value, theme.palette.primary.light),
+      renderCell: ({ value }: GridCellParams<number>) => (
+        <VisualBar
+          formattedValue={formatRatioAsPercentageString(value, 1)}
+          value={value}
+          color={(theme) => theme.palette.primary.light}
+        />
+      ),
     })),
     {
       ...NUMBER_COL_DEF,
@@ -218,7 +218,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         <VisualBar
           formattedValue={value.toFixed(2)}
           value={value}
-          color={theme.palette.primary.dark}
+          color={(theme) => theme.palette.primary.dark}
         />
       ),
     },
