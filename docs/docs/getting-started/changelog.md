@@ -2,6 +2,24 @@
 
 ## [2.2.0] - 2022-07-08
 
+### Added
+
+- Contextual information has been added to most functionalities, linking directly to the relevant documentation link.
+- The F1 metric was added as a default metric.
+
+### Changed
+
+- Smart tags are now grouped in families, so it is easier to parse them. This also impact how filters are displayed.
+- The confusion matrix can be shown with raw values (not just normalized).
+- We now show the top 20, instead of 10, most similar examples in the utterances details.
+- Renamed our docker images to use `servicenowdocker` registry on Docker Hub.
+
+##### Performance Overview Table
+- Columns can be temporarily hidden.
+- Use outcomes' icons as headers instead of the outcomes' full names.
+- Added visual bars, so it is easier to analyze the model's performance.
+
+
 ## [2.1.1] - 2022-06-06
 
 ### Changed
