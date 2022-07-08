@@ -13,6 +13,7 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
+import { behavioralTestingDescription } from "./PerturbationTestingSummary";
 
 const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
 
@@ -95,12 +96,7 @@ const Dashboard = () => {
         <PreviewCard
           title="Behavioral Testing"
           to={`/${jobId}/behavioral_testing_summary${searchString}`}
-          description={
-            <Description
-              text="Perturbation Tests asses your model's robustness, or how it handles things like misspellings or punctuation changes."
-              link="/behavioral-testing-summary/"
-            />
-          }
+          description={behavioralTestingDescription}
         >
           <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
             <PerturbationTestingPreview
