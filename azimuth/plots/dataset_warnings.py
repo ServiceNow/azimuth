@@ -476,11 +476,11 @@ def nb_tokens_plot(
     """
     # Sanitize values
     train_per_class_count, eval_per_class_count = map(
-        lambda data: np.nan_to_num(np.array(data, dtype=float)),  # type: ignore
+        lambda data: np.nan_to_num(np.array(data, dtype=float)),
         (train_per_class_count, eval_per_class_count),
     )
     train_per_class_stats, eval_per_class_stats = map(
-        lambda data: np.nan_to_num(np.array(data, dtype=float)),  # type: ignore
+        lambda data: np.nan_to_num(np.array(data, dtype=float)),
         (train_per_class_stats, eval_per_class_stats),
     )
 
