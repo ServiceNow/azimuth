@@ -26,7 +26,7 @@ def test_confidence_histogram(tiny_text_config):
         tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0),
     )
-    out = mod.compute_on_dataset_split()[0].details_all_bins
+    out = mod.compute_on_dataset_split()[0].bins
     ds = mod.get_dataset_split()
 
     assert len(out) == CONFIDENCE_BINS_COUNT  # We have CONFIDENCE_BINS_COUNT bins.
@@ -44,9 +44,7 @@ def test_confidence_histogram(tiny_text_config):
         tiny_text_config,
         mod_options=ModuleOptions(pipeline_index=0, without_postprocessing=True),
     )
-    out_without_postprocessing = mod_without_postprocessing.compute_on_dataset_split()[
-        0
-    ].details_all_bins
+    out_without_postprocessing = mod_without_postprocessing.compute_on_dataset_split()[0].bins
 
     # Confidences should be lower with postprocessing
     mean_with_post = np.mean(
@@ -85,7 +83,7 @@ def test_confidence_histogram_empty(simple_text_config, apply_mocked_startup_tas
         simple_text_config,
         mod_options=ModuleOptions(filters=DatasetFilters(labels=UNKNOWN_TARGET), pipeline_index=0),
     )
-    out = mod.compute_on_dataset_split()[0].details_all_bins
+    out = mod.compute_on_dataset_split()[0].bins
 
     assert len(out) == CONFIDENCE_BINS_COUNT  # We have CONFIDENCE_BINS_COUNT bins.
     # When filters cause an empty dataset_split, we should return empty bins

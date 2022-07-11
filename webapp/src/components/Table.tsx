@@ -69,6 +69,7 @@ export const Table = <Row extends { id: GridRowId }>({
   ...props
 }: Props<Row>) => (
   <DataGrid
+    disableColumnFilter
     disableColumnMenu
     disableSelectionOnClick
     hideFooter={!props.pagination && !components?.Footer}

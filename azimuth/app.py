@@ -3,7 +3,7 @@
 # in the root directory of this source tree.
 import logging
 from threading import Event
-from typing import Dict, Optional, cast
+from typing import Dict, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
@@ -18,10 +18,9 @@ from azimuth.modules.base_classes import Module
 from azimuth.modules.utilities.validation import ValidationModule
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions
-from azimuth.types.validation import ValidationResponse
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
-from azimuth.utils.logs import MultipleException, set_logger_config
+from azimuth.utils.logs import set_logger_config
 from azimuth.utils.project import load_dataset_split_managers_from_config
 from azimuth.utils.validation import assert_not_none
 
@@ -267,12 +266,6 @@ def run_validation(
         MultipleException if the validation failed.
     """
 
-    def raise_exception_if_needed(validation_module):
-        validation_module.result()
-        response = cast(ValidationResponse, validation_module.result()[0])
-        if response.exceptions:
-            raise MultipleException(response.exceptions)
-
     def run_validation_module(pipeline_index=None):
         validation_module = ValidationModule(
             config=config,
@@ -280,7 +273,8 @@ def run_validation(
             mod_options=ModuleOptions(pipeline_index=pipeline_index),
         )
         validation_module.start_task_on_dataset_split(task_manager.client)
-        raise_exception_if_needed(validation_module)
+        # Will raise exceptions as needed.
+        validation_module.result()
 
     if config.pipelines is None:
         run_validation_module()

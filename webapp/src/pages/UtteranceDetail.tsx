@@ -1,6 +1,5 @@
 import {
   Box,
-  Chip,
   Paper,
   Tab,
   Tabs,
@@ -12,7 +11,9 @@ import makeStyles from "@mui/styles/makeStyles";
 import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
+import Description from "components/Description";
 import Loading from "components/Loading";
+import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import TabPipelineRequired from "components/TabPipelineRequired";
 import PerturbedUtterances from "components/Utterance/PerturbedUtterances";
 import SimilarUtterances from "components/Utterance/SimilarUtterances";
@@ -27,10 +28,29 @@ import {
   getUtterancesEndpoint,
 } from "services/api";
 import { DatasetSplitName, Outcome } from "types/api";
-import { ID_TOOLTIP, OUTCOME_COLOR } from "utils/const";
+import {
+  DATASET_SMART_TAG_FAMILIES,
+  ID_TOOLTIP,
+  OUTCOME_COLOR,
+  SMART_TAG_FAMILIES,
+} from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { isPipelineSelected } from "utils/helpers";
 
+const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
+  similarity: (
+    <Description
+      text="Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class."
+      link="/exploration-space/utterance-details/#semantically-similar-utterances"
+    />
+  ),
+  perturbedUtterances: (
+    <Description
+      text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations."
+      link="/exploration-space/utterance-details/#behavioral-tests"
+    />
+  ),
+};
 const useStyles = makeStyles<Theme, { outcome?: Outcome }>((theme) => ({
   tags: {
     display: "grid",
@@ -70,7 +90,7 @@ const useStyles = makeStyles<Theme, { outcome?: Outcome }>((theme) => ({
   },
 }));
 
-const UtteranceDetail = () => {
+export const UtteranceDetail = () => {
   const { jobId, utteranceId, datasetSplitName } = useParams<{
     jobId: string;
     utteranceId: string;
@@ -134,8 +154,16 @@ const UtteranceDetail = () => {
     );
   }
 
+  const smartTagFamilies = isPipelineSelected(pipeline)
+    ? SMART_TAG_FAMILIES
+    : DATASET_SMART_TAG_FAMILIES;
+
   return (
     <Box display="flex" flexDirection="column" gap={2} height="100%">
+      <Description
+        text="Inspect the details of all of the analyses that have been performed on this utterance."
+        link="/exploration-space/utterance-details/"
+      />
       <Paper variant="outlined" className={classes.utteranceContainer}>
         <Tooltip title={ID_TOOLTIP}>
           <Typography>Id</Typography>
@@ -166,9 +194,9 @@ const UtteranceDetail = () => {
                     {utterance.modelPrediction.postprocessedPrediction}
                   </span>
                   {isPipelineSelected(pipeline) &&
-                    datasetInfo?.defaultThreshold &&
+                    utterancesResponse?.confidenceThreshold !== null &&
                     ` (< ${formatRatioAsPercentageString(
-                      datasetInfo.defaultThreshold[pipeline.pipelineIndex]
+                      utterancesResponse.confidenceThreshold
                     )})`}
                 </Typography>
               )}
@@ -194,15 +222,17 @@ const UtteranceDetail = () => {
 
         <Typography>Smart Tags</Typography>
         <Box className={classes.tags}>
-          {utterance.smartTags.map((tag) => (
-            <Chip
-              color="primary"
-              variant="outlined"
-              size="small"
-              key={tag}
-              label={tag}
-            />
-          ))}
+          {smartTagFamilies.map(
+            (family) =>
+              utterance[family].length > 0 && (
+                <SmartTagFamilyBadge
+                  key={family}
+                  family={family}
+                  smartTags={utterance[family]}
+                  withName
+                />
+              )
+          )}
         </Box>
 
         <Typography>Proposed Action</Typography>
@@ -243,6 +273,7 @@ const UtteranceDetail = () => {
             />
           </Tabs>
         </Box>
+        {UTTERANCE_DETAIL_TAB_DESCRIPTION[view]}
         {view === "similarity" && (
           <Box width={280}>
             <DatasetSplitToggler

@@ -155,8 +155,17 @@ export interface components {
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
+    ConfidenceHistogramResponse: {
+      bins: components["schemas"]["ConfidenceBinDetails"][];
+      confidenceThreshold: number | null;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
     ConfusionMatrixResponse: {
       confusionMatrix: { [key: string]: any };
+      normalized: boolean;
     };
     CustomObject: {
       class_name: string;
@@ -224,7 +233,6 @@ export interface components {
       evalClassDistribution: number[];
       trainClassDistribution: number[];
       startupTasks: { [key: string]: any };
-      defaultThreshold: number[] | null;
       modelContract: components["schemas"]["SupportedModelContract"];
       predictionAvailable: boolean;
       perturbationTestingAvailable: boolean;
@@ -282,6 +290,7 @@ export interface components {
     GetUtterancesResponse: {
       utterances: components["schemas"]["Utterance"][];
       utteranceCount: number;
+      confidenceThreshold: number | null;
     };
     HTTPValidationError: {
       detail?: components["schemas"]["ValidationError"][];
@@ -330,11 +339,17 @@ export interface components {
      * that all fields are represented correctly.
      */
     MetricsPerFilter: {
+      almostCorrect: components["schemas"]["MetricsPerFilterValue"][];
+      behavioralTesting: components["schemas"]["MetricsPerFilterValue"][];
+      pipelineComparison: components["schemas"]["MetricsPerFilterValue"][];
+      uncertain: components["schemas"]["MetricsPerFilterValue"][];
       prediction: components["schemas"]["MetricsPerFilterValue"][];
-      label: components["schemas"]["MetricsPerFilterValue"][];
-      smartTag: components["schemas"]["MetricsPerFilterValue"][];
-      dataAction: components["schemas"]["MetricsPerFilterValue"][];
       outcome: components["schemas"]["MetricsPerFilterValue"][];
+      extremeLength: components["schemas"]["MetricsPerFilterValue"][];
+      partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
+      dissimilar: components["schemas"]["MetricsPerFilterValue"][];
+      label: components["schemas"]["MetricsPerFilterValue"][];
+      dataAction: components["schemas"]["MetricsPerFilterValue"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -386,11 +401,17 @@ export interface components {
      * that all fields are represented correctly.
      */
     OutcomeCountPerFilter: {
+      almostCorrect: components["schemas"]["OutcomeCountPerFilterValue"][];
+      behavioralTesting: components["schemas"]["OutcomeCountPerFilterValue"][];
+      pipelineComparison: components["schemas"]["OutcomeCountPerFilterValue"][];
+      uncertain: components["schemas"]["OutcomeCountPerFilterValue"][];
       prediction: components["schemas"]["OutcomeCountPerFilterValue"][];
-      label: components["schemas"]["OutcomeCountPerFilterValue"][];
-      smartTag: components["schemas"]["OutcomeCountPerFilterValue"][];
-      dataAction: components["schemas"]["OutcomeCountPerFilterValue"][];
       outcome: components["schemas"]["OutcomeCountPerFilterValue"][];
+      extremeLength: components["schemas"]["OutcomeCountPerFilterValue"][];
+      partialSyntax: components["schemas"]["OutcomeCountPerFilterValue"][];
+      dissimilar: components["schemas"]["OutcomeCountPerFilterValue"][];
+      label: components["schemas"]["OutcomeCountPerFilterValue"][];
+      dataAction: components["schemas"]["OutcomeCountPerFilterValue"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -667,11 +688,17 @@ export interface components {
      * that all fields are represented correctly.
      */
     Utterance: {
+      almostCorrect: string[];
+      behavioralTesting: string[];
+      pipelineComparison: string[];
+      uncertain: string[];
+      extremeLength: string[];
+      partialSyntax: string[];
+      dissimilar: string[];
       /** Row index computed by Azimuth.. */
       index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
-      smartTags: components["schemas"]["SmartTag"][];
       dataAction: components["schemas"]["DataAction"];
       label: string;
       utterance: string;
@@ -681,13 +708,11 @@ export interface components {
      * that all fields are represented correctly.
      */
     UtteranceCountPerFilter: {
-      prediction:
-        | components["schemas"]["UtteranceCountPerFilterValue"][]
-        | null;
+      extremeLength: components["schemas"]["UtteranceCountPerFilterValue"][];
+      partialSyntax: components["schemas"]["UtteranceCountPerFilterValue"][];
+      dissimilar: components["schemas"]["UtteranceCountPerFilterValue"][];
       label: components["schemas"]["UtteranceCountPerFilterValue"][];
-      smartTag: components["schemas"]["UtteranceCountPerFilterValue"][];
       dataAction: components["schemas"]["UtteranceCountPerFilterValue"][];
-      outcome: components["schemas"]["UtteranceCountPerFilterValue"][] | null;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -851,7 +876,13 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
+        dissimilar?: components["schemas"]["SmartTag"][];
+        almostCorrect?: components["schemas"]["SmartTag"][];
+        behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
@@ -861,7 +892,7 @@ export interface operations {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["ConfidenceBinDetails"][];
+          "application/json": components["schemas"]["ConfidenceHistogramResponse"];
         };
       };
       /** Validation Error */
@@ -896,7 +927,13 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
+        dissimilar?: components["schemas"]["SmartTag"][];
+        almostCorrect?: components["schemas"]["SmartTag"][];
+        behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
@@ -980,7 +1017,13 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
+        dissimilar?: components["schemas"]["SmartTag"][];
+        almostCorrect?: components["schemas"]["SmartTag"][];
+        behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
@@ -1012,7 +1055,13 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
+        dissimilar?: components["schemas"]["SmartTag"][];
+        almostCorrect?: components["schemas"]["SmartTag"][];
+        behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
@@ -1048,7 +1097,13 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
+        dissimilar?: components["schemas"]["SmartTag"][];
+        almostCorrect?: components["schemas"]["SmartTag"][];
+        behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
@@ -1244,7 +1299,13 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
+        dissimilar?: components["schemas"]["SmartTag"][];
+        almostCorrect?: components["schemas"]["SmartTag"][];
+        behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;
@@ -1279,7 +1340,13 @@ export interface operations {
         confidenceMax?: number;
         labels?: string[];
         predictions?: string[];
-        smartTags?: components["schemas"]["SmartTag"][];
+        extremeLength?: components["schemas"]["SmartTag"][];
+        partialSyntax?: components["schemas"]["SmartTag"][];
+        dissimilar?: components["schemas"]["SmartTag"][];
+        almostCorrect?: components["schemas"]["SmartTag"][];
+        behavioralTesting?: components["schemas"]["SmartTag"][];
+        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
         utterance?: string;

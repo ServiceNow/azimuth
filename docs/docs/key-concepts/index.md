@@ -19,8 +19,8 @@ types of analyses that Azimuth provides.
 
     Examples of smart tag **families**:
 
-    * **syntax** tags: identifies utterances with an abnormal or notable syntax.
-    * **behavioral testing** tags: identifies utterances which failed at least one behavioral test.
+    * **partial syntax**: identifies utterances with a partial syntax, e.g. missing a verb.
+    * **behavioral testing**: identifies utterances which failed at least one behavioral test.
 
     Examples of **individual** smart tags:
 
@@ -59,9 +59,8 @@ in [:material-link: Prediction outcomes](outcomes.md).
 In Azimuth, different types of analysis are provided. Each analysis has a dedicated section in the
 documentation. Almost all of them (except saliency maps) are linked to smart tags.
 
-1. [:material-link: Syntax Analysis](syntax-analysis.md)
-2. [:material-link: Similarity Analysis](similarity.md)
-3. [:material-link: Behavioral Testing](behavioral-testing.md)
-4. [:material-link: Almost Correct](outcomes.md)
-5. [:material-link: Uncertainty Quantification](uncertainty.md)
-6. [:material-link: Saliency Maps](saliency.md)
+1. [:material-link: Saliency Maps](saliency.md)
+2. [:material-link: Syntax Analysis](syntax-analysis.md)
+3. [:material-link: Similarity Analysis](similarity.md)
+4. [:material-link: Behavioral Testing](behavioral-testing.md)
+5. [:material-link: Uncertainty Estimation](uncertainty.md)

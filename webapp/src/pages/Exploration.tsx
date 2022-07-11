@@ -4,6 +4,7 @@ import UtterancesTable from "components/Analysis/UtterancesTable";
 import ConfidenceHistogramTopWords from "components/ConfidenceHistogramTopWords";
 import ConfusionMatrix from "components/ConfusionMatrix";
 import Controls from "components/Controls/Controls";
+import Description from "components/Description";
 import Metrics from "components/Metrics/Metrics";
 import PageHeader from "components/PageHeader";
 import TabPipelineRequired from "components/TabPipelineRequired";
@@ -47,8 +48,14 @@ const Exploration = () => {
   }>();
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
-  const { filters, pagination, pipeline, postprocessing, searchString } =
-    useQueryState();
+  const {
+    confusionMatrix,
+    filters,
+    pagination,
+    pipeline,
+    postprocessing,
+    searchString,
+  } = useQueryState();
 
   const history = useHistory();
 
@@ -71,6 +78,7 @@ const Exploration = () => {
       <div className={classes.container}>
         <div className={classes.layout}>
           <Controls
+            confusionMatrix={confusionMatrix}
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
@@ -112,6 +120,10 @@ const Exploration = () => {
               {mainView === "performance_overview" &&
                 isPipelineSelected(pipeline) && (
                   <>
+                    <Description
+                      text="Assess the quality of the metrics for any given subset of data."
+                      link="/exploration-space/performance-overview/"
+                    />
                     <Metrics
                       jobId={jobId}
                       datasetSplitName={datasetSplitName}
@@ -121,6 +133,7 @@ const Exploration = () => {
                     />
                     <ConfidenceHistogramTopWords
                       baseUrl={baseUrl}
+                      confusionMatrix={confusionMatrix}
                       filters={filters}
                       pagination={pagination}
                       pipeline={pipeline}
@@ -128,11 +141,16 @@ const Exploration = () => {
                     />
                   </>
                 )}
-              {mainView === "confusion_matrix" &&
-                isPipelineSelected(pipeline) && (
+              {mainView === "confusion_matrix" && isPipelineSelected(pipeline) && (
+                <>
+                  <Description
+                    text="Visualize the model confusion between each pair of intents."
+                    link="/exploration-space/confusion-matrix/"
+                  />
                   <ConfusionMatrix
                     jobId={jobId}
                     datasetSplitName={datasetSplitName}
+                    confusionMatrix={confusionMatrix}
                     filters={filters}
                     pipeline={pipeline}
                     classOptions={classOptions}
@@ -140,14 +158,16 @@ const Exploration = () => {
                     labelFilters={filters.labels}
                     postprocessing={postprocessing}
                   />
-                )}
+                </>
+              )}
               {mainView === "utterances" && (
                 <UtterancesTable
                   jobId={jobId}
                   datasetInfo={datasetInfo}
                   datasetSplitName={datasetSplitName}
-                  pagination={pagination}
+                  confusionMatrix={confusionMatrix}
                   filters={filters}
+                  pagination={pagination}
                   pipeline={pipeline}
                   postprocessing={postprocessing}
                 />

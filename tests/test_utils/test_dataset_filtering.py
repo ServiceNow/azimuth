@@ -6,9 +6,21 @@ import pytest
 
 from azimuth.types import DatasetColumn, DatasetFilters
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import ALL_SMART_TAGS, DataAction, SmartTag
+from azimuth.types.tag import (
+    ALL_SMART_TAGS,
+    SMART_TAGS_FAMILY_MAPPING,
+    DataAction,
+    SmartTag,
+    SmartTagFamily,
+)
 from azimuth.utils.filtering import filter_dataset_split
 from tests.utils import generate_mocked_dm, get_table_key
+
+
+def test_all_smart_tags_have_a_family():
+    assert sorted(
+        tag.value for family in SMART_TAGS_FAMILY_MAPPING.values() for tag in family
+    ) == sorted(ALL_SMART_TAGS)
 
 
 def test_dataset_filtering(simple_text_config):
@@ -28,7 +40,10 @@ def test_dataset_filtering(simple_text_config):
     assert filtered_len(DatasetFilters(labels=[0])) == 22
     assert filtered_len(DatasetFilters(data_actions=[DataAction.relabel])) == 1
     assert filtered_len(DatasetFilters(outcomes=[OutcomeName.IncorrectAndRejected])) == 33
-    assert filtered_len(DatasetFilters(smart_tags=[SmartTag.short])) == 1
+    assert (
+        filtered_len(DatasetFilters(smart_tags={SmartTagFamily.extreme_length: [SmartTag.short]}))
+        == 1
+    )
     assert filtered_len(DatasetFilters(utterance="some")) == 2
     assert filtered_len(DatasetFilters(predictions=[1])) == 5
 
@@ -95,7 +110,19 @@ def test_dataset_filtering_multi(simple_text_config):
     assert num_rejection_class == len(ds_filtered)
 
 
-def test_dataset_filtering_no_smart_tag(simple_text_config):
+@pytest.mark.parametrize(
+    "family",
+    [
+        SmartTagFamily.extreme_length,
+        SmartTagFamily.partial_syntax,
+        SmartTagFamily.dissimilar,
+        SmartTagFamily.behavioral_testing,
+        SmartTagFamily.almost_correct,
+        SmartTagFamily.pipeline_comparison,
+        SmartTagFamily.uncertain,
+    ],
+)
+def test_dataset_filtering_no_smart_tag(simple_text_config, family):
     dm = generate_mocked_dm(simple_text_config)
     simple_table_key = get_table_key(simple_text_config)
     # Reset all tags to False for the first utterance, to ensure that at least one row is
@@ -110,11 +137,13 @@ def test_dataset_filtering_no_smart_tag(simple_text_config):
 
     ds_filtered = filter_dataset_split(
         dm.get_dataset_split(simple_table_key),
-        DatasetFilters(smart_tags=[SmartTag.no_smart_tag]),
+        DatasetFilters(smart_tags={family: ["NO_SMART_TAGS"]}),
         config=dm.config,
     )
     assert len(ds_filtered) > 0
-    assert len(ds_filtered.filter(lambda x: any(x[v] for v in ALL_SMART_TAGS))) == 0
+    assert (
+        len(ds_filtered.filter(lambda x: any(x[v] for v in SMART_TAGS_FAMILY_MAPPING[family]))) == 0
+    )
 
 
 def test_dataset_filtering_confidence(simple_text_config):
@@ -134,15 +163,27 @@ def test_dataset_filtering_confidence(simple_text_config):
     )
 
 
-def test_dataset_filtering_mutually_exclusive(simple_text_config):
+def test_dataset_filtering_smart_tags_uses_or_within_family(simple_text_config):
     dm = generate_mocked_dm(simple_text_config)
     ds = dm.get_dataset_split(get_table_key(simple_text_config))
-    ds_filtered = filter_dataset_split(
+    ds_filtered_long_sentence = filter_dataset_split(
         ds,
-        DatasetFilters(smart_tags=["NO_SMART_TAGS", "short_sentence"]),
+        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["long_sentence"]}),
         config=dm.config,
     )
-    assert len(ds_filtered) == 0
+    ds_filtered_short_sentence = filter_dataset_split(
+        ds,
+        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["short_sentence"]}),
+        config=dm.config,
+    )
+    ds_filtered = filter_dataset_split(
+        ds,
+        DatasetFilters(
+            smart_tags={SmartTagFamily.extreme_length: ["long_sentence", "short_sentence"]}
+        ),
+        config=dm.config,
+    )
+    assert len(ds_filtered) == len(ds_filtered_long_sentence) + len(ds_filtered_short_sentence)
 
 
 def test_dataset_filtering_without_postprocessing(simple_text_config):

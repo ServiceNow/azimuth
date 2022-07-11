@@ -24,7 +24,7 @@ enabled later on in the application.
     1. The name of your encoder must be supported by
     [sentence-transformers](https://github.com/UKPLab/sentence-transformers).
     2. Threshold to determine the ratio of utterances that should belong to another class for the
-    smart tags `few_similar_train`/`few_similar_eval`.
+    smart tags `conflicting_neighbors_train`/`conflicting_neighbors_eval`.
     3. Threshold for cosine similarity for the smart tags `no_close_train`/`no_close_eval`.
 
 === "Config Example"

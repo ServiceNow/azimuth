@@ -1,13 +1,17 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
-from typing import Dict, List, Optional, Tuple
+import typing
+from typing import Dict, Generic, List, Optional, Tuple, TypeVar
 
 from pydantic import Field
+from pydantic.generics import GenericModel
 
 from azimuth.types import AliasModel, Array, ModuleResponse, PlotSpecification
 from azimuth.types.outcomes import OutcomeName
+from azimuth.types.tag import DATASET_SMART_TAG_FAMILIES, PIPELINE_SMART_TAG_FAMILIES
+
+T = TypeVar("T")
 
 
 class MetricsResponseCommonFields(ModuleResponse):
@@ -30,16 +34,44 @@ class UtteranceCountPerFilterValue(AliasModel):
     filter_value: str = Field(..., title="Filter value")
 
 
-class UtteranceCountPerFilter(AliasModel):
-    prediction: Optional[List[UtteranceCountPerFilterValue]] = Field(
-        ..., title="Prediction", nullable=True
+if typing.TYPE_CHECKING:
+
+    class GenericAliasModel(AliasModel, Generic[T]):
+        pass
+
+    class GenericAliasModelPipeline(AliasModel, Generic[T]):
+        pass
+
+    ValuePerDatasetSmartTag = GenericAliasModel
+    ValuePerPipelineSmartTag = GenericAliasModelPipeline
+
+else:
+    ValuePerDatasetSmartTag = AliasModel.with_fields(
+        "ValuePerDatasetSmartTag",
+        GenericModel,
+        Generic[T],
+        **{k.value: (List[T], Field(...)) for k in DATASET_SMART_TAG_FAMILIES}
     )
-    label: List[UtteranceCountPerFilterValue] = Field(..., title="Label")
-    smart_tag: List[UtteranceCountPerFilterValue] = Field(..., title="Smart tag")
-    data_action: List[UtteranceCountPerFilterValue] = Field(..., title="Data action tag")
-    outcome: Optional[List[UtteranceCountPerFilterValue]] = Field(
-        ..., title="Outcome", nullable=True
+    ValuePerPipelineSmartTag = AliasModel.with_fields(
+        "ValuePerPipelineSmartTag",
+        GenericModel,
+        Generic[T],
+        **{k.value: (List[T], Field(...)) for k in PIPELINE_SMART_TAG_FAMILIES}
     )
+
+
+class ValuePerDatasetFilter(ValuePerDatasetSmartTag[T], GenericModel, Generic[T]):
+    label: List[T] = Field(..., title="Label")
+    data_action: List[T] = Field(..., title="Data action tag")
+
+
+class ValuePerPipelineFilter(ValuePerPipelineSmartTag[T], GenericModel, Generic[T]):
+    prediction: List[T] = Field(..., title="Prediction")
+    outcome: List[T] = Field(..., title="Outcome")
+
+
+class UtteranceCountPerFilter(ValuePerDatasetFilter[UtteranceCountPerFilterValue]):
+    pass
 
 
 class UtteranceCountPerFilterResponse(AliasModel):
@@ -51,12 +83,11 @@ class OutcomeCountPerFilterValue(UtteranceCountPerFilterValue):
     outcome_count: Dict[OutcomeName, int] = Field(..., title="Prediction count per outcome")
 
 
-class OutcomeCountPerFilter(AliasModel):
-    prediction: List[OutcomeCountPerFilterValue] = Field(..., title="Prediction")
-    label: List[OutcomeCountPerFilterValue] = Field(..., title="Label")
-    smart_tag: List[OutcomeCountPerFilterValue] = Field(..., title="Smart tag")
-    data_action: List[OutcomeCountPerFilterValue] = Field(..., title="Data action tag")
-    outcome: List[OutcomeCountPerFilterValue] = Field(..., title="Outcome")
+class OutcomeCountPerFilter(
+    ValuePerDatasetFilter[OutcomeCountPerFilterValue],
+    ValuePerPipelineFilter[OutcomeCountPerFilterValue],
+):
+    pass
 
 
 class OutcomeCountPerFilterResponse(ModuleResponse):
@@ -68,12 +99,10 @@ class MetricsPerFilterValue(MetricsResponseCommonFields, UtteranceCountPerFilter
     pass
 
 
-class MetricsPerFilter(AliasModel):
-    prediction: List[MetricsPerFilterValue] = Field(..., title="Prediction")
-    label: List[MetricsPerFilterValue] = Field(..., title="Label")
-    smart_tag: List[MetricsPerFilterValue] = Field(..., title="Smart tag")
-    data_action: List[MetricsPerFilterValue] = Field(..., title="Data action tag")
-    outcome: List[MetricsPerFilterValue] = Field(..., title="Outcome")
+class MetricsPerFilter(
+    ValuePerDatasetFilter[MetricsPerFilterValue], ValuePerPipelineFilter[MetricsPerFilterValue]
+):
+    pass
 
 
 class MetricsPerFilterModuleResponse(ModuleResponse):
@@ -87,6 +116,7 @@ class MetricsPerFilterAPIResponse(MetricsPerFilterModuleResponse):
 
 class ConfusionMatrixResponse(ModuleResponse):
     confusion_matrix: Array[float] = Field(..., title="Confusion Matrix normalized")
+    normalized: bool = Field(..., title="Normalized state of Confusion Matrix")
 
 
 class ConfidenceBinDetails(AliasModel):
@@ -97,7 +127,10 @@ class ConfidenceBinDetails(AliasModel):
 
 
 class ConfidenceHistogramResponse(ModuleResponse):
-    details_all_bins: List[ConfidenceBinDetails] = Field(..., title="Details for all bins")
+    bins: List[ConfidenceBinDetails] = Field(..., title="Details for all bins")
+    confidence_threshold: Optional[float] = Field(
+        ..., title="Confidence threshold in selected pipeline", nullable=True
+    )
 
 
 class OutcomeCountPerThresholdValue(AliasModel):

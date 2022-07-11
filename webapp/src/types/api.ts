@@ -5,6 +5,8 @@ export type AvailableDatasetSplits =
   components["schemas"]["AvailableDatasetSplits"];
 export type ConfidenceBinDetails =
   components["schemas"]["ConfidenceBinDetails"];
+export type ConfidenceHistogramResponse =
+  components["schemas"]["ConfidenceHistogramResponse"];
 // TODO Fix generated type (problem with python "Array" types)
 export type ConfusionMatrixOperation =
   paths["/dataset_splits/{dataset_split_name}/confusion_matrix"]["get"] & {
@@ -17,6 +19,22 @@ export type ConfusionMatrixOperation =
     };
   };
 export type ConfusionMatrixResponse = { confusionMatrix: number[][] };
+// CountPerFilterResponse is basically like OutcomeCountPerFilterResponse | UtteranceCountPerFilterResponse
+// (which would unfortunately lose all OutcomeCountPerFilterResponse's extra fields),
+// but with OutcomeCountPerFilterResponse's extra fields as optional instead.
+export interface CountPerFilterResponse
+  extends UtteranceCountPerFilterResponse {
+  countPerFilter: Partial<
+    Omit<
+      OutcomeCountPerFilterResponse["countPerFilter"],
+      keyof UtteranceCountPerFilterResponse["countPerFilter"]
+    >
+  > &
+    Record<
+      keyof UtteranceCountPerFilterResponse["countPerFilter"],
+      CountPerFilterValue[]
+    >;
+}
 export type CountPerFilterValue = Partial<OutcomeCountPerFilterValue> &
   UtteranceCountPerFilterValue;
 export type DataAction = components["schemas"]["DataAction"];

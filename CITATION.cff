@@ -1,4 +1,4 @@
-cff-version: 1.1.0
+cff-version: 1.0.0
 message: "If you use Azimuth in your projects, please cite it as below."
 authors:
 - family-names: "Branchaud-Charron"
@@ -18,7 +18,7 @@ authors:
 - family-names: "Babu"
   given-names: "Nandhini"
 title: "Azimuth, an open-source dataset and error analysis tool for text classification"
-version: 2.1
+version: 2.2
 doi: 10.5281/zenodo.6511558
-date-released: 2022-05-27
+date-released: 2022-07-08
 url: "https://github.com/ServiceNow/azimuth"

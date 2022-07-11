@@ -56,6 +56,28 @@ class SmartTag(str, Enum):
     no_smart_tag = "NO_SMART_TAGS"
 
 
+class SmartTagFamily(str, Enum):
+    extreme_length = "extreme_length"
+    partial_syntax = "partial_syntax"
+    dissimilar = "dissimilar"
+    almost_correct = "almost_correct"
+    behavioral_testing = "behavioral_testing"
+    pipeline_comparison = "pipeline_comparison"
+    uncertain = "uncertain"
+
+
+DATASET_SMART_TAG_FAMILIES = [
+    SmartTagFamily.extreme_length,
+    SmartTagFamily.partial_syntax,
+    SmartTagFamily.dissimilar,
+]
+PIPELINE_SMART_TAG_FAMILIES = [
+    SmartTagFamily.almost_correct,
+    SmartTagFamily.behavioral_testing,
+    SmartTagFamily.pipeline_comparison,
+    SmartTagFamily.uncertain,
+]
+
 Tag = str
 ALL_DATA_ACTION_FILTERS = [a.value for a in DataAction]
 ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a != DataAction.no_action]
@@ -82,6 +104,40 @@ ALL_PREDICTION_TAGS = [
     SmartTag.incorrect_for_all_pipelines,
 ]
 ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
+
+SMART_TAGS_FAMILY_MAPPING = {
+    SmartTagFamily.extreme_length: [
+        SmartTag.multi_sent,
+        SmartTag.short,
+        SmartTag.long,
+    ],
+    SmartTagFamily.partial_syntax: [
+        SmartTag.no_verb,
+        SmartTag.no_subj,
+        SmartTag.no_obj,
+    ],
+    SmartTagFamily.dissimilar: [
+        SmartTag.conflicting_neighbors_train,
+        SmartTag.conflicting_neighbors_eval,
+        SmartTag.no_close_train,
+        SmartTag.no_close_eval,
+    ],
+    SmartTagFamily.almost_correct: [
+        SmartTag.correct_top_3,
+        SmartTag.correct_low_conf,
+    ],
+    SmartTagFamily.behavioral_testing: [
+        SmartTag.failed_punctuation,
+        SmartTag.failed_fuzzy_matching,
+    ],
+    SmartTagFamily.pipeline_comparison: [
+        SmartTag.pipeline_disagreement,
+        SmartTag.incorrect_for_all_pipelines,
+    ],
+    SmartTagFamily.uncertain: [
+        SmartTag.high_epistemic_uncertainty,
+    ],
+}
 
 
 class TaggingResponse(ModuleResponse):
