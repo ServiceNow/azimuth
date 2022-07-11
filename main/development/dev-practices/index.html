@@ -1535,8 +1535,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#git-flow" class="md-nav__link">
-    Git flow
+  <a href="#git-branches" class="md-nav__link">
+    Git Branches
   </a>
   
 </li>
@@ -1624,8 +1624,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#git-flow" class="md-nav__link">
-    Git flow
+  <a href="#git-branches" class="md-nav__link">
+    Git Branches
   </a>
   
 </li>
@@ -1690,17 +1690,13 @@
 
 
 <h1 id="development-pratices">Development Pratices</h1>
-<h2 id="git-flow">Git flow</h2>
-<p>We follow an approach named <a href="https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow">Git flow</a>:</p>
+<h2 id="git-branches">Git Branches</h2>
 <ul>
-<li><code>main</code>: Should always be working with up-to-date documentation, users will run this branch.</li>
-<li><code>dev</code>: Integrates new features, documentation can be lacking.</li>
-<li><code>feature/*</code>: Feature branch than can be merged into <code>dev</code> only.</li>
-<li><code>hotfix/*</code>: Hotfix branches that can be merged into <code>main</code>.</li>
-<li><code>release/*</code>: Not used for now.</li>
+<li><code>main</code>: Integrates new features, documentation can be lacking. Users will run this branch if they run locally. If they use Docker, they will use our latest release and won't be affected by the latest changes on <code>main</code>.</li>
+<li><code>release/*</code>: Branches that can be created to release a version, whenever <code>main</code> might contain additional commits which should not be part of the immediate release. <code>release/*</code> should be merged in <code>main</code> after.</li>
 </ul>
+<p>We don't have a convention for the names of regular branches for developing features and fixes.</p>
 <p>Each version has its own tag (<span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.5 7A1.5 1.5 0 0 1 4 5.5 1.5 1.5 0 0 1 5.5 4 1.5 1.5 0 0 1 7 5.5 1.5 1.5 0 0 1 5.5 7m15.91 4.58-9-9C12.05 2.22 11.55 2 11 2H4c-1.11 0-2 .89-2 2v7c0 .55.22 1.05.59 1.41l8.99 9c.37.36.87.59 1.42.59.55 0 1.05-.23 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.56-.23-1.06-.59-1.42Z"/></svg></span><code>v2.0.0</code> for example) and release package on Github.</p>
-<p>When hotfixes are merged into <code>main</code>, they should be ported back into <code>dev</code> as well.</p>
 <h2 id="committing">Committing</h2>
 <p>We try to commit regularly, so it is easy to revert partial changes.</p>
 <h3 id="front-end-types">Front End Types</h3>
