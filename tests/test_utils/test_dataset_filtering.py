@@ -53,7 +53,7 @@ def test_dataset_filtering(simple_text_config):
     assert combination_len < min(ds_len[((), (1,))], ds_len[((0,), ())])
 
 
-def test_dataset_filtering_errors(simple_text_config):
+def test_dataset_filtering_columns_not_in_dataset(simple_text_config):
     dm = generate_mocked_dm(simple_text_config)
     ds = dm.get_dataset_split(get_table_key(simple_text_config))
     ds = ds.rename_column(DatasetColumn.postprocessed_prediction, "col1")
@@ -62,29 +62,21 @@ def test_dataset_filtering_errors(simple_text_config):
     ds = ds.rename_column(DatasetColumn.postprocessed_outcome, "col4")
     ds = ds.rename_column(DatasetColumn.postprocessed_confidences, "col5")
 
-    with pytest.raises(ValueError) as e:
-        _ = filter_dataset_split(ds, DatasetFilters(prediction=[0]), config=dm.config)
-    assert DatasetColumn.postprocessed_prediction in str(e.value)
+    ds_filtered = filter_dataset_split(ds, DatasetFilters(prediction=[0]), config=dm.config)
+    assert len(ds_filtered) == len(ds)
 
-    with pytest.raises(ValueError) as e:
-        _ = filter_dataset_split(ds, DatasetFilters(utterance="substring"), config=dm.config)
-    assert "utterance" in str(e.value)
+    ds_filtered = filter_dataset_split(ds, DatasetFilters(utterance="substring"), config=dm.config)
+    assert len(ds_filtered) == len(ds)
 
-    with pytest.raises(ValueError) as e:
-        _ = filter_dataset_split(ds, DatasetFilters(label=[1]), config=dm.config)
-    assert "label" in str(e.value)
+    ds_filtered = filter_dataset_split(ds, DatasetFilters(label=[1]), config=dm.config)
+    assert len(ds_filtered) == len(ds)
 
-    with pytest.raises(ValueError) as e:
-        _ = filter_dataset_split(
-            ds,
-            DatasetFilters(outcome=[OutcomeName.IncorrectAndRejected]),
-            config=dm.config,
-        )
-    assert DatasetColumn.postprocessed_outcome in str(e.value)
+    outcome = [OutcomeName.IncorrectAndRejected]
+    ds_filtered = filter_dataset_split(ds, DatasetFilters(outcome=outcome), config=dm.config)
+    assert len(ds_filtered) == len(ds)
 
-    with pytest.raises(ValueError) as e:
-        _ = filter_dataset_split(ds, DatasetFilters(confidence_max=0.5), config=dm.config)
-    assert DatasetColumn.postprocessed_confidences in str(e.value)
+    ds_filtered = filter_dataset_split(ds, DatasetFilters(confidence_max=0.5), config=dm.config)
+    assert len(ds_filtered) == len(ds)
 
 
 def test_dataset_filtering_multi(simple_text_config):
