@@ -1,18 +1,14 @@
 # Development Pratices
 
-## Git flow
+## Git Branches
 
-We follow an approach named [Git flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow):
+* `main`: Integrates new features, documentation can be lacking. Users will run this branch if they run locally. If they use Docker, they will use our latest release and won't be affected by the latest changes on `main`.
+* `release/*`: Branches that can be created to release a version, whenever `main` might contain additional commits which should not be part of the immediate release. `release/*` should be merged in `main` after.
 
-* `main`: Should always be working with up-to-date documentation, users will run this branch.
-* `dev`: Integrates new features, documentation can be lacking.
-* `feature/*`: Feature branch than can be merged into `dev` only.
-* `hotfix/*`: Hotfix branches that can be merged into `main`.
-* `release/*`: Not used for now.
+We don't have a convention for the names of regular branches for developing features and fixes.
 
 Each version has its own tag (:material-tag:`v2.0.0` for example) and release package on Github.
 
-When hotfixes are merged into `main`, they should be ported back into `dev` as well.
 
 ## Committing
 We try to commit regularly, so it is easy to revert partial changes.
