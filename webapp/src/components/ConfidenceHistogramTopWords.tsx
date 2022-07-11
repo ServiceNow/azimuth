@@ -5,12 +5,12 @@ import ConfidenceHistogram from "components/ConfidenceHistogram/ConfidenceHistog
 import { DatasetSplitName } from "types/api";
 import {
   getConfidenceHistogramEndpoint,
-  getDatasetInfoEndpoint,
   getTopWordsEndpoint,
 } from "services/api";
 import TopWords from "components/TopWords/TopWords";
 import TopWordsSkeleton from "components/TopWords/TopWordsSkeleton";
 import {
+  QueryConfusionMatrixState,
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
@@ -21,6 +21,7 @@ import { ALL_OUTCOMES } from "utils/const";
 
 type Props = {
   baseUrl: string;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: Required<QueryPipelineState>;
@@ -29,6 +30,7 @@ type Props = {
 
 const ConfidenceHistogramTopWords: React.FC<Props> = ({
   baseUrl,
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
@@ -38,8 +40,6 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
     jobId: string;
     datasetSplitName: DatasetSplitName;
   }>();
-
-  const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
   const {
     outcomes = ALL_OUTCOMES,
@@ -60,8 +60,6 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
     ...postprocessing,
   });
 
-  const threshold = datasetInfo?.defaultThreshold?.[pipeline.pipelineIndex];
-
   const { data: topWords, isFetching: isFetchingTopWords } =
     getTopWordsEndpoint.useQuery({
       jobId,
@@ -80,11 +78,10 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
       <ConfidenceHistogram
         isFetching={isFetchingConfidenceHistogram}
         error={error?.message}
-        bins={bins}
+        data={bins}
         confidenceMin={confidenceMin}
         confidenceMax={confidenceMax}
         filteredOutcomes={outcomes}
-        threshold={threshold}
       />
       <Box
         display="grid"
@@ -104,6 +101,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
         ) : (
           <TopWords
             baseUrl={baseUrl}
+            confusionMatrix={confusionMatrix}
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}
@@ -121,6 +119,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
         ) : (
           <TopWords
             baseUrl={baseUrl}
+            confusionMatrix={confusionMatrix}
             filters={filters}
             pagination={pagination}
             pipeline={pipeline}

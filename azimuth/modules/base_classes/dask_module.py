@@ -138,7 +138,9 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         log.info(f"Starting custom query {self.name}")
         # pure=false to be sure that everything is rerun.
         # Using self.name as key as we don't have indices
-        self.future = client.submit(self.compute, custom_query, key=self.name, pure=False)
+        self.future = client.submit(
+            self.compute, custom_query, key=f"{self.name}_{hash(str(custom_query))}", pure=False
+        )
         # Tell that this future is for custom use only.
         self.future.is_custom = True
         self.add_done_callback(self.on_end)

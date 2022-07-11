@@ -35,7 +35,6 @@ from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.project import (
     perturbation_testing_available,
     postprocessing_editable,
-    postprocessing_known,
     predictions_available,
     similarity_available,
 )
@@ -96,15 +95,6 @@ def get_dataset_info(
 
     model_contract = task_manager.config.model_contract
 
-    threshold = (
-        None
-        if config.pipelines is None
-        else [
-            pipeline.threshold if postprocessing_known(task_manager.config, idx) else None
-            for idx, pipeline in enumerate(config.pipelines)
-        ]
-    )
-
     return DatasetInfoResponse(
         project_name=config.name,
         class_names=eval_dm.get_class_names(),
@@ -115,7 +105,6 @@ def get_dataset_info(
         if training_dm is not None
         else [],
         startup_tasks={k: v.status() for k, v in startup_tasks.items()},
-        default_threshold=threshold,
         model_contract=model_contract,
         prediction_available=predictions_available(task_manager.config),
         perturbation_testing_available=perturbation_testing_available(task_manager.config),

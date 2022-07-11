@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 from collections import Counter
-from typing import List
+from typing import Dict, List
 
 from fastapi import APIRouter, Depends
 
@@ -15,7 +15,12 @@ from azimuth.types.model_performance import (
     UtteranceCountPerFilterResponse,
     UtteranceCountPerFilterValue,
 )
-from azimuth.types.tag import ALL_DATA_ACTIONS, ALL_SMART_TAGS
+from azimuth.types.tag import (
+    ALL_DATA_ACTIONS,
+    SMART_TAGS_FAMILY_MAPPING,
+    SmartTag,
+    SmartTagFamily,
+)
 from azimuth.utils.conversion import merge_counters
 from azimuth.utils.filtering import filter_dataset_split
 from azimuth.utils.ml.model_performance import sorted_by_utterance_count_with_last
@@ -56,22 +61,34 @@ def get_count_per_filter(
     label_counter = merge_counters(
         get_default_counter(class_names), Counter(ds[config.columns.label])
     )
-    smart_tag_counter: Counter = Counter(
-        **{t: sum(ds[t]) if t in ds.column_names else 0 for t in ALL_SMART_TAGS}
-    )
+    smart_tag_counter: Dict[SmartTagFamily, Counter] = {
+        tag_family: Counter(
+            **{
+                SmartTag.no_smart_tag: sum(
+                    ds.to_pandas()[set(tags).intersection(ds.column_names)]  # type: ignore
+                    .to_numpy()
+                    .sum(1)
+                    == 0
+                )
+            },
+            **{t: sum(ds[t]) if t in ds.column_names else 0 for t in tags},
+        )
+        for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
+    }
     data_action_counter: Counter = Counter(**{t: sum(ds[t]) for t in ALL_DATA_ACTIONS})
 
     return UtteranceCountPerFilterResponse(
         count_per_filter=UtteranceCountPerFilter(
-            prediction=None,
-            outcome=None,
             label=sorted_by_utterance_count_with_last(
                 counter_to_count_per_filter_value(label_counter),
                 dataset_split_manager.rejection_class_idx,
             ),
-            smart_tag=sorted_by_utterance_count_with_last(
-                counter_to_count_per_filter_value(smart_tag_counter), -1
-            ),
+            **{
+                family.value: sorted_by_utterance_count_with_last(
+                    counter_to_count_per_filter_value(counters), 0
+                )
+                for family, counters in smart_tag_counter.items()
+            },
             data_action=sorted_by_utterance_count_with_last(
                 counter_to_count_per_filter_value(data_action_counter),
                 -1,

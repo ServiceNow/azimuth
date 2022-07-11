@@ -35,3 +35,7 @@ A summary of the test results can be **downloaded**, as well as the **modified s
 both the evaluation set and training set. Download the required file by clicking **Export**
 :material-download: in the upper right corner of the table and then selecting the appropriate item
 from the menu.
+
+!!! tip "Augment custom utterance"
+
+    See our [:material-link: Custom Utterances page](custom-utterances.md) to learn how to augment additional data.

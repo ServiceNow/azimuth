@@ -9,6 +9,7 @@ from azimuth.modules.base_classes import AggregationModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.types import ModuleOptions, SupportedMethod, SupportedModelContract
 from azimuth.types.validation import ValidationResponse
+from azimuth.utils.logs import MultipleExceptions
 from azimuth.utils.validation import assert_not_none
 
 
@@ -69,6 +70,8 @@ class ValidationModule(AggregationModule[ModelContractConfig]):
             can_make_saliency = False
 
         # Should we raise instead?
+        if exception_gatherer.exceptions:
+            raise MultipleExceptions(exceptions=exception_gatherer.exceptions)
         return [
             ValidationResponse(
                 is_cuda_available=cuda_available,
@@ -77,7 +80,6 @@ class ValidationModule(AggregationModule[ModelContractConfig]):
                 model_has_correct_type=model_has_correct_type,
                 can_make_prediction=can_make_prediction,
                 can_make_saliency=can_make_saliency,
-                exceptions=exception_gatherer.exceptions,
             )
         ]
 

@@ -6,6 +6,7 @@ import {
   QueryPipelineState,
   QueryPostprocessingState,
   QueryState,
+  QueryConfusionMatrixState,
 } from "types/models";
 
 export const classNames = (...args: any[]) => args.filter(Boolean).join(" ");
@@ -37,12 +38,21 @@ const convertSearchParams = <T>(
 export const parseSearchString = (searchString: string) => {
   const q = new URLSearchParams(searchString);
   return {
+    confusionMatrix: convertSearchParams<QueryConfusionMatrixState>(q, {
+      normalized: (s) => s === null && undefined,
+    }),
     filters: convertSearchParams<QueryFilterState>(q, {
       confidenceMin: convertNumber,
       confidenceMax: convertNumber,
       labels: convertStringArray,
       predictions: convertStringArray,
-      smartTags: convertStringArray,
+      extremeLength: convertStringArray,
+      partialSyntax: convertStringArray,
+      dissimilar: convertStringArray,
+      almostCorrect: convertStringArray,
+      behavioralTesting: convertStringArray,
+      pipelineComparison: convertStringArray,
+      uncertain: convertStringArray,
       dataActions: convertStringArray,
       outcomes: convertStringArray,
       utterance: convertString,

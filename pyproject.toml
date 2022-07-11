@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "azimuth"
-version = "2.1.1"
+version = "2.2.0"
 description = "Azimuth provides an unified error analysis experience to data scientists."
 readme = "README.md"
 authors = ["Butter-ball team <xaicaps@servicenow.com>"]

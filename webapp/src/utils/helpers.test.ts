@@ -10,7 +10,13 @@ test("convertSearchParamsToFilterState", () => {
     confidenceMax: undefined,
     labels: undefined,
     predictions: undefined,
-    smartTags: undefined,
+    extremeLength: undefined,
+    partialSyntax: undefined,
+    dissimilar: undefined,
+    almostCorrect: undefined,
+    behavioralTesting: undefined,
+    pipelineComparison: undefined,
+    uncertain: undefined,
     dataActions: undefined,
     outcomes: undefined,
     utterance: undefined,
@@ -18,14 +24,20 @@ test("convertSearchParamsToFilterState", () => {
 
   expect(
     parseSearchString(
-      "?labels=1,2&predictions=3,4&smartTags=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
+      "?labels=1,2&predictions=3,4&partialSyntax=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
     ).filters
   ).toStrictEqual({
     confidenceMin: undefined,
     confidenceMax: undefined,
     labels: ["1", "2"],
     predictions: ["3", "4"],
-    smartTags: ["missing_obj", "missing_subj"],
+    extremeLength: undefined,
+    partialSyntax: ["missing_obj", "missing_subj"],
+    dissimilar: undefined,
+    almostCorrect: undefined,
+    behavioralTesting: undefined,
+    pipelineComparison: undefined,
+    uncertain: undefined,
     dataActions: ["remove", "relabel"],
     outcomes: ["CorrectAndPredicted", "IncorrectAndRejected"],
     utterance: undefined,
@@ -36,7 +48,13 @@ test("convertSearchParamsToFilterState", () => {
     confidenceMax: undefined,
     labels: undefined,
     predictions: ["3"],
-    smartTags: undefined,
+    extremeLength: undefined,
+    partialSyntax: undefined,
+    dissimilar: undefined,
+    almostCorrect: undefined,
+    behavioralTesting: undefined,
+    pipelineComparison: undefined,
+    uncertain: undefined,
     dataActions: undefined,
     outcomes: undefined,
     utterance: undefined,
@@ -47,7 +65,13 @@ test("convertSearchParamsToFilterState", () => {
     confidenceMax: undefined,
     labels: undefined,
     predictions: undefined,
-    smartTags: undefined,
+    extremeLength: undefined,
+    partialSyntax: undefined,
+    dissimilar: undefined,
+    almostCorrect: undefined,
+    behavioralTesting: undefined,
+    pipelineComparison: undefined,
+    uncertain: undefined,
     dataActions: undefined,
     outcomes: undefined,
     utterance: undefined,
@@ -63,7 +87,7 @@ test("constructSearchString", () => {
       confidenceMax: undefined,
       labels: undefined,
       predictions: undefined,
-      smartTags: undefined,
+      partialSyntax: undefined,
       dataActions: undefined,
       outcomes: undefined,
       utterance: undefined,
@@ -75,13 +99,13 @@ test("constructSearchString", () => {
       confidenceMax: 0.6,
       labels: ["1", "2"],
       predictions: ["3", "4"],
-      smartTags: ["missing_obj", "missing_subj"],
+      partialSyntax: ["missing_obj", "missing_subj"],
       dataActions: ["remove", "relabel"],
       outcomes: ["CorrectAndPredicted", "IncorrectAndRejected"],
       utterance: undefined,
     })
   ).toBe(
-    "?confidenceMin=0.4&confidenceMax=0.6&labels=1,2&predictions=3,4&smartTags=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
+    "?confidenceMin=0.4&confidenceMax=0.6&labels=1,2&predictions=3,4&partialSyntax=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
   );
   expect(
     constructSearchString({
@@ -143,12 +167,12 @@ describe("constructApiSearchString", () => {
         confidenceMax: 0.6,
         labels: ["class1", "class2"],
         predictions: ["class2", "class3"],
-        smartTags: ["missing_subj", "missing_obj"],
+        partialSyntax: ["missing_subj", "missing_obj"],
         dataActions: ["remove", "relabel"],
         outcomes: ["CorrectAndPredicted", "IncorrectAndRejected"],
       })
     ).toBe(
-      "?pipelineIndex=1&confidenceMin=0.4&confidenceMax=0.6&labels=class1&labels=class2&predictions=class2&predictions=class3&smartTags=missing_subj&smartTags=missing_obj&dataActions=remove&dataActions=relabel&outcomes=CorrectAndPredicted&outcomes=IncorrectAndRejected"
+      "?pipelineIndex=1&confidenceMin=0.4&confidenceMax=0.6&labels=class1&labels=class2&predictions=class2&predictions=class3&partialSyntax=missing_subj&partialSyntax=missing_obj&dataActions=remove&dataActions=relabel&outcomes=CorrectAndPredicted&outcomes=IncorrectAndRejected"
     );
   });
 });

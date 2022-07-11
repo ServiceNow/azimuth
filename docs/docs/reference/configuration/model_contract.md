@@ -28,6 +28,11 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
                 kwargs={"path": "recall"},
                 additional_kwargs={"average": "weighted"},
             ),
+            "F1": MetricDefinition(
+                class_name="datasets.load_metric",
+                kwargs={"path": "f1"},
+                additional_kwargs={"average": "weighted"},
+            ),
         }
     ```
 
@@ -218,7 +223,7 @@ Example: `distilbert.embeddings.word_embeddings`.
 
 :blue_circle: **Default value**: Precision and Recall. See in the config example below.
 
-By default, Azimuth will compute Precision and Recall on the dataset. `metrics` leverages custom
+By default, Azimuth will compute Precision, Recall and F1 on the dataset. `metrics` leverages custom
 objects, with an additional field which allow defining `kwargs`
 to be sent to the metric `compute()` function.
 
@@ -269,6 +274,15 @@ your own, as detailed in [:material-link: Defining Metrics](../custom-objects/me
           "additional_kwargs": {
             "average": "weighted"
           }
+        },
+        "F1": {
+            "class_name":"datasets.load_metric",
+            "kwargs": {
+              "path": "f1"
+            },
+            "additional_kwargs": {
+              "average": "weighted"
+            }
         }
       }
     }

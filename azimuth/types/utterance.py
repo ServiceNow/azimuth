@@ -7,8 +7,12 @@ from typing import List, Optional
 from pydantic import Field
 
 from azimuth.types import AliasModel
+from azimuth.types.model_performance import (
+    ValuePerDatasetSmartTag,
+    ValuePerPipelineSmartTag,
+)
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import DataAction, SmartTag
+from azimuth.types.tag import DataAction
 
 
 class ModelPrediction(AliasModel):
@@ -25,13 +29,12 @@ class ModelSaliency(AliasModel):
     saliencies: List[float] = Field(..., title="Saliency")
 
 
-class Utterance(AliasModel):
+class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str]):
     index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
     model_prediction: Optional[ModelPrediction] = Field(
         ..., title="Model prediction", nullable=True
     )
     model_saliency: Optional[ModelSaliency] = Field(..., title="Model saliency", nullable=True)
-    smart_tags: List[SmartTag] = Field(..., title="Smart tags")
     data_action: DataAction = Field(..., title="Data action tag")
     label: str = Field(..., title="Label")
     utterance: str = Field(..., title="Utterance")
@@ -40,6 +43,9 @@ class Utterance(AliasModel):
 class GetUtterancesResponse(AliasModel):
     utterances: List[Utterance] = Field(..., title="Utterances")
     utterance_count: int = Field(..., title="Utterance count")
+    confidence_threshold: Optional[float] = Field(
+        ..., title="Confidence threshold in selected pipeline (if any)", nullable=True
+    )
 
     class Config:
         schema_extra = {

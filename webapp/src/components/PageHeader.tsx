@@ -62,7 +62,8 @@ const PageHeader = () => {
 
   const history = useHistory();
   const location = useLocation();
-  const { filters, pagination, pipeline, postprocessing } = useQueryState();
+  const { confusionMatrix, filters, pagination, pipeline, postprocessing } =
+    useQueryState();
 
   // If present, preserve pipelineIndex when navigating, but nothing else
   const searchString = constructSearchString(pipeline);
@@ -70,10 +71,11 @@ const PageHeader = () => {
   const setPipeline = (pipelineIndex?: number) => {
     history.push(
       `${location.pathname}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
-        pipelineIndex,
         ...postprocessing,
+        pipelineIndex,
       })}`
     );
   };
@@ -98,7 +100,7 @@ const PageHeader = () => {
           name: "Settings",
         },
         {
-          pathname: `/${jobId}/threshold`,
+          pathname: `/${jobId}/thresholds`,
           name: "Threshold Comparison",
         },
         {

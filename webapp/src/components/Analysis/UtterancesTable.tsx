@@ -2,7 +2,7 @@ import { GetApp, SvgIconComponent } from "@mui/icons-material";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import { Box, Button, Chip, Tooltip, useTheme } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -13,8 +13,9 @@ import {
 import HoverableDataCell from "components/Analysis/HoverableDataCell";
 import UtterancesTableFooter from "components/Analysis/UtterancesTableFooter";
 import CopyButton from "components/CopyButton";
-import CheckIcon from "components/Icons/Check";
-import XIcon from "components/Icons/X";
+import Description from "components/Description";
+import OutcomeIcon from "components/Icons/OutcomeIcon";
+import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
 import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import UtteranceSaliency from "components/Utterance/UtteranceSaliency";
@@ -25,25 +26,27 @@ import {
   DataAction,
   DatasetInfoResponse,
   DatasetSplitName,
-  Outcome,
   Utterance,
   UtterancesSortableColumn,
 } from "types/api";
 import {
   QueryFilterState,
+  QueryConfusionMatrixState,
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
 import { downloadDatasetSplit } from "utils/api";
 import {
+  DATASET_SMART_TAG_FAMILIES,
   ID_TOOLTIP,
-  OUTCOME_COLOR,
-  OUTCOME_PRETTY_NAMES,
   PAGE_SIZE,
+  SMART_TAG_FAMILIES,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
+
+const SMART_TAG_WIDTH = 30;
 
 const useStyles = makeStyles((theme) => ({
   gridContainer: {
@@ -95,6 +98,7 @@ type Props = {
   jobId: string;
   datasetInfo?: DatasetInfoResponse;
   datasetSplitName: DatasetSplitName;
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
@@ -105,6 +109,7 @@ const UtterancesTable: React.FC<Props> = ({
   jobId,
   datasetInfo,
   datasetSplitName,
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
@@ -112,7 +117,6 @@ const UtterancesTable: React.FC<Props> = ({
 }) => {
   const history = useHistory();
   const classes = useStyles();
-  const theme = useTheme();
 
   const { page = 1, sort, descending } = pagination;
 
@@ -135,6 +139,7 @@ const UtterancesTable: React.FC<Props> = ({
 
   const handlePageChange = (page: number) => {
     const q = constructSearchString({
+      ...confusionMatrix,
       ...filters,
       ...pagination,
       ...pipeline,
@@ -151,6 +156,7 @@ const UtterancesTable: React.FC<Props> = ({
     history.push(
       `/${jobId}/dataset_splits/${datasetSplitName}/utterances${constructSearchString(
         {
+          ...confusionMatrix,
           ...filters,
           ...pagination,
           ...pipeline,
@@ -161,17 +167,19 @@ const UtterancesTable: React.FC<Props> = ({
       )}`
     );
 
+  const smartTagFamilies = isPipelineSelected(pipeline)
+    ? SMART_TAG_FAMILIES
+    : DATASET_SMART_TAG_FAMILIES;
+
   const renderHeaderWithFilter = (
     headerName: string,
-    filter?: string[],
+    filtered: boolean,
     Icon?: SvgIconComponent
   ) => (
     <>
       {Icon && <Icon className={classes.headerIcon} />}
       <div className="MuiDataGrid-columnHeaderTitle">{headerName}</div>
-      {filter !== undefined && (
-        <FilterAltOutlinedIcon fontSize="medium" color="success" />
-      )}
+      {filtered && <FilterAltOutlinedIcon fontSize="medium" color="success" />}
     </>
   );
 
@@ -204,32 +212,20 @@ const UtterancesTable: React.FC<Props> = ({
   const getConfidence = ({ row }: GridValueGetterParams<undefined, Row>) =>
     row.modelPrediction?.[`${prefix}Confidences`][0];
 
-  const outcomeIcon = (outcome: Outcome) => {
-    const Icon = outcome.includes("Correct") ? CheckIcon : XIcon;
-    const color = theme.palette[OUTCOME_COLOR[outcome]].main;
-    return (
-      <Tooltip title={OUTCOME_PRETTY_NAMES[outcome]}>
-        <Icon fontSize="large" sx={{ color }} />
-      </Tooltip>
-    );
-  };
-
   const renderOutcome = ({ row }: GridCellParams<undefined, Row>) =>
-    row.modelPrediction && outcomeIcon(row.modelPrediction[`${prefix}Outcome`]);
+    row.modelPrediction &&
+    OutcomeIcon({ outcome: row.modelPrediction[`${prefix}Outcome`] });
 
   const renderSmartTags = ({ row }: GridCellParams<undefined, Row>) => (
-    <HoverableDataCell>
-      {row.smartTags.map((tag) => (
-        <Chip
-          className={classes.chip}
-          color="primary"
-          variant="outlined"
-          size="small"
-          key={tag}
-          label={tag}
+    <Box display="grid" gridAutoColumns={SMART_TAG_WIDTH} gridAutoFlow="column">
+      {smartTagFamilies.map((family) => (
+        <SmartTagFamilyBadge
+          key={family}
+          family={family}
+          smartTags={row[family]}
         />
       ))}
-    </HoverableDataCell>
+    </Box>
   );
 
   const renderDataAction = ({
@@ -251,7 +247,8 @@ const UtterancesTable: React.FC<Props> = ({
       field: "id",
       headerName: "Id",
       description: ID_TOOLTIP,
-      width: 60,
+      minWidth: 40,
+      width: 40,
       sortable: false,
       align: "center",
       headerAlign: "center",
@@ -260,8 +257,10 @@ const UtterancesTable: React.FC<Props> = ({
       field: "utterance",
       headerClassName: classes.hideRightSeparator,
       headerName: "Utterance",
+      description:
+        "Utterances from dataset are overlaid with saliency maps, highlighting the most important tokens for the model's prediction.",
       flex: 5,
-      minWidth: 406,
+      minWidth: 413,
       renderCell: renderUtterance,
     },
     {
@@ -278,7 +277,11 @@ const UtterancesTable: React.FC<Props> = ({
     {
       field: "label",
       renderHeader: () =>
-        renderHeaderWithFilter("Label", filters.labels, AdjustIcon),
+        renderHeaderWithFilter(
+          "Label",
+          filters.labels !== undefined,
+          AdjustIcon
+        ),
       flex: 1,
       minWidth: 120,
       renderCell: renderHoverableDataCell,
@@ -289,7 +292,7 @@ const UtterancesTable: React.FC<Props> = ({
       renderHeader: () =>
         renderHeaderWithFilter(
           "Prediction",
-          filters.predictions,
+          filters.predictions !== undefined,
           MultilineChartIcon
         ),
       flex: 1,
@@ -310,7 +313,7 @@ const UtterancesTable: React.FC<Props> = ({
       field: "confidence",
       headerName: "Conf",
       description: "Confidence", // tooltip
-      width: 90,
+      width: 80,
       align: "center",
       headerAlign: "center",
       valueGetter: getConfidence,
@@ -320,20 +323,26 @@ const UtterancesTable: React.FC<Props> = ({
           : undefined,
     },
     {
-      field: "smartTags[]",
+      field: "smartTags",
+      headerName: "Smart Tags",
       renderHeader: () =>
-        renderHeaderWithFilter("Smart Tags", filters.smartTags),
-      flex: 5,
-      minWidth: 160,
+        renderHeaderWithFilter(
+          "Smart Tags",
+          smartTagFamilies.some((family) => filters[family] !== undefined)
+        ),
+      width: 10 + SMART_TAG_WIDTH * smartTagFamilies.length,
       renderCell: renderSmartTags,
       sortable: false,
     },
     {
       field: "dataAction",
       renderHeader: () =>
-        renderHeaderWithFilter("Proposed Action", filters.dataActions),
+        renderHeaderWithFilter(
+          "Proposed Action",
+          filters.dataActions !== undefined
+        ),
       renderCell: renderDataAction,
-      width: 192,
+      width: 155,
     },
   ];
 
@@ -359,6 +368,10 @@ const UtterancesTable: React.FC<Props> = ({
   return (
     <Box className={classes.gridContainer}>
       <div className={classes.gridHeaderActions}>
+        <Description
+          text="View insights on individual utterances with details results and annotations."
+          link="/exploration-space/utterances-table/"
+        />
         <Button
           className={classes.exportButton}
           onClick={() =>

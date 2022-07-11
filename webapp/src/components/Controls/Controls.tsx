@@ -7,6 +7,7 @@ import {
   IconButton,
   InputAdornment,
   OutlinedInput,
+  Stack,
   Switch,
   Tooltip,
   Typography,
@@ -17,12 +18,13 @@ import {
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
+  QueryConfusionMatrixState,
 } from "types/models";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { motion } from "framer-motion";
 import ClearIcon from "@mui/icons-material/Clear";
 import TuneIcon from "@mui/icons-material/Tune";
-import { DatasetSplitName } from "types/api";
+import { CountPerFilterResponse, DatasetSplitName } from "types/api";
 import { useHistory, useParams } from "react-router-dom";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
 import {
@@ -38,11 +40,18 @@ import DatasetSplitToggler from "./DatasetSplitToggler";
 import FilterSelector from "./FilterSelector";
 import FilterSlider from "./FilterSlider";
 import FilterTextField from "./FilterTextField";
-import { OUTCOME_PRETTY_NAMES } from "../../utils/const";
+import {
+  OUTCOME_PRETTY_NAMES,
+  SMART_TAG_FAMILIES,
+  SMART_TAG_FAMILY_ICONS,
+  SMART_TAG_FAMILY_PRETTY_NAMES,
+} from "utils/const";
+import Description from "components/Description";
 
 const MotionChevronLeftIcon = motion(ChevronLeftIcon);
 
 type Props = {
+  confusionMatrix: QueryConfusionMatrixState;
   filters: QueryFilterState;
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
@@ -50,7 +59,13 @@ type Props = {
   searchString: string;
 };
 
+type Query = {
+  data?: CountPerFilterResponse;
+  isFetching: boolean;
+};
+
 const Controls: React.FC<Props> = ({
+  confusionMatrix,
   filters,
   pagination,
   pipeline,
@@ -68,7 +83,7 @@ const Controls: React.FC<Props> = ({
   }>();
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
-  const { data: countPerFilter, isFetching: isFetchingCountPerFilter } =
+  const { data: countPerFilter, isFetching: isFetchingCountPerFilter }: Query =
     isPipelineSelected(pipeline)
       ? getOutcomeCountPerFilterEndpoint.useQuery({
           jobId,
@@ -91,7 +106,6 @@ const Controls: React.FC<Props> = ({
 
   const selectedLabels = filters.labels || [];
   const selectedPredictions = filters.predictions || [];
-  const selectedSmartTags = filters.smartTags || [];
   const selectedDataActions = filters.dataActions || [];
 
   const handleCollapseFilters = () => {
@@ -109,6 +123,7 @@ const Controls: React.FC<Props> = ({
   const handleClearFilters = () => {
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...pagination,
         ...pipeline,
         ...postprocessing,
@@ -119,6 +134,7 @@ const Controls: React.FC<Props> = ({
   const handleFilterChange = (filters: QueryFilterState) =>
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
         ...pipeline,
@@ -144,6 +160,7 @@ const Controls: React.FC<Props> = ({
   const handlePostprocessingChange = (checked: boolean) =>
     history.push(
       `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pagination,
         ...pipeline,
@@ -168,16 +185,11 @@ const Controls: React.FC<Props> = ({
   );
 
   return (
-    <Box
+    <Stack
       component={motion.div}
       border="1px solid rgba(0, 0, 0, 0.12)"
       boxSizing="content-box"
-      display="grid"
-      gridTemplateRows={`${theme.spacing(5)} auto ${theme.spacing(
-        6
-      )} auto auto auto`}
       overflow="hidden"
-      alignContent="flex-start"
       sx={{
         borderTopRightRadius: theme.shape.borderRadius,
         borderBottomRightRadius: theme.shape.borderRadius,
@@ -196,6 +208,7 @@ const Controls: React.FC<Props> = ({
           <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
             <TuneIcon />
             <Typography variant="subtitle2">Controls</Typography>
+            <Description link="/exploration-space/#control-panel" />
           </Box>
         )}
         <Button
@@ -330,17 +343,28 @@ const Controls: React.FC<Props> = ({
                 filters={countPerFilter?.countPerFilter.prediction}
                 isFetching={isFetchingCountPerFilter}
               />
-              {divider}
-              <FilterSelector
-                label="Smart Tags"
-                maxCount={maxCount}
-                operator="AND"
-                searchValue={searchValue}
-                selectedOptions={selectedSmartTags}
-                handleValueChange={handleFilterSelectorChange("smartTags")}
-                filters={countPerFilter?.countPerFilter.smartTag}
-                isFetching={isFetchingCountPerFilter}
-              />
+              {SMART_TAG_FAMILIES.map((filterName) => (
+                <React.Fragment key={filterName}>
+                  {divider}
+                  <FilterSelector
+                    label={
+                      <Stack direction="row" gap={1}>
+                        {SMART_TAG_FAMILY_PRETTY_NAMES[filterName]}
+                        {React.createElement(
+                          SMART_TAG_FAMILY_ICONS[filterName],
+                          {}
+                        )}
+                      </Stack>
+                    }
+                    maxCount={maxCount}
+                    searchValue={searchValue}
+                    selectedOptions={filters[filterName] ?? []}
+                    handleValueChange={handleFilterSelectorChange(filterName)}
+                    filters={countPerFilter?.countPerFilter[filterName]}
+                    isFetching={isFetchingCountPerFilter}
+                  />
+                </React.Fragment>
+              ))}
               {divider}
               <FilterSelector
                 label="Proposed Action"
@@ -355,7 +379,7 @@ const Controls: React.FC<Props> = ({
           </Box>
         </>
       )}
-    </Box>
+    </Stack>
   );
 };
 

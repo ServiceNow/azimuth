@@ -1,5 +1,3 @@
-from typing import List
-
 from azimuth.types import AliasModel
 
 
@@ -10,7 +8,3 @@ class ValidationResponse(AliasModel):
     model_has_correct_type: bool
     can_make_prediction: bool
     can_make_saliency: bool
-    exceptions: List[Exception]
-
-    class Config:
-        arbitrary_types_allowed = True

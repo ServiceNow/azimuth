@@ -18,8 +18,8 @@ to see more information on each metric.
     * :material-circle:{ .correct_rejected } **Correct & Rejected**
     * :material-circle:{ .incorrect_rejected } **Incorrect & Rejected**
     * :material-circle:{ .incorrect_predicted } **Incorrect & Predicted**
-* The 2nd and 3rd fields represent the **precision** and **recall**.
-* The 4th field shows the **Expected Calibration Error** (ECE), which indicates the quality of the
+* The second tile contains the **precision**, **recall** and **F1**.
+* The last tile shows the **Expected Calibration Error** (ECE), which indicates the quality of the
   model's calibration. An ECE of 0 means perfect calibration; A lower ECE is better. Hover the ECE
   to show a plot that displays the breakdown of the ECE computation per bin.
 

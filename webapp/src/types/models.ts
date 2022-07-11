@@ -5,14 +5,18 @@ import {
   UtterancesSortableColumn,
 } from "types/api";
 
-export type ApiCallState = "init" | "fetching" | "error" | "done";
-
 export type QueryFilterState = {
   confidenceMin?: number;
   confidenceMax?: number;
   labels?: string[];
   predictions?: string[];
-  smartTags?: SmartTag[];
+  extremeLength?: SmartTag[];
+  partialSyntax?: SmartTag[];
+  dissimilar?: SmartTag[];
+  almostCorrect?: SmartTag[];
+  behavioralTesting?: SmartTag[];
+  pipelineComparison?: SmartTag[];
+  uncertain?: SmartTag[];
   dataActions?: DataAction[];
   outcomes?: Outcome[];
   utterance?: string;
@@ -32,10 +36,15 @@ export type QueryPostprocessingState = {
   withoutPostprocessing?: true;
 };
 
+export type QueryConfusionMatrixState = {
+  normalized?: false;
+};
+
 export type QueryState = QueryFilterState &
   QueryPaginationState &
   QueryPipelineState &
-  QueryPostprocessingState;
+  QueryPostprocessingState &
+  QueryConfusionMatrixState;
 
 export type Tags = { [Tag: string]: boolean };
 

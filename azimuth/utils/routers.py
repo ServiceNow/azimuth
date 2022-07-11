@@ -24,7 +24,7 @@ from azimuth.types import (
     SupportedTask,
 )
 from azimuth.types.outcomes import OutcomeName
-from azimuth.types.tag import DataAction, SmartTag
+from azimuth.types.tag import DataAction, SmartTag, SmartTagFamily
 from azimuth.utils.project import predictions_available
 
 
@@ -39,7 +39,15 @@ def build_named_dataset_filters(
     confidence_max: float = Query(1, title="Maximum confidence", alias="confidenceMax"),
     labels: List[str] = Query([], title="Label"),
     predictions: List[str] = Query([], title="Prediction"),
-    smart_tags: List[SmartTag] = Query([], title="Smart tags", alias="smartTags"),
+    extreme_length: List[SmartTag] = Query([], title="Extreme length", alias="extremeLength"),
+    partial_syntax: List[SmartTag] = Query([], title="Partial syntax", alias="partialSyntax"),
+    dissimilar: List[SmartTag] = Query([], title="Dissimilar"),
+    almost_correct: List[SmartTag] = Query([], title="Almost correct", alias="almostCorrect"),
+    behavioral_testing: List[SmartTag] = Query(
+        [], title="Behavioral testing", alias="behavioralTesting"
+    ),
+    pipeline_comparison: List[SmartTag] = Query([], title="Pipeline comparison"),
+    uncertain: List[SmartTag] = Query([], title="Uncertain"),
     data_actions: List[DataAction] = Query([], title="Data action tags", alias="dataActions"),
     outcomes: List[OutcomeName] = Query([], title="Outcomes", alias="outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
@@ -51,7 +59,13 @@ def build_named_dataset_filters(
         confidence_max: The desired maximum confidence
         labels: The desired class labels
         predictions: The desired class predictions
-        smart_tags: The desired smart tags
+        extreme_length: The desired `extreme_length` smart tags
+        partial_syntax: The desired `partial_syntax` smart tags
+        dissimilar: The desired `dissimilar` smart tags
+        almost_correct: The desired `almost_correct` smart tags
+        behavioral_testing: The desired `behavioral_testing` smart tags
+        pipeline_comparison: The desired `pipeline_comparison` smart tags
+        uncertain: The desired `uncertain` smart tags
         data_actions: The desired data_action tags
         outcomes: The desired outcomes
         utterance: The substring desired in each utterance
@@ -65,7 +79,15 @@ def build_named_dataset_filters(
         confidence_max=confidence_max,
         labels=labels,
         predictions=predictions,
-        smart_tags=smart_tags,
+        smart_tags={
+            SmartTagFamily.extreme_length: extreme_length,
+            SmartTagFamily.partial_syntax: partial_syntax,
+            SmartTagFamily.dissimilar: dissimilar,
+            SmartTagFamily.almost_correct: almost_correct,
+            SmartTagFamily.behavioral_testing: behavioral_testing,
+            SmartTagFamily.pipeline_comparison: pipeline_comparison,
+            SmartTagFamily.uncertain: uncertain,
+        },
         data_actions=data_actions,
         utterance=utterance,
         outcomes=outcomes,

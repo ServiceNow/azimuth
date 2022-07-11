@@ -1,3 +1,13 @@
+import {
+  AlmostCorrect,
+  BehavioralTesting,
+  Dissimilar,
+  ExtremeLength,
+  PartialSyntax,
+  PipelineComparison,
+  Uncertain,
+} from "components/Icons/SmartTagFamily";
+
 export const DATASET_SPLIT_NAMES = ["eval", "train"] as const;
 
 export const DATASET_SPLIT_PRETTY_NAMES = {
@@ -37,3 +47,38 @@ export const OUTCOME_PRETTY_NAMES = {
 
 export const PREDICTION_CONFIDENCE_FAILURE_REASON =
   "Confidence too far from original.";
+
+// The families of smart tags that don't require a pipeline
+export const DATASET_SMART_TAG_FAMILIES = [
+  "extremeLength",
+  "partialSyntax",
+  "dissimilar",
+] as const;
+
+export const SMART_TAG_FAMILIES = [
+  ...DATASET_SMART_TAG_FAMILIES,
+  "almostCorrect",
+  "behavioralTesting",
+  "pipelineComparison",
+  "uncertain",
+] as const;
+
+export const SMART_TAG_FAMILY_ICONS = {
+  extremeLength: ExtremeLength,
+  partialSyntax: PartialSyntax,
+  dissimilar: Dissimilar,
+  almostCorrect: AlmostCorrect,
+  behavioralTesting: BehavioralTesting,
+  pipelineComparison: PipelineComparison,
+  uncertain: Uncertain,
+} as const;
+
+export const SMART_TAG_FAMILY_PRETTY_NAMES = {
+  extremeLength: "Extreme Length",
+  partialSyntax: "Partial Syntax",
+  dissimilar: "Dissimilar",
+  almostCorrect: "Almost Correct",
+  behavioralTesting: "Behavioral Testing",
+  pipelineComparison: "Pipeline Comparison",
+  uncertain: "Uncertain",
+} as const;

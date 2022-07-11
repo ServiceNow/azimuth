@@ -1,6 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from copy import copy
 from enum import Enum
 from typing import Dict, List, Optional
 
@@ -35,8 +36,9 @@ from azimuth.types.similarity_analysis import (
 )
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
-    ALL_PREDICTION_TAGS,
-    ALL_SMART_TAGS,
+    DATASET_SMART_TAG_FAMILIES,
+    PIPELINE_SMART_TAG_FAMILIES,
+    SMART_TAGS_FAMILY_MAPPING,
     DataAction,
 )
 from azimuth.types.utterance import (
@@ -48,6 +50,7 @@ from azimuth.types.utterance import (
 from azimuth.utils.filtering import filter_dataset_split
 from azimuth.utils.project import (
     perturbation_testing_available,
+    postprocessing_known,
     predictions_available,
     saliency_available,
     similarity_available,
@@ -115,6 +118,14 @@ def get_utterances(
     ):
         sort_by = UtterancesSortableColumn.index
 
+    threshold = (
+        config.pipelines[pipeline_index].threshold
+        if config.pipelines is not None
+        and pipeline_index is not None
+        and postprocessing_known(task_manager.config, pipeline_index)
+        else None
+    )
+
     dataset_filters = named_filters.to_dataset_filters(dataset_split_manager.get_class_names())
     table_key = (
         PredictionTableKey.from_pipeline_index(
@@ -133,7 +144,9 @@ def get_utterances(
 
     if len(ds_filtered) == 0:
         # No utterances, empty response.
-        return GetUtterancesResponse(utterances=[], utterance_count=0)
+        return GetUtterancesResponse(
+            utterances=[], utterance_count=0, confidence_threshold=threshold
+        )
 
     ds = dataset_split_manager.get_dataset_split_with_class_names(table_key=table_key).select(
         ds_filtered[DatasetColumn.row_idx]
@@ -160,7 +173,9 @@ def get_utterances(
 
     if len(ds) == 0:
         # No utterances, empty response.
-        return GetUtterancesResponse(utterances=[], utterance_count=utterance_count)
+        return GetUtterancesResponse(
+            utterances=[], utterance_count=utterance_count, confidence_threshold=threshold
+        )
 
     indices_subset = ds[DatasetColumn.row_idx]
     tags = dataset_split_manager.get_tags(indices_subset, table_key=table_key)
@@ -212,11 +227,9 @@ def get_utterances(
     else:
         model_saliencies = [None] * len(ds)
 
-    available_tags = (
-        ALL_SMART_TAGS
-        if pipeline_index is not None
-        else set(ALL_SMART_TAGS).difference(ALL_PREDICTION_TAGS)
-    )
+    available_families = copy(DATASET_SMART_TAG_FAMILIES)
+    if pipeline_index is not None:
+        available_families += PIPELINE_SMART_TAG_FAMILIES
     utterances = [
         Utterance(
             index=data[DatasetColumn.row_idx],
@@ -224,18 +237,26 @@ def get_utterances(
                 (t for t, v in tag.items() if t in ALL_DATA_ACTIONS and v),
                 DataAction.no_action,
             ),
-            smart_tags=[t for t, v in tag.items() if t in available_tags and v],
             label=data[dataset_split_manager.config.columns.label],
             utterance=data[dataset_split_manager.config.columns.text_input],
             model_prediction=model_prediction,
             model_saliency=model_saliency,
+            # Smart tags families
+            **{
+                family.value: [t for t in tags_in_family if tag[t]]
+                if family in available_families
+                else []
+                for family, tags_in_family in SMART_TAGS_FAMILY_MAPPING.items()
+            },
         )
         for data, tag, model_saliency, model_prediction in zip(
             ds, tags, model_saliencies, predictions
         )
     ]
 
-    return GetUtterancesResponse(utterances=utterances, utterance_count=utterance_count)
+    return GetUtterancesResponse(
+        utterances=utterances, utterance_count=utterance_count, confidence_threshold=threshold
+    )
 
 
 @router.get(
@@ -291,7 +312,7 @@ def get_perturbed_utterances(
 def get_similar(
     dataset_split_name: DatasetSplitName,
     index: int,
-    limit: int = Query(10, title="Limit"),
+    limit: int = Query(20, title="Limit"),
     neighbors_dataset_split_name: Optional[DatasetSplitName] = Query(
         None, title="Neighbors dataset split", alias="neighborsDatasetSplitName"
     ),
