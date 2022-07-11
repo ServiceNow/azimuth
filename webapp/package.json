@@ -11,6 +11,7 @@
     "@mui/system": "^5.5.1",
     "@mui/x-data-grid": "^5.6.1",
     "@reduxjs/toolkit": "^1.8.1",
+    "@testing-library/react-hooks": "^8.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "framer-motion": "^4.1.17",
