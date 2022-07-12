@@ -1,3 +1,5 @@
+import _ from "lodash";
+import { Link } from "react-router-dom";
 import {
   Box,
   ListSubheader,
@@ -11,6 +13,7 @@ import {
   GridColumnMenuContainer,
   GridColumnMenuProps,
   GridColumnsMenuItem,
+  GridRow,
   GridRowSpacingParams,
   GridSortCellParams,
   GridSortModel,
@@ -23,11 +26,11 @@ import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
-import { Table, Column } from "components/Table";
+import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
 import { getMetricsPerFilterEndpoint } from "services/api";
-import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
+import { DatasetSplitName, MetricsPerFilterValue, Outcome } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
@@ -38,6 +41,7 @@ import {
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
+import { constructSearchString } from "utils/helpers";
 
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
@@ -77,7 +81,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     React.useState<DatasetSplitName>("eval");
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
-
   const { data, isFetching, error } = getMetricsPerFilterEndpoint.useQuery({
     jobId,
     datasetSplitName: selectedDatasetSplit,
@@ -240,6 +243,37 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     };
   }, []);
 
+  const filterName = BASIC_FILTER_OPTIONS.find(
+    (option) => option === selectedMetricPerFilterOption
+  )
+    ? `${selectedMetricPerFilterOption}s`
+    : selectedMetricPerFilterOption;
+
+  const constructFilterQueryVal = (value: string) =>
+    (value === "overall" &&
+      data &&
+      data.metricsPerFilter[selectedMetricPerFilterOption].map(
+        (metrics) => metrics.filterValue
+      )) ||
+    value;
+
+  const RowLink = (props: RowProps<Row>) => (
+    <Link
+      style={{ color: "unset", textDecoration: "unset" }}
+      to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/performance_overview${constructSearchString(
+        {
+          [filterName]: [constructFilterQueryVal(props.row.filterValue)],
+          outcomes: _.keys(
+            _.pickBy(props.row.outcomeCount, (outcomeCount) => outcomeCount > 0)
+          ) as Outcome[],
+          ...pipeline,
+        }
+      )}`}
+    >
+      <GridRow {...props} />
+    </Link>
+  );
+
   return error ? (
     <Typography
       sx={{ minHeight: 20 }}
@@ -285,6 +319,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         sortingOrder={["desc", "asc"]}
         components={{
           ColumnMenu,
+          Row: RowLink,
           ...(rows.length > INITIAL_NUMBER_VISIBLE
             ? {
                 Footer,
