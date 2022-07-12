@@ -63,7 +63,7 @@ training set or on the evaluation set.
 
     :material-dots-vertical: Beside each column header, click the vertical dots to hide the
     corresponding column, or multiple ones by selecting 'Show columns'. However, the table columns
-    will reappear as soon as the table is modified (e.g. sorting) or if the page is refreshed.
+    will reappear if the page is refreshed.
 
 ![Screenshot](../_static/images/dashboard/performance-analysis.png)
 

@@ -11,6 +11,7 @@ import {
   GridColumnMenuContainer,
   GridColumnMenuProps,
   GridColumnsMenuItem,
+  GridColumnVisibilityModel,
   GridRow,
   GridRowSpacingParams,
   GridSortCellParams,
@@ -87,10 +88,14 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     ...pipeline,
   });
 
-  // Track table sort model to keep 'overall' at top
+  // Track table sort model to keep 'overall' at top.
+  // Controlling sort model triggers rerenders that lose any uncontrolled states,
+  // so we must control all states.
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
     { field: "utteranceCount", sort: "desc" },
   ]);
+  const [columnVisibilityModel, onColumnVisibilityModelChange] =
+    React.useState<GridColumnVisibilityModel>({});
 
   const rows: Row[] = React.useMemo(() => {
     return data
@@ -292,6 +297,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         }}
         sortModel={sortModel}
         onSortModelChange={setSortModel}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={onColumnVisibilityModelChange}
         getRowClassName={({ id }) => `${id === OVERALL_ROW_ID ? "total" : ""}`}
         getRowSpacing={getRowSpacing}
         autoHeight
