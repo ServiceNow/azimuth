@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Added a row link facility to the rows of performance table of dashboard to navigate to exploration page with filters applied.
 
 ### Changed
 
