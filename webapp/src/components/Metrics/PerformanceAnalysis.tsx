@@ -251,8 +251,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
 
   const constructFilterQueryVal = (value: string) =>
     (value === "overall" &&
-      data &&
-      data.metricsPerFilter[selectedMetricPerFilterOption].map(
+      data?.metricsPerFilter[selectedMetricPerFilterOption].map(
         (metrics) => metrics.filterValue
       )) ||
     value;
