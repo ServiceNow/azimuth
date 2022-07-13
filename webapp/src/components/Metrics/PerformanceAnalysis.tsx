@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -30,7 +29,7 @@ import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
 import { getMetricsPerFilterEndpoint } from "services/api";
-import { DatasetSplitName, MetricsPerFilterValue, Outcome } from "types/api";
+import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
@@ -262,9 +261,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/performance_overview${constructSearchString(
         {
           [filterName]: [constructFilterQueryVal(props.row.filterValue)],
-          outcomes: _.keys(
-            _.pickBy(props.row.outcomeCount, (outcomeCount) => outcomeCount > 0)
-          ) as Outcome[],
           ...pipeline,
         }
       )}`}
