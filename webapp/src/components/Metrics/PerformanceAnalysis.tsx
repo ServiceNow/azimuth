@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import {
   Box,
   ListSubheader,
@@ -28,6 +27,7 @@ import SeeMoreLess, {
 import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
+import { Link } from "react-router-dom";
 import { getMetricsPerFilterEndpoint } from "services/api";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
@@ -80,6 +80,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     React.useState<DatasetSplitName>("eval");
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
+
   const { data, isFetching, error } = getMetricsPerFilterEndpoint.useQuery({
     jobId,
     datasetSplitName: selectedDatasetSplit,
@@ -242,9 +243,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     };
   }, []);
 
-  const filterName = BASIC_FILTER_OPTIONS.find(
-    (option) => option === selectedMetricPerFilterOption
-  )
+  const filterName = (
+    BASIC_FILTER_OPTIONS as readonly FilterByViewOption[]
+  ).includes(selectedMetricPerFilterOption)
     ? `${selectedMetricPerFilterOption}s`
     : selectedMetricPerFilterOption;
 
