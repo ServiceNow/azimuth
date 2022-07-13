@@ -248,19 +248,14 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     ? `${selectedMetricPerFilterOption}s`
     : selectedMetricPerFilterOption;
 
-  const constructFilterQueryVal = (value: string) =>
-    (value === "overall" &&
-      data?.metricsPerFilter[selectedMetricPerFilterOption].map(
-        (metrics) => metrics.filterValue
-      )) ||
-    value;
-
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
       to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/performance_overview${constructSearchString(
         {
-          [filterName]: [constructFilterQueryVal(props.row.filterValue)],
+          ...(props.row.id !== OVERALL_ROW_ID && {
+            [filterName]: [props.row.filterValue],
+          }),
           ...pipeline,
         }
       )}`}
