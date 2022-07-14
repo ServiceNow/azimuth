@@ -11,6 +11,7 @@ import {
   GridColumnMenuContainer,
   GridColumnMenuProps,
   GridColumnsMenuItem,
+  GridRow,
   GridRowSpacingParams,
   GridSortCellParams,
   GridSortModel,
@@ -23,9 +24,10 @@ import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
-import { Table, Column } from "components/Table";
+import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
+import { Link } from "react-router-dom";
 import { getMetricsPerFilterEndpoint } from "services/api";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
@@ -38,6 +40,7 @@ import {
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
+import { constructSearchString } from "utils/helpers";
 
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
@@ -240,6 +243,28 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     };
   }, []);
 
+  const filterName = (
+    BASIC_FILTER_OPTIONS as readonly FilterByViewOption[]
+  ).includes(selectedMetricPerFilterOption)
+    ? `${selectedMetricPerFilterOption}s`
+    : selectedMetricPerFilterOption;
+
+  const RowLink = (props: RowProps<Row>) => (
+    <Link
+      style={{ color: "unset", textDecoration: "unset" }}
+      to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/performance_overview${constructSearchString(
+        {
+          ...(props.row.id !== OVERALL_ROW_ID && {
+            [filterName]: [props.row.filterValue],
+          }),
+          ...pipeline,
+        }
+      )}`}
+    >
+      <GridRow {...props} />
+    </Link>
+  );
+
   return error ? (
     <Typography
       sx={{ minHeight: 20 }}
@@ -285,6 +310,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         sortingOrder={["desc", "asc"]}
         components={{
           ColumnMenu,
+          Row: RowLink,
           ...(rows.length > INITIAL_NUMBER_VISIBLE
             ? {
                 Footer,

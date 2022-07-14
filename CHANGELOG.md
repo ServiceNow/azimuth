@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Rows of Performance Analysis table now link to exploration page with filters applied.
 
 ### Changed
 
