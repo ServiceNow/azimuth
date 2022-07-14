@@ -5,9 +5,7 @@ import {
   UtterancesSortableColumn,
 } from "types/api";
 
-export type QueryFilterState = {
-  confidenceMin?: number;
-  confidenceMax?: number;
+export type QueryArrayFiltersState = {
   label?: string[];
   prediction?: string[];
   extremeLength?: SmartTag[];
@@ -19,6 +17,11 @@ export type QueryFilterState = {
   uncertain?: SmartTag[];
   dataAction?: DataAction[];
   outcome?: Outcome[];
+};
+
+export type QueryFilterState = QueryArrayFiltersState & {
+  confidenceMin?: number;
+  confidenceMax?: number;
   utterance?: string;
 };
 
