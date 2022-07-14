@@ -104,10 +104,6 @@ const Controls: React.FC<Props> = ({
     `${datasetSplitName}ClassDistribution`
   ].reduce((a, b) => a + b);
 
-  const selectedLabels = filters.labels || [];
-  const selectedPredictions = filters.predictions || [];
-  const selectedDataActions = filters.dataActions || [];
-
   const handleCollapseFilters = () => {
     setIsCollapsed(!isCollapsed);
   };
@@ -317,8 +313,8 @@ const Controls: React.FC<Props> = ({
                 label="Prediction Outcome"
                 maxCount={maxCount}
                 searchValue={searchValue}
-                selectedOptions={filters.outcomes || []}
-                handleValueChange={handleFilterSelectorChange("outcomes")}
+                selectedOptions={filters.outcome ?? []}
+                handleValueChange={handleFilterSelectorChange("outcome")}
                 filters={countPerFilter?.countPerFilter.outcome}
                 isFetching={isFetchingCountPerFilter}
                 prettyNames={OUTCOME_PRETTY_NAMES}
@@ -328,8 +324,8 @@ const Controls: React.FC<Props> = ({
                 label="Label"
                 maxCount={maxCount}
                 searchValue={searchValue}
-                selectedOptions={selectedLabels}
-                handleValueChange={handleFilterSelectorChange("labels")}
+                selectedOptions={filters.label ?? []}
+                handleValueChange={handleFilterSelectorChange("label")}
                 filters={countPerFilter?.countPerFilter.label}
                 isFetching={isFetchingCountPerFilter}
               />
@@ -338,8 +334,8 @@ const Controls: React.FC<Props> = ({
                 label="Prediction"
                 maxCount={maxCount}
                 searchValue={searchValue}
-                selectedOptions={selectedPredictions}
-                handleValueChange={handleFilterSelectorChange("predictions")}
+                selectedOptions={filters.prediction ?? []}
+                handleValueChange={handleFilterSelectorChange("prediction")}
                 filters={countPerFilter?.countPerFilter.prediction}
                 isFetching={isFetchingCountPerFilter}
               />
@@ -370,8 +366,8 @@ const Controls: React.FC<Props> = ({
                 label="Proposed Action"
                 maxCount={maxCount}
                 searchValue={searchValue}
-                selectedOptions={selectedDataActions}
-                handleValueChange={handleFilterSelectorChange("dataActions")}
+                selectedOptions={filters.dataAction ?? []}
+                handleValueChange={handleFilterSelectorChange("dataAction")}
                 filters={countPerFilter?.countPerFilter.dataAction}
                 isFetching={isFetchingCountPerFilter}
               />

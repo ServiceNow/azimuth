@@ -8,8 +8,8 @@ test("convertSearchParamsToFilterState", () => {
   expect(parseSearchString("").filters).toStrictEqual({
     confidenceMin: undefined,
     confidenceMax: undefined,
-    labels: undefined,
-    predictions: undefined,
+    label: undefined,
+    prediction: undefined,
     extremeLength: undefined,
     partialSyntax: undefined,
     dissimilar: undefined,
@@ -17,20 +17,20 @@ test("convertSearchParamsToFilterState", () => {
     behavioralTesting: undefined,
     pipelineComparison: undefined,
     uncertain: undefined,
-    dataActions: undefined,
-    outcomes: undefined,
+    dataAction: undefined,
+    outcome: undefined,
     utterance: undefined,
   });
 
   expect(
     parseSearchString(
-      "?labels=1,2&predictions=3,4&partialSyntax=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
+      "?label=1,2&prediction=3,4&partialSyntax=missing_obj,missing_subj&dataAction=remove,relabel&outcome=CorrectAndPredicted,IncorrectAndRejected"
     ).filters
   ).toStrictEqual({
     confidenceMin: undefined,
     confidenceMax: undefined,
-    labels: ["1", "2"],
-    predictions: ["3", "4"],
+    label: ["1", "2"],
+    prediction: ["3", "4"],
     extremeLength: undefined,
     partialSyntax: ["missing_obj", "missing_subj"],
     dissimilar: undefined,
@@ -38,16 +38,16 @@ test("convertSearchParamsToFilterState", () => {
     behavioralTesting: undefined,
     pipelineComparison: undefined,
     uncertain: undefined,
-    dataActions: ["remove", "relabel"],
-    outcomes: ["CorrectAndPredicted", "IncorrectAndRejected"],
+    dataAction: ["remove", "relabel"],
+    outcome: ["CorrectAndPredicted", "IncorrectAndRejected"],
     utterance: undefined,
   });
 
-  expect(parseSearchString("predictions=3").filters).toStrictEqual({
+  expect(parseSearchString("prediction=3").filters).toStrictEqual({
     confidenceMin: undefined,
     confidenceMax: undefined,
-    labels: undefined,
-    predictions: ["3"],
+    label: undefined,
+    prediction: ["3"],
     extremeLength: undefined,
     partialSyntax: undefined,
     dissimilar: undefined,
@@ -55,16 +55,16 @@ test("convertSearchParamsToFilterState", () => {
     behavioralTesting: undefined,
     pipelineComparison: undefined,
     uncertain: undefined,
-    dataActions: undefined,
-    outcomes: undefined,
+    dataAction: undefined,
+    outcome: undefined,
     utterance: undefined,
   });
 
   expect(parseSearchString("confidenceMin=0").filters).toStrictEqual({
     confidenceMin: 0,
     confidenceMax: undefined,
-    labels: undefined,
-    predictions: undefined,
+    label: undefined,
+    prediction: undefined,
     extremeLength: undefined,
     partialSyntax: undefined,
     dissimilar: undefined,
@@ -72,24 +72,24 @@ test("convertSearchParamsToFilterState", () => {
     behavioralTesting: undefined,
     pipelineComparison: undefined,
     uncertain: undefined,
-    dataActions: undefined,
-    outcomes: undefined,
+    dataAction: undefined,
+    outcome: undefined,
     utterance: undefined,
   });
 });
 
 test("constructSearchString", () => {
   expect(constructSearchString({})).toBe("");
-  expect(constructSearchString({ outcomes: [] })).toBe("");
+  expect(constructSearchString({ outcome: [] })).toBe("");
   expect(
     constructSearchString({
       confidenceMin: undefined,
       confidenceMax: undefined,
-      labels: undefined,
-      predictions: undefined,
+      label: undefined,
+      prediction: undefined,
       partialSyntax: undefined,
-      dataActions: undefined,
-      outcomes: undefined,
+      dataAction: undefined,
+      outcome: undefined,
       utterance: undefined,
     })
   ).toBe("");
@@ -97,21 +97,21 @@ test("constructSearchString", () => {
     constructSearchString({
       confidenceMin: 0.4,
       confidenceMax: 0.6,
-      labels: ["1", "2"],
-      predictions: ["3", "4"],
+      label: ["1", "2"],
+      prediction: ["3", "4"],
       partialSyntax: ["missing_obj", "missing_subj"],
-      dataActions: ["remove", "relabel"],
-      outcomes: ["CorrectAndPredicted", "IncorrectAndRejected"],
+      dataAction: ["remove", "relabel"],
+      outcome: ["CorrectAndPredicted", "IncorrectAndRejected"],
       utterance: undefined,
     })
   ).toBe(
-    "?confidenceMin=0.4&confidenceMax=0.6&labels=1,2&predictions=3,4&partialSyntax=missing_obj,missing_subj&dataActions=remove,relabel&outcomes=CorrectAndPredicted,IncorrectAndRejected"
+    "?confidenceMin=0.4&confidenceMax=0.6&label=1,2&prediction=3,4&partialSyntax=missing_obj,missing_subj&dataAction=remove,relabel&outcome=CorrectAndPredicted,IncorrectAndRejected"
   );
   expect(
     constructSearchString({
-      predictions: ["3"],
+      prediction: ["3"],
     })
-  ).toBe("?predictions=3");
+  ).toBe("?prediction=3");
 });
 
 describe("constructApiSearchString", () => {
@@ -120,7 +120,7 @@ describe("constructApiSearchString", () => {
   });
 
   it("ignores empty arrays", () => {
-    expect(constructApiSearchString({ outcomes: [] })).toBe("");
+    expect(constructApiSearchString({ outcome: [] })).toBe("");
   });
 
   it("supports numbers", () => {
@@ -165,14 +165,14 @@ describe("constructApiSearchString", () => {
         pipelineIndex: 1,
         confidenceMin: 0.4,
         confidenceMax: 0.6,
-        labels: ["class1", "class2"],
-        predictions: ["class2", "class3"],
+        label: ["class1", "class2"],
+        prediction: ["class2", "class3"],
         partialSyntax: ["missing_subj", "missing_obj"],
-        dataActions: ["remove", "relabel"],
-        outcomes: ["CorrectAndPredicted", "IncorrectAndRejected"],
+        dataAction: ["remove", "relabel"],
+        outcome: ["CorrectAndPredicted", "IncorrectAndRejected"],
       })
     ).toBe(
-      "?pipelineIndex=1&confidenceMin=0.4&confidenceMax=0.6&labels=class1&labels=class2&predictions=class2&predictions=class3&partialSyntax=missing_subj&partialSyntax=missing_obj&dataActions=remove&dataActions=relabel&outcomes=CorrectAndPredicted&outcomes=IncorrectAndRejected"
+      "?pipelineIndex=1&confidenceMin=0.4&confidenceMax=0.6&label=class1&label=class2&prediction=class2&prediction=class3&partialSyntax=missing_subj&partialSyntax=missing_obj&dataAction=remove&dataAction=relabel&outcome=CorrectAndPredicted&outcome=IncorrectAndRejected"
     );
   });
 });

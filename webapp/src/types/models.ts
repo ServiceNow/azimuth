@@ -8,8 +8,8 @@ import {
 export type QueryFilterState = {
   confidenceMin?: number;
   confidenceMax?: number;
-  labels?: string[];
-  predictions?: string[];
+  label?: string[];
+  prediction?: string[];
   extremeLength?: SmartTag[];
   partialSyntax?: SmartTag[];
   dissimilar?: SmartTag[];
@@ -17,8 +17,8 @@ export type QueryFilterState = {
   behavioralTesting?: SmartTag[];
   pipelineComparison?: SmartTag[];
   uncertain?: SmartTag[];
-  dataActions?: DataAction[];
-  outcomes?: Outcome[];
+  dataAction?: DataAction[];
+  outcome?: Outcome[];
   utterance?: string;
 };
 

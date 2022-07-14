@@ -73,13 +73,13 @@ def test_module_cache_with_options(simple_text_config):
     original_mod = FilterableModule(
         DatasetSplitName.eval,
         simple_text_config,
-        mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
+        mod_options=ModuleOptions(filters=DatasetFilters(label=[0]), pipeline_index=0),
     )
 
     modified_mod = FilterableModule(
         DatasetSplitName.eval,
         simple_text_config,
-        mod_options=ModuleOptions(filters=DatasetFilters(labels=[1]), pipeline_index=0),
+        mod_options=ModuleOptions(filters=DatasetFilters(label=[1]), pipeline_index=0),
     )
 
     assert original_mod.name != modified_mod.name
@@ -89,7 +89,7 @@ def test_module_cache_with_options(simple_text_config):
         Module(
             DatasetSplitName.eval,
             simple_text_config,
-            mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
+            mod_options=ModuleOptions(filters=DatasetFilters(label=[0]), pipeline_index=0),
         )
 
 

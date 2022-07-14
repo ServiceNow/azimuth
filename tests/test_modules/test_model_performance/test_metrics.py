@@ -55,7 +55,7 @@ def test_metrics(tiny_text_config):
     metrics_mod_filters = MetricsModule(
         DatasetSplitName.eval,
         tiny_text_config,
-        mod_options=ModuleOptions(filters=DatasetFilters(predictions=[1]), pipeline_index=0),
+        mod_options=ModuleOptions(filters=DatasetFilters(prediction=[1]), pipeline_index=0),
     )
     [metrics_res_filters] = metrics_mod_filters.compute_on_dataset_split()
 
@@ -120,7 +120,7 @@ def test_empty_ds(tiny_text_config):
     mod = MetricsModule(
         DatasetSplitName.eval,
         tiny_text_config,
-        mod_options=ModuleOptions(filters=DatasetFilters(labels=[42]), pipeline_index=0),
+        mod_options=ModuleOptions(filters=DatasetFilters(label=[42]), pipeline_index=0),
     )
     _ = mod.get_dataset_split()
     [json_output] = mod.compute_on_dataset_split()
@@ -177,7 +177,7 @@ def test_outcome_count_per_filter(tiny_text_config):
     mod_filter_0 = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,
         config=tiny_text_config,
-        mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
+        mod_options=ModuleOptions(filters=DatasetFilters(label=[0]), pipeline_index=0),
     )
 
     [res_filter_0] = mod_filter_0.compute_on_dataset_split()
