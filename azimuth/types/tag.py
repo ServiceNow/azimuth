@@ -86,24 +86,6 @@ ALL_SMART_TAG_FILTERS = [a.value for a in SmartTag]
 ALL_SMART_TAGS = [a for a in ALL_SMART_TAG_FILTERS if a != SmartTag.no_smart_tag]
 
 ALL_TAGS = ALL_SMART_TAGS + ALL_DATA_ACTIONS
-ALL_SYNTAX_TAGS = [
-    SmartTag.multi_sent,
-    SmartTag.short,
-    SmartTag.long,
-    SmartTag.no_verb,
-    SmartTag.no_subj,
-    SmartTag.no_obj,
-]
-ALL_PREDICTION_TAGS = [
-    SmartTag.failed_punctuation.value,
-    SmartTag.failed_fuzzy_matching.value,
-    SmartTag.correct_low_conf,
-    SmartTag.correct_top_3,
-    SmartTag.high_epistemic_uncertainty,
-    SmartTag.pipeline_disagreement,
-    SmartTag.incorrect_for_all_pipelines,
-]
-ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 
 SMART_TAGS_FAMILY_MAPPING = {
     SmartTagFamily.extreme_length: [
@@ -138,6 +120,15 @@ SMART_TAGS_FAMILY_MAPPING = {
         SmartTag.high_epistemic_uncertainty,
     ],
 }
+
+ALL_SYNTAX_TAGS = [
+    *SMART_TAGS_FAMILY_MAPPING[SmartTagFamily.extreme_length],
+    *SMART_TAGS_FAMILY_MAPPING[SmartTagFamily.partial_syntax],
+]
+ALL_PREDICTION_TAGS: List[Tag] = [
+    tag for family in PIPELINE_SMART_TAG_FAMILIES for tag in SMART_TAGS_FAMILY_MAPPING[family]
+]
+ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 
 
 class TaggingResponse(ModuleResponse):
