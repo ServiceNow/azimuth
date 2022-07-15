@@ -46,7 +46,9 @@ def build_named_dataset_filters(
     behavioral_testing: List[SmartTag] = Query(
         [], title="Behavioral testing", alias="behavioralTesting"
     ),
-    pipeline_comparison: List[SmartTag] = Query([], title="Pipeline comparison"),
+    pipeline_comparison: List[SmartTag] = Query(
+        [], title="Pipeline comparison", alias="pipelineComparison"
+    ),
     uncertain: List[SmartTag] = Query([], title="Uncertain"),
     data_actions: List[DataAction] = Query([], title="Data action tags", alias="dataActions"),
     outcomes: List[OutcomeName] = Query([], title="Outcomes", alias="outcomes"),

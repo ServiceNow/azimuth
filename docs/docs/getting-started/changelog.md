@@ -1,5 +1,11 @@
 # Releases
 
+## [2.2.1] - 2022-07-15
+
+### Fixed
+
+- Fixed pipeline comparison smart tag family not working as a filter on the Exploration space.
+
 ## [2.2.0] - 2022-07-08
 
 ### Added
@@ -18,7 +24,6 @@
 - Columns can be temporarily hidden.
 - Use outcomes' icons as headers instead of the outcomes' full names.
 - Added visual bars, so it is easier to analyze the model's performance.
-
 
 ## [2.1.1] - 2022-06-06
 
