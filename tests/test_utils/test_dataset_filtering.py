@@ -8,6 +8,8 @@ from azimuth.types import DatasetColumn, DatasetFilters
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import (
     ALL_SMART_TAGS,
+    DATASET_SMART_TAG_FAMILIES,
+    PIPELINE_SMART_TAG_FAMILIES,
     SMART_TAGS_FAMILY_MAPPING,
     DataAction,
     SmartTag,
@@ -21,6 +23,12 @@ def test_all_smart_tags_have_a_family():
     assert sorted(
         tag.value for family in SMART_TAGS_FAMILY_MAPPING.values() for tag in family
     ) == sorted(ALL_SMART_TAGS)
+
+
+def test_all_smart_tag_families_are_dataset_or_pipeline():
+    assert sorted(SMART_TAGS_FAMILY_MAPPING.keys()) == sorted(
+        DATASET_SMART_TAG_FAMILIES + PIPELINE_SMART_TAG_FAMILIES
+    )
 
 
 def test_dataset_filtering(simple_text_config):
