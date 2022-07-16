@@ -881,7 +881,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
-        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -932,7 +932,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
-        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1022,7 +1022,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
-        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1060,7 +1060,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
-        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1102,7 +1102,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
-        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1304,7 +1304,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
-        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
@@ -1345,7 +1345,7 @@ export interface operations {
         dissimilar?: components["schemas"]["SmartTag"][];
         almostCorrect?: components["schemas"]["SmartTag"][];
         behavioralTesting?: components["schemas"]["SmartTag"][];
-        pipeline_comparison?: components["schemas"]["SmartTag"][];
+        pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
         dataActions?: components["schemas"]["DataAction"][];
         outcomes?: components["schemas"]["OutcomeName"][];
