@@ -120,119 +120,122 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     total: rows.length,
   });
 
-  const customSort = (
-    // Use this sort to keep the overall row at the top always.
-    // All columns must use it as their sorter.
-    v1: GridCellValue,
-    v2: GridCellValue,
-    param1: GridSortCellParams,
-    param2: GridSortCellParams
-  ) => {
-    const sign = sortDirectionRef.current === "desc" ? 1 : -1;
-    //Custom sort to keep 'overall' at top
-    if ((param1.id as number) === OVERALL_ROW_ID) return sign;
-    if ((param2.id as number) === OVERALL_ROW_ID) return -sign;
+  const columns: Column<Row>[] = React.useMemo(() => {
+    const customSort = (
+      // Use this sort to keep the overall row at the top always.
+      // All columns must use it as their sorter.
+      v1: GridCellValue,
+      v2: GridCellValue,
+      param1: GridSortCellParams,
+      param2: GridSortCellParams
+    ) => {
+      const sign = sortDirectionRef.current === "desc" ? 1 : -1;
+      //Custom sort to keep 'overall' at top
+      if ((param1.id as number) === OVERALL_ROW_ID) return sign;
+      if ((param2.id as number) === OVERALL_ROW_ID) return -sign;
 
-    // Fall back to default sort
-    return gridStringOrNumberComparator(v1, v2, param1, param2);
-  };
+      // Fall back to default sort
+      return gridStringOrNumberComparator(v1, v2, param1, param2);
+    };
 
-  const NUMBER_COL_DEF = {
-    flex: 1,
-    minWidth: 120,
-    maxWidth: 220,
-    type: "number",
-    sortComparator: customSort,
-  };
-
-  const columns: Column<Row>[] = [
-    {
-      field: "filterValue",
-      headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
-      width: 220,
+    const NUMBER_COL_DEF = {
+      flex: 1,
+      minWidth: 120,
+      maxWidth: 220,
+      type: "number",
       sortComparator: customSort,
-      renderHeader: () => (
-        <Select
-          sx={{
-            fontFamily: "inherit",
-            fontSize: "inherit",
-            fontWeight: "inherit",
-            color: "inherit",
-            marginRight: 1,
-          }}
-          // We must stop the blur event because if not it causes exceptions elsewhere
-          // See here: https://github.com/mui/mui-x/issues/1439
-          onBlur={(event) => event.stopPropagation()}
-          variant="standard"
-          id="filter-by-select"
-          value={selectedMetricPerFilterOption}
-          onChange={(event) =>
-            setSelectedMetricPerFilterOption(
-              event.target.value as FilterByViewOption
-            )
-          }
-        >
-          {BASIC_FILTER_OPTIONS.map((key) => (
-            <MenuItem key={key} value={key}>
-              {OPTION_PRETTY_NAME[key]}
-            </MenuItem>
-          ))}
-          <ListSubheader>Smart Tags</ListSubheader>
-          {SMART_TAG_FAMILIES.map((key) => (
-            <MenuItem key={key} value={key} sx={{ gap: 1 }}>
-              {OPTION_PRETTY_NAME[key]}
-              {React.createElement(SMART_TAG_FAMILY_ICONS[key], {})}
-            </MenuItem>
-          ))}
-        </Select>
-      ),
-    },
-    {
-      ...NUMBER_COL_DEF,
-      field: "utteranceCount",
-      headerName: "Utterance Count",
-      minWidth: 146,
-    },
-    ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
-      ...NUMBER_COL_DEF,
-      field: outcome,
-      headerName: OUTCOME_PRETTY_NAMES[outcome],
-      renderHeader: () => OutcomeIcon({ outcome }),
-      valueGetter: ({ row }) => row.outcomeCount[outcome] / row.utteranceCount,
-      renderCell: ({ value }: GridCellParams<number>) => (
-        <VisualBar
-          formattedValue={formatRatioAsPercentageString(value, 1)}
-          value={value}
-          color={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
-        />
-      ),
-    })),
-    ...customMetricNames.map<Column<Row>>((metricName) => ({
-      ...NUMBER_COL_DEF,
-      field: metricName,
-      headerName: metricName,
-      valueGetter: ({ row }) => row.customMetrics[metricName],
-      renderCell: ({ value }: GridCellParams<number>) => (
-        <VisualBar
-          formattedValue={formatRatioAsPercentageString(value, 1)}
-          value={value}
-          color={(theme) => theme.palette.primary.light}
-        />
-      ),
-    })),
-    {
-      ...NUMBER_COL_DEF,
-      field: "ece",
-      headerName: "ECE",
-      renderCell: ({ value }: GridCellParams<number>) => (
-        <VisualBar
-          formattedValue={value.toFixed(2)}
-          value={value}
-          color={(theme) => theme.palette.primary.dark}
-        />
-      ),
-    },
-  ];
+    };
+
+    return [
+      {
+        field: "filterValue",
+        headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
+        width: 220,
+        sortComparator: customSort,
+        renderHeader: () => (
+          <Select
+            sx={{
+              fontFamily: "inherit",
+              fontSize: "inherit",
+              fontWeight: "inherit",
+              color: "inherit",
+              marginRight: 1,
+            }}
+            // We must stop the blur event because if not it causes exceptions elsewhere
+            // See here: https://github.com/mui/mui-x/issues/1439
+            onBlur={(event) => event.stopPropagation()}
+            variant="standard"
+            id="filter-by-select"
+            value={selectedMetricPerFilterOption}
+            onChange={(event) =>
+              setSelectedMetricPerFilterOption(
+                event.target.value as FilterByViewOption
+              )
+            }
+          >
+            {BASIC_FILTER_OPTIONS.map((key) => (
+              <MenuItem key={key} value={key}>
+                {OPTION_PRETTY_NAME[key]}
+              </MenuItem>
+            ))}
+            <ListSubheader>Smart Tags</ListSubheader>
+            {SMART_TAG_FAMILIES.map((key) => (
+              <MenuItem key={key} value={key} sx={{ gap: 1 }}>
+                {OPTION_PRETTY_NAME[key]}
+                {React.createElement(SMART_TAG_FAMILY_ICONS[key], {})}
+              </MenuItem>
+            ))}
+          </Select>
+        ),
+      },
+      {
+        ...NUMBER_COL_DEF,
+        field: "utteranceCount",
+        headerName: "Utterance Count",
+        minWidth: 146,
+      },
+      ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
+        ...NUMBER_COL_DEF,
+        field: outcome,
+        headerName: OUTCOME_PRETTY_NAMES[outcome],
+        renderHeader: () => OutcomeIcon({ outcome }),
+        valueGetter: ({ row }) =>
+          row.outcomeCount[outcome] / row.utteranceCount,
+        renderCell: ({ value }: GridCellParams<number>) => (
+          <VisualBar
+            formattedValue={formatRatioAsPercentageString(value, 1)}
+            value={value}
+            color={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
+          />
+        ),
+      })),
+      ...customMetricNames.map<Column<Row>>((metricName) => ({
+        ...NUMBER_COL_DEF,
+        field: metricName,
+        headerName: metricName,
+        valueGetter: ({ row }) => row.customMetrics[metricName],
+        renderCell: ({ value }: GridCellParams<number>) => (
+          <VisualBar
+            formattedValue={formatRatioAsPercentageString(value, 1)}
+            value={value}
+            color={(theme) => theme.palette.primary.light}
+          />
+        ),
+      })),
+      {
+        ...NUMBER_COL_DEF,
+        field: "ece",
+        headerName: "ECE",
+        renderCell: ({ value }: GridCellParams<number>) => (
+          <VisualBar
+            formattedValue={value.toFixed(2)}
+            value={value}
+            color={(theme) => theme.palette.primary.dark}
+          />
+        ),
+      },
+    ];
+  }, [customMetricNames]);
 
   const Footer = () => (
     <Box
