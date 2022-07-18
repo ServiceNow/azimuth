@@ -1,6 +1,4 @@
 ARG DEVICE=cpu
-# Set to "dev" for dev deps
-ARG STAGE="production"
 
 FROM pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime as build_gpu
 # Copy binaries from other images here
@@ -9,6 +7,9 @@ RUN pip install --upgrade pip
 FROM python:3.8 as build_cpu
 # NOOP step on CPU
 FROM build_${DEVICE}
+
+# Set to "dev" for dev deps
+ARG STAGE="production"
 
 ENV STAGE=${STAGE} \
   PYTHONFAULTHANDLER=1 \
@@ -32,11 +33,11 @@ COPY poetry.lock pyproject.toml /app/
 
 WORKDIR /app
 RUN poetry config virtualenvs.create false && \
- poetry install --no-interaction --no-ansi --no-root $(/usr/bin/test "$STAGE" == production && echo "--no-dev")
+ poetry install --no-interaction --no-ansi --no-root $(/usr/bin/test $STAGE == production && echo "--no-dev")
 
 # Install the project.
 COPY . /app/
-RUN poetry install --no-interaction --no-ansi $(/usr/bin/test "$STAGE" == production && echo "--no-dev")
+RUN poetry install --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
 # If on GPU, we replace onnxruntime by onnxruntime-gpu.
 ARG DEVICE=cpu
 RUN if [ "$DEVICE" = "gpu" ] ; then pip uninstall -y onnxruntime && pip install onnxruntime-gpu  ; fi
