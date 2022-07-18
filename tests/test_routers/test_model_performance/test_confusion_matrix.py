@@ -10,7 +10,7 @@ from starlette.testclient import TestClient
 def test_get_confusion_matrix(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/dataset_splits/eval/confusion_matrix?pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/confusion_matrix?pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     assert np.allclose(
@@ -20,7 +20,7 @@ def test_get_confusion_matrix(app: FastAPI) -> None:
     )
 
     # not normalized
-    resp = client.get("/dataset_splits/eval/confusion_matrix?pipelineIndex=0&normalized=false")
+    resp = client.get("/dataset_splits/eval/confusion_matrix?pipeline_index=0&normalized=false")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     assert np.allclose(

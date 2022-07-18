@@ -11,7 +11,7 @@ from azimuth.types.tag import SmartTag
 
 def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/utterance_count/per_filter?pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/utterance_count/per_filter?pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
@@ -31,7 +31,7 @@ def test_get_utterance_count_per_filter(app: FastAPI) -> None:
     assert "prediction" not in metrics and "outcome" not in metrics and "uncertain" not in metrics
 
     resp = client.get(
-        "/dataset_splits/eval/utterance_count/per_filter?pipelineIndex=0&label=positive"
+        "/dataset_splits/eval/utterance_count/per_filter?pipeline_index=0&label=positive"
     )
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()

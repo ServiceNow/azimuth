@@ -36,7 +36,7 @@ def test_utterances(app: FastAPI):
     assert resp["utteranceCount"] == 42
     first_idx = resp["utterances"][0]["index"]
 
-    resp = client.get("/dataset_splits/eval/utterances?pipelineIndex=0&sort=confidence").json()
+    resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0&sort=confidence").json()
     first_idx_sorted = resp["utterances"][0]["index"]
     assert first_idx_sorted != first_idx
 
@@ -66,7 +66,7 @@ def test_get_utterances(app: FastAPI, monkeypatch):
 
     monkeypatch.setattr(utt_module, "saliency_available", lambda x: True)
     client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/utterances?pipelineIndex=0").json()
+    resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0").json()
     assert len(resp["utterances"]) == 42
 
     first_utterance = resp["utterances"][0]
@@ -90,7 +90,7 @@ def test_get_utterances_no_pipeline(app: FastAPI, monkeypatch):
 def test_perturbed_utterances(app: FastAPI, monkeypatch):
     client = TestClient(app)
     resp = client.get(
-        "/dataset_splits/eval/utterances/1/perturbed_utterances?pipelineIndex=0"
+        "/dataset_splits/eval/utterances/1/perturbed_utterances?pipeline_index=0"
     ).json()
     # Utterance 1 has 15 perturbation tests
     assert len(resp) == 15

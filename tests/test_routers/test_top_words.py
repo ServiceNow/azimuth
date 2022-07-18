@@ -10,7 +10,7 @@ from starlette.testclient import TestClient
 def test_top_words(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/dataset_splits/eval/top_words?indices=1&indices=2&pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/top_words?indices=1&indices=2&pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     assert data == {
@@ -57,7 +57,7 @@ def test_top_words(app: FastAPI) -> None:
 def test_top_words_no_result(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/dataset_splits/eval/top_words?pipelineIndex=0&utterance=no_result")
+    resp = client.get("/dataset_splits/eval/top_words?pipeline_index=0&utterance=no_result")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     assert data == {

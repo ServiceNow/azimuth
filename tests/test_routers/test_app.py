@@ -56,7 +56,7 @@ def test_get_dataset_info(app: FastAPI) -> None:
 def test_perturbation_summary(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/perturbation_testing_summary?pipelineIndex=0").json()
+    resp = client.get("/perturbation_testing_summary?pipeline_index=0").json()
 
     assert len(resp) == 2
 

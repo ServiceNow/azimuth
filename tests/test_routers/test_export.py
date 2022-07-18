@@ -19,7 +19,7 @@ def test_get_report(app: FastAPI) -> None:
     client = TestClient(app)
     resp = client.get("/export/perturbation_testing_summary")
     assert resp.status_code == 422
-    resp = client.get("/export/perturbation_testing_summary?pipelineIndex=0")
+    resp = client.get("/export/perturbation_testing_summary?pipeline_index=0")
     assert resp.status_code == 200
     assert resp.headers["content-type"] == "text/csv; charset=utf-8"
     assert int(resp.headers["content-length"]) > 0
@@ -29,7 +29,7 @@ def test_get_report(app: FastAPI) -> None:
 
 def test_get_utterances(app: FastAPI) -> None:
     client = TestClient(app)
-    resp = client.get("/export/dataset_splits/eval/perturbed_utterances?pipelineIndex=0")
+    resp = client.get("/export/dataset_splits/eval/perturbed_utterances?pipeline_index=0")
     assert resp.status_code == 200
     assert resp.headers["content-type"] == "application/json"
     assert int(resp.headers["content-length"]) > 0

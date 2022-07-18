@@ -10,7 +10,7 @@ from starlette.testclient import TestClient
 def test_get_outcome_count_per_threshold(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/dataset_splits/eval/outcome_count/per_threshold?pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/outcome_count/per_threshold?pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     # app does not have an editable postprocessing.
@@ -19,7 +19,7 @@ def test_get_outcome_count_per_threshold(app: FastAPI) -> None:
 
 def test_get_outcome_count_per_filter(app: FastAPI) -> None:
     client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/outcome_count/per_filter?pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/outcome_count/per_filter?pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     metrics = data.pop("countPerFilter")
