@@ -154,8 +154,8 @@ const Exploration = () => {
                     filters={filters}
                     pipeline={pipeline}
                     classOptions={classOptions}
-                    predictionFilters={filters.predictions}
-                    labelFilters={filters.labels}
+                    predictionFilters={filters.prediction}
+                    labelFilters={filters.label}
                     postprocessing={postprocessing}
                   />
                 </>

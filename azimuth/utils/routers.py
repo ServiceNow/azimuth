@@ -37,8 +37,8 @@ def get_last_update(dataset_split_managers: List[Optional[DatasetSplitManager]])
 def build_named_dataset_filters(
     confidence_min: float = Query(0, title="Minimum confidence", alias="confidenceMin"),
     confidence_max: float = Query(1, title="Maximum confidence", alias="confidenceMax"),
-    labels: List[str] = Query([], title="Label"),
-    predictions: List[str] = Query([], title="Prediction"),
+    label: List[str] = Query([], title="Label"),
+    prediction: List[str] = Query([], title="Prediction"),
     extreme_length: List[SmartTag] = Query([], title="Extreme length", alias="extremeLength"),
     partial_syntax: List[SmartTag] = Query([], title="Partial syntax", alias="partialSyntax"),
     dissimilar: List[SmartTag] = Query([], title="Dissimilar"),
@@ -50,8 +50,8 @@ def build_named_dataset_filters(
         [], title="Pipeline comparison", alias="pipelineComparison"
     ),
     uncertain: List[SmartTag] = Query([], title="Uncertain"),
-    data_actions: List[DataAction] = Query([], title="Data action tags", alias="dataActions"),
-    outcomes: List[OutcomeName] = Query([], title="Outcomes", alias="outcomes"),
+    data_action: List[DataAction] = Query([], title="Data action tags", alias="dataAction"),
+    outcome: List[OutcomeName] = Query([], title="Outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
 ) -> NamedDatasetFilters:
     """Build the named filter component used by many tasks. Intended as a FastAPI endpoint dependency.
@@ -59,8 +59,8 @@ def build_named_dataset_filters(
     Args:
         confidence_min: The desired minimum confidence
         confidence_max: The desired maximum confidence
-        labels: The desired class labels
-        predictions: The desired class predictions
+        label: The desired class labels
+        prediction: The desired class predictions
         extreme_length: The desired `extreme_length` smart tags
         partial_syntax: The desired `partial_syntax` smart tags
         dissimilar: The desired `dissimilar` smart tags
@@ -68,8 +68,8 @@ def build_named_dataset_filters(
         behavioral_testing: The desired `behavioral_testing` smart tags
         pipeline_comparison: The desired `pipeline_comparison` smart tags
         uncertain: The desired `uncertain` smart tags
-        data_actions: The desired data_action tags
-        outcomes: The desired outcomes
+        data_action: The desired data_action tags
+        outcome: The desired outcomes
         utterance: The substring desired in each utterance
 
     Returns:
@@ -79,8 +79,8 @@ def build_named_dataset_filters(
     return NamedDatasetFilters(
         confidence_min=confidence_min,
         confidence_max=confidence_max,
-        labels=labels,
-        predictions=predictions,
+        label=label,
+        prediction=prediction,
         smart_tags={
             SmartTagFamily.extreme_length: extreme_length,
             SmartTagFamily.partial_syntax: partial_syntax,
@@ -90,9 +90,9 @@ def build_named_dataset_filters(
             SmartTagFamily.pipeline_comparison: pipeline_comparison,
             SmartTagFamily.uncertain: uncertain,
         },
-        data_actions=data_actions,
+        data_action=data_action,
         utterance=utterance,
-        outcomes=outcomes,
+        outcome=outcome,
     )
 
 

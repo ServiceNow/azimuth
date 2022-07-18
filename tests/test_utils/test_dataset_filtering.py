@@ -31,24 +31,24 @@ def test_dataset_filtering(simple_text_config):
 
     def filtered_len(tf: DatasetFilters) -> int:
         ds_filtered = filter_dataset_split(ds, tf, config=dm.config)
-        ds_len[(tuple(tf.labels), tuple(tf.predictions))] = len(ds_filtered)
+        ds_len[(tuple(tf.label), tuple(tf.prediction))] = len(ds_filtered)
         return len(ds_filtered)
 
     assert filtered_len(DatasetFilters()) == len(ds)
     assert filtered_len(DatasetFilters(confidence_min=0.5)) == 0.9 * len(ds) // 2
     assert filtered_len(DatasetFilters(confidence_max=0.5)) == len(ds) - 0.9 * len(ds) // 2
-    assert filtered_len(DatasetFilters(labels=[0])) == 22
-    assert filtered_len(DatasetFilters(data_actions=[DataAction.relabel])) == 1
-    assert filtered_len(DatasetFilters(outcomes=[OutcomeName.IncorrectAndRejected])) == 33
+    assert filtered_len(DatasetFilters(label=[0])) == 22
+    assert filtered_len(DatasetFilters(data_action=[DataAction.relabel])) == 1
+    assert filtered_len(DatasetFilters(outcome=[OutcomeName.IncorrectAndRejected])) == 33
     assert (
         filtered_len(DatasetFilters(smart_tags={SmartTagFamily.extreme_length: [SmartTag.short]}))
         == 1
     )
     assert filtered_len(DatasetFilters(utterance="some")) == 2
-    assert filtered_len(DatasetFilters(predictions=[1])) == 5
+    assert filtered_len(DatasetFilters(prediction=[1])) == 5
 
     # We can filter by combinations of filter
-    combination_len = filtered_len(DatasetFilters(labels=[0], predictions=[1]))
+    combination_len = filtered_len(DatasetFilters(label=[0], prediction=[1]))
     assert combination_len == 3
     assert combination_len < min(ds_len[((), (1,))], ds_len[((0,), ())])
 
@@ -63,7 +63,7 @@ def test_dataset_filtering_errors(simple_text_config):
     ds = ds.rename_column(DatasetColumn.postprocessed_confidences, "col5")
 
     with pytest.raises(ValueError) as e:
-        _ = filter_dataset_split(ds, DatasetFilters(predictions=[0]), config=dm.config)
+        _ = filter_dataset_split(ds, DatasetFilters(prediction=[0]), config=dm.config)
     assert DatasetColumn.postprocessed_prediction in str(e.value)
 
     with pytest.raises(ValueError) as e:
@@ -71,13 +71,13 @@ def test_dataset_filtering_errors(simple_text_config):
     assert "utterance" in str(e.value)
 
     with pytest.raises(ValueError) as e:
-        _ = filter_dataset_split(ds, DatasetFilters(labels=[1]), config=dm.config)
+        _ = filter_dataset_split(ds, DatasetFilters(label=[1]), config=dm.config)
     assert "label" in str(e.value)
 
     with pytest.raises(ValueError) as e:
         _ = filter_dataset_split(
             ds,
-            DatasetFilters(outcomes=[OutcomeName.IncorrectAndRejected]),
+            DatasetFilters(outcome=[OutcomeName.IncorrectAndRejected]),
             config=dm.config,
         )
     assert DatasetColumn.postprocessed_outcome in str(e.value)
@@ -98,11 +98,11 @@ def test_dataset_filtering_multi(simple_text_config):
     assert len(ds_filtered) == len(ds)
 
     # We can filter by multiple targets ie does nothing in this case.
-    ds_filtered = filter_dataset_split(ds, DatasetFilters(labels=[0, 1]), config=dm.config)
+    ds_filtered = filter_dataset_split(ds, DatasetFilters(label=[0, 1]), config=dm.config)
     assert len(ds) == len(ds_filtered)
 
     # We can filter by multiple preds, will remove the rejection class from preds
-    ds_filtered = filter_dataset_split(ds, DatasetFilters(predictions=[0, 1]), config=dm.config)
+    ds_filtered = filter_dataset_split(ds, DatasetFilters(prediction=[0, 1]), config=dm.config)
     num_rejection_class = sum(
         p != dm.rejection_class_idx
         for p in dm.get_dataset_split(simple_table_key)[DatasetColumn.postprocessed_prediction]
@@ -191,12 +191,12 @@ def test_dataset_filtering_without_postprocessing(simple_text_config):
     ds = dm.get_dataset_split(get_table_key(simple_text_config))
     ds_filtered_with_postprocessing = filter_dataset_split(
         ds,
-        DatasetFilters(predictions=[0]),
+        DatasetFilters(prediction=[0]),
         config=dm.config,
     )
     ds_filtered_without_postprocessing = filter_dataset_split(
         ds,
-        DatasetFilters(predictions=[0]),
+        DatasetFilters(prediction=[0]),
         config=dm.config,
         without_postprocessing=True,
     )

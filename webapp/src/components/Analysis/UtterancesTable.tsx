@@ -279,7 +279,7 @@ const UtterancesTable: React.FC<Props> = ({
       renderHeader: () =>
         renderHeaderWithFilter(
           "Label",
-          filters.labels !== undefined,
+          filters.label !== undefined,
           AdjustIcon
         ),
       flex: 1,
@@ -292,7 +292,7 @@ const UtterancesTable: React.FC<Props> = ({
       renderHeader: () =>
         renderHeaderWithFilter(
           "Prediction",
-          filters.predictions !== undefined,
+          filters.prediction !== undefined,
           MultilineChartIcon
         ),
       flex: 1,
@@ -339,7 +339,7 @@ const UtterancesTable: React.FC<Props> = ({
       renderHeader: () =>
         renderHeaderWithFilter(
           "Proposed Action",
-          filters.dataActions !== undefined
+          filters.dataAction !== undefined
         ),
       renderCell: renderDataAction,
       width: 155,

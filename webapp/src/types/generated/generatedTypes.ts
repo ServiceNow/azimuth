@@ -874,8 +874,8 @@ export interface operations {
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
+        label?: string[];
+        prediction?: string[];
         extremeLength?: components["schemas"]["SmartTag"][];
         partialSyntax?: components["schemas"]["SmartTag"][];
         dissimilar?: components["schemas"]["SmartTag"][];
@@ -883,8 +883,8 @@ export interface operations {
         behavioralTesting?: components["schemas"]["SmartTag"][];
         pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
+        dataAction?: components["schemas"]["DataAction"][];
+        outcome?: components["schemas"]["OutcomeName"][];
         utterance?: string;
       };
     };
@@ -925,8 +925,8 @@ export interface operations {
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
+        label?: string[];
+        prediction?: string[];
         extremeLength?: components["schemas"]["SmartTag"][];
         partialSyntax?: components["schemas"]["SmartTag"][];
         dissimilar?: components["schemas"]["SmartTag"][];
@@ -934,8 +934,8 @@ export interface operations {
         behavioralTesting?: components["schemas"]["SmartTag"][];
         pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
+        dataAction?: components["schemas"]["DataAction"][];
+        outcome?: components["schemas"]["OutcomeName"][];
         utterance?: string;
       };
     };
@@ -1015,8 +1015,8 @@ export interface operations {
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
+        label?: string[];
+        prediction?: string[];
         extremeLength?: components["schemas"]["SmartTag"][];
         partialSyntax?: components["schemas"]["SmartTag"][];
         dissimilar?: components["schemas"]["SmartTag"][];
@@ -1024,8 +1024,8 @@ export interface operations {
         behavioralTesting?: components["schemas"]["SmartTag"][];
         pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
+        dataAction?: components["schemas"]["DataAction"][];
+        outcome?: components["schemas"]["OutcomeName"][];
         utterance?: string;
       };
     };
@@ -1053,8 +1053,8 @@ export interface operations {
       query: {
         confidenceMin?: number;
         confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
+        label?: string[];
+        prediction?: string[];
         extremeLength?: components["schemas"]["SmartTag"][];
         partialSyntax?: components["schemas"]["SmartTag"][];
         dissimilar?: components["schemas"]["SmartTag"][];
@@ -1062,8 +1062,8 @@ export interface operations {
         behavioralTesting?: components["schemas"]["SmartTag"][];
         pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
+        dataAction?: components["schemas"]["DataAction"][];
+        outcome?: components["schemas"]["OutcomeName"][];
         utterance?: string;
       };
     };
@@ -1095,8 +1095,8 @@ export interface operations {
         withoutPostprocessing?: boolean;
         confidenceMin?: number;
         confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
+        label?: string[];
+        prediction?: string[];
         extremeLength?: components["schemas"]["SmartTag"][];
         partialSyntax?: components["schemas"]["SmartTag"][];
         dissimilar?: components["schemas"]["SmartTag"][];
@@ -1104,8 +1104,8 @@ export interface operations {
         behavioralTesting?: components["schemas"]["SmartTag"][];
         pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
+        dataAction?: components["schemas"]["DataAction"][];
+        outcome?: components["schemas"]["OutcomeName"][];
         utterance?: string;
         pipelineIndex?: number;
         limit?: number;
@@ -1297,8 +1297,8 @@ export interface operations {
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
+        label?: string[];
+        prediction?: string[];
         extremeLength?: components["schemas"]["SmartTag"][];
         partialSyntax?: components["schemas"]["SmartTag"][];
         dissimilar?: components["schemas"]["SmartTag"][];
@@ -1306,8 +1306,8 @@ export interface operations {
         behavioralTesting?: components["schemas"]["SmartTag"][];
         pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
+        dataAction?: components["schemas"]["DataAction"][];
+        outcome?: components["schemas"]["OutcomeName"][];
         utterance?: string;
       };
     };
@@ -1338,8 +1338,8 @@ export interface operations {
         pipelineIndex: number;
         confidenceMin?: number;
         confidenceMax?: number;
-        labels?: string[];
-        predictions?: string[];
+        label?: string[];
+        prediction?: string[];
         extremeLength?: components["schemas"]["SmartTag"][];
         partialSyntax?: components["schemas"]["SmartTag"][];
         dissimilar?: components["schemas"]["SmartTag"][];
@@ -1347,8 +1347,8 @@ export interface operations {
         behavioralTesting?: components["schemas"]["SmartTag"][];
         pipelineComparison?: components["schemas"]["SmartTag"][];
         uncertain?: components["schemas"]["SmartTag"][];
-        dataActions?: components["schemas"]["DataAction"][];
-        outcomes?: components["schemas"]["OutcomeName"][];
+        dataAction?: components["schemas"]["DataAction"][];
+        outcome?: components["schemas"]["OutcomeName"][];
         utterance?: string;
       };
     };

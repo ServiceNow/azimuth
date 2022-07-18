@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   FormControlLabel,
+  FormControlLabelProps,
   IconButton,
   InputAdornment,
   OutlinedInput,
@@ -19,6 +20,7 @@ import {
   QueryPipelineState,
   QueryPostprocessingState,
   QueryConfusionMatrixState,
+  QueryArrayFiltersState,
 } from "types/models";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { motion } from "framer-motion";
@@ -104,10 +106,6 @@ const Controls: React.FC<Props> = ({
     `${datasetSplitName}ClassDistribution`
   ].reduce((a, b) => a + b);
 
-  const selectedLabels = filters.labels || [];
-  const selectedPredictions = filters.predictions || [];
-  const selectedDataActions = filters.dataActions || [];
-
   const handleCollapseFilters = () => {
     setIsCollapsed(!isCollapsed);
   };
@@ -142,7 +140,7 @@ const Controls: React.FC<Props> = ({
       })}`
     );
 
-  const handleFilterSelectorChange =
+  const getFilterChangeHandler =
     <FilterName extends keyof QueryFilterState>(filterName: FilterName) =>
     (filterValue: QueryFilterState[FilterName]) =>
       handleFilterChange({ ...filters, [filterName]: filterValue });
@@ -179,6 +177,22 @@ const Controls: React.FC<Props> = ({
         )
       : 0;
   }, [countPerFilter]);
+
+  const FilterCheckboxList: React.FC<{
+    filter: keyof QueryArrayFiltersState;
+    label: FormControlLabelProps["label"];
+    prettyNames?: Record<string, string>;
+  }> = ({ filter, ...props }) => (
+    <FilterSelector
+      maxCount={maxCount}
+      searchValue={searchValue}
+      selectedOptions={filters[filter] ?? []}
+      handleValueChange={getFilterChangeHandler(filter)}
+      filters={countPerFilter?.countPerFilter[filter]}
+      isFetching={isFetchingCountPerFilter}
+      {...props}
+    />
+  );
 
   const divider = (
     <Box marginY={1} borderBottom="1px solid rgba(0, 0, 0, 0.12)" />
@@ -277,7 +291,7 @@ const Controls: React.FC<Props> = ({
             label="Utterance"
             placeholder="Search utterances"
             filterValue={filters.utterance}
-            setFilterValue={handleFilterSelectorChange("utterance")}
+            setFilterValue={getFilterChangeHandler("utterance")}
           />
           {divider}
           <FilterSlider
@@ -311,72 +325,28 @@ const Controls: React.FC<Props> = ({
             />
           </Box>
           {divider}
-          <Box marginTop={1} sx={{ overflowY: "auto", overflowX: "hidden" }}>
-            <>
-              <FilterSelector
-                label="Prediction Outcome"
-                maxCount={maxCount}
-                searchValue={searchValue}
-                selectedOptions={filters.outcomes || []}
-                handleValueChange={handleFilterSelectorChange("outcomes")}
-                filters={countPerFilter?.countPerFilter.outcome}
-                isFetching={isFetchingCountPerFilter}
-                prettyNames={OUTCOME_PRETTY_NAMES}
+          <Stack display="block" divider={divider} overflow="hidden auto">
+            <FilterCheckboxList
+              filter="outcome"
+              label="Prediction Outcome"
+              prettyNames={OUTCOME_PRETTY_NAMES}
+            />
+            <FilterCheckboxList filter="label" label="Label" />
+            <FilterCheckboxList filter="prediction" label="Prediction" />
+            {SMART_TAG_FAMILIES.map((filterName) => (
+              <FilterCheckboxList
+                key={filterName}
+                filter={filterName}
+                label={
+                  <Stack direction="row" gap={1}>
+                    {SMART_TAG_FAMILY_PRETTY_NAMES[filterName]}
+                    {React.createElement(SMART_TAG_FAMILY_ICONS[filterName])}
+                  </Stack>
+                }
               />
-              {divider}
-              <FilterSelector
-                label="Label"
-                maxCount={maxCount}
-                searchValue={searchValue}
-                selectedOptions={selectedLabels}
-                handleValueChange={handleFilterSelectorChange("labels")}
-                filters={countPerFilter?.countPerFilter.label}
-                isFetching={isFetchingCountPerFilter}
-              />
-              {divider}
-              <FilterSelector
-                label="Prediction"
-                maxCount={maxCount}
-                searchValue={searchValue}
-                selectedOptions={selectedPredictions}
-                handleValueChange={handleFilterSelectorChange("predictions")}
-                filters={countPerFilter?.countPerFilter.prediction}
-                isFetching={isFetchingCountPerFilter}
-              />
-              {SMART_TAG_FAMILIES.map((filterName) => (
-                <React.Fragment key={filterName}>
-                  {divider}
-                  <FilterSelector
-                    label={
-                      <Stack direction="row" gap={1}>
-                        {SMART_TAG_FAMILY_PRETTY_NAMES[filterName]}
-                        {React.createElement(
-                          SMART_TAG_FAMILY_ICONS[filterName],
-                          {}
-                        )}
-                      </Stack>
-                    }
-                    maxCount={maxCount}
-                    searchValue={searchValue}
-                    selectedOptions={filters[filterName] ?? []}
-                    handleValueChange={handleFilterSelectorChange(filterName)}
-                    filters={countPerFilter?.countPerFilter[filterName]}
-                    isFetching={isFetchingCountPerFilter}
-                  />
-                </React.Fragment>
-              ))}
-              {divider}
-              <FilterSelector
-                label="Proposed Action"
-                maxCount={maxCount}
-                searchValue={searchValue}
-                selectedOptions={selectedDataActions}
-                handleValueChange={handleFilterSelectorChange("dataActions")}
-                filters={countPerFilter?.countPerFilter.dataAction}
-                isFetching={isFetchingCountPerFilter}
-              />
-            </>
-          </Box>
+            ))}
+            <FilterCheckboxList filter="dataAction" label="Proposed Action" />
+          </Stack>
         </>
       )}
     </Stack>

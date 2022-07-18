@@ -44,8 +44,8 @@ export const parseSearchString = (searchString: string) => {
     filters: convertSearchParams<QueryFilterState>(q, {
       confidenceMin: convertNumber,
       confidenceMax: convertNumber,
-      labels: convertStringArray,
-      predictions: convertStringArray,
+      label: convertStringArray,
+      prediction: convertStringArray,
       extremeLength: convertStringArray,
       partialSyntax: convertStringArray,
       dissimilar: convertStringArray,
@@ -53,8 +53,8 @@ export const parseSearchString = (searchString: string) => {
       behavioralTesting: convertStringArray,
       pipelineComparison: convertStringArray,
       uncertain: convertStringArray,
-      dataActions: convertStringArray,
-      outcomes: convertStringArray,
+      dataAction: convertStringArray,
+      outcome: convertStringArray,
       utterance: convertString,
     }),
     pagination: convertSearchParams<QueryPaginationState>(q, {

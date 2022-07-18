@@ -81,7 +81,7 @@ def test_confidence_histogram_empty(simple_text_config, apply_mocked_startup_tas
     mod = ConfidenceHistogramModule(
         DatasetSplitName.eval,
         simple_text_config,
-        mod_options=ModuleOptions(filters=DatasetFilters(labels=UNKNOWN_TARGET), pipeline_index=0),
+        mod_options=ModuleOptions(filters=DatasetFilters(label=UNKNOWN_TARGET), pipeline_index=0),
     )
     out = mod.compute_on_dataset_split()[0].bins
 

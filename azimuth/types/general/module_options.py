@@ -15,29 +15,29 @@ from azimuth.types.tag import DataAction
 class AbsDatasetFilters(AliasModel):
     confidence_min: float = 0
     confidence_max: float = 1
-    data_actions: List[DataAction] = []
-    outcomes: List[OutcomeName] = []
+    data_action: List[DataAction] = []
+    outcome: List[OutcomeName] = []
     smart_tags: Dict[str, List[str]] = {}
     utterance: Optional[str]  # Must contain this subset.
 
 
 class DatasetFilters(AbsDatasetFilters):
-    labels: List[int] = []
-    predictions: List[int] = []
+    label: List[int] = []
+    prediction: List[int] = []
 
 
 class NamedDatasetFilters(AbsDatasetFilters):
-    labels: List[str] = []
-    predictions: List[str] = []
+    label: List[str] = []
+    prediction: List[str] = []
 
     def to_dataset_filters(self, class_names: List[str]) -> DatasetFilters:
         return DatasetFilters(
             confidence_min=self.confidence_min,
             confidence_max=self.confidence_max,
-            labels=[class_names.index(cl) for cl in self.labels],
-            predictions=[class_names.index(cl) for cl in self.predictions],
-            data_actions=self.data_actions,
-            outcomes=self.outcomes,
+            label=[class_names.index(cl) for cl in self.label],
+            prediction=[class_names.index(cl) for cl in self.prediction],
+            data_action=self.data_action,
+            outcome=self.outcome,
             smart_tags=self.smart_tags,
             utterance=self.utterance,
         )

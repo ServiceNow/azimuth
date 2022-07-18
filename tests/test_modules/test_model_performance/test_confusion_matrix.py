@@ -29,7 +29,7 @@ def test_confusion_matrix(tiny_text_config):
     mod_filter = ConfusionMatrixModule(
         DatasetSplitName.eval,
         tiny_text_config,
-        mod_options=ModuleOptions(filters=DatasetFilters(labels=[0]), pipeline_index=0),
+        mod_options=ModuleOptions(filters=DatasetFilters(label=[0]), pipeline_index=0),
     )
     [json_output_filter] = mod_filter.compute_on_dataset_split()
 

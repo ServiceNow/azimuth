@@ -52,14 +52,14 @@ def filter_dataset_split(
         dataset_split = dataset_split.filter(
             lambda x: filters.confidence_min <= x[confidence_column][0] <= filters.confidence_max
         )
-    if len(filters.labels) > 0:
+    if len(filters.label) > 0:
         verify_column_is_present(config.columns.label, dataset_split)
-        dataset_split = dataset_split.filter(lambda x: x[config.columns.label] in filters.labels)
+        dataset_split = dataset_split.filter(lambda x: x[config.columns.label] in filters.label)
     if filters.utterance is not None:
         verify_column_is_present(config.columns.text_input, dataset_split)
         by = filters.utterance.lower()
         dataset_split = dataset_split.filter(lambda x: by in x[config.columns.text_input].lower())
-    if len(filters.predictions) > 0:
+    if len(filters.prediction) > 0:
         prediction_column = (
             DatasetColumn.model_predictions
             if without_postprocessing
@@ -68,21 +68,21 @@ def filter_dataset_split(
         verify_column_is_present(prediction_column, dataset_split)
         if without_postprocessing:
             dataset_split = dataset_split.filter(
-                lambda x: x[DatasetColumn.model_predictions][0] in filters.predictions
+                lambda x: x[DatasetColumn.model_predictions][0] in filters.prediction
             )
         else:
             dataset_split = dataset_split.filter(
-                lambda x: x[DatasetColumn.postprocessed_prediction] in filters.predictions
+                lambda x: x[DatasetColumn.postprocessed_prediction] in filters.prediction
             )
-    if len(filters.data_actions) > 0:
+    if len(filters.data_action) > 0:
         # We do OR for data_action tags.
         dataset_split = dataset_split.filter(
             lambda x: any(
                 ((not any(x[v] for v in ALL_DATA_ACTIONS)) if v == DataAction.no_action else x[v])
-                for v in filters.data_actions
+                for v in filters.data_action
             )
         )
-    if len(filters.outcomes) > 0:
+    if len(filters.outcome) > 0:
         outcome_column = (
             DatasetColumn.model_outcome
             if without_postprocessing
@@ -90,7 +90,7 @@ def filter_dataset_split(
         )
         verify_column_is_present(outcome_column, dataset_split)
         # We do OR for outcomes.
-        dataset_split = dataset_split.filter(lambda x: x[outcome_column] in filters.outcomes)
+        dataset_split = dataset_split.filter(lambda x: x[outcome_column] in filters.outcome)
     for key, tags_in_family in filters.smart_tags.items():
         # For each smart tag family, we do OR, but AND between families
         # If None, it is none of them.

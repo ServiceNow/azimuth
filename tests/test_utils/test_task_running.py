@@ -16,7 +16,7 @@ task_name = SupportedModule.PerturbationTestingSummary
 dataset_split_name = DatasetSplitName.train
 indices = [1, 2, 3]
 mod_options = ModuleOptions(
-    threshold=0.6, filters=DatasetFilters(labels=[0]), pipeline_index=0
+    threshold=0.6, filters=DatasetFilters(label=[0]), pipeline_index=0
 )  # example
 custom_query = {"custom_key1": 1, "custom_key2": "two"}
 

@@ -284,13 +284,13 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
         """
         filter_copy = initial_filter.copy(deep=True)
         if label is not None:
-            filter_copy.labels.append(label)
+            filter_copy.label.append(label)
         if prediction is not None:
-            filter_copy.predictions.append(prediction)
+            filter_copy.prediction.append(prediction)
         if data_action is not None:
-            filter_copy.data_actions.append(data_action)
+            filter_copy.data_action.append(data_action)
         if outcome is not None:
-            filter_copy.outcomes.append(outcome)
+            filter_copy.outcome.append(outcome)
         if smart_tag is not None:
             filter_copy.smart_tags.update(smart_tag)
         return filter_copy

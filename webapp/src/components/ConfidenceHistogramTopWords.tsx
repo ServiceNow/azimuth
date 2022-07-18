@@ -42,7 +42,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
   }>();
 
   const {
-    outcomes = ALL_OUTCOMES,
+    outcome = ALL_OUTCOMES,
     confidenceMin = 0,
     confidenceMax = 1,
     ...filtersWithoutBins
@@ -81,7 +81,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
         data={bins}
         confidenceMin={confidenceMin}
         confidenceMax={confidenceMax}
-        filteredOutcomes={outcomes}
+        filteredOutcomes={outcome}
       />
       <Box
         display="grid"
