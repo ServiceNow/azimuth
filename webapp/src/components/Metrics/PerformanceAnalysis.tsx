@@ -30,7 +30,7 @@ import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
 import { Link } from "react-router-dom";
-import { getMetricsPerFilterEndpoint } from "services/api";
+import { getConfigEndpoint, getMetricsPerFilterEndpoint } from "services/api";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
@@ -85,6 +85,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+
   const { data, isFetching, error } = getMetricsPerFilterEndpoint.useQuery({
     jobId,
     datasetSplitName: selectedDatasetSplit,
@@ -110,10 +112,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ]
       : [];
   }, [data, selectedMetricPerFilterOption]);
-
-  const customMetricNames = React.useMemo(() => {
-    return data ? Object.keys(data.metricsOverall[0].customMetrics) : [];
-  }, [data]);
 
   const { numberVisible, seeMoreLessProps } = useMoreLess({
     init: INITIAL_NUMBER_VISIBLE,
@@ -209,7 +207,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
           />
         ),
       })),
-      ...customMetricNames.map<Column<Row>>((metricName) => ({
+      ...Object.keys(config?.metrics ?? []).map<Column<Row>>((metricName) => ({
         ...NUMBER_COL_DEF,
         field: metricName,
         headerName: metricName,
@@ -235,7 +233,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       },
     ];
-  }, [customMetricNames]);
+  }, [config]);
 
   const Footer = () => (
     <Box
