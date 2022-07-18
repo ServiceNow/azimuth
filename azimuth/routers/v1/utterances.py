@@ -108,9 +108,7 @@ def get_utterances(
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
     pagination: Optional[PaginationParams] = Depends(get_pagination),
-    without_postprocessing: bool = Query(
-        False, title="Without Postprocessing", alias="withoutPostprocessing"
-    ),
+    without_postprocessing: bool = Query(False, title="Without Postprocessing"),
 ) -> GetUtterancesResponse:
     if (
         sort_by in {UtterancesSortableColumn.confidence, UtterancesSortableColumn.prediction}
@@ -314,7 +312,7 @@ def get_similar(
     index: int,
     limit: int = Query(20, title="Limit"),
     neighbors_dataset_split_name: Optional[DatasetSplitName] = Query(
-        None, title="Neighbors dataset split", alias="neighborsDatasetSplitName"
+        None, title="Neighbors dataset split"
     ),
     # the source dataset
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),

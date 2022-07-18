@@ -35,22 +35,18 @@ def get_last_update(dataset_split_managers: List[Optional[DatasetSplitManager]])
 
 
 def build_named_dataset_filters(
-    confidence_min: float = Query(0, title="Minimum confidence", alias="confidenceMin"),
-    confidence_max: float = Query(1, title="Maximum confidence", alias="confidenceMax"),
+    confidence_min: float = Query(0, title="Minimum confidence"),
+    confidence_max: float = Query(1, title="Maximum confidence"),
     label: List[str] = Query([], title="Label"),
     prediction: List[str] = Query([], title="Prediction"),
-    extreme_length: List[SmartTag] = Query([], title="Extreme length", alias="extremeLength"),
-    partial_syntax: List[SmartTag] = Query([], title="Partial syntax", alias="partialSyntax"),
+    extreme_length: List[SmartTag] = Query([], title="Extreme length"),
+    partial_syntax: List[SmartTag] = Query([], title="Partial syntax"),
     dissimilar: List[SmartTag] = Query([], title="Dissimilar"),
-    almost_correct: List[SmartTag] = Query([], title="Almost correct", alias="almostCorrect"),
-    behavioral_testing: List[SmartTag] = Query(
-        [], title="Behavioral testing", alias="behavioralTesting"
-    ),
-    pipeline_comparison: List[SmartTag] = Query(
-        [], title="Pipeline comparison", alias="pipelineComparison"
-    ),
+    almost_correct: List[SmartTag] = Query([], title="Almost correct"),
+    behavioral_testing: List[SmartTag] = Query([], title="Behavioral testing"),
+    pipeline_comparison: List[SmartTag] = Query([], title="Pipeline comparison"),
     uncertain: List[SmartTag] = Query([], title="Uncertain"),
-    data_action: List[DataAction] = Query([], title="Data action tags", alias="dataAction"),
+    data_action: List[DataAction] = Query([], title="Data action tags"),
     outcome: List[OutcomeName] = Query([], title="Outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
 ) -> NamedDatasetFilters:
@@ -166,14 +162,14 @@ def get_custom_task_result(
 
 
 def require_pipeline_index(
-    pipeline_index: int = Query(..., title="Pipeline index", alias="pipelineIndex"),
+    pipeline_index: int = Query(..., title="Pipeline index"),
     config: AzimuthConfig = Depends(get_config),
 ):
     return query_pipeline_index(pipeline_index, config)
 
 
 def query_pipeline_index(
-    pipeline_index: Optional[int] = Query(None, title="Pipeline index", alias="pipelineIndex"),
+    pipeline_index: Optional[int] = Query(None, title="Pipeline index"),
     config: AzimuthConfig = Depends(get_config),
 ) -> Optional[int]:
     """Get and validate the pipeline index from query parameters.
