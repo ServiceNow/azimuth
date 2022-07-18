@@ -46,9 +46,7 @@ def get_metrics(
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
-    without_postprocessing: bool = Query(
-        False, title="Without Postprocessing", alias="withoutPostprocessing"
-    ),
+    without_postprocessing: bool = Query(False, title="Without Postprocessing"),
 ) -> MetricsAPIResponse:
     mod_options = ModuleOptions(
         filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),

@@ -38,9 +38,7 @@ def get_confusion_matrix(
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
-    without_postprocessing: bool = Query(
-        False, title="Without Postprocessing", alias="withoutPostprocessing"
-    ),
+    without_postprocessing: bool = Query(False, title="Without Postprocessing"),
     normalized: bool = Query(True, title="Normalized"),
 ) -> ConfusionMatrixResponse:
     mod_options = ModuleOptions(

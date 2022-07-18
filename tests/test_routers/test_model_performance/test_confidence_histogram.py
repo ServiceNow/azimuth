@@ -19,7 +19,7 @@ def test_get_confidence_histogram_wrong_dataset(app: FastAPI) -> None:
 def test_get_confidence_histogram(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/dataset_splits/eval/confidence_histogram?bins=0&bins=1&pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/confidence_histogram?bins=0&bins=1&pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
 

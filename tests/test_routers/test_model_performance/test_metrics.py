@@ -26,7 +26,7 @@ common_metric_response = {
 def test_get_metrics(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/dataset_splits/eval/metrics?pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/metrics?pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     _ = data.pop("ecePlot")
@@ -35,7 +35,7 @@ def test_get_metrics(app: FastAPI) -> None:
 
 def test_get_metrics_per_filter(app: FastAPI) -> None:
     client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/metrics/per_filter?pipelineIndex=0")
+    resp = client.get("/dataset_splits/eval/metrics/per_filter?pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
 
