@@ -20,6 +20,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
-- Fixed loosing hidden columns when sorting Performance Analysis table.
+- Fixed losing hidden columns when sorting Performance Analysis table.
 
 ### Security

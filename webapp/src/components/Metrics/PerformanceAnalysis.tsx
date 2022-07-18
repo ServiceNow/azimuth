@@ -94,7 +94,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
     { field: "utteranceCount", sort: "desc" },
   ]);
-  const [columnVisibilityModel, onColumnVisibilityModelChange] =
+  const [columnVisibilityModel, setColumnVisibilityModel] =
     React.useState<GridColumnVisibilityModel>({});
 
   const rows: Row[] = React.useMemo(() => {
@@ -298,7 +298,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         sortModel={sortModel}
         onSortModelChange={setSortModel}
         columnVisibilityModel={columnVisibilityModel}
-        onColumnVisibilityModelChange={onColumnVisibilityModelChange}
+        onColumnVisibilityModelChange={setColumnVisibilityModel}
         getRowClassName={({ id }) => `${id === OVERALL_ROW_ID ? "total" : ""}`}
         getRowSpacing={getRowSpacing}
         autoHeight
