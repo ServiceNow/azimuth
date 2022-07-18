@@ -44,6 +44,8 @@ import {
 import { formatRatioAsPercentageString } from "utils/format";
 import { constructSearchString } from "utils/helpers";
 
+const INITIAL_SORT_DIRECTION = "desc";
+
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
 
@@ -90,7 +92,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   });
 
   // Track table sort model to keep 'overall' at top.
-  const sortDirectionRef = React.useRef<GridSortDirection>();
+  const sortDirectionRef = React.useRef<GridSortDirection>(
+    INITIAL_SORT_DIRECTION
+  );
   const handleSortModelChange = (model: GridSortModel) => {
     const [sortModel] = model;
     sortDirectionRef.current = sortModel?.sort;
@@ -316,7 +320,9 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         }}
         initialState={{
           sorting: {
-            sortModel: [{ field: columns[1].field, sort: "desc" }],
+            sortModel: [
+              { field: columns[1].field, sort: INITIAL_SORT_DIRECTION },
+            ],
           },
         }}
       />
