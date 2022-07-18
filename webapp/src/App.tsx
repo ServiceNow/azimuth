@@ -51,7 +51,7 @@ const DatasetSplitRedirect = () => {
 
   return (
     <Redirect
-      to={`/${jobId}/dataset_splits/${datasetSplitName}/performance_overview?pipelineIndex=0`}
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/performance_overview?pipeline_index=0`}
     />
   );
 };
@@ -70,7 +70,7 @@ export default class App extends React.Component<Props> {
                 <ErrorBoundary>
                   <Switch>
                     <Route exact path="/">
-                      <Redirect to="/local?pipelineIndex=0" />
+                      <Redirect to="/local?pipeline_index=0" />
                     </Route>
                     <Route path="/:jobId">
                       <StatusCheck>

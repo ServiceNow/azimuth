@@ -19,6 +19,9 @@ export const raiseSuccessToast = (message: string) => {
   toast.success(message);
 };
 
+const camelToSnakeCase = (s: string) =>
+  s.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
+
 const convertNumber = (s: string | null) =>
   s === null ? undefined : Number(s);
 
@@ -31,7 +34,7 @@ const convertStringArray = <T extends string>(s: string | null) =>
 const convertSearchParams = <T>(
   q: URLSearchParams,
   conversions: Required<{ [Key in keyof T]: (key: string | null) => T[Key] }>
-): T => _.mapValues(conversions, (convert, name) => convert(q.get(name))) as T;
+): T => _.mapValues(conversions, (c, k) => c(q.get(camelToSnakeCase(k)))) as T;
 
 // This function is dangerous and should be memoized.
 // It is still used in unit tests.
@@ -75,10 +78,10 @@ const joinSearchString = (q: string[]) => (q.length ? `?${q.join("&")}` : "");
 
 export const constructSearchString = (query: Partial<QueryState>): string =>
   joinSearchString(
-    Object.entries(query).flatMap(([filter, value]) =>
+    Object.entries(query).flatMap(([key, value]) =>
       value === undefined || (Array.isArray(value) && value.length === 0)
         ? []
-        : [`${filter}=${value}`]
+        : [`${camelToSnakeCase(key)}=${value}`]
     )
   );
 
@@ -87,7 +90,7 @@ export const constructApiSearchString = (query: object): string =>
     Object.entries(query).flatMap(([key, value]) =>
       value === undefined
         ? []
-        : (Array.isArray(value) ? value : [value]).map((v) => `${key}=${v}`)
+        : [value].flat().map((v) => `${camelToSnakeCase(key)}=${v}`)
     )
   );
 

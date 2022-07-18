@@ -26,7 +26,7 @@ type OperationArgs<Operation> = {
   ? { [Key in keyof PathParameters as CamelCase<Key>]: PathParameters[Key] }
   : {}) &
   (Operation extends OperationWithQueryParameters<infer QueryParameters>
-    ? QueryParameters
+    ? { [Key in keyof QueryParameters as CamelCase<Key>]: QueryParameters[Key] }
     : {}) &
   (Operation extends OperationWithJSONRequestBody<infer JSONRequestBody>
     ? { body: JSONRequestBody }

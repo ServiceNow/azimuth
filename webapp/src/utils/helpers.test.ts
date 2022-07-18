@@ -24,7 +24,7 @@ test("convertSearchParamsToFilterState", () => {
 
   expect(
     parseSearchString(
-      "?label=1,2&prediction=3,4&partialSyntax=missing_obj,missing_subj&dataAction=remove,relabel&outcome=CorrectAndPredicted,IncorrectAndRejected"
+      "?label=1,2&prediction=3,4&partial_syntax=missing_obj,missing_subj&data_action=remove,relabel&outcome=CorrectAndPredicted,IncorrectAndRejected"
     ).filters
   ).toStrictEqual({
     confidenceMin: undefined,
@@ -60,7 +60,7 @@ test("convertSearchParamsToFilterState", () => {
     utterance: undefined,
   });
 
-  expect(parseSearchString("confidenceMin=0").filters).toStrictEqual({
+  expect(parseSearchString("confidence_min=0").filters).toStrictEqual({
     confidenceMin: 0,
     confidenceMax: undefined,
     label: undefined,
@@ -105,7 +105,7 @@ test("constructSearchString", () => {
       utterance: undefined,
     })
   ).toBe(
-    "?confidenceMin=0.4&confidenceMax=0.6&label=1,2&prediction=3,4&partialSyntax=missing_obj,missing_subj&dataAction=remove,relabel&outcome=CorrectAndPredicted,IncorrectAndRejected"
+    "?confidence_min=0.4&confidence_max=0.6&label=1,2&prediction=3,4&partial_syntax=missing_obj,missing_subj&data_action=remove,relabel&outcome=CorrectAndPredicted,IncorrectAndRejected"
   );
   expect(
     constructSearchString({
@@ -130,7 +130,7 @@ describe("constructApiSearchString", () => {
         limit: 10,
         offset: 0,
       })
-    ).toBe("?pipelineIndex=1&limit=10&offset=0");
+    ).toBe("?pipeline_index=1&limit=10&offset=0");
   });
 
   it("ignores undefined", () => {
@@ -172,7 +172,7 @@ describe("constructApiSearchString", () => {
         outcome: ["CorrectAndPredicted", "IncorrectAndRejected"],
       })
     ).toBe(
-      "?pipelineIndex=1&confidenceMin=0.4&confidenceMax=0.6&label=class1&label=class2&prediction=class2&prediction=class3&partialSyntax=missing_subj&partialSyntax=missing_obj&dataAction=remove&dataAction=relabel&outcome=CorrectAndPredicted&outcome=IncorrectAndRejected"
+      "?pipeline_index=1&confidence_min=0.4&confidence_max=0.6&label=class1&label=class2&prediction=class2&prediction=class3&partial_syntax=missing_subj&partial_syntax=missing_obj&data_action=remove&data_action=relabel&outcome=CorrectAndPredicted&outcome=IncorrectAndRejected"
     );
   });
 });
