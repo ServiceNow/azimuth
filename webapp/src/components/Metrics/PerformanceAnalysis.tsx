@@ -93,12 +93,13 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     ...pipeline,
   });
 
-  // Track table sort direction to keep 'overall' at top.
+  // Track table sort model to keep 'overall' at top.
   const sortDirectionRef = React.useRef<GridSortDirection>(
     INITIAL_SORT_DIRECTION
   );
-  const handleSortModelChange = ([{ sort }]: GridSortModel) => {
-    sortDirectionRef.current = sort;
+  const handleSortModelChange = (model: GridSortModel) => {
+    const [sortModel] = model;
+    sortDirectionRef.current = sortModel?.sort;
   };
 
   const rows: Row[] = React.useMemo(() => {
