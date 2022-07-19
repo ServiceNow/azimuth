@@ -2,7 +2,7 @@ import { GetApp, SvgIconComponent } from "@mui/icons-material";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -251,6 +251,11 @@ const UtterancesTable: React.FC<Props> = ({
       sortable: false,
       align: "center",
       headerAlign: "center",
+      renderCell: ({ value }: GridCellParams<number>) => (
+        <Tooltip title={value}>
+          <div className="MuiDataGrid-cellContent">{value}</div>
+        </Tooltip>
+      ),
     },
     {
       field: "utterance",
