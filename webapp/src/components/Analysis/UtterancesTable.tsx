@@ -2,7 +2,7 @@ import { GetApp, SvgIconComponent } from "@mui/icons-material";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -247,11 +247,15 @@ const UtterancesTable: React.FC<Props> = ({
       field: "id",
       headerName: "Id",
       description: ID_TOOLTIP,
-      minWidth: 40,
-      width: 40,
+      width: 55,
       sortable: false,
       align: "center",
       headerAlign: "center",
+      renderCell: ({ value }: GridCellParams<number>) => (
+        <Tooltip title={value}>
+          <div className="MuiDataGrid-cellContent">{value}</div>
+        </Tooltip>
+      ),
     },
     {
       field: "utterance",
@@ -260,7 +264,7 @@ const UtterancesTable: React.FC<Props> = ({
       description:
         "Utterances from dataset are overlaid with saliency maps, highlighting the most important tokens for the model's prediction.",
       flex: 5,
-      minWidth: 413,
+      minWidth: 398,
       renderCell: renderUtterance,
     },
     {
