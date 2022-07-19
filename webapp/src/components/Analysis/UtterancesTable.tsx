@@ -247,8 +247,7 @@ const UtterancesTable: React.FC<Props> = ({
       field: "id",
       headerName: "Id",
       description: ID_TOOLTIP,
-      minWidth: 40,
-      width: 40,
+      width: 55,
       sortable: false,
       align: "center",
       headerAlign: "center",
@@ -260,7 +259,7 @@ const UtterancesTable: React.FC<Props> = ({
       description:
         "Utterances from dataset are overlaid with saliency maps, highlighting the most important tokens for the model's prediction.",
       flex: 5,
-      minWidth: 413,
+      minWidth: 398,
       renderCell: renderUtterance,
     },
     {
