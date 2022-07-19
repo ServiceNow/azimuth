@@ -1,5 +1,11 @@
 # Releases
 
+## [2.2.2] - 2022-07-19
+
+### Fixed
+
+- Fixed losing hidden columns when sorting Performance Analysis table, clicking `See more`/`less`, or switching dataset split or pipeline.
+
 ## [2.2.1] - 2022-07-15
 
 ### Fixed
