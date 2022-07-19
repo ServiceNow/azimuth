@@ -17,6 +17,36 @@ test("display loading state", async () => {
   await screen.findByText("type");
   await screen.findByRole("progressbar");
   expect(await screen.queryByRole("figure")).toBeNull();
+  expect(screen.getByLabelText("collapse-type")).toBeDisabled();
+});
+
+test("display reloading state", async () => {
+  renderWithTheme(
+    <FilterSelector
+      label="type"
+      maxCount={0}
+      searchValue=""
+      selectedOptions={[]}
+      handleValueChange={() => {}}
+      filters={[
+        {
+          outcomeCount: {
+            CorrectAndPredicted: 0,
+            CorrectAndRejected: 0,
+            IncorrectAndPredicted: 0,
+            IncorrectAndRejected: 0,
+          },
+          utteranceCount: 0,
+          filterValue: "type1",
+        },
+      ]}
+      isFetching={true}
+    />
+  );
+
+  await screen.findByText("type");
+  await screen.findByRole("progressbar");
+  expect(await screen.queryByRole("figure")).not.toBeNull();
   expect(screen.getByLabelText("collapse-type")).not.toBeDisabled();
 });
 
