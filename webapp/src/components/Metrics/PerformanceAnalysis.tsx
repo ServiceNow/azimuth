@@ -178,9 +178,11 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             ))}
             <ListSubheader>Smart Tags</ListSubheader>
             {SMART_TAG_FAMILIES.map((key) => (
-              <MenuItem key={key} value={key} sx={{ gap: 1 }}>
-                {OPTION_PRETTY_NAME[key]}
-                {React.createElement(SMART_TAG_FAMILY_ICONS[key], {})}
+              <MenuItem key={key} value={key}>
+                <Box display="flex" gap={1}>
+                  {OPTION_PRETTY_NAME[key]}
+                  {React.createElement(SMART_TAG_FAMILY_ICONS[key])}
+                </Box>
               </MenuItem>
             ))}
           </Select>
@@ -233,7 +235,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       },
     ];
-  }, [customMetricNames]);
+  }, [customMetricNames, selectedMetricPerFilterOption, sortModel]);
 
   const Footer = () => (
     <Box
