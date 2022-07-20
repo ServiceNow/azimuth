@@ -89,11 +89,12 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   });
 
   // Track table sort model to keep 'overall' at top.
-  // Controlling sort model triggers rerenders that lose any uncontrolled states,
-  // so we must control all states.
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
     { field: "utteranceCount", sort: "desc" },
   ]);
+  // We must redefine columns when selectedMetricPerFilterOption changes.
+  // The Table then loses any uncontrolled (internal) states. So, we must
+  // control all states we care about, including columnVisibilityModel.
   const [columnVisibilityModel, setColumnVisibilityModel] =
     React.useState<GridColumnVisibilityModel>({});
 
