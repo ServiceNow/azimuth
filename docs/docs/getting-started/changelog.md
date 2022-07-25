@@ -1,5 +1,12 @@
 # Releases
 
+## [2.2.3] - 2022-07-25
+
+### Fixed
+
+- Fixed losing hidden columns from Performance Analysis table when changing view (Label, Prediction, etc.).
+- Fixed utterances table poorly showing ids greater than 99, now supporting up to 9999.
+
 ## [2.2.2] - 2022-07-19
 
 ### Fixed
