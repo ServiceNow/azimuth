@@ -11,9 +11,9 @@ import {
   GridColumnMenuContainer,
   GridColumnMenuProps,
   GridColumnsMenuItem,
+  GridColumnVisibilityModel,
   GridRowSpacingParams,
   GridSortCellParams,
-  GridSortDirection,
   GridSortModel,
   gridStringOrNumberComparator,
   HideGridColMenuItem,
@@ -27,7 +27,7 @@ import SeeMoreLess, {
 import { Table, Column } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
-import { getConfigEndpoint, getMetricsPerFilterEndpoint } from "services/api";
+import { getMetricsPerFilterEndpoint } from "services/api";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
@@ -39,8 +39,6 @@ import {
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
-
-const INITIAL_SORT_DIRECTION = "desc";
 
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
@@ -81,21 +79,21 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
-  const { data: config } = getConfigEndpoint.useQuery({ jobId });
-
   const { data, isFetching, error } = getMetricsPerFilterEndpoint.useQuery({
     jobId,
     datasetSplitName: selectedDatasetSplit,
     ...pipeline,
   });
 
-  // Track table sort direction to keep 'overall' at top.
-  const sortDirectionRef = React.useRef<GridSortDirection>(
-    INITIAL_SORT_DIRECTION
-  );
-  const handleSortModelChange = ([{ sort }]: GridSortModel) => {
-    sortDirectionRef.current = sort;
-  };
+  // Track table sort model to keep 'overall' at top.
+  const [sortModel, setSortModel] = React.useState<GridSortModel>([
+    { field: "utteranceCount", sort: "desc" },
+  ]);
+  // We must redefine columns when selectedMetricPerFilterOption changes.
+  // The Table then loses any uncontrolled (internal) states. So, we must
+  // control all states we care about, including columnVisibilityModel.
+  const [columnVisibilityModel, setColumnVisibilityModel] =
+    React.useState<GridColumnVisibilityModel>({});
 
   const rows: Row[] = React.useMemo(() => {
     return data
@@ -114,6 +112,11 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   });
 
   const columns: Column<Row>[] = React.useMemo(() => {
+    // It's pointless to render (incomplete) column headers if there is no data.
+    if (data === undefined) return [];
+
+    const customMetricNames = Object.keys(data.metricsOverall[0].customMetrics);
+
     const customSort = (
       // Use this sort to keep the overall row at the top always.
       // All columns must use it as their sorter.
@@ -122,7 +125,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       param1: GridSortCellParams,
       param2: GridSortCellParams
     ) => {
-      const sign = sortDirectionRef.current === "desc" ? 1 : -1;
+      const sign = sortModel[0].sort === "desc" ? 1 : -1;
       //Custom sort to keep 'overall' at top
       if ((param1.id as number) === OVERALL_ROW_ID) return sign;
       if ((param2.id as number) === OVERALL_ROW_ID) return -sign;
@@ -142,7 +145,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     return [
       {
         field: "filterValue",
-        headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
         width: 220,
         sortComparator: customSort,
         renderHeader: () => (
@@ -173,9 +175,11 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             ))}
             <ListSubheader>Smart Tags</ListSubheader>
             {SMART_TAG_FAMILIES.map((key) => (
-              <MenuItem key={key} value={key} sx={{ gap: 1 }}>
-                {OPTION_PRETTY_NAME[key]}
-                {React.createElement(SMART_TAG_FAMILY_ICONS[key], {})}
+              <MenuItem key={key} value={key}>
+                <Box display="flex" gap={1}>
+                  {OPTION_PRETTY_NAME[key]}
+                  {React.createElement(SMART_TAG_FAMILY_ICONS[key])}
+                </Box>
               </MenuItem>
             ))}
           </Select>
@@ -202,7 +206,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
           />
         ),
       })),
-      ...Object.keys(config?.metrics ?? []).map<Column<Row>>((metricName) => ({
+      ...customMetricNames.map<Column<Row>>((metricName) => ({
         ...NUMBER_COL_DEF,
         field: metricName,
         headerName: metricName,
@@ -228,7 +232,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       },
     ];
-  }, [config]);
+  }, [data, selectedMetricPerFilterOption, sortModel]);
 
   const Footer = () => (
     <Box
@@ -278,7 +282,10 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
             background: (theme) => theme.palette.grey[200],
           },
         }}
-        onSortModelChange={handleSortModelChange}
+        sortModel={sortModel}
+        onSortModelChange={setSortModel}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={setColumnVisibilityModel}
         getRowClassName={({ id }) => `${id === OVERALL_ROW_ID ? "total" : ""}`}
         getRowSpacing={getRowSpacing}
         autoHeight
@@ -296,13 +303,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
                 Footer,
               }
             : {}),
-        }}
-        initialState={{
-          sorting: {
-            sortModel: [
-              { field: columns[1].field, sort: INITIAL_SORT_DIRECTION },
-            ],
-          },
         }}
       />
     </Box>
