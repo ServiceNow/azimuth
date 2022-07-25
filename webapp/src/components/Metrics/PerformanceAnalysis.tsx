@@ -109,16 +109,17 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       : [];
   }, [data, selectedMetricPerFilterOption]);
 
-  const customMetricNames = React.useMemo(() => {
-    return data ? Object.keys(data.metricsOverall[0].customMetrics) : [];
-  }, [data]);
-
   const { numberVisible, seeMoreLessProps } = useMoreLess({
     init: INITIAL_NUMBER_VISIBLE,
     total: rows.length,
   });
 
   const columns: Column<Row>[] = React.useMemo(() => {
+    // It's pointless to render (incomplete) column headers if there is no data.
+    if (data === undefined) return [];
+
+    const customMetricNames = Object.keys(data.metricsOverall[0].customMetrics);
+
     const customSort = (
       // Use this sort to keep the overall row at the top always.
       // All columns must use it as their sorter.
@@ -234,7 +235,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       },
     ];
-  }, [customMetricNames, selectedMetricPerFilterOption, sortModel]);
+  }, [data, selectedMetricPerFilterOption, sortModel]);
 
   const Footer = () => (
     <Box
