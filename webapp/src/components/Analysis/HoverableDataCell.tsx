@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Paper, Popper } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import { gridClasses } from "@mui/x-data-grid";
 
 function isOverflown(element: Element) {
@@ -12,13 +11,6 @@ type GridCellExpandProps = {
   children: React.ReactNode;
 };
 
-const useStyles = makeStyles((theme) => ({
-  contentWrapper: {
-    padding: theme.spacing(2),
-    wordBreak: "break-all",
-  },
-}));
-
 const HoverableDataCell = (props: GridCellExpandProps) => {
   const { autoWidth = false, children } = props;
 
@@ -26,7 +18,6 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
   const cellDiv = React.useRef(null);
   const cellValue = React.useRef(null);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const classes = useStyles();
   const [showFullCell, setShowFullCell] = React.useState(false);
   const [showPopper, setShowPopper] = React.useState(false);
 
@@ -88,10 +79,20 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
           }}
         >
           <Paper
-            className={classes.contentWrapper}
             elevation={2}
             sx={{
-              minHeight: wrapper.current!.offsetHeight - 3,
+              minHeight: wrapper.current!.offsetHeight,
+              padding: "10px",
+              paddingBottom: "12px",
+              display: "flex",
+              alignItems: "center",
+              // Replicate some style normally inherited from DataGrid's root.
+              // Unfortunately, gridClasses.root doesn't work, so duplicating:
+              fontSize: 14,
+              fontWeight: 500,
+              lineHeight: 1.55,
+              fontFamily: "Gilroy",
+              outline: "none",
             }}
           >
             {children}
