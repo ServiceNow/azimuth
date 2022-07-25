@@ -147,7 +147,6 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
     return [
       {
         field: "filterValue",
-        headerName: OPTION_PRETTY_NAME[selectedMetricPerFilterOption],
         width: 220,
         sortComparator: customSort,
         renderHeader: () => (
