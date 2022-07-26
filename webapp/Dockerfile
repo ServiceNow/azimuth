@@ -31,7 +31,7 @@ FROM builder as production
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=prod_builder /app/build/ /app/build
+COPY --from=prod_builder /app/build /app/build
 COPY --from=prod_builder /app/server.js /app/server.js
 
 RUN npm install express http-proxy-middleware cors
