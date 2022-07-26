@@ -26,14 +26,14 @@ ServiceNow suggests the following technical support pathways for open-source pro
 2. View the Documentation.
 3. Search the Discussions. 
 4. Search the project knowledge base or Wiki for known errors, useful solutions, and troubleshooting tips. 
-5. Check the project guidelines /CONTRIBUTING.md file if you would like details on how you can submit a change. Community contributions are valued and appreciated!
+5. Check the project guidelines in the [`CONTRIBUTING.md`](CONTRIBUTING.md) file if you would like details on how you can submit a change. Community contributions are valued and appreciated!
 6. Log an Issue if it hasn’t already been logged. If the issue has already been logged by another user, vote it up, and add a comment with additional or missing information. Do your best to choose the correct category when logging a new issue. This will make it easier to differentiate bugs from new feature requests or ideas. If after logging an issue you find the solution, please close your issue and provide a comment with the solution. This will help the project owners and other users.
 7. Contact the project team contributors of the project to see if they can help as a last resort only. 
 
 **Repositories**
 
 - Read and follow the license instructions
-- Remember to include citations if you use someone else’s work in your own project. Do a search for ‘Bibtex’ to find the correct project citation reference. 
+- Remember to include citations if you use someone else’s work in your own project. Use the [`CITATION.cff`](CITATION.cff) to find the correct project citation reference. 
 - ‘Star’ project repos to save for future reference.
 - ‘Watch’ project repos to get notifications of changes – this can get noisy for some projects, so only watch the ones you really need to track closely. 
 
