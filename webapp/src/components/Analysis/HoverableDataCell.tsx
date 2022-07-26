@@ -1,45 +1,23 @@
 import React from "react";
 import { Box, Paper, Popper } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import { gridClasses } from "@mui/x-data-grid";
 
 function isOverflown(element: Element) {
   return element.scrollWidth > element.clientWidth;
 }
 
 type GridCellExpandProps = {
+  autoWidth?: boolean;
   children: React.ReactNode;
 };
 
-const MIN_CELL_WIDTH = 100;
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    alignItems: "center",
-    width: "100%",
-    height: "100%",
-    position: "relative",
-    display: "flex",
-    "& .cellValue": {
-      whiteSpace: "nowrap",
-      wordBreak: "break-all",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-    },
-  },
-  contentWrapper: {
-    padding: theme.spacing(2),
-    wordBreak: "break-all",
-  },
-}));
-
 const HoverableDataCell = (props: GridCellExpandProps) => {
-  const { children } = props;
+  const { autoWidth = false, children } = props;
 
   const wrapper = React.useRef<HTMLDivElement | null>(null);
   const cellDiv = React.useRef(null);
   const cellValue = React.useRef(null);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const classes = useStyles();
   const [showFullCell, setShowFullCell] = React.useState(false);
   const [showPopper, setShowPopper] = React.useState(false);
 
@@ -73,46 +51,55 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
   }, [setShowFullCell, showFullCell]);
 
   return (
-    <div
-      ref={wrapper}
-      className={classes.root}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <Box
-        ref={cellDiv}
-        height={0}
-        width="100%"
-        display="block"
-        position="absolute"
-        top={-1} // compensate row border
-      />
-      <div ref={cellValue} className="cellValue">
+    <>
+      <div ref={cellValue} className={gridClasses.cellContent}>
         {children}
       </div>
+      <Box
+        ref={wrapper}
+        height="100%"
+        width="100%"
+        position="absolute"
+        top={0}
+        left={0}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <Box ref={cellDiv} />
+      </Box>
       {showPopper && (
         <Popper
           open={showFullCell && anchorEl !== null}
+          placement="bottom-start"
           anchorEl={anchorEl}
           style={{
-            width: anchorEl ? anchorEl.clientWidth + 20 : MIN_CELL_WIDTH,
-            minWidth: MIN_CELL_WIDTH,
+            ...(!autoWidth && { width: wrapper.current!.offsetWidth }),
             pointerEvents: "none", // Because of that, avoid nesting anything
             // that relies on pointer events like click, hover or scroll.
           }}
         >
           <Paper
-            className={classes.contentWrapper}
             elevation={2}
             sx={{
-              minHeight: wrapper.current!.offsetHeight - 3,
+              minHeight: wrapper.current!.offsetHeight,
+              padding: "10px",
+              paddingBottom: "12px",
+              display: "flex",
+              alignItems: "center",
+              // Replicate some style normally inherited from DataGrid's root.
+              // Unfortunately, gridClasses.root doesn't work, so duplicating:
+              fontSize: 14,
+              fontWeight: 500,
+              lineHeight: 1.55,
+              fontFamily: "Gilroy",
+              outline: "none",
             }}
           >
             {children}
           </Paper>
         </Popper>
       )}
-    </div>
+    </>
   );
 };
 

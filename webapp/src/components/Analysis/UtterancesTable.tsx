@@ -49,6 +49,9 @@ import { constructSearchString, isPipelineSelected } from "utils/helpers";
 const SMART_TAG_WIDTH = 30;
 
 const useStyles = makeStyles((theme) => ({
+  hoverableDataCell: {
+    position: "relative",
+  },
   gridContainer: {
     width: "100%",
     height: "100%",
@@ -190,7 +193,7 @@ const UtterancesTable: React.FC<Props> = ({
   );
 
   const renderHoverableDataCell = ({ value }: GridCellParams) => (
-    <HoverableDataCell>{value}</HoverableDataCell>
+    <HoverableDataCell autoWidth>{value}</HoverableDataCell>
   );
 
   const getPrediction = ({ row }: GridValueGetterParams<undefined, Row>) => {
@@ -251,6 +254,8 @@ const UtterancesTable: React.FC<Props> = ({
       sortable: false,
       align: "center",
       headerAlign: "center",
+      cellClassName: classes.hoverableDataCell,
+      renderCell: renderHoverableDataCell,
     },
     {
       field: "utterance",
@@ -260,6 +265,7 @@ const UtterancesTable: React.FC<Props> = ({
         "Utterances from dataset are overlaid with saliency maps, highlighting the most important tokens for the model's prediction.",
       flex: 5,
       minWidth: 398,
+      cellClassName: classes.hoverableDataCell,
       renderCell: renderUtterance,
     },
     {
@@ -283,6 +289,7 @@ const UtterancesTable: React.FC<Props> = ({
         ),
       flex: 1,
       minWidth: 120,
+      cellClassName: classes.hoverableDataCell,
       renderCell: renderHoverableDataCell,
     },
     {
@@ -297,6 +304,7 @@ const UtterancesTable: React.FC<Props> = ({
       flex: 1,
       minWidth: 120,
       valueGetter: getPrediction,
+      cellClassName: classes.hoverableDataCell,
       renderCell: renderHoverableDataCell,
     },
     {
