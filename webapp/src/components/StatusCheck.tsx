@@ -31,7 +31,8 @@ const render_cell = (task_name: string, task_status: string) => (
     <Paper variant="outlined">
       <Box display="flex" alignItems="center" gap={1}>
         <Typography>
-          {`${task_name.split("_").map(capitalize).join(" ")} `} {STATUS_ICON_MAPPING[task_status]}
+          {`${task_name.split("_").map(capitalize).join(" ")}  `}
+          {STATUS_ICON_MAPPING[task_status]}
         </Typography>
       </Box>
     </Paper>
