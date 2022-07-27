@@ -1,5 +1,4 @@
 import { fireEvent, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { renderWithRouterAndRedux } from "mocks/utils";
 import { DatasetSplitName } from "types/api";
 import DatasetSplitToggler from "./DatasetSplitToggler";
