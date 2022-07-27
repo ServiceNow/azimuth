@@ -12,6 +12,7 @@ Released changes are shown in the
 
 ### Added
 - Rows of Performance Analysis table now link to exploration page with filters applied.
+- Added visual bars to the similarity column in the semantically similar utterances.
 
 ### Changed
 
