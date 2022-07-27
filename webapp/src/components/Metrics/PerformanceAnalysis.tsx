@@ -11,6 +11,7 @@ import {
   GridColumnMenuContainer,
   GridColumnMenuProps,
   GridColumnsMenuItem,
+  GridColumnVisibilityModel,
   GridRow,
   GridRowSpacingParams,
   GridSortCellParams,
