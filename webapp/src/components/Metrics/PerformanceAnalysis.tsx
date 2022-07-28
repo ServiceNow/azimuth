@@ -137,11 +137,10 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       return gridStringOrNumberComparator(v1, v2, param1, param2);
     };
 
-    const NUMBER_COL_DEF = {
+    const METRIC_COLUMN = {
       flex: 1,
       minWidth: 120,
       maxWidth: 220,
-      type: "number",
       sortComparator: customSort,
     };
 
@@ -189,13 +188,15 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       },
       {
-        ...NUMBER_COL_DEF,
         field: "utteranceCount",
-        headerName: "Utterance Count",
-        minWidth: 146,
+        headerName: "Total",
+        description: "Total number of utterances",
+        width: 96,
+        align: "right",
+        sortComparator: customSort,
       },
       ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
-        ...NUMBER_COL_DEF,
+        ...METRIC_COLUMN,
         field: outcome,
         headerName: OUTCOME_PRETTY_NAMES[outcome],
         renderHeader: () => OutcomeIcon({ outcome }),
@@ -210,7 +211,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       })),
       ...customMetricNames.map<Column<Row>>((metricName) => ({
-        ...NUMBER_COL_DEF,
+        ...METRIC_COLUMN,
         field: metricName,
         headerName: metricName,
         valueGetter: ({ row }) => row.customMetrics[metricName],
@@ -223,7 +224,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       })),
       {
-        ...NUMBER_COL_DEF,
+        ...METRIC_COLUMN,
         field: "ece",
         headerName: "ECE",
         renderCell: ({ value }: GridCellParams<number>) => (
