@@ -17,7 +17,7 @@ const renderPerturbationTestingPreview = (
     { route: "/local?pipeline_index=0", path: "/:jobId?:pipeline" }
   );
 
-describe("Pertubation API", () => {
+describe("PerturbationTestingPreview API", () => {
   const handlers = [getPertubationResponse];
   const server = setupServer(...handlers);
 
