@@ -137,7 +137,11 @@ const Metrics: React.FC<Props> = ({
           isLoading={isFetching}
           value={metrics?.ece.toFixed(2)}
           name="ECE"
-          description={ECE_TOOLTIP}
+          description={
+            metrics?.ecePlot
+              ? `${ECE_TOOLTIP}\nThis ECE is computed using ${metrics?.ecePlot?.data[0].x.length} bins.`
+              : ECE_TOOLTIP
+          }
         />
       </MetricsCard>
     </Box>

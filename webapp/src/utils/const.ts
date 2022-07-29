@@ -21,7 +21,6 @@ export const ID_TOOLTIP =
 export const ECE_TOOLTIP = `
 The ECE measures the calibration of the model, meaning if the confidence of the model matches its accuracy.
 The lower the better. An ECE of 0 means perfect calibration.
-This ECE is computed using 20 bins.
 `;
 
 export const PIPELINE_REQUIRED_TIP = "Unavailable without a pipeline";
