@@ -10,7 +10,6 @@ import {
   Tooltip,
   tooltipClasses,
   Typography,
-  useTheme,
 } from "@mui/material";
 
 const useStyles = makeStyles(() => ({
@@ -39,7 +38,6 @@ const Metric: React.FC<Props> = ({
   flexDirection,
 }) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   const tooltip = description
     .trim()
@@ -61,12 +59,12 @@ const Metric: React.FC<Props> = ({
           <Typography marginX={0.5} whiteSpace="nowrap">
             {name}
           </Typography>
-          <Typography marginX={0.5} variant="h6" sx={{ color }}>
+          <Typography align="center" variant="h6" width="5ch" sx={{ color }}>
+            {/* 5ch is wide enough for 100.0% */}
             {(!isLoading && value) || (
               <Skeleton
                 role="skeleton"
                 variant="text"
-                width={theme.spacing(7)}
                 animation={isLoading && undefined} // default animation when loading, false in case of an error
               />
             )}
