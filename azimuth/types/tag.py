@@ -121,10 +121,6 @@ SMART_TAGS_FAMILY_MAPPING = {
     ],
 }
 
-ALL_SYNTAX_TAGS = [
-    *SMART_TAGS_FAMILY_MAPPING[SmartTagFamily.extreme_length],
-    *SMART_TAGS_FAMILY_MAPPING[SmartTagFamily.partial_syntax],
-]
 ALL_PREDICTION_TAGS: List[Tag] = [
     tag for family in PIPELINE_SMART_TAG_FAMILIES for tag in SMART_TAGS_FAMILY_MAPPING[family]
 ]

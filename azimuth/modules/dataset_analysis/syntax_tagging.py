@@ -12,7 +12,12 @@ from azimuth.config import CommonFieldsConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.types import DatasetColumn, ModuleResponse
-from azimuth.types.tag import ALL_SYNTAX_TAGS, SmartTag, TaggingResponse
+from azimuth.types.tag import (
+    SMART_TAGS_FAMILY_MAPPING,
+    SmartTag,
+    SmartTagFamily,
+    TaggingResponse,
+)
 
 
 class SyntaxTaggingModule(DatasetResultModule[CommonFieldsConfig]):
@@ -55,7 +60,11 @@ class SyntaxTaggingModule(DatasetResultModule[CommonFieldsConfig]):
         records: List[TaggingResponse] = []
 
         for tokens, utterance in zip(batch_tokens, utterances):
-            tag: Dict[SmartTag, bool] = {smart_tag: False for smart_tag in ALL_SYNTAX_TAGS}
+            tag: Dict[SmartTag, bool] = {
+                smart_tag: False
+                for family in [SmartTagFamily.extreme_length, SmartTagFamily.partial_syntax]
+                for smart_tag in SMART_TAGS_FAMILY_MAPPING[family]
+            }
             adds = {}
 
             # Syntax
