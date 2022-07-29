@@ -41,17 +41,14 @@ const Metric: React.FC<Props> = ({
   const classes = useStyles();
   const theme = useTheme();
 
+  const tooltip = description
+    .trim()
+    .split("\n")
+    .map((paragraph) => <Typography variant="inherit">{paragraph}</Typography>);
+
   return (
     <Box display="flex" justifyContent="flex-end">
-      <Tooltip
-        title={description
-          .trim()
-          .split("\n")
-          .map((paragraph) => (
-            <Typography variant="inherit">{paragraph}</Typography>
-          ))}
-        classes={{ popper: classes.popper }}
-      >
+      <Tooltip title={tooltip} classes={{ popper: classes.popper }}>
         <Box
           height="100%"
           paddingX={2.5}
