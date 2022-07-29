@@ -9,7 +9,6 @@ import {
   Skeleton,
   Tooltip,
   tooltipClasses,
-  TooltipProps,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -24,7 +23,7 @@ const useStyles = makeStyles(() => ({
 
 type Props = {
   name: string;
-  description: TooltipProps["title"];
+  description: string;
   isLoading: boolean;
   value?: string;
   color?: string;
@@ -44,7 +43,15 @@ const Metric: React.FC<Props> = ({
 
   return (
     <Box display="flex" justifyContent="flex-end">
-      <Tooltip title={description} classes={{ popper: classes.popper }}>
+      <Tooltip
+        title={description
+          .trim()
+          .split("\n")
+          .map((paragraph) => (
+            <Typography variant="inherit">{paragraph}</Typography>
+          ))}
+        classes={{ popper: classes.popper }}
+      >
         <Box
           height="100%"
           paddingX={2.5}

@@ -8,7 +8,7 @@ import {
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
-import { OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
+import { ECE_TOOLTIP, OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import Metric from "./Metric";
 import MetricsCard from "./MetricsCard";
@@ -22,36 +22,14 @@ const OUTCOMES = [
 ] as const;
 
 const OUTCOME_DESCRIPTIONS = {
-  CorrectAndPredicted: (
-    <>
-      <Typography>
-        The predicted class matches the label and is not the rejection class.
-      </Typography>
-    </>
-  ),
-  CorrectAndRejected: (
-    <>
-      <Typography>
-        The predicted class and the label are the rejection class.
-      </Typography>
-    </>
-  ),
-  IncorrectAndRejected: (
-    <>
-      <Typography>
-        The predicted class is the rejection class, but not the label.
-      </Typography>
-    </>
-  ),
-  IncorrectAndPredicted: (
-    <>
-      <Typography>
-        The predicted class does not match the label and is not the rejection
-        class.
-      </Typography>
-      <Typography>The target is below 10%.</Typography>
-    </>
-  ),
+  CorrectAndPredicted:
+    "The predicted class matches the label and is not the rejection class.",
+  CorrectAndRejected:
+    "The predicted class and the label are the rejection class.",
+  IncorrectAndRejected:
+    "The predicted class is the rejection class, but not the label.",
+  IncorrectAndPredicted:
+    "The predicted class does not match the label and is not the rejection class.",
 };
 
 type Props = {
@@ -107,15 +85,9 @@ const Metrics: React.FC<Props> = ({
             }
             name={OUTCOME_PRETTY_NAMES[outcome]}
             description={
-              <>
-                {!isFetching && metrics && (
-                  <Typography>
-                    {`${metrics.outcomeCount[outcome]} out of
-            ${metrics.utteranceCount} utterances`}
-                  </Typography>
-                )}
-                {OUTCOME_DESCRIPTIONS[outcome]}
-              </>
+              !isFetching && metrics
+                ? `${metrics.outcomeCount[outcome]} out of ${metrics.utteranceCount} utterances\n${OUTCOME_DESCRIPTIONS[outcome]}`
+                : OUTCOME_DESCRIPTIONS[outcome]
             }
             color={theme.palette[OUTCOME_COLOR[outcome]].main}
           />
@@ -136,7 +108,7 @@ const Metrics: React.FC<Props> = ({
                 )
               }
               name={metricName}
-              description={<Typography>{description}</Typography>}
+              description={description}
             />
           ))}
         </MetricsCard>
@@ -165,18 +137,7 @@ const Metrics: React.FC<Props> = ({
           isLoading={isFetching}
           value={metrics?.ece.toFixed(2)}
           name="ECE"
-          description={
-            <>
-              <Typography>
-                The ECE measures the calibration of the model, meaning if the
-                confidence of the model matches its accuracy.
-              </Typography>
-              <Typography>
-                The lower the better. An ECE of 0 means perfect calibration.
-              </Typography>
-              <Typography>This ECE is computed using 20 bins.</Typography>
-            </>
-          }
+          description={ECE_TOOLTIP}
         />
       </MetricsCard>
     </Box>
