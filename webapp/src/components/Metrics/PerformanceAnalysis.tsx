@@ -29,11 +29,15 @@ import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
 import { Link } from "react-router-dom";
-import { getMetricsPerFilterEndpoint } from "services/api";
+import {
+  getCustomMetricInfoEndpoint,
+  getMetricsPerFilterEndpoint,
+} from "services/api";
 import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
+  ECE_TOOLTIP,
   OUTCOME_COLOR,
   OUTCOME_PRETTY_NAMES,
   SMART_TAG_FAMILIES,
@@ -82,6 +86,8 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
+  const { data: metricsInfo } = getCustomMetricInfoEndpoint.useQuery({ jobId });
+
   const { data, isFetching, error } = getMetricsPerFilterEndpoint.useQuery({
     jobId,
     datasetSplitName: selectedDatasetSplit,
@@ -115,10 +121,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   });
 
   const columns: Column<Row>[] = React.useMemo(() => {
-    // It's pointless to render (incomplete) column headers if there is no data.
-    if (data === undefined) return [];
-
-    const customMetricNames = Object.keys(data.metricsOverall[0].customMetrics);
+    const metricsEntries = Object.entries(metricsInfo ?? {});
 
     const customSort = (
       // Use this sort to keep the overall row at the top always.
@@ -137,11 +140,10 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       return gridStringOrNumberComparator(v1, v2, param1, param2);
     };
 
-    const NUMBER_COL_DEF = {
+    const METRIC_COLUMN = {
       flex: 1,
       minWidth: 120,
       maxWidth: 220,
-      type: "number",
       sortComparator: customSort,
     };
 
@@ -189,13 +191,15 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       },
       {
-        ...NUMBER_COL_DEF,
         field: "utteranceCount",
-        headerName: "Utterance Count",
-        minWidth: 146,
+        headerName: "Total",
+        description: "Total number of utterances",
+        width: 96,
+        align: "right",
+        sortComparator: customSort,
       },
       ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
-        ...NUMBER_COL_DEF,
+        ...METRIC_COLUMN,
         field: outcome,
         headerName: OUTCOME_PRETTY_NAMES[outcome],
         renderHeader: () => OutcomeIcon({ outcome }),
@@ -209,9 +213,10 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
           />
         ),
       })),
-      ...customMetricNames.map<Column<Row>>((metricName) => ({
-        ...NUMBER_COL_DEF,
+      ...metricsEntries.map<Column<Row>>(([metricName, { description }]) => ({
+        ...METRIC_COLUMN,
         field: metricName,
+        description,
         headerName: metricName,
         valueGetter: ({ row }) => row.customMetrics[metricName],
         renderCell: ({ value }: GridCellParams<number>) => (
@@ -223,9 +228,10 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       })),
       {
-        ...NUMBER_COL_DEF,
+        ...METRIC_COLUMN,
         field: "ece",
         headerName: "ECE",
+        description: ECE_TOOLTIP,
         renderCell: ({ value }: GridCellParams<number>) => (
           <VisualBar
             formattedValue={value.toFixed(2)}
@@ -235,7 +241,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
         ),
       },
     ];
-  }, [data, selectedMetricPerFilterOption, sortModel]);
+  }, [metricsInfo, selectedMetricPerFilterOption, sortModel]);
 
   const Footer = () => (
     <Box

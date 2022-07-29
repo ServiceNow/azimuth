@@ -9,9 +9,7 @@ import {
   Skeleton,
   Tooltip,
   tooltipClasses,
-  TooltipProps,
   Typography,
-  useTheme,
 } from "@mui/material";
 
 const useStyles = makeStyles(() => ({
@@ -24,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 type Props = {
   name: string;
-  description: TooltipProps["title"];
+  description: string;
   isLoading: boolean;
   value?: string;
   color?: string;
@@ -40,11 +38,15 @@ const Metric: React.FC<Props> = ({
   flexDirection,
 }) => {
   const classes = useStyles();
-  const theme = useTheme();
+
+  const tooltip = description
+    .trim()
+    .split("\n")
+    .map((paragraph) => <Typography variant="inherit">{paragraph}</Typography>);
 
   return (
     <Box display="flex" justifyContent="flex-end">
-      <Tooltip title={description} classes={{ popper: classes.popper }}>
+      <Tooltip title={tooltip} classes={{ popper: classes.popper }}>
         <Box
           height="100%"
           paddingX={2.5}
@@ -57,12 +59,12 @@ const Metric: React.FC<Props> = ({
           <Typography marginX={0.5} whiteSpace="nowrap">
             {name}
           </Typography>
-          <Typography marginX={0.5} variant="h6" sx={{ color }}>
+          <Typography align="center" variant="h6" width="5ch" sx={{ color }}>
+            {/* 5ch is wide enough for 100.0% */}
             {(!isLoading && value) || (
               <Skeleton
                 role="skeleton"
                 variant="text"
-                width={theme.spacing(7)}
                 animation={isLoading && undefined} // default animation when loading, false in case of an error
               />
             )}
