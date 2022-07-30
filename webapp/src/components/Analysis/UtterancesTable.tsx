@@ -1,5 +1,4 @@
 import { GetApp, SvgIconComponent } from "@mui/icons-material";
-import AdjustIcon from "@mui/icons-material/Adjust";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
 import { Box, Button } from "@mui/material";
@@ -15,6 +14,7 @@ import UtterancesTableFooter from "components/Analysis/UtterancesTableFooter";
 import CopyButton from "components/CopyButton";
 import Description from "components/Description";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
+import TargetIcon from "components/Icons/Target";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
 import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
@@ -285,7 +285,7 @@ const UtterancesTable: React.FC<Props> = ({
         renderHeaderWithFilter(
           "Label",
           filters.label !== undefined,
-          AdjustIcon
+          TargetIcon
         ),
       flex: 1,
       minWidth: 120,
