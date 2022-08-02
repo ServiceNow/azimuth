@@ -191,10 +191,10 @@ const FilterSelector = <FilterValue extends string>({
           onClick={() => setIsCollapsed(!isCollapsed)}
           aria-label={`collapse-${label}`}
           sx={{ padding: 0, minWidth: 0 }}
-          disabled={!filters && !isFetching}
+          disabled={!filters}
         >
           <MotionArrowDropDownIcon
-            animate={{ rotate: isCollapsed ? -90 : 0 }}
+            animate={{ rotate: isCollapsed || !filters ? -90 : 0 }}
             transition={transition}
             className={classes.collapseIcon}
           />
@@ -214,15 +214,20 @@ const FilterSelector = <FilterValue extends string>({
           label={label}
           componentsProps={{ typography: titleTypographyProps }}
         />
-        {selectedOptions.length > 0 && (
+        {filters && selectedOptions.length > 0 && (
           <Typography variant="body2" className={classes.selectedCount}>
             ({selectedOptions.length} selected)
           </Typography>
         )}
+        {isFetching && (
+          <Box flex="1" display="flex" justifyContent="end" marginRight={1}>
+            <CircularProgress size="1em" />
+          </Box>
+        )}
       </div>
       {!isCollapsed && (
         <>
-          {options ? (
+          {options && (
             <motion.ul
               className={classes.options}
               animate={{
@@ -232,8 +237,6 @@ const FilterSelector = <FilterValue extends string>({
             >
               {options.map(renderOption)}
             </motion.ul>
-          ) : (
-            isFetching && <CircularProgress />
           )}
           {numberOfOptions > INITIAL_NUMBER_VISIBLE && (
             <SeeMoreLess {...seeMoreLessProps} />
