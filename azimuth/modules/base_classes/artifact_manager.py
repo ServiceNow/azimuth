@@ -27,6 +27,8 @@ class ArtifactManager:
 
     instance: Optional["ArtifactManager"] = None
 
+    TOKENIZER_PATH = "./azimuth_shr/tokenizers/bert-base-uncased"
+
     def __init__(self):
         # The keys of the dict are a hash of the config.
         self.dataset_dict_mapping: Dict[Hash, DatasetDict] = {}
@@ -119,7 +121,7 @@ class ArtifactManager:
 
     def get_tokenizer(self):
         if self.tokenizer is None:
-            self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+            self.tokenizer = AutoTokenizer.from_pretrained(self.TOKENIZER_PATH)
         return self.tokenizer
 
     def get_metric(self, config, name: str, **kwargs):
@@ -131,3 +133,7 @@ class ArtifactManager:
     @classmethod
     def clear_cache(cls) -> None:
         cls.instance = None
+
+    @classmethod
+    def save_tokenizer(cls):
+        AutoTokenizer.from_pretrained("bert-base-uncased").save_pretrained(cls.TOKENIZER_PATH)
