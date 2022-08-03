@@ -334,7 +334,7 @@ def load_azimuth_config(config_path: str) -> AzimuthConfig:
     log.info(
         f"Dataset will be loaded with {cfg.dataset.class_name} "
         + remote_mention
-        + f"with the following args: {cfg.dataset.kwargs}."
+        + f"with the following args and kwargs: {cfg.dataset.args} {cfg.dataset.kwargs}."
     )
     if cfg.pipelines:
         for pipeline_idx, pipeline in enumerate(cfg.pipelines):
