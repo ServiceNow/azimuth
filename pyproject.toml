@@ -3,7 +3,7 @@ name = "azimuth"
 version = "2.2.3"
 description = "Azimuth provides an unified error analysis experience to data scientists."
 readme = "README.md"
-authors = ["Butter-ball team <xaicaps@servicenow.com>"]
+authors = ["Azimuth team <azimuth-team@servicenow.com>"]
 homepage = "https://github.com/ServiceNow/azimuth"
 repository = "https://github.com/ServiceNow/azimuth"
 
