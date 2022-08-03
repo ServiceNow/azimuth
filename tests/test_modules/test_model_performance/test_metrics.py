@@ -251,6 +251,12 @@ def test_outcome_count_per_filter_without_postprocessing(tiny_text_config):
                 "otherwise the following test doesn't test much"
             )
 
+    # Regression test for bug https://github.com/ServiceNow/azimuth/issues/195
+    # If we pass without_postprocessing to the modules, but we forget to propagate it in
+    # FilterableModule.get_dataset_split(), utterances are mistakenly filtered based on their
+    # post-processed outcome, but then the response is counted using the model outcome. Here, some
+    # utterances that were IncorrectAndRejected with post-processing would be counted as a different
+    # model outcome. We verify that the counts are still 0 for the other outcomes.
     [res_without_postprocessing] = OutcomeCountPerFilterModule(
         DatasetSplitName.eval,
         config=tiny_text_config,
