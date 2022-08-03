@@ -22,5 +22,6 @@ Released changes are shown in the
 
 ### Fixed
 - Fixed utterances table poorly showing ids greater than 9999.
+- Fixed filtering aggregation modules without post-processing.
 
 ### Security
