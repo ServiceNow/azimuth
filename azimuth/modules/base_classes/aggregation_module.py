@@ -56,7 +56,12 @@ class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
 
         """
         ds = super().get_dataset_split(name)
-        return filter_dataset_split(ds, filters=self.mod_options.filters, config=self.config)
+        return filter_dataset_split(
+            dataset_split=ds,
+            filters=self.mod_options.filters,
+            config=self.config,
+            without_postprocessing=self.mod_options.without_postprocessing,
+        )
 
     def _get_predictions_from_ds(self) -> List[int]:
         """Get predicted classes according to the module options (with or without postprocessing).

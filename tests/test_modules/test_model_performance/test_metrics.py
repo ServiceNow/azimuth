@@ -231,6 +231,46 @@ def test_outcome_count_per_filter(tiny_text_config):
     assert res_post.count_per_filter.extreme_length != res.count_per_filter.extreme_length
 
 
+def test_outcome_count_per_filter_without_postprocessing(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
+
+    [res] = OutcomeCountPerFilterModule(
+        DatasetSplitName.eval,
+        config=tiny_text_config,
+        mod_options=ModuleOptions(
+            filters=DatasetFilters(outcome=[OutcomeName.IncorrectAndRejected]), pipeline_index=0
+        ),
+    ).compute_on_dataset_split()
+    for per_outcome in res.count_per_filter.outcome:
+        if per_outcome.filter_value != OutcomeName.IncorrectAndRejected:
+            assert per_outcome.utterance_count == 0, f"expected no {per_outcome.filter_value}"
+        else:
+            assert per_outcome.utterance_count > 0, (
+                f"expected some {per_outcome.filter_value},"
+                "otherwise the following test doesn't test much"
+            )
+
+    # Regression test for bug https://github.com/ServiceNow/azimuth/issues/195
+    # If we pass without_postprocessing to the modules, but we forget to propagate it in
+    # FilterableModule.get_dataset_split(), utterances are mistakenly filtered based on their
+    # post-processed outcome, but then the response is counted using the model outcome. Here, some
+    # utterances that were IncorrectAndRejected with post-processing would be counted as a different
+    # model outcome. We verify that the counts are still 0 for the other outcomes.
+    [res_without_postprocessing] = OutcomeCountPerFilterModule(
+        DatasetSplitName.eval,
+        config=tiny_text_config,
+        mod_options=ModuleOptions(
+            filters=DatasetFilters(outcome=[OutcomeName.IncorrectAndRejected]),
+            pipeline_index=0,
+            without_postprocessing=True,
+        ),
+    ).compute_on_dataset_split()
+    for per_outcome in res_without_postprocessing.count_per_filter.outcome:
+        if per_outcome.filter_value != OutcomeName.IncorrectAndRejected:
+            assert per_outcome.utterance_count == 0, f"expected no {per_outcome.filter_value}"
+
+
 def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
     apply_mocked_startup_task(tiny_text_config)
     mf_module = MetricsPerFilterModule(
