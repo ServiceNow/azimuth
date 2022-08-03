@@ -7,7 +7,6 @@ from typing import Dict, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
-from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -119,8 +118,6 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
         version="1.0",
         default_response_class=JSONResponseIgnoreNan,
     )
-    if profile:
-        app.add_middleware(PyInstrumentProfilerMiddleware)
 
     # Setup routes
     from azimuth.routers.v1.admin import router as admin_router
