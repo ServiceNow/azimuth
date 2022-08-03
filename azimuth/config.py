@@ -290,7 +290,7 @@ class PerturbationTestingScope(ModelContractConfig):
 
 
 class SimilarityConfig(CommonFieldsConfig):
-    # Similarity configuration to define the encoded and the similarity threshold.
+    # Similarity configuration to define the encoder and the similarity threshold.
     similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
 
 
