@@ -24,5 +24,6 @@
       }
     }
   ],
-  "saliency_layer": "distilbert.embeddings.word_embeddings"
+  "saliency_layer": "distilbert.embeddings.word_embeddings",
+  "batch_size": 256
 }
