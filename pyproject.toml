@@ -4,7 +4,7 @@ version = "2.2.3"
 description = "Azimuth provides an unified error analysis experience to data scientists."
 readme = "README.md"
 authors = ["Azimuth team <azimuth-team@servicenow.com>"]
-homepage = "https://github.com/ServiceNow/azimuth"
+homepage = "https://servicenow.github.io/azimuth"
 repository = "https://github.com/ServiceNow/azimuth"
 
 packages = [{ include = "azimuth/" },]
