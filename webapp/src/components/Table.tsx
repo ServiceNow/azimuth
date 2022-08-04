@@ -7,6 +7,7 @@ import {
   GridRowId,
   GridRowProps,
   GridValueGetterParams,
+  MAX_PAGE_SIZE,
 } from "@mui/x-data-grid";
 import CustomPagination from "components/CustomPagination";
 import React from "react";
@@ -65,6 +66,7 @@ export interface Props<Row> extends DataGridProps {
 
 export const Table = <Row extends { id: GridRowId }>({
   components,
+  pageSize,
   sx,
   ...props
 }: Props<Row>) => (
@@ -74,7 +76,17 @@ export const Table = <Row extends { id: GridRowId }>({
     disableSelectionOnClick
     hideFooter={!props.pagination && !components?.Footer}
     rowHeight={64}
-    pageSize={props.pagination && PAGE_SIZE}
+    // Free version of DataGrid crashes if pageSize > MAX_PAGE_SIZE, so we
+    // default to showing all rows, which can be done with an undefined or
+    // negative pageSize. Switching between a number and undefined tries to
+    // switch between controlled and uncontrolled, which fails, so we use -1.
+    pageSize={
+      pageSize === undefined
+        ? props.pagination && PAGE_SIZE
+        : pageSize > MAX_PAGE_SIZE
+        ? -1
+        : pageSize
+    }
     components={{
       ...(props.pagination && { Pagination: CustomPagination }),
       ...components,
