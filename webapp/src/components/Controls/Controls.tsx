@@ -178,21 +178,14 @@ const Controls: React.FC<Props> = ({
       : 0;
   }, [countPerFilter]);
 
-  const FilterCheckboxList: React.FC<{
-    filter: keyof QueryArrayFiltersState;
-    label: FormControlLabelProps["label"];
-    prettyNames?: Record<string, string>;
-  }> = ({ filter, ...props }) => (
-    <FilterSelector
-      maxCount={maxCount}
-      searchValue={searchValue}
-      selectedOptions={filters[filter] ?? []}
-      handleValueChange={getFilterChangeHandler(filter)}
-      filters={countPerFilter?.countPerFilter[filter]}
-      isFetching={isFetchingCountPerFilter}
-      {...props}
-    />
-  );
+  const getFilterSelectorProps = (filter: keyof QueryArrayFiltersState) => ({
+    maxCount: maxCount,
+    searchValue: searchValue,
+    selectedOptions: filters[filter] ?? [],
+    handleValueChange: getFilterChangeHandler(filter),
+    filters: countPerFilter?.countPerFilter[filter],
+    isFetching: isFetchingCountPerFilter,
+  });
 
   const divider = (
     <Box marginY={1} borderBottom="1px solid rgba(0, 0, 0, 0.12)" />
@@ -326,17 +319,23 @@ const Controls: React.FC<Props> = ({
           </Box>
           {divider}
           <Stack display="block" divider={divider} overflow="hidden auto">
-            <FilterCheckboxList
-              filter="outcome"
+            <FilterSelector
+              {...getFilterSelectorProps("outcome")}
               label="Prediction Outcome"
               prettyNames={OUTCOME_PRETTY_NAMES}
             />
-            <FilterCheckboxList filter="label" label="Label" />
-            <FilterCheckboxList filter="prediction" label="Prediction" />
+            <FilterSelector
+              {...getFilterSelectorProps("label")}
+              label="Label"
+            />
+            <FilterSelector
+              {...getFilterSelectorProps("prediction")}
+              label="Prediction"
+            />
             {SMART_TAG_FAMILIES.map((filterName) => (
-              <FilterCheckboxList
+              <FilterSelector
                 key={filterName}
-                filter={filterName}
+                {...getFilterSelectorProps(filterName)}
                 label={
                   <Stack direction="row" gap={1}>
                     {SMART_TAG_FAMILY_PRETTY_NAMES[filterName]}
@@ -345,7 +344,10 @@ const Controls: React.FC<Props> = ({
                 }
               />
             ))}
-            <FilterCheckboxList filter="dataAction" label="Proposed Action" />
+            <FilterSelector
+              {...getFilterSelectorProps("dataAction")}
+              label="Proposed Action"
+            />
           </Stack>
         </>
       )}

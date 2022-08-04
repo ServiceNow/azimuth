@@ -247,4 +247,4 @@ const FilterSelector = <FilterValue extends string>({
   );
 };
 
-export default FilterSelector;
+export default React.memo(FilterSelector);
