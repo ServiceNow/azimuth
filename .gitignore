@@ -129,4 +129,5 @@ azimuth_shr/cached_models
 azimuth_shr/files
 azimuth_shr/local_files
 azimuth_shr/sentence_transformers
+azimuth_shr/sentence_transformers_cache
 azimuth_shr/tf_hub/
