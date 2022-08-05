@@ -29,11 +29,9 @@ If you are familiar with the codebase, providing a "unit test" is helpful, but n
 
 ## How to submit changes
 
-First, open an issue describing your desired changes.
-This is especially important if you need to add a new dependency.
-If that is the case, please mention which package and which version you would like to add.
+First, open an issue describing your desired changes, if it does not exist already. This is especially important if you need to add a new dependency. If that is the case, please mention which package and which version you would like to add. Once a team member accepts your proposition, you can start coding!
 
-Once a member accept your proposition, you can start coding!
+You can also self-assign an existing issue by commmenting #self-assign on the issue.
 
 1. [Fork the repo to your own account](https://github.com/ServiceNow/azimuth/fork).
 2. Clone your fork of the repo locally.
