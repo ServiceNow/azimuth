@@ -29,7 +29,7 @@ If you are familiar with the codebase, providing a "unit test" is helpful, but n
 
 ## How to submit changes
 
-First, open an issue describing your desired changes, if it does not exist already. This is especially important if you need to add a new dependency. If that is the case, please mention which package and which version you would like to add. Once a member accept your proposition, you can start coding!
+First, open an issue describing your desired changes, if it does not exist already. This is especially important if you need to add a new dependency. If that is the case, please mention which package and which version you would like to add. Once a team member accepts your proposition, you can start coding!
 
 You can also self-assign an existing issue by commmenting #self-assign on the issue.
 
