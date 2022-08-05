@@ -90,7 +90,11 @@ const Dashboard = () => {
             />
           }
         >
-          <PerformanceAnalysis jobId={jobId} pipeline={pipeline} />
+          <PerformanceAnalysis
+            jobId={jobId}
+            pipeline={pipeline}
+            availableDatasetSplits={data?.availableDatasetSplits}
+          />
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) && data?.perturbationTestingAvailable && (

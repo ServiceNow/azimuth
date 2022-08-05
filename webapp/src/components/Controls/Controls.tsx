@@ -4,7 +4,6 @@ import {
   Button,
   CircularProgress,
   FormControlLabel,
-  FormControlLabelProps,
   IconButton,
   InputAdornment,
   OutlinedInput,
@@ -245,6 +244,7 @@ const Controls: React.FC<Props> = ({
         <>
           <Box margin={1}>
             <DatasetSplitToggler
+              availableDatasetSplits={datasetInfo?.availableDatasetSplits}
               value={datasetSplitName}
               onChange={handleDatasetSplitChange}
             />
