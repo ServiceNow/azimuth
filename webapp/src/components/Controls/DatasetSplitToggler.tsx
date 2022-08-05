@@ -15,36 +15,28 @@ const DatasetSplitToggler: React.FC<Props> = ({
   availableDatasetSplits,
   value,
   onChange,
-}) => {
-  const handleSelectionChange = (newValue: DatasetSplitName | null) => {
-    if (newValue !== null) {
-      onChange(newValue);
-    }
-  };
-
-  return (
-    <ToggleButtonGroup
-      color="secondary"
-      exclusive
-      fullWidth
-      size="small"
-      value={value}
-      onChange={(_, value) => handleSelectionChange(value)}
-    >
-      {DATASET_SPLIT_NAMES.map((datasetSplitName) => (
-        <ToggleButton
-          key={datasetSplitName}
-          sx={{ gap: 1, whiteSpace: "nowrap" }}
-          value={datasetSplitName}
-          disabled={!availableDatasetSplits?.[datasetSplitName]}
-        >
-          {datasetSplitName === "eval" && <SpeedIcon />}
-          {datasetSplitName === "train" && <ModelTrainingIcon />}
-          {DATASET_SPLIT_PRETTY_NAMES[datasetSplitName]} Set
-        </ToggleButton>
-      ))}
-    </ToggleButtonGroup>
-  );
-};
+}) => (
+  <ToggleButtonGroup
+    color="secondary"
+    exclusive
+    fullWidth
+    size="small"
+    value={value}
+    onChange={(_, value: DatasetSplitName | null) => value && onChange(value)}
+  >
+    {DATASET_SPLIT_NAMES.map((datasetSplitName) => (
+      <ToggleButton
+        key={datasetSplitName}
+        sx={{ gap: 1, whiteSpace: "nowrap" }}
+        value={datasetSplitName}
+        disabled={!availableDatasetSplits?.[datasetSplitName]}
+      >
+        {datasetSplitName === "eval" && <SpeedIcon />}
+        {datasetSplitName === "train" && <ModelTrainingIcon />}
+        {DATASET_SPLIT_PRETTY_NAMES[datasetSplitName]} Set
+      </ToggleButton>
+    ))}
+  </ToggleButtonGroup>
+);
 
 export default React.memo(DatasetSplitToggler);
