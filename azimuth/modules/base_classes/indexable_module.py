@@ -2,6 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import abc
+import dataclasses
 from abc import ABC, abstractmethod
 from typing import Callable, Dict, List, Optional, Set, cast
 
@@ -211,6 +212,10 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                     for idx, r in enumerate(res_casted)
                 }
                 dm.add_tags(high_epistemic, table_key=table_key)
+                # We also save with use_bma=False so the smart tag is saved in the
+                # main prediction table.
+                non_bma_table_key = dataclasses.replace(table_key, use_bma=False)
+                dm.add_tags(high_epistemic, table_key=non_bma_table_key)
             pred_tags = self.get_pred_tags(
                 label=dm.get_dataset_split(table_key=table_key)[self.config.columns.label],
                 model_predictions=dm.get_dataset_split(table_key=table_key)[

@@ -100,9 +100,10 @@ def test_high_epistemic_tag(simple_text_config):
         sum(dm.get_dataset_split(simple_table_key_with_bma)[SmartTag.high_epistemic_uncertainty])
         == 10
     )
-    # With simple_table_key (use_bma is False), we still get 0
+    # With simple_table_key (use_bma is False), we should still get 10 so the smart tag is
+    # available in the main prediction table.
     simple_table_key = get_table_key(simple_text_config)
-    assert sum(dm.get_dataset_split(simple_table_key)[SmartTag.high_epistemic_uncertainty]) == 0
+    assert sum(dm.get_dataset_split(simple_table_key)[SmartTag.high_epistemic_uncertainty]) == 10
 
 
 def test_pred_smart_tags(clinc_text_config):
