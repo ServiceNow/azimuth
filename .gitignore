@@ -127,6 +127,7 @@ dask-worker-space/
 
 azimuth_shr/cached_models
 azimuth_shr/files
+azimuth_shr/huggingface_cache
 azimuth_shr/local_files
 azimuth_shr/sentence_transformers
 azimuth_shr/tf_hub/
