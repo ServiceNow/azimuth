@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import FilterSelector from "components/Controls/FilterSelector";
 import { renderWithTheme } from "mocks/utils";
+import { PIPELINE_REQUIRED_TIP } from "utils/const";
 
 test("display loading state", async () => {
   renderWithTheme(
@@ -16,6 +17,7 @@ test("display loading state", async () => {
   );
 
   await screen.findByText("type");
+  expect(screen.queryByLabelText(PIPELINE_REQUIRED_TIP)).toBeNull();
   await screen.findByRole("progressbar");
   expect(await screen.queryByRole("figure")).toBeNull();
   expect(screen.getByLabelText("collapse-type")).toBeDisabled();
@@ -47,6 +49,7 @@ test("display reloading state", async () => {
   );
 
   await screen.findByText("type");
+  expect(screen.queryByLabelText(PIPELINE_REQUIRED_TIP)).toBeNull();
   await screen.findByRole("progressbar");
   expect(screen.getByRole("figure").parentElement!.parentElement).toHaveStyle({
     opacity: 0.38,
@@ -68,9 +71,13 @@ test("display null state", async () => {
   );
 
   await screen.findByText("type");
+  const label = screen.getByLabelText(PIPELINE_REQUIRED_TIP);
   expect(await screen.queryByRole("progressbar")).toBeNull();
   expect(await screen.queryByRole("figure")).toBeNull();
   expect(screen.getByLabelText("collapse-type")).toBeDisabled();
+
+  fireEvent.mouseOver(label);
+  await screen.findByText(PIPELINE_REQUIRED_TIP);
 });
 
 test("display error state", async () => {
@@ -99,6 +106,7 @@ test("display error state", async () => {
   );
 
   screen.getByText("type");
+  expect(screen.queryByLabelText(PIPELINE_REQUIRED_TIP)).toBeNull();
   expect(screen.queryByRole("progressbar")).toBeNull();
   expect(screen.getByRole("figure").parentElement!.parentElement).toHaveStyle({
     opacity: 0.38,
