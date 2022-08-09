@@ -4,8 +4,8 @@ services:
     image: ${REGISTRY}/azimuth:${BACKEND_VERSION}_${DEVICE}
     environment:
       - "CFG_PATH=${CFG_PATH}"
+      - "HF_HOME=/azimuth_shr/huggingface_cache"
       - "SENTENCE_TRANSFORMERS_HOME=/azimuth_shr/sentence_transformers"
-      - "TRANSFORMERS_CACHE=/azimuth_shr/sentence_transformers_cache"
       - "TFHUB_CACHE_DIR=/azimuth_shr/tf_hub"
       - "TH"
       - "TEMP"
