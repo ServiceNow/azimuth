@@ -10,7 +10,8 @@ test("display loading state", async () => {
       searchValue=""
       selectedOptions={[]}
       handleValueChange={() => {}}
-      isFetching={true}
+      isFetching
+      isSuccess={false}
     />
   );
 
@@ -40,13 +41,16 @@ test("display reloading state", async () => {
           filterValue: "type1",
         },
       ]}
-      isFetching={true}
+      isFetching
+      isSuccess={false}
     />
   );
 
   await screen.findByText("type");
   await screen.findByRole("progressbar");
-  expect(await screen.queryByRole("figure")).not.toBeNull();
+  expect(screen.getByRole("figure").parentElement!.parentElement).toHaveStyle({
+    opacity: 0.38,
+  });
   expect(screen.getByLabelText("collapse-type")).not.toBeDisabled();
 });
 
@@ -59,6 +63,7 @@ test("display null state", async () => {
       selectedOptions={[]}
       handleValueChange={() => {}}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -66,6 +71,39 @@ test("display null state", async () => {
   expect(await screen.queryByRole("progressbar")).toBeNull();
   expect(await screen.queryByRole("figure")).toBeNull();
   expect(screen.getByLabelText("collapse-type")).toBeDisabled();
+});
+
+test("display error state", async () => {
+  renderWithTheme(
+    <FilterSelector
+      label="type"
+      maxCount={0}
+      searchValue=""
+      selectedOptions={[]}
+      handleValueChange={() => {}}
+      filters={[
+        {
+          outcomeCount: {
+            CorrectAndPredicted: 0,
+            CorrectAndRejected: 0,
+            IncorrectAndPredicted: 0,
+            IncorrectAndRejected: 0,
+          },
+          utteranceCount: 0,
+          filterValue: "type1",
+        },
+      ]}
+      isFetching={false}
+      isSuccess={false}
+    />
+  );
+
+  screen.getByText("type");
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  expect(screen.getByRole("figure").parentElement!.parentElement).toHaveStyle({
+    opacity: 0.38,
+  });
+  expect(screen.getByLabelText("collapse-type")).not.toBeDisabled();
 });
 
 test("empty outcome count", async () => {
@@ -89,6 +127,7 @@ test("empty outcome count", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -98,6 +137,9 @@ test("empty outcome count", async () => {
 
   const distribution = await screen.findByRole("figure");
   expect(distribution).toHaveStyle("width: 0%");
+  expect(distribution.parentElement!.parentElement).not.toHaveStyle({
+    opacity: 0.38,
+  });
 
   expect(screen.getByLabelText("type1")).not.toBeDisabled();
 });
@@ -123,6 +165,7 @@ test("collapsible filter", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -175,6 +218,7 @@ test("multi filter order", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -224,6 +268,7 @@ test("see more", async () => {
         filterValue: `type${i + 1}`,
       }))}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -260,6 +305,7 @@ test("see more long list", async () => {
         filterValue: `type${i + 1}`,
       }))}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -316,6 +362,7 @@ test("selected options", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -364,6 +411,7 @@ test("select all options", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -412,6 +460,7 @@ test("unselect all options", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -498,6 +547,7 @@ test("filter by search", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 

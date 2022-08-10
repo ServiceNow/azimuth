@@ -87,6 +87,7 @@ type Props<FilterValue> = {
   handleValueChange: (selectedOptions: FilterValue[]) => void;
   filters?: CountPerFilterValue[] | null;
   isFetching: boolean;
+  isSuccess: boolean;
   prettyNames?: Record<string, string>;
 };
 
@@ -98,6 +99,7 @@ const FilterSelector = <FilterValue extends string>({
   handleValueChange,
   filters,
   isFetching,
+  isSuccess,
   prettyNames,
 }: Props<FilterValue>) => {
   const classes = useStyles();
@@ -172,9 +174,9 @@ const FilterSelector = <FilterValue extends string>({
             display="flex"
             height="100%"
             sx={{
-              opacity: isFetching
-                ? (theme) => theme.palette.action.disabledOpacity
-                : 1,
+              opacity: isSuccess
+                ? undefined
+                : (theme) => theme.palette.action.disabledOpacity,
             }}
           >
             <FilterDistribution maxCount={maxCount} filter={filter} />
