@@ -93,15 +93,10 @@ def test_high_epistemic_tag(simple_text_config):
     # Set BMA
     mod.config.uncertainty.iterations = 20
     mod.mod_options.use_bma = True
-
-    # If BMA is set, we expect 10 tagged.
     mod.save_result(predictions, dm)
-    assert (
-        sum(dm.get_dataset_split(simple_table_key_with_bma)[SmartTag.high_epistemic_uncertainty])
-        == 10
-    )
-    # With simple_table_key (use_bma is False), we should still get 10 so the smart tag is
-    # available in the main prediction table.
+
+    # If BMA is set, we expect 10 tagged, and those tags to be found in the prediction table
+    # with the regular key, so they can be retrieved like the other tags.
     simple_table_key = get_table_key(simple_text_config)
     assert sum(dm.get_dataset_split(simple_table_key)[SmartTag.high_epistemic_uncertainty]) == 10
 

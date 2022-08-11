@@ -204,6 +204,8 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
             )
 
             if table_key.use_bma:
+                # Epistemic uncertainty is only computed when use_bma is set to True, hence why the
+                # smart tag is only computed on that condition.
                 high_epistemic = {
                     idx: {
                         SmartTag.high_epistemic_uncertainty: r.epistemic
@@ -211,24 +213,26 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                     }
                     for idx, r in enumerate(res_casted)
                 }
-                dm.add_tags(high_epistemic, table_key=table_key)
-                # We also save with use_bma=False so the smart tag is saved in the
-                # main prediction table.
+                # We save the smart tag with use_bma=False so the smart tag can be retrieved in the
+                # prediction table with the regular key, as the other tags.
                 non_bma_table_key = dataclasses.replace(table_key, use_bma=False)
                 dm.add_tags(high_epistemic, table_key=non_bma_table_key)
-            pred_tags = self.get_pred_tags(
-                label=dm.get_dataset_split(table_key=table_key)[self.config.columns.label],
-                model_predictions=dm.get_dataset_split(table_key=table_key)[
-                    DatasetColumn.model_predictions
-                ],
-                postprocessed_prediction=dm.get_dataset_split(table_key=table_key)[
-                    DatasetColumn.postprocessed_prediction
-                ],
-            )
-            dm.add_tags(
-                {idx: pred_tag_row for idx, pred_tag_row in enumerate(pred_tags)},
-                table_key=table_key,
-            )
+            else:
+                # These tags only need to be computed for the prediction table with the regular key
+                # (use_bma=False)
+                pred_tags = self.get_pred_tags(
+                    label=dm.get_dataset_split(table_key=table_key)[self.config.columns.label],
+                    model_predictions=dm.get_dataset_split(table_key=table_key)[
+                        DatasetColumn.model_predictions
+                    ],
+                    postprocessed_prediction=dm.get_dataset_split(table_key=table_key)[
+                        DatasetColumn.postprocessed_prediction
+                    ],
+                )
+                dm.add_tags(
+                    {idx: pred_tag_row for idx, pred_tag_row in enumerate(pred_tags)},
+                    table_key=table_key,
+                )
 
     @staticmethod
     def get_pred_tags(
