@@ -18,6 +18,7 @@ import {
   GridSortModel,
   gridStringOrNumberComparator,
   HideGridColMenuItem,
+  MAX_PAGE_SIZE,
 } from "@mui/x-data-grid";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
@@ -116,9 +117,16 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
   }, [data, selectedMetricPerFilterOption]);
 
   const { numberVisible, seeMoreLessProps } = useMoreLess({
-    init: INITIAL_NUMBER_VISIBLE,
+    init: INITIAL_NUMBER_VISIBLE + 1, // 1 extra for overall row
     total: rows.length,
   });
+  // Free version of DataGrid crashes if pageSize > MAX_PAGE_SIZE, so we
+  // overwrite seeMoreLessProps to jump from MAX_PAGE_SIZE to all rows.
+  if (numberVisible > MAX_PAGE_SIZE) {
+    seeMoreLessProps.nextStepUp = 0;
+  } else if (numberVisible + seeMoreLessProps.nextStepUp > MAX_PAGE_SIZE) {
+    seeMoreLessProps.nextStepUp = rows.length - numberVisible;
+  }
 
   const columns: Column<Row>[] = React.useMemo(() => {
     const metricsEntries = Object.entries(metricsInfo ?? {});

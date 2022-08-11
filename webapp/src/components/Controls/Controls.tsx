@@ -4,7 +4,6 @@ import {
   Button,
   CircularProgress,
   FormControlLabel,
-  FormControlLabelProps,
   IconButton,
   InputAdornment,
   OutlinedInput,
