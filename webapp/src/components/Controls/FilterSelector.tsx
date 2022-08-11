@@ -176,7 +176,7 @@ const FilterSelector = <FilterValue extends string>({
             height="100%"
             sx={{
               opacity: isSuccess
-                ? undefined
+                ? 1
                 : (theme) => theme.palette.action.disabledOpacity,
             }}
           >

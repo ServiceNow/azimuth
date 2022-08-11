@@ -145,9 +145,7 @@ test("empty outcome count", async () => {
 
   const distribution = screen.getByRole("figure");
   expect(distribution).toHaveStyle({ width: "0%" });
-  expect(distribution.parentElement!.parentElement).not.toHaveStyle({
-    opacity: 0.38,
-  });
+  expect(distribution.parentElement!.parentElement).toHaveStyle({ opacity: 1 });
 
   expect(screen.getByLabelText("type1")).not.toBeDisabled();
 });
