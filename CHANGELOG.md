@@ -23,6 +23,7 @@ Released changes are shown in the
 ### Fixed
 - Fixed utterances table poorly showing ids greater than 9999.
 - Fixed filtering aggregation modules without post-processing.
+- Fixed high_epistemic_uncertainty smart tag which wasn't showing in the UI.
 - Fixed crash when hitting `See more` until over 100 rows in Performance Analysis table.
 
 ### Security
