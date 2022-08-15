@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import FilterSelector from "components/Controls/FilterSelector";
 import { renderWithTheme } from "mocks/utils";
+import { PIPELINE_REQUIRED_TIP } from "utils/const";
 
 test("display loading state", async () => {
   renderWithTheme(
@@ -10,13 +11,15 @@ test("display loading state", async () => {
       searchValue=""
       selectedOptions={[]}
       handleValueChange={() => {}}
-      isFetching={true}
+      isFetching
+      isSuccess={false}
     />
   );
 
-  await screen.findByText("type");
-  await screen.findByRole("progressbar");
-  expect(await screen.queryByRole("figure")).toBeNull();
+  screen.getByText("type");
+  expect(screen.queryByLabelText(PIPELINE_REQUIRED_TIP)).toBeNull();
+  screen.getByRole("progressbar");
+  expect(screen.queryByRole("figure")).toBeNull();
   expect(screen.getByLabelText("collapse-type")).toBeDisabled();
 });
 
@@ -40,13 +43,17 @@ test("display reloading state", async () => {
           filterValue: "type1",
         },
       ]}
-      isFetching={true}
+      isFetching
+      isSuccess={false}
     />
   );
 
-  await screen.findByText("type");
-  await screen.findByRole("progressbar");
-  expect(await screen.queryByRole("figure")).not.toBeNull();
+  screen.getByText("type");
+  expect(screen.queryByLabelText(PIPELINE_REQUIRED_TIP)).toBeNull();
+  screen.getByRole("progressbar");
+  expect(screen.getByRole("figure").parentElement!.parentElement).toHaveStyle({
+    opacity: 0.38,
+  });
   expect(screen.getByLabelText("collapse-type")).not.toBeDisabled();
 });
 
@@ -59,13 +66,52 @@ test("display null state", async () => {
       selectedOptions={[]}
       handleValueChange={() => {}}
       isFetching={false}
+      isSuccess
     />
   );
 
-  await screen.findByText("type");
-  expect(await screen.queryByRole("progressbar")).toBeNull();
-  expect(await screen.queryByRole("figure")).toBeNull();
+  screen.getByText("type");
+  const label = screen.getByLabelText(PIPELINE_REQUIRED_TIP);
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  expect(screen.queryByRole("figure")).toBeNull();
   expect(screen.getByLabelText("collapse-type")).toBeDisabled();
+
+  fireEvent.mouseOver(label);
+  await screen.findByText(PIPELINE_REQUIRED_TIP);
+});
+
+test("display error state", async () => {
+  renderWithTheme(
+    <FilterSelector
+      label="type"
+      maxCount={0}
+      searchValue=""
+      selectedOptions={[]}
+      handleValueChange={() => {}}
+      filters={[
+        {
+          outcomeCount: {
+            CorrectAndPredicted: 0,
+            CorrectAndRejected: 0,
+            IncorrectAndPredicted: 0,
+            IncorrectAndRejected: 0,
+          },
+          utteranceCount: 0,
+          filterValue: "type1",
+        },
+      ]}
+      isFetching={false}
+      isSuccess={false}
+    />
+  );
+
+  screen.getByText("type");
+  expect(screen.queryByLabelText(PIPELINE_REQUIRED_TIP)).toBeNull();
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  expect(screen.getByRole("figure").parentElement!.parentElement).toHaveStyle({
+    opacity: 0.38,
+  });
+  expect(screen.getByLabelText("collapse-type")).not.toBeDisabled();
 });
 
 test("empty outcome count", async () => {
@@ -89,15 +135,17 @@ test("empty outcome count", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
-  await screen.findByText("type");
-  const items = await screen.findAllByRole("listitem");
+  screen.getByText("type");
+  const items = screen.getAllByRole("listitem");
   expect(items).toHaveLength(1);
 
-  const distribution = await screen.findByRole("figure");
-  expect(distribution).toHaveStyle("width: 0%");
+  const distribution = screen.getByRole("figure");
+  expect(distribution).toHaveStyle({ width: "0%" });
+  expect(distribution.parentElement!.parentElement).toHaveStyle({ opacity: 1 });
 
   expect(screen.getByLabelText("type1")).not.toBeDisabled();
 });
@@ -123,15 +171,16 @@ test("collapsible filter", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
-  const typeElement = await screen.findByLabelText("collapse-type");
-  await screen.findByText("type1");
+  const typeElement = screen.getByLabelText("collapse-type");
+  screen.getByText("type1");
   fireEvent.click(typeElement);
-  expect(await screen.queryByText("type1")).toBeNull();
+  expect(screen.queryByText("type1")).toBeNull();
   fireEvent.click(typeElement);
-  expect(await screen.queryByText("type1")).toBeVisible();
+  expect(screen.getByText("type1")).toBeVisible();
 });
 
 test("multi filter order", async () => {
@@ -175,11 +224,12 @@ test("multi filter order", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
-  await screen.findByText("type");
-  const items = await screen.findAllByRole("listitem");
+  screen.getByText("type");
+  const items = screen.getAllByRole("listitem");
   expect(items).toHaveLength(3);
 
   const expectedOrder = ["type2", "type1", "type3"];
@@ -187,19 +237,17 @@ test("multi filter order", async () => {
     expect(item.textContent).toBe(expectedOrder[index]);
   });
 
-  const distributions = await screen.findAllByRole("figure");
+  const distributions = screen.getAllByRole("figure");
   const expectedProportions = [
     ["25%", "25%", "25%", "25%"],
     ["100%", "0%", "0%", "0%"],
     ["0%", "0%", "0%", "100%"],
   ];
-  await waitFor(() => {
-    distributions.forEach((distribution, distributionIndex) => {
-      const proportions = distribution.childNodes;
-      proportions.forEach((proportion, proportionIndex) => {
-        expect(proportion).toHaveStyle(
-          `width: ${expectedProportions[distributionIndex][proportionIndex]}`
-        );
+  distributions.forEach((distribution, distributionIndex) => {
+    const proportions = distribution.childNodes;
+    proportions.forEach((proportion, proportionIndex) => {
+      expect(proportion).toHaveStyle({
+        width: expectedProportions[distributionIndex][proportionIndex],
       });
     });
   });
@@ -224,21 +272,22 @@ test("see more", async () => {
         filterValue: `type${i + 1}`,
       }))}
       isFetching={false}
+      isSuccess
     />
   );
 
-  const list = await screen.findByRole("list");
+  const list = screen.getByRole("list");
   await waitFor(() => {
     expect(list).toHaveStyle({ "max-height": `${5 * 28}px` });
   });
-  let seeMoreButton = await screen.findByText("See more (6)");
+  const seeMoreButton = screen.getByText("See more (6)");
 
   fireEvent.click(seeMoreButton);
   await waitFor(() => {
     expect(list).toHaveStyle({ "max-height": `${11 * 28}px` });
   });
   // TODO This doesn't test what we intend. Improve test.
-  expect(await screen.queryByText("See more")).toBeNull();
+  expect(screen.queryByText("See more")).toBeNull();
 });
 
 test("see more long list", async () => {
@@ -260,20 +309,21 @@ test("see more long list", async () => {
         filterValue: `type${i + 1}`,
       }))}
       isFetching={false}
+      isSuccess
     />
   );
 
-  const list = await screen.findByRole("list");
+  const list = screen.getByRole("list");
   await waitFor(() => {
     expect(list).toHaveStyle({ "max-height": `${5 * 28}px` });
   });
-  let seeMoreButton = await screen.findByText("See more (15)");
+  let seeMoreButton = screen.getByText("See more (15)");
 
   fireEvent.click(seeMoreButton);
   await waitFor(() => {
     expect(list).toHaveStyle({ "max-height": `${20 * 28}px` });
   });
-  seeMoreButton = await screen.findByText("See more (1)");
+  seeMoreButton = screen.getByText("See more (1)");
 
   fireEvent.click(seeMoreButton);
   await waitFor(() => {
@@ -316,6 +366,7 @@ test("selected options", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -364,6 +415,7 @@ test("select all options", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -412,6 +464,7 @@ test("unselect all options", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
@@ -498,10 +551,11 @@ test("filter by search", async () => {
         },
       ]}
       isFetching={false}
+      isSuccess
     />
   );
 
-  let items = await screen.findAllByRole("listitem");
+  const items = screen.getAllByRole("listitem");
   expect(items).toHaveLength(3);
 
   const expectedOrder = ["category1", "category2", "category3"];

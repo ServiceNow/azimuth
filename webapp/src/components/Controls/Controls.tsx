@@ -63,6 +63,7 @@ type Props = {
 type Query = {
   data?: CountPerFilterResponse;
   isFetching: boolean;
+  isSuccess: boolean;
 };
 
 const Controls: React.FC<Props> = ({
@@ -84,20 +85,23 @@ const Controls: React.FC<Props> = ({
   }>();
   const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
-  const { data: countPerFilter, isFetching: isFetchingCountPerFilter }: Query =
-    isPipelineSelected(pipeline)
-      ? getOutcomeCountPerFilterEndpoint.useQuery({
-          jobId,
-          datasetSplitName,
-          ...filters,
-          ...pipeline,
-          ...postprocessing,
-        })
-      : getUtteranceCountPerFilterEndpoint.useQuery({
-          jobId,
-          datasetSplitName,
-          ...filters,
-        });
+  const {
+    data: countPerFilter,
+    isFetching: isFetchingCountPerFilter,
+    isSuccess: isSuccessCountPerFilter,
+  }: Query = isPipelineSelected(pipeline)
+    ? getOutcomeCountPerFilterEndpoint.useQuery({
+        jobId,
+        datasetSplitName,
+        ...filters,
+        ...pipeline,
+        ...postprocessing,
+      })
+    : getUtteranceCountPerFilterEndpoint.useQuery({
+        jobId,
+        datasetSplitName,
+        ...filters,
+      });
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
@@ -184,6 +188,7 @@ const Controls: React.FC<Props> = ({
     handleValueChange: getFilterChangeHandler(filter),
     filters: countPerFilter?.countPerFilter[filter],
     isFetching: isFetchingCountPerFilter,
+    isSuccess: isSuccessCountPerFilter,
   });
 
   const divider = (

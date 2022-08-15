@@ -22,6 +22,7 @@ import { motion } from "framer-motion";
 import React from "react";
 import { TOOLTIP_ENTER_DELAY } from "styles/const";
 import { CountPerFilterValue } from "types/api";
+import { PIPELINE_REQUIRED_TIP } from "utils/const";
 
 const MotionArrowDropDownIcon = motion(ArrowDropDownIcon);
 
@@ -87,6 +88,7 @@ type Props<FilterValue> = {
   handleValueChange: (selectedOptions: FilterValue[]) => void;
   filters?: CountPerFilterValue[] | null;
   isFetching: boolean;
+  isSuccess: boolean;
   prettyNames?: Record<string, string>;
 };
 
@@ -98,6 +100,7 @@ const FilterSelector = <FilterValue extends string>({
   handleValueChange,
   filters,
   isFetching,
+  isSuccess,
   prettyNames,
 }: Props<FilterValue>) => {
   const classes = useStyles();
@@ -172,9 +175,9 @@ const FilterSelector = <FilterValue extends string>({
             display="flex"
             height="100%"
             sx={{
-              opacity: isFetching
-                ? (theme) => theme.palette.action.disabledOpacity
-                : 1,
+              opacity: isSuccess
+                ? 1
+                : (theme) => theme.palette.action.disabledOpacity,
             }}
           >
             <FilterDistribution maxCount={maxCount} filter={filter} />
@@ -199,21 +202,23 @@ const FilterSelector = <FilterValue extends string>({
             className={classes.collapseIcon}
           />
         </Button>
-        <FormControlLabel
-          className={classes.checkboxGroup}
-          control={
-            <Checkbox
-              checked={someOptionsAreSelected}
-              className={classes.checkbox}
-              color="primary"
-              disabled={!filters} // so it can't be clicked before options are loaded
-              indeterminate={someOptionsAreSelected && !allOptionsAreSelected}
-              onChange={(_, checked) => handleSelectAll(checked)}
-            />
-          }
-          label={label}
-          componentsProps={{ typography: titleTypographyProps }}
-        />
+        <Tooltip title={isSuccess && !filters ? PIPELINE_REQUIRED_TIP : ""}>
+          <FormControlLabel
+            className={classes.checkboxGroup}
+            control={
+              <Checkbox
+                checked={someOptionsAreSelected}
+                className={classes.checkbox}
+                color="primary"
+                disabled={!filters} // so it can't be clicked before options are loaded
+                indeterminate={someOptionsAreSelected && !allOptionsAreSelected}
+                onChange={(_, checked) => handleSelectAll(checked)}
+              />
+            }
+            label={label}
+            componentsProps={{ typography: titleTypographyProps }}
+          />
+        </Tooltip>
         {filters && selectedOptions.length > 0 && (
           <Typography variant="body2" className={classes.selectedCount}>
             ({selectedOptions.length} selected)
