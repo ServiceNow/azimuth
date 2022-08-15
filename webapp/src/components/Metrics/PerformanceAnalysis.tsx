@@ -34,7 +34,11 @@ import {
   getCustomMetricInfoEndpoint,
   getMetricsPerFilterEndpoint,
 } from "services/api";
-import { DatasetSplitName, MetricsPerFilterValue } from "types/api";
+import {
+  AvailableDatasetSplits,
+  DatasetSplitName,
+  MetricsPerFilterValue,
+} from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
@@ -77,11 +81,16 @@ type FilterByViewOption =
 type Props = {
   jobId: string;
   pipeline: Required<QueryPipelineState>;
+  availableDatasetSplits: AvailableDatasetSplits | undefined;
 };
 
 type Row = MetricsPerFilterValue & { id: number };
 
-const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
+const PerformanceAnalysis: React.FC<Props> = ({
+  jobId,
+  pipeline,
+  availableDatasetSplits,
+}) => {
   const [selectedDatasetSplit, setSelectedDatasetSplit] =
     React.useState<DatasetSplitName>("eval");
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
@@ -298,6 +307,7 @@ const PerformanceAnalysis: React.FC<Props> = ({ jobId, pipeline }) => {
       <Box marginBottom={1} display="flex" justifyContent="start">
         <Box width={340}>
           <DatasetSplitToggler
+            availableDatasetSplits={availableDatasetSplits}
             value={selectedDatasetSplit}
             onChange={setSelectedDatasetSplit}
           />

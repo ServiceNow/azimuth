@@ -22,9 +22,11 @@ const Dashboard = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { pipeline, searchString } = useQueryState();
 
-  const { data, error, isFetching } = getDatasetInfoEndpoint.useQuery({
-    jobId,
-  });
+  const {
+    data: datasetInfo,
+    error,
+    isFetching,
+  } = getDatasetInfoEndpoint.useQuery({ jobId });
 
   if (isFetching) {
     <Loading />;
@@ -64,7 +66,7 @@ const Dashboard = () => {
           Go to exploration space
         </Button>
       </Box>
-      {data?.availableDatasetSplits.train && (
+      {datasetInfo?.availableDatasetSplits.train && (
         <PreviewCard
           title="Dataset Class Distribution Analysis"
           to={`/${jobId}/dataset_class_distribution_analysis${searchString}`}
@@ -90,26 +92,31 @@ const Dashboard = () => {
             />
           }
         >
-          <PerformanceAnalysis jobId={jobId} pipeline={pipeline} />
-        </PreviewCard>
-      )}
-      {isPipelineSelected(pipeline) && data?.perturbationTestingAvailable && (
-        <PreviewCard
-          title="Behavioral Testing"
-          to={`/${jobId}/behavioral_testing_summary${searchString}`}
-          description={behavioralTestingDescription}
-        >
-          <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
-            <PerturbationTestingPreview
-              jobId={jobId}
-              pipeline={pipeline}
-              availableDatasetSplits={data.availableDatasetSplits}
-            />
-          </Box>
+          <PerformanceAnalysis
+            jobId={jobId}
+            pipeline={pipeline}
+            availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+          />
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) &&
-        data?.postprocessingEditable?.[pipeline.pipelineIndex] && (
+        datasetInfo?.perturbationTestingAvailable && (
+          <PreviewCard
+            title="Behavioral Testing"
+            to={`/${jobId}/behavioral_testing_summary${searchString}`}
+            description={behavioralTestingDescription}
+          >
+            <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
+              <PerturbationTestingPreview
+                jobId={jobId}
+                pipeline={pipeline}
+                availableDatasetSplits={datasetInfo.availableDatasetSplits}
+              />
+            </Box>
+          </PreviewCard>
+        )}
+      {isPipelineSelected(pipeline) &&
+        datasetInfo?.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
             to={`/${jobId}/thresholds${searchString}`}

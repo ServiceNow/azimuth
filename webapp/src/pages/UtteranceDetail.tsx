@@ -277,6 +277,7 @@ export const UtteranceDetail = () => {
         {view === "similarity" && (
           <Box width={280}>
             <DatasetSplitToggler
+              availableDatasetSplits={datasetInfo?.availableDatasetSplits}
               value={neighborsDatasetSplitName}
               onChange={(value) => value && setNeighborsDatasetSplitName(value)}
             />
