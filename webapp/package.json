@@ -56,7 +56,6 @@
     "@types/react-router-dom": "^5",
     "canvas": "^2.9.3",
     "http-proxy-middleware": "^1.0.6",
-    "jest-canvas-mock": "^2.4.0",
     "msw": "^0.35.0",
     "openapi-typescript": "^4.0.1",
     "react-app-rewired": "^2.1.5",

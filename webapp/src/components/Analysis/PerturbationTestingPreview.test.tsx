@@ -5,7 +5,7 @@ import { AvailableDatasetSplits } from "types/api";
 import { setupServer } from "msw/node";
 import {
   getPertubationResponse,
-  getPertubationResponseWithnoTrainFailureRate,
+  getPertubationResponseWithoutTrainFailureRate,
   getPertubationResponseWithFailureResponse,
 } from "mocks/api/mockPertubationAPI";
 import { formatRatioAsPercentageString } from "utils/format";
@@ -22,7 +22,7 @@ const renderPerturbationTestingPreview = (
     { route: "/local?pipeline_index=0", path: "/:jobId?:pipeline" }
   );
 
-describe("Perturbation Testing Preview", () => {
+describe("PerturbationTestingPreview", () => {
   const handlers = [getPertubationResponse];
   const server = setupServer(...handlers);
 
@@ -83,71 +83,82 @@ describe("Perturbation Testing Preview", () => {
     await waitFor(() => expect(screen.getByText("--%")).toBeVisible());
   });
 
-  it("should verify the perturbation preview table displayed with expected columns, rows, formatted contents, sort model", async () => {
+  it("should have expected columns", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    await waitFor(() => {
-      const table_columns = [
-        "Test Family",
-        "Test Name",
-        "Modif. Type",
-        "Test Description",
-        "FR on Evaluation Set",
-      ];
-      const columheaders = screen.getAllByRole("columnheader");
-
-      // verify if all the required columns are displayed
-      columheaders.forEach((item, index) => {
-        expect(item.textContent).toEqual(table_columns[index]);
-      });
-    });
+    const table_columns = [
+      "Test Family",
+      "Test Name",
+      "Modif. Type",
+      "Test Description",
+      "FR on Evaluation Set",
+    ];
+    // verify if all the required columns are displayed
+    waitFor(() =>
+      table_columns.forEach((name) => {
+        expect(screen.getByRole("columnheader", { name })).toBeInTheDocument();
+      })
+    );
   });
 
-  it("should be having a default sort as desc for colum header 'FR on Evaluation/Training set'", async () => {
+  it("should have default sort as desc for colum header 'FR on Evaluation/Training set'", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    const columheaders = await screen.findAllByRole("columnheader");
-    const fr_column = columheaders.find(
-      (column) => column.ariaColIndex === "5"
-    );
-    fr_column && waitFor(() => expect(fr_column.ariaSort).toBe("descending"));
+    waitFor(() => {
+      expect(
+        screen.getByRole("columnheader", { name: "FR on Evaluation Set" })
+          .ariaSort
+      ).toBe("descending");
+      expect(
+        screen.getByRole("columnheader", { name: "FR on Evaluation Set" })
+          .ariaSort
+      ).not.toBe("ascending");
+    });
   });
 
   it("should verify the perturbation preview table displayed with tooltips for column headers 3 and 5", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
+    waitFor(() => {
+      // verify if the tooltips are displayed on hovering the columns
+      const fr_column = screen.getByRole("columnheader", {
+        name: "Modif. Type",
+      });
+      fireEvent.mouseOver(fr_column);
+      waitFor(() =>
+        expect(screen.getByText("Modification Type")).toBeVisible()
+      );
 
-    const columheaders = await screen.findAllByRole("columnheader");
-
-    // verify if the tooltips are displayed on hovering the columns
-    const modif_type_column = columheaders.find(
-      (column) => column.ariaColIndex === "3"
-    );
-    modif_type_column && fireEvent.mouseOver(modif_type_column);
-    waitFor(() => expect(screen.getByText("Modification Type")).toBeVisible());
-
-    const fr_column = columheaders.find(
-      (column) => column.ariaColIndex === "5"
-    );
-    fr_column && fireEvent.mouseOver(fr_column);
-    waitFor(() =>
-      expect(screen.getByText("Failure Rate on Evaluation Set")).toBeVisible()
-    );
+      fireEvent.mouseOver(
+        screen.getByRole("columnheader", {
+          name: "FR on Evaluation Set",
+        })
+      );
+      waitFor(() =>
+        expect(screen.getByText("Failure Rate on Evaluation Set")).toBeVisible()
+      );
+    });
   });
 
   it("should modify the last Column 'Failure Rate' if the toggle is changed to train/eval", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    const columheaders = await screen.findAllByRole("columnheader");
-    // before toggle changes
-    const fr_column = columheaders.find(
-      (column) => column.ariaColIndex === "5"
-    );
-    fr_column && expect(fr_column.textContent).toEqual("FR on Evaluation Set");
-
-    // after toggle changes
-    fireEvent.click(await screen.findByRole("button", { pressed: false }));
-    fr_column && expect(fr_column.textContent).toEqual("FR on Training Set");
-    fr_column && fireEvent.mouseOver(fr_column);
-    waitFor(() =>
-      expect(screen.getByText("Failure Rate on Training Set")).toBeVisible()
-    );
+    waitFor(() => {
+      // before toggle changes
+      expect(
+        screen.getByRole("columnheader", {
+          name: "FR on Evaluation Set",
+        })
+      ).toBeInTheDocument();
+      // after toggle changes
+      fireEvent.click(screen.getByRole("button", { pressed: false }));
+      waitFor(() => {
+        const fr_column = screen.getByRole("columnheader", {
+          name: "FR on Training Set",
+        });
+        expect(fr_column).toBeInTheDocument();
+        fireEvent.mouseOver(fr_column);
+        waitFor(() =>
+          expect(screen.getByText("Failure Rate on Training Set")).toBeVisible()
+        );
+      });
+    });
   });
 
   it("should verify the tooltip and formatted value that get displayed for FR column data", async () => {
@@ -200,8 +211,8 @@ describe("Perturbation Testing Preview", () => {
   });
 });
 
-describe("Perturbation Testing Preview with no failure rate available for training set", () => {
-  const handlers = [getPertubationResponseWithnoTrainFailureRate];
+describe("PerturbationTestingPreview without failure rate for training set", () => {
+  const handlers = [getPertubationResponseWithoutTrainFailureRate];
   const server = setupServer(...handlers);
 
   beforeAll(() => server.listen());
@@ -209,7 +220,7 @@ describe("Perturbation Testing Preview with no failure rate available for traini
   afterAll(() => server.close());
   it("should not display value if failure rate for a datasplit is not available", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    await waitFor(() => {
+    waitFor(() => {
       // --% percentage is expected to be shown if failure rate for one of the datasplit is unavailable
       expect(screen.getByText("--%")).toBeVisible();
       // should have a success color if the failure rate is not present for the datasplit
@@ -218,7 +229,7 @@ describe("Perturbation Testing Preview with no failure rate available for traini
   });
 });
 
-describe("Perturbation Testing Preview with Failure response", () => {
+describe("PerturbationTestingPreview with Failure response", () => {
   const handlers = [getPertubationResponseWithFailureResponse];
   const server = setupServer(...handlers);
 

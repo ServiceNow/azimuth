@@ -233,7 +233,7 @@ export const getPertubationResponse = rest.get(
   }
 );
 
-export const getPertubationResponseWithnoTrainFailureRate = rest.get(
+export const getPertubationResponseWithoutTrainFailureRate = rest.get(
   `${baseUrl}/perturbation_testing_summary`,
   (req, res, ctx) => {
     const datasetInfoResponse: PerturbationTestingSummary = {
