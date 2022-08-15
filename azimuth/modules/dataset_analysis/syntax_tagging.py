@@ -8,7 +8,7 @@ import spacy
 from datasets import Dataset
 from spacy.lang.en import English
 
-from azimuth.config import CommonFieldsConfig
+from azimuth.config import SyntaxConfig, SyntaxOptions
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.types import DatasetColumn, ModuleResponse
@@ -18,9 +18,10 @@ from azimuth.types.tag import (
     SmartTagFamily,
     TaggingResponse,
 )
+from azimuth.utils.validation import assert_not_none
 
 
-class SyntaxTaggingModule(DatasetResultModule[CommonFieldsConfig]):
+class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
     """Calculate smart tags related to syntax."""
 
     # sentencizer
@@ -66,21 +67,18 @@ class SyntaxTaggingModule(DatasetResultModule[CommonFieldsConfig]):
                 for smart_tag in SMART_TAGS_FAMILY_MAPPING[family]
             }
             adds = {}
+            syntax_options: SyntaxOptions = assert_not_none(self.config.syntax)
 
-            # Syntax
             do = self.spacy_pipeline(utterance)
             adds[DatasetColumn.token_count] = len(tokens)
 
-            # assigning value to tags
             if len(list(do.sents)) > 1:
                 tag[SmartTag.multi_sent] = True
-                # for now if an utterance is flagged as having more than one
-                # sentence we won't calculate the rest of tags until this is
-                # fixed.
+                # if an utterance has more than one sentence, no other tags are added.
             else:
-                if len(tokens) > 15:
+                if len(tokens) >= syntax_options.long_sentence_min_token:
                     tag[SmartTag.long] = True
-                if len(tokens) <= 3:
+                if len(tokens) <= syntax_options.short_sentence_max_token:
                     tag[SmartTag.short] = True
 
                 tokens = self.spacy_pos(utterance)

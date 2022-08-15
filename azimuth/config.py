@@ -129,6 +129,11 @@ class DatasetWarningsOptions(BaseModel):
     max_delta_std_tokens: float = 3.0
 
 
+class SyntaxOptions(BaseModel):
+    short_sentence_max_token: int = 3
+    long_sentence_min_token: int = 16
+
+
 class NeutralTokenOptions(BaseModel):
     threshold: float = 1
     suffix_list: List[str] = ["pls", "please", "thank you", "appreciated"]
@@ -299,10 +304,16 @@ class DatasetWarningConfig(CommonFieldsConfig):
     dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
 
 
+class SyntaxConfig(CommonFieldsConfig):
+    # Dataset warnings configuration to change thresholds that trigger warnings
+    syntax: SyntaxOptions = SyntaxOptions()
+
+
 class AzimuthConfig(
     PerturbationTestingScope,
     SimilarityConfig,
     DatasetWarningConfig,
+    SyntaxConfig,
     extra=Extra.forbid,
 ):
     # This class should remain empty!
