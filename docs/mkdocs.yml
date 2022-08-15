@@ -98,6 +98,7 @@ nav:
               - reference/configuration/analyses/behavioral_testing.md
               - reference/configuration/analyses/similarity.md
               - reference/configuration/analyses/dataset_warnings.md
+              - reference/configuration/analyses/syntax.md
       - Custom Objects:
           - reference/custom-objects/index.md
           - reference/custom-objects/dataset.md

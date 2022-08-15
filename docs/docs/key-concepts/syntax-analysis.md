@@ -59,7 +59,12 @@ from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 ```
 
-Based on the token count, the `long_sentence` (> 15 tokens) and `short_sentence` (<= 3 tokens) smart
-tags are computed.
+Based on the token count, the `long_sentence` and `short_sentence` smart tags are computed.
+
+## Configuration
+
+[:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md)
+explains how to edit the thresholds to determine what is considered a short and long sentence.
+
 
 --8<-- "includes/abbreviations.md"

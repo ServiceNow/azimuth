@@ -1,6 +1,6 @@
 # Analyses Customization
 
-Three analyses can be configured in Azimuth. Go to each relevant section to know more about the
+Four analyses can be configured in Azimuth. Go to each relevant section to know more about the
 different attributes that can be defined.
 
 === "Class Definition"
@@ -19,6 +19,10 @@ different attributes that can be defined.
 
     class DatasetWarningConfig(CommonFieldsConfig):
         dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
+
+
+    class SyntaxConfig(CommonFieldsConfig):
+        syntax: SyntaxOptions = SyntaxOptions()
     ```
 
 === "Config Example"

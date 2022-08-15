@@ -305,7 +305,7 @@ class DatasetWarningConfig(CommonFieldsConfig):
 
 
 class SyntaxConfig(CommonFieldsConfig):
-    # Dataset warnings configuration to change thresholds that trigger warnings
+    # Syntax configuration to change thresholds that determine short and long sentences.
     syntax: SyntaxOptions = SyntaxOptions()
 
 
