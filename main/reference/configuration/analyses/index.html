@@ -1224,6 +1224,8 @@
         
           
         
+          
+        
       
       
         
@@ -1282,6 +1284,20 @@
     <li class="md-nav__item">
       <a href="dataset_warnings/" class="md-nav__link">
         Dataset Class Distribution Analysis Config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="syntax/" class="md-nav__link">
+        Syntax Analysis Config
       </a>
     </li>
   
@@ -1554,7 +1570,7 @@
 
 
 <h1 id="analyses-customization">Analyses Customization</h1>
-<p>Three analyses can be configured in Azimuth. Go to each relevant section to know more about the
+<p>Four analyses can be configured in Azimuth. Go to each relevant section to learn more about the
 different attributes that can be defined.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Class Definition</label><label for="__tabbed_1_2">Config Example</label></div>
 <div class="tabbed-content">
@@ -1572,6 +1588,10 @@ different attributes that can be defined.</p>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="k">class</span> <span class="nc">DatasetWarningConfig</span><span class="p">(</span><span class="n">CommonFieldsConfig</span><span class="p">):</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">dataset_warnings</span><span class="p">:</span> <span class="n">DatasetWarningsOptions</span> <span class="o">=</span> <span class="n">DatasetWarningsOptions</span><span class="p">()</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">class</span> <span class="nc">SyntaxConfig</span><span class="p">(</span><span class="n">CommonFieldsConfig</span><span class="p">):</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">syntax</span><span class="p">:</span> <span class="n">SyntaxOptions</span> <span class="o">=</span> <span class="n">SyntaxOptions</span><span class="p">()</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
