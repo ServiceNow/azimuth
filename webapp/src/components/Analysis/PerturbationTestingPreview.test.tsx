@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { renderWithRouterAndRedux } from "mocks/utils";
 import PerturbationTestingPreview from "./PerturbationTestingPreview";
 import { AvailableDatasetSplits } from "types/api";
@@ -8,7 +8,6 @@ import {
   getPertubationResponseWithoutTrainFailureRate,
   getPertubationResponseWithFailureResponse,
 } from "mocks/api/mockPertubationAPI";
-import { formatRatioAsPercentageString } from "utils/format";
 
 const renderPerturbationTestingPreview = (
   availableDatasetSplits: AvailableDatasetSplits
@@ -30,15 +29,14 @@ describe("PerturbationTestingPreview", () => {
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
-  it("should be having two toggle buttons for the train and test", async () => {
+  it("should have two toggle buttons for the train and test", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     await waitFor(() => {
       expect(screen.getAllByRole("button")).toHaveLength(2);
-      expect(screen.getAllByRole("button")).not.toHaveLength(1);
     });
   });
 
-  it("should be having a disabled toggle button if either one of the datasplit is unavailable", async () => {
+  it("should have a disabled toggle button if either one of the datasplit is unavailable", async () => {
     renderPerturbationTestingPreview({ train: false, eval: true });
     await waitFor(() => {
       //Verifying if the train toggle button is disabled if not available in datasplits
@@ -66,11 +64,6 @@ describe("PerturbationTestingPreview", () => {
         "font-size: 3.75rem; color: rgb(237, 108, 2)"
       );
 
-      // selected toggle should be highlighted with some bgcolor
-      expect(screen.getByRole("button", { pressed: true })).toHaveStyle(
-        "color: rgb(156, 39, 176)"
-      );
-
       // verify with some random unexpected values to not have been displayed.
       expect(screen.queryByText(/17.0%/i)).toBeNull();
       expect(screen.queryByText("some random text")).toBeNull();
@@ -78,7 +71,7 @@ describe("PerturbationTestingPreview", () => {
     });
   });
 
-  it("should not display value if a datasplit is not available", async () => {
+  it("should not display a value if datasplit is not available", async () => {
     renderPerturbationTestingPreview({ train: false, eval: true });
     await waitFor(() => expect(screen.getByText("--%")).toBeVisible());
   });
@@ -92,121 +85,11 @@ describe("PerturbationTestingPreview", () => {
       "Test Description",
       "FR on Evaluation Set",
     ];
-    // verify if all the required columns are displayed
-    waitFor(() =>
-      table_columns.forEach((name) => {
-        expect(screen.getByRole("columnheader", { name })).toBeInTheDocument();
-      })
-    );
-  });
-
-  it("should have default sort as desc for colum header 'FR on Evaluation/Training set'", async () => {
-    renderPerturbationTestingPreview({ train: true, eval: true });
-    waitFor(() => {
-      expect(
-        screen.getByRole("columnheader", { name: "FR on Evaluation Set" })
-          .ariaSort
-      ).toBe("descending");
-      expect(
-        screen.getByRole("columnheader", { name: "FR on Evaluation Set" })
-          .ariaSort
-      ).not.toBe("ascending");
-    });
-  });
-
-  it("should verify the perturbation preview table displayed with tooltips for column headers 3 and 5", async () => {
-    renderPerturbationTestingPreview({ train: true, eval: true });
-    waitFor(() => {
-      // verify if the tooltips are displayed on hovering the columns
-      const fr_column = screen.getByRole("columnheader", {
-        name: "Modif. Type",
-      });
-      fireEvent.mouseOver(fr_column);
-      waitFor(() =>
-        expect(screen.getByText("Modification Type")).toBeVisible()
-      );
-
-      fireEvent.mouseOver(
-        screen.getByRole("columnheader", {
-          name: "FR on Evaluation Set",
-        })
-      );
-      waitFor(() =>
-        expect(screen.getByText("Failure Rate on Evaluation Set")).toBeVisible()
-      );
-    });
-  });
-
-  it("should modify the last Column 'Failure Rate' if the toggle is changed to train/eval", async () => {
-    renderPerturbationTestingPreview({ train: true, eval: true });
-    waitFor(() => {
-      // before toggle changes
-      expect(
-        screen.getByRole("columnheader", {
-          name: "FR on Evaluation Set",
-        })
-      ).toBeInTheDocument();
-      // after toggle changes
-      fireEvent.click(screen.getByRole("button", { pressed: false }));
-      waitFor(() => {
-        const fr_column = screen.getByRole("columnheader", {
-          name: "FR on Training Set",
-        });
-        expect(fr_column).toBeInTheDocument();
-        fireEvent.mouseOver(fr_column);
-        waitFor(() =>
-          expect(screen.getByText("Failure Rate on Training Set")).toBeVisible()
-        );
-      });
-    });
-  });
-
-  it("should verify the tooltip and formatted value that get displayed for FR column data", async () => {
-    renderPerturbationTestingPreview({ train: true, eval: true });
+    const columnheaders = screen.getAllByRole("columnheader");
     await waitFor(() => {
-      // verify if the tooltip is displayed to FR column data on hovering it
-      const fr_column = screen
-        .getAllByRole("row")
-        .filter((row) => row.ariaRowIndex === "2")
-        .find((cell) => cell.ariaColIndex === "5");
-      fr_column &&
-        waitFor(() => {
-          expect(fr_column.ariaLabel).toEqual(
-            "Average Confidence Delta: 6.90%"
-          );
-        });
-
-      // verify the FR data displayed as expected format.
-      const test_data = {
-        allTestsSummary: [
-          {
-            name: "Typos",
-            description: "Replace characters in the utterance to create typos.",
-            family: "Fuzzy Matching",
-            perturbationType: "Replacement",
-            evalFailureRate: 0.30434782608695654,
-            evalCount: 23,
-            evalFailedCount: 7,
-            evalConfidenceDelta: 0.069,
-            trainFailureRate: 0.17647058823529413,
-            trainCount: 17,
-            trainFailedCount: 3,
-            trainConfidenceDelta: 0.08399999999999999,
-            example: {
-              utterance: "i need my bank account frozen",
-              perturbedUtterance: "i need my bank acDount frozen",
-            },
-          },
-        ],
-      };
-      fr_column &&
-        test_data.allTestsSummary.map((test) => {
-          expect(fr_column.textContent).toContain(
-            `${formatRatioAsPercentageString(test.evalFailureRate, 1)}(${
-              test.evalFailedCount
-            } out of ${test.evalCount})`
-          );
-        });
+      table_columns.forEach((name, index) => {
+        expect(columnheaders[index].textContent).toEqual(name);
+      });
     });
   });
 });

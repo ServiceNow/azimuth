@@ -54,7 +54,6 @@
     "@types/react-dom": "^17.0.11",
     "@types/react-plotly.js": "^2.2.4",
     "@types/react-router-dom": "^5",
-    "canvas": "^2.9.3",
     "http-proxy-middleware": "^1.0.6",
     "msw": "^0.35.0",
     "openapi-typescript": "^4.0.1",

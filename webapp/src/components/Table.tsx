@@ -72,6 +72,7 @@ export const Table = <Row extends { id: GridRowId }>({
     disableColumnFilter
     disableColumnMenu
     disableSelectionOnClick
+    disableVirtualization
     hideFooter={!props.pagination && !components?.Footer}
     rowHeight={64}
     pageSize={props.pagination && PAGE_SIZE}
