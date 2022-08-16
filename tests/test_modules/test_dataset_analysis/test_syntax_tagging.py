@@ -26,20 +26,34 @@ def test_syntax_tagging(simple_text_config):
     }
     json_output = mod.compute(batch)
     assert len(json_output) == 4
-    assert json_output[0].tags[SmartTag.short] and json_output[0].tags[SmartTag.no_subj] is True
+    assert json_output[0].tags[SmartTag.short] and json_output[0].tags[SmartTag.no_subj]
     assert not all(
         v for k, v in json_output[0].tags.items() if k not in [SmartTag.short, SmartTag.no_subj]
     )
 
-    assert json_output[1].tags[SmartTag.multi_sent] is True
+    assert json_output[1].tags[SmartTag.multi_sent]
     assert not all(v for k, v in json_output[1].tags.items() if k is not SmartTag.multi_sent)
 
-    assert json_output[2].tags[SmartTag.no_obj] is True
+    assert json_output[2].tags[SmartTag.no_obj]
     assert not all(v for k, v in json_output[2].tags.items() if k is not SmartTag.no_obj)
 
-    assert json_output[3].tags[SmartTag.no_verb] is True
+    assert json_output[3].tags[SmartTag.no_verb]
     assert not all(v for k, v in json_output[3].tags.items() if k is not SmartTag.no_verb)
 
     json_output = mod.compute_on_dataset_split()
     ds = mod.get_dataset_split()
     assert len(json_output) == len(ds)
+
+    # Edit config values
+    simple_text_config.syntax.short_sentence_max_token = 2
+    simple_text_config.syntax.long_sentence_min_token = 3
+
+    mod_2 = SyntaxTaggingModule(
+        DatasetSplitName.eval,
+        simple_text_config,
+    )
+
+    json_output_2 = mod_2.compute(batch)
+    # Tags should changed for utterances below, based on new config values
+    assert not json_output_2[2].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
+    assert not json_output_2[3].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
