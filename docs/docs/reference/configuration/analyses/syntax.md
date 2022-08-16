@@ -2,7 +2,7 @@
 
 :blue_circle: **Default value:** `SyntaxOptions()`
 
-Some thresholds can be modified to determine what is considered a short and a long sentence, as explained in
+Some thresholds can be modified to determine what is considered a short or a long sentence, as explained in
 [:material-link: Syntax Analysis](../../../key-concepts/syntax-analysis.md).
 
 === "Class Definition"

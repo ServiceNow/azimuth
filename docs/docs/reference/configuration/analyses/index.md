@@ -1,6 +1,6 @@
 # Analyses Customization
 
-Four analyses can be configured in Azimuth. Go to each relevant section to know more about the
+Four analyses can be configured in Azimuth. Go to each relevant section to learn more about the
 different attributes that can be defined.
 
 === "Class Definition"

@@ -64,7 +64,7 @@ Based on the token count, the `long_sentence` and `short_sentence` smart tags ar
 ## Configuration
 
 [:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md)
-explains how to edit the thresholds to determine what is considered a short and long sentence.
+explains how to edit the thresholds to determine what is considered a short or long sentence.
 
 
 --8<-- "includes/abbreviations.md"
