@@ -33,6 +33,7 @@ import { Link } from "react-router-dom";
 import {
   getCustomMetricInfoEndpoint,
   getMetricsPerFilterEndpoint,
+  getConfigEndpoint,
 } from "services/api";
 import {
   AvailableDatasetSplits,
@@ -96,6 +97,11 @@ const PerformanceAnalysis: React.FC<Props> = ({
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
+  const { data: config } = getConfigEndpoint.useQuery(
+    { jobId },
+    { skip: jobId === undefined }
+  );
+
   const { data: metricsInfo } = getCustomMetricInfoEndpoint.useQuery({ jobId });
 
   const { data, isFetching, error } = getMetricsPerFilterEndpoint.useQuery({
@@ -103,6 +109,8 @@ const PerformanceAnalysis: React.FC<Props> = ({
     datasetSplitName: selectedDatasetSplit,
     ...pipeline,
   });
+
+  const [comparedPipeline, setComparedPipeline] = React.useState<number>();
 
   // Track table sort model to keep 'overall' at top.
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
@@ -304,7 +312,7 @@ const PerformanceAnalysis: React.FC<Props> = ({
     </Typography>
   ) : (
     <Box width={1326}>
-      <Box marginBottom={1} display="flex" justifyContent="start">
+      <Box marginBottom={1} display="flex" justifyContent="space-between">
         <Box width={340}>
           <DatasetSplitToggler
             availableDatasetSplits={availableDatasetSplits}
@@ -312,6 +320,25 @@ const PerformanceAnalysis: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
+        <Select
+          id="compare-pipeline-model"
+          variant="outlined"
+          displayEmpty
+          value={comparedPipeline ?? ""}
+          sx={{ ".MuiSelect-select": { paddingY: 0 } }}
+          onChange={({ target: { value } }) =>
+            setComparedPipeline(typeof value === "number" ? value : undefined)
+          }
+        >
+          <MenuItem value="">
+            <em>No pipeline</em>
+          </MenuItem>
+          {config?.pipelines?.map((pipeline, pipelineIndex) => (
+            <MenuItem key={pipelineIndex} value={pipelineIndex}>
+              {pipeline.name}
+            </MenuItem>
+          ))}
+        </Select>
       </Box>
       <Table
         sx={{
