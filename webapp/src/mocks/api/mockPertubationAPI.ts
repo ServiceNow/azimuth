@@ -3,7 +3,7 @@ import { PerturbationTestingSummary } from "types/api";
 
 const baseUrl = "http://localhost/api/local";
 
-export const getPertubationResponse = rest.get(
+export const getPerturbationResponse = rest.get(
   `${baseUrl}/perturbation_testing_summary`,
   (req, res, ctx) => {
     const datasetInfoResponse: PerturbationTestingSummary = {
@@ -233,7 +233,7 @@ export const getPertubationResponse = rest.get(
   }
 );
 
-export const getPertubationResponseWithoutTrainFailureRate = rest.get(
+export const getPerturbationResponseWithoutTrainFailureRate = rest.get(
   `${baseUrl}/perturbation_testing_summary`,
   (req, res, ctx) => {
     const datasetInfoResponse: PerturbationTestingSummary = {
@@ -463,7 +463,7 @@ export const getPertubationResponseWithoutTrainFailureRate = rest.get(
   }
 );
 
-export const getPertubationResponseWithFailureResponse = rest.get(
+export const getPerturbationResponseWithFailureResponse = rest.get(
   `${baseUrl}/perturbation_testing_summary`,
   (req, res, ctx) => {
     return res(ctx.status(500));

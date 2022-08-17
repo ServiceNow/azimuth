@@ -1,12 +1,12 @@
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { renderWithRouterAndRedux } from "mocks/utils";
 import PerturbationTestingPreview from "./PerturbationTestingPreview";
 import { AvailableDatasetSplits } from "types/api";
 import { setupServer } from "msw/node";
 import {
-  getPertubationResponse,
-  getPertubationResponseWithoutTrainFailureRate,
-  getPertubationResponseWithFailureResponse,
+  getPerturbationResponse,
+  getPerturbationResponseWithoutTrainFailureRate,
+  getPerturbationResponseWithFailureResponse,
 } from "mocks/api/mockPertubationAPI";
 
 const renderPerturbationTestingPreview = (
@@ -22,7 +22,7 @@ const renderPerturbationTestingPreview = (
   );
 
 describe("PerturbationTestingPreview", () => {
-  const handlers = [getPertubationResponse];
+  const handlers = [getPerturbationResponse];
   const server = setupServer(...handlers);
 
   beforeAll(() => server.listen());
@@ -36,7 +36,7 @@ describe("PerturbationTestingPreview", () => {
     });
   });
 
-  it("should have a disabled toggle button if either one of the datasplit is unavailable", async () => {
+  it("should have a disabled toggle button if either one of the dataset split is unavailable", async () => {
     renderPerturbationTestingPreview({ train: false, eval: true });
     await waitFor(() => {
       //Verifying if the train toggle button is disabled if not available in datasplits
@@ -53,7 +53,7 @@ describe("PerturbationTestingPreview", () => {
   it("should display the data in the toggle with expected styling (color, font), format", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     await waitFor(() => {
-      // Verrify if the actual response data from API is visibly displayed on the toggle
+      // Verify if the actual response data from API is visibly displayed on the toggle
       expect(screen.getByText(/14.0%/i)).toBeVisible();
       expect(screen.getByText("Failure rate - Evaluation Set")).toBeVisible();
       expect(screen.getByText(/16.0%/i)).toBeVisible();
@@ -78,24 +78,54 @@ describe("PerturbationTestingPreview", () => {
 
   it("should have expected columns", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    const table_columns = [
+    const expectedColumnHeaders = [
       "Test Family",
       "Test Name",
       "Modif. Type",
       "Test Description",
       "FR on Evaluation Set",
     ];
-    const columnheaders = screen.getAllByRole("columnheader");
+    const actualColumnHeaders = screen.getAllByRole("columnheader");
     await waitFor(() => {
-      table_columns.forEach((name, index) => {
-        expect(columnheaders[index].textContent).toEqual(name);
+      expectedColumnHeaders.forEach((name, index) => {
+        expect(actualColumnHeaders[index].textContent).toEqual(name);
       });
+    });
+  });
+
+  it("should have default sort as desc for colum header 'FR on Evaluation/Training set'", async () => {
+    renderPerturbationTestingPreview({ train: true, eval: true });
+    await waitFor(() =>
+      expect(
+        screen.getAllByRole("columnheader")[4].getAttribute("aria-sort")
+      ).toBe("descending")
+    );
+  });
+
+  it("should modify the last Column 'Failure Rate' and tooltips of it if the toggle is changed to train/eval", async () => {
+    renderPerturbationTestingPreview({ train: true, eval: true });
+    // before toggle changes
+    expect(screen.getAllByRole("columnheader")[4].textContent).toBe(
+      "FR on Evaluation Set"
+    );
+    expect(
+      screen.getByLabelText("Failure Rate on Evaluation Set")
+    ).toBeInTheDocument();
+    // after toggle changes
+    fireEvent.click(screen.getByRole("button", { pressed: false }));
+    await waitFor(() => {
+      expect(screen.getAllByRole("columnheader")[4].textContent).toBe(
+        "FR on Training Set"
+      );
+      expect(
+        screen.getByLabelText("Failure Rate on Training Set")
+      ).toBeInTheDocument();
     });
   });
 });
 
 describe("PerturbationTestingPreview without failure rate for training set", () => {
-  const handlers = [getPertubationResponseWithoutTrainFailureRate];
+  const handlers = [getPerturbationResponseWithoutTrainFailureRate];
   const server = setupServer(...handlers);
 
   beforeAll(() => server.listen());
@@ -113,7 +143,7 @@ describe("PerturbationTestingPreview without failure rate for training set", () 
 });
 
 describe("PerturbationTestingPreview with Failure response", () => {
-  const handlers = [getPertubationResponseWithFailureResponse];
+  const handlers = [getPerturbationResponseWithFailureResponse];
   const server = setupServer(...handlers);
 
   beforeAll(() => server.listen());
