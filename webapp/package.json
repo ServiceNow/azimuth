@@ -62,7 +62,15 @@
   "jest": {
     "coverageReporters": [
       "text"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 1,
+        "functions": 1,
+        "lines": 1,
+        "statements": 1
+      }
+    }
   },
   "engines": {
     "node": ">=14.17.5 <18.0.0"
