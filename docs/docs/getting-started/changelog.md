@@ -1,5 +1,18 @@
 # Releases
 
+## [2.3.0] - 2022-08-17
+
+### Added
+- Rows of Performance Analysis table now link to exploration page with filters applied, when the user clicks.
+- Added visual bars to the similarity column in the semantically similar utterances.
+- New attribute in the config allows to change the thresholds to determine a short and long sentence.
+
+### Fixed
+- Fixed utterances table poorly showing ids greater than 9999.
+- Fixed filtering aggregation modules without post-processing.
+- Fixed high_epistemic_uncertainty smart tag which wasn't showing in the UI.
+- Fixed crash when hitting `See more` until over 100 rows in Performance Analysis table.
+
 ## [2.2.3] - 2022-07-25
 
 ### Fixed
