@@ -55,7 +55,7 @@ the dropdown :material-arrow-down-drop-circle-outline: to see the metrics broken
 predicted class, or smart tag families. Use the toggle to alternate between the performance on the
 training set or on the evaluation set.
 
-The user can click on any row in the table to get directly to the exploration space with the corresponding filters applied. This allows for further investigation of the errors. As an example, clicking on the row with the label `freeze_account` will bring to the exploration space with that same filter applied. This works with prediction classes and smart tags too.
+The user can click on any row in the table to get directly to the exploration space with the corresponding filters applied. This allows for further investigation of errors. As an example, clicking on the row with the label `freeze_account` will bring the user to the exploration space with that same filter applied. This works with prediction classes and smart tags too.
 
 !!! tip "Sort the table and hide columns"
 
