@@ -5,7 +5,7 @@ import { AvailableDatasetSplits, DatasetSplitName } from "types/api";
 
 const handleValueChange = jest.fn();
 const renderDatasetSplitToggler = (
-  availableDatasetSplits: AvailableDatasetSplits | undefined,
+  availableDatasetSplits: AvailableDatasetSplits,
   value: DatasetSplitName
 ) =>
   renderWithRouterAndRedux(
