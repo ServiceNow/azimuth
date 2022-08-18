@@ -13,7 +13,7 @@ const renderPreviewCard = (
   );
 
 describe("PreviewCard", () => {
-  it("should display the title and description without 'view details' button", async () => {
+  it("should display the title and description without 'view details' button", () => {
     const description = (
       <Description
         text="Assess model performance through prediction metrics."
@@ -35,7 +35,7 @@ describe("PreviewCard", () => {
     expect(screen.queryByText(/View details/i)).toBeNull();
   });
 
-  it("should display title, description and 'View details'", async () => {
+  it("should display title, description and 'View details'", () => {
     const description = (
       <Description
         text="Compare the class distribution of your training and evaluation sets."
