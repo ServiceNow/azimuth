@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import Description from "components/Description";
 import { renderWithRouterAndRedux } from "mocks/utils";
 import PreviewCard from "./PreviewCard";
@@ -21,20 +21,18 @@ describe("PreviewCard", () => {
       />
     );
     renderPreviewCard("Performance Analysis", description);
-    await waitFor(() => {
-      // verify title and description displayed as expected
-      expect(screen.getByText("Performance Analysis")).toBeVisible();
-      expect(
-        screen.getByText("Assess model performance through prediction metrics.")
-      ).toBeVisible();
-      // verify the documentation link
-      const link: HTMLAnchorElement = screen.getByRole("link");
-      expect(link.href).toContain("/#performance-analysis");
-      expect(screen.getByText("Learn more")).toBeVisible();
-      expect(screen.getByTestId("LinkIcon")).toBeInTheDocument();
-      // verify if the view details is not displayed if 'to' param is unavailable
-      expect(screen.queryByText(/View details/i)).toBeNull();
-    });
+    // verify the title and description displayed as expected
+    expect(screen.getByText("Performance Analysis")).toBeVisible();
+    expect(
+      screen.getByText("Assess model performance through prediction metrics.")
+    ).toBeVisible();
+    // verify the documentation link
+    const link: HTMLAnchorElement = screen.getByRole("link");
+    expect(link).toHaveTextContent("Learn more");
+    expect(link.href).toContain("/#performance-analysis");
+    expect(screen.getByTestId("LinkIcon")).toBeInTheDocument();
+    // verify if the view details is not displayed if 'to' param is unavailable
+    expect(screen.queryByText(/View details/i)).toBeNull();
   });
 
   it("should display title, description and 'View details'", async () => {
@@ -49,14 +47,16 @@ describe("PreviewCard", () => {
       description,
       "/local/dataset_class_distribution_analysis?pipeline_index=0"
     );
-    await waitFor(() => {
-      expect(screen.getByText("View details")).toBeInTheDocument();
-      const link: HTMLAnchorElement[] = screen.getAllByRole("link");
-      expect(link[1].href).toEqual(
-        expect.stringContaining(
-          "/local/dataset_class_distribution_analysis?pipeline_index=0"
-        )
-      );
+    const viewDetailsLinkButton: HTMLAnchorElement = screen.getByRole("link", {
+      name: /View details/,
     });
+    expect(viewDetailsLinkButton).toBeInTheDocument();
+    expect(viewDetailsLinkButton.href).toContain(
+      "/local/dataset_class_distribution_analysis?pipeline_index=0"
+    );
+    const documentLink: HTMLAnchorElement = screen.getByRole("link", {
+      name: /Learn more/,
+    });
+    expect(documentLink.href).toContain("/dataset-warnings/");
   });
 });
