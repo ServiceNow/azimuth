@@ -48,7 +48,7 @@ If a pipeline allows it, you can get saliency of a custom utterance by doing the
                   "Don't forget to star our repo!"]
 
     response = requests.get("http://0.0.0.0:8091/custom_utterances/saliency",
-                            params={"utterances": utterances, "pipelineIndex": 0}).json()
+                            params={"utterances": utterances, "pipeline_index": 0}).json()
     pprint(response)
     ```
 
