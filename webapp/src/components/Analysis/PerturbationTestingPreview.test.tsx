@@ -31,23 +31,19 @@ describe("PerturbationTestingPreview", () => {
 
   it("should have two toggle buttons for the train and test", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    await waitFor(() => {
-      expect(screen.getAllByRole("button")).toHaveLength(2);
-    });
+    expect(screen.getAllByRole("button")).toHaveLength(2);
   });
 
-  it("should have a disabled toggle button if either one of the dataset split is unavailable", async () => {
+  it("should disable the toggle button if either one of the dataset splits is unavailable", async () => {
     renderPerturbationTestingPreview({ train: false, eval: true });
-    await waitFor(() => {
-      //Verifying if the train toggle button is disabled if not available in datasplits
-      expect(screen.getByRole("button", { pressed: false })).toHaveClass(
-        "Mui-disabled"
-      );
-      // By default, evaluation toggle is selected on page load.
-      expect(screen.getByRole("button", { pressed: true })).not.toHaveClass(
-        "Mui-disabled"
-      );
-    });
+    // Verifying if the train toggle button is disabled if not available in dataset splits
+    expect(screen.getByRole("button", { pressed: false })).toHaveClass(
+      "Mui-disabled"
+    );
+    // By default, evaluation toggle is selected on page load.
+    expect(screen.getByRole("button", { pressed: true })).not.toHaveClass(
+      "Mui-disabled"
+    );
   });
 
   it("should display the data in the toggle with expected styling (color, font), format", async () => {
@@ -71,7 +67,7 @@ describe("PerturbationTestingPreview", () => {
     });
   });
 
-  it("should not display a value if datasplit is not available", async () => {
+  it("should display '--%' if dataset splits is not available", async () => {
     renderPerturbationTestingPreview({ train: false, eval: true });
     await waitFor(() => expect(screen.getByText("--%")).toBeVisible());
   });
@@ -95,32 +91,24 @@ describe("PerturbationTestingPreview", () => {
 
   it("should have default sort as desc for colum header 'FR on Evaluation/Training set'", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    await waitFor(() =>
-      expect(
-        screen.getAllByRole("columnheader")[4].getAttribute("aria-sort")
-      ).toBe("descending")
-    );
+    const header = screen.getByRole("columnheader", { name: /Failure Rate/ });
+    expect(header).toHaveAttribute("aria-sort", "descending");
   });
 
   it("should modify the last Column 'Failure Rate' and tooltips of it if the toggle is changed to train/eval", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
+    const header = screen.getByRole("columnheader", { name: /Failure Rate/ });
     // before toggle changes
-    expect(screen.getAllByRole("columnheader")[4].textContent).toBe(
-      "FR on Evaluation Set"
-    );
+    expect(header).toHaveTextContent("Evaluation Set");
     expect(
       screen.getByLabelText("Failure Rate on Evaluation Set")
     ).toBeInTheDocument();
     // after toggle changes
     fireEvent.click(screen.getByRole("button", { pressed: false }));
-    await waitFor(() => {
-      expect(screen.getAllByRole("columnheader")[4].textContent).toBe(
-        "FR on Training Set"
-      );
-      expect(
-        screen.getByLabelText("Failure Rate on Training Set")
-      ).toBeInTheDocument();
-    });
+    expect(header).toHaveTextContent("Training Set");
+    expect(
+      screen.getByLabelText("Failure Rate on Training Set")
+    ).toBeInTheDocument();
   });
 });
 
@@ -131,13 +119,11 @@ describe("PerturbationTestingPreview without failure rate for training set", () 
   beforeAll(() => server.listen());
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
-  it("should not display value if failure rate for a datasplit is not available", async () => {
+  it("should not display value if failure rate for a dataset splits is not available", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    waitFor(() => {
-      // --% percentage is expected to be shown if failure rate for one of the datasplit is unavailable
+    await waitFor(() => {
+      // --% percentage is expected to be shown if failure rate for one of the dataset splits is unavailable
       expect(screen.getByText("--%")).toBeVisible();
-      // should have a success color if the failure rate is not present for the datasplit
-      expect(screen.getByText("--%")).toHaveStyle("color: rgb(46, 125, 50)");
     });
   });
 });
@@ -149,19 +135,15 @@ describe("PerturbationTestingPreview with Failure response", () => {
   beforeAll(() => server.listen());
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
-  it("should be expected to display error message if API fails", async () => {
+  it("should display the error message if API fails", async () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
-    waitFor(() => {
+    await waitFor(() => {
       // expected error message
       expect(
-        screen.queryByText(
+        screen.getByText(
           "Something went wrong fetching behavioral testing summary"
         )
       ).toBeTruthy();
-      // some random message
-      expect(
-        screen.queryByText("Error message not defined in the code")
-      ).toBeNull();
     });
   });
 });
