@@ -29,12 +29,12 @@ describe("PerturbationTestingPreview", () => {
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
-  it("should have two toggle buttons for the train and test", async () => {
+  it("should have two toggle buttons for the train and test", () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     expect(screen.getAllByRole("button")).toHaveLength(2);
   });
 
-  it("should disable the toggle button if either one of the dataset splits is unavailable", async () => {
+  it("should disable the toggle button if either one of the dataset splits is unavailable", () => {
     renderPerturbationTestingPreview({ train: false, eval: true });
     // Verifying if the train toggle button is disabled if not available in dataset splits
     expect(screen.getByRole("button", { pressed: false })).toHaveClass(
@@ -72,7 +72,7 @@ describe("PerturbationTestingPreview", () => {
     await waitFor(() => expect(screen.getByText("--%")).toBeVisible());
   });
 
-  it("should have expected columns", async () => {
+  it("should have expected columns", () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     const expectedColumnHeaders = [
       "Test Family",
@@ -82,20 +82,18 @@ describe("PerturbationTestingPreview", () => {
       "FR on Evaluation Set",
     ];
     const actualColumnHeaders = screen.getAllByRole("columnheader");
-    await waitFor(() => {
-      expectedColumnHeaders.forEach((name, index) => {
-        expect(actualColumnHeaders[index].textContent).toEqual(name);
-      });
+    expectedColumnHeaders.forEach((name, index) => {
+      expect(actualColumnHeaders[index].textContent).toEqual(name);
     });
   });
 
-  it("should have default sort as desc for colum header 'FR on Evaluation/Training set'", async () => {
+  it("should have default sort as desc for colum header 'FR on Evaluation/Training set'", () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     const header = screen.getByRole("columnheader", { name: /Failure Rate/ });
     expect(header).toHaveAttribute("aria-sort", "descending");
   });
 
-  it("should modify the last Column 'Failure Rate' and tooltips of it if the toggle is changed to train/eval", async () => {
+  it("should modify the last Column 'Failure Rate' and tooltips of it if the toggle is changed to train/eval", () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     const header = screen.getByRole("columnheader", { name: /Failure Rate/ });
     // before toggle changes
