@@ -118,7 +118,7 @@ describe("PerturbationTestingPreview without failure rate for training set", () 
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
   it("should not display value if failure rate for a dataset splits is not available", async () => {
-    renderPerturbationTestingPreview({ train: true, eval: true });
+    renderPerturbationTestingPreview({ train: false, eval: true });
     await waitFor(() => {
       // --% percentage is expected to be shown if failure rate for one of the dataset splits is unavailable
       expect(screen.getByText("--%")).toBeVisible();
