@@ -141,7 +141,7 @@ describe("PerturbationTestingPreview with Failure response", () => {
         screen.getByText(
           "Something went wrong fetching behavioral testing summary"
         )
-      ).toBeTruthy();
+      ).toBeVisible();
     });
   });
 });
