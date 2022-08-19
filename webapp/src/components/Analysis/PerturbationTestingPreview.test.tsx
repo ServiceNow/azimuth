@@ -7,7 +7,7 @@ import {
   getPerturbationResponse,
   getPerturbationResponseWithoutTrainFailureRate,
   getPerturbationResponseWithFailureResponse,
-} from "mocks/api/mockPertubationAPI";
+} from "mocks/api/mockPerturbationAPI";
 
 const renderPerturbationTestingPreview = (
   availableDatasetSplits: AvailableDatasetSplits
