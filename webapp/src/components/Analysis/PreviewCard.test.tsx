@@ -13,7 +13,7 @@ const renderPreviewCard = (
   );
 
 describe("PreviewCard", () => {
-  it("should display the title and description without 'view details' button", () => {
+  it("should display the title, description, Learn more link button with href address without 'view details' button", () => {
     const description = (
       <Description
         text="Assess model performance through prediction metrics."
@@ -35,7 +35,7 @@ describe("PreviewCard", () => {
     expect(screen.queryByText(/View details/i)).toBeNull();
   });
 
-  it("should display title, description and 'View details'", () => {
+  it("should display 'View details' button with right href link to route path and 'Learn more' link button with associated href address to documentation", () => {
     const description = (
       <Description
         text="Compare the class distribution of your training and evaluation sets."

@@ -1,5 +1,5 @@
 import { BoxProps } from "@mui/material";
-import { fireEvent, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { renderWithTheme } from "mocks/utils";
 import VisualBar from "./VisualBar";
 

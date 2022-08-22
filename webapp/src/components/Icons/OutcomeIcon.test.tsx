@@ -21,25 +21,25 @@ describe("OutcomeIcon", () => {
       "Incorrect & Predicted"
     );
   });
-  it("should have a right color if the label is 'Correct & Predicted'", () => {
+  it("should have a right color for the label 'Correct & Predicted'", () => {
     renderOutcomeIcon("CorrectAndPredicted");
     expect(screen.getByLabelText("Correct & Predicted")).toHaveStyle(
       "color: #00B686"
     );
   });
-  it("should have a right color if the label is 'Correct & Rejected'", () => {
+  it("should have a right color for the label 'Correct & Rejected'", () => {
     renderOutcomeIcon("CorrectAndRejected");
     expect(screen.getByLabelText("Correct & Rejected")).toHaveStyle(
       "color: #456857"
     );
   });
-  it("should have a right color if the label is 'Incorrect & Predicted'", () => {
+  it("should have a right color for the label 'Incorrect & Predicted'", () => {
     renderOutcomeIcon("IncorrectAndPredicted");
     expect(screen.getByLabelText("Incorrect & Predicted")).toHaveStyle(
       "color: #E32437"
     );
   });
-  it("should have a right color if the label is 'Incorrect & Rejected'", () => {
+  it("should have a right color for the label 'Incorrect & Rejected'", () => {
     renderOutcomeIcon("IncorrectAndRejected");
     expect(screen.getByLabelText("Incorrect & Rejected")).toHaveStyle(
       "color: #FD9700"

@@ -30,12 +30,14 @@ describe("DatasetSplitToggler", () => {
     expect(screen.getByTestId("SpeedIcon")).toBeInTheDocument();
     expect(screen.getByTestId("ModelTrainingIcon")).toBeInTheDocument();
   });
+
   it("should disable the toggle button if one of the dataset split is unavailable", () => {
     renderDatasetSplitToggler({ train: false, eval: true }, "eval");
     expect(screen.getByRole("button", { name: "Training Set" })).toHaveClass(
       "Mui-disabled"
     );
   });
+
   it("should trigger the change of a button and send the selected toggled value", () => {
     renderDatasetSplitToggler({ train: true, eval: true }, "eval");
     const trainToggleButton = screen.getByRole("button", {
