@@ -70,6 +70,7 @@ const Dashboard = () => {
         <PreviewCard
           title="Dataset Class Distribution Analysis"
           to={`/${jobId}/dataset_class_distribution_analysis${searchString}`}
+          linkButton="View details"
           description={
             <Description
               text="Compare the class distribution of your training and evaluation sets."
@@ -104,6 +105,7 @@ const Dashboard = () => {
           <PreviewCard
             title="Behavioral Testing"
             to={`/${jobId}/behavioral_testing_summary${searchString}`}
+            linkButton="View details"
             description={behavioralTestingDescription}
           >
             <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
@@ -120,6 +122,7 @@ const Dashboard = () => {
           <PreviewCard
             title="Post-processing Analysis"
             to={`/${jobId}/thresholds${searchString}`}
+            linkButton="View details"
             description={postprocessingDescription}
           >
             <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
