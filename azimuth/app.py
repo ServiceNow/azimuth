@@ -23,8 +23,6 @@ from azimuth.utils.logs import set_logger_config
 from azimuth.utils.project import load_dataset_split_managers_from_config
 from azimuth.utils.validation import assert_not_none
 
-log = structlog.getLogger(__name__)
-
 _dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]] = {}
 _task_manager: Optional[TaskManager] = None
 _startup_tasks: Optional[Dict[str, Module]] = None
@@ -99,9 +97,13 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
         ValueError: If no dataset_split in config.
     """
     global _dataset_split_managers, _task_manager, _startup_tasks, _azimuth_config, _ready_flag
-    log.info("🔭 Azimuth starting 🔭")
+
     level = logging.DEBUG if debug else logging.INFO
     set_logger_config(level)
+
+    log = structlog.get_logger(__name__)
+
+    log.info("🔭 Azimuth starting 🔭")
 
     azimuth_config = load_azimuth_config(config_path)
     if azimuth_config.dataset is None:
