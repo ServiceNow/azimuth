@@ -1,43 +1,23 @@
-import { Box, capitalize, Stack, Typography } from "@mui/material";
+import { Box, capitalize, CircularProgress, Typography } from "@mui/material";
+import DoneIcon from "@mui/icons-material/Done";
 import noData from "assets/launch.svg";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { getStatusEndpoint } from "services/api";
 import Loading from "./Loading";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import CheckIcon from "./Icons/Check";
 import ErrorIcon from "@mui/icons-material/Error";
-import PendingOutlinedIcon from "@mui/icons-material/PendingOutlined";
 
 type Props = {
   children: React.ReactNode;
 };
 
-interface StringByString {
-  [key: string]: any;
-}
-
-const STATUS_ICON_MAPPING: StringByString = {
-  finished: <CheckIcon />,
-  not_started: <CheckIcon />,
-  pending: <PendingOutlinedIcon />,
-  error: <ErrorIcon />,
-  lost: <ErrorIcon />,
+const STATUS_ICONS: Record<string, React.ReactElement> = {
+  finished: <DoneIcon color="success" />,
+  not_started: <DoneIcon color="success" />, // Happens when the task was already computed.
+  pending: <CircularProgress />,
+  error: <ErrorIcon color="error" />,
+  lost: <ErrorIcon color="error" />,
 };
-
-const render_cell = (task_name: string, task_status: string) => (
-  <Grid item xs={1.5}>
-    <Paper variant="outlined">
-      <Box display="flex" alignItems="center" gap={1}>
-        <Typography>
-          {`${task_name.split("_").map(capitalize).join(" ")}  `}
-          {STATUS_ICON_MAPPING[task_status]}
-        </Typography>
-      </Box>
-    </Paper>
-  </Grid>
-);
 
 const StatusCheck: React.FC<Props> = ({ children }) => {
   const { jobId } = useParams<{ jobId: string }>();
@@ -75,11 +55,19 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
             The startup tasks are still in progress. Grab a coffee and we will
             auto-refresh for you.
           </Typography>
-          <Grid container spacing={2} columnSpacing={3} columns={3}>
-            {Object.entries(status.startupTasksStatus).map(
-              ([task_name, task_status]) => render_cell(task_name, task_status)
-            )}
-          </Grid>
+          <Box
+            display="grid"
+            rowGap={2}
+            columnGap={8}
+            gridTemplateColumns="repeat(2, 1fr)"
+          >
+            {Object.entries(status.startupTasksStatus).map(([task, status]) => (
+              <Box display="flex" alignItems="center" gap={1}>
+                {STATUS_ICONS[status]}
+                <Typography>{capitalize(task).replace(/_/g, " ")}</Typography>
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Box>
     );
