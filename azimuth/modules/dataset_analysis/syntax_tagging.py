@@ -81,10 +81,10 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
                 if len(tokens) <= syntax_options.short_sentence_max_token:
                     tag[SmartTag.short] = True
 
-                tokens = self.spacy_pos(utterance)
-                sub_toks = [tok for tok in tokens if (tok.dep_ in self.subj_tags)]
-                obj_toks = [tok for tok in tokens if (tok.dep_ in self.obj_tags)]
-                vrb_toks = [tok for tok in tokens if (tok.pos_ in self.verb_tags)]
+                tokens_doc = self.spacy_pos(utterance)
+                sub_toks = [tok for tok in tokens_doc if (tok.dep_ in self.subj_tags)]
+                obj_toks = [tok for tok in tokens_doc if (tok.dep_ in self.obj_tags)]
+                vrb_toks = [tok for tok in tokens_doc if (tok.pos_ in self.verb_tags)]
 
                 if len(sub_toks) == 0:
                     tag[SmartTag.no_subj] = True
