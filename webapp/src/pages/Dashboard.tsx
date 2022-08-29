@@ -86,6 +86,8 @@ const Dashboard = () => {
       {isPipelineSelected(pipeline) && (
         <PreviewCard
           title="Performance Analysis"
+          to={`/${jobId}/performance_analysis_comparison${searchString}`}
+          linkButton="Compare models"
           description={
             <Description
               text="Assess model performance through prediction metrics."

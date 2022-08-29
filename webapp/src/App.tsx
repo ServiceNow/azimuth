@@ -25,6 +25,7 @@ import PipelineCheck from "components/PipelineCheck";
 import store from "store";
 import { Provider } from "react-redux";
 import Dashboard from "pages/Dashboard";
+import PerformanceAnalysisComparison from "pages/PerformanceAnalysisComparison";
 import PerturbationTestingSummary from "pages/PerturbationTestingSummary";
 import Threshold from "pages/Threshold";
 import { DatasetSplitName } from "types/api";
@@ -125,6 +126,14 @@ export default class App extends React.Component<Props> {
                             >
                               <BasicLayout>
                                 <UtteranceDetail />
+                              </BasicLayout>
+                            </Route>
+                            <Route
+                              path="/:jobId/performance_analysis_comparison"
+                              exact
+                            >
+                              <BasicLayout>
+                                <PerformanceAnalysisComparison />
                               </BasicLayout>
                             </Route>
                             <Route>
