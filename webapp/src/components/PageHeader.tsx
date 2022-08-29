@@ -96,6 +96,10 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
+          pathname: `/${jobId}/performance_analysis_comparison`,
+          name: "Performance Analysis Comparison",
+        },
+        {
           pathname: `/${jobId}/settings`,
           name: "Settings",
         },
