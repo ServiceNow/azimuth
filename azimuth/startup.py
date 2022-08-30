@@ -250,7 +250,7 @@ def start_tasks_for_dms(
             dep_mods = get_modules(mods, startup.dependency_names)
             mods.update(
                 {
-                    f"{startup.name}_{k.value}_{pipeline_index}": v
+                    f"{startup.name}_{k.value}_{pipeline_index or ''}".rstrip("_"): v
                     for k, v in make_startup_tasks(
                         dataset_split_managers,
                         task_manager,
