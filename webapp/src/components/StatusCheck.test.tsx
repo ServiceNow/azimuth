@@ -20,9 +20,6 @@ test("shows the waiting status when waiting for startup tasks", async () => {
     path: "/:jobId",
   });
 
-  await screen.findByText(
-    "The startup tasks are still in progress. Grab a coffee and we will auto-refresh for you."
-  );
-  const content = await screen.queryByText("content");
-  expect(content).toBeNull();
+  await screen.findByText("The startup tasks are still in progress.");
+  expect(screen.queryByText("content")).toBeNull();
 });
