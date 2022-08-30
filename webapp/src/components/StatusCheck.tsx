@@ -44,17 +44,20 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
     return (
       <Box
         display="flex"
+        flexDirection="column"
         justifyContent="center"
         alignItems="center"
         width="100%"
-        height="100vh"
+        height="100%"
       >
         <Box
           display="flex"
           flexDirection="column"
           alignItems="center"
           gap={4}
-          width={700}
+          padding={4}
+          width="100%"
+          sx={{ overflowY: "auto" }}
         >
           <img src={noData} alt="Startup tasks still in progress" width={400} />
           <Typography variant="h2" align="center">
