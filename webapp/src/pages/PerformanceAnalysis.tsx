@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import Description from "components/Description";
-import PerformanceAnalysisComparisonTable from "components/Metrics/PerformanceAnalysisComparisonTable";
+import PerformanceAnalysisComparisonTable from "components/Metrics/PerformanceAnalysisTable";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useParams } from "react-router-dom";

@@ -6,14 +6,14 @@ import { Link } from "react-router-dom";
 type Props = {
   title: string;
   to?: string;
-  linkButton?: string;
+  linkButtonText?: string;
   description: React.ReactElement<typeof Description>;
 };
 
 const PreviewCard: React.FC<Props> = ({
   title,
   to,
-  linkButton,
+  linkButtonText = "View details",
   children,
   description,
 }) => (
@@ -28,7 +28,7 @@ const PreviewCard: React.FC<Props> = ({
       </Box>
       {to && (
         <Button color="secondary" variant="outlined" component={Link} to={to}>
-          {linkButton}
+          {linkButtonText}
         </Button>
       )}
     </Box>
