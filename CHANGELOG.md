@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+Added a new page to compare different pipelines in the performance analysis table.
 
 ### Changed
 
