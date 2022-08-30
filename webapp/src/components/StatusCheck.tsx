@@ -1,11 +1,11 @@
-import { Box, capitalize, CircularProgress, Typography } from "@mui/material";
 import DoneIcon from "@mui/icons-material/Done";
+import ErrorIcon from "@mui/icons-material/Error";
+import { Box, capitalize, CircularProgress, Typography } from "@mui/material";
 import noData from "assets/launch.svg";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { getStatusEndpoint } from "services/api";
 import Loading from "./Loading";
-import ErrorIcon from "@mui/icons-material/Error";
 
 type Props = {
   children: React.ReactNode;
