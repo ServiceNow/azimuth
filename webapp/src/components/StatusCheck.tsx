@@ -1,6 +1,12 @@
 import DoneIcon from "@mui/icons-material/Done";
 import ErrorIcon from "@mui/icons-material/Error";
-import { Box, capitalize, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  capitalize,
+  CircularProgress,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import noData from "assets/launch.svg";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -67,7 +73,7 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
           >
             {Object.entries(status.startupTasksStatus).map(([task, status]) => (
               <Box display="flex" alignItems="center" gap={1}>
-                {STATUS_ICONS[status]}
+                <Tooltip title={status}>{STATUS_ICONS[status]}</Tooltip>
                 <Typography>{capitalize(task).replace(/_/g, " ")}</Typography>
               </Box>
             ))}
