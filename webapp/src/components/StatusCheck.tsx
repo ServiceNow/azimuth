@@ -14,7 +14,7 @@ type Props = {
 const STATUS_ICONS: Record<string, React.ReactElement> = {
   finished: <DoneIcon color="success" />,
   not_started: <DoneIcon color="success" />, // Happens when the task was already computed.
-  pending: <CircularProgress />,
+  pending: <CircularProgress size={16} sx={{ margin: "2px" }} />,
   error: <ErrorIcon color="error" />,
   lost: <ErrorIcon color="error" />,
 };
