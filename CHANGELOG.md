@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+Added a new page to compare different pipelines in the performance analysis table.
 
 ### Changed
 - Added a proposed action: `merge_classes`, and rename `consider_new_class` to `define_new_class`.
