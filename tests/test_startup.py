@@ -23,7 +23,7 @@ from tests.utils import get_table_key
 def test_startup_task(tiny_text_config, tiny_text_task_manager):
     dms = load_dataset_split_managers_from_config(tiny_text_config)
     mods = startup_tasks(dms, tiny_text_task_manager)
-    one_mod = mods["syntax_tags_eval_None"]
+    one_mod = mods["syntax_tags_eval"]
     # We lock the task manager
     assert tiny_text_task_manager.is_locked
     assert not one_mod.done()
