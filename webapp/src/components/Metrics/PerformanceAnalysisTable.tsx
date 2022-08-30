@@ -87,7 +87,7 @@ type Row = {
   comparedPipeline?: MetricsPerFilterValue;
 };
 
-const PerformanceAnalysisComparisonTable: React.FC<Props> = ({
+const PerformanceAnalysisTable: React.FC<Props> = ({
   jobId,
   pipeline,
   availableDatasetSplits,
@@ -260,7 +260,7 @@ const PerformanceAnalysisComparisonTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline, index) => ({
         field: `${pipeline}UtteranceCount`,
         headerName: `${prefixPipelineName(index)}Total`,
-        description: "Total number of utterances",
+        description: `${prefixPipelineName(index)}Total`,
         width: 120,
         align: "right",
         valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
@@ -355,7 +355,7 @@ const PerformanceAnalysisComparisonTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline, index) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ece`,
-        headerName: `${prefixPipelineName(index)}ECE`,
+        headerName: `${prefixPipelineName(index)}ece`,
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number>) =>
@@ -368,7 +368,7 @@ const PerformanceAnalysisComparisonTable: React.FC<Props> = ({
           ),
       })),
       {
-        field: `deltaECE`,
+        field: `deltaece`,
         headerName: "Delta",
         width: 160,
         align: "right",
@@ -386,62 +386,24 @@ const PerformanceAnalysisComparisonTable: React.FC<Props> = ({
         sortComparator: customSort,
       },
     ];
-  }, [
-    metricInfo,
-    selectedMetricPerFilterOption,
-    sortModel,
-    pipeline,
-    comparedPipeline,
-  ]);
+  }, [metricInfo, selectedMetricPerFilterOption, sortModel, comparedPipeline]);
 
   React.useEffect(() => {
     if (comparedPipeline === pipeline.pipelineIndex) {
       setComparedPipeline(undefined);
     }
-    if (comparedPipeline === undefined) {
-      setColumnVisibilityModel({
-        comparedPipelineUtteranceCount: false,
-        deltaUtteranceCount: false,
-        comparedPipelineCorrectAndPredicted: false,
-        deltaCorrectAndPredicted: false,
-        comparedPipelineCorrectAndRejected: false,
-        deltaCorrectAndRejected: false,
-        comparedPipelineIncorrectAndRejected: false,
-        deltaIncorrectAndRejected: false,
-        comparedPipelineIncorrectAndPredicted: false,
-        deltaIncorrectAndPredicted: false,
-        comparedPipelinePrecision: false,
-        deltaPipelinePrecision: false,
-        comparedPipelineRecall: false,
-        deltaPipelineRecall: false,
-        comparedPipelineF1: false,
-        deltaPipelineF1: false,
-        comparedPipelineece: false,
-        deltaPipelineece: false,
-      });
-    } else {
-      setColumnVisibilityModel({
-        comparedPipelineUtteranceCount: true,
-        deltaUtteranceCount: true,
-        comparedPipelineCorrectAndPredicted: true,
-        deltaCorrectAndPredicted: true,
-        comparedPipelineCorrectAndRejected: true,
-        deltaCorrectAndRejected: true,
-        comparedPipelineIncorrectAndRejected: true,
-        deltaIncorrectAndRejected: true,
-        comparedPipelineIncorrectAndPredicted: true,
-        deltaIncorrectAndPredicted: true,
-        comparedPipelinePrecision: true,
-        deltaPipelinePrecision: true,
-        comparedPipelineRecall: true,
-        deltaPipelineRecall: true,
-        comparedPipelineF1: true,
-        deltaPipelineF1: true,
-        comparedPipelineece: true,
-        deltaPipelineece: true,
-      });
-    }
-  }, [pipeline, comparedPipeline]);
+    const visibility = comparedPipeline !== undefined;
+    const columnVisibilityEntries = [
+      "UtteranceCount",
+      ...ALL_OUTCOMES,
+      ...Object.keys(metricInfo ?? {}),
+      "ece",
+    ].flatMap((field) => [
+      [`comparedPipeline${field}`, visibility],
+      [`delta${field}`, visibility],
+    ]);
+    setColumnVisibilityModel(Object.fromEntries(columnVisibilityEntries));
+  }, [pipeline, comparedPipeline, metricInfo]);
 
   const getRowSpacing = React.useCallback(({ id }: GridRowSpacingParams) => {
     return {
@@ -564,4 +526,4 @@ const PerformanceAnalysisComparisonTable: React.FC<Props> = ({
   );
 };
 
-export default React.memo(PerformanceAnalysisComparisonTable);
+export default React.memo(PerformanceAnalysisTable);
