@@ -52,8 +52,12 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
         >
           <img src={noData} alt="Startup tasks still in progress" width={400} />
           <Typography variant="h2" align="center">
-            The startup tasks are still in progress. Grab a coffee and we will
-            auto-refresh for you.
+            <Typography variant="inherit">
+              The startup tasks are still in progress.
+            </Typography>
+            <Typography variant="inherit">
+              Grab a coffee and we will auto-refresh for you.
+            </Typography>
           </Typography>
           <Box
             display="grid"
