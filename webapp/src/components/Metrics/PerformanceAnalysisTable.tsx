@@ -5,6 +5,8 @@ import {
   MenuItem,
   Select,
   Typography,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import {
   GridCellParams,
@@ -464,28 +466,30 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
-        <Select
-          id="compare-pipeline-model"
-          variant="outlined"
-          displayEmpty
-          value={comparedPipeline ?? ""}
-          sx={{ ".MuiSelect-select": { paddingY: 0 } }}
-          onChange={({ target: { value } }) =>
-            setComparedPipeline(typeof value === "number" ? value : undefined)
-          }
-        >
-          <MenuItem value="">
-            <em>No pipeline</em>
-          </MenuItem>
-          {config?.pipelines?.map(
-            (pipelineData, index) =>
-              index !== pipeline.pipelineIndex && (
-                <MenuItem key={index} value={index}>
-                  {pipelineData.name}
-                </MenuItem>
-              )
-          )}
-        </Select>
+        <FormControl size="small">
+          <InputLabel id="compare-pipeline-model">Compared with...</InputLabel>
+          <Select
+            id="compare-pipeline-model-select"
+            value={comparedPipeline ?? "No pipeline"}
+            label="Compared with..."
+            displayEmpty
+            onChange={({ target: { value } }) =>
+              setComparedPipeline(typeof value === "number" ? value : undefined)
+            }
+          >
+            <MenuItem value="No pipeline">
+              <em>No pipeline</em>
+            </MenuItem>
+            {config?.pipelines?.map(
+              (pipelineData, index) =>
+                index !== pipeline.pipelineIndex && (
+                  <MenuItem key={index} value={index}>
+                    {pipelineData.name}
+                  </MenuItem>
+                )
+            )}
+          </Select>
+        </FormControl>
       </Box>
       <Table
         sx={{
