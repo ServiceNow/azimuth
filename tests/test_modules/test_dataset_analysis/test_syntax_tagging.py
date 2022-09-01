@@ -57,3 +57,46 @@ def test_syntax_tagging(simple_text_config):
     # Tags should changed for utterances below, based on new config values
     assert not json_output_2[2].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
     assert not json_output_2[3].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
+
+
+def test_syntax_tagging_french(simple_text_config):
+    mod = SyntaxTaggingModule(
+        DatasetSplitName.eval,
+        simple_text_config,
+    )
+
+    assert mod is not None
+    batch = {
+        DatasetColumn.idx: [0, 1, 2, 3],
+        "utterance": [
+            "adore les biscuits!",
+            "c'est terrible. C'est horrible pour moi d'ecrire ce test, mais je m'amuse bien.",
+            "Je parle",
+            "le sucre et les biscuits!",  # as currently implemented, no subject or object
+        ],
+        "label": [0, 1, 0, 1],
+    }
+    json_output = mod.compute(batch)
+    assert len(json_output) == 4
+
+    assert json_output[0].tags[SmartTag.no_subj]
+    assert not any([json_output[0].tags[SmartTag.no_obj], json_output[0].tags[SmartTag.no_verb]])
+
+    assert not any(
+        [
+            json_output[1].tags[SmartTag.no_subj],
+            json_output[1].tags[SmartTag.no_verb],
+            json_output[1].tags[SmartTag.no_verb],
+        ]
+    )
+
+    assert not any([json_output[2].tags[SmartTag.no_subj], json_output[2].tags[SmartTag.no_verb]])
+    assert json_output[2].tags[SmartTag.no_obj]
+
+    assert all(
+        [
+            json_output[3].tags[SmartTag.no_obj],
+            json_output[3].tags[SmartTag.no_verb],
+            json_output[3].tags[SmartTag.no_subj],
+        ]
+    )

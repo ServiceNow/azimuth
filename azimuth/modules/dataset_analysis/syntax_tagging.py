@@ -29,12 +29,12 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
     spacy_pipeline.add_pipe("sentencizer")
 
     # part of speech
-    subj_tags = ["nsubj", "nsubjpass"]
-    obj_tags = ["dobj", "pobj", "dobj"]
+    subj_tags = ["nsubj", "nsubjpass", "nsubj:pass"]
+    obj_tags = ["dobj", "pobj", "obj", "iobj", "obl:arg", "obl:agent", "obl:mod"]
 
-    # we use pos_ for verb since for the moment it is more reliable
+    # we use pos_ for verb since it is simpler and more reliable.
     verb_tags = ["VERB", "AUX"]
-    spacy_pos = spacy.load("en_core_web_sm")
+    spacy_pos = spacy.load("fr_core_news_sm")
 
     def compute(self, batch: Dataset) -> List[TaggingResponse]:  # type: ignore
         """Get smart tags for provided indices.
