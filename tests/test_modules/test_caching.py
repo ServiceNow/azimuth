@@ -8,7 +8,7 @@ from copy import deepcopy
 import h5py
 import pytest
 
-from azimuth.config import PerturbationTestingScope
+from azimuth.config import PerturbationTestingConfig
 from azimuth.modules.base_classes import (
     AggregationModule,
     FilterableModule,
@@ -141,7 +141,7 @@ def test_wrong_aggregation_module(simple_text_config):
         )
 
 
-class MyPerturbationModule(Module[PerturbationTestingScope]):
+class MyPerturbationModule(Module[PerturbationTestingConfig]):
     def compute_on_dataset_split(self):
         return [{"potato": i} for i in self.get_indices()]
 
