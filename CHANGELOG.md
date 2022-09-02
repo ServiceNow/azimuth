@@ -13,6 +13,7 @@ Released changes are shown in the
 ### Added
 
 ### Changed
+- The rejection class is always the last row/column in the confusion matrix.
 
 ### Deprecated/Breaking Changes
 
