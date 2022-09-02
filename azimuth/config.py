@@ -287,7 +287,7 @@ class ModelContractConfig(CommonFieldsConfig):
         return pipeline_definitions
 
 
-class PerturbationTestingScope(ModelContractConfig):
+class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
     behavioral_testing: Optional[BehavioralTestingOptions] = Field(
         BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
@@ -310,7 +310,7 @@ class SyntaxConfig(CommonFieldsConfig):
 
 
 class AzimuthConfig(
-    PerturbationTestingScope,
+    PerturbationTestingConfig,
     SimilarityConfig,
     DatasetWarningConfig,
     SyntaxConfig,

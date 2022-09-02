@@ -9,7 +9,7 @@ from datasets import DatasetDict
 from azimuth.config import (
     AzimuthConfig,
     ModelContractConfig,
-    PerturbationTestingScope,
+    PerturbationTestingConfig,
     SimilarityConfig,
 )
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -91,7 +91,7 @@ def similarity_available(config: SimilarityConfig) -> bool:
     return config.similarity is not None
 
 
-def perturbation_testing_available(config: PerturbationTestingScope) -> bool:
+def perturbation_testing_available(config: PerturbationTestingConfig) -> bool:
     correct_model_contract = config.model_contract in [
         SupportedModelContract.hf_text_classification,
         SupportedModelContract.custom_text_classification,

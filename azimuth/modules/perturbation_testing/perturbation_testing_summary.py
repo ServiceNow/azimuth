@@ -7,7 +7,7 @@ from typing import List, Optional
 
 import pandas as pd
 
-from azimuth.config import PerturbationTestingScope
+from azimuth.config import PerturbationTestingConfig
 from azimuth.modules.base_classes import ComparisonModule
 from azimuth.modules.perturbation_testing import PerturbationTestingModule
 from azimuth.modules.task_execution import get_task_result
@@ -42,7 +42,7 @@ class PerturbedUtteranceNeededInfo:
 PERTURBATION_TEST_GROUPING = ["family", "name", "perturbation_type", "dataset_split_name"]
 
 
-class PerturbationTestingSummaryModule(ComparisonModule[PerturbationTestingScope]):
+class PerturbationTestingSummaryModule(ComparisonModule[PerturbationTestingConfig]):
     """Summary of perturbation tests per dataset split."""
 
     def compute_on_dataset_split(  # type: ignore
