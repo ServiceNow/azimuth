@@ -43,9 +43,8 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
 
         # Put the rejection class last for the confusion matrix
         rejection_idx = ds_mng.rejection_class_idx
-        max_idx = num_classes - 1
-        if rejection_idx != max_idx:
-            new_order = [x for x in range(0, max_idx + 1) if x != rejection_idx] + [rejection_idx]
+        if rejection_idx != max(class_ids):
+            new_order = class_ids[:rejection_idx] + class_ids[rejection_idx + 1 :] + [rejection_idx]
             cf = cf[np.ix_(new_order, new_order)]
         return [
             ConfusionMatrixResponse(confusion_matrix=cf, normalized=self.mod_options.cf_normalized)
