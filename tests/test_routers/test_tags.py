@@ -18,7 +18,8 @@ def test_post_tags(app: FastAPI) -> None:
         "dataActions": [
             {
                 "relabel": False,
-                "considerNewClass": False,
+                "addNewClass": False,
+                "mergeClasses": False,
                 "remove": True,
                 "augmentWithSimilar": False,
                 "investigate": False,
@@ -35,7 +36,8 @@ def test_post_tags(app: FastAPI) -> None:
         "dataActions": [
             {
                 "relabel": False,
-                "considerNewClass": False,
+                "addNewClass": False,
+                "mergeClasses": False,
                 "remove": False,
                 "augmentWithSimilar": False,
                 "investigate": False,

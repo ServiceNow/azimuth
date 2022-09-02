@@ -28,7 +28,8 @@ def format_data_actions(tags) -> DataActionResponse:
     formatted_data_actions = [
         DataActionMapping(
             relabel=x["relabel"],
-            consider_new_class=x["consider_new_class"],
+            add_new_class=x["add_new_class"],
+            merge_classes=x["merge_classes"],
             remove=x["remove"],
             augment_with_similar=x["augment_with_similar"],
             investigate=x["investigate"],
