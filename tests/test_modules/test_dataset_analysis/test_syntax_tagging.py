@@ -100,3 +100,7 @@ def test_syntax_tagging_french(simple_text_config):
             json_output[3].tags[SmartTag.no_subj],
         ]
     )
+
+    # Sentencizer is from English model but should work for French
+    assert not any(json_output[i].tags[SmartTag.multi_sent] for i in [0, 2, 3])
+    assert json_output[1].tags[SmartTag.multi_sent]
