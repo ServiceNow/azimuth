@@ -11,6 +11,7 @@ import {
 import {
   GridCellParams,
   GridCellValue,
+  GridColumnHeaderParams,
   GridColumnMenuContainer,
   GridColumnMenuProps,
   GridColumnsMenuItem,
@@ -23,6 +24,7 @@ import {
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
+import OutcomeIcon from "components/Icons/OutcomeIcon";
 import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
@@ -174,18 +176,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     );
   }, [basePipelineData, comparedPipelineData, selectedMetricPerFilterOption]);
 
-  const prefixPipelineName = (pipelineIdx: number) => {
-    return (
-      config?.pipelines &&
-      `${
-        (pipelineIdx === 1 &&
-          comparedPipeline !== undefined &&
-          config.pipelines[comparedPipeline].name) ||
-        config.pipelines[pipeline.pipelineIndex].name
-      } - `
-    );
-  };
-
   const columns: Column<Row>[] = React.useMemo(() => {
     const metricsEntries = Object.entries(metricInfo ?? {});
 
@@ -212,6 +202,37 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       maxWidth: 220,
       sortComparator: customSort,
     };
+
+    const span = (
+      baseOrCompared: typeof pipelines[number],
+      shortHeader: React.ReactNode,
+      longHeader: React.ReactNode = shortHeader
+    ) => ({
+      ...(comparedPipeline === undefined
+        ? { renderHeader: () => shortHeader }
+        : {
+            headerClassName: "span",
+            cellClassName: "span",
+            renderHeader:
+              baseOrCompared === "basePipeline"
+                ? ({ colDef }: GridColumnHeaderParams) => (
+                    <>
+                      {config?.pipelines?.[pipeline.pipelineIndex].name}
+                      <Box
+                        position="absolute"
+                        left={0}
+                        right={-2 * colDef.computedWidth}
+                        top={0}
+                        lineHeight={1}
+                        textAlign="center"
+                      >
+                        {longHeader}
+                      </Box>
+                    </>
+                  )
+                : () => config?.pipelines?.[comparedPipeline].name,
+          }),
+    });
 
     return [
       {
@@ -258,11 +279,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           </Select>
         ),
       },
-
-      ...pipelines.map<Column<Row>>((pipeline, index) => ({
+      ...pipelines.map<Column<Row>>((pipeline) => ({
         field: `${pipeline}UtteranceCount`,
-        headerName: `${prefixPipelineName(index)}Total`,
-        description: `${prefixPipelineName(index)}Total`,
+        ...span(pipeline, "Total", "Utterance Count"),
         width: 120,
         align: "right",
         valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
@@ -279,12 +298,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         sortComparator: customSort,
       },
       ...ALL_OUTCOMES.flatMap<Column<Row>>((outcome) => [
-        ...pipelines.map<Column<Row>>((pipeline, index) => ({
+        ...pipelines.map<Column<Row>>((pipeline) => ({
           ...METRIC_COLUMN,
           field: `${pipeline}${outcome}`,
-          headerName: `${prefixPipelineName(index)}${
+          ...span(
+            pipeline,
+            OutcomeIcon({ outcome }),
             OUTCOME_PRETTY_NAMES[outcome]
-          }`,
+          ),
           valueGetter: ({ row }) =>
             row[pipeline] &&
             row[pipeline]!.outcomeCount[outcome] /
@@ -320,11 +341,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ]),
       ...metricsEntries.flatMap<Column<Row>>(
         ([metricName, { description }]) => [
-          ...pipelines.map<Column<Row>>((pipeline, index) => ({
+          ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
+            ...span(pipeline, metricName),
             description,
-            headerName: `${prefixPipelineName(index)}${metricName}`,
             valueGetter: ({ row }) => row[pipeline]?.customMetrics[metricName],
             renderCell: ({ value }: GridCellParams<number>) => (
               <VisualBar
@@ -354,10 +375,10 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           },
         ]
       ),
-      ...pipelines.map<Column<Row>>((pipeline, index) => ({
+      ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
-        field: `${pipeline}ece`,
-        headerName: `${prefixPipelineName(index)}ece`,
+        field: `${pipeline}ECE`,
+        ...span(pipeline, "ECE"),
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number>) =>
@@ -370,7 +391,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ),
       })),
       {
-        field: `deltaece`,
+        field: `deltaECE`,
         headerName: "Delta",
         width: 160,
         align: "right",
@@ -388,7 +409,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         sortComparator: customSort,
       },
     ];
-  }, [metricInfo, selectedMetricPerFilterOption, sortModel, comparedPipeline]);
+  }, [
+    comparedPipeline,
+    config,
+    metricInfo,
+    pipeline,
+    selectedMetricPerFilterOption,
+    sortModel,
+  ]);
 
   React.useEffect(() => {
     if (comparedPipeline === pipeline.pipelineIndex) {
@@ -399,7 +427,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       "UtteranceCount",
       ...ALL_OUTCOMES,
       ...Object.keys(metricInfo ?? {}),
-      "ece",
+      "ECE",
     ].flatMap((field) => [
       [`comparedPipeline${field}`, visibility],
       [`delta${field}`, visibility],
@@ -499,10 +527,19 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           "& .MuiDataGrid-columnHeaders": {
             borderBottom: "none",
           },
+          "& .MuiDataGrid-virtualScroller": {
+            // Stops accidental navigation on horizontal scroll with touch pad
+            overscrollBehaviorX: "contain",
+          },
           "& .total": {
             background: (theme) => theme.palette.grey[200],
           },
+          "& .span": {
+            borderRight: "none",
+          },
         }}
+        showCellRightBorder
+        showColumnRightBorder
         sortModel={sortModel}
         onSortModelChange={setSortModel}
         columnVisibilityModel={columnVisibilityModel}
