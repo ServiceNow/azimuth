@@ -40,6 +40,14 @@ You can also self-assign an existing issue by commmenting #self-assign on the is
 5. [Open a pull-request](https://github.com/ServiceNow/azimuth/compare) with your branch.
 6. Once a team member approves your changes, we will merge the pull request promptly.
 
+### Guidelines for a good pull-request
+When coding, pay special attention to the following:
+* Your code should be well commented for non-trivial sections, so it can be easily understood and maintained by others.
+* Do not expose any personal/sensitive data.
+* Add unit tests when a notable functionality has been added or changed.
+* Read our [development best practices](https://servicenow.github.io/azimuth/development/dev-practices/) to set up `pre-commit`, and test your changes.
+* Do not forget to notify the team in advance that you are working on an issue (Using #self-assign or by creating an issue). Mention it if you need to add/bump a dependency.
+* Check the [PR template](https://github.com/ServiceNow/azimuth/blob/main/.github/pull_request_template.md) in advance to see the checklist of things to do.
 
 ### Where to ask for help!
 
