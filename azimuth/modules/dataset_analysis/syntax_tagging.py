@@ -18,6 +18,7 @@ from azimuth.types.tag import (
     SmartTagFamily,
     TaggingResponse,
 )
+from azimuth.utils.string_processing import clean_utterance
 from azimuth.utils.validation import assert_not_none
 
 
@@ -81,7 +82,7 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
                 if len(tokens) <= syntax_options.short_sentence_max_token:
                     tag[SmartTag.short] = True
 
-                tokens_doc = self.spacy_pos(utterance)
+                tokens_doc = self.spacy_pos(clean_utterance(utterance))
                 sub_toks = [tok for tok in tokens_doc if (tok.dep_ in self.subj_tags)]
                 obj_toks = [tok for tok in tokens_doc if (tok.dep_ in self.obj_tags)]
                 vrb_toks = [tok for tok in tokens_doc if (tok.pos_ in self.verb_tags)]

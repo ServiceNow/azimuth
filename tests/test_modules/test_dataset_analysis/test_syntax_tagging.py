@@ -71,8 +71,8 @@ def test_syntax_tagging_french(simple_text_config):
         "utterance": [
             "adore les biscuits!",
             "c'est terrible. C'est horrible pour moi d'ecrire ce test, mais je m'amuse bien.",
-            "Je parle",
-            "le sucre et les biscuits!",  # as currently implemented, no subject or object
+            f"J{chr(8217)}aime",  # Single quote rather than apostrophe,
+            "le sucre et les biscuits!",  # As currently implemented, no subject or object
         ],
         "label": [0, 1, 0, 1],
     }
