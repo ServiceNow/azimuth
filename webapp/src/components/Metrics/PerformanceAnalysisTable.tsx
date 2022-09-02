@@ -239,6 +239,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         id: 1,
         field: "filterValue",
         width: 220,
+        headerClassName: "sticky", // TODO doesn't work
+        cellClassName: "sticky",
         sortComparator: customSort,
         valueGetter: ({ row }) => row.basePipeline.filterValue,
         renderHeader: () => (
@@ -536,6 +538,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           },
           "& .span": {
             borderRight: "none",
+          },
+          "& .sticky": {
+            position: "sticky",
+            left: 0,
+            background: (theme) => theme.palette.background.paper,
           },
         }}
         showCellRightBorder
