@@ -1,19 +1,22 @@
 # syntax = docker/dockerfile:1.2.1
-FROM node:14.17.5 AS builder
-# Same base image
-FROM builder as test
+FROM node:14.17.5 AS base
+
 WORKDIR /app
+
+
+FROM base as test
+
 COPY yarn.lock yarn.lock
 COPY package.json package.json
 
-
 RUN yarn --production=false;
+
 COPY . /app
 
 RUN yarn --production=false;
 
 
-FROM builder as prod_builder
+FROM base as prod_builder
 
 ENV NODE_ENV=production
 
@@ -27,8 +30,9 @@ COPY . /app
 
 RUN yarn --production=false;yarn build;
 
-FROM builder as production
-WORKDIR /app
+
+FROM base as production
+
 ENV NODE_ENV=production
 
 COPY --from=prod_builder /app/build /app/build
