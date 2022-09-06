@@ -539,55 +539,65 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           </Select>
         </FormControl>
       </Box>
-      <Table
+      <Paper
+        variant="outlined"
         sx={{
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            // Stops accidental navigation on horizontal scroll with touch pad
-            overscrollBehaviorX: "contain",
-          },
-          "& .total": {
-            background: (theme) => theme.palette.grey[200],
-          },
-          "& .span": {
-            borderRight: "none",
-          },
-          "& .sticky": {
-            position: "sticky",
-            left: 0,
-            background: (theme) => theme.palette.background.paper,
-          },
+          marginTop: 2,
+          paddingTop: 3,
         }}
-        showCellRightBorder
-        showColumnRightBorder
-        sortModel={sortModel}
-        onSortModelChange={setSortModel}
-        columnVisibilityModel={columnVisibilityModel}
-        onColumnVisibilityModelChange={setColumnVisibilityModel}
-        getRowClassName={({ id }) => `${id === OVERALL_ROW_ID ? "total" : ""}`}
-        getRowSpacing={getRowSpacing}
-        autoHeight
-        rowHeight={ROW_HEIGHT}
-        columns={columns}
-        rows={rows}
-        loading={
-          isLoading ||
-          isFetchingBasePipelineData ||
-          isFetchingComparedPipelineData
-        }
-        pageSize={rows.length}
-        disableColumnMenu={false}
-        sortingOrder={["desc", "asc"]}
-        components={{
-          ColumnMenu,
-          Row: RowLink,
-        }}
-      />
+      >
+        <Table
+          sx={{
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              // Stops accidental navigation on horizontal scroll with touch pad
+              overscrollBehaviorX: "contain",
+            },
+            "& .total": {
+              background: (theme) => theme.palette.grey[200],
+            },
+            "& .span": {
+              borderRight: "none",
+            },
+            "& .sticky": {
+              position: "sticky",
+              left: 0,
+              background: (theme) => theme.palette.background.paper,
+            },
+          }}
+          showCellRightBorder
+          showColumnRightBorder
+          sortModel={sortModel}
+          onSortModelChange={setSortModel}
+          columnVisibilityModel={columnVisibilityModel}
+          onColumnVisibilityModelChange={setColumnVisibilityModel}
+          getRowClassName={({ id }) =>
+            `${id === OVERALL_ROW_ID ? "total" : ""}`
+          }
+          getRowSpacing={getRowSpacing}
+          autoHeight
+          rowHeight={ROW_HEIGHT}
+          columns={columns}
+          rows={rows}
+          loading={
+            isLoading ||
+            isFetchingBasePipelineData ||
+            isFetchingComparedPipelineData
+          }
+          pageSize={rows.length}
+          disableColumnMenu={false}
+          sortingOrder={["desc", "asc"]}
+          components={{
+            ColumnMenu,
+            Row: RowLink,
+          }}
+        />
+      </Paper>
     </Paper>
   );
 };
