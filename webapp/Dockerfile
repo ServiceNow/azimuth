@@ -16,19 +16,11 @@ COPY . /app
 RUN yarn --production=false;
 
 
-FROM base as prod_builder
+FROM test as prod_builder
 
 ENV NODE_ENV=production
 
-WORKDIR /app
-COPY yarn.lock yarn.lock
-COPY package.json package.json
-
-RUN yarn --production=false;
-
-COPY . /app
-
-RUN yarn --production=false;yarn build;
+RUN yarn build;
 
 
 FROM base as production
