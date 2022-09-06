@@ -198,12 +198,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
 
     const METRIC_COLUMN = {
       flex: 1,
-      minWidth: 120,
-      maxWidth: 220,
+      minWidth: 150,
+      maxWidth: 250,
       sortComparator: customSort,
     };
 
-    const span = (
+    const groupHeader = (
       baseOrCompared: typeof pipelines[number],
       shortHeader: React.ReactNode,
       longHeader: React.ReactNode = shortHeader
@@ -238,7 +238,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       {
         id: 1,
         field: "filterValue",
-        width: 220,
+        width: 200,
         headerClassName: "sticky", // TODO doesn't work
         cellClassName: "sticky",
         sortComparator: customSort,
@@ -283,7 +283,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       },
       ...pipelines.map<Column<Row>>((pipeline) => ({
         field: `${pipeline}UtteranceCount`,
-        ...span(pipeline, "Total", "Utterance Count"),
+        ...groupHeader(pipeline, "Total", "Utterance Count"),
         width: 120,
         align: "right",
         valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
@@ -303,7 +303,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...pipelines.map<Column<Row>>((pipeline) => ({
           ...METRIC_COLUMN,
           field: `${pipeline}${outcome}`,
-          ...span(
+          ...groupHeader(
             pipeline,
             OutcomeIcon({ outcome }),
             OUTCOME_PRETTY_NAMES[outcome]
@@ -323,7 +323,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         {
           field: `delta${outcome}`,
           headerName: "Delta",
-          width: 160,
+          width: 150,
           align: "right",
           valueGetter: ({ row }) =>
             row.comparedPipeline &&
@@ -346,7 +346,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
-            ...span(pipeline, metricName),
+            ...groupHeader(pipeline, metricName),
             description,
             valueGetter: ({ row }) => row[pipeline]?.customMetrics[metricName],
             renderCell: ({ value }: GridCellParams<number>) => (
@@ -360,7 +360,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           {
             field: `delta${metricName}`,
             headerName: "Delta",
-            width: 160,
+            width: 150,
             align: "right",
             valueGetter: ({ row }) =>
               row.comparedPipeline &&
@@ -380,7 +380,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
-        ...span(pipeline, "ECE"),
+        ...groupHeader(pipeline, "ECE"),
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number>) =>
@@ -395,7 +395,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       {
         field: `deltaECE`,
         headerName: "Delta",
-        width: 160,
+        width: 150,
         align: "right",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
