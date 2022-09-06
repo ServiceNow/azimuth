@@ -234,6 +234,41 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           }),
     });
 
+    const utteranceCount: Column<Row>[] =
+      selectedMetricPerFilterOption === "label"
+        ? [
+            {
+              field: "utteranceCount",
+              headerName: "Total",
+              description: "Number of Utterances in each model",
+              width: 120,
+              align: "right",
+              valueGetter: ({ row }) => row.basePipeline.utteranceCount,
+              sortComparator: customSort,
+            },
+          ]
+        : [
+            ...pipelines.map<Column<Row>>((pipeline) => ({
+              field: `${pipeline}UtteranceCount`,
+              ...groupHeader(pipeline, "Number of utterances"),
+              width: 150,
+              align: "right",
+              valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
+              sortComparator: customSort,
+            })),
+            {
+              field: `deltaUtteranceCount`,
+              headerName: "Delta",
+              width: 150,
+              align: "right",
+              valueGetter: ({ row }) =>
+                row.comparedPipeline &&
+                row.comparedPipeline.utteranceCount -
+                  row.basePipeline.utteranceCount,
+              sortComparator: customSort,
+            },
+          ];
+
     return [
       {
         id: 1,
@@ -281,24 +316,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           </Select>
         ),
       },
-      ...pipelines.map<Column<Row>>((pipeline) => ({
-        field: `${pipeline}UtteranceCount`,
-        ...groupHeader(pipeline, "Total", "Utterance Count"),
-        width: 120,
-        align: "right",
-        valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
-        sortComparator: customSort,
-      })),
-      {
-        field: `deltaUtteranceCount`,
-        headerName: "Delta",
-        width: 120,
-        align: "right",
-        valueGetter: ({ row }) =>
-          row.comparedPipeline &&
-          row.comparedPipeline.utteranceCount - row.basePipeline.utteranceCount,
-        sortComparator: customSort,
-      },
+      ...utteranceCount,
       ...ALL_OUTCOMES.flatMap<Column<Row>>((outcome) => [
         ...pipelines.map<Column<Row>>((pipeline) => ({
           ...METRIC_COLUMN,
