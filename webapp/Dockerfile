@@ -16,9 +16,7 @@ COPY . /app
 RUN yarn --production=false;
 
 
-FROM test as prod_builder
-
-ENV NODE_ENV=production
+FROM test as build
 
 RUN yarn build;
 
@@ -27,8 +25,8 @@ FROM base as production
 
 ENV NODE_ENV=production
 
-COPY --from=prod_builder /app/build /app/build
-COPY --from=prod_builder /app/server.js /app/server.js
+COPY --from=build /app/build /app/build
+COPY --from=build /app/server.js /app/server.js
 
 RUN npm install express http-proxy-middleware cors
 CMD node server.js
