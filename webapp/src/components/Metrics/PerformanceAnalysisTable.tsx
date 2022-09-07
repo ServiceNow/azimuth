@@ -514,30 +514,36 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
-        <FormControl size="small">
-          <InputLabel id="compare-pipeline-model">Compared with...</InputLabel>
-          <Select
-            id="compare-pipeline-model-select"
-            value={comparedPipeline ?? "No pipeline"}
-            label="Compared with..."
-            displayEmpty
-            onChange={({ target: { value } }) =>
-              setComparedPipeline(typeof value === "number" ? value : undefined)
-            }
-          >
-            <MenuItem value="No pipeline">
-              <em>No pipeline</em>
-            </MenuItem>
-            {config?.pipelines?.map(
-              (pipelineData, index) =>
-                index !== pipeline.pipelineIndex && (
-                  <MenuItem key={index} value={index}>
-                    {pipelineData.name}
-                  </MenuItem>
+        <Box display="flex" flexDirection="row" justifyContent="flex-end">
+          <InputLabel id="compare-pipeline-model-label" sx={{ padding: 1 }}>
+            Compare Baseline ({config?.pipelines?.[pipeline.pipelineIndex].name}
+            ) with:
+          </InputLabel>
+          <FormControl variant="standard">
+            <Select
+              id="compare-pipeline-model-select"
+              value={comparedPipeline ?? "No pipeline"}
+              displayEmpty
+              onChange={({ target: { value } }) =>
+                setComparedPipeline(
+                  typeof value === "number" ? value : undefined
                 )
-            )}
-          </Select>
-        </FormControl>
+              }
+            >
+              <MenuItem value="No pipeline">
+                <em>No pipeline</em>
+              </MenuItem>
+              {config?.pipelines?.map(
+                (pipelineData, index) =>
+                  index !== pipeline.pipelineIndex && (
+                    <MenuItem key={index} value={index}>
+                      {pipelineData.name}
+                    </MenuItem>
+                  )
+              )}
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Paper
         variant="outlined"
@@ -567,6 +573,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             "& .sticky": {
               position: "sticky",
               left: 0,
+              zIndex: 1,
+              borderRight: "1px solid grey",
               background: (theme) => theme.palette.background.paper,
             },
           }}
