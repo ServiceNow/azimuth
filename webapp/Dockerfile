@@ -1,23 +1,11 @@
 # syntax = docker/dockerfile:1.2.1
-FROM node:14.17.5 AS builder
-# Same base image
-FROM builder as test
-WORKDIR /app
-COPY yarn.lock yarn.lock
-COPY package.json package.json
-
-
-RUN yarn --production=false;
-COPY . /app
-
-RUN yarn --production=false;
-
-
-FROM builder as prod_builder
-
-ENV NODE_ENV=production
+FROM node:14.17.5 AS base
 
 WORKDIR /app
+
+
+FROM base as test
+
 COPY yarn.lock yarn.lock
 COPY package.json package.json
 
@@ -25,14 +13,20 @@ RUN yarn --production=false;
 
 COPY . /app
 
-RUN yarn --production=false;yarn build;
+RUN yarn --production=false;
 
-FROM builder as production
-WORKDIR /app
+
+FROM test as build
+
+RUN yarn build;
+
+
+FROM base as production
+
 ENV NODE_ENV=production
 
-COPY --from=prod_builder /app/build /app/build
-COPY --from=prod_builder /app/server.js /app/server.js
+COPY --from=build /app/build /app/build
+COPY --from=build /app/server.js /app/server.js
 
 RUN npm install express http-proxy-middleware cors
 CMD node server.js
