@@ -31,7 +31,7 @@
     "test": "react-app-rewired test --coverage",
     "eject": "react-scripts eject",
     "fix": "make npm.audit.fix",
-    "types": "rm -f src/types/generated/generatedTypes.ts && openapi-typescript http://localhost:8091/openapi.json --output src/types/generated/generatedTypes.ts"
+    "types": "rm -f src/types/generated/generatedTypes.ts && poetry run python ../openapi.py > openapi.json && openapi-typescript openapi.json --output src/types/generated/generatedTypes.ts && rm -f openapi.json"
   },
   "eslintConfig": {
     "extends": "react-app"
