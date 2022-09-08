@@ -15,7 +15,7 @@ Five proposed actions are currently supported:
 * **Relabel**: The label for this utterance should be changed.
 * **Augment with Similar**: This utterance lacks nearby utterances in the same class, and new,
   similarly labeled utterances should be added.
-* **Add New Class**: This data point may belong to a new class that is not available in the
+* **Add New Class**: This data point may belong to a new class that doesn't exist in the
   currently defined classes. Based on the number of data points identified with this action, a user
   may choose to add a new class.
 * **Merge Classes**: The label and the predicted class for this data point may be too similar. Based on the number of data points identified with this action, a user may choose to merge the two classes.

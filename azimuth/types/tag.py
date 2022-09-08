@@ -149,10 +149,10 @@ class PostDataActionRequest(AliasModel):
                 "data_actions": {
                     1: {
                         "relabel": True,
+                        "augment_with_similar": False,
                         "add_new_class": False,
                         "merge_classes": False,
                         "remove": False,
-                        "augment_with_similar": False,
                         "investigate": False,
                     }
                 },
