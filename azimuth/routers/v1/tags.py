@@ -24,22 +24,6 @@ router = APIRouter()
 TAGS = ["Tag v1"]
 
 
-def format_data_actions(tags) -> DataActionResponse:
-    formatted_data_actions = [
-        DataActionMapping(
-            relabel=x["relabel"],
-            add_new_class=x["add_new_class"],
-            merge_classes=x["merge_classes"],
-            remove=x["remove"],
-            augment_with_similar=x["augment_with_similar"],
-            investigate=x["investigate"],
-        )
-        for x in tags
-    ]
-
-    return DataActionResponse(data_actions=formatted_data_actions)
-
-
 @router.post(
     "",
     summary="Post data_action tags",
@@ -76,5 +60,4 @@ def post_data_actions(
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=e.args[0])
     task_manager.clear_worker_cache()
     updated_tags = dataset.get_tags(list(request_data.data_actions.keys()), table_key=table_key)
-    formatted_tags = format_data_actions(updated_tags)
-    return formatted_tags
+    return DataActionResponse(data_actions=[DataActionMapping(**x) for x in updated_tags])

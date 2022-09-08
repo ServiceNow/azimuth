@@ -13,7 +13,7 @@ from azimuth.types import AliasModel, DatasetSplitName, ModuleResponse
 class DataActionMapping(AliasModel):
     relabel: bool = Field(..., title="Relabel")
     augment_with_similar: bool = Field(..., title="Augment with Similar")
-    add_new_class: bool = Field(..., title="Add New Class")
+    define_new_class: bool = Field(..., title="Define New Class")
     merge_classes: bool = Field(..., title="Merge Two Classes")
     remove: bool = Field(..., title="Remove")
     investigate: bool = Field(..., title="Investigate")
@@ -22,7 +22,7 @@ class DataActionMapping(AliasModel):
 class DataAction(str, Enum):
     relabel = "relabel"
     augment_with_similar = "augment_with_similar"
-    add_new_class = "add_new_class"
+    define_new_class = "define_new_class"
     merge_classes = "merge_classes"
     remove = "remove"
     investigate = "investigate"
@@ -150,7 +150,7 @@ class PostDataActionRequest(AliasModel):
                     1: {
                         "relabel": True,
                         "augment_with_similar": False,
-                        "add_new_class": False,
+                        "define_new_class": False,
                         "merge_classes": False,
                         "remove": False,
                         "investigate": False,
