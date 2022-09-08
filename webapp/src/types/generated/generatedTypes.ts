@@ -183,7 +183,7 @@ export interface components {
     DataAction:
       | "relabel"
       | "augment_with_similar"
-      | "add_new_class"
+      | "define_new_class"
       | "merge_classes"
       | "remove"
       | "investigate"
@@ -195,7 +195,7 @@ export interface components {
     DataActionMapping: {
       relabel: boolean;
       augmentWithSimilar: boolean;
-      addNewClass: boolean;
+      defineNewClass: boolean;
       mergeClasses: boolean;
       remove: boolean;
       investigate: boolean;
