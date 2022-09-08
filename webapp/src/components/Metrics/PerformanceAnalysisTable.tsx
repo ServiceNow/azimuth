@@ -6,7 +6,7 @@ import {
   Select,
   Typography,
   InputLabel,
-  FormControl,
+  FormControlLabel,
 } from "@mui/material";
 import {
   GridCellParams,
@@ -509,14 +509,16 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
-        <Box display="flex" flexDirection="row" justifyContent="flex-end">
-          <InputLabel id="compare-pipeline-model-label" sx={{ padding: 1 }}>
-            Compare Baseline ({config?.pipelines?.[pipeline.pipelineIndex].name}
-            ) with:
-          </InputLabel>
-          <FormControl variant="standard">
+        <FormControlLabel
+          label={`Compare Baseline (${
+            config?.pipelines?.[pipeline.pipelineIndex].name
+          } ) with:`}
+          labelPlacement="start"
+          sx={{ gap: 1, paddingRight: 2 }}
+          control={
             <Select
               id="compare-pipeline-model-select"
+              variant="standard"
               value={comparedPipeline ?? "No pipeline"}
               displayEmpty
               onChange={({ target: { value } }) =>
@@ -537,8 +539,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                   )
               )}
             </Select>
-          </FormControl>
-        </Box>
+          }
+        ></FormControlLabel>
       </Box>
       <Paper
         variant="outlined"
