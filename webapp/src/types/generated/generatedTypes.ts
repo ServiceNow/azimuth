@@ -120,6 +120,7 @@ export interface components {
       artifact_path?: string;
       batch_size?: number;
       use_cuda?: Partial<"auto"> & Partial<boolean>;
+      syntax?: components["schemas"]["SyntaxOptions"];
       dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
       similarity?: components["schemas"]["SimilarityOptions"];
       pipelines?: components["schemas"]["PipelineDefinition"][];
@@ -181,9 +182,10 @@ export interface components {
     /** An enumeration. */
     DataAction:
       | "relabel"
-      | "consider_new_class"
-      | "remove"
       | "augment_with_similar"
+      | "define_new_class"
+      | "merge_classes"
+      | "remove"
       | "investigate"
       | "NO_ACTION";
     /**
@@ -192,9 +194,10 @@ export interface components {
      */
     DataActionMapping: {
       relabel: boolean;
-      considerNewClass: boolean;
-      remove: boolean;
       augmentWithSimilar: boolean;
+      defineNewClass: boolean;
+      mergeClasses: boolean;
+      remove: boolean;
       investigate: boolean;
     };
     /**
@@ -619,6 +622,10 @@ export interface components {
       | "hf_text_classification"
       | "file_based_text_classification"
       | "custom_text_classification";
+    SyntaxOptions: {
+      short_sentence_max_token?: number;
+      long_sentence_min_token?: number;
+    };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
      *

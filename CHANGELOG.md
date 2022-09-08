@@ -13,6 +13,7 @@ Released changes are shown in the
 ### Added
 
 ### Changed
+- Added a proposed action: `merge_classes`, and rename `consider_new_class` to `define_new_class`.
 
 ### Deprecated/Breaking Changes
 
