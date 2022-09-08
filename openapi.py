@@ -3,10 +3,10 @@ import sys
 
 from fastapi.openapi.utils import get_openapi
 
-from azimuth.app import define_app
+from azimuth.app import create_app
 
 if __name__ == "__main__":
-    app = define_app()
+    app = create_app()
     openapi = get_openapi(
         title=app.title,
         version=app.version,

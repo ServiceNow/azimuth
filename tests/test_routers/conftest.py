@@ -24,7 +24,7 @@ def mock_ready_flag_false():
 
 def create_test_app(config) -> FastAPI:
     json.dump(config.dict(by_alias=True), open("/tmp/config.json", "w"))
-    return me_app.create_app_with("/tmp/config.json", debug=False, profile=False)
+    return me_app.start_app("/tmp/config.json", debug=False, profile=False)
 
 
 FAST_TEST_CFG = {
