@@ -155,26 +155,33 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         {
           id: OVERALL_ROW_ID,
           basePipeline: basePipelineData.metricsOverall[0],
-          ...(comparedPipelineData && {
-            comparedPipeline: comparedPipelineData.metricsOverall[0],
-          }),
+          ...(comparedPipeline &&
+            comparedPipelineData && {
+              comparedPipeline: comparedPipelineData.metricsOverall[0],
+            }),
         },
         ...basePipelineData.metricsPerFilter[selectedMetricPerFilterOption].map(
           (basePipeline, index) => ({
             id: index,
             basePipeline,
-            ...(comparedPipelineData && {
-              comparedPipeline:
-                comparedPipelineData.metricsPerFilter[
-                  selectedMetricPerFilterOption
-                ][index],
-            }),
+            ...(comparedPipeline &&
+              comparedPipelineData && {
+                comparedPipeline:
+                  comparedPipelineData.metricsPerFilter[
+                    selectedMetricPerFilterOption
+                  ][index],
+              }),
           })
         ),
       ]) ||
       []
     );
-  }, [basePipelineData, comparedPipelineData, selectedMetricPerFilterOption]);
+  }, [
+    basePipelineData,
+    comparedPipeline,
+    comparedPipelineData,
+    selectedMetricPerFilterOption,
+  ]);
 
   const columns: Column<Row>[] = React.useMemo(() => {
     const metricsEntries = Object.entries(metricInfo ?? {});
@@ -242,7 +249,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               headerName: "Total",
               description: "Number of Utterances in each model",
               width: 120,
-              align: "right",
+              align: "center",
               valueGetter: ({ row }) => row.basePipeline.utteranceCount,
               sortComparator: customSort,
             },
@@ -252,15 +259,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               field: `${pipeline}UtteranceCount`,
               ...groupHeader(pipeline, "Number of utterances"),
               width: 150,
-              align: "right",
+              align: "center",
               valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
               sortComparator: customSort,
             })),
             {
               field: `deltaUtteranceCount`,
               headerName: "Delta",
-              width: 150,
-              align: "right",
+              width: 100,
               valueGetter: ({ row }) =>
                 row.comparedPipeline &&
                 row.comparedPipeline.utteranceCount -
@@ -268,6 +274,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               sortComparator: customSort,
             },
           ];
+
+    const styleDeltaValues = (value: number) =>
+      value >= 0 ? "delta-value-positive" : "delta-value-negative";
 
     return [
       {
@@ -342,20 +351,16 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           field: `delta${outcome}`,
           headerName: "Delta",
           width: 150,
-          align: "right",
           valueGetter: ({ row }) =>
             row.comparedPipeline &&
             row.comparedPipeline.outcomeCount[outcome] /
               row.comparedPipeline.utteranceCount -
               row.basePipeline.outcomeCount[outcome] /
                 row.basePipeline.utteranceCount,
-          renderCell: ({ value }: GridCellParams<number>) => (
-            <VisualBar
-              formattedValue={formatRatioAsPercentageString(value, 1)}
-              value={value}
-              color={(theme) => theme.palette.primary.dark}
-            />
-          ),
+          cellClassName: (params: GridCellParams<number>) =>
+            styleDeltaValues(params.value),
+          valueFormatter: ({ value }) =>
+            formatRatioAsPercentageString(value as number, 1),
           sortComparator: customSort,
         },
       ]),
@@ -379,18 +384,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             field: `delta${metricName}`,
             headerName: "Delta",
             width: 150,
-            align: "right",
             valueGetter: ({ row }) =>
               row.comparedPipeline &&
               row.comparedPipeline.customMetrics[metricName] -
                 row.basePipeline.customMetrics[metricName],
-            renderCell: ({ value }: GridCellParams<number>) => (
-              <VisualBar
-                formattedValue={formatRatioAsPercentageString(value, 1)}
-                value={value}
-                color={(theme) => theme.palette.primary.dark}
-              />
-            ),
+            cellClassName: (params: GridCellParams<number>) =>
+              styleDeltaValues(params.value),
+            valueFormatter: ({ value }) =>
+              formatRatioAsPercentageString(value as number, 1),
             sortComparator: customSort,
           },
         ]
@@ -414,18 +415,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         field: `deltaECE`,
         headerName: "Delta",
         width: 150,
-        align: "right",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.ece - row.basePipeline.ece,
-        renderCell: ({ value }: GridCellParams<number>) =>
-          value && (
-            <VisualBar
-              formattedValue={value.toFixed(2)}
-              value={value}
-              color={(theme) => theme.palette.primary.dark}
-            />
-          ),
+        cellClassName: (params: GridCellParams<number>) =>
+          styleDeltaValues(params.value),
+        valueFormatter: ({ value }) => value && (value as number).toFixed(2),
         sortComparator: customSort,
       },
     ];
@@ -576,6 +571,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               zIndex: 1,
               borderRight: "1px solid grey",
               background: (theme) => theme.palette.background.paper,
+            },
+            "& .delta-value-positive": {
+              color: (theme) => theme.palette.secondary.dark,
+              fontWeight: "bold",
+            },
+            "& .delta-value-negative": {
+              color: (theme) => theme.palette.primary.main,
+              fontWeight: "bold",
             },
           }}
           showCellRightBorder
