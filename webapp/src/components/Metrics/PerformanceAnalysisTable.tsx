@@ -402,14 +402,13 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...groupHeader(pipeline, "ECE"),
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
-        renderCell: ({ value }: GridCellParams<number>) =>
-          value && (
-            <VisualBar
-              formattedValue={value.toFixed(2)}
-              value={value}
-              color={(theme) => theme.palette.primary.dark}
-            />
-          ),
+        renderCell: ({ value }: GridCellParams<number>) => (
+          <VisualBar
+            formattedValue={value.toFixed(2)}
+            value={value}
+            color={(theme) => theme.palette.primary.dark}
+          />
+        ),
       })),
       {
         field: `deltaECE`,
