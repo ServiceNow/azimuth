@@ -7,6 +7,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
+import noData from "assets/launch.svg";
 import React from "react";
 import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
@@ -20,6 +21,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { constructSearchString } from "utils/helpers";
 import { OUTCOME_COLOR } from "utils/const";
 import { classNames } from "utils/helpers";
+import Loading from "./Loading";
 
 const CONFUSION_ROW_OFFSET = 1;
 const CONFUSION_COLUMN_OFFSET = 1;
@@ -33,7 +35,6 @@ type Props = {
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
   postprocessing: QueryPostprocessingState;
-  classOptions: string[];
   predictionFilters?: string[];
   labelFilters?: string[];
 };
@@ -92,7 +93,6 @@ const ConfusionMatrix: React.FC<Props> = ({
   filters,
   pipeline,
   postprocessing,
-  classOptions,
   predictionFilters,
   labelFilters,
 }) => {
@@ -106,23 +106,32 @@ const ConfusionMatrix: React.FC<Props> = ({
     ),
   });
 
-  const {
-    data: { confusionMatrix: data, normalized } = {
-      confusionMatrix: [],
-      normalized: confusionMatrix.normalized,
-    },
-  } = getConfusionMatrixEndpoint.useQuery({
-    jobId,
-    datasetSplitName,
-    ...confusionMatrix,
-    ...filters,
-    ...pipeline,
-    ...postprocessing,
-  });
+  const { data, isLoading, isFetching, error } =
+    getConfusionMatrixEndpoint.useQuery({
+      jobId,
+      datasetSplitName,
+      ...confusionMatrix,
+      ...filters,
+      ...pipeline,
+      ...postprocessing,
+    });
+
+  if (isLoading) {
+    return <Loading />;
+  } else if (error || data === undefined) {
+    return (
+      <Box alignItems="center" display="grid" justifyItems="center">
+        <img src={noData} width="50%" alt="no dataset info" />
+        <Typography>{error?.message || "Unexpected error"}</Typography>
+      </Box>
+    );
+  }
+
+  const matrix = data.confusionMatrix as number[][];
 
   // Set to 1 if the maxCount is 0 so we don't divide by 0.
   // This is fine since all values will be 0 anyway in this case.
-  const maxCount = Math.max(...data.flat()) || 1;
+  const maxCount = Math.max(...matrix.flat()) || 1;
 
   const handleNormalizedStateChange = (checked: boolean) =>
     history.push(
@@ -149,10 +158,10 @@ const ConfusionMatrix: React.FC<Props> = ({
         backgroundColor: alpha(
           theme.palette[
             rowIndex === columnIndex
-              ? columnIndex === classOptions.length - 1
+              ? columnIndex === data.classNames.length - 1
                 ? OUTCOME_COLOR.CorrectAndRejected
                 : OUTCOME_COLOR.CorrectAndPredicted
-              : columnIndex === classOptions.length - 1
+              : columnIndex === data.classNames.length - 1
               ? OUTCOME_COLOR.IncorrectAndRejected
               : OUTCOME_COLOR.IncorrectAndPredicted
           ].main,
@@ -167,7 +176,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             theme.palette.common[value / maxCount > 0.7 ? "white" : "black"]
           }
         >
-          {normalized ? (
+          {data.normalized ? (
             <>
               {(value * 100).toFixed(0)}
               <Typography
@@ -200,7 +209,7 @@ const ConfusionMatrix: React.FC<Props> = ({
         <FormControlLabel
           control={
             <Switch
-              checked={normalized ?? true}
+              checked={data.normalized}
               onChange={(_, checked) => handleNormalizedStateChange(checked)}
             />
           }
@@ -231,8 +240,8 @@ const ConfusionMatrix: React.FC<Props> = ({
           display="grid"
           gridColumn="2 / span 2"
           gridRow="2 / span 2"
-          gridTemplateColumns={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
-          gridTemplateRows={`${LABEL_LENGTH} repeat(${classOptions.length}, ${CELL_SIZE})`}
+          gridTemplateColumns={`${LABEL_LENGTH} repeat(${data.classNames.length}, ${CELL_SIZE})`}
+          gridTemplateRows={`${LABEL_LENGTH} repeat(${data.classNames.length}, ${CELL_SIZE})`}
           height="100%"
           justifyItems="center"
           overflow="auto"
@@ -242,7 +251,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             overscrollBehaviorX: "contain",
           }}
         >
-          {data.flatMap((row, rowIndex) =>
+          {matrix.flatMap((row, rowIndex) =>
             row.flatMap((value, columnIndex) =>
               value > 0 || rowIndex === columnIndex
                 ? [renderCell(value, rowIndex, columnIndex)]
@@ -250,7 +259,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             )
           )}
 
-          {classOptions.flatMap((classOption, i) => [
+          {data.classNames.flatMap((className, i) => [
             <Typography
               key={`column-${i}`}
               className={classNames(
@@ -260,7 +269,7 @@ const ConfusionMatrix: React.FC<Props> = ({
                 classes.verticalLabel,
                 classes.topStickyCell,
                 predictionFilters &&
-                  !predictionFilters.includes(classOption) &&
+                  !predictionFilters.includes(className) &&
                   classes.filteredLabel
               )}
               variant="caption"
@@ -273,7 +282,7 @@ const ConfusionMatrix: React.FC<Props> = ({
                 },
               }}
             >
-              {classOption}
+              {className}
             </Typography>,
             <Typography
               key={`row-${i}`}
@@ -283,7 +292,7 @@ const ConfusionMatrix: React.FC<Props> = ({
                 classes.rowLabel,
                 classes.leftStickyCell,
                 labelFilters &&
-                  !labelFilters.includes(classOption) &&
+                  !labelFilters.includes(className) &&
                   classes.filteredLabel
               )}
               variant="caption"
@@ -296,12 +305,12 @@ const ConfusionMatrix: React.FC<Props> = ({
                 },
               }}
             >
-              {classOption}
+              {className}
             </Typography>,
             <Box
               key={`grid-column-${i}`}
               gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
-              gridRow={`2 / -1`}
+              gridRow="2 / -1"
               width="100%"
               height="100%"
               boxShadow={(theme) => `0 0 0 0.35px ${theme.palette.divider}`}
@@ -311,7 +320,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             />,
             <Box
               key={`grid-row-${i}`}
-              gridColumn={`2 / -1`}
+              gridColumn="2 / -1"
               gridRow={i + CONFUSION_ROW_OFFSET + 1}
               width="100%"
               height="100%"
@@ -323,7 +332,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             <Box
               key={`hover-column-${i}`}
               gridColumn={i + CONFUSION_COLUMN_OFFSET + 1}
-              gridRow={`1 / -1`}
+              gridRow="1 / -1"
               position="sticky"
               width="100%"
               height="100%"
@@ -334,7 +343,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             />,
             <Box
               key={`hover-row-${i}`}
-              gridColumn={`1 / -1`}
+              gridColumn="1 / -1"
               gridRow={i + CONFUSION_ROW_OFFSET + 1}
               position="sticky"
               width="100%"
@@ -356,6 +365,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             gridRow={CONFUSION_ROW_OFFSET}
           />
         </Box>
+        {isFetching && <Loading gridColumn="-1" gridRow="-1" />}
       </Box>
     </Box>
   );

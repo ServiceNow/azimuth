@@ -29,7 +29,7 @@ const Dashboard = () => {
   } = getDatasetInfoEndpoint.useQuery({ jobId });
 
   if (isFetching) {
-    <Loading />;
+    return <Loading />;
   } else if (error) {
     return (
       <Box alignItems="center" display="grid" justifyItems="center">

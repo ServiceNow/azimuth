@@ -1,11 +1,6 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  AzimuthConfig,
-  ConfusionMatrixOperation,
-  DataAction,
-  DataActionResponse,
-} from "types/api";
+import { AzimuthConfig, DataAction, DataActionResponse } from "types/api";
 import { Tags } from "types/models";
 import { GetUtterancesQueryState, fetchApi, TypedResponse } from "utils/api";
 import { DATA_ACTION_NONE_VALUE } from "utils/const";
@@ -262,11 +257,7 @@ export const api = createApi({
     getConfusionMatrix: build.query({
       providesTags: () => [{ type: "ConfusionMatrix" }],
       queryFn: responseToData(
-        fetchApi<
-          "/dataset_splits/{dataset_split_name}/confusion_matrix",
-          "get",
-          ConfusionMatrixOperation
-        >({
+        fetchApi({
           path: "/dataset_splits/{dataset_split_name}/confusion_matrix",
           method: "get",
         }),

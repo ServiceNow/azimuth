@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, BoxProps, CircularProgress } from "@mui/material";
 
-const Loading = () => {
+const Loading = (props: BoxProps) => {
   return (
     <Box
       width="100%"
@@ -9,6 +9,7 @@ const Loading = () => {
       display="flex"
       alignItems="center"
       justifyContent="center"
+      {...props}
     >
       <CircularProgress />
     </Box>

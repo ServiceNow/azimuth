@@ -60,7 +60,6 @@ const Exploration = () => {
   const history = useHistory();
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
-  const classOptions = datasetInfo?.classNames || [];
 
   const setMainView = (mainView: MainView) => {
     history.push(
@@ -153,7 +152,6 @@ const Exploration = () => {
                     confusionMatrix={confusionMatrix}
                     filters={filters}
                     pipeline={pipeline}
-                    classOptions={classOptions}
                     predictionFilters={filters.prediction}
                     labelFilters={filters.label}
                     postprocessing={postprocessing}
