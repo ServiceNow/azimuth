@@ -139,6 +139,11 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
 
 
 def define_app() -> FastAPI:
+    """Defines the FastAPI.
+
+    Returns:
+        FastAPI.
+    """
     app = FastAPI(
         title="Azimuth API",
         description="Azimuth API",
