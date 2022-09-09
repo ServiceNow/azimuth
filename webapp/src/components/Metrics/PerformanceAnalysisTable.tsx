@@ -534,11 +534,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           }
         ></FormControlLabel>
       </Box>
-      <Paper
-        variant="outlined"
+      <Box
         sx={{
           marginTop: 2,
-          padding: 3,
+          border: (theme) => `1px solid ${theme.palette.grey[200]}`,
+          paddingTop: (theme) => theme.spacing(3),
         }}
       >
         <Table
@@ -600,7 +600,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             Row: RowLink,
           }}
         />
-      </Paper>
+      </Box>
     </Paper>
   );
 };
