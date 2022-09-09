@@ -61,14 +61,19 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             else:
                 cf_normalized = cf
 
-            # Replace values of the rejection class by 0 so they don't influence the algorithm
-            cf_rej_class_0 = cf_normalized.copy()
-            cf_rej_class_0[rejection_idx] = 0
-            cf_rej_class_0[:, rejection_idx] = 0
+            # Remove the rejection class so it doesn't influence the algorithm
+            cf_no_rejection = np.delete(
+                np.delete(cf_normalized, rejection_idx, 0), rejection_idx, 1
+            )
 
             # Get order based on reverse_cuthill_mckee algorithm
-            graph = csr_matrix(cf_rej_class_0 >= MIN_CONFUSION_CUTHILL_MCKEE)
-            order = reverse_cuthill_mckee(graph)
+            order_no_rejection = reverse_cuthill_mckee(
+                csr_matrix(cf_no_rejection >= MIN_CONFUSION_CUTHILL_MCKEE)
+            )
+
+            # Get right class indices and add rejection_idx at the end.
+            classes_no_rejection = np.delete(class_ids, rejection_idx)
+            order = np.append(classes_no_rejection[order_no_rejection], rejection_idx)
 
             # Put the rejection class last for the confusion matrix
             if rejection_idx != order[-1]:
