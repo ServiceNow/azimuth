@@ -2,6 +2,8 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 
-from azimuth.app import create_app
+from azimuth.app import start_app
+from azimuth.config import parse_args
 
-app = create_app()
+args = parse_args()
+app = start_app(config_path=args.config_path, debug=args.debug)

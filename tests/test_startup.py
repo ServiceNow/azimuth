@@ -30,7 +30,7 @@ def test_startup_task(tiny_text_config, tiny_text_task_manager):
     assert all("train" in k or "eval" in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
-    ), "Some modules dont have callbacks!"
+    ), "Some modules don't have callbacks!"
 
 
 def test_startup_task_fast(tiny_text_config, tiny_text_task_manager):
@@ -76,7 +76,7 @@ def test_startup_task_no_train(tiny_text_config_no_train, tiny_text_task_manager
     assert all("train" not in k or "eval" in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
-    ), "Some modules dont have callbacks!"
+    ), "Some modules don't have callbacks!"
 
 
 @pytest.mark.parametrize("iterations", [20, 1])

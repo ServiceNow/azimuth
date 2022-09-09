@@ -8,7 +8,6 @@ import inspect
 import os
 import re
 from itertools import compress
-from pprint import pprint
 
 from pydantic.main import BaseModel
 
@@ -231,11 +230,8 @@ def test_doc():
     for module in modules:
         mod = importlib.import_module(module)
         handle_module(mod, exceptions, history)
-    if exceptions:
-        # Summary
-        exceptions = set([v[0] for v in exceptions])
-        pprint(exceptions, width=100)
-        raise ValueError(f"{len(exceptions)} documentation errors")
+    exceptions = set(v[0] for v in exceptions)
+    assert not exceptions
 
 
 if __name__ == "__main__":

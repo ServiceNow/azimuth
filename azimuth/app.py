@@ -68,27 +68,12 @@ def get_config() -> Optional[AzimuthConfig]:
     return _azimuth_config
 
 
-def create_app() -> FastAPI:
-    """Launch the application's API.
-
-    Returns:
-        API.
-
-    Raises:
-        ValueError: If no dataset_split in config.
-
-    """
-    args = parse_args()
-    return create_app_with(config_path=args.config_path, debug=args.debug, profile=args.profile)
-
-
-def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
+def start_app(config_path, debug=False) -> FastAPI:
     """Launch the application's API.
 
     Args:
         config_path: path to the config
         debug: Debug flag
-        profile: profiling flag.
 
     Returns:
         API.
@@ -114,6 +99,29 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
     initialize_managers(azimuth_config, local_cluster)
     assert_not_none(_task_manager).client.run(set_logger_config, level)
 
+    app = create_app()
+
+    log.info("All routes added to router.")
+
+    if debug:
+        for r in app.router.routes:
+            log.debug("Route", methods=r.__dict__.get("methods"), path=r.__dict__["path"])
+
+    @app.on_event("shutdown")
+    def shutdown_event():
+        if _task_manager:
+            _task_manager.close()
+            _task_manager.cluster.close()
+
+    return app
+
+
+def create_app() -> FastAPI:
+    """Create the FastAPI.
+
+    Returns:
+        FastAPI.
+    """
     app = FastAPI(
         title="Azimuth API",
         description="Azimuth API",
@@ -199,24 +207,11 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
     )
     app.include_router(api_router)
 
-    log.info("All routes added to router.")
-
-    if debug:
-        for r in app.router.routes:
-            log.debug("Route", methods=r.__dict__.get("methods"), path=r.__dict__["path"])
-
     app.add_middleware(
         CORSMiddleware,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    log.info("Enabled CORS.")
-
-    @app.on_event("shutdown")
-    def shutdown_event():
-        if _task_manager:
-            _task_manager.close()
-            _task_manager.cluster.close()
 
     return app
 

@@ -24,7 +24,6 @@ def parse_args():
     parser.add_argument("config_path", default="/config/config.json")
     parser.add_argument("--port", default=8091, help="Port to serve the API.")
     parser.add_argument("--debug", action="store_true")
-    parser.add_argument("--profile", action="store_true")
     return parser.parse_args()
 
 

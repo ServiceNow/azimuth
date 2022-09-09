@@ -35,8 +35,15 @@ repos:
       - id: prettier
         name: prettier
         language: system
-        entry: bash -c 'cd webapp && poetry run yarn prettier --write .'
+        entry: bash -c 'cd webapp && yarn prettier --write .'
         files: webapp
+  - repo: local
+    hooks:
+      - id: frontend types
+        name: Regenerate frontend types
+        language: system
+        entry: bash -c 'cd webapp && yarn types'
+        files: azimuth
   - repo: local
     hooks:
       - id: flake8
