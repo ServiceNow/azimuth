@@ -19,7 +19,7 @@ import {
 } from "types/models";
 import { useHistory, useLocation } from "react-router-dom";
 import { constructSearchString } from "utils/helpers";
-import { OUTCOME_COLOR } from "utils/const";
+import { OUTCOME_COLOR, UNKNOWN_ERROR } from "utils/const";
 import { classNames } from "utils/helpers";
 import Loading from "./Loading";
 
@@ -122,7 +122,7 @@ const ConfusionMatrix: React.FC<Props> = ({
     return (
       <Box alignItems="center" display="grid" justifyItems="center">
         <img src={noData} width="50%" alt="no dataset info" />
-        <Typography>{error?.message || "Unexpected error"}</Typography>
+        <Typography>{error?.message || UNKNOWN_ERROR}</Typography>
       </Box>
     );
   }
