@@ -401,7 +401,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
-          value && (
+          value !== undefined && (
             <VisualBar
               formattedValue={value.toFixed(2)}
               value={value}
