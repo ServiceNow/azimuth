@@ -35,7 +35,7 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
 
     # we use pos_ for verb since it is simpler and more reliable.
     verb_tags = ["VERB", "AUX"]
-    spacy_pos = spacy.load("fr_core_news_sm")
+    spacy_pos = spacy.load("fr_core_news_md")
 
     def compute(self, batch: Dataset) -> List[TaggingResponse]:  # type: ignore
         """Get smart tags for provided indices.

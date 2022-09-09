@@ -71,13 +71,14 @@ def test_syntax_tagging_french(simple_text_config):
         "utterance": [
             "adore les biscuits!",
             "c'est terrible. C'est horrible pour moi d'ecrire ce test, mais je m'amuse bien.",
-            f"J{chr(8217)}aime",  # Single quote rather than apostrophe,
+            f"J{chr(8217)}aimerais aller",  # Single quote; sm model struggled with j'aimerais subj
             "le sucre et les biscuits!",  # As currently implemented, no subject or object
+            "indiquez-moi l'état de mes demandes",  # Sm model struggled with verb as first word
         ],
-        "label": [0, 1, 0, 1],
+        "label": [0, 1, 0, 1, 0],
     }
     json_output = mod.compute(batch)
-    assert len(json_output) == 4
+    assert len(json_output) == 5
 
     assert json_output[0].tags[SmartTag.no_subj]
     assert not any([json_output[0].tags[SmartTag.no_obj], json_output[0].tags[SmartTag.no_verb]])
@@ -100,6 +101,8 @@ def test_syntax_tagging_french(simple_text_config):
             json_output[3].tags[SmartTag.no_subj],
         ]
     )
+
+    assert not json_output[4].tags[SmartTag.no_verb]
 
     # Sentencizer is from English model but should work for French
     assert not any(json_output[i].tags[SmartTag.multi_sent] for i in [0, 2, 3])
