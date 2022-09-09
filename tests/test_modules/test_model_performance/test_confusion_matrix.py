@@ -24,6 +24,7 @@ def test_confusion_matrix(tiny_text_config):
     assert json_output.confusion_matrix.shape == (dm.get_num_classes(), dm.get_num_classes())
     # All row sums to one except the last one because it is rejection class
     assert np.allclose(json_output.confusion_matrix.sum(-1)[:-1], 1.0)
+    assert json_output.class_names == dm.get_class_names()
 
     # Filtered confusion matrix
     mod_filter = ConfusionMatrixModule(
@@ -35,6 +36,7 @@ def test_confusion_matrix(tiny_text_config):
 
     # A row sums to 0.
     assert any(json_output_filter.confusion_matrix.sum(-1) == 0)
+    assert json_output_filter.class_names == dm.get_class_names()
 
     # Confusion matrix without postprocessing
     mod_without_postprocessing = ConfusionMatrixModule(
@@ -56,3 +58,27 @@ def test_confusion_matrix(tiny_text_config):
     )
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
     assert json_output_not_normalized.confusion_matrix.sum() == dm.num_rows
+
+
+def test_confusion_matrix_reorder_rejection_class(guse_text_config):
+    # Setting high threshold to make sure everything gets predicted as NO_INTENT
+    guse_text_config.pipelines[0].postprocessors[-1].threshold = 1
+    save_predictions(guse_text_config)
+
+    # Basic confusion matrix
+    mod = ConfusionMatrixModule(
+        DatasetSplitName.eval,
+        guse_text_config,
+        mod_options=ModuleOptions(pipeline_index=0),
+    )
+    [json_output] = mod.compute_on_dataset_split()
+
+    dm = mod.get_dataset_split_manager()
+
+    # Assert that the rejection class in not the last one already
+    assert dm.rejection_class_idx != dm.get_num_classes() - 1
+    # Assert that the confusion matrix is empty for all columns except the last one.
+    assert sum(sum(json_output.confusion_matrix[:, :-1])) == 0
+    assert sum(json_output.confusion_matrix[:, -1]) > 0
+    # Assert the rejection class is last in the class names
+    assert json_output.class_names[-1] == dm.get_class_names()[dm.rejection_class_idx]

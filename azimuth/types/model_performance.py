@@ -116,6 +116,7 @@ class MetricsPerFilterAPIResponse(MetricsPerFilterModuleResponse):
 
 class ConfusionMatrixResponse(ModuleResponse):
     confusion_matrix: Array[float] = Field(..., title="Confusion Matrix normalized")
+    class_names: List[str] = Field(..., title="Ordered class names for the confusion matrix")
     normalized: bool = Field(..., title="Normalized state of Confusion Matrix")
 
 

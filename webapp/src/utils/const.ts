@@ -15,6 +15,8 @@ export const DATASET_SPLIT_PRETTY_NAMES = {
   train: "Training",
 } as const;
 
+export const UNKNOWN_ERROR = "An unknown error occurred";
+
 export const ID_TOOLTIP =
   "This id created by Azimuth corresponds to the row_idx column in the dataset split export";
 

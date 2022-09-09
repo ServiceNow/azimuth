@@ -1,4 +1,4 @@
-import { components, paths } from "types/generated/generatedTypes";
+import { components } from "types/generated/generatedTypes";
 
 export type AzimuthConfig = components["schemas"]["AzimuthConfig"];
 export type AvailableDatasetSplits =
@@ -7,18 +7,6 @@ export type ConfidenceBinDetails =
   components["schemas"]["ConfidenceBinDetails"];
 export type ConfidenceHistogramResponse =
   components["schemas"]["ConfidenceHistogramResponse"];
-// TODO Fix generated type (problem with python "Array" types)
-export type ConfusionMatrixOperation =
-  paths["/dataset_splits/{dataset_split_name}/confusion_matrix"]["get"] & {
-    responses: {
-      200: {
-        content: {
-          "application/json": ConfusionMatrixResponse;
-        };
-      };
-    };
-  };
-export type ConfusionMatrixResponse = { confusionMatrix: number[][] };
 // CountPerFilterResponse is basically like OutcomeCountPerFilterResponse | UtteranceCountPerFilterResponse
 // (which would unfortunately lose all OutcomeCountPerFilterResponse's extra fields),
 // but with OutcomeCountPerFilterResponse's extra fields as optional instead.

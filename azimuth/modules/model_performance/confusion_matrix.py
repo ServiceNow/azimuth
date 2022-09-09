@@ -4,6 +4,7 @@
 
 from typing import List
 
+import numpy as np
 from datasets import Dataset
 from sklearn.metrics import confusion_matrix
 
@@ -31,13 +32,28 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             ds[self.config.columns.label],
         )
         ds_mng = self.get_dataset_split_manager()
-        class_ids = list(range(ds_mng.get_num_classes()))
+        num_classes = ds_mng.get_num_classes()
+        class_ids = list(range(num_classes))
         cf = confusion_matrix(
             y_true=labels,
             y_pred=predictions,
             labels=class_ids,
             normalize="true" if self.mod_options.cf_normalized else None,
         )
+
+        class_names = ds_mng.get_class_names()
+
+        # Put the rejection class last for the confusion matrix
+        rejection_idx = ds_mng.rejection_class_idx
+        if rejection_idx != num_classes - 1:
+            new_order = class_ids[:rejection_idx] + class_ids[rejection_idx + 1 :] + [rejection_idx]
+            cf = cf[np.ix_(new_order, new_order)]
+            class_names = [class_names[i] for i in new_order]
+
         return [
-            ConfusionMatrixResponse(confusion_matrix=cf, normalized=self.mod_options.cf_normalized)
+            ConfusionMatrixResponse(
+                confusion_matrix=cf,
+                class_names=class_names,
+                normalized=self.mod_options.cf_normalized,
+            )
         ]

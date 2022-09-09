@@ -166,6 +166,7 @@ export interface components {
      */
     ConfusionMatrixResponse: {
       confusionMatrix: { [key: string]: any };
+      classNames: string[];
       normalized: boolean;
     };
     CustomObject: {
