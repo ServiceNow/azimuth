@@ -9,8 +9,6 @@ You should check all boxes before the PR is ready. If a box does not apply, chec
 * [ ] **ISSUE NUMBER.** You linked the issue number (Ex: Resolve #XXX).
 * [ ] **PRE-COMMIT.** You ran pre-commit on all commits, or else, you
   ran `pre-commit run --all-files` at the end.
-* [ ] **FRONTEND TYPES.** Regenerate the front-ent types if you played with types and routes.
-  Run `cd webapp && yarn types` while the back-end is running.
 * [ ] **USER CHANGES.** The changes are added to CHANGELOG.md and the documentation, if they impact
   our users.
 * [ ] **DEV CHANGES.**
