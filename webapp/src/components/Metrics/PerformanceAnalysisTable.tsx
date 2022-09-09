@@ -355,8 +355,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               row.comparedPipeline.utteranceCount -
               row.basePipeline.outcomeCount[outcome] /
                 row.basePipeline.utteranceCount,
-          cellClassName: (params: GridCellParams<number>) =>
-            styleDeltaValues(params.value),
+          cellClassName: ({ value }: GridCellParams<number>) =>
+            styleDeltaValues(value),
           valueFormatter: ({ value }) =>
             formatRatioAsPercentageString(value as number, 1),
           sortComparator: customSort,
@@ -386,8 +386,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               row.comparedPipeline &&
               row.comparedPipeline.customMetrics[metricName] -
                 row.basePipeline.customMetrics[metricName],
-            cellClassName: (params: GridCellParams<number>) =>
-              styleDeltaValues(params.value),
+            cellClassName: ({ value }: GridCellParams<number>) =>
+              styleDeltaValues(value),
             valueFormatter: ({ value }) =>
               formatRatioAsPercentageString(value as number, 1),
             sortComparator: customSort,
@@ -400,7 +400,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...groupHeader(pipeline, "ECE"),
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
-        renderCell: ({ value }: GridCellParams<number>) =>
+        renderCell: ({ value }: GridCellParams<number | undefined>) =>
           value && (
             <VisualBar
               formattedValue={value.toFixed(2)}
@@ -416,8 +416,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.ece - row.basePipeline.ece,
-        cellClassName: (params: GridCellParams<number>) =>
-          styleDeltaValues(params.value),
+        cellClassName: ({ value }: GridCellParams<number>) =>
+          styleDeltaValues(value),
         valueFormatter: ({ value }) => value && (value as number).toFixed(2),
         sortComparator: customSort,
       },
