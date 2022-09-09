@@ -5,7 +5,6 @@ import {
   MenuItem,
   Select,
   Typography,
-  InputLabel,
   FormControlLabel,
 } from "@mui/material";
 import {
@@ -17,7 +16,6 @@ import {
   GridColumnsMenuItem,
   GridColumnVisibilityModel,
   GridRow,
-  GridRowSpacingParams,
   GridSortCellParams,
   GridSortModel,
   gridStringOrNumberComparator,
@@ -283,7 +281,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         id: 1,
         field: "filterValue",
         width: 200,
-        headerClassName: "sticky", // TODO doesn't work
+        headerClassName: "sticky-header", // TODO doesn't work
         cellClassName: "sticky",
         sortComparator: customSort,
         valueGetter: ({ row }) => row.basePipeline.filterValue,
@@ -402,13 +400,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...groupHeader(pipeline, "ECE"),
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
-        renderCell: ({ value }: GridCellParams<number>) => (
-          <VisualBar
-            formattedValue={value.toFixed(2)}
-            value={value}
-            color={(theme) => theme.palette.primary.dark}
-          />
-        ),
+        renderCell: ({ value }: GridCellParams<number>) =>
+          value && (
+            <VisualBar
+              formattedValue={value.toFixed(2)}
+              value={value}
+              color={(theme) => theme.palette.primary.dark}
+            />
+          ),
       })),
       {
         field: `deltaECE`,
@@ -448,12 +447,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     ]);
     setColumnVisibilityModel(Object.fromEntries(columnVisibilityEntries));
   }, [pipeline, comparedPipeline, metricInfo]);
-
-  const getRowSpacing = React.useCallback(({ id }: GridRowSpacingParams) => {
-    return {
-      bottom: id === OVERALL_ROW_ID ? 12 : 0,
-    };
-  }, []);
 
   const RowLink = (props: RowProps<Row>) => (
     <Link
@@ -545,7 +538,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         variant="outlined"
         sx={{
           marginTop: 2,
-          paddingTop: 3,
+          padding: 3,
         }}
       >
         <Table
@@ -569,7 +562,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             "& .sticky": {
               position: "sticky",
               left: 0,
-              zIndex: 1,
               borderRight: "1px solid grey",
               background: (theme) => theme.palette.background.paper,
             },
@@ -591,7 +583,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           getRowClassName={({ id }) =>
             `${id === OVERALL_ROW_ID ? "total" : ""}`
           }
-          getRowSpacing={getRowSpacing}
           autoHeight
           rowHeight={ROW_HEIGHT}
           columns={columns}
