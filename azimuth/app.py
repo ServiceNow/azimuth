@@ -11,7 +11,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.status import HTTP_404_NOT_FOUND
 
 from azimuth import startup
-from azimuth.config import AzimuthConfig, load_azimuth_config, parse_args
+from azimuth.config import AzimuthConfig, load_azimuth_config
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import Module
 from azimuth.modules.utilities.validation import ValidationModule
