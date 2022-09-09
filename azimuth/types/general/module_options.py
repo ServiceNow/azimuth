@@ -98,3 +98,6 @@ class ModuleOptions(AliasModel):
         title="Nb of bins to compute for different modules.",
     )
     cf_normalized: bool = Field(True, title="Normalize the confusion matrix.")
+    cf_preserved_class_order: bool = Field(
+        False, title="Keep the class order for the confusion matrix."
+    )

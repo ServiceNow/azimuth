@@ -13,8 +13,8 @@ Released changes are shown in the
 ### Added
 
 ### Changed
-- The rejection class is always the last row/column in the confusion matrix.
 - Added a proposed action: `merge_classes`, and rename `consider_new_class` to `define_new_class`.
+- The order of the classes in the confusion matrix is now smarter: classes where the model gets confused will be closer to one another. The rejection class is always the last row/column in the confusion matrix. A toggle allows the user to keep the original order from the dataset if preferred.
 
 ### Deprecated/Breaking Changes
 

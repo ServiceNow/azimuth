@@ -118,6 +118,8 @@ class ConfusionMatrixResponse(ModuleResponse):
     confusion_matrix: Array[float] = Field(..., title="Confusion Matrix normalized")
     class_names: List[str] = Field(..., title="Ordered class names for the confusion matrix")
     normalized: bool = Field(..., title="Normalized state of Confusion Matrix")
+    preserved_class_order: bool = Field(..., title="State of the order of the Confusion Matrix")
+    rejection_class_position: int = Field(..., title="Position of the rejection class")
 
 
 class ConfidenceBinDetails(AliasModel):
