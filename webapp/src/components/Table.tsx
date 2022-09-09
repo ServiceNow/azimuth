@@ -74,6 +74,7 @@ export const Table = <Row extends { id: GridRowId }>({
     disableColumnFilter
     disableColumnMenu
     disableSelectionOnClick
+    disableVirtualization
     hideFooter={!props.pagination && !components?.Footer}
     rowHeight={64}
     // Free version of DataGrid crashes if pageSize > MAX_PAGE_SIZE, so we

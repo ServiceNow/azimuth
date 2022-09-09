@@ -23,8 +23,6 @@ from azimuth.utils.logs import set_logger_config
 from azimuth.utils.project import load_dataset_split_managers_from_config
 from azimuth.utils.validation import assert_not_none
 
-log = structlog.getLogger(__name__)
-
 _dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]] = {}
 _task_manager: Optional[TaskManager] = None
 _startup_tasks: Optional[Dict[str, Module]] = None
@@ -70,27 +68,12 @@ def get_config() -> Optional[AzimuthConfig]:
     return _azimuth_config
 
 
-def create_app() -> FastAPI:
-    """Launch the application's API.
-
-    Returns:
-        API.
-
-    Raises:
-        ValueError: If no dataset_split in config.
-
-    """
-    args = parse_args()
-    return create_app_with(config_path=args.config_path, debug=args.debug, profile=args.profile)
-
-
-def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
+def start_app(config_path, debug=False) -> FastAPI:
     """Launch the application's API.
 
     Args:
         config_path: path to the config
         debug: Debug flag
-        profile: profiling flag.
 
     Returns:
         API.
@@ -99,9 +82,13 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
         ValueError: If no dataset_split in config.
     """
     global _dataset_split_managers, _task_manager, _startup_tasks, _azimuth_config, _ready_flag
-    log.info("🔭 Azimuth starting 🔭")
+
     level = logging.DEBUG if debug else logging.INFO
     set_logger_config(level)
+
+    log = structlog.get_logger(__name__)
+
+    log.info("🔭 Azimuth starting 🔭")
 
     azimuth_config = load_azimuth_config(config_path)
     if azimuth_config.dataset is None:
@@ -112,6 +99,29 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
     initialize_managers(azimuth_config, local_cluster)
     assert_not_none(_task_manager).client.run(set_logger_config, level)
 
+    app = create_app()
+
+    log.info("All routes added to router.")
+
+    if debug:
+        for r in app.router.routes:
+            log.debug("Route", methods=r.__dict__.get("methods"), path=r.__dict__["path"])
+
+    @app.on_event("shutdown")
+    def shutdown_event():
+        if _task_manager:
+            _task_manager.close()
+            _task_manager.cluster.close()
+
+    return app
+
+
+def create_app() -> FastAPI:
+    """Create the FastAPI.
+
+    Returns:
+        FastAPI.
+    """
     app = FastAPI(
         title="Azimuth API",
         description="Azimuth API",
@@ -197,24 +207,11 @@ def create_app_with(config_path, debug=False, profile=False) -> FastAPI:
     )
     app.include_router(api_router)
 
-    log.info("All routes added to router.")
-
-    if debug:
-        for r in app.router.routes:
-            log.debug("Route", methods=r.__dict__.get("methods"), path=r.__dict__["path"])
-
     app.add_middleware(
         CORSMiddleware,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    log.info("Enabled CORS.")
-
-    @app.on_event("shutdown")
-    def shutdown_event():
-        if _task_manager:
-            _task_manager.close()
-            _task_manager.cluster.close()
 
     return app
 

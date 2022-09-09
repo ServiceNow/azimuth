@@ -183,9 +183,10 @@ export interface components {
     /** An enumeration. */
     DataAction:
       | "relabel"
-      | "consider_new_class"
-      | "remove"
       | "augment_with_similar"
+      | "define_new_class"
+      | "merge_classes"
+      | "remove"
       | "investigate"
       | "NO_ACTION";
     /**
@@ -194,9 +195,10 @@ export interface components {
      */
     DataActionMapping: {
       relabel: boolean;
-      considerNewClass: boolean;
-      remove: boolean;
       augmentWithSimilar: boolean;
+      defineNewClass: boolean;
+      mergeClasses: boolean;
+      remove: boolean;
       investigate: boolean;
     };
     /**

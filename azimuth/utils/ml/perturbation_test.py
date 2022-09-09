@@ -5,7 +5,7 @@
 from dataclasses import dataclass
 from typing import Callable, List, Optional, Tuple
 
-from azimuth.config import PerturbationTestingScope
+from azimuth.config import PerturbationTestingConfig
 from azimuth.types.perturbation_testing import (
     PerturbationTestClass,
     PerturbationTestFailureReason,
@@ -23,7 +23,7 @@ class PerturbationTest:
 
     name: PerturbationTestName
     family: PerturbationTestFamily
-    test_fn: Callable[[str, PerturbationTestingScope], List[PerturbedUtteranceDetails]]
+    test_fn: Callable[[str, PerturbationTestingConfig], List[PerturbedUtteranceDetails]]
     test_type: PerturbationTestType
     test_class: PerturbationTestClass
     conf_delta_threshold: float  # Delta in confidence which will fail the test.

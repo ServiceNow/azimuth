@@ -6,7 +6,7 @@ different attributes that can be defined.
 === "Class Definition"
 
     ```python
-    class PerturbationTestingScope(ModelContractConfig):
+    class PerturbationTestingConfig(ModelContractConfig):
         behavioral_testing: Optional[BehavioralTestingOptions] = Field(
             BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
         )

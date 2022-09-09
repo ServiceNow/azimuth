@@ -24,7 +24,6 @@ def parse_args():
     parser.add_argument("config_path", default="/config/config.json")
     parser.add_argument("--port", default=8091, help="Port to serve the API.")
     parser.add_argument("--debug", action="store_true")
-    parser.add_argument("--profile", action="store_true")
     return parser.parse_args()
 
 
@@ -287,7 +286,7 @@ class ModelContractConfig(CommonFieldsConfig):
         return pipeline_definitions
 
 
-class PerturbationTestingScope(ModelContractConfig):
+class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
     behavioral_testing: Optional[BehavioralTestingOptions] = Field(
         BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
@@ -310,7 +309,7 @@ class SyntaxConfig(CommonFieldsConfig):
 
 
 class AzimuthConfig(
-    PerturbationTestingScope,
+    PerturbationTestingConfig,
     SimilarityConfig,
     DatasetWarningConfig,
     SyntaxConfig,

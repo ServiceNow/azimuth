@@ -23,14 +23,14 @@ from tests.utils import get_table_key
 def test_startup_task(tiny_text_config, tiny_text_task_manager):
     dms = load_dataset_split_managers_from_config(tiny_text_config)
     mods = startup_tasks(dms, tiny_text_task_manager)
-    one_mod = mods["syntax_tags_eval_None"]
+    one_mod = mods["syntax_tags_eval"]
     # We lock the task manager
     assert tiny_text_task_manager.is_locked
     assert not one_mod.done()
     assert all("train" in k or "eval" in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
-    ), "Some modules dont have callbacks!"
+    ), "Some modules don't have callbacks!"
 
 
 def test_startup_task_fast(tiny_text_config, tiny_text_task_manager):
@@ -76,7 +76,7 @@ def test_startup_task_no_train(tiny_text_config_no_train, tiny_text_task_manager
     assert all("train" not in k or "eval" in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
-    ), "Some modules dont have callbacks!"
+    ), "Some modules don't have callbacks!"
 
 
 @pytest.mark.parametrize("iterations", [20, 1])

@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Tuple, cast
 import numpy as np
 from datasets import Dataset
 
-from azimuth.config import PerturbationTestingScope
+from azimuth.config import PerturbationTestingConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
@@ -44,7 +44,7 @@ from azimuth.utils.ml.seeding import RandomContext
 from azimuth.utils.validation import assert_not_none
 
 
-class PerturbationTestingModule(DatasetResultModule[PerturbationTestingScope]):
+class PerturbationTestingModule(DatasetResultModule[PerturbationTestingConfig]):
     """
     This module generates perturbed utterances based on a list of perturbation tests and
     provides detailed results on the prediction results for the new perturbed utterances.
@@ -62,7 +62,7 @@ class PerturbationTestingModule(DatasetResultModule[PerturbationTestingScope]):
     def __init__(
         self,
         dataset_split_name: DatasetSplitName,
-        config: PerturbationTestingScope,
+        config: PerturbationTestingConfig,
         mod_options: Optional[ModuleOptions] = None,
     ):
 

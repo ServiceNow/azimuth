@@ -6,7 +6,7 @@ from typing import List
 
 import nlpaug.augmenter.char as nac
 
-from azimuth.config import PerturbationTestingScope
+from azimuth.config import PerturbationTestingConfig
 from azimuth.types.perturbation_testing import (
     PerturbationType,
     PerturbedUtteranceDetails,
@@ -61,7 +61,7 @@ def add_neutral_token(
 
 
 def neutral_prefix(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Add a neutral prefix to an utterance.
 
@@ -80,7 +80,7 @@ def neutral_prefix(
 
 
 def neutral_suffix(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Add a neutral suffix to an utterance.
 
@@ -99,7 +99,7 @@ def neutral_suffix(
 
 
 def add_all_neutral_tokens(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Add neutral tokens at the beginning and the end of the utterance.
 
@@ -155,7 +155,7 @@ def remove_or_add_final_punctuation(
 
 
 def remove_or_add_final_period(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Remove or add period at the end of an utterance.
 
@@ -171,7 +171,7 @@ def remove_or_add_final_period(
 
 
 def remove_or_add_final_question_mark(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Remove or add question mark at the end of an perturbed_utterance.
 
@@ -230,7 +230,7 @@ def remove_or_add_inside_punctuation(
 
 
 def remove_or_add_inside_comma(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Remove or add a comma inside an utterance (not at the end).
 
@@ -246,7 +246,7 @@ def remove_or_add_inside_comma(
 
 
 def remove_or_add_inside_period(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Remove or add a period inside an utterance (not at the end).
 
@@ -266,7 +266,7 @@ def get_utterances_diff(original_utterance: str, perturbed_utterance: str) -> Li
     return list(set(perturbed_utterance.split()).difference(set(original_utterance.split())))
 
 
-def typo(original: str, config: PerturbationTestingScope) -> List[PerturbedUtteranceDetails]:
+def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtteranceDetails]:
     """Create different types of typos in an utterance.
 
     It uses the nlpaug package for this test and introduce mistakes raised by OCR, keyboard typo,
@@ -322,7 +322,7 @@ def typo(original: str, config: PerturbationTestingScope) -> List[PerturbedUtter
 
 
 def remove_or_add_contractions(
-    original: str, config: PerturbationTestingScope
+    original: str, config: PerturbationTestingConfig
 ) -> List[PerturbedUtteranceDetails]:
     """Expand or contract relevant expressions when present in the utterance.
 
