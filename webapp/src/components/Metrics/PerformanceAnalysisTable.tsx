@@ -281,7 +281,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         id: 1,
         field: "filterValue",
         width: 200,
-        headerClassName: "sticky-header", // TODO doesn't work
+        headerClassName: "sticky", // TODO doesn't work
         cellClassName: "sticky",
         sortComparator: customSort,
         valueGetter: ({ row }) => row.basePipeline.filterValue,
