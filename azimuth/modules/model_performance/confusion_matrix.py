@@ -75,12 +75,6 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             classes_no_rejection = np.delete(class_ids, rejection_idx)
             order = np.append(classes_no_rejection[order_no_rejection], rejection_idx)
 
-            # Put the rejection class last for the confusion matrix
-            if rejection_idx != order[-1]:
-                rejection_position = np.where(order == rejection_idx)[0][0]
-                # From the rejection position, roll backwards all values
-                order[rejection_position:] = np.roll(order[rejection_position:], -1)
-
             # Re-order matrix
             cf = cf[np.ix_(order, order)]
             class_names = [ds_mng.get_class_names()[i] for i in order]
