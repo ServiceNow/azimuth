@@ -86,7 +86,7 @@ def test_confusion_matrix_reorder_rejection_class(guse_text_config):
 
     dm = mod.get_dataset_split_manager()
 
-    # Assert that the rejection class in not the last one already
+    # Assert that the rejection class is not the last one already
     num_classes = dm.get_num_classes()
     assert dm.rejection_class_idx != num_classes - 1
     # Assert that the confusion matrix is empty for all columns except the last one.
