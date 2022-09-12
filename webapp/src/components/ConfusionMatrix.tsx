@@ -1,14 +1,16 @@
 import {
   alpha,
   Box,
+  FormControlLabel,
+  FormGroup,
+  Switch,
   Theme,
   Typography,
-  Switch,
-  FormControlLabel,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import noData from "assets/launch.svg";
 import React from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import {
@@ -17,10 +19,8 @@ import {
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
-import { useHistory, useLocation } from "react-router-dom";
-import { constructSearchString } from "utils/helpers";
 import { OUTCOME_COLOR, UNKNOWN_ERROR } from "utils/const";
-import { classNames } from "utils/helpers";
+import { classNames, constructSearchString } from "utils/helpers";
 import Loading from "./Loading";
 
 const CONFUSION_ROW_OFFSET = 1;
@@ -133,13 +133,14 @@ const ConfusionMatrix: React.FC<Props> = ({
   // This is fine since all values will be 0 anyway in this case.
   const maxCount = Math.max(...matrix.flat()) || 1;
 
-  const handleNormalizedStateChange = (checked: boolean) =>
+  const handleStateChange = (newConfusionMatrix: QueryConfusionMatrixState) =>
     history.push(
       `${location.pathname}${constructSearchString({
+        ...confusionMatrix,
         ...filters,
         ...pipeline,
         ...postprocessing,
-        normalized: checked && undefined,
+        ...newConfusionMatrix,
       })}`
     );
 
@@ -157,13 +158,13 @@ const ConfusionMatrix: React.FC<Props> = ({
       sx={(theme) => ({
         backgroundColor: alpha(
           theme.palette[
-            rowIndex === columnIndex
-              ? columnIndex === data.classNames.length - 1
-                ? OUTCOME_COLOR.CorrectAndRejected
-                : OUTCOME_COLOR.CorrectAndPredicted
-              : columnIndex === data.classNames.length - 1
-              ? OUTCOME_COLOR.IncorrectAndRejected
-              : OUTCOME_COLOR.IncorrectAndPredicted
+            OUTCOME_COLOR[
+              `${rowIndex === columnIndex ? "Correct" : "Incorrect"}And${
+                columnIndex === data.rejectionClassPosition
+                  ? "Rejected"
+                  : "Predicted"
+              }`
+            ]
           ].main,
           value / maxCount
         ),
@@ -176,7 +177,7 @@ const ConfusionMatrix: React.FC<Props> = ({
             theme.palette.common[value / maxCount > 0.7 ? "white" : "black"]
           }
         >
-          {data.normalized ? (
+          {data.normalize ? (
             <>
               {(value * 100).toFixed(0)}
               <Typography
@@ -205,17 +206,32 @@ const ConfusionMatrix: React.FC<Props> = ({
       minHeight={0}
       width="100%"
     >
-      <Box marginLeft="auto">
+      <FormGroup sx={{ marginLeft: "auto" }}>
         <FormControlLabel
           control={
             <Switch
-              checked={data.normalized}
-              onChange={(_, checked) => handleNormalizedStateChange(checked)}
+              checked={data.normalize}
+              onChange={(_, checked) =>
+                handleStateChange({ normalize: checked && undefined })
+              }
             />
           }
           label="Normalize"
+          labelPlacement="start"
         />
-      </Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={data.preserveClassOrder}
+              onChange={(_, checked) =>
+                handleStateChange({ preserveClassOrder: checked || undefined })
+              }
+            />
+          }
+          label="Preserve user-provided class order"
+          labelPlacement="start"
+        />
+      </FormGroup>
       <Box
         alignItems="center"
         display="grid"

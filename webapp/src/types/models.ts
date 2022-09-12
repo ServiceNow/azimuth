@@ -40,7 +40,8 @@ export type QueryPostprocessingState = {
 };
 
 export type QueryConfusionMatrixState = {
-  normalized?: false;
+  normalize?: false;
+  preserveClassOrder?: true;
 };
 
 export type QueryState = QueryFilterState &

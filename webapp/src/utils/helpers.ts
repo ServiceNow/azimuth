@@ -42,7 +42,8 @@ export const parseSearchString = (searchString: string) => {
   const q = new URLSearchParams(searchString);
   return {
     confusionMatrix: convertSearchParams<QueryConfusionMatrixState>(q, {
-      normalized: (s) => s === null && undefined,
+      normalize: (s) => s === null && undefined,
+      preserveClassOrder: (s) => s !== null || undefined,
     }),
     filters: convertSearchParams<QueryFilterState>(q, {
       confidenceMin: convertNumber,
