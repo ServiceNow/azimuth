@@ -70,10 +70,10 @@ def test_syntax_tagging_french(simple_text_config):
         DatasetColumn.idx: [0, 1, 2, 3],
         "utterance": [
             "adore les biscuits!",
-            "c'est terrible. C'est horrible pour moi d'ecrire ce test, mais je m'amuse bien.",
+            "c'est terrible. C'est horrible pour moi d'écrire ce test, mais je m'amuse bien.",
             f"J{chr(8217)}aimerais aller",  # Single quote; sm model struggled with j'aimerais subj
             "le sucre et les biscuits!",  # As currently implemented, no subject or object
-            "indiquez-moi l'état de mes demandes",  # Sm model struggled with verb as first word
+            "Indiquez-moi l'état de mes demandes",  # First word (a) capitalized and (b) verb
         ],
         "label": [0, 1, 0, 1, 0],
     }
