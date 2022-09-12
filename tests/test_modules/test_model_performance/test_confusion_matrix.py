@@ -56,19 +56,20 @@ def test_confusion_matrix(tiny_text_config):
     mod_not_normalized = ConfusionMatrixModule(
         DatasetSplitName.eval,
         tiny_text_config,
-        mod_options=ModuleOptions(pipeline_index=0, cf_normalized=False),
+        mod_options=ModuleOptions(pipeline_index=0, cf_normalize=False),
     )
     [json_output_not_normalized] = mod_not_normalized.compute_on_dataset_split()
     assert json_output_not_normalized.confusion_matrix.sum() == dm.num_rows
 
     # Preserving the class order from the dataset
-    mod_preserved_order = ConfusionMatrixModule(
+    mod_preserve_order = ConfusionMatrixModule(
         DatasetSplitName.eval,
         tiny_text_config,
-        mod_options=ModuleOptions(pipeline_index=0, cf_preserved_class_order=True),
+        mod_options=ModuleOptions(pipeline_index=0, cf_preserve_class_order=True),
     )
-    [json_output_preserved_order] = mod_preserved_order.compute_on_dataset_split()
-    assert json_output_preserved_order.class_names == dm.get_class_names()
+    [json_output_preserve_order] = mod_preserve_order.compute_on_dataset_split()
+    assert json_output_preserve_order.class_names == dm.get_class_names()
+    assert json_output_preserve_order.preserve_class_order
 
 
 def test_confusion_matrix_reorder_rejection_class(guse_text_config):
@@ -97,12 +98,12 @@ def test_confusion_matrix_reorder_rejection_class(guse_text_config):
     assert json_output.rejection_class_position == num_classes - 1
 
     # Preserving the class order from the dataset
-    mod_preserved_order = ConfusionMatrixModule(
+    mod_preserve_order = ConfusionMatrixModule(
         DatasetSplitName.eval,
         guse_text_config,
-        mod_options=ModuleOptions(pipeline_index=0, cf_preserved_class_order=True),
+        mod_options=ModuleOptions(pipeline_index=0, cf_preserve_class_order=True),
     )
-    [json_output_preserved_order] = mod_preserved_order.compute_on_dataset_split()
-    assert json_output_preserved_order.class_names == dm.get_class_names()
+    [json_output_preserve_order] = mod_preserve_order.compute_on_dataset_split()
+    assert json_output_preserve_order.class_names == dm.get_class_names()
     # The rejection class should not be last
-    assert json_output_preserved_order.rejection_class_position == dm.rejection_class_idx
+    assert json_output_preserve_order.rejection_class_position == dm.rejection_class_idx

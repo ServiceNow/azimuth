@@ -22,8 +22,8 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
     """Computes the confusion matrix on the specified dataset split."""
 
     allowed_mod_options = FilterableModule.allowed_mod_options | {
-        "cf_normalized",
-        "cf_preserved_class_order",
+        "cf_normalize",
+        "cf_preserve_class_order",
     }
 
     def compute_on_dataset_split(self) -> List[ConfusionMatrixResponse]:  # type: ignore
@@ -48,13 +48,13 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             y_true=labels,
             y_pred=predictions,
             labels=class_ids,
-            normalize="true" if self.mod_options.cf_normalized else None,
+            normalize="true" if self.mod_options.cf_normalize else None,
         )
 
         # Reorder rows and columns so the bandwidth of the matrix is smaller
-        if not self.mod_options.cf_preserved_class_order:
+        if not self.mod_options.cf_preserve_class_order:
             # Get a normalized confusion matrix if not already computed
-            if not self.mod_options.cf_normalized:
+            if not self.mod_options.cf_normalize:
                 cf_normalized = confusion_matrix(
                     y_true=labels, y_pred=predictions, labels=class_ids, normalize="true"
                 )
@@ -83,10 +83,10 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
             ConfusionMatrixResponse(
                 confusion_matrix=cf,
                 class_names=class_names,
-                normalized=self.mod_options.cf_normalized,
-                preserved_class_order=self.mod_options.cf_preserved_class_order,
+                normalize=self.mod_options.cf_normalize,
+                preserve_class_order=self.mod_options.cf_preserve_class_order,
                 rejection_class_position=rejection_idx
-                if self.mod_options.cf_preserved_class_order
+                if self.mod_options.cf_preserve_class_order
                 else num_classes - 1,
             )
         ]

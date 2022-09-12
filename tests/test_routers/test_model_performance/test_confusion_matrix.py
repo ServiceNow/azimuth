@@ -20,7 +20,7 @@ def test_get_confusion_matrix(app: FastAPI) -> None:
     )
 
     # not normalized
-    resp = client.get("/dataset_splits/eval/confusion_matrix?pipeline_index=0&normalized=false")
+    resp = client.get("/dataset_splits/eval/confusion_matrix?pipeline_index=0&normalize=false")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     assert np.allclose(
@@ -29,9 +29,9 @@ def test_get_confusion_matrix(app: FastAPI) -> None:
         atol=1e-2,
     )
 
-    # preserved class order
+    # preserve class order
     resp = client.get(
-        "/dataset_splits/eval/confusion_matrix?pipeline_index=0&preserved_class_order=true"
+        "/dataset_splits/eval/confusion_matrix?pipeline_index=0&preserve_class_order=true"
     )
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
