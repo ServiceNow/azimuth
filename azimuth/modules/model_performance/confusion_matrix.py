@@ -71,7 +71,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
                 csr_matrix(cf_no_rejection >= MIN_CONFUSION_CUTHILL_MCKEE)
             )
 
-            # Get right class indices and add rejection_idx at the end.
+            # Get class indices by reduced-bandwidth order and add rejection_idx at the end.
             classes_no_rejection = np.delete(class_ids, rejection_idx)
             order = np.append(classes_no_rejection[order_no_rejection], rejection_idx)
 
