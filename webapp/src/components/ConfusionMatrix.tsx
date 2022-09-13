@@ -220,7 +220,10 @@ const ConfusionMatrix: React.FC<Props> = ({
           label="Normalize"
           labelPlacement="start"
         />
-        <Tooltip title="Reorder classes with reverse Cuthill–McKee algorithm">
+        <Tooltip
+          title="Reorder classes with reverse Cuthill–McKee algorithm"
+          placement="bottom-end"
+        >
           <FormControlLabel
             control={
               <Switch
