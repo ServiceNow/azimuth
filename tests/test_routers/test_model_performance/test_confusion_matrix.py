@@ -15,16 +15,28 @@ def test_get_confusion_matrix(app: FastAPI) -> None:
     data = resp.json()
     assert np.allclose(
         data["confusionMatrix"],
-        [[0.090, 0.136, 0.772], [0.05, 0.05, 0.9], [0.0, 0.0, 0.0]],
+        [[0.05, 0.05, 0.9], [0.136, 0.090, 0.772], [0.0, 0.0, 0.0]],
         atol=1e-2,
     )
 
     # not normalized
-    resp = client.get("/dataset_splits/eval/confusion_matrix?pipeline_index=0&normalized=false")
+    resp = client.get("/dataset_splits/eval/confusion_matrix?pipeline_index=0&normalize=false")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
     assert np.allclose(
         data["confusionMatrix"],
-        [[2.0, 3.0, 17.0], [1.0, 1.0, 18.0], [0.0, 0.0, 0.0]],
+        [[1.0, 1.0, 18.0], [3.0, 2.0, 17.0], [0.0, 0.0, 0.0]],
+        atol=1e-2,
+    )
+
+    # preserve class order
+    resp = client.get(
+        "/dataset_splits/eval/confusion_matrix?pipeline_index=0&reorder_classes=false"
+    )
+    assert resp.status_code == HTTP_200_OK, resp.text
+    data = resp.json()
+    assert np.allclose(
+        data["confusionMatrix"],
+        [[0.090, 0.136, 0.772], [0.05, 0.05, 0.9], [0.0, 0.0, 0.0]],
         atol=1e-2,
     )

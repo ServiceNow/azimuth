@@ -6,6 +6,8 @@ from typing import List
 
 import numpy as np
 from datasets import Dataset
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import reverse_cuthill_mckee
 from sklearn.metrics import confusion_matrix
 
 from azimuth.config import ModelContractConfig
@@ -13,11 +15,16 @@ from azimuth.modules.base_classes import FilterableModule
 from azimuth.types.model_performance import ConfusionMatrixResponse
 from azimuth.utils.validation import assert_not_none
 
+MIN_CONFUSION_CUTHILL_MCKEE = 0.1
+
 
 class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
     """Computes the confusion matrix on the specified dataset split."""
 
-    allowed_mod_options = FilterableModule.allowed_mod_options | {"cf_normalized"}
+    allowed_mod_options = FilterableModule.allowed_mod_options | {
+        "cf_normalize",
+        "cf_reorder_classes",
+    }
 
     def compute_on_dataset_split(self) -> List[ConfusionMatrixResponse]:  # type: ignore
         """Computes confusion matrix from sklearn.
@@ -34,26 +41,51 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
         ds_mng = self.get_dataset_split_manager()
         num_classes = ds_mng.get_num_classes()
         class_ids = list(range(num_classes))
+        class_names = ds_mng.get_class_names()
+        rejection_idx = ds_mng.rejection_class_idx
+        rejection_class = class_names[rejection_idx]
+
         cf = confusion_matrix(
             y_true=labels,
             y_pred=predictions,
             labels=class_ids,
-            normalize="true" if self.mod_options.cf_normalized else None,
+            normalize="true" if self.mod_options.cf_normalize else None,
         )
 
-        class_names = ds_mng.get_class_names()
+        # Reorder rows and columns so the bandwidth of the matrix is smaller
+        if self.mod_options.cf_reorder_classes:
+            # Get a normalized confusion matrix if not already computed
+            if not self.mod_options.cf_normalize:
+                cf_normalized = confusion_matrix(
+                    y_true=labels, y_pred=predictions, labels=class_ids, normalize="true"
+                )
+            else:
+                cf_normalized = cf
 
-        # Put the rejection class last for the confusion matrix
-        rejection_idx = ds_mng.rejection_class_idx
-        if rejection_idx != num_classes - 1:
-            new_order = class_ids[:rejection_idx] + class_ids[rejection_idx + 1 :] + [rejection_idx]
-            cf = cf[np.ix_(new_order, new_order)]
-            class_names = [class_names[i] for i in new_order]
+            # Remove the rejection class so it doesn't influence the algorithm
+            cf_no_rejection = np.delete(
+                np.delete(cf_normalized, rejection_idx, 0), rejection_idx, 1
+            )
+
+            # Get order based on reverse_cuthill_mckee algorithm
+            order_no_rejection = reverse_cuthill_mckee(
+                csr_matrix(cf_no_rejection >= MIN_CONFUSION_CUTHILL_MCKEE)
+            )
+
+            # Get class indices by reduced-bandwidth order and add rejection_idx at the end.
+            classes_no_rejection = np.delete(class_ids, rejection_idx)
+            order = np.append(classes_no_rejection[order_no_rejection], rejection_idx)
+
+            # Re-order matrix
+            cf = cf[np.ix_(order, order)]
+            class_names = [ds_mng.get_class_names()[i] for i in order]
 
         return [
             ConfusionMatrixResponse(
                 confusion_matrix=cf,
                 class_names=class_names,
-                normalized=self.mod_options.cf_normalized,
+                normalize=self.mod_options.cf_normalize,
+                reorder_classes=self.mod_options.cf_reorder_classes,
+                rejection_class=rejection_class,
             )
         ]
