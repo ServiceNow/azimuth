@@ -14,8 +14,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import {
-  QueryFilterState,
   QueryConfusionMatrixState,
+  QueryFilterState,
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
@@ -160,7 +160,7 @@ const ConfusionMatrix: React.FC<Props> = ({
           theme.palette[
             OUTCOME_COLOR[
               `${rowIndex === columnIndex ? "Correct" : "Incorrect"}And${
-                columnIndex === data.rejectionClassPosition
+                data.classNames[columnIndex] === data.rejectionClass
                   ? "Rejected"
                   : "Predicted"
               }`

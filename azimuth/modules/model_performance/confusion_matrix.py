@@ -43,6 +43,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
         class_ids = list(range(num_classes))
         class_names = ds_mng.get_class_names()
         rejection_idx = ds_mng.rejection_class_idx
+        rejection_class = class_names[rejection_idx]
 
         cf = confusion_matrix(
             y_true=labels,
@@ -85,8 +86,6 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
                 class_names=class_names,
                 normalize=self.mod_options.cf_normalize,
                 preserve_class_order=self.mod_options.cf_preserve_class_order,
-                rejection_class_position=rejection_idx
-                if self.mod_options.cf_preserve_class_order
-                else num_classes - 1,
+                rejection_class=rejection_class,
             )
         ]

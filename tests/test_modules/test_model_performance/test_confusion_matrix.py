@@ -25,8 +25,7 @@ def test_confusion_matrix(tiny_text_config):
     assert json_output.confusion_matrix.shape == (num_classes, num_classes)
     # All row sums to one except the last one because it is rejection class
     assert np.allclose(json_output.confusion_matrix.sum(-1)[:-1], 1.0)
-    assert json_output.class_names[-1] == "REJECTION_CLASS"
-    assert json_output.rejection_class_position == num_classes - 1
+    assert json_output.class_names[-1] == json_output.rejection_class == "REJECTION_CLASS"
 
     # Filtered confusion matrix
     mod_filter = ConfusionMatrixModule(
@@ -94,8 +93,8 @@ def test_confusion_matrix_reorder_rejection_class(guse_text_config):
     assert sum(sum(json_output.confusion_matrix[:, :-1])) == 0
     assert sum(json_output.confusion_matrix[:, -1]) > 0
     # Assert the rejection class is last in the class names
-    assert json_output.class_names[-1] == dm.get_class_names()[dm.rejection_class_idx]
-    assert json_output.rejection_class_position == num_classes - 1
+    rejection_class = dm.get_class_names()[dm.rejection_class_idx]
+    assert json_output.class_names[-1] == json_output.rejection_class == rejection_class
 
     # Preserving the class order from the dataset
     mod_preserve_order = ConfusionMatrixModule(
@@ -105,5 +104,3 @@ def test_confusion_matrix_reorder_rejection_class(guse_text_config):
     )
     [json_output_preserve_order] = mod_preserve_order.compute_on_dataset_split()
     assert json_output_preserve_order.class_names == dm.get_class_names()
-    # The rejection class should not be last
-    assert json_output_preserve_order.rejection_class_position == dm.rejection_class_idx

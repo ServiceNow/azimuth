@@ -169,7 +169,7 @@ export interface components {
       classNames: string[];
       normalize: boolean;
       preserveClassOrder: boolean;
-      rejectionClassPosition: number;
+      rejectionClass: string;
     };
     CustomObject: {
       class_name: string;
