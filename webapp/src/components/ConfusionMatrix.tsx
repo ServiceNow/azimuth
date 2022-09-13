@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
-import noData from "assets/launch.svg";
+import noData from "assets/void.svg";
 import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { getConfusionMatrixEndpoint } from "services/api";
