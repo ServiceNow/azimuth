@@ -22,4 +22,4 @@ The toggle "Preserve user-provided class order" allows showing the confusion mat
 
 !!! example
 
-    In this example, 55% of utterances labeled as `bill_due` were predicted as `bill_balance`.
+    In this example, 45% of utterances labeled as `bill_due` were predicted as `bill_balance`.
