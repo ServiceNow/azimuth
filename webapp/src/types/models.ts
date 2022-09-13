@@ -41,7 +41,7 @@ export type QueryPostprocessingState = {
 
 export type QueryConfusionMatrixState = {
   normalize?: false;
-  preserveClassOrder?: true;
+  reorderClasses?: false;
 };
 
 export type QueryState = QueryFilterState &

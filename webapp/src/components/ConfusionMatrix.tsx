@@ -5,6 +5,7 @@ import {
   FormGroup,
   Switch,
   Theme,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
@@ -219,18 +220,20 @@ const ConfusionMatrix: React.FC<Props> = ({
           label="Normalize"
           labelPlacement="start"
         />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={data.preserveClassOrder}
-              onChange={(_, checked) =>
-                handleStateChange({ preserveClassOrder: checked || undefined })
-              }
-            />
-          }
-          label="Preserve user-provided class order"
-          labelPlacement="start"
-        />
+        <Tooltip title="Reorder classes with reverse Cuthill–McKee algorithm">
+          <FormControlLabel
+            control={
+              <Switch
+                checked={data.reorderClasses}
+                onChange={(_, checked) =>
+                  handleStateChange({ reorderClasses: checked && undefined })
+                }
+              />
+            }
+            label="Reorder classes"
+            labelPlacement="start"
+          />
+        </Tooltip>
       </FormGroup>
       <Box
         alignItems="center"
