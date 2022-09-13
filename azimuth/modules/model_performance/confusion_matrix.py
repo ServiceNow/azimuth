@@ -23,7 +23,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
 
     allowed_mod_options = FilterableModule.allowed_mod_options | {
         "cf_normalize",
-        "cf_preserve_class_order",
+        "cf_reorder_classes",
     }
 
     def compute_on_dataset_split(self) -> List[ConfusionMatrixResponse]:  # type: ignore
@@ -53,7 +53,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
         )
 
         # Reorder rows and columns so the bandwidth of the matrix is smaller
-        if not self.mod_options.cf_preserve_class_order:
+        if self.mod_options.cf_reorder_classes:
             # Get a normalized confusion matrix if not already computed
             if not self.mod_options.cf_normalize:
                 cf_normalized = confusion_matrix(
@@ -85,7 +85,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
                 confusion_matrix=cf,
                 class_names=class_names,
                 normalize=self.mod_options.cf_normalize,
-                preserve_class_order=self.mod_options.cf_preserve_class_order,
+                reorder_classes=self.mod_options.cf_reorder_classes,
                 rejection_class=rejection_class,
             )
         ]

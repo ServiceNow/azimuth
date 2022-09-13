@@ -31,7 +31,7 @@ def test_get_confusion_matrix(app: FastAPI) -> None:
 
     # preserve class order
     resp = client.get(
-        "/dataset_splits/eval/confusion_matrix?pipeline_index=0&preserve_class_order=true"
+        "/dataset_splits/eval/confusion_matrix?pipeline_index=0&reorder_classes=false"
     )
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()

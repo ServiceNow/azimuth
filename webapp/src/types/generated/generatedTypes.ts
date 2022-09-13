@@ -168,7 +168,7 @@ export interface components {
       confusionMatrix: { [key: string]: any };
       classNames: string[];
       normalize: boolean;
-      preserveClassOrder: boolean;
+      reorderClasses: boolean;
       rejectionClass: string;
     };
     CustomObject: {
@@ -1345,7 +1345,7 @@ export interface operations {
       query: {
         without_postprocessing?: boolean;
         normalize?: boolean;
-        preserve_class_order?: boolean;
+        reorder_classes?: boolean;
         pipeline_index: number;
         confidence_min?: number;
         confidence_max?: number;

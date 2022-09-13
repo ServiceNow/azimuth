@@ -98,6 +98,6 @@ class ModuleOptions(AliasModel):
         title="Nb of bins to compute for different modules.",
     )
     cf_normalize: bool = Field(True, title="Normalize the confusion matrix.")
-    cf_preserve_class_order: bool = Field(
-        False, title="Maintain the user-supplied class order for the confusion matrix."
+    cf_reorder_classes: bool = Field(
+        True, title="Reorder classes based on reverse Cuthill-Mckee algorithm."
     )

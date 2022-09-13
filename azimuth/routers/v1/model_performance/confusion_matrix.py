@@ -40,14 +40,14 @@ def get_confusion_matrix(
     pipeline_index: int = Depends(require_pipeline_index),
     without_postprocessing: bool = Query(False, title="Without Postprocessing"),
     normalize: bool = Query(True, title="Normalize"),
-    preserve_class_order: bool = Query(False, title="Preserve Class Order"),
+    reorder_classes: bool = Query(True, title="Reorder Classes"),
 ) -> ConfusionMatrixResponse:
     mod_options = ModuleOptions(
         filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
         without_postprocessing=without_postprocessing,
         cf_normalize=normalize,
-        cf_preserve_class_order=preserve_class_order,
+        cf_reorder_classes=reorder_classes,
     )
 
     task_result: ConfusionMatrixResponse = get_standard_task_result(

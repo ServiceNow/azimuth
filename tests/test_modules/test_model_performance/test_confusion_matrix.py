@@ -64,11 +64,11 @@ def test_confusion_matrix(tiny_text_config):
     mod_preserve_order = ConfusionMatrixModule(
         DatasetSplitName.eval,
         tiny_text_config,
-        mod_options=ModuleOptions(pipeline_index=0, cf_preserve_class_order=True),
+        mod_options=ModuleOptions(pipeline_index=0, cf_reorder_classes=False),
     )
     [json_output_preserve_order] = mod_preserve_order.compute_on_dataset_split()
     assert json_output_preserve_order.class_names == dm.get_class_names()
-    assert json_output_preserve_order.preserve_class_order
+    assert not json_output_preserve_order.reorder_classes
 
 
 def test_confusion_matrix_reorder_rejection_class(guse_text_config):
@@ -100,7 +100,7 @@ def test_confusion_matrix_reorder_rejection_class(guse_text_config):
     mod_preserve_order = ConfusionMatrixModule(
         DatasetSplitName.eval,
         guse_text_config,
-        mod_options=ModuleOptions(pipeline_index=0, cf_preserve_class_order=True),
+        mod_options=ModuleOptions(pipeline_index=0, cf_reorder_classes=False),
     )
     [json_output_preserve_order] = mod_preserve_order.compute_on_dataset_split()
     assert json_output_preserve_order.class_names == dm.get_class_names()

@@ -118,7 +118,7 @@ class ConfusionMatrixResponse(ModuleResponse):
     confusion_matrix: Array[float] = Field(..., title="Confusion Matrix")
     class_names: List[str] = Field(..., title="Ordered class names for the confusion matrix")
     normalize: bool = Field(..., title="State of the normalization of the Confusion Matrix")
-    preserve_class_order: bool = Field(..., title="State of the order of the Confusion Matrix")
+    reorder_classes: bool = Field(..., title="State of the order of the Confusion Matrix")
     rejection_class: str = Field(..., title="Rejection class name")
 
 
