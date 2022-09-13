@@ -1,24 +1,16 @@
-# Minimal makefile for Sphinx documentation
-#
+# Minimal makefile for documentation
+
 REGISTRY = servicenowdocker
 IMAGE = azimuth_docs
 
-.PHONY: html
-html:
-	mkdocs build
+.PHONY: build_docs
+build_docs:
+	docker build -t $(REGISTRY)/$(IMAGE) -f docs/Dockerfile.docs .
 
-.PHONY: watch
-watch:
-	mkdocs serve
-
-.PHONY: build_doc
-build_doc:
-	docker build -t $(REGISTRY)/$(IMAGE) -f Dockerfile.docs .
-
-.PHONY: push_doc
-push_doc:
+.PHONY: push_docs
+push_docs:
 	docker push $(REGISTRY)/$(IMAGE)
 
-.PHONY: server
-server:
+.PHONY: serve_docs
+serve_docs:
 	docker run -p 8080:8080 --rm -it $(REGISTRY)/$(IMAGE)
