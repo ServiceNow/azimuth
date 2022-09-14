@@ -18,7 +18,7 @@ from azimuth.types.tag import (
     SmartTagFamily,
     TaggingResponse,
 )
-from azimuth.utils.string_processing import clean_utterance
+from azimuth.utils.utterance import clean_utterance
 from azimuth.utils.validation import assert_not_none
 
 

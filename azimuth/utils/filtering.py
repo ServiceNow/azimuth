@@ -14,7 +14,7 @@ from azimuth.types.tag import (
     SmartTag,
     SmartTagFamily,
 )
-from azimuth.utils.string_processing import clean_utterance
+from azimuth.utils.utterance import clean_utterance
 
 
 def filter_dataset_split(
