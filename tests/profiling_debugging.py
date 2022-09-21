@@ -43,9 +43,13 @@ def main():
     print("Starting profiler!")
     with Profiler() as p:
         mod = MODULE(dataset_split_name=DATASET_SPLIT, config=config, mod_options=MOD_OPTIONS)
-        mod.compute_on_dataset_split()
+        res = mod.compute_on_dataset_split()
 
-    p.print()
+    file_name = "logs.txt"
+    with open(file_name, "w") as f:
+        p.print(file=f)
+
+    print(res)
 
 
 if __name__ == "__main__":

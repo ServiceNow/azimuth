@@ -22,7 +22,7 @@ from azimuth.types.tag import (
     SmartTagFamily,
 )
 from azimuth.utils.conversion import merge_counters
-from azimuth.utils.filtering import filter_dataset_split
+from azimuth.utils.dataset_operations import filter_dataset_split
 from azimuth.utils.ml.model_performance import sorted_by_utterance_count_with_last
 from azimuth.utils.routers import build_named_dataset_filters
 

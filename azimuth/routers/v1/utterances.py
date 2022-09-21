@@ -47,7 +47,7 @@ from azimuth.types.utterance import (
     ModelSaliency,
     Utterance,
 )
-from azimuth.utils.filtering import filter_dataset_split
+from azimuth.utils.dataset_operations import filter_dataset_split
 from azimuth.utils.project import (
     perturbation_testing_available,
     postprocessing_known,

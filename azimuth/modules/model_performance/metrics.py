@@ -33,6 +33,12 @@ from azimuth.types.tag import (
     SmartTag,
     SmartTagFamily,
 )
+from azimuth.utils.dataset_operations import (
+    filter_dataset_split,
+    get_confidences_from_ds,
+    get_outcomes_from_ds,
+    get_predictions_from_ds,
+)
 from azimuth.utils.ml.ece import compute_ece_from_bins
 from azimuth.utils.ml.model_performance import sorted_by_utterance_count_with_last
 from azimuth.utils.validation import assert_not_none
@@ -58,65 +64,75 @@ def first_value(di: Optional[Dict]) -> Optional[float]:
 class MetricsModule(FilterableModule[ModelContractConfig]):
     """Computes different metrics on each dataset split."""
 
-    def compute_on_dataset_split(self) -> List[MetricsModuleResponse]:  # type: ignore
-        ds: Dataset = assert_not_none(self.get_dataset_split())
-        indices = self.get_indices()
-        if len(indices) == 0:
+    def compute_metrics(self, ds: Dataset) -> List[MetricsModuleResponse]:
+        """Compute all metrics on a given dataset split.
+
+        Args:
+            ds: Dataset Split to compute metrics for.
+
+        Returns:
+            MetricsModuleResponse with all metrics.
+        """
+        if len(ds) == 0:
             # Nothing to do, we return an empty response.
             return [BASE_RESPONSE]
-
-        utterance_count = len(indices)
-        outcome_count = Counter(self._get_outcomes_from_ds())
-        outcome_count.update({outcome: 0 for outcome in ALL_OUTCOMES})
-
-        # Compute ECE
-        conf_hist_mod = ConfidenceHistogramModule(
-            dataset_split_name=self.dataset_split_name,
-            config=self.config,
-            mod_options=self.mod_options,
-        )
-        bins = conf_hist_mod.compute_on_dataset_split()[0].bins
-        ece, acc, expected = compute_ece_from_bins(bins)
-        count_per_bin = [sum(b.outcome_count.values()) for b in bins]
-
-        metric_values = {}
-        dm = self.get_dataset_split_manager()
-        for metric_name, metric_obj_def in self.config.metrics.items():
-            met: Metric = self.artifact_manager.get_metric(
-                self.config,
-                metric_name,
-                label_list=dm.get_class_names(),
-                rejection_class_idx=dm.rejection_class_idx,
-                force_kwargs=True,  # Set True here as load_metrics has **kwargs.
+        else:
+            utterance_count = len(ds)
+            outcome_count = Counter(
+                get_outcomes_from_ds(ds, self.mod_options.without_postprocessing)
             )
-            accept_probabilities = "probabilities" in inspect.signature(met._compute).parameters
-            extra_kwargs = (
-                dict(probabilities=self.make_probabilities()) if accept_probabilities else {}
-            )
-            extra_kwargs.update(metric_obj_def.additional_kwargs)
-            with warnings.catch_warnings():
-                # Ignore warnings such as
-                #   UndefinedMetricWarning: Precision is ill-defined and being set to 0.0
-                warnings.simplefilter("ignore", category=UndefinedMetricWarning)
-                metric_values[metric_name] = assert_not_none(
-                    first_value(
-                        met.compute(
-                            predictions=self._get_predictions_from_ds(),
-                            references=ds[self.config.columns.label],
-                            **extra_kwargs,
+            outcome_count.update({outcome: 0 for outcome in ALL_OUTCOMES})
+
+            # Compute ECE
+            bins = ConfidenceHistogramModule.get_bins(ds, self.mod_options.without_postprocessing)
+            # = conf_hist_mod.compute_on_dataset_split()[0].bins
+            ece, acc, expected = compute_ece_from_bins(bins)
+            count_per_bin = [sum(b.outcome_count.values()) for b in bins]
+
+            metric_values = {}
+            dm = self.get_dataset_split_manager()
+            for metric_name, metric_obj_def in self.config.metrics.items():
+                met: Metric = self.artifact_manager.get_metric(
+                    self.config,
+                    metric_name,
+                    label_list=dm.get_class_names(),
+                    rejection_class_idx=dm.rejection_class_idx,
+                    force_kwargs=True,  # Set True here as load_metrics has **kwargs.
+                )
+                accept_probabilities = "probabilities" in inspect.signature(met._compute).parameters
+                extra_kwargs = (
+                    dict(probabilities=self.make_probabilities()) if accept_probabilities else {}
+                )
+                extra_kwargs.update(metric_obj_def.additional_kwargs)
+                with warnings.catch_warnings():
+                    # Ignore warnings such as
+                    #   UndefinedMetricWarning: Precision is ill-defined and being set to 0.0
+                    warnings.simplefilter("ignore", category=UndefinedMetricWarning)
+                    metric_values[metric_name] = assert_not_none(
+                        first_value(
+                            met.compute(
+                                predictions=get_predictions_from_ds(
+                                    ds, self.mod_options.without_postprocessing
+                                ),
+                                references=ds[self.config.columns.label],
+                                **extra_kwargs,
+                            )
                         )
                     )
-                )
 
-        return [
-            MetricsModuleResponse(
-                outcome_count=outcome_count,
-                ece=ece,
-                ece_plot_args=(acc, expected, ece, count_per_bin),
-                utterance_count=utterance_count,
-                custom_metrics=metric_values,
-            )
-        ]
+            return [
+                MetricsModuleResponse(
+                    outcome_count=outcome_count,
+                    ece=ece,
+                    ece_plot_args=(acc, expected, ece, count_per_bin),
+                    utterance_count=utterance_count,
+                    custom_metrics=metric_values,
+                )
+            ]
+
+    def compute_on_dataset_split(self) -> List[MetricsModuleResponse]:  # type: ignore
+        ds: Dataset = assert_not_none(self.get_dataset_split())
+        return self.compute_metrics(ds)
 
     @staticmethod
     def module_to_api_response(res: List[MetricsModuleResponse]) -> List[MetricsAPIResponse]:
@@ -150,7 +166,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
         probs = np.zeros([len(ds), num_classes])
         for idx, (confidences, predictions) in enumerate(
             zip(
-                self._get_confidences_from_ds(),
+                get_confidences_from_ds(ds, self.mod_options.without_postprocessing),
                 ds[DatasetColumn.model_predictions],
             )
         ):
@@ -173,14 +189,14 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
         Returns:
             Metrics for all provided filters.
         """
+        ds = self.get_dataset_split()
         accumulator = []
         for filter_value, filters in filters_dict.items():
-            met_module = MetricsModule(
+            ds_filter = filter_dataset_split(ds, filters, config=self.config)
+            metric = MetricsModule(
                 dataset_split_name=self.dataset_split_name,
                 config=self.config,
-                mod_options=self.mod_options.copy(update={"filters": filters}),
-            )
-            metric = met_module.compute_on_dataset_split()[0]
+            ).compute_metrics(ds_filter)[0]
             accumulator.append(MetricsPerFilterValue(**metric.dict(), filter_value=filter_value))
         return accumulator
 

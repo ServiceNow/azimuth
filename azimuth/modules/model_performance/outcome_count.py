@@ -23,6 +23,7 @@ from azimuth.types.tag import (
     SMART_TAGS_FAMILY_MAPPING,
     SmartTag,
 )
+from azimuth.utils.dataset_operations import get_outcomes_from_ds
 from azimuth.utils.ml.model_performance import (
     sorted_by_utterance_count,
     sorted_by_utterance_count_with_last,
@@ -50,7 +51,9 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
         """
         outcome_count_per_class: Dict[Tuple[str, OutcomeName], int] = defaultdict(int)
 
-        for utterance_class, outcome in zip(ds[dataset_column], self._get_outcomes_from_ds()):
+        for utterance_class, outcome in zip(
+            ds[dataset_column], get_outcomes_from_ds(ds, self.mod_options.without_postprocessing)
+        ):
             outcome_count_per_class[(dm.get_class_names()[utterance_class], outcome)] += 1
 
         return sorted_by_utterance_count_with_last(
@@ -77,7 +80,9 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
         all_tags = dm.get_tags(
             indices=assert_is_list(ds[DatasetColumn.row_idx]), table_key=self._get_table_key()
         )
-        for utterance_tags, outcome in zip(all_tags, self._get_outcomes_from_ds()):
+        for utterance_tags, outcome in zip(
+            all_tags, get_outcomes_from_ds(ds, self.mod_options.without_postprocessing)
+        ):
             no_tag = True
             for filter_, tagged in utterance_tags.items():
                 if tagged and filter_ in filters[:-1]:
@@ -100,7 +105,9 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
             List of Outcome Count for each outcome.
 
         """
-        outcome_count = defaultdict(int, Counter(self._get_outcomes_from_ds()))
+        outcome_count = defaultdict(
+            int, Counter(get_outcomes_from_ds(ds, self.mod_options.without_postprocessing))
+        )
         empty_outcome_count = {outcome: 0 for outcome in OutcomeName}
 
         metrics = [

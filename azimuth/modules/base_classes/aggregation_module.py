@@ -3,14 +3,13 @@
 # in the root directory of this source tree.
 import time
 from abc import ABC
-from typing import List, Optional, cast
+from typing import List, Optional
 
 from datasets import Dataset
 
 from azimuth.modules.base_classes import ConfigScope, ExpirableMixin, Module
-from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
-from azimuth.types.outcomes import OutcomeName
-from azimuth.utils.filtering import filter_dataset_split
+from azimuth.types import DatasetSplitName, ModuleOptions, ModuleResponse
+from azimuth.utils.dataset_operations import filter_dataset_split
 
 
 class AggregationModule(Module[ConfigScope], ABC):
@@ -62,42 +61,3 @@ class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
             config=self.config,
             without_postprocessing=self.mod_options.without_postprocessing,
         )
-
-    def _get_predictions_from_ds(self) -> List[int]:
-        """Get predicted classes according to the module options (with or without postprocessing).
-
-        Returns: List of Predictions
-        """
-        ds = self.get_dataset_split()
-        if self.mod_options.without_postprocessing:
-            return cast(List[int], [preds[0] for preds in ds[DatasetColumn.model_predictions]])
-        else:
-            return cast(List[int], ds[DatasetColumn.postprocessed_prediction])
-
-    def _get_confidences_from_ds(self) -> List[List[float]]:
-        """Get confidences according to the module options (with or without postprocessing).
-
-        Notes: Confidences are sorted according to their values (not the class id).
-
-        Returns: List of Confidences
-        """
-        ds = self.get_dataset_split()
-        confidences = (
-            ds[DatasetColumn.model_confidences]
-            if self.mod_options.without_postprocessing
-            else ds[DatasetColumn.postprocessed_confidences]
-        )
-        return cast(List[List[float]], confidences)
-
-    def _get_outcomes_from_ds(self) -> List[OutcomeName]:
-        """Get outcomes according to the module options (with or without postprocessing).
-
-        Returns: List of Outcomes
-        """
-        ds = self.get_dataset_split()
-        outcomes = (
-            ds[DatasetColumn.model_outcome]
-            if self.mod_options.without_postprocessing
-            else ds[DatasetColumn.postprocessed_outcome]
-        )
-        return cast(List[OutcomeName], outcomes)
