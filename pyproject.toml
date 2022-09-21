@@ -21,9 +21,9 @@ faiss-cpu = "=1.6.5"
 tensorflow = "~2.8.0"
 tensorflow-text = "~2.8.0"
 tensorflow-estimator = "~2.8.0"
-onnx = "^1.9.0"
-onnxruntime-extensions = "0.3.1"
-onnxruntime = "1.10"
+onnx = "^1.12.0"
+onnxruntime-extensions = "0.4.2"
+onnxruntime = "1.12.1"
 scipy = "^1.6.3"
 torch = { version = "1.9.0", source = "PyPI" }
 
