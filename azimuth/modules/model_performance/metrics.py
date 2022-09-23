@@ -68,7 +68,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
         """Compute all metrics on a given dataset split.
 
         Args:
-            ds: Dataset Split to compute metrics for.
+            ds: Dataset Split for which to compute metrics.
 
         Returns:
             MetricsModuleResponse with all metrics.
@@ -85,7 +85,6 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
 
             # Compute ECE
             bins = ConfidenceHistogramModule.get_bins(ds, self.mod_options.without_postprocessing)
-            # = conf_hist_mod.compute_on_dataset_split()[0].bins
             ece, acc, expected = compute_ece_from_bins(bins)
             count_per_bin = [sum(b.outcome_count.values()) for b in bins]
 
