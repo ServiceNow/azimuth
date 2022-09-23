@@ -65,7 +65,10 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
     """Computes different metrics on each dataset split."""
 
     def compute_metrics(self, ds: Dataset) -> List[MetricsModuleResponse]:
-        """Compute all metrics on a given dataset split.
+        """Compute all metrics on the specified dataset split.
+
+        Note: This lives outside of `compute_on_dataset_split()` so that it can be called without
+        going through calling the module and filtering the dataset.
 
         Args:
             ds: Dataset Split for which to compute metrics.
@@ -130,6 +133,7 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
             ]
 
     def compute_on_dataset_split(self) -> List[MetricsModuleResponse]:  # type: ignore
+        """Computes different metrics according to the specified module options."""
         ds: Dataset = assert_not_none(self.get_dataset_split())
         return self.compute_metrics(ds)
 
@@ -191,11 +195,11 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
         ds = self.get_dataset_split()
         accumulator = []
         for filter_value, filters in filters_dict.items():
-            ds_filter = filter_dataset_split(ds, filters, config=self.config)
+            ds_filtered = filter_dataset_split(ds, filters, config=self.config)
             metric = MetricsModule(
                 dataset_split_name=self.dataset_split_name,
                 config=self.config,
-            ).compute_metrics(ds_filter)[0]
+            ).compute_metrics(ds_filtered)[0]
             accumulator.append(MetricsPerFilterValue(**metric.dict(), filter_value=filter_value))
         return accumulator
 

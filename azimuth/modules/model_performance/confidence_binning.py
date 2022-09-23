@@ -41,11 +41,15 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
     def get_bins(
         cls, ds: Dataset, without_postprocessing: bool = False
     ) -> List[ConfidenceBinDetails]:
-        """Compute the bins on the dataset split.
+        """Compute the bins on the specified dataset split.
+
+        Note: This lives outside of `compute_on_dataset_split()` so that it can be called without
+        going through calling the module and filtering the dataset.
 
         Args:
             ds: Dataset Split on which to compute bins
-            without_postprocessing: Whether to use outcomes and confidences without pipeline postprocessing
+            without_postprocessing: Whether to use outcomes and confidences without pipeline
+                postprocessing
 
         Returns:
             List of the confidence bins with their confidence and the outcome count.
