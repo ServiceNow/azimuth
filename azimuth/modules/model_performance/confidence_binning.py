@@ -44,8 +44,8 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
         """Compute the bins on the dataset split.
 
         Args:
-            ds: Dataset Split to compute bins
-            without_postprocessing: Determine which outcomes and confidences to use.
+            ds: Dataset Split on which to compute bins
+            without_postprocessing: Whether to use outcomes and confidences without pipeline postprocessing
 
         Returns:
             List of the confidence bins with their confidence and the outcome count.
