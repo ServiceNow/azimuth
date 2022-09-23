@@ -1,13 +1,15 @@
 import {
+  alpha,
   Box,
-  Paper,
+  FormControlLabel,
   ListSubheader,
+  Paper,
   MenuItem,
   Select,
   Typography,
-  FormControlLabel,
 } from "@mui/material";
 import {
+  DATA_GRID_PROPS_DEFAULT_VALUES,
   GridCellParams,
   GridCellValue,
   GridColumnHeaderParams,
@@ -18,10 +20,12 @@ import {
   GridRow,
   GridSortCellParams,
   GridSortModel,
+  GridValueGetterParams,
   gridStringOrNumberComparator,
   HideGridColMenuItem,
 } from "@mui/x-data-grid";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
+import DeltaComputationBars from "components/Metrics/DeltaComputationBars";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
 import { Table, Column, RowProps } from "components/Table";
 import VisualBar from "components/VisualBar";
@@ -36,6 +40,7 @@ import {
   AvailableDatasetSplits,
   DatasetSplitName,
   MetricsPerFilterValue,
+  Outcome,
 } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
@@ -49,6 +54,7 @@ import {
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { constructSearchString } from "utils/helpers";
+import { motion } from "framer-motion";
 
 const ROW_HEIGHT = 35;
 
@@ -87,6 +93,18 @@ type Row = {
   id: number;
   basePipeline: MetricsPerFilterValue;
   comparedPipeline?: MetricsPerFilterValue;
+};
+
+const calculateDeltaMargins = (value: number) => {
+  if (value <= 2) {
+    return [-20, -10, 0, 10, 20];
+  } else if (value > 2 && value < 5) {
+    return [-50, -20, -10, 0, 10, 20, 50];
+  } else if (value > 5) {
+    return [-100, -50, -20, -10, 0, 10, 20, 50, 100];
+  } else {
+    return [-20, -10, 0, 10, 20];
+  }
 };
 
 const PerformanceAnalysisTable: React.FC<Props> = ({
@@ -153,22 +171,20 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         {
           id: OVERALL_ROW_ID,
           basePipeline: basePipelineData.metricsOverall[0],
-          ...(comparedPipeline &&
-            comparedPipelineData && {
-              comparedPipeline: comparedPipelineData.metricsOverall[0],
-            }),
+          ...(comparedPipelineData && {
+            comparedPipeline: comparedPipelineData.metricsOverall[0],
+          }),
         },
         ...basePipelineData.metricsPerFilter[selectedMetricPerFilterOption].map(
           (basePipeline, index) => ({
             id: index,
             basePipeline,
-            ...(comparedPipeline &&
-              comparedPipelineData && {
-                comparedPipeline:
-                  comparedPipelineData.metricsPerFilter[
-                    selectedMetricPerFilterOption
-                  ][index],
-              }),
+            ...(comparedPipelineData && {
+              comparedPipeline:
+                comparedPipelineData.metricsPerFilter[
+                  selectedMetricPerFilterOption
+                ][index],
+            }),
           })
         ),
       ]) ||
@@ -180,6 +196,140 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     comparedPipelineData,
     selectedMetricPerFilterOption,
   ]);
+
+  const deltaMetrics: number[] = React.useMemo(() => {
+    const delta: number[] = [];
+    basePipelineData &&
+      comparedPipelineData &&
+      Object.keys(metricInfo ?? {}).flatMap((field) => {
+        delta.push(
+          comparedPipelineData.metricsOverall[0].customMetrics[field] -
+            basePipelineData.metricsOverall[0].customMetrics[field]
+        );
+        basePipelineData.metricsPerFilter[selectedMetricPerFilterOption].map(
+          (basePipeline, index) => {
+            delta.push(
+              comparedPipelineData.metricsPerFilter[
+                selectedMetricPerFilterOption
+              ][index].customMetrics[field] - basePipeline.customMetrics[field]
+            );
+          }
+        );
+      });
+    const filteredDelta = delta.filter((x) => !isNaN(x));
+    return calculateDeltaMargins(Math.max(...filteredDelta) * 100);
+  }, [selectedMetricPerFilterOption, basePipelineData, comparedPipelineData]);
+
+  const deltaUtteranceCount: number[] = React.useMemo(() => {
+    const delta: number[] = [];
+    basePipelineData &&
+      comparedPipelineData &&
+      delta.push(
+        comparedPipelineData.metricsOverall[0].utteranceCount -
+          basePipelineData.metricsOverall[0].utteranceCount
+      );
+    basePipelineData &&
+      comparedPipelineData &&
+      basePipelineData.metricsPerFilter[selectedMetricPerFilterOption].map(
+        (basePipeline, index) => {
+          delta.push(
+            comparedPipelineData.metricsPerFilter[
+              selectedMetricPerFilterOption
+            ][index].utteranceCount - basePipeline.utteranceCount
+          );
+        }
+      );
+    return calculateDeltaMargins(Math.max(...delta) * 100);
+  }, [selectedMetricPerFilterOption, basePipelineData, comparedPipelineData]);
+
+  const deltaECE: number[] = React.useMemo(() => {
+    const delta: number[] = [];
+    basePipelineData &&
+      comparedPipelineData &&
+      delta.push(
+        comparedPipelineData.metricsOverall[0].ece -
+          basePipelineData.metricsOverall[0].ece
+      );
+    basePipelineData &&
+      comparedPipelineData &&
+      basePipelineData.metricsPerFilter[selectedMetricPerFilterOption].map(
+        (basePipeline, index) => {
+          delta.push(
+            comparedPipelineData.metricsPerFilter[
+              selectedMetricPerFilterOption
+            ][index].ece - basePipeline.ece
+          );
+        }
+      );
+    const filteredDelta = delta.filter((x) => !isNaN(x));
+    return calculateDeltaMargins(Math.max(...filteredDelta) * 100);
+  }, [selectedMetricPerFilterOption, basePipelineData, comparedPipelineData]);
+
+  const renderDeltaBarHeader = (margin: number[], key: string) => (
+    <Box
+      key={key}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {margin.map((val) => (
+        <Typography margin={1} fontWeight="bold" fontSize={13}>
+          {val}
+        </Typography>
+      ))}
+    </Box>
+  );
+
+  const renderDeltaRows = ({ value }: GridCellParams) => (
+    <Box
+      borderLeft={(theme) =>
+        `3px dashed ${alpha(theme.palette.common.black, 0.2)}`
+      }
+      height="100%"
+      // marginRight={8.5}
+      position="inherit"
+    >
+      <DeltaComputationBars value={value} />
+    </Box>
+  );
+
+  const renderDeltaBarRows = ({ value }: GridCellParams) => (
+    <Box flex={1} height="100%">
+      <Box top={0} height="100%" width="100%">
+        {/* left="67%" */}
+        <>
+          {/* <Box
+            borderLeft={(theme) =>
+              `3px dashed ${alpha(theme.palette.common.black, 0.2)}`
+            }
+            height="100%"
+            width="100%"
+            marginLeft={36}
+          ></Box> */}
+          <Box
+            position="relative"
+            // component={motion.div}
+            key={formatRatioAsPercentageString(value, 1)}
+            // overflow="auto"
+            height="90%"
+            sx={{
+              ...(value < 0 ? { right: `50%` } : { left: "50%" }),
+              width: `${Math.abs(value) * 50}%`,
+            }}
+            // marginLeft={1}
+            // animate={{
+            //   width: `${value > 0 ? 100 * value : 0}%`,
+            // }}
+            // initial={false}
+            // transition={{ type: "tween" }}
+            bgcolor={(theme) => theme.palette.primary.light}
+          />
+        </>
+      </Box>
+    </Box>
+  );
 
   const columns: Column<Row>[] = React.useMemo(() => {
     const metricsEntries = Object.entries(metricInfo ?? {});
@@ -226,7 +376,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                       <Box
                         position="absolute"
                         left={0}
-                        right={-2 * colDef.computedWidth}
+                        right={-3 * colDef.computedWidth}
                         top={0}
                         lineHeight={1}
                         textAlign="center"
@@ -247,7 +397,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               headerName: "Total",
               description: "Number of Utterances in each model",
               width: 120,
-              align: "center",
+              align: "right",
               valueGetter: ({ row }) => row.basePipeline.utteranceCount,
               sortComparator: customSort,
             },
@@ -257,14 +407,15 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               field: `${pipeline}UtteranceCount`,
               ...groupHeader(pipeline, "Number of utterances"),
               width: 150,
-              align: "center",
+              align: "right",
               valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
               sortComparator: customSort,
             })),
             {
-              field: `deltaUtteranceCount`,
               headerName: "Delta",
               width: 100,
+              align: "right",
+              field: "deltaUtteranceCount",
               valueGetter: ({ row }) =>
                 row.comparedPipeline &&
                 row.comparedPipeline.utteranceCount -
@@ -280,54 +431,23 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       {
         id: 1,
         field: "filterValue",
+        disableColumnMenu: true,
         width: 200,
-        headerClassName: "sticky", // TODO doesn't work
+        hideSortIcons: true,
+        headerHeight: 15,
+        headerAlign: "right",
+        headerClassName: "sticy",
         cellClassName: "sticky",
         sortComparator: customSort,
         valueGetter: ({ row }) => row.basePipeline.filterValue,
-        renderHeader: () => (
-          <Select
-            sx={{
-              fontFamily: "inherit",
-              fontSize: "inherit",
-              fontWeight: "inherit",
-              color: "inherit",
-              marginRight: 1,
-            }}
-            // We must stop the blur event because if not it causes exceptions elsewhere
-            // See here: https://github.com/mui/mui-x/issues/1439
-            onBlur={(event) => event.stopPropagation()}
-            variant="standard"
-            id="filter-by-select"
-            value={selectedMetricPerFilterOption}
-            onChange={(event) =>
-              setSelectedMetricPerFilterOption(
-                event.target.value as FilterByViewOption
-              )
-            }
-          >
-            {BASIC_FILTER_OPTIONS.map((key) => (
-              <MenuItem key={key} value={key}>
-                {OPTION_PRETTY_NAME[key]}
-              </MenuItem>
-            ))}
-            <ListSubheader>Smart Tags</ListSubheader>
-            {SMART_TAG_FAMILIES.map((key) => (
-              <MenuItem key={key} value={key}>
-                <Box display="flex" gap={1}>
-                  {OPTION_PRETTY_NAME[key]}
-                  {React.createElement(SMART_TAG_FAMILY_ICONS[key])}
-                </Box>
-              </MenuItem>
-            ))}
-          </Select>
-        ),
+        renderHeader: () => <Box height={15}></Box>,
       },
       ...utteranceCount,
       ...ALL_OUTCOMES.flatMap<Column<Row>>((outcome) => [
         ...pipelines.map<Column<Row>>((pipeline) => ({
           ...METRIC_COLUMN,
           field: `${pipeline}${outcome}`,
+          align: "right",
           ...groupHeader(
             pipeline,
             OutcomeIcon({ outcome }),
@@ -341,14 +461,19 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             <VisualBar
               formattedValue={formatRatioAsPercentageString(value, 1)}
               value={value}
-              color={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
+              color={(theme) =>
+                alpha(theme.palette[OUTCOME_COLOR[outcome]].main, 0.5)
+              }
             />
           ),
         })),
         {
-          field: `delta${outcome}`,
           headerName: "Delta",
-          width: 150,
+          width: 100,
+          align: "right",
+          headerAlign: "right",
+          headerClassName: "span",
+          field: `delta${outcome}`,
           valueGetter: ({ row }) =>
             row.comparedPipeline &&
             row.comparedPipeline.outcomeCount[outcome] /
@@ -361,12 +486,28 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             formatRatioAsPercentageString(value as number, 1),
           sortComparator: customSort,
         },
+        {
+          field: `delta${outcome}Bars`,
+          width: 200,
+          align: "right",
+          headerAlign: "right",
+          headerName: "Delta Bars",
+          valueGetter: ({ row }) =>
+            row.comparedPipeline &&
+            row.comparedPipeline.outcomeCount[outcome] /
+              row.comparedPipeline.utteranceCount -
+              row.basePipeline.outcomeCount[outcome] /
+                row.basePipeline.utteranceCount,
+          renderCell: ({ value }: GridCellParams<number>) => <></>,
+          sortComparator: customSort,
+        },
       ]),
       ...metricsEntries.flatMap<Column<Row>>(
         ([metricName, { description }]) => [
           ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
+            align: "right",
             ...groupHeader(pipeline, metricName),
             description,
             valueGetter: ({ row }) => row[pipeline]?.customMetrics[metricName],
@@ -379,9 +520,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             ),
           })),
           {
-            field: `delta${metricName}`,
             headerName: "Delta",
-            width: 150,
+            width: 100,
+            align: "right",
+            headerAlign: "right",
+            headerClassName: "span",
+            field: `delta${metricName}`,
             valueGetter: ({ row }) =>
               row.comparedPipeline &&
               row.comparedPipeline.customMetrics[metricName] -
@@ -392,12 +536,27 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               formatRatioAsPercentageString(value as number, 1),
             sortComparator: customSort,
           },
+          {
+            field: `delta${metricName}Bars`,
+            width: 200,
+            align: "right",
+            headerAlign: "right",
+            renderHeader: () =>
+              renderDeltaBarHeader(deltaMetrics, `delta${metricName}Bars`),
+            valueGetter: ({ row }) =>
+              row.comparedPipeline &&
+              row.comparedPipeline.customMetrics[metricName] -
+                row.basePipeline.customMetrics[metricName],
+            renderCell: renderDeltaBarRows,
+            sortComparator: customSort,
+          },
         ]
       ),
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
         ...groupHeader(pipeline, "ECE"),
+        align: "right",
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
@@ -405,20 +564,34 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             <VisualBar
               formattedValue={value.toFixed(2)}
               value={value}
-              color={(theme) => theme.palette.primary.dark}
+              color={(theme) => alpha(theme.palette.primary.dark, 0.5)}
             />
           ),
       })),
       {
         field: `deltaECE`,
         headerName: "Delta",
-        width: 150,
+        align: "right",
+        headerAlign: "right",
+        headerClassName: "span",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.ece - row.basePipeline.ece,
         cellClassName: ({ value }: GridCellParams<number>) =>
           styleDeltaValues(value),
         valueFormatter: ({ value }) => value && (value as number).toFixed(2),
+        sortComparator: customSort,
+      },
+      {
+        field: `deltaECEBars`,
+        width: 450,
+        align: "right",
+        headerAlign: "right",
+        renderHeader: () => renderDeltaBarHeader(deltaECE, "deltaECEBar"),
+        valueGetter: ({ row }) =>
+          row.comparedPipeline &&
+          row.comparedPipeline.ece - row.basePipeline.ece,
+        renderCell: renderDeltaBarRows,
         sortComparator: customSort,
       },
     ];
@@ -444,6 +617,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     ].flatMap((field) => [
       [`comparedPipeline${field}`, visibility],
       [`delta${field}`, visibility],
+      [`delta${field}Bars`, visibility],
     ]);
     setColumnVisibilityModel(Object.fromEntries(columnVisibilityEntries));
   }, [pipeline, comparedPipeline, metricInfo]);
@@ -464,6 +638,45 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     >
       <GridRow {...props} />
     </Link>
+  );
+
+  const ClassHeader = () => (
+    <Select
+      sx={{
+        fontFamily: "inherit",
+        fontSize: "inherit",
+        fontWeight: "bold",
+        color: "inherit",
+        marginLeft: 1,
+        top: (theme) => theme.spacing(2),
+      }}
+      // We must stop the blur event because if not it causes exceptions elsewhere
+      // See here: https://github.com/mui/mui-x/issues/1439
+      // onBlur={(event) => event.stopPropagation()}
+      variant="standard"
+      id="filter-by-select"
+      value={selectedMetricPerFilterOption}
+      onChange={(event) =>
+        setSelectedMetricPerFilterOption(
+          event.target.value as FilterByViewOption
+        )
+      }
+    >
+      {BASIC_FILTER_OPTIONS.map((key) => (
+        <MenuItem key={key} value={key}>
+          {OPTION_PRETTY_NAME[key]}
+        </MenuItem>
+      ))}
+      <ListSubheader>Smart Tags</ListSubheader>
+      {SMART_TAG_FAMILIES.map((key) => (
+        <MenuItem key={key} value={key}>
+          <Box display="flex" gap={1}>
+            {OPTION_PRETTY_NAME[key]}
+            {React.createElement(SMART_TAG_FAMILY_ICONS[key])}
+          </Box>
+        </MenuItem>
+      ))}
+    </Select>
   );
 
   return errorFetchingBasePipelineData ? (
@@ -501,38 +714,40 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
-        <FormControlLabel
-          label={`Compare Baseline (${
-            config?.pipelines?.[pipeline.pipelineIndex].name
-          } ) with:`}
-          labelPlacement="start"
-          sx={{ gap: 1, paddingRight: 2 }}
-          control={
-            <Select
-              id="compare-pipeline-model-select"
-              variant="standard"
-              value={comparedPipeline ?? "No pipeline"}
-              displayEmpty
-              onChange={({ target: { value } }) =>
-                setComparedPipeline(
-                  typeof value === "number" ? value : undefined
-                )
-              }
-            >
-              <MenuItem value="No pipeline">
-                <em>No pipeline</em>
-              </MenuItem>
-              {config?.pipelines?.map(
-                (pipelineData, index) =>
-                  index !== pipeline.pipelineIndex && (
-                    <MenuItem key={index} value={index}>
-                      {pipelineData.name}
-                    </MenuItem>
+        {config && (
+          <FormControlLabel
+            label={`Compare Baseline (${
+              config?.pipelines?.[pipeline.pipelineIndex].name
+            } ) with:`}
+            labelPlacement="start"
+            sx={{ gap: 1, paddingRight: 2 }}
+            control={
+              <Select
+                id="compare-pipeline-model-select"
+                variant="standard"
+                value={comparedPipeline ?? "No pipeline"}
+                displayEmpty
+                onChange={({ target: { value } }) =>
+                  setComparedPipeline(
+                    typeof value === "number" ? value : undefined
                   )
-              )}
-            </Select>
-          }
-        ></FormControlLabel>
+                }
+              >
+                <MenuItem value="No pipeline">
+                  <em>No pipeline</em>
+                </MenuItem>
+                {config?.pipelines?.map(
+                  (pipelineData, index) =>
+                    index !== pipeline.pipelineIndex && (
+                      <MenuItem key={index} value={index}>
+                        {pipelineData.name}
+                      </MenuItem>
+                    )
+                )}
+              </Select>
+            }
+          ></FormControlLabel>
+        )}
       </Box>
       <Box
         sx={{
@@ -548,6 +763,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             },
             "& .MuiDataGrid-columnHeaders": {
               borderBottom: "none",
+              height: DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight,
             },
             "& .MuiDataGrid-virtualScroller": {
               // Stops accidental navigation on horizontal scroll with touch pad
@@ -568,10 +784,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             "& .delta-value-positive": {
               color: (theme) => theme.palette.secondary.dark,
               fontWeight: "bold",
+              borderRight: "none",
             },
             "& .delta-value-negative": {
               color: (theme) => theme.palette.primary.main,
               fontWeight: "bold",
+              borderRight: "none",
             },
           }}
           showCellRightBorder
@@ -598,6 +816,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           components={{
             ColumnMenu,
             Row: RowLink,
+            Header: ClassHeader,
           }}
         />
       </Box>

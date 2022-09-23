@@ -10,7 +10,10 @@ const OutcomeIcon: React.FC<{ outcome: Outcome }> = ({ outcome }) => {
     <Tooltip title={OUTCOME_PRETTY_NAMES[outcome]}>
       <Icon
         fontSize="large"
-        sx={{ color: (theme) => theme.palette[OUTCOME_COLOR[outcome]].main }}
+        sx={{
+          color: (theme) => theme.palette[OUTCOME_COLOR[outcome]].main,
+          height: 56,
+        }}
       />
     </Tooltip>
   );

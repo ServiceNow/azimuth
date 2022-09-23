@@ -218,6 +218,7 @@ const PerformanceAnalysis: React.FC<Props> = ({
       ...ALL_OUTCOMES.map<Column<Row>>((outcome) => ({
         ...METRIC_COLUMN,
         field: outcome,
+        align: "right",
         headerName: OUTCOME_PRETTY_NAMES[outcome],
         renderHeader: () => OutcomeIcon({ outcome }),
         valueGetter: ({ row }) =>

@@ -1,6 +1,7 @@
 import { components } from "types/generated/generatedTypes";
 
 export type AzimuthConfig = components["schemas"]["AzimuthConfig"];
+export type PipelineDefinition = components["schemas"]["PipelineDefinition"];
 export type AvailableDatasetSplits =
   components["schemas"]["AvailableDatasetSplits"];
 export type ConfidenceBinDetails =
