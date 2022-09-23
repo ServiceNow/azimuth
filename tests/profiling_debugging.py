@@ -2,7 +2,9 @@
 This file help profiling Module. Change the constants and run the file.
 """
 import tempfile
+import threading
 
+import psutil
 from pyinstrument import Profiler
 from tqdm import tqdm
 
@@ -27,7 +29,13 @@ DEPS_MOD_OPTIONS = ModuleOptions(pipeline_index=0)
 MOD_OPTIONS = ModuleOptions(pipeline_index=0)
 
 
+def print_memory():
+    threading.Timer(2.0, print_memory).start()
+    print(f"Memory used: {psutil.virtual_memory().used / 1024 / 1024}")
+
+
 def main():
+    print_memory()
     config = AzimuthConfig.parse_file(CFG_FILE).copy(
         update={"artifact_path": str(tempfile.mkdtemp())}
     )
