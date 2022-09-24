@@ -149,7 +149,9 @@ const UtterancesTable: React.FC<Props> = ({
       ...postprocessing,
       page: page + 1,
     });
-    history.push(`/app/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
+    history.push(
+      `/app/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`
+    );
   };
 
   const handleSortModelChange = ([model]:

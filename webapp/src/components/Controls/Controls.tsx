@@ -156,7 +156,9 @@ const Controls: React.FC<Props> = ({
     });
 
   const handleDatasetSplitChange = (name: DatasetSplitName) =>
-    history.push(`/app/${jobId}/dataset_splits/${name}/${mainView}${searchString}`);
+    history.push(
+      `/app/${jobId}/dataset_splits/${name}/${mainView}${searchString}`
+    );
 
   const handlePostprocessingChange = (checked: boolean) =>
     history.push(
