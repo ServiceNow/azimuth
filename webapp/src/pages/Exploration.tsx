@@ -63,7 +63,7 @@ const Exploration = () => {
 
   const setMainView = (mainView: MainView) => {
     history.push(
-      `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}${searchString}`
+      `/app/${jobId}/dataset_splits/${datasetSplitName}/${mainView}${searchString}`
     );
   };
 

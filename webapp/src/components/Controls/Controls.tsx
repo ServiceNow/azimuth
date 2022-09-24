@@ -83,7 +83,7 @@ const Controls: React.FC<Props> = ({
     datasetSplitName: DatasetSplitName;
     mainView?: string;
   }>();
-  const baseUrl = `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
+  const baseUrl = `/app/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`;
 
   const {
     data: countPerFilter,
@@ -156,7 +156,7 @@ const Controls: React.FC<Props> = ({
     });
 
   const handleDatasetSplitChange = (name: DatasetSplitName) =>
-    history.push(`/${jobId}/dataset_splits/${name}/${mainView}${searchString}`);
+    history.push(`/app/${jobId}/dataset_splits/${name}/${mainView}${searchString}`);
 
   const handlePostprocessingChange = (checked: boolean) =>
     history.push(

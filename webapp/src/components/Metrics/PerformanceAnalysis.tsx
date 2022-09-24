@@ -280,7 +280,7 @@ const PerformanceAnalysis: React.FC<Props> = ({
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/performance_overview${constructSearchString(
+      to={`/app/${jobId}/dataset_splits/${selectedDatasetSplit}/performance_overview${constructSearchString(
         {
           ...(props.row.id !== OVERALL_ROW_ID && {
             [selectedMetricPerFilterOption]: [props.row.filterValue],

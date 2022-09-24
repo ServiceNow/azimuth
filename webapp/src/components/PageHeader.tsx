@@ -88,31 +88,31 @@ const PageHeader = () => {
     () =>
       [
         {
-          pathname: `/${jobId}`,
+          pathname: `/app/${jobId}`,
           name: "Dashboard",
         },
         {
-          pathname: `/${jobId}/behavioral_testing_summary`,
+          pathname: `/app/${jobId}/behavioral_testing_summary`,
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/settings`,
+          pathname: `/app/${jobId}/settings`,
           name: "Settings",
         },
         {
-          pathname: `/${jobId}/thresholds`,
+          pathname: `/app/${jobId}/thresholds`,
           name: "Threshold Comparison",
         },
         {
-          pathname: `/${jobId}/dataset_class_distribution_analysis`,
+          pathname: `/app/${jobId}/dataset_class_distribution_analysis`,
           name: "Dataset Class Distribution Analysis",
         },
         {
-          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`,
+          pathname: `/app/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`,
           name: "Exploration",
         },
         {
-          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/utterances/${utteranceId}`,
+          pathname: `/app/${jobId}/dataset_splits/${datasetSplitName}/utterances/${utteranceId}`,
           name: "Utterance Details",
         },
       ]
@@ -178,7 +178,7 @@ const PageHeader = () => {
               component={RouterLink}
               size="small"
               color="primary"
-              to={`/${jobId}/settings${searchString}`}
+              to={`/app/${jobId}/settings${searchString}`}
               sx={{
                 padding: 0,
                 "&:hover > svg": {

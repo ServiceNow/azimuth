@@ -59,7 +59,7 @@ const Dashboard = () => {
           color="secondary"
           variant="contained"
           component={Link}
-          to={`/${jobId}/dataset_splits/eval/performance_overview${searchString}`}
+          to={`/app/${jobId}/dataset_splits/eval/performance_overview${searchString}`}
           sx={{ gap: 1 }}
         >
           <Telescope fontSize="large" />
@@ -69,7 +69,7 @@ const Dashboard = () => {
       {datasetInfo?.availableDatasetSplits.train && (
         <PreviewCard
           title="Dataset Class Distribution Analysis"
-          to={`/${jobId}/dataset_class_distribution_analysis${searchString}`}
+          to={`/app/${jobId}/dataset_class_distribution_analysis${searchString}`}
           description={
             <Description
               text="Compare the class distribution of your training and evaluation sets."
@@ -103,7 +103,7 @@ const Dashboard = () => {
         datasetInfo?.perturbationTestingAvailable && (
           <PreviewCard
             title="Behavioral Testing"
-            to={`/${jobId}/behavioral_testing_summary${searchString}`}
+            to={`/app/${jobId}/behavioral_testing_summary${searchString}`}
             description={behavioralTestingDescription}
           >
             <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
@@ -119,7 +119,7 @@ const Dashboard = () => {
         datasetInfo?.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
-            to={`/${jobId}/thresholds${searchString}`}
+            to={`/app/${jobId}/thresholds${searchString}`}
             description={postprocessingDescription}
           >
             <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>

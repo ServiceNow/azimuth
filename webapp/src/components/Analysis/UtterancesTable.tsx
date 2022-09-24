@@ -149,7 +149,7 @@ const UtterancesTable: React.FC<Props> = ({
       ...postprocessing,
       page: page + 1,
     });
-    history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
+    history.push(`/app/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
   };
 
   const handleSortModelChange = ([model]:
@@ -157,7 +157,7 @@ const UtterancesTable: React.FC<Props> = ({
     | [GridSortItem]
     | []) =>
     history.push(
-      `/${jobId}/dataset_splits/${datasetSplitName}/utterances${constructSearchString(
+      `/app/${jobId}/dataset_splits/${datasetSplitName}/utterances${constructSearchString(
         {
           ...confusionMatrix,
           ...filters,
@@ -366,7 +366,7 @@ const UtterancesTable: React.FC<Props> = ({
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={`/${jobId}/dataset_splits/${datasetSplitName}/utterances/${props.row.id}${searchString}`}
+      to={`/app/${jobId}/dataset_splits/${datasetSplitName}/utterances/${props.row.id}${searchString}`}
     >
       <GridRow {...props} />
     </Link>

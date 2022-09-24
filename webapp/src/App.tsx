@@ -70,49 +70,49 @@ export default class App extends React.Component<Props> {
                 <ErrorBoundary>
                   <Switch>
                     <Route exact path="/">
-                      <Redirect to="/local?pipeline_index=0" />
+                      <Redirect to="/app/local?pipeline_index=0" />
                     </Route>
-                    <Route path="/:jobId">
+                    <Route path="/app/:jobId">
                       <StatusCheck>
                         <PipelineCheck>
                           <Switch>
-                            <Route path="/:jobId" exact>
+                            <Route path="/app/:jobId" exact>
                               <BasicLayout maxWidth="md">
                                 <Dashboard />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/settings" exact>
+                            <Route path="/app/:jobId/settings" exact>
                               <BasicLayout>
                                 <Settings />
                               </BasicLayout>
                             </Route>
                             <Route
-                              path="/:jobId/dataset_splits/:datasetSplitName"
+                              path="/app/:jobId/dataset_splits/:datasetSplitName"
                               exact
                             >
                               <DatasetSplitRedirect />
                             </Route>
                             <Route
-                              path="/:jobId/dataset_splits/:datasetSplitName/:mainView"
+                              path="/app/:jobId/dataset_splits/:datasetSplitName/:mainView"
                               exact
                             >
                               <Exploration />
                             </Route>
                             <Route
-                              path="/:jobId/behavioral_testing_summary"
+                              path="/app/:jobId/behavioral_testing_summary"
                               exact
                             >
                               <BasicLayout>
                                 <PerturbationTestingSummary />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/thresholds" exact>
+                            <Route path="/app/:jobId/thresholds" exact>
                               <BasicLayout>
                                 <Threshold />
                               </BasicLayout>
                             </Route>
                             <Route
-                              path="/:jobId/dataset_class_distribution_analysis"
+                              path="/app/:jobId/dataset_class_distribution_analysis"
                               exact
                             >
                               <BasicLayout>
@@ -120,7 +120,7 @@ export default class App extends React.Component<Props> {
                               </BasicLayout>
                             </Route>
                             <Route
-                              path="/:jobId/dataset_splits/:datasetSplitName/utterances/:utteranceId"
+                              path="/app/:jobId/dataset_splits/:datasetSplitName/utterances/:utteranceId"
                               exact
                             >
                               <BasicLayout>
