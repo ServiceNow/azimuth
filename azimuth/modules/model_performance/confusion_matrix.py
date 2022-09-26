@@ -13,6 +13,7 @@ from sklearn.metrics import confusion_matrix
 from azimuth.config import ModelContractConfig
 from azimuth.modules.base_classes import FilterableModule
 from azimuth.types.model_performance import ConfusionMatrixResponse
+from azimuth.utils.dataset_operations import get_predictions_from_ds
 from azimuth.utils.validation import assert_not_none
 
 MIN_CONFUSION_CUTHILL_MCKEE = 0.1
@@ -35,7 +36,7 @@ class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
         """
         ds: Dataset = assert_not_none(self.get_dataset_split())
         predictions, labels = (
-            self._get_predictions_from_ds(),
+            get_predictions_from_ds(ds, self.mod_options.without_postprocessing),
             ds[self.config.columns.label],
         )
         ds_mng = self.get_dataset_split_manager()

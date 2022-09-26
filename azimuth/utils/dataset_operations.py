@@ -1,12 +1,13 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Union, cast
+from typing import List, Union, cast
 
 from datasets import Dataset
 
 from azimuth.config import ProjectConfig
 from azimuth.types import DatasetColumn, DatasetFilters, NamedDatasetFilters
+from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
     SMART_TAGS_FAMILY_MAPPING,
@@ -105,3 +106,54 @@ def filter_dataset_split(
             )
 
     return dataset_split
+
+
+def get_predictions_from_ds(ds: Dataset, without_postprocessing: bool = False) -> List[int]:
+    """Get predicted classes, with or without postprocessing.
+
+    Args:
+        ds: Dataset Split for which to get predictions.
+        without_postprocessing: Determine which column to use.
+
+    Returns: List of Predictions
+    """
+    if without_postprocessing:
+        return cast(List[int], [preds[0] for preds in ds[DatasetColumn.model_predictions]])
+    else:
+        return cast(List[int], ds[DatasetColumn.postprocessed_prediction])
+
+
+def get_confidences_from_ds(ds: Dataset, without_postprocessing: bool = False) -> List[List[float]]:
+    """Get confidences, with or without postprocessing.
+
+    Notes: Confidences are sorted according to their values (not the class id).
+
+    Args:
+        ds: Dataset Split for which to get confidences.
+        without_postprocessing: Determine which column to use.
+
+    Returns: List of Confidences
+    """
+    confidences = (
+        ds[DatasetColumn.model_confidences]
+        if without_postprocessing
+        else ds[DatasetColumn.postprocessed_confidences]
+    )
+    return cast(List[List[float]], confidences)
+
+
+def get_outcomes_from_ds(ds: Dataset, without_postprocessing: bool = False) -> List[OutcomeName]:
+    """Get outcomes, with or without postprocessing.
+
+        Args:
+        ds: Dataset Split for which to get outcomes.
+        without_postprocessing: Determine which column to use.
+
+    Returns: List of Outcomes
+    """
+    outcomes = (
+        ds[DatasetColumn.model_outcome]
+        if without_postprocessing
+        else ds[DatasetColumn.postprocessed_outcome]
+    )
+    return cast(List[OutcomeName], outcomes)

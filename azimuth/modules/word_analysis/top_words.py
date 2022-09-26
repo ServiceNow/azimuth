@@ -18,6 +18,7 @@ from azimuth.types.word_analysis import (
     TopWordsResponse,
     TopWordsResult,
 )
+from azimuth.utils.dataset_operations import get_predictions_from_ds
 from azimuth.utils.ml.third_parties.stop_words import STOP_WORDS
 from azimuth.utils.project import saliency_available
 
@@ -89,9 +90,9 @@ class TopWordsModule(FilterableModule[ModelContractConfig]):
             else TopWordsImportanceCriteria.frequent
         )
 
-        dataset_split = self.get_dataset_split()
+        ds = self.get_dataset_split()
 
-        if len(dataset_split) == 0:
+        if len(ds) == 0:
             return [
                 TopWordsResponse(
                     all=[],
@@ -109,9 +110,9 @@ class TopWordsModule(FilterableModule[ModelContractConfig]):
         important_words_errors = []
 
         tokenizer = self.artifact_manager.get_tokenizer()
-        is_error = np.array(self._get_predictions_from_ds()) != np.array(
-            dataset_split[self.config.columns.label]
-        )
+        is_error = np.array(
+            get_predictions_from_ds(ds, self.mod_options.without_postprocessing)
+        ) != np.array(ds[self.config.columns.label])
 
         for idx, record in enumerate(words_saliencies):
             # Put everything to lower case and remove cls/sep tokens.

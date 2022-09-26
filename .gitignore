@@ -9,6 +9,7 @@ cache
 *.swp
 !poetry.lock
 !yarn.lock
+tests/logs.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
