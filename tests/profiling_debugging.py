@@ -3,6 +3,7 @@ This file help profiling Module. Change the constants and run the file.
 """
 import tempfile
 import threading
+import time
 
 import psutil
 from pyinstrument import Profiler
@@ -30,8 +31,12 @@ MOD_OPTIONS = ModuleOptions(pipeline_index=0)
 
 
 def print_memory():
-    threading.Timer(2.0, print_memory).start()
-    print(f"Memory used: {psutil.virtual_memory().used / 1024 / 1024}")
+    def fn():
+        while True:
+            print(f"Memory used: {psutil.virtual_memory().used / 1024 / 1024}")
+            time.sleep(2)
+
+    threading.Thread(target=fn).start()
 
 
 def main():
