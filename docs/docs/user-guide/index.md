@@ -22,7 +22,8 @@ The top banner contains useful information and links.
 * A dropdown :material-arrow-down-drop-circle-outline: allows you to select the different pipelines
   defined in the config. It also allows you to select no pipelines.
 * The [**settings**](settings.md) :gear: allow you to enable/disable different analyses.
-* A link to the documentation is available in the help :material-help-circle: option.
+* A link to the support Slack channel and to the documentation is available in the help
+  :material-help-circle: option.
 
 ![Screenshot](../_static/images/dashboard/top-banner.png)
 

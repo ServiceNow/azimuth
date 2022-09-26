@@ -75,7 +75,7 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
             gridTemplateColumns="repeat(2, 1fr)"
           >
             {Object.entries(status.startupTasksStatus).map(([task, status]) => (
-              <Box display="flex" alignItems="center" gap={1}>
+              <Box key={task} display="flex" alignItems="center" gap={1}>
                 <Tooltip title={status}>{STATUS_ICONS[status]}</Tooltip>
                 <Typography>{capitalize(task).replace(/_/g, " ")}</Typography>
               </Box>
