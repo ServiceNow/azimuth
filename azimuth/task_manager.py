@@ -35,7 +35,7 @@ class TaskManager:
 
     def __init__(self, config: AzimuthConfig, cluster: Optional[SpecCluster] = None):
         self.config = config
-        self.cluster = cluster or default_cluster(large=False)
+        self.cluster = cluster or default_cluster(large=config.large_dask_cluster)
         self.client = Client(cluster)
         self.tasks: Dict[str, type] = {}
         self.current_tasks: Dict[str, DaskModule] = {}

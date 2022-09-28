@@ -222,6 +222,9 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # Will use CUDA and will need GPUs if set to True.
     # If "auto" we check if CUDA is available.
     use_cuda: Union[Literal["auto"], bool] = "auto"
+    # Memory of the dask cluster. Regular is 6GB, Large is 12GB.
+    # For bigger models, large might be needed.
+    large_dask_cluster: bool = False
 
     def get_artifact_path(self) -> str:
         """Generate a path for caching.
