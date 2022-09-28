@@ -27,6 +27,7 @@ def test_get_config(app: FastAPI):
             "max_delta_std_tokens": 3.0,
             "min_num_per_class": 20,
         },
+        "large_dask_cluster": False,
         "metrics": {
             "F1": {
                 "additional_kwargs": {"average": "weighted"},
