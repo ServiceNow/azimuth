@@ -1,5 +1,12 @@
 import { Settings } from "@mui/icons-material";
-import { Box, Breadcrumbs, IconButton, Link, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  IconButton,
+  Link,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -10,10 +17,10 @@ import {
   useParams,
 } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
-import { DatasetSplitName, PipelineDefinition } from "types/api";
+import { DatasetSplitName } from "types/api";
 import { constructSearchString } from "utils/helpers";
-import HelpMenu from "./HelpMenu";
-import PipelineSelect from "./PipelineSelect";
+import HelpMenu from "components/HelpMenu";
+import PipelineSelect from "components/PipelineSelect";
 
 const useStyles = makeStyles((theme) => ({
   jobHeader: {
@@ -155,7 +162,13 @@ const PageHeader = () => {
                   <PipelineSelect
                     selectedPipeline={pipeline.pipelineIndex ?? ""}
                     onChange={(value) => setPipeline(value)}
-                    pipelines={config.pipelines?.map((pipeline) => pipeline)}
+                    pipelineMenuItem={config.pipelines?.map(
+                      (pipeline, pipelineIndex) => (
+                        <MenuItem key={pipelineIndex} value={pipelineIndex}>
+                          {pipeline.name}
+                        </MenuItem>
+                      )
+                    )}
                   />
                 )}
               </>
