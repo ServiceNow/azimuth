@@ -4,7 +4,6 @@ import {
   FormControlLabel,
   ListSubheader,
   MenuItem,
-  Paper,
   Select,
   Typography,
 } from "@mui/material";
@@ -447,12 +446,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     setColumnVisibilityModel(Object.fromEntries(columnVisibilityEntries));
   }, [pipeline, selectedMetricPerFilterOption, comparedPipeline, metricInfo]);
 
-  const getRowSpacing = React.useCallback(({ id }: GridRowSpacingParams) => {
-    return {
-      bottom: id === OVERALL_ROW_ID ? 12 : 0,
-    };
-  }, []);
-
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
@@ -537,13 +530,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       {errorFetchingComparedPipelineData.message}
     </Typography>
   ) : (
-    <Paper
-      variant="outlined"
-      sx={{
-        height: "100%",
-        padding: 4,
-        marginTop: 2,
-      }}
+    <Box
+      border={(theme) => `1px solid ${theme.palette.grey[200]}`}
+      height="100%"
+      padding={4}
+      marginTop={2}
     >
       <Box marginBottom={1} display="flex" justifyContent="space-between">
         <Box width={340}>
@@ -580,9 +571,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         )}
       </Box>
       <Box
-        sx={{
-          border: (theme) => `1px solid ${theme.palette.grey[200]}`,
-        }}
+        border={(theme) => `1px solid ${theme.palette.grey[200]}`}
+        sx={{ backgroundColor: (theme) => theme.palette.background.paper }}
       >
         <Table
           sx={{
@@ -596,7 +586,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               // Stops accidental navigation on horizontal scroll with touch pad
               overscrollBehaviorX: "contain",
             },
-            "& .total": {
+            "& .overall": {
+              borderRight: (theme) => `1px solid ${theme.palette.grey[300]}`,
               background: (theme) => theme.palette.grey[200],
             },
             "& .content-sticky": {
@@ -605,6 +596,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               zIndex: (theme) => theme.zIndex.mobileStepper,
               borderRight: (theme) => `1px solid ${theme.palette.grey[200]}`,
               background: (theme) => theme.palette.background.paper,
+            },
+            "& .content-sticky-overall": {
+              position: "sticky",
+              left: 0,
+              borderRight: (theme) => `1px solid ${theme.palette.grey[300]}`,
+              background: (theme) => theme.palette.grey[200],
             },
             "& .no-border-right": {
               borderRight: "none",
@@ -617,9 +614,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           columnVisibilityModel={columnVisibilityModel}
           onColumnVisibilityModelChange={setColumnVisibilityModel}
           getRowClassName={({ id }) =>
-            `${id === OVERALL_ROW_ID ? "total" : ""}`
+            `${id === OVERALL_ROW_ID ? "overall" : ""}`
           }
-          getRowSpacing={getRowSpacing}
+          getCellClassName={({ id }) =>
+            `${id === OVERALL_ROW_ID ? "content-sticky-overall" : ""}`
+          }
           autoHeight
           rowHeight={ROW_HEIGHT}
           columns={columns}
@@ -638,7 +637,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           }}
         />
       </Box>
-    </Paper>
+    </Box>
   );
 };
 
