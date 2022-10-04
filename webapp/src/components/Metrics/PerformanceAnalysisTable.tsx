@@ -215,7 +215,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
 
     const DELTA_METRIC_COLUMN = {
       flex: 1,
-      minWidth: 250,
+      minWidth: 175,
       maxWidth: 350,
       sortComparator: customSort,
     };
@@ -334,7 +334,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             <DeltaComputationBar
               value={value}
               formattedValue={formatRatioAsPercentageString(value as number, 1)}
-              width={isNaN(value) ? 0 : Math.abs(value) * 100}
+              width={isNaN(value) ? 0 : Math.abs(value) * 50}
             />
           ),
         },
@@ -374,7 +374,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                   value as number,
                   1
                 )}
-                width={isNaN(value) ? 0 : Math.abs(value) * 100}
+                width={isNaN(value) ? 0 : Math.abs(value) * 50}
               />
             ),
           },
@@ -410,7 +410,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           <DeltaComputationBar
             value={value}
             formattedValue={value && (value as number).toFixed(2)}
-            width={isNaN(value) ? 0 : Math.abs(value) * 100}
+            width={isNaN(value) ? 0 : Math.abs(value) * 50}
           />
         ),
       },
