@@ -277,10 +277,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
       })),
       {
-        ...METRIC_COLUMN,
+        ...DELTA_METRIC_COLUMN,
         field: "deltaUtteranceCount",
         headerName: "Delta",
         headerClassName: "no-border-right",
+        cellClassName: "border-left",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.utteranceCount - row.basePipeline.utteranceCount,
@@ -321,6 +322,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           field: `delta${outcome}`,
           headerName: "Delta",
           headerClassName: "no-border-right",
+          cellClassName: "border-left",
           align: "right",
           valueGetter: ({ row }) =>
             row.comparedPipeline &&
@@ -359,6 +361,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             field: `delta${metricName}`,
             headerName: "Delta",
             headerClassName: "no-border-right",
+            cellClassName: "border-left",
             align: "right",
             valueGetter: ({ row }) =>
               row.comparedPipeline &&
@@ -398,6 +401,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         field: `deltaECE`,
         headerName: "Delta",
         headerClassName: "no-border-right",
+        cellClassName: "border-left",
         align: "right",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
@@ -606,6 +610,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             "& .no-border-right": {
               borderRight: "none",
             },
+            "& .border-left": {
+              borderLeft: (theme) => `1px solid ${theme.palette.grey[300]}`,
+            },
           }}
           showCellRightBorder
           showColumnRightBorder
@@ -616,8 +623,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           getRowClassName={({ id }) =>
             `${id === OVERALL_ROW_ID ? "overall" : ""}`
           }
-          getCellClassName={({ id }) =>
-            `${id === OVERALL_ROW_ID ? "content-sticky-overall" : ""}`
+          getCellClassName={({ id, field }) =>
+            `${
+              id === OVERALL_ROW_ID
+                ? "content-sticky-overall"
+                : field.startsWith("delta")
+                ? "overall"
+                : ""
+            }`
           }
           autoHeight
           rowHeight={ROW_HEIGHT}
