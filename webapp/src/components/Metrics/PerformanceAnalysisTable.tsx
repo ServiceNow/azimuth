@@ -50,7 +50,10 @@ import {
   SMART_TAG_FAMILY_ICONS,
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
-import { formatRatioAsPercentageString } from "utils/format";
+import {
+  formatNumberAsString,
+  formatRatioAsPercentageString,
+} from "utils/format";
 import { constructSearchString } from "utils/helpers";
 
 const ROW_HEIGHT = 35;
@@ -406,7 +409,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           value !== undefined && (
             <DeltaComputationBar
               value={value}
-              formattedValue={value === 0 ? "0" : value.toFixed(2)}
+              formattedValue={value === 0 ? "0" : formatNumberAsString(value)}
               width={isNaN(value) ? 0 : Math.abs(value) * 50}
             />
           ),
