@@ -282,6 +282,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         headerName: "Delta",
         headerClassName: "no-border-right",
         cellClassName: "border-left",
+        headerAlign: "center",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.utteranceCount - row.basePipeline.utteranceCount,
@@ -323,7 +324,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           headerName: "Delta",
           headerClassName: "no-border-right",
           cellClassName: "border-left",
-          align: "right",
+          headerAlign: "center",
           valueGetter: ({ row }) =>
             row.comparedPipeline &&
             row.comparedPipeline.outcomeCount[outcome] /
@@ -362,7 +363,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             headerName: "Delta",
             headerClassName: "no-border-right",
             cellClassName: "border-left",
-            align: "right",
+            headerAlign: "center",
             valueGetter: ({ row }) =>
               row.comparedPipeline &&
               row.comparedPipeline.customMetrics[metricName] -
@@ -402,7 +403,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         headerName: "Delta",
         headerClassName: "no-border-right",
         cellClassName: "border-left",
-        align: "right",
+        headerAlign: "center",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.ece - row.basePipeline.ece,
