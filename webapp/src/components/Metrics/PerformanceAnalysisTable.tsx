@@ -157,7 +157,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         {
           id: OVERALL_ROW_ID,
           basePipeline: basePipelineData.metricsOverall[0],
-          ...(comparedPipeline &&
+          ...(comparedPipeline !== undefined &&
             comparedPipelineData && {
               comparedPipeline: comparedPipelineData.metricsOverall[0],
             }),
@@ -166,7 +166,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           (basePipeline, index) => ({
             id: index,
             basePipeline,
-            ...(comparedPipeline &&
+            ...(comparedPipeline !== undefined &&
               comparedPipelineData && {
                 comparedPipeline:
                   comparedPipelineData.metricsPerFilter[
