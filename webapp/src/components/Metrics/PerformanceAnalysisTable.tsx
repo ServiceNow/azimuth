@@ -595,17 +595,18 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               borderRight: (theme) => `1px solid ${theme.palette.grey[300]}`,
               background: (theme) => theme.palette.grey[200],
             },
+            "& .delta": {
+              background: (theme) => theme.palette.grey[100],
+            },
             "& .content-sticky": {
               position: "sticky",
               left: 0,
               zIndex: (theme) => theme.zIndex.mobileStepper,
-              borderRight: (theme) => `1px solid ${theme.palette.grey[200]}`,
               background: (theme) => theme.palette.background.paper,
             },
             "& .content-sticky-overall": {
               position: "sticky",
               left: 0,
-              borderRight: (theme) => `1px solid ${theme.palette.grey[300]}`,
               background: (theme) => theme.palette.grey[200],
             },
             "& .no-border-right": {
@@ -629,7 +630,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               id === OVERALL_ROW_ID
                 ? "content-sticky-overall"
                 : field.startsWith("delta")
-                ? "overall"
+                ? "delta"
                 : ""
             }`
           }
