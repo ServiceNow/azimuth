@@ -16,7 +16,6 @@ import {
   GridColumnsMenuItem,
   GridColumnVisibilityModel,
   GridRow,
-  GridRowSpacingParams,
   GridSortCellParams,
   GridSortModel,
   gridStringOrNumberComparator,
