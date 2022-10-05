@@ -391,6 +391,8 @@ export interface components {
       postprocessedConfidences: number[];
       modelOutcome: components["schemas"]["OutcomeName"];
       postprocessedOutcome: components["schemas"]["OutcomeName"];
+      preprocessingSteps: components["schemas"]["PreprocessingStep"][];
+      postprocessingSteps: components["schemas"]["PostprocessingStep"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -559,6 +561,34 @@ export interface components {
     PostDataActionRequest: {
       datasetSplitName?: components["schemas"]["DatasetSplitName"];
       dataActions: { [key: string]: { [key: string]: boolean } };
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    PostProcessingIO: {
+      texts: string[];
+      logits: { [key: string]: any };
+      preds: { [key: string]: any };
+      probs: { [key: string]: any };
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    PostprocessingStep: {
+      order: number;
+      output: components["schemas"]["PostProcessingIO"];
+      className: string;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    PreprocessingStep: {
+      order: number;
+      text: string[];
+      className: string;
     };
     PunctuationTestOptions: {
       threshold?: number;

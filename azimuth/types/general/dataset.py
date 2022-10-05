@@ -15,6 +15,7 @@ class DatasetColumn(str, Enum):
     idx = "idx"
     model_predictions = "model_predictions"
     postprocessed_prediction = "postprocessed_prediction"
+    pipeline_steps = "pipeline_steps"
     model_confidences = "model_confidences"
     postprocessed_confidences = "postprocessed_confidences"
     confidence_bin_idx = "confidence_bin_idx"

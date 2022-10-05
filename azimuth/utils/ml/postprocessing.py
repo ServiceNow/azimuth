@@ -26,6 +26,26 @@ class PostProcessingIO(AliasModel):
         )
 
 
+class PreprocessingStep(AliasModel):
+    order: int
+    text: List[str]
+    class_name: str
+
+    def __getitem__(self, item: int) -> "PreprocessingStep":
+        return PreprocessingStep(order=self.order, text=self.text[item], class_name=self.class_name)
+
+
+class PostprocessingStep(AliasModel):
+    order: int
+    output: PostProcessingIO
+    class_name: str
+
+    def __getitem__(self, item: int) -> "PostprocessingStep":
+        return PostprocessingStep(
+            order=self.order, output=self.output[item], class_name=self.class_name
+        )
+
+
 class Postprocessing(abc.ABC):
     """Generic Functors for postprocessing.
 

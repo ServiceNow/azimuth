@@ -7,7 +7,11 @@ from typing import List
 from pydantic import Field
 
 from azimuth.types import AliasModel, ModuleResponse
-from azimuth.utils.ml.postprocessing import PostProcessingIO
+from azimuth.utils.ml.postprocessing import (
+    PostProcessingIO,
+    PostprocessingStep,
+    PreprocessingStep,
+)
 
 
 class Prediction(AliasModel):
@@ -21,6 +25,8 @@ class PredictionResponse(ModuleResponse):
     label: int = Field(..., title="Label")
     model_output: PostProcessingIO = Field(..., title="Output before post-processing")
     postprocessed_output: PostProcessingIO = Field(..., title="Output after post-processing")
+    preprocessing_steps: List[PreprocessingStep]
+    postprocessing_steps: List[PostprocessingStep]
 
 
 class SaliencyResponse(ModuleResponse):

@@ -22,7 +22,7 @@ from azimuth.types import (
 )
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse, SaliencyResponse
-from azimuth.utils.ml.postprocessing import PostProcessingIO
+from azimuth.utils.ml.postprocessing import PostProcessingIO, PostprocessingStep
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.validation import assert_not_none
 
@@ -138,7 +138,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
         # Compute saliency on the batch.
         ...
 
-    def run_postprocessing(self, output: PostProcessingIO, **kwargs) -> PostProcessingIO:
+    def run_postprocessing(self, output: PostProcessingIO, **kwargs) -> List[PostprocessingStep]:
         """
         Run all postprocessors defined in `self.config` on a batch.
 
@@ -158,14 +158,22 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 f" and pipeline definitions (got {self.config.pipelines})."
             )
         postprocessors = self.config.pipelines[self.mod_options.pipeline_index].postprocessors
+        postprocessing_steps = []
         if postprocessors is not None:
-            for post in postprocessors:
+            for order, post in enumerate(postprocessors):
                 # Q: Why do we reload the postprocessors all the time?
                 # A: We should memoize it based on the module options, but that can get complicated.
                 #    It is less burdensome to just reload it.
                 fn = load_custom_object(post, **kwargs)
                 output = fn(output)
-        return output
+                postprocessing_steps.append(
+                    PostprocessingStep(
+                        order=order,
+                        class_name=post.class_name.removeprefix("azimuth.utils.ml.postprocessing."),
+                        output=output,
+                    )
+                )
+        return postprocessing_steps
 
     def _save_result(self, res, dm):
         table_key = self._get_table_key()
@@ -173,6 +181,14 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
         # Save result in a DatasetSplitManager
         if len(res) > 0 and isinstance(res[0], PredictionResponse):
             res_casted = cast(List[PredictionResponse], res)
+            # dm.add_column_to_prediction_table(
+            #     key=DatasetColumn.preprocessing_steps,
+            #     features=[
+            #         [cl_idx for cl_idx in reversed(np.argsort(pred_res.model_output.probs[0]))]
+            #         for pred_res in res_casted
+            #     ],
+            #     table_key=table_key,
+            # )
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.model_predictions,
                 features=[
@@ -198,6 +214,21 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 key=DatasetColumn.postprocessed_confidences,
                 features=[
                     [prob for prob in reversed(np.sort(pred_res.postprocessed_output.probs[0]))]
+                    for pred_res in res_casted
+                ],
+                table_key=table_key,
+            )
+            dm.add_column_to_prediction_table(
+                key=DatasetColumn.pipeline_steps,
+                features=[
+                    {
+                        "preprocessing_steps": [
+                            step.dict() for step in pred_res.preprocessing_steps
+                        ],
+                        "postprocessing_steps": [
+                            step.dict() for step in pred_res.postprocessing_steps
+                        ],
+                    }
                     for pred_res in res_casted
                 ],
                 table_key=table_key,
