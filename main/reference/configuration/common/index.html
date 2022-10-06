@@ -9,7 +9,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.5.3">
+      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
     
     
       
@@ -17,7 +17,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.7a952b86.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.20d9efc8.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.cbb835fc.min.css">
@@ -1246,6 +1246,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#large-dask-cluster" class="md-nav__link">
+    Large Dask Cluster
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1635,6 +1642,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#large-dask-cluster" class="md-nav__link">
+    Large Dask Cluster
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1665,6 +1679,7 @@
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">artifact_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/cache&quot;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">use_cuda</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">large_dask_cluster</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1693,6 +1708,9 @@ the memory available on your machine.</p>
 <p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value</strong>: <code>auto</code></p>
 <p>If cuda is available on your machine, set to <code>true</code>, otherwise <code>false</code>. Can also be set to "auto"
 and let the user-code take care of it.</p>
+<h2 id="large-dask-cluster">Large Dask Cluster</h2>
+<p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value</strong>: False</p>
+<p>The memory of the dask cluster is usually 6GB. If your models are big or if you encounter garbage collection errors,  you can set the memory to 12GB by setting <code>large_dask_cluster</code> to <code>True</code>.</p>
 
 
 
@@ -1769,7 +1787,7 @@ and let the user-code take care of it.</p>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "search.suggest", "navigation.indexes", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "main", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.37e9125f.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.078830c0.min.js"></script>
       
     
   </body>
