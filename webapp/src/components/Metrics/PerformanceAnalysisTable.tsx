@@ -4,10 +4,12 @@ import {
   FormControlLabel,
   ListSubheader,
   MenuItem,
+  Paper,
   Select,
   Typography,
 } from "@mui/material";
 import {
+  DATA_GRID_PROPS_DEFAULT_VALUES,
   GridCellParams,
   GridCellValue,
   GridColumnHeaderParams,
@@ -55,7 +57,7 @@ import { constructSearchString } from "utils/helpers";
 const ROW_HEIGHT = 35;
 const OVERALL_ROW_ID = -1; // -1 so that the other rows can range from 0 - n-1
 const LABEL_WIDTH = 200;
-const LABEL_HEIGHT = 32;
+const LABEL_HEIGHT = DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight;
 
 const pipelines = ["basePipeline", "comparedPipeline"] as const;
 const BASIC_FILTER_OPTIONS = ["label", "prediction"] as const;
@@ -109,10 +111,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     number | undefined
   >();
 
-  const { data: config } = getConfigEndpoint.useQuery(
-    { jobId },
-    { skip: jobId === undefined }
-  );
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
 
   const { data: metricInfo } = getCustomMetricInfoEndpoint.useQuery({
     jobId,
@@ -226,7 +225,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     ) => ({
       ...(comparedPipeline === undefined
         ? {
-            headerClassName: "no-border-right",
             renderHeader: () => shortHeader,
           }
         : {
@@ -258,10 +256,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         id: 1,
         field: "filterValue",
         width: LABEL_WIDTH,
-        headerClassName: "no-border-right",
-        cellClassName: "content-sticky",
-        hideSortIcons: true,
-        disableColumnMenu: false,
+        cellClassName: "sticky",
         sortComparator: customSort,
         valueGetter: ({ row }) => row.basePipeline.filterValue,
       },
@@ -271,7 +266,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...(selectedMetricPerFilterOption !== "label" &&
           groupHeader(pipeline, "Number of utterances")),
         headerName: "Total",
-        headerClassName: "no-border-right",
         align: "right",
         valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
       })),
@@ -279,19 +273,19 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...DELTA_METRIC_COLUMN,
         field: "deltaUtteranceCount",
         headerName: "Delta",
-        headerClassName: "no-border-right",
-        cellClassName: "border-left",
+        cellClassName: "delta",
         headerAlign: "center",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.utteranceCount - row.basePipeline.utteranceCount,
-        renderCell: ({ value }: GridCellParams<number>) => (
-          <DeltaComputationBar
-            value={value}
-            formattedValue={value}
-            width={Math.abs(value)}
-          />
-        ),
+        renderCell: ({ value }: GridCellParams<number | undefined>) =>
+          value !== undefined && (
+            <DeltaComputationBar
+              value={value}
+              formattedValue={value}
+              width={Math.abs(value)}
+            />
+          ),
       },
       ...ALL_OUTCOMES.flatMap<Column<Row>>((outcome) => [
         ...pipelines.map<Column<Row>>((pipeline) => ({
@@ -307,22 +301,22 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             row[pipeline] &&
             row[pipeline]!.outcomeCount[outcome] /
               row[pipeline]!.utteranceCount,
-          renderCell: ({ value }: GridCellParams<number>) => (
-            <VisualBar
-              formattedValue={formatRatioAsPercentageString(value, 1)}
-              value={value}
-              color={(theme) =>
-                alpha(theme.palette[OUTCOME_COLOR[outcome]].main, 0.5)
-              }
-            />
-          ),
+          renderCell: ({ value }: GridCellParams<number | undefined>) =>
+            value !== undefined && (
+              <VisualBar
+                formattedValue={formatRatioAsPercentageString(value, 1)}
+                value={value}
+                color={(theme) =>
+                  alpha(theme.palette[OUTCOME_COLOR[outcome]].main, 0.5)
+                }
+              />
+            ),
         })),
         {
           ...DELTA_METRIC_COLUMN,
           field: `delta${outcome}`,
           headerName: "Delta",
-          headerClassName: "no-border-right",
-          cellClassName: "border-left",
+          cellClassName: "delta",
           headerAlign: "center",
           valueGetter: ({ row }) =>
             row.comparedPipeline &&
@@ -330,13 +324,17 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               row.comparedPipeline.utteranceCount -
               row.basePipeline.outcomeCount[outcome] /
                 row.basePipeline.utteranceCount,
-          renderCell: ({ value }: GridCellParams<number>) => (
-            <DeltaComputationBar
-              value={value}
-              formattedValue={formatRatioAsPercentageString(value as number, 1)}
-              width={isNaN(value) ? 0 : Math.abs(value) * 50}
-            />
-          ),
+          renderCell: ({ value }: GridCellParams<number | undefined>) =>
+            value !== undefined && (
+              <DeltaComputationBar
+                value={value}
+                formattedValue={formatRatioAsPercentageString(
+                  value as number,
+                  1
+                )}
+                width={isNaN(value) ? 0 : Math.abs(value) * 50}
+              />
+            ),
         },
       ]),
       ...metricsEntries.flatMap<Column<Row>>(
@@ -347,36 +345,38 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             ...groupHeader(pipeline, metricName),
             description,
             align: "right",
-            valueGetter: ({ row }) => row[pipeline]?.customMetrics[metricName],
-            renderCell: ({ value }: GridCellParams<number>) => (
-              <VisualBar
-                formattedValue={formatRatioAsPercentageString(value, 1)}
-                value={value}
-                color={(theme) => theme.palette.primary.light}
-              />
-            ),
+            valueGetter: ({ row: { [pipeline]: metrics } }) =>
+              metrics?.customMetrics[metricName] ?? NaN,
+            renderCell: ({ value }: GridCellParams<number | undefined>) =>
+              value !== undefined && (
+                <VisualBar
+                  formattedValue={formatRatioAsPercentageString(value, 1)}
+                  value={value}
+                  color={(theme) => theme.palette.primary.light}
+                />
+              ),
           })),
           {
             ...DELTA_METRIC_COLUMN,
             field: `delta${metricName}`,
             headerName: "Delta",
-            headerClassName: "no-border-right",
-            cellClassName: "border-left",
+            cellClassName: "delta",
             headerAlign: "center",
             valueGetter: ({ row }) =>
               row.comparedPipeline &&
               row.comparedPipeline.customMetrics[metricName] -
                 row.basePipeline.customMetrics[metricName],
-            renderCell: ({ value }: GridCellParams<number>) => (
-              <DeltaComputationBar
-                value={value}
-                formattedValue={formatRatioAsPercentageString(
-                  value as number,
-                  1
-                )}
-                width={isNaN(value) ? 0 : Math.abs(value) * 50}
-              />
-            ),
+            renderCell: ({ value }: GridCellParams<number | undefined>) =>
+              value !== undefined && (
+                <DeltaComputationBar
+                  value={value}
+                  formattedValue={formatRatioAsPercentageString(
+                    value as number,
+                    1
+                  )}
+                  width={isNaN(value) ? 0 : Math.abs(value) * 50}
+                />
+              ),
           },
         ]
       ),
@@ -400,19 +400,19 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...DELTA_METRIC_COLUMN,
         field: `deltaECE`,
         headerName: "Delta",
-        headerClassName: "no-border-right",
-        cellClassName: "border-left",
+        cellClassName: "delta",
         headerAlign: "center",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.ece - row.basePipeline.ece,
-        renderCell: ({ value }: GridCellParams<number>) => (
-          <DeltaComputationBar
-            value={value}
-            formattedValue={value && (value as number).toFixed(2)}
-            width={isNaN(value) ? 0 : Math.abs(value) * 50}
-          />
-        ),
+        renderCell: ({ value }: GridCellParams<number | undefined>) =>
+          value !== undefined && (
+            <DeltaComputationBar
+              value={value}
+              formattedValue={value === 0 ? "0" : value.toFixed(2)}
+              width={isNaN(value) ? 0 : Math.abs(value) * 50}
+            />
+          ),
       },
     ];
   }, [
@@ -470,10 +470,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
 
   const LabelHeader = () => (
     <Box
+      className="MuiDataGrid-withBorder"
       position="relative"
       height={LABEL_HEIGHT}
       width={LABEL_WIDTH}
-      top={LABEL_HEIGHT}
+      marginBottom={-LABEL_HEIGHT}
       padding={(theme) => theme.spacing(1)}
       zIndex={(theme) => theme.zIndex.mobileStepper}
       bgcolor={(theme) => theme.palette.background.paper}
@@ -534,13 +535,17 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       {errorFetchingComparedPipelineData.message}
     </Typography>
   ) : (
-    <Box
-      border={(theme) => `1px solid ${theme.palette.grey[200]}`}
-      height="100%"
-      padding={4}
-      marginTop={2}
+    <Paper
+      variant="outlined"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        padding: 4,
+        marginTop: 4,
+      }}
     >
-      <Box marginBottom={1} display="flex" justifyContent="space-between">
+      <Box marginBottom={2} display="flex" justifyContent="space-between">
         <Box width={340}>
           <DatasetSplitToggler
             availableDatasetSplits={availableDatasetSplits}
@@ -552,15 +557,16 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           <Box display="flex" flexDirection="row" alignItems="center">
             <FormControlLabel
               label={`Compare Baseline (${
-                config?.pipelines?.[pipeline.pipelineIndex].name
-              } ) with:`}
+                config.pipelines?.[pipeline.pipelineIndex].name
+              }) with:`}
               labelPlacement="start"
               sx={{ gap: 1, paddingRight: 2 }}
               control={
                 <PipelineSelect
-                  selectedPipeline={comparedPipeline ?? ""}
+                  selectedPipeline={comparedPipeline}
                   onChange={(value) => setComparedPipeline(value)}
-                  pipelineMenuItem={config.pipelines?.map(
+                >
+                  {config.pipelines?.map(
                     ({ name }, pipelineIndex) =>
                       pipelineIndex !== pipeline.pipelineIndex && (
                         <MenuItem key={pipelineIndex} value={pipelineIndex}>
@@ -568,15 +574,19 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                         </MenuItem>
                       )
                   )}
-                />
+                </PipelineSelect>
               }
             ></FormControlLabel>
           </Box>
         )}
       </Box>
       <Box
+        height="650px"
+        display="flex"
+        flexDirection="column"
+        overflow="auto"
+        paddingTop={1}
         border={(theme) => `1px solid ${theme.palette.grey[200]}`}
-        sx={{ backgroundColor: (theme) => theme.palette.background.paper }}
       >
         <Table
           sx={{
@@ -590,22 +600,17 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               // Stops accidental navigation on horizontal scroll with touch pad
               overscrollBehaviorX: "contain",
             },
-            "& .overall": {
-              borderRight: (theme) => `1px solid ${theme.palette.grey[300]}`,
-              background: (theme) => theme.palette.grey[200],
-            },
             "& .delta": {
               background: (theme) => theme.palette.grey[100],
             },
-            "& .content-sticky": {
+            "& .sticky": {
               position: "sticky",
               left: 0,
               zIndex: (theme) => theme.zIndex.mobileStepper,
               background: (theme) => theme.palette.background.paper,
             },
-            "& .content-sticky-overall": {
-              position: "sticky",
-              left: 0,
+
+            "& .overall": {
               background: (theme) => theme.palette.grey[200],
             },
             "& .no-border-right": {
@@ -624,16 +629,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           getRowClassName={({ id }) =>
             `${id === OVERALL_ROW_ID ? "overall" : ""}`
           }
-          getCellClassName={({ id, field }) =>
-            `${
-              id === OVERALL_ROW_ID
-                ? "content-sticky-overall"
-                : field.startsWith("delta")
-                ? "delta"
-                : ""
-            }`
+          getCellClassName={({ id }) =>
+            `${id === OVERALL_ROW_ID ? "overall" : ""}`
           }
-          autoHeight
           rowHeight={ROW_HEIGHT}
           columns={columns}
           rows={rows}
@@ -651,7 +649,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           }}
         />
       </Box>
-    </Box>
+    </Paper>
   );
 };
 

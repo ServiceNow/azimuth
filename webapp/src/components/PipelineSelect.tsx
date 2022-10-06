@@ -1,15 +1,15 @@
-import React from "react";
 import { Select, MenuItem } from "@mui/material";
+import React from "react";
 
 type Props = {
-  selectedPipeline: number | string;
-  pipelineMenuItem: React.ReactNode;
+  selectedPipeline: number | undefined;
+  children: React.ReactNode;
   onChange: (value: number | undefined) => void;
 };
 
 const PipelineSelect: React.FC<Props> = ({
   selectedPipeline,
-  pipelineMenuItem,
+  children,
   onChange,
 }) => {
   return (
@@ -25,7 +25,7 @@ const PipelineSelect: React.FC<Props> = ({
       <MenuItem value="">
         <em>No pipeline</em>
       </MenuItem>
-      {pipelineMenuItem}
+      {children}
     </Select>
   );
 };

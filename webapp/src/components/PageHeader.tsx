@@ -160,16 +160,15 @@ const PageHeader = () => {
                 </Typography>
                 {config && (
                   <PipelineSelect
-                    selectedPipeline={pipeline.pipelineIndex ?? ""}
+                    selectedPipeline={pipeline.pipelineIndex}
                     onChange={(value) => setPipeline(value)}
-                    pipelineMenuItem={config.pipelines?.map(
-                      (pipeline, pipelineIndex) => (
-                        <MenuItem key={pipelineIndex} value={pipelineIndex}>
-                          {pipeline.name}
-                        </MenuItem>
-                      )
-                    )}
-                  />
+                  >
+                    {config.pipelines?.map((pipeline, pipelineIndex) => (
+                      <MenuItem key={pipelineIndex} value={pipelineIndex}>
+                        {pipeline.name}
+                      </MenuItem>
+                    ))}
+                  </PipelineSelect>
                 )}
               </>
             )}

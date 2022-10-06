@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import Description from "components/Description";
-import PerformanceAnalysisComparisonTable from "components/Metrics/PerformanceAnalysisTable";
+import PerformanceAnalysisTable from "components/Metrics/PerformanceAnalysisTable";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -27,7 +27,7 @@ const PerformanceAnalysisComparison = () => {
       <Typography variant="h4">Performance Analysis</Typography>
       {performanceAnalysisDescription}
       {isPipelineSelected(pipeline) ? (
-        <PerformanceAnalysisComparisonTable
+        <PerformanceAnalysisTable
           jobId={jobId}
           pipeline={pipeline}
           availableDatasetSplits={datasetInfo?.availableDatasetSplits}
