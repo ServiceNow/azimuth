@@ -53,6 +53,6 @@ and let the user-code take care of it.
 
 :blue_circle: **Default value**: False
 
-The memory of the dask cluster is usually 6GB. For bigger models, that might not be enough. It can be set to 12GB, by setting `large_dask_cluster` to `True`.
+The memory of the dask cluster is usually 6GB. If your models are big or if you encounter garbage collection errors,  you can set the memory to 12GB by setting `large_dask_cluster` to `True`.
 
 --8<-- "includes/abbreviations.md"
