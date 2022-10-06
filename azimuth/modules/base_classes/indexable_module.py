@@ -166,10 +166,17 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 #    It is less burdensome to just reload it.
                 fn = load_custom_object(post, **kwargs)
                 output = fn(output)
+                # When updating to python 3.9, use .removeprefix()
+                class_name = (
+                    post.class_name[32:]
+                    if post.class_name.startswith("azimuth.utils.ml.postprocessing.")
+                    else post.class_name
+                )
+
                 postprocessing_steps.append(
                     PostprocessingStep(
                         order=order,
-                        class_name=post.class_name.removeprefix("azimuth.utils.ml.postprocessing."),
+                        class_name=class_name,
                         output=output,
                     )
                 )

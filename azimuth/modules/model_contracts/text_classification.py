@@ -41,7 +41,7 @@ class PipelineOutputProtocol(Protocol):
 
 @runtime_checkable
 class PipelineOutputProtocolV2(Protocol):
-    """Class containing result of a batch"""
+    """Class containing result of a batch with pre and postprocessing steps"""
 
     # model output without passing through post-processing stage: texts, logits, probs, preds
     model_output: PostProcessingIO
@@ -246,11 +246,6 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         Returns:
             Raw and postprocessed output.
         """
-        t = pipeline_output.preprocessing_steps[1]["text"]
-        print(t)
-        PreprocessingStep(order=0, class_name="test", text=t)
-        print("là")
-
         if isinstance(pipeline_output, PipelineOutputProtocolV2):
             # User is following our contract, we can work with it.
             # Constructing new objects so indexing works.
@@ -279,9 +274,9 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
                         class_name=step["class_name"],
                         output=PostProcessingIO(
                             texts=input_batch[self.config.columns.text_input],
-                            probs=step["output"].probs,
-                            preds=step["output"].preds,
-                            logits=step["output"].logits,
+                            probs=cast(PostProcessingIO, step["output"]).probs,
+                            preds=cast(PostProcessingIO, step["output"]).preds,
+                            logits=cast(PostProcessingIO, step["output"]).logits,
                         ),
                     )
                     for step in pipeline_output.postprocessing_steps
