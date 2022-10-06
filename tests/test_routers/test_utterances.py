@@ -74,7 +74,7 @@ def test_get_utterances(app: FastAPI, monkeypatch):
     assert len(first_utterance["modelSaliency"]) == 2
 
 
-def test_empty_search_with_filters(app: FastAPI):
+def test_get_utterances_empty_filters(app: FastAPI):
     client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances?utterance=rrgeth").json()
     assert len(resp["utterances"]) == 0

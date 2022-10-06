@@ -26,12 +26,19 @@ def test_get_outcome_count_per_filter(app: FastAPI) -> None:
     assert "label" in metrics and len(metrics["label"]) == 3
 
 
-def test_empty_search_with_filters(app: FastAPI):
+def test_outcome_count_empty_filters(app: FastAPI):
     client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/outcome_count?utterance=rrgeth").json()
-    assert len(resp["utterances"]) == 0
+    resp = client.get(
+        "/dataset_splits/eval/outcome_count/per_filter?pipeline_index=0&utterance=rrgeth"
+    )
+    assert resp.status_code == HTTP_200_OK, resp.text
+    data = resp.json()
+    assert data["utteranceCount"] == 0
 
     resp = client.get(
-        "/dataset_splits/eval/outcome_count?utterance=rrgeth&data_action=relabel"
-    ).json()
-    assert len(resp["utterances"]) == 0
+        "/dataset_splits/eval/outcome_count/per_filter"
+        "?pipeline_index=0&utterance=rrgeth&data_action=relabel"
+    )
+    assert resp.status_code == HTTP_200_OK, resp.text
+    data = resp.json()
+    assert data["utteranceCount"] == 0
