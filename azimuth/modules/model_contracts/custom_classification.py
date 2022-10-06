@@ -51,6 +51,9 @@ class CustomTextClassificationModule(TextClassificationNoSaliencyModule):
             postprocessing_steps,
         ) = self.get_postprocessed_output(batch, model_out)
 
+        print("go")
+        print(preprocessing_steps)
+
         return self._parse_prediction_output(
             batch, raw, postprocessed, preprocessing_steps, postprocessing_steps, epistemic
         )

@@ -246,25 +246,10 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         Returns:
             Raw and postprocessed output.
         """
-        if isinstance(pipeline_output, PipelineOutputProtocol):
-            # User is following our contract, we can work with it.
-            # Constructing PostProcessingIO object so indexing works.
-            return (
-                PostProcessingIO(
-                    texts=input_batch[self.config.columns.text_input],
-                    probs=pipeline_output.model_output.probs,
-                    preds=pipeline_output.model_output.preds,
-                    logits=pipeline_output.model_output.logits,
-                ),
-                PostProcessingIO(
-                    texts=input_batch[self.config.columns.text_input],
-                    probs=pipeline_output.postprocessor_output.probs,
-                    preds=pipeline_output.postprocessor_output.preds,
-                    logits=pipeline_output.postprocessor_output.logits,
-                ),
-                [],
-                [],
-            )
+        t = pipeline_output.preprocessing_steps[1]["text"]
+        print(t)
+        PreprocessingStep(order=0, class_name="test", text=t)
+        print("là")
 
         if isinstance(pipeline_output, PipelineOutputProtocolV2):
             # User is following our contract, we can work with it.
@@ -294,13 +279,32 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
                         class_name=step["class_name"],
                         output=PostProcessingIO(
                             texts=input_batch[self.config.columns.text_input],
-                            probs=step["output"].postprocessor_output.probs,
-                            preds=step["output"].postprocessor_output.preds,
-                            logits=step["output"].postprocessor_output.logits,
+                            probs=step["output"].probs,
+                            preds=step["output"].preds,
+                            logits=step["output"].logits,
                         ),
                     )
                     for step in pipeline_output.postprocessing_steps
                 ],
+            )
+        if isinstance(pipeline_output, PipelineOutputProtocol):
+            # User is following our contract, we can work with it.
+            # Constructing PostProcessingIO object so indexing works.
+            return (
+                PostProcessingIO(
+                    texts=input_batch[self.config.columns.text_input],
+                    probs=pipeline_output.model_output.probs,
+                    preds=pipeline_output.model_output.preds,
+                    logits=pipeline_output.model_output.logits,
+                ),
+                PostProcessingIO(
+                    texts=input_batch[self.config.columns.text_input],
+                    probs=pipeline_output.postprocessor_output.probs,
+                    preds=pipeline_output.postprocessor_output.preds,
+                    logits=pipeline_output.postprocessor_output.logits,
+                ),
+                [],
+                [],
             )
 
         rejection_class_idx = self.get_dataset_split_manager().rejection_class_idx

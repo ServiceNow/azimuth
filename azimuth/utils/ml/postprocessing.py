@@ -32,7 +32,9 @@ class PreprocessingStep(AliasModel):
     class_name: str
 
     def __getitem__(self, item: int) -> "PreprocessingStep":
-        return PreprocessingStep(order=self.order, text=self.text[item], class_name=self.class_name)
+        return PreprocessingStep(
+            order=self.order, text=[self.text[item]], class_name=self.class_name
+        )
 
 
 class PostprocessingStep(AliasModel):

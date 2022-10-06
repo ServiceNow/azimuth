@@ -181,14 +181,6 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
         # Save result in a DatasetSplitManager
         if len(res) > 0 and isinstance(res[0], PredictionResponse):
             res_casted = cast(List[PredictionResponse], res)
-            # dm.add_column_to_prediction_table(
-            #     key=DatasetColumn.preprocessing_steps,
-            #     features=[
-            #         [cl_idx for cl_idx in reversed(np.argsort(pred_res.model_output.probs[0]))]
-            #         for pred_res in res_casted
-            #     ],
-            #     table_key=table_key,
-            # )
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.model_predictions,
                 features=[
