@@ -94,7 +94,7 @@ def start_app(config_path, debug=False) -> FastAPI:
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
 
-    local_cluster = default_cluster(large=False)
+    local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
     initialize_managers(azimuth_config, local_cluster)
     assert_not_none(_task_manager).client.run(set_logger_config, level)
