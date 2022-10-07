@@ -185,7 +185,7 @@ def assert_args_presence(args, doc, member, name, exceptions):
     if any(styles):
         exceptions.append(
             (
-                "{} {} are not style properly 'argument': documentation".format(
+                "{} {} are not styled properly 'argument': documentation".format(
                     name, list(compress(args, styles))
                 ),
                 member.__module__,
