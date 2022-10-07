@@ -16,6 +16,10 @@ from azimuth.types.model_performance import (
     ConfidenceHistogramResponse,
 )
 from azimuth.types.outcomes import ALL_OUTCOMES, OutcomeName
+from azimuth.utils.dataset_operations import (
+    get_confidences_from_ds,
+    get_outcomes_from_ds,
+)
 from azimuth.utils.validation import assert_not_none
 
 CONFIDENCE_BINS_COUNT = 20
@@ -24,23 +28,38 @@ CONFIDENCE_BINS_COUNT = 20
 class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
     """Return a confidence histogram of the predictions."""
 
-    def get_outcome_mask(self, outcome: OutcomeName) -> List[bool]:
-        return [utterance_outcome == outcome for utterance_outcome in self._get_outcomes_from_ds()]
+    @staticmethod
+    def get_outcome_mask(
+        ds, outcome: OutcomeName, without_postprocessing: bool = False
+    ) -> List[bool]:
+        return [
+            utterance_outcome == outcome
+            for utterance_outcome in get_outcomes_from_ds(ds, without_postprocessing)
+        ]
 
-    def compute_on_dataset_split(self) -> List[ConfidenceHistogramResponse]:  # type: ignore
-        """Compute the confidence histogram with CONFIDENCE_BINS_COUNT bins on the dataset split.
+    @classmethod
+    def get_bins(
+        cls, ds: Dataset, without_postprocessing: bool = False
+    ) -> List[ConfidenceBinDetails]:
+        """Compute the bins on the specified dataset split.
+
+        Note: This lives outside of `compute_on_dataset_split()` so that it can be called without
+        going through calling the module and filtering the dataset.
+
+        Args:
+            ds: Dataset Split on which to compute bins
+            without_postprocessing: Whether to use outcomes and confidences without pipeline
+                postprocessing
 
         Returns:
             List of the confidence bins with their confidence and the outcome count.
-
         """
-        bins = np.linspace(0, 1, CONFIDENCE_BINS_COUNT + 1)
 
-        ds: Dataset = assert_not_none(self.get_dataset_split())
+        bins = np.linspace(0, 1, CONFIDENCE_BINS_COUNT + 1)
 
         if len(ds) > 0:
             # Get the bin index for each prediction.
-            confidences = np.max(self._get_confidences_from_ds(), axis=1)
+            confidences = np.max(get_confidences_from_ds(ds, without_postprocessing), axis=1)
             bin_indices = np.floor(confidences * CONFIDENCE_BINS_COUNT)
 
             # Create the records. We drop the last bin as it's the maximum.
@@ -50,7 +69,7 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
                 outcome_count = defaultdict(int)
                 for outcome in ALL_OUTCOMES:
                     outcome_count[outcome] = np.logical_and(
-                        bin_mask, self.get_outcome_mask(outcome)
+                        bin_mask, cls.get_outcome_mask(ds, outcome, without_postprocessing)
                     ).sum()
                 mean_conf = (
                     0 if bin_mask.sum() == 0 else np.nan_to_num(confidences[bin_mask].mean())
@@ -75,7 +94,23 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
                 for bin_index, bin_min_value in enumerate(bins[:-1])
             ]
 
-        return [ConfidenceHistogramResponse(bins=result, confidence_threshold=self.get_threshold())]
+        return result
+
+    def compute_on_dataset_split(self) -> List[ConfidenceHistogramResponse]:  # type: ignore
+        """Compute the confidence histogram with CONFIDENCE_BINS_COUNT bins on the dataset split.
+
+        Returns:
+            Confidence bins and threshold.
+
+        """
+        ds: Dataset = assert_not_none(self.get_dataset_split())
+
+        return [
+            ConfidenceHistogramResponse(
+                bins=self.get_bins(ds, self.mod_options.without_postprocessing),
+                confidence_threshold=self.get_threshold(),
+            )
+        ]
 
 
 class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig]):

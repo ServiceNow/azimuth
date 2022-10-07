@@ -15,7 +15,7 @@ from azimuth.types.tag import (
     SmartTag,
     SmartTagFamily,
 )
-from azimuth.utils.filtering import filter_dataset_split
+from azimuth.utils.dataset_operations import filter_dataset_split
 from tests.utils import generate_mocked_dm, get_table_key
 
 

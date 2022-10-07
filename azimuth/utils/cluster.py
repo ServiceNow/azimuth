@@ -35,15 +35,14 @@ def default_cluster(large=False) -> SpecCluster:
     os.environ.update(dask_envs)
 
     # Start the cluster locally
-    log.info("Starting cluster locally!")
+    memory_limit = "12GB" if large else "6GB"
+    log.info(f"Starting cluster locally with {memory_limit} of memory!")
     tmp_file = pjoin(str(tempfile.mkdtemp()), "dask-worker-space")
     with dask.config.set({"distributed.worker.daemon": False}):
         cluster = distributed.LocalCluster(
             n_workers=2,
             local_directory=tmp_file,
             threads_per_worker=1,
-            # Bigger mem on Toolkit to accomodate large ONNX models,
-            # "auto" doesnt work well.
-            memory_limit="12GB" if large else "6GB",
+            memory_limit=memory_limit,  # "auto" doesnt work well.
         )
     return cluster

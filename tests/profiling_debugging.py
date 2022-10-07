@@ -2,7 +2,10 @@
 This file help profiling Module. Change the constants and run the file.
 """
 import tempfile
+import threading
+import time
 
+import psutil
 from pyinstrument import Profiler
 from tqdm import tqdm
 
@@ -27,7 +30,17 @@ DEPS_MOD_OPTIONS = ModuleOptions(pipeline_index=0)
 MOD_OPTIONS = ModuleOptions(pipeline_index=0)
 
 
+def print_memory():
+    def fn():
+        while True:
+            print(f"Memory used: {psutil.virtual_memory().used / 1024 / 1024}")
+            time.sleep(2)
+
+    threading.Thread(target=fn).start()
+
+
 def main():
+    print_memory()
     config = AzimuthConfig.parse_file(CFG_FILE).copy(
         update={"artifact_path": str(tempfile.mkdtemp())}
     )
@@ -43,9 +56,13 @@ def main():
     print("Starting profiler!")
     with Profiler() as p:
         mod = MODULE(dataset_split_name=DATASET_SPLIT, config=config, mod_options=MOD_OPTIONS)
-        mod.compute_on_dataset_split()
+        res = mod.compute_on_dataset_split()
 
-    p.print()
+    file_name = "logs.txt"
+    with open(file_name, "w") as f:
+        p.print(file=f)
+
+    print(res)
 
 
 if __name__ == "__main__":

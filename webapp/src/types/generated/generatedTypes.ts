@@ -120,6 +120,7 @@ export interface components {
       artifact_path?: string;
       batch_size?: number;
       use_cuda?: Partial<"auto"> & Partial<boolean>;
+      large_dask_cluster?: boolean;
       language?: components["schemas"]["SupportedLanguage"];
       syntax?: components["schemas"]["SyntaxOptions"];
       dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
