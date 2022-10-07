@@ -4,6 +4,7 @@
 
 import argparse
 import os
+from enum import Enum
 from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
@@ -17,6 +18,66 @@ log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
 
 REQUIRED_EXT = {"csv", "json"}
+
+
+class SupportedLanguage(str, Enum):
+    en = "en"
+    fr = "fr"
+
+
+# TODO Is it better to do many little dictionaries, or have one dictionary with keys
+#  SupportedLanguage and values as a typed class, as below?
+#
+# class LanguageDefaultValues(AliasModel):
+#     suffix_list: List[str]
+#     prefix_list: List[str]
+#     spacy_model: str
+#     obj_tags: List[str]
+#     subj_tags: List[str]
+#
+#
+# config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
+#     SupportedLanguage.en: LanguageDefaultValues(
+#         suffix_list=["pls", "please", "thank you", "appreciated"],
+#         prefix_list=["pls", "please", "hello", "greetings"],
+#         spacy_model="en_core_web_sm",
+#         obj_tags=["dobj", "pobj", "obj"],
+#         subj_tags=["nsubj", "nsubjpass"]
+#     ),
+#     SupportedLanguage.fr: LanguageDefaultValues(
+#         suffix_list=["svp", "s'il vous plaît", "merci", "super"],
+#         prefix_list=["svp", "s'il vous plaît", "bonjour", "allô"],
+#         spacy_model="fr_core_news_md",
+#         obj_tags=["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
+#         subj_tags=["nsubj", "nsubj:pass"]
+#     )
+# }
+
+suffix_list_per_language: Dict[SupportedLanguage, List[str]] = {
+    SupportedLanguage.en: ["pls", "please", "thank you", "appreciated"],
+    SupportedLanguage.fr: ["svp", "s'il vous plaît", "merci", "super"],
+}
+
+prefix_list_per_language: Dict[SupportedLanguage, List[str]] = {
+    SupportedLanguage.en: ["pls", "please", "hello", "greetings"],
+    SupportedLanguage.fr: ["svp", "s'il vous plaît", "bonjour", "allô"],
+}
+
+spacy_model_per_language: Dict[SupportedLanguage, str] = {
+    SupportedLanguage.en: "en_core_web_sm",
+    SupportedLanguage.fr: "fr_core_news_md",
+}
+
+# To see all dep tag options for a spacy model: spacy.load(SPACY_MODEL).get_pipe("parser").labels
+obj_tags_per_language: Dict[SupportedLanguage, List[str]] = {
+    SupportedLanguage.en: ["dobj", "pobj", "obj"],
+    SupportedLanguage.fr: ["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
+}
+
+subj_tags_per_language: Dict[SupportedLanguage, List[str]] = {
+    SupportedLanguage.en: ["nsubj", "nsubjpass"],
+    SupportedLanguage.fr: ["nsubj", "nsubj:pass"],
+}
 
 
 def parse_args():
@@ -131,12 +192,15 @@ class DatasetWarningsOptions(BaseModel):
 class SyntaxOptions(BaseModel):
     short_sentence_max_token: int = 3
     long_sentence_min_token: int = 16
+    subj_tags: List[str] = []  # Language-based default value set by AzimuthConfig
+    obj_tags: List[str] = []  # Language-based default value set by AzimuthConfig
+    spacy_model: str = ""  # Language-based default value set by AzimuthConfig
 
 
 class NeutralTokenOptions(BaseModel):
     threshold: float = 1
-    suffix_list: List[str] = ["pls", "please", "thank you", "appreciated"]
-    prefix_list: List[str] = ["pls", "please", "hello", "greetings"]
+    suffix_list: List[str] = []  # Language-based default value set by AzimuthConfig
+    prefix_list: List[str] = []  # Language-based default value set by AzimuthConfig
 
 
 class PunctuationTestOptions(BaseModel):
@@ -308,15 +372,45 @@ class SyntaxConfig(CommonFieldsConfig):
     syntax: SyntaxOptions = SyntaxOptions()
 
 
+class LanguageConfig(CommonFieldsConfig):
+    # Language configuration sets multiple config values; see reference dictionary/ies for details
+    # TODO Correct grammar when code decision has been made
+    language: SupportedLanguage = SupportedLanguage.en
+
+
 class AzimuthConfig(
     PerturbationTestingConfig,
     SimilarityConfig,
     DatasetWarningConfig,
     SyntaxConfig,
+    LanguageConfig,
     extra=Extra.forbid,
 ):
+    # TODO @fred But _why_ should this class remain empty? :) Should it just be empty of data
+    #  attributes, and are methods ok?
     # This class should remain empty!
-    pass
+    # pass
+    @root_validator()
+    def dynamic_language_config_values(cls, values):
+        if values["behavioral_testing"]:
+            values["behavioral_testing"].neutral_token.prefix_list = (
+                values["behavioral_testing"].neutral_token.prefix_list
+                or prefix_list_per_language[values["language"]]
+            )
+            values["behavioral_testing"].neutral_token.suffix_list = (
+                values["behavioral_testing"].neutral_token.suffix_list
+                or suffix_list_per_language[values["language"]]
+            )
+        values["syntax"].subj_tags = (
+            values["syntax"].subj_tags or subj_tags_per_language[values["language"]]
+        )
+        values["syntax"].obj_tags = (
+            values["syntax"].obj_tags or obj_tags_per_language[values["language"]]
+        )
+        values["syntax"].spacy_model = (
+            values["syntax"].spacy_model or spacy_model_per_language[values["language"]]
+        )
+        return values
 
 
 def load_azimuth_config(config_path: str) -> AzimuthConfig:

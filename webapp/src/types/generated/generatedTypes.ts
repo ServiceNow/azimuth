@@ -120,6 +120,7 @@ export interface components {
       artifact_path?: string;
       batch_size?: number;
       use_cuda?: Partial<"auto"> & Partial<boolean>;
+      language?: components["schemas"]["SupportedLanguage"];
       syntax?: components["schemas"]["SyntaxOptions"];
       dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
       similarity?: components["schemas"]["SimilarityOptions"];
@@ -621,6 +622,8 @@ export interface components {
       startupTasksStatus: { [key: string]: string };
     };
     /** An enumeration. */
+    SupportedLanguage: "en" | "fr";
+    /** An enumeration. */
     SupportedModelContract:
       | "hf_text_classification"
       | "file_based_text_classification"
@@ -628,6 +631,9 @@ export interface components {
     SyntaxOptions: {
       short_sentence_max_token?: number;
       long_sentence_min_token?: number;
+      subj_tags?: string[];
+      obj_tags?: string[];
+      spacy_model?: string;
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.

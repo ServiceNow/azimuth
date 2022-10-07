@@ -1,7 +1,6 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
 from azimuth.modules.dataset_analysis.syntax_tagging import SyntaxTaggingModule
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag
@@ -59,10 +58,10 @@ def test_syntax_tagging(simple_text_config):
     assert not json_output_2[3].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
 
 
-def test_syntax_tagging_french(simple_text_config):
+def test_syntax_tagging_french(simple_text_config_french):
     mod = SyntaxTaggingModule(
         DatasetSplitName.eval,
-        simple_text_config,
+        simple_text_config_french,
     )
 
     assert mod is not None

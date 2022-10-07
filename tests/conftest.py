@@ -8,7 +8,7 @@ from copy import deepcopy
 import pytest
 from distributed import Client, LocalCluster
 
-from azimuth.config import AzimuthConfig
+from azimuth.config import AzimuthConfig, SupportedLanguage
 from azimuth.modules.base_classes import ArtifactManager
 from azimuth.startup import START_UP_THREAD_NAME
 from azimuth.task_manager import TaskManager
@@ -135,6 +135,22 @@ def tiny_text_task_manager(tiny_text_config, dask_client):
     start_up_thread = [th for th in thread if th.name == START_UP_THREAD_NAME]
     for th in start_up_thread:
         th.join()
+
+
+@pytest.fixture
+def simple_text_config_french(tmp_path):
+    return AzimuthConfig(
+        name="sentiment-analysis-french",
+        dataset=DATASET_CFG,
+        pipelines=[PIPELINE_CFG],
+        artifact_path=str(tmp_path),
+        batch_size=10,
+        model_contract="hf_text_classification",
+        saliency_layer="distilbert.embeddings.word_embeddings",
+        rejection_class=None,
+        behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
+        language=SupportedLanguage.fr,
+    )
 
 
 # File-Based Fixtures

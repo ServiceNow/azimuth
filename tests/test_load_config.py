@@ -8,8 +8,11 @@ from pydantic import ValidationError
 from azimuth.config import (
     AzimuthConfig,
     PipelineDefinition,
+    SupportedLanguage,
     TemperatureScaling,
     ThresholdConfig,
+    obj_tags_per_language,
+    spacy_model_per_language,
 )
 
 CURR_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -118,3 +121,22 @@ def test_pipeline_names():
                 },
             }
         )
+
+
+def test_french_defaults_and_override():
+    subj_tags_potatoes = ["russet", "yukon_gold"]
+    cfg = AzimuthConfig(
+        **{
+            **DEFAULT_CONFIG,
+            **{"language": "fr", "syntax": {"subj_tags": subj_tags_potatoes}},
+        }
+    )
+    assert (
+        cfg.syntax.subj_tags == subj_tags_potatoes
+    ), "Config did not take user-provided values for subj_tags"
+    assert (
+        cfg.syntax.spacy_model == spacy_model_per_language[SupportedLanguage.fr]
+    ), "Config did not take default French value for spacy_model"
+    assert (
+        cfg.syntax.obj_tags == obj_tags_per_language[SupportedLanguage.fr]
+    ), "Config did not take default French value for spacy_model"
