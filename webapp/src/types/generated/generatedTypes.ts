@@ -631,9 +631,9 @@ export interface components {
     SyntaxOptions: {
       short_sentence_max_token?: number;
       long_sentence_min_token?: number;
+      spacy_model?: string;
       subj_tags?: string[];
       obj_tags?: string[];
-      spacy_model?: string;
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.

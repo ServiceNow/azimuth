@@ -1,6 +1,7 @@
 # Project Config
 
-The project configuration contains mandatory fields that specify the dataset to load in Azimuth.
+The project configuration contains mainly mandatory fields that specify the dataset to load in
+Azimuth and details about the way it is handled by the app.
 
 === "Class Definition"
 
@@ -136,7 +137,16 @@ follows:
 :yellow_circle: **Default value**: `REJECTION_CLASS`
 
 The field `rejection_class` requires the class to be present in the dataset. If your dataset doesn't
-have a rejection class, set the value to `null`. More details on the rejection class is available
+have a rejection class, set the value to `null`. More details on the rejection class are available
 in [Prediction Outcomes](../../key-concepts/outcomes.md).
+
+## Language
+
+:blue_circle: **Default value**: `"en"`
+
+The field `language` determines how Azimuth will process the dataset for language-related
+analyses. Azimuth currently supports English (`"en"`) and French (`"fr"`). More details are
+available in [Syntax Analysis](../../key-concepts/syntax-analysis.md) and
+[Behavioral Testing](../../key-concepts/behavioral-testing.md).
 
 --8<-- "includes/abbreviations.md"

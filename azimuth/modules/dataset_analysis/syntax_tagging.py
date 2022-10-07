@@ -25,7 +25,7 @@ from azimuth.utils.validation import assert_not_none
 class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
     """Calculate smart tags related to syntax."""
 
-    # sentencizer; English() should work for other languages that have similar sentence conventions.
+    # Sentencizer; English() should work for other languages that have similar sentence conventions.
     spacy_pipeline = English()
     spacy_pipeline.add_pipe("sentencizer")
 

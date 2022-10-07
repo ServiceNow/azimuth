@@ -19,7 +19,7 @@ the reference.
 ## Config Scopes
 
 1. [:material-link: Project Config](./project.md) :red_circle:
-    * Mandatory fields to define the name of the project and the dataset information.
+    * Mainly mandatory fields to define the name of the project and the dataset information.
 2. [:material-link: Model Contract Config](./model_contract.md) :orange_circle:
     * Defines how Azimuth interacts with the models/pipelines.
 3. [:material-link: Common Fields Config](./common.md) :blue_circle:

@@ -25,6 +25,12 @@ class SupportedLanguage(str, Enum):
     fr = "fr"
 
 
+# spaCy models must be in pyproject.toml to be loaded by Azimuth
+class SupportedSpacyModels(str, Enum):
+    en_core_web_sm = "en_core_web_sm"
+    fr_core_news_md = "fr_core_news_md"
+
+
 # TODO Is it better to do many little dictionaries, or have one dictionary with keys
 #  SupportedLanguage and values as a typed class, as below?
 #
@@ -32,8 +38,8 @@ class SupportedLanguage(str, Enum):
 #     suffix_list: List[str]
 #     prefix_list: List[str]
 #     spacy_model: str
-#     obj_tags: List[str]
 #     subj_tags: List[str]
+#     obj_tags: List[str]
 #
 #
 # config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
@@ -41,15 +47,15 @@ class SupportedLanguage(str, Enum):
 #         suffix_list=["pls", "please", "thank you", "appreciated"],
 #         prefix_list=["pls", "please", "hello", "greetings"],
 #         spacy_model="en_core_web_sm",
-#         obj_tags=["dobj", "pobj", "obj"],
 #         subj_tags=["nsubj", "nsubjpass"]
+#         obj_tags=["dobj", "pobj", "obj"],
 #     ),
 #     SupportedLanguage.fr: LanguageDefaultValues(
 #         suffix_list=["svp", "s'il vous plaît", "merci", "super"],
 #         prefix_list=["svp", "s'il vous plaît", "bonjour", "allô"],
 #         spacy_model="fr_core_news_md",
-#         obj_tags=["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
-#         subj_tags=["nsubj", "nsubj:pass"]
+#         subj_tags=["nsubj", "nsubj:pass"],
+#         obj_tags=["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"]
 #     )
 # }
 
@@ -64,19 +70,19 @@ prefix_list_per_language: Dict[SupportedLanguage, List[str]] = {
 }
 
 spacy_model_per_language: Dict[SupportedLanguage, str] = {
-    SupportedLanguage.en: "en_core_web_sm",
-    SupportedLanguage.fr: "fr_core_news_md",
+    SupportedLanguage.en: SupportedSpacyModels.en_core_web_sm,
+    SupportedLanguage.fr: SupportedSpacyModels.fr_core_news_md,
 }
 
 # To see all dep tag options for a spacy model: spacy.load(SPACY_MODEL).get_pipe("parser").labels
-obj_tags_per_language: Dict[SupportedLanguage, List[str]] = {
-    SupportedLanguage.en: ["dobj", "pobj", "obj"],
-    SupportedLanguage.fr: ["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
-}
-
 subj_tags_per_language: Dict[SupportedLanguage, List[str]] = {
     SupportedLanguage.en: ["nsubj", "nsubjpass"],
     SupportedLanguage.fr: ["nsubj", "nsubj:pass"],
+}
+
+obj_tags_per_language: Dict[SupportedLanguage, List[str]] = {
+    SupportedLanguage.en: ["dobj", "pobj", "obj"],
+    SupportedLanguage.fr: ["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
 }
 
 
@@ -192,9 +198,9 @@ class DatasetWarningsOptions(BaseModel):
 class SyntaxOptions(BaseModel):
     short_sentence_max_token: int = 3
     long_sentence_min_token: int = 16
+    spacy_model: str = ""  # Language-based default value set by AzimuthConfig
     subj_tags: List[str] = []  # Language-based default value set by AzimuthConfig
     obj_tags: List[str] = []  # Language-based default value set by AzimuthConfig
-    spacy_model: str = ""  # Language-based default value set by AzimuthConfig
 
 
 class NeutralTokenOptions(BaseModel):
@@ -401,14 +407,14 @@ class AzimuthConfig(
                 values["behavioral_testing"].neutral_token.suffix_list
                 or suffix_list_per_language[values["language"]]
             )
+        values["syntax"].spacy_model = (
+            values["syntax"].spacy_model or spacy_model_per_language[values["language"]]
+        )
         values["syntax"].subj_tags = (
             values["syntax"].subj_tags or subj_tags_per_language[values["language"]]
         )
         values["syntax"].obj_tags = (
             values["syntax"].obj_tags or obj_tags_per_language[values["language"]]
-        )
-        values["syntax"].spacy_model = (
-            values["syntax"].spacy_model or spacy_model_per_language[values["language"]]
         )
         return values
 
