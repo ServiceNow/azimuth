@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 type Props = {
   value: number;
-  formattedValue: string | number;
+  formattedValue: string;
   width: number;
 };
 

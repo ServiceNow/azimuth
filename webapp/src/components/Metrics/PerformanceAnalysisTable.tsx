@@ -57,7 +57,6 @@ import { constructSearchString } from "utils/helpers";
 const ROW_HEIGHT = 35;
 const OVERALL_ROW_ID = -1; // -1 so that the other rows can range from 0 - n-1
 const LABEL_WIDTH = 200;
-const LABEL_HEIGHT = DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight;
 
 const pipelines = ["basePipeline", "comparedPipeline"] as const;
 const BASIC_FILTER_OPTIONS = ["label", "prediction"] as const;
@@ -282,7 +281,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           value !== undefined && (
             <DeltaComputationBar
               value={value}
-              formattedValue={value}
+              formattedValue={String(value)}
               width={Math.abs(value)}
             />
           ),
@@ -472,11 +471,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     <Box
       className="MuiDataGrid-withBorder"
       position="relative"
-      height={LABEL_HEIGHT}
+      height={DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight}
       width={LABEL_WIDTH}
-      marginBottom={-LABEL_HEIGHT}
-      padding={(theme) => theme.spacing(1)}
-      zIndex={(theme) => theme.zIndex.mobileStepper}
+      marginBottom={-DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight}
+      padding={1}
+      zIndex={1}
       bgcolor={(theme) => theme.palette.background.paper}
     >
       <Select
@@ -580,75 +579,66 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           </Box>
         )}
       </Box>
-      <Box
-        height="650px"
-        display="flex"
-        flexDirection="column"
-        overflow="auto"
-        paddingTop={1}
-        border={(theme) => `1px solid ${theme.palette.grey[200]}`}
-      >
-        <Table
-          sx={{
-            "& .MuiDataGrid-cell": {
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-virtualScroller": {
-              // Stops accidental navigation on horizontal scroll with touch pad
-              overscrollBehaviorX: "contain",
-            },
-            "& .delta": {
-              background: (theme) => theme.palette.grey[100],
-            },
-            "& .sticky": {
-              position: "sticky",
-              left: 0,
-              zIndex: (theme) => theme.zIndex.mobileStepper,
-              background: (theme) => theme.palette.background.paper,
-            },
+      <Table
+        sx={{
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            // Stops accidental navigation on horizontal scroll with touch pad
+            overscrollBehaviorX: "contain",
+          },
+          "& .delta": {
+            background: (theme) => theme.palette.grey[100],
+          },
+          "& .sticky": {
+            position: "sticky",
+            left: 0,
+            zIndex: (theme) => theme.zIndex.mobileStepper,
+            background: (theme) => theme.palette.background.paper,
+          },
 
-            "& .overall": {
-              background: (theme) => theme.palette.grey[200],
-            },
-            "& .no-border-right": {
-              borderRight: "none",
-            },
-            "& .border-left": {
-              borderLeft: (theme) => `1px solid ${theme.palette.grey[300]}`,
-            },
-          }}
-          showCellRightBorder
-          showColumnRightBorder
-          sortModel={sortModel}
-          onSortModelChange={setSortModel}
-          columnVisibilityModel={columnVisibilityModel}
-          onColumnVisibilityModelChange={setColumnVisibilityModel}
-          getRowClassName={({ id }) =>
-            `${id === OVERALL_ROW_ID ? "overall" : ""}`
-          }
-          getCellClassName={({ id }) =>
-            `${id === OVERALL_ROW_ID ? "overall" : ""}`
-          }
-          rowHeight={ROW_HEIGHT}
-          columns={columns}
-          rows={rows}
-          loading={
-            isLoading ||
-            isFetchingBasePipelineData ||
-            isFetchingComparedPipelineData
-          }
-          disableColumnMenu={false}
-          sortingOrder={["desc", "asc"]}
-          components={{
-            ColumnMenu,
-            Row: RowLink,
-            Header: LabelHeader,
-          }}
-        />
-      </Box>
+          "& .overall": {
+            background: (theme) => theme.palette.grey[200],
+          },
+          "& .no-border-right": {
+            borderRight: "none",
+          },
+          "& .border-left": {
+            borderLeft: (theme) => `1px solid ${theme.palette.grey[300]}`,
+          },
+        }}
+        showCellRightBorder
+        showColumnRightBorder
+        sortModel={sortModel}
+        onSortModelChange={setSortModel}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={setColumnVisibilityModel}
+        getRowClassName={({ id }) =>
+          `${id === OVERALL_ROW_ID ? "overall" : ""}`
+        }
+        getCellClassName={({ id }) =>
+          `${id === OVERALL_ROW_ID ? "overall" : ""}`
+        }
+        rowHeight={ROW_HEIGHT}
+        columns={columns}
+        rows={rows}
+        loading={
+          isLoading ||
+          isFetchingBasePipelineData ||
+          isFetchingComparedPipelineData
+        }
+        disableColumnMenu={false}
+        sortingOrder={["desc", "asc"]}
+        components={{
+          ColumnMenu,
+          Row: RowLink,
+          Header: LabelHeader,
+        }}
+      />
     </Paper>
   );
 };
