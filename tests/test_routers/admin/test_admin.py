@@ -9,6 +9,17 @@ def test_get_config(app: FastAPI):
     assert res == {
         "artifact_path": "/tmp/azimuth_test_cache",
         "batch_size": 16,
+        "behavioral_testing": {
+            "fuzzy_matching": {"threshold": 1.0},
+            "neutral_token": {
+                "prefix_list": ["pls", "please", "hello", "greetings"],
+                "suffix_list": ["pls", "please", "thank you", "appreciated"],
+                "threshold": 1.0,
+            },
+            "punctuation": {"threshold": 1.0},
+            "seed": 300,
+            "typo": {"nb_typos_per_utterance": 1, "threshold": 0.005},
+        },
         "columns": {
             "failed_parsing_reason": "failed_parsing_reason",
             "label": "label",
@@ -27,6 +38,7 @@ def test_get_config(app: FastAPI):
             "max_delta_std_tokens": 3.0,
             "min_num_per_class": 20,
         },
+        "language": "en",
         "large_dask_cluster": False,
         "metrics": {
             "F1": {
@@ -53,17 +65,6 @@ def test_get_config(app: FastAPI):
         },
         "model_contract": "custom_text_classification",
         "name": "sentiment-analysis",
-        "behavioral_testing": {
-            "fuzzy_matching": {"threshold": 1.0},
-            "neutral_token": {
-                "prefix_list": ["pls", "please", "hello", "greetings"],
-                "suffix_list": ["pls", "please", "thank you", "appreciated"],
-                "threshold": 1.0,
-            },
-            "punctuation": {"threshold": 1.0},
-            "seed": 300,
-            "typo": {"nb_typos_per_utterance": 1, "threshold": 0.005},
-        },
         "pipelines": [
             {
                 "model": {
@@ -83,9 +84,15 @@ def test_get_config(app: FastAPI):
             "conflicting_neighbors_threshold": 0.9,
             "no_close_threshold": 0.5,
         },
+        "syntax": {
+            "long_sentence_min_token": 16,
+            "short_sentence_max_token": 3,
+            "spacy_model": "en_core_web_sm",
+            "subj_tags": ["nsubj", "nsubjpass"],
+            "obj_tags": ["dobj", "pobj", "obj"],
+        },
         "uncertainty": {"high_epistemic_threshold": 0.1, "iterations": 1},
         "use_cuda": False,
-        "syntax": {"long_sentence_min_token": 16, "short_sentence_max_token": 3},
     }
 
 
