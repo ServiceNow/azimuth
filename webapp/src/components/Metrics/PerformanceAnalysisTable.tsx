@@ -1,5 +1,4 @@
 import {
-  alpha,
   Box,
   FormControlLabel,
   ListSubheader,
@@ -265,7 +264,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...(selectedMetricPerFilterOption !== "label" &&
           groupHeader(pipeline, "Number of utterances")),
         headerName: "Total",
-        align: "right",
+        headerAlign: "center",
+        align: "center",
         valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
       })),
       {
@@ -339,8 +339,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
-            ...groupHeader(pipeline, metricName),
             description,
+            ...groupHeader(pipeline, metricName),
             align: "right",
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
               metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
@@ -613,9 +613,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         onSortModelChange={setSortModel}
         columnVisibilityModel={columnVisibilityModel}
         onColumnVisibilityModelChange={setColumnVisibilityModel}
-        getRowClassName={({ id }) =>
-          `${id === OVERALL_ROW_ID ? "overall" : ""}`
-        }
         getCellClassName={({ id }) =>
           `${id === OVERALL_ROW_ID ? "overall" : ""}`
         }
