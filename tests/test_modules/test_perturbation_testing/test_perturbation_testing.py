@@ -18,6 +18,7 @@ from azimuth.types.tag import SmartTag
 from azimuth.utils.ml.perturbation_functions import (
     get_utterances_diff,
     remove_or_add_contractions,
+    remove_or_add_final_punctuation,
     typo,
 )
 from azimuth.utils.ml.perturbation_test import PerturbationTest
@@ -125,6 +126,24 @@ def test_typo_hyphens(simple_text_config):
             == simple_text_config.behavioral_testing.typo.nb_typos_per_utterance
             and "'" not in perturbed_utterance_detail.perturbations
         )
+
+
+def test_typo_aug_fixes(simple_text_config):
+    original = "il y a un espace avant le point d'interrogation ?"
+    perturbed_utterance_details = typo(original, simple_text_config)
+    perturbed_utterance = perturbed_utterance_details[0].perturbed_utterance
+    assert "'" in perturbed_utterance, "Apostrophe ' replaced with quote ’ and not corrected."
+    assert " ?" in perturbed_utterance, "Penultimate space removed and not replaced."
+
+    perturbed_utterance_details_b = remove_or_add_final_punctuation(original, ".")
+    perturbed_utterance_b = perturbed_utterance_details_b[0].perturbed_utterance
+    assert perturbed_utterance_b[-2] != " ", "Penultimate space incorrectly kept."
+
+    original_2 = "il n’y a pas un espace avant le point d’interrogation?"
+    perturbed_utterance_details_2 = typo(original_2, simple_text_config)
+    perturbed_utterance_2 = perturbed_utterance_details_2[0].perturbed_utterance
+    assert "'" not in perturbed_utterance_2, "Quote ’ incorrectly replaced with apostrophe '."
+    assert " ?" not in perturbed_utterance_2, "Penultimate space incorrectly added."
 
 
 def test_if_failed(simple_text_config):
