@@ -305,9 +305,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               <VisualBar
                 formattedValue={formatRatioAsPercentageString(value, 1)}
                 value={value}
-                color={(theme) =>
-                  alpha(theme.palette[OUTCOME_COLOR[outcome]].main, 0.5)
-                }
+                color={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
               />
             ),
         })),
@@ -391,7 +389,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             <VisualBar
               formattedValue={value.toFixed(2)}
               value={value}
-              color={(theme) => alpha(theme.palette.primary.dark, 0.5)}
+              color={(theme) => theme.palette.primary.dark}
             />
           ),
       })),
