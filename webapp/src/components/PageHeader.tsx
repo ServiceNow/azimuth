@@ -1,12 +1,5 @@
 import { Settings } from "@mui/icons-material";
-import {
-  Box,
-  Breadcrumbs,
-  IconButton,
-  Link,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { Box, Breadcrumbs, IconButton, Link, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -162,13 +155,8 @@ const PageHeader = () => {
                   <PipelineSelect
                     selectedPipeline={pipeline.pipelineIndex}
                     onChange={setPipeline}
-                  >
-                    {config.pipelines?.map((pipeline, pipelineIndex) => (
-                      <MenuItem key={pipelineIndex} value={pipelineIndex}>
-                        {pipeline.name}
-                      </MenuItem>
-                    ))}
-                  </PipelineSelect>
+                    pipelines={config.pipelines!}
+                  />
                 )}
               </>
             )}

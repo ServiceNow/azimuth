@@ -3,14 +3,16 @@ import React from "react";
 
 type Props = {
   selectedPipeline: number | undefined;
-  children: React.ReactNode;
   onChange: (value: number | undefined) => void;
+  pipelines: { name: string }[];
+  disabledPipelines?: number[];
 };
 
 const PipelineSelect: React.FC<Props> = ({
   selectedPipeline,
-  children,
   onChange,
+  pipelines,
+  disabledPipelines = [],
 }) => {
   return (
     <Select
@@ -25,7 +27,11 @@ const PipelineSelect: React.FC<Props> = ({
       <MenuItem value="">
         <em>No pipeline</em>
       </MenuItem>
-      {children}
+      {pipelines.map(({ name }, i) => (
+        <MenuItem key={i} value={i} disabled={disabledPipelines.includes(i)}>
+          {name}
+        </MenuItem>
+      ))}
     </Select>
   );
 };

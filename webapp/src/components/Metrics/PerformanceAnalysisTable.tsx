@@ -565,16 +565,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                 <PipelineSelect
                   selectedPipeline={comparedPipeline}
                   onChange={setComparedPipeline}
-                >
-                  {config.pipelines?.map(
-                    ({ name }, pipelineIndex) =>
-                      pipelineIndex !== pipeline.pipelineIndex && (
-                        <MenuItem key={pipelineIndex} value={pipelineIndex}>
-                          {name}
-                        </MenuItem>
-                      )
-                  )}
-                </PipelineSelect>
+                  pipelines={config.pipelines!}
+                  disabledPipelines={[pipeline.pipelineIndex]}
+                />
               }
             ></FormControlLabel>
           </Box>
