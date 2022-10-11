@@ -2,6 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import contextlib
+import re
 from typing import List
 
 import nlpaug.augmenter.char as nac
@@ -139,6 +140,7 @@ def remove_or_add_final_punctuation(
     # Replace with specified punctuation if last character is another punctuation sign.
     elif any([p in last_char for p in [".", "!", "?", ","]]):
         perturb_utt = original[:-1] + punctuation_sign
+        perturb_utt = re.sub(r" ([.!?,])", r"\1", perturb_utt)  # Remove any penultimate space
         perturbation_type = PerturbationType.Replacement
     # Add specified punctuation otherwise.
     else:
@@ -307,9 +309,19 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
         with contextlib.redirect_stdout(None):
             # While nlpaug fixes their useless print, we ignore it.
             perturbed_utterance = aug.augment(original, n=1)
-        # Issue 854 nac adds spaces between the hyphen and $ sign.
-        perturbed_utterance = perturbed_utterance.replace(" ' ", "'")
-        perturbed_utterance = perturbed_utterance.replace("$ ", "$")
+        # Issue 854 nac adds spaces around the quote/apostrophe and $ sign; remove them.
+        perturbed_utterance = re.sub(r" (['’]) ", r"\1", perturbed_utterance)
+        perturbed_utterance = re.sub(r"([$]) ", r"\1", perturbed_utterance)
+        # nac replaces apostrophes with quotes; revert to original.
+        perturbed_utterance = (
+            re.sub(r"’", r"'", perturbed_utterance) if "'" in original else perturbed_utterance
+        )
+        # nac removes space before the final punctuation; re-add them.
+        perturbed_utterance = (
+            perturbed_utterance[:-1] + " " + perturbed_utterance[-1]
+            if re.search(r" [.!?,]", original[-2:])
+            else perturbed_utterance
+        )
         perturbations = get_utterances_diff(original, perturbed_utterance)
         results.append(
             PerturbedUtteranceDetails(
