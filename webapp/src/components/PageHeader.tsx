@@ -161,7 +161,7 @@ const PageHeader = () => {
                 {config && (
                   <PipelineSelect
                     selectedPipeline={pipeline.pipelineIndex}
-                    onChange={(value) => setPipeline(value)}
+                    onChange={setPipeline}
                   >
                     {config.pipelines?.map((pipeline, pipelineIndex) => (
                       <MenuItem key={pipelineIndex} value={pipelineIndex}>

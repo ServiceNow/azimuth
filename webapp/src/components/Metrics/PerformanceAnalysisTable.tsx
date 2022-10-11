@@ -56,7 +56,7 @@ import { constructSearchString } from "utils/helpers";
 
 const ROW_HEIGHT = 35;
 const OVERALL_ROW_ID = -1; // -1 so that the other rows can range from 0 - n-1
-const LABEL_WIDTH = 200;
+const HEADER_WIDTH = 200;
 
 const pipelines = ["basePipeline", "comparedPipeline"] as const;
 const BASIC_FILTER_OPTIONS = ["label", "prediction"] as const;
@@ -254,7 +254,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       {
         id: 1,
         field: "filterValue",
-        width: LABEL_WIDTH,
+        width: HEADER_WIDTH,
         cellClassName: "sticky",
         sortComparator: customSort,
         valueGetter: ({ row }) => row.basePipeline.filterValue,
@@ -345,7 +345,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             description,
             align: "right",
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
-              metrics?.customMetrics[metricName] ?? NaN,
+              metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
             renderCell: ({ value }: GridCellParams<number | undefined>) =>
               value !== undefined && (
                 <VisualBar
@@ -467,12 +467,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     </Link>
   );
 
-  const LabelHeader = () => (
+  const Header = () => (
     <Box
       className="MuiDataGrid-withBorder"
       position="relative"
       height={DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight}
-      width={LABEL_WIDTH}
+      width={HEADER_WIDTH}
       marginBottom={-DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight}
       padding={1}
       zIndex={1}
@@ -563,7 +563,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
               control={
                 <PipelineSelect
                   selectedPipeline={comparedPipeline}
-                  onChange={(value) => setComparedPipeline(value)}
+                  onChange={setComparedPipeline}
                 >
                   {config.pipelines?.map(
                     ({ name }, pipelineIndex) =>
@@ -586,6 +586,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           },
           "& .MuiDataGrid-columnHeaders": {
             borderBottom: "none",
+            height: DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight,
           },
           "& .MuiDataGrid-virtualScroller": {
             // Stops accidental navigation on horizontal scroll with touch pad
@@ -606,9 +607,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           },
           "& .no-border-right": {
             borderRight: "none",
-          },
-          "& .border-left": {
-            borderLeft: (theme) => `1px solid ${theme.palette.grey[300]}`,
           },
         }}
         showCellRightBorder
@@ -636,7 +634,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         components={{
           ColumnMenu,
           Row: RowLink,
-          Header: LabelHeader,
+          Header: Header,
         }}
       />
     </Paper>
