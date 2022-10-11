@@ -632,7 +632,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         components={{
           ColumnMenu,
           Row: RowLink,
-          Header: Header,
+          Header,
         }}
       />
     </Paper>
