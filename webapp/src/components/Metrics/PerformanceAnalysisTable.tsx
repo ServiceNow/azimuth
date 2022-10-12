@@ -185,7 +185,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     selectedMetricPerFilterOption,
   ]);
 
-  const columns: Column<Row>[] = React.useMemo(() => {
+  const columns = React.useMemo((): Column<Row>[] => {
     const metricsEntries = Object.entries(metricInfo ?? {});
 
     const customSort = (
@@ -254,7 +254,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
 
     return [
       {
-        id: 1,
         field: "filterValue",
         width: HEADER_WIDTH,
         cellClassName: "sticky",
@@ -595,7 +594,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             zIndex: (theme) => theme.zIndex.mobileStepper,
             background: (theme) => theme.palette.background.paper,
           },
-
           "& .overall": {
             background: (theme) => theme.palette.grey[200],
           },
@@ -609,9 +607,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         onSortModelChange={setSortModel}
         columnVisibilityModel={columnVisibilityModel}
         onColumnVisibilityModelChange={setColumnVisibilityModel}
-        getCellClassName={({ id }) =>
-          `${id === OVERALL_ROW_ID ? "overall" : ""}`
-        }
+        getCellClassName={({ id }) => (id === OVERALL_ROW_ID ? "overall" : "")}
         rowHeight={ROW_HEIGHT}
         columns={columns}
         rows={rows}
