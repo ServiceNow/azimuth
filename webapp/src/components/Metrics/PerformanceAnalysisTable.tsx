@@ -217,9 +217,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     };
 
     const DELTA_METRIC_COLUMN = {
-      flex: 1,
-      minWidth: 175,
-      maxWidth: 350,
+      headerName: "Delta",
+      cellClassName: "delta",
+      width: 175,
       sortComparator: customSort,
     };
 
@@ -243,10 +243,16 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                       <Box
                         position="absolute"
                         left={0}
-                        right={-2 * colDef.computedWidth}
+                        right={
+                          -colDef.computedWidth - DELTA_METRIC_COLUMN.width
+                        }
                         top={0}
                         lineHeight={1}
-                        textAlign="center"
+                        height={14}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        gap={1}
                       >
                         {longHeader}
                       </Box>
@@ -267,19 +273,16 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}UtteranceCount`,
+        description: "Total number of utterances",
         ...(selectedMetricPerFilterOption !== "label" &&
-          groupHeader(pipeline, "Number of utterances")),
+          groupHeader(pipeline, "Total", "Total number of utterances")),
         headerName: "Total",
-        headerAlign: "center",
-        align: "center",
+        align: "right",
         valueGetter: ({ row }) => row[pipeline]?.utteranceCount,
       })),
       {
         ...DELTA_METRIC_COLUMN,
         field: "deltaUtteranceCount",
-        headerName: "Delta",
-        cellClassName: "delta",
-        headerAlign: "center",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.utteranceCount - row.basePipeline.utteranceCount,
@@ -299,9 +302,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ...groupHeader(
             pipeline,
             OutcomeIcon({ outcome }),
-            OUTCOME_PRETTY_NAMES[outcome]
+            <>
+              {OutcomeIcon({ outcome })}
+              {OUTCOME_PRETTY_NAMES[outcome]}
+            </>
           ),
-          align: "right",
           valueGetter: ({ row }) =>
             row[pipeline] &&
             row[pipeline]!.outcomeCount[outcome] /
@@ -318,9 +323,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         {
           ...DELTA_METRIC_COLUMN,
           field: `delta${outcome}`,
-          headerName: "Delta",
-          cellClassName: "delta",
-          headerAlign: "center",
           valueGetter: ({ row }) =>
             row.comparedPipeline &&
             row.comparedPipeline.outcomeCount[outcome] /
@@ -347,7 +349,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             field: `${pipeline}${metricName}`,
             description,
             ...groupHeader(pipeline, metricName),
-            align: "right",
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
               metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
             renderCell: ({ value }: GridCellParams<number | undefined>) =>
@@ -362,9 +363,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           {
             ...DELTA_METRIC_COLUMN,
             field: `delta${metricName}`,
-            headerName: "Delta",
-            cellClassName: "delta",
-            headerAlign: "center",
             valueGetter: ({ row }) =>
               row.comparedPipeline &&
               row.comparedPipeline.customMetrics[metricName] -
@@ -387,7 +385,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
         ...groupHeader(pipeline, "ECE"),
-        align: "right",
         description: ECE_TOOLTIP,
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
@@ -402,9 +399,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       {
         ...DELTA_METRIC_COLUMN,
         field: `deltaECE`,
-        headerName: "Delta",
-        cellClassName: "delta",
-        headerAlign: "center",
         valueGetter: ({ row }) =>
           row.comparedPipeline &&
           row.comparedPipeline.ece - row.basePipeline.ece,
@@ -484,10 +478,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     >
       <Select
         sx={{
-          fontFamily: "inherit",
           fontSize: "inherit",
           fontWeight: "bold",
-          color: "inherit",
         }}
         // We must stop the blur event because if not it causes exceptions elsewhere
         // See here: https://github.com/mui/mui-x/issues/1439
