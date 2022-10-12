@@ -141,6 +141,10 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     { skip: comparedPipeline === undefined }
   );
 
+  const error =
+    (comparedPipeline !== undefined && errorFetchingComparedPipelineData) ||
+    errorFetchingBasePipelineData;
+
   // Track table sort model to keep 'overall' at top.
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
     { field: "utteranceCount", sort: "desc" },
@@ -515,23 +519,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     </Box>
   );
 
-  return errorFetchingBasePipelineData ? (
+  return error ? (
     <Typography
       sx={{ minHeight: 20 }}
       variant="body2"
       margin={2}
       alignSelf="center"
     >
-      {errorFetchingBasePipelineData.message}
-    </Typography>
-  ) : errorFetchingComparedPipelineData ? (
-    <Typography
-      sx={{ minHeight: 20 }}
-      variant="body2"
-      margin={2}
-      alignSelf="center"
-    >
-      {errorFetchingComparedPipelineData.message}
+      {error.message}
     </Typography>
   ) : (
     <Paper
