@@ -170,15 +170,15 @@ class DatasetWarningsOptions(BaseModel):
 class SyntaxOptions(BaseModel):
     short_sentence_max_token: int = 3
     long_sentence_min_token: int = 16
-    spacy_model: str = ""  # Language-based default value set by AzimuthConfig
-    subj_tags: List[str] = []  # Language-based default value set by AzimuthConfig
-    obj_tags: List[str] = []  # Language-based default value set by AzimuthConfig
+    spacy_model: str = ""  # Language-based dynamic default value
+    subj_tags: List[str] = []  # Language-based dynamic default value
+    obj_tags: List[str] = []  # Language-based dynamic default value
 
 
 class NeutralTokenOptions(BaseModel):
     threshold: float = 1
-    suffix_list: List[str] = []  # Language-based default value set by AzimuthConfig
-    prefix_list: List[str] = []  # Language-based default value set by AzimuthConfig
+    suffix_list: List[str] = []  # Language-based default value
+    prefix_list: List[str] = []  # Language-based default value
 
 
 class PunctuationTestOptions(BaseModel):
