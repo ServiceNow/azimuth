@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 import structlog
 from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, validator
 
-from azimuth.types import SupportedModelContract
+from azimuth.types import AliasModel, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 
 log = structlog.get_logger(__file__)
@@ -31,58 +31,30 @@ class SupportedSpacyModels(str, Enum):
     fr_core_news_md = "fr_core_news_md"
 
 
-# TODO Is it better to do many little dictionaries, or have one dictionary with keys
-#  SupportedLanguage and values as a typed class, as below?
-#
-# class LanguageDefaultValues(AliasModel):
-#     suffix_list: List[str]
-#     prefix_list: List[str]
-#     spacy_model: str
-#     subj_tags: List[str]
-#     obj_tags: List[str]
-#
-#
-# config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
-#     SupportedLanguage.en: LanguageDefaultValues(
-#         suffix_list=["pls", "please", "thank you", "appreciated"],
-#         prefix_list=["pls", "please", "hello", "greetings"],
-#         spacy_model="en_core_web_sm",
-#         subj_tags=["nsubj", "nsubjpass"]
-#         obj_tags=["dobj", "pobj", "obj"],
-#     ),
-#     SupportedLanguage.fr: LanguageDefaultValues(
-#         suffix_list=["svp", "s'il vous plaît", "merci", "super"],
-#         prefix_list=["svp", "s'il vous plaît", "bonjour", "allô"],
-#         spacy_model="fr_core_news_md",
-#         subj_tags=["nsubj", "nsubj:pass"],
-#         obj_tags=["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"]
-#     )
-# }
+class LanguageDefaultValues(AliasModel):
+    suffix_list: List[str]
+    prefix_list: List[str]
+    spacy_model: str
+    subj_tags: List[str]
+    obj_tags: List[str]
 
-suffix_list_per_language: Dict[SupportedLanguage, List[str]] = {
-    SupportedLanguage.en: ["pls", "please", "thank you", "appreciated"],
-    SupportedLanguage.fr: ["svp", "s'il vous plaît", "merci", "super"],
-}
-
-prefix_list_per_language: Dict[SupportedLanguage, List[str]] = {
-    SupportedLanguage.en: ["pls", "please", "hello", "greetings"],
-    SupportedLanguage.fr: ["svp", "s'il vous plaît", "bonjour", "allô"],
-}
-
-spacy_model_per_language: Dict[SupportedLanguage, str] = {
-    SupportedLanguage.en: SupportedSpacyModels.en_core_web_sm,
-    SupportedLanguage.fr: SupportedSpacyModels.fr_core_news_md,
-}
 
 # To see all dep tag options for a spacy model: spacy.load(SPACY_MODEL).get_pipe("parser").labels
-subj_tags_per_language: Dict[SupportedLanguage, List[str]] = {
-    SupportedLanguage.en: ["nsubj", "nsubjpass"],
-    SupportedLanguage.fr: ["nsubj", "nsubj:pass"],
-}
-
-obj_tags_per_language: Dict[SupportedLanguage, List[str]] = {
-    SupportedLanguage.en: ["dobj", "pobj", "obj"],
-    SupportedLanguage.fr: ["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
+config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
+    SupportedLanguage.en: LanguageDefaultValues(
+        suffix_list=["pls", "please", "thank you", "appreciated"],
+        prefix_list=["pls", "please", "hello", "greetings"],
+        spacy_model="en_core_web_sm",
+        subj_tags=["nsubj", "nsubjpass"],
+        obj_tags=["dobj", "pobj", "obj"],
+    ),
+    SupportedLanguage.fr: LanguageDefaultValues(
+        suffix_list=["svp", "s'il vous plaît", "merci", "super"],
+        prefix_list=["svp", "s'il vous plaît", "bonjour", "allô"],
+        spacy_model="fr_core_news_md",
+        subj_tags=["nsubj", "nsubj:pass"],
+        obj_tags=["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
+    ),
 }
 
 
@@ -382,9 +354,31 @@ class SyntaxConfig(CommonFieldsConfig):
 
 
 class LanguageConfig(CommonFieldsConfig):
-    # Language configuration sets multiple config values; see reference dictionary/ies for details
-    # TODO Correct grammar when code decision has been made
+    # Language configuration sets multiple config values; see reference dictionary for details
     language: SupportedLanguage = SupportedLanguage.en
+
+    @root_validator()
+    def dynamic_language_config_values(cls, values):
+        if values["behavioral_testing"]:
+            values["behavioral_testing"].neutral_token.prefix_list = (
+                values["behavioral_testing"].neutral_token.prefix_list
+                or config_defaults_per_language[values["language"]].prefix_list
+            )
+            values["behavioral_testing"].neutral_token.suffix_list = (
+                values["behavioral_testing"].neutral_token.suffix_list
+                or config_defaults_per_language[values["language"]].suffix_list
+            )
+        values["syntax"].spacy_model = (
+            values["syntax"].spacy_model
+            or config_defaults_per_language[values["language"]].spacy_model
+        )
+        values["syntax"].subj_tags = (
+            values["syntax"].subj_tags or config_defaults_per_language[values["language"]].subj_tags
+        )
+        values["syntax"].obj_tags = (
+            values["syntax"].obj_tags or config_defaults_per_language[values["language"]].obj_tags
+        )
+        return values
 
 
 class AzimuthConfig(
@@ -395,31 +389,8 @@ class AzimuthConfig(
     LanguageConfig,
     extra=Extra.forbid,
 ):
-    # TODO @fred But _why_ should this class remain empty? :) Should it just be empty of data
-    #  attributes, and are methods ok?
     # This class should remain empty!
-    # pass
-    @root_validator()
-    def dynamic_language_config_values(cls, values):
-        if values["behavioral_testing"]:
-            values["behavioral_testing"].neutral_token.prefix_list = (
-                values["behavioral_testing"].neutral_token.prefix_list
-                or prefix_list_per_language[values["language"]]
-            )
-            values["behavioral_testing"].neutral_token.suffix_list = (
-                values["behavioral_testing"].neutral_token.suffix_list
-                or suffix_list_per_language[values["language"]]
-            )
-        values["syntax"].spacy_model = (
-            values["syntax"].spacy_model or spacy_model_per_language[values["language"]]
-        )
-        values["syntax"].subj_tags = (
-            values["syntax"].subj_tags or subj_tags_per_language[values["language"]]
-        )
-        values["syntax"].obj_tags = (
-            values["syntax"].obj_tags or obj_tags_per_language[values["language"]]
-        )
-        return values
+    pass
 
 
 def load_azimuth_config(config_path: str) -> AzimuthConfig:

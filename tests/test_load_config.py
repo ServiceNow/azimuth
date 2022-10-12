@@ -11,8 +11,7 @@ from azimuth.config import (
     SupportedLanguage,
     TemperatureScaling,
     ThresholdConfig,
-    obj_tags_per_language,
-    spacy_model_per_language,
+    config_defaults_per_language,
 )
 
 CURR_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -135,8 +134,8 @@ def test_french_defaults_and_override():
         cfg.syntax.subj_tags == subj_tags_potatoes
     ), "Config did not take user-provided values for subj_tags"
     assert (
-        cfg.syntax.spacy_model == spacy_model_per_language[SupportedLanguage.fr]
+        cfg.syntax.spacy_model == config_defaults_per_language[SupportedLanguage.fr].spacy_model
     ), "Config did not take default French value for spacy_model"
     assert (
-        cfg.syntax.obj_tags == obj_tags_per_language[SupportedLanguage.fr]
+        cfg.syntax.obj_tags == config_defaults_per_language[SupportedLanguage.fr].obj_tags
     ), "Config did not take default French value for spacy_model"
