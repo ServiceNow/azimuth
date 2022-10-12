@@ -572,9 +572,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
           },
+          "& .MuiDataGrid-columnHeader": {
+            // Fix line-height not affecting non-text headers like icons
+            height: DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight,
+          },
           "& .MuiDataGrid-columnHeaders": {
             borderBottom: "none",
-            height: DATA_GRID_PROPS_DEFAULT_VALUES.headerHeight,
           },
           "& .MuiDataGrid-virtualScroller": {
             // Stops accidental navigation on horizontal scroll with touch pad
