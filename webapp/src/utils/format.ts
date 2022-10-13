@@ -1,16 +1,13 @@
-export function formatRatioAsPercentageString(
+export const formatNumberAsString = (value: number, digits: number = 2) => {
+  if (isNaN(value)) return "--";
+
+  const fixed = value.toFixed(digits);
+  // Use at least one significant digit, in case the provided fixed number of
+  // decimal places fails to produce any significant digit (for example "0.00").
+  return value !== 0 && Number(fixed) === 0 ? value.toPrecision(1) : fixed;
+};
+
+export const formatRatioAsPercentageString = (
   value: number,
   digits: number = 2
-) {
-  if (isNaN(value)) {
-    return "--%";
-  }
-  const percentage = 100 * value;
-  let percentageString = percentage.toFixed(digits);
-  if (percentage !== 0 && Number(percentageString) === 0) {
-    // Use at least one significant digit, in case the provided fixed number of
-    // decimal places fails to produce any significant digit (0%).
-    percentageString = percentage.toPrecision(1);
-  }
-  return `${percentageString}%`;
-}
+) => `${formatNumberAsString(100 * value, digits)}%`;

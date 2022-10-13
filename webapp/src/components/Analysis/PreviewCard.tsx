@@ -6,10 +6,17 @@ import { Link } from "react-router-dom";
 type Props = {
   title: string;
   to?: string;
+  linkButtonText?: string;
   description: React.ReactElement<typeof Description>;
 };
 
-const PreviewCard: React.FC<Props> = ({ title, to, children, description }) => (
+const PreviewCard: React.FC<Props> = ({
+  title,
+  to,
+  linkButtonText = "View details",
+  children,
+  description,
+}) => (
   <Paper
     variant="outlined"
     sx={{ display: "flex", flexDirection: "column", gap: 4, padding: 4 }}
@@ -21,7 +28,7 @@ const PreviewCard: React.FC<Props> = ({ title, to, children, description }) => (
       </Box>
       {to && (
         <Button color="secondary" variant="outlined" component={Link} to={to}>
-          View details
+          {linkButtonText}
         </Button>
       )}
     </Box>
