@@ -4,7 +4,6 @@
 import itertools
 import os
 from collections import defaultdict
-from os.path import join as pjoin
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -38,16 +37,17 @@ class FAISSModule(IndexableModule[SimilarityConfig]):
         self.encoder = None
         super().__init__(dataset_split_name, config, mod_options)
 
+    def get_model_name_or_path(self):
+        model_name_or_path = self.config.similarity.faiss_encoder
+        if os.environ.get("TRANSFORMERS_OFFLINE"):
+            home = os.environ.get("SENTENCE_TRANSFORMERS_HOME")
+            model_name_or_path = os.path.join(home, f"sentence-transformers_{model_name_or_path}")
+        return model_name_or_path
+
     def get_model(self):
         if self.encoder is None:
-            with FileLock(pjoin(self.cache_dir, "st.lock")):
-                model = self.config.similarity.faiss_encoder
-                if os.environ.get("TRANSFORMERS_OFFLINE"):
-                    model = os.path.join(
-                        os.environ.get("SENTENCE_TRANSFORMERS_HOME"),
-                        f"sentence-transformers_{model}",
-                    )
-                self.encoder = SentenceTransformer(model)
+            with FileLock(os.path.join(self.cache_dir, "st.lock")):
+                self.encoder = SentenceTransformer(self.get_model_name_or_path())
         return self.encoder
 
     def compute_on_dataset_split(self) -> List[FAISSResponse]:  # type: ignore
