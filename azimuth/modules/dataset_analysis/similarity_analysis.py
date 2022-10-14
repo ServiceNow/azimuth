@@ -2,6 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import itertools
+import os
 from collections import defaultdict
 from os.path import join as pjoin
 from typing import Dict, List, Optional, Tuple
@@ -40,7 +41,13 @@ class FAISSModule(IndexableModule[SimilarityConfig]):
     def get_model(self):
         if self.encoder is None:
             with FileLock(pjoin(self.cache_dir, "st.lock")):
-                self.encoder = SentenceTransformer(self.config.similarity.faiss_encoder)
+                model = self.config.similarity.faiss_encoder
+                if os.environ.get("TRANSFORMERS_OFFLINE"):
+                    model = os.path.join(
+                        os.environ.get("SENTENCE_TRANSFORMERS_HOME"),
+                        f"sentence-transformers_{model}",
+                    )
+                self.encoder = SentenceTransformer(model)
         return self.encoder
 
     def compute_on_dataset_split(self) -> List[FAISSResponse]:  # type: ignore
