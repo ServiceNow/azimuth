@@ -27,19 +27,20 @@ class SupportedLanguage(str, Enum):
 
 # spaCy models must be in pyproject.toml to be loaded by Azimuth
 class SupportedSpacyModels(str, Enum):
+    use_default = ""
     en_core_web_sm = "en_core_web_sm"
     fr_core_news_md = "fr_core_news_md"
 
 
+# To see all dep tag options for a spacy model: spacy.load(SPACY_MODEL).get_pipe("parser").labels
 class LanguageDefaultValues(AliasModel):
     suffix_list: List[str]
     prefix_list: List[str]
-    spacy_model: str
+    spacy_model: SupportedSpacyModels
     subj_tags: List[str]
     obj_tags: List[str]
 
 
-# To see all dep tag options for a spacy model: spacy.load(SPACY_MODEL).get_pipe("parser").labels
 config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
     SupportedLanguage.en: LanguageDefaultValues(
         suffix_list=["pls", "please", "thank you", "appreciated"],
@@ -170,7 +171,7 @@ class DatasetWarningsOptions(BaseModel):
 class SyntaxOptions(BaseModel):
     short_sentence_max_token: int = 3
     long_sentence_min_token: int = 16
-    spacy_model: str = ""  # Language-based dynamic default value
+    spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
     subj_tags: List[str] = []  # Language-based dynamic default value
     obj_tags: List[str] = []  # Language-based dynamic default value
 
@@ -359,25 +360,15 @@ class LanguageConfig(CommonFieldsConfig):
 
     @root_validator()
     def dynamic_language_config_values(cls, values):
+        defaults = config_defaults_per_language[values["language"]]
         if values["behavioral_testing"]:
-            values["behavioral_testing"].neutral_token.prefix_list = (
-                values["behavioral_testing"].neutral_token.prefix_list
-                or config_defaults_per_language[values["language"]].prefix_list
-            )
-            values["behavioral_testing"].neutral_token.suffix_list = (
-                values["behavioral_testing"].neutral_token.suffix_list
-                or config_defaults_per_language[values["language"]].suffix_list
-            )
-        values["syntax"].spacy_model = (
-            values["syntax"].spacy_model
-            or config_defaults_per_language[values["language"]].spacy_model
-        )
-        values["syntax"].subj_tags = (
-            values["syntax"].subj_tags or config_defaults_per_language[values["language"]].subj_tags
-        )
-        values["syntax"].obj_tags = (
-            values["syntax"].obj_tags or config_defaults_per_language[values["language"]].obj_tags
-        )
+            neutral_token = values["behavioral_testing"].neutral_token
+            neutral_token.prefix_list = neutral_token.prefix_list or defaults.prefix_list
+            neutral_token.suffix_list = neutral_token.suffix_list or defaults.suffix_list
+        syntax = values["syntax"]
+        syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
+        syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
+        syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
         return values
 
 
@@ -389,7 +380,7 @@ class AzimuthConfig(
     LanguageConfig,
     extra=Extra.forbid,
 ):
-    # This class should remain empty!
+    # Do not add fields!! as modules (scope-dependent) would be recomputed when a field is changed.
     pass
 
 

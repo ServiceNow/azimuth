@@ -629,10 +629,12 @@ export interface components {
       | "hf_text_classification"
       | "file_based_text_classification"
       | "custom_text_classification";
+    /** An enumeration. */
+    SupportedSpacyModels: "" | "en_core_web_sm" | "fr_core_news_md";
     SyntaxOptions: {
       short_sentence_max_token?: number;
       long_sentence_min_token?: number;
-      spacy_model?: string;
+      spacy_model?: components["schemas"]["SupportedSpacyModels"];
       subj_tags?: string[];
       obj_tags?: string[];
     };

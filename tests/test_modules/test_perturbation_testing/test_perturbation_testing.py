@@ -1,6 +1,8 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+import re
+
 from azimuth.modules.perturbation_testing.perturbation_testing import (
     PerturbationTestingModule,
 )
@@ -129,21 +131,21 @@ def test_typo_hyphens(simple_text_config):
 
 
 def test_typo_aug_fixes(simple_text_config):
-    original = "il y a un espace avant le point d'interrogation ?"
+    # Many opportunities for nac to alter: quote, apostrophe, spacing around punctuation
+    original = "Allô ! Je l’adore. Est-ce que c'est $42?"
+    re_punctuation = re.compile(r"(\w+)")
+    punctuation_original = re_punctuation.split(original)[::2]
     perturbed_utterance_details = typo(original, simple_text_config)
     perturbed_utterance = perturbed_utterance_details[0].perturbed_utterance
-    assert "'" in perturbed_utterance, "Apostrophe ' replaced with quote ’ and not corrected."
-    assert " ?" in perturbed_utterance, "Penultimate space removed and not replaced."
+    punctuation_perturbed = re_punctuation.split(perturbed_utterance)[::2]
+    assert punctuation_original == punctuation_perturbed, (
+        f"Augmenter has introduced spacing or punctuation errors.\noriginal: "
+        f"{original}\nperturbed: {perturbed_utterance}"
+    )
 
     perturbed_utterance_details_b = remove_or_add_final_punctuation(original, ".")
     perturbed_utterance_b = perturbed_utterance_details_b[0].perturbed_utterance
     assert perturbed_utterance_b[-2] != " ", "Penultimate space incorrectly kept."
-
-    original_2 = "il n’y a pas un espace avant le point d’interrogation?"
-    perturbed_utterance_details_2 = typo(original_2, simple_text_config)
-    perturbed_utterance_2 = perturbed_utterance_details_2[0].perturbed_utterance
-    assert "'" not in perturbed_utterance_2, "Quote ’ incorrectly replaced with apostrophe '."
-    assert " ?" not in perturbed_utterance_2, "Penultimate space incorrectly added."
 
 
 def test_if_failed(simple_text_config):

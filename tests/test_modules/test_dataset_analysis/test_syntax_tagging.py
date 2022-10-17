@@ -82,24 +82,16 @@ def test_syntax_tagging_french(simple_text_config_french):
     assert json_output[0].tags[SmartTag.no_subj]
     assert not any([json_output[0].tags[SmartTag.no_obj], json_output[0].tags[SmartTag.no_verb]])
 
-    assert not any(
-        [
-            json_output[1].tags[SmartTag.no_subj],
-            json_output[1].tags[SmartTag.no_verb],
-            json_output[1].tags[SmartTag.no_verb],
-        ]
-    )
+    assert not json_output[1].tags[SmartTag.no_subj]
+    assert not json_output[1].tags[SmartTag.no_verb]
+    assert not json_output[1].tags[SmartTag.no_verb]
 
     assert not any([json_output[2].tags[SmartTag.no_subj], json_output[2].tags[SmartTag.no_verb]])
     assert json_output[2].tags[SmartTag.no_obj]
 
-    assert all(
-        [
-            json_output[3].tags[SmartTag.no_obj],
-            json_output[3].tags[SmartTag.no_verb],
-            json_output[3].tags[SmartTag.no_subj],
-        ]
-    )
+    assert json_output[3].tags[SmartTag.no_obj]
+    assert json_output[3].tags[SmartTag.no_verb]
+    assert json_output[3].tags[SmartTag.no_subj]
 
     assert not json_output[4].tags[SmartTag.no_verb]
 

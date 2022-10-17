@@ -3,6 +3,7 @@
 # in the root directory of this source tree.
 import contextlib
 import re
+from itertools import zip_longest
 from typing import List
 
 import nlpaug.augmenter.char as nac
@@ -139,8 +140,7 @@ def remove_or_add_final_punctuation(
         perturbation_type = PerturbationType.Deletion
     # Replace with specified punctuation if last character is another punctuation sign.
     elif any([p in last_char for p in [".", "!", "?", ","]]):
-        perturb_utt = original[:-1] + punctuation_sign
-        perturb_utt = re.sub(r" ([.!?,])", r"\1", perturb_utt)  # Remove any penultimate space
+        perturb_utt = original[:-1].rstrip() + punctuation_sign
         perturbation_type = PerturbationType.Replacement
     # Add specified punctuation otherwise.
     else:
@@ -288,15 +288,29 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
     augmentations = []
     perturbation_types = []
     behavioral_testing_config = assert_not_none(config.behavioral_testing)
+    # Special chars limited for all augs to facilitate cleaning up nac spacing/punctuation below
     for nb_typo in range(1, behavioral_testing_config.typo.nb_typos_per_utterance + 1):
         augmentations.extend(
             [
-                nac.KeyboardAug(min_char=4, aug_word_max=nb_typo, aug_char_p=0.1 * nb_typo),
-                nac.RandomCharAug(
-                    action="swap", min_char=4, aug_word_max=nb_typo, aug_char_p=0.1 * nb_typo
+                nac.KeyboardAug(
+                    min_char=4,
+                    aug_word_max=nb_typo,
+                    aug_char_p=0.1 * nb_typo,
+                    include_special_char=False,
                 ),
                 nac.RandomCharAug(
-                    action="delete", min_char=4, aug_word_max=nb_typo, aug_char_p=0.1 * nb_typo
+                    action="swap",
+                    min_char=4,
+                    aug_word_max=nb_typo,
+                    aug_char_p=0.1 * nb_typo,
+                    spec_char="_",
+                ),
+                nac.RandomCharAug(
+                    action="delete",
+                    min_char=4,
+                    aug_word_max=nb_typo,
+                    aug_char_p=0.1 * nb_typo,
+                    spec_char="_",
                 ),
             ]
         )
@@ -309,18 +323,16 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
         with contextlib.redirect_stdout(None):
             # While nlpaug fixes their useless print, we ignore it.
             perturbed_utterance = aug.augment(original, n=1)
-        # Issue 854 nac adds spaces around the quote/apostrophe and $ sign; remove them.
-        perturbed_utterance = re.sub(r" (['’]) ", r"\1", perturbed_utterance)
-        perturbed_utterance = re.sub(r"([$]) ", r"\1", perturbed_utterance)
-        # nac replaces apostrophes with quotes; revert to original.
-        perturbed_utterance = (
-            re.sub(r"’", r"'", perturbed_utterance) if "'" in original else perturbed_utterance
-        )
-        # nac removes space before the final punctuation; re-add them.
-        perturbed_utterance = (
-            perturbed_utterance[:-1] + " " + perturbed_utterance[-1]
-            if re.search(r" [.!?,]", original[-2:])
-            else perturbed_utterance
+        # nac alters spacing around punctuation (e.g., around '; after $; before ?) and replaces
+        # apostrophes with quotes; revert to original.
+        re_punctuation = re.compile(r"(\w+)")
+        punctuations = re_punctuation.split(original)[::2]
+        words = re_punctuation.split(perturbed_utterance)[1::2]
+        perturbed_utterance = "".join(
+            [
+                punctuation + word
+                for punctuation, word in zip_longest(punctuations, words, fillvalue="")
+            ]
         )
         perturbations = get_utterances_diff(original, perturbed_utterance)
         results.append(
