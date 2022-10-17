@@ -21,6 +21,8 @@ This file contains functions that perturb an utterance, and can be used by
 PerturbationTestingModule.
 """
 
+re_punctuation = re.compile(r"(\w+)")
+
 
 def add_neutral_token(
     original: str, position: str, neutral_tokens: List[str]
@@ -325,14 +327,11 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
             perturbed_utterance = aug.augment(original, n=1)
         # nac alters spacing around punctuation (e.g., around '; after $; before ?) and replaces
         # apostrophes with quotes; revert to original.
-        re_punctuation = re.compile(r"(\w+)")
         punctuations = re_punctuation.split(original)[::2]
         words = re_punctuation.split(perturbed_utterance)[1::2]
         perturbed_utterance = "".join(
-            [
-                punctuation + word
-                for punctuation, word in zip_longest(punctuations, words, fillvalue="")
-            ]
+            punctuation + word
+            for punctuation, word in zip_longest(punctuations, words, fillvalue="")
         )
         perturbations = get_utterances_diff(original, perturbed_utterance)
         results.append(
