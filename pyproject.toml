@@ -32,7 +32,6 @@ transformers = "4.16.2"
 sentence-transformers = "2.1.0"
 spacy = "3.1.5"
 en_core_web_sm = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.1.0/en_core_web_sm-3.1.0.tar.gz#egg=en_core_web_sm"}
-fr_core_news_sm = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.1.0/fr_core_news_sm-3.1.0.tar.gz#egg=fr_core_news_sm"}
 fr_core_news_md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.1.0/fr_core_news_md-3.1.0.tar.gz#egg=fr_core_news_md"}
 nlpaug = "1.1.10"
 datasets = "1.16.1"

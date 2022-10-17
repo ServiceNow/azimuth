@@ -673,20 +673,7 @@ spacy = ">=3.1.0,<3.2.0"
 [package.source]
 type = "url"
 url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.1.0/fr_core_news_md-3.1.0.tar.gz#egg=fr_core_news_md"
-[[package]]
-name = "fr-core-news-sm"
-version = "3.1.0"
-description = "French pipeline optimized for CPU. Components: tok2vec, morphologizer, parser, senter, ner, attribute_ruler, lemmatizer."
-category = "main"
-optional = false
-python-versions = "*"
 
-[package.dependencies]
-spacy = ">=3.1.0,<3.2.0"
-
-[package.source]
-type = "url"
-url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.1.0/fr_core_news_sm-3.1.0.tar.gz#egg=fr_core_news_sm"
 [[package]]
 name = "frozenlist"
 version = "1.3.0"
@@ -3374,7 +3361,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "149b20e18381e3aff62ffe7898ab8da84784e83e01fd69401e8eb32bf0661b96"
+content-hash = "2b5527189a026efd21403419b0fa84df3cd830eae8649ff77929143b76e05ed1"
 
 [metadata.files]
 absl-py = [
@@ -3862,7 +3849,6 @@ fonttools = [
     {file = "fonttools-4.31.2.zip", hash = "sha256:236b29aee6b113e8f7bee28779c1230a86ad2aac9a74a31b0aedf57e7dfb62a4"},
 ]
 fr-core-news-md = []
-fr-core-news-sm = []
 frozenlist = [
     {file = "frozenlist-1.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d2257aaba9660f78c7b1d8fea963b68f3feffb1a9d5d05a18401ca9eb3e8d0a3"},
     {file = "frozenlist-1.3.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:4a44ebbf601d7bac77976d429e9bdb5a4614f9f4027777f9e54fd765196e9d3b"},
