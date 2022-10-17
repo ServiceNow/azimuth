@@ -19,17 +19,17 @@ dependency tag lists will generally not need to be modified.
     class SyntaxOptions(BaseModel):
         short_sentence_max_token: int = 3 # (1)
         long_sentence_min_token: int = 16 # (2)
-        subj_tags: List[str] = []  # Language-based default value set by AzimuthConfig (3)
-        obj_tags: List[str] = []  # Language-based default value set by AzimuthConfig (4)
-        spacy_model: str = ""  # Language-based default value set by AzimuthConfig (5)
+        spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default (3)
+        subj_tags: List[str] = []  # Language-based default value (4)
+        obj_tags: List[str] = []  # Language-based default value (5)
     ```
 
     1. Maximum number of tokens for a sentence to be tagged as short (e.g <=3 for the default)
     2. Minimum number of tokens for a sentence to be tagged as long (e.g >=16 for the default)
-    4. spaCy model to use for syntax tagging. English default is `"en_core_web_sm"`.
-    3. spaCy dependency tags used to determine whether a word is a subject (noun). English
+    3. spaCy model to use for syntax tagging. English default is `"en_core_web_sm"`.
+    4. spaCy dependency tags used to determine whether a word is a subject (noun). English
     default is `["nsubj", "nsubjpass"]`.
-    4. spaCy dependency tags used to determine whether a word is an object (noun). English
+    5. spaCy dependency tags used to determine whether a word is an object (noun). English
     default is `["dobj", "pobj", "obj"]`.
 
 === "Config Example"

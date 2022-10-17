@@ -22,8 +22,8 @@ It can be enabled later on in the application.
 
     class NeutralTokenOptions(BaseModel):
         threshold: float = 1  # (5)
-        suffix_list: List[str] = []  # Language-based default value set by AzimuthConfig # (6)
-        prefix_list: List[str] = []  # Language-based default value set by AzimuthConfig # (7)
+        suffix_list: List[str] = []  # Language-based default value # (6)
+        prefix_list: List[str] = []  # Language-based default value # (7)
 
 
     class PunctuationTestOptions(BaseModel):

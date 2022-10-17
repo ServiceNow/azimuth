@@ -13,7 +13,7 @@ Released changes are shown in the
 ### Added
 - Azimuth now works on French datasets (and pipelines)! Language can be selected in the config,
   and language-specific defaults for syntax-tagging and behavioral tests (neutral tokens) will be
-  set dynamically.
+  set dynamically (or can be altered manually).
 - Added a new page to compare different pipelines in the performance analysis table.
 
 

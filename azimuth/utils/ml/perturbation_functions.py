@@ -303,14 +303,14 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
                     min_char=4,
                     aug_word_max=nb_typo,
                     aug_char_p=0.1 * nb_typo,
-                    spec_char="_",
+                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue to be added
                 ),
                 nac.RandomCharAug(
                     action="delete",
                     min_char=4,
                     aug_word_max=nb_typo,
                     aug_char_p=0.1 * nb_typo,
-                    spec_char="_",
+                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue to be added
                 ),
             ]
         )
