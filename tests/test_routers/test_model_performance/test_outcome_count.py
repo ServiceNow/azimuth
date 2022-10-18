@@ -35,7 +35,7 @@ def test_outcome_count_empty_filters(app: FastAPI):
     data = resp.json()
     assert data["utteranceCount"] == 0
 
-# This used to fail when we were filtering on an empty dataset
+    # This used to fail when we were filtering on an empty dataset
     resp = client.get(
         "/dataset_splits/eval/outcome_count/per_filter"
         "?pipeline_index=0&utterance=yukongold&data_action=relabel"
