@@ -8,7 +8,7 @@ from typing import Dict, Optional
 import structlog
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
-from starlette.status import HTTP_404_NOT_FOUND
+from starlette.status import HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN
 
 from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config
@@ -66,6 +66,11 @@ def get_ready_flag() -> Optional[Event]:
 
 def get_config() -> Optional[AzimuthConfig]:
     return _azimuth_config
+
+
+def require_unlocked_app(config: AzimuthConfig = Depends(get_config)):
+    if config.locked:
+        raise HTTPException(HTTP_403_FORBIDDEN, detail="Azimuth is currently locked.")
 
 
 def start_app(config_path, debug=False) -> FastAPI:

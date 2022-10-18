@@ -225,6 +225,8 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # Memory of the dask cluster. Regular is 6GB, Large is 12GB.
     # For bigger models, large might be needed.
     large_dask_cluster: bool = False
+    # Disable configuration changes
+    locked: bool = Field(False, env="AZ_LOCKED")
 
     def get_artifact_path(self) -> str:
         """Generate a path for caching.
