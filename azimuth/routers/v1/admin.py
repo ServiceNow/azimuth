@@ -5,7 +5,12 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import ValidationError
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 
-from azimuth.app import get_config, require_unlocked_app, get_task_manager, initialize_managers
+from azimuth.app import (
+    get_config,
+    get_task_manager,
+    initialize_managers,
+    require_unlocked_app,
+)
 from azimuth.config import AzimuthConfig, AzimuthValidationError
 from azimuth.task_manager import TaskManager
 

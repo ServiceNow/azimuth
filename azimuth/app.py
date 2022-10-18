@@ -8,7 +8,7 @@ from typing import Dict, Optional
 import structlog
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
-from starlette.status import HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN
+from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
 from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config
