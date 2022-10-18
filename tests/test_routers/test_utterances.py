@@ -76,10 +76,11 @@ def test_get_utterances(app: FastAPI, monkeypatch):
 
 def test_get_utterances_empty_filters(app: FastAPI):
     client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/utterances?utterance=rrgeth").json()
+    resp = client.get("/dataset_splits/eval/utterances?utterance=yukongold").json()
     assert len(resp["utterances"]) == 0
 
-    resp = client.get("/dataset_splits/eval/utterances?utterance=rrgeth&data_action=relabel").json()
+# This used to fail when we were filtering on an empty dataset
+    resp = client.get("/dataset_splits/eval/utterances?utterance=yukongold&data_action=relabel").json()
     assert len(resp["utterances"]) == 0
 
 
