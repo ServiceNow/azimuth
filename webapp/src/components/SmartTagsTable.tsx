@@ -289,7 +289,6 @@ const SmartTagsTable: React.FC<{
               display="flex"
               flexDirection="column"
               gap={1}
-              width={160}
               position="sticky"
               bgcolor={(theme) => theme.palette.background.paper}
               {...{
@@ -344,6 +343,7 @@ const SmartTagsTable: React.FC<{
                   borderLeft="solid 1px"
                   borderRight="solid 1px"
                   paddingY={0.5}
+                  width={160}
                   {...{
                     [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
                     [`grid${transpose ? "Row" : "Column"}`]: familyIndex + 4,
