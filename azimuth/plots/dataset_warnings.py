@@ -23,22 +23,29 @@ from azimuth.utils.plots import (
 )
 
 
-def min_nb_samples_plot(
-    train_nb_sample: np.ndarray, eval_nb_sample: np.ndarray, threshold: int, cls_names: List[str]
-) -> DatasetWarningPlots:
-    """Generate the plot for the minimal number of samples per label.
+def nb_samples_plot(
+    train_nb_sample: np.ndarray,
+    eval_nb_sample: np.ndarray,
+    alert_train: List[bool],
+    alert_eval: List[bool],
+    cls_names: List[str],
+    order: np.ndarray,
+):
+    """Generate the figure with the number of samples per label.
 
     Args:
         train_nb_sample: Distribution of the nb of samples per label in the training set.
         eval_nb_sample:  Distribution of the nb of samples per label in the eval set.
-        threshold: Threshold below which a label has an associated alert.
+        alert_train: Indicator if there is an alert per label in the training set.
+        alert_eval: Indicator if there is an alert per label in the evaluation set.
         cls_names: Class names.
+        order: Display order of the class indices
 
     Returns:
         Plot.
 
     """
-    order = eval_nb_sample.argsort()
+
     cls_names = shorten_cls_names(cls_names)
 
     fig = go.Figure()
@@ -65,16 +72,7 @@ def min_nb_samples_plot(
         title="Number of samples per class in both sets",
         height=PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + max(len(train_nb_sample), 6) * 23,
     )
-    fig.add_vline(x=threshold, line_width=1, line_dash="dot", line_color=Colors.Orange)
-    fig.add_annotation(
-        text=threshold,
-        x=threshold,
-        y=1.002,
-        yanchor="bottom",
-        yref="paper",
-        font=dict(color=Colors.Orange),
-        showarrow=False,
-    )
+
     fig.update_xaxes(
         zeroline=True,
         zerolinecolor=Colors.Axis,
@@ -84,8 +82,8 @@ def min_nb_samples_plot(
     )
     fig.update_yaxes(ticks="outside", ticklen=24, tickcolor="white")
 
+    # Generate warning indicators on the left axis
     x_warning = -0.037
-
     for idx, label in enumerate(order):
         common_args = dict(
             xref="paper",
@@ -94,9 +92,9 @@ def min_nb_samples_plot(
             y=idx,
             font=dict(color=Colors.Orange, size=AXIS_FONT_SIZE),
         )
-        if train_nb_sample[label] < threshold:
+        if alert_train[label]:
             fig.add_annotation(text="◒", **common_args)
-        if eval_nb_sample[label] < threshold:
+        if alert_eval[label]:
             fig.add_annotation(text="◓", **common_args)
 
     y_legend_1 = Y_LEGEND_LINE_1 + 3 * Y_LEGEND_LINE_HEIGHT
@@ -167,6 +165,125 @@ def min_nb_samples_plot(
     )
 
     fig = fig_default(fig)
+    return fig
+
+
+def min_nb_samples_plot(
+    train_nb_sample: np.ndarray,
+    eval_nb_sample: np.ndarray,
+    threshold: int,
+    alert_train: List[bool],
+    alert_eval: List[bool],
+    cls_names: List[str],
+) -> DatasetWarningPlots:
+    """Generate the plot for the minimal number of samples per label.
+
+    Args:
+        train_nb_sample: Distribution of the nb of samples per label in the training set.
+        eval_nb_sample:  Distribution of the nb of samples per label in the eval set.
+        threshold: Threshold below which a label has an associated alert.
+        alert_train: Indicator if there is an alert per label in the training set.
+        alert_eval: Indicator if there is an alert per label in the evaluation set.
+        cls_names: Class names.
+
+    Returns:
+        Plot.
+
+    """
+    order = eval_nb_sample.argsort()
+
+    fig = nb_samples_plot(
+        train_nb_sample, eval_nb_sample, alert_train, alert_eval, cls_names, order
+    )
+    fig.add_vline(x=threshold, line_width=1, line_dash="dot", line_color=Colors.Orange)
+    fig.add_annotation(
+        text=threshold,
+        x=threshold,
+        y=1.002,
+        yanchor="bottom",
+        yref="paper",
+        font=dict(color=Colors.Orange),
+        showarrow=False,
+    )
+
+    return DatasetWarningPlots(overall=json.loads(fig.to_json()), per_class=None)
+
+
+def class_imbalance_plot(
+    train_nb_sample: np.ndarray,
+    eval_nb_sample: np.ndarray,
+    train_mean: float,
+    eval_mean: float,
+    max_perc_delta: float,
+    alert_train: List[bool],
+    alert_eval: List[bool],
+    cls_names: List[str],
+) -> DatasetWarningPlots:
+    """Generate the plot for the class imbalance warnings.
+
+    Args:
+        train_nb_sample: Distribution of the number of samples per label in the training set.
+        eval_nb_sample:  Distribution of the number of samples per label in the eval set.
+        train_mean: Mean of the number of samples in the training set.
+        eval_mean: Mean of the number of samples in the evaluation set.
+        max_perc_delta: Percentage around the mean where values need to be.
+        alert_train: Indicator if there is an alert per label in the training set.
+        alert_eval: Indicator if there is an alert per label in the evaluation set.
+        cls_names: Class names.
+
+    Returns:
+        Plot.
+
+    """
+    order = eval_nb_sample.argsort()
+
+    fig = nb_samples_plot(
+        train_nb_sample, eval_nb_sample, alert_train, alert_eval, cls_names, order
+    )
+    num_classes = len(cls_names)
+    y1_eval = num_classes + 2
+    y1_train = num_classes + 1
+    common_args = dict(layer="below", line_width=1, y0=-1)
+    common_args_rect = dict(type="rect", opacity=0.3, **common_args)
+    fig.add_shape(
+        x0=eval_mean * (1 - max_perc_delta),
+        x1=eval_mean * (1 + max_perc_delta),
+        y1=y1_eval,
+        line_color=Colors.DataViz1,
+        fillcolor=Colors.DataViz1,
+        **common_args_rect,
+    )
+    fig.add_shape(
+        x0=train_mean * (1 - max_perc_delta),
+        x1=train_mean * (1 + max_perc_delta),
+        y1=y1_train,
+        line_color=Colors.DataViz2,
+        fillcolor=Colors.DataViz2,
+        **common_args_rect,
+    )
+    common_args_line = dict(type="line", line_dash="dot", **common_args)
+    fig.add_shape(
+        x0=eval_mean,
+        x1=eval_mean,
+        y1=y1_eval,
+        line_color=Colors.DataViz1,
+        **common_args_line,
+    )
+    fig.add_shape(
+        x0=train_mean,
+        x1=train_mean,
+        y1=y1_train,
+        line_color=Colors.DataViz2,
+        **common_args_line,
+    )
+    common_args_ann = dict(yanchor="top", font=dict(color=Colors.Text), showarrow=False)
+    fig.add_annotation(
+        text=f"Mean in eval: {eval_mean:.2f}", x=eval_mean, y=y1_eval, **common_args_ann
+    )
+    fig.add_annotation(
+        text=f"Mean in train: {train_mean:.2f}", x=train_mean, y=y1_train, **common_args_ann
+    )
+
     return DatasetWarningPlots(overall=json.loads(fig.to_json()), per_class=None)
 
 

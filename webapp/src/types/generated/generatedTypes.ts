@@ -281,6 +281,7 @@ export interface components {
     };
     DatasetWarningsOptions: {
       min_num_per_class?: number;
+      max_delta_class_imbalance?: number;
       max_delta_representation?: number;
       max_delta_mean_tokens?: number;
       max_delta_std_tokens?: number;
