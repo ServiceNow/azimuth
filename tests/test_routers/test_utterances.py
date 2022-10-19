@@ -80,7 +80,9 @@ def test_get_utterances_empty_filters(app: FastAPI):
     assert len(resp["utterances"]) == 0
 
     # This used to fail when we were filtering on an empty dataset
-    resp = client.get("/dataset_splits/eval/utterances?utterance=yukongold&data_action=relabel").json()
+    resp = client.get(
+        "/dataset_splits/eval/utterances?utterance=yukongold&data_action=relabel"
+    ).json()
     assert len(resp["utterances"]) == 0
 
 
