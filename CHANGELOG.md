@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Added new class imbalance warnings
 
 ### Changed
 - Added a proposed action: `merge_classes`, and rename `consider_new_class` to `define_new_class`.
