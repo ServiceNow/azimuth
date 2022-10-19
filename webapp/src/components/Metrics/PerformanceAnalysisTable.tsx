@@ -26,7 +26,7 @@ import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import DeltaComputationBar from "components/Metrics/DeltaComputationBar";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
 import PipelineSelect from "components/PipelineSelect";
-import { Table, Column, RowProps } from "components/Table";
+import { Column, RowProps, Table } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -172,10 +172,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             basePipeline,
             ...(comparedPipeline !== undefined &&
               comparedPipelineData && {
-                comparedPipeline:
-                  comparedPipelineData.metricsPerFilter[
-                    selectedMetricPerFilterOption
-                  ][index],
+                comparedPipeline: comparedPipelineData.metricsPerFilter[
+                  selectedMetricPerFilterOption
+                ].find(
+                  ({ filterValue }) => filterValue === basePipeline.filterValue
+                ),
               }),
           })
         ),
