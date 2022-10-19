@@ -73,7 +73,7 @@ const Dashboard = () => {
           to={`/${jobId}/dataset_warnings${searchString}`}
           description={
             <Description
-              text="Detect issues related to class size, class imbalance or dataset shift between your training and evaluation sets."
+              text="Investigate issues related to class size, class imbalance, or dataset shift between your training and evaluation sets."
               link="/dataset-warnings/"
             />
           }
