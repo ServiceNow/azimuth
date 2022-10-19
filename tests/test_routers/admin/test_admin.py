@@ -86,6 +86,7 @@ def test_get_config(app: FastAPI):
         "uncertainty": {"high_epistemic_threshold": 0.1, "iterations": 1},
         "use_cuda": False,
         "syntax": {"long_sentence_min_token": 16, "short_sentence_max_token": 3},
+        "locked": False,
     }
 
 
