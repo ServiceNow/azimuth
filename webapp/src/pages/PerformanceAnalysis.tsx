@@ -10,8 +10,8 @@ import { isPipelineSelected } from "utils/helpers";
 
 export const performanceAnalysisDescription = (
   <Description
-    text="Assess model performance through prediction metrics."
-    link="/#performance-analysis"
+    text="Analyze the metrics on different data subpopulations."
+    link="/#prediction-quality"
   />
 );
 
@@ -24,7 +24,9 @@ const PerformanceAnalysisComparison = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100%">
-      <Typography variant="h4">Performance Analysis</Typography>
+      <Typography variant="h4">
+        Prediction Quality by Data Subpopulation
+      </Typography>
       {performanceAnalysisDescription}
       {isPipelineSelected(pipeline) ? (
         <PerformanceAnalysisTable

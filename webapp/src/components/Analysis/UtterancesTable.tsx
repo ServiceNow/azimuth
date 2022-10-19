@@ -30,8 +30,8 @@ import {
   UtterancesSortableColumn,
 } from "types/api";
 import {
-  QueryFilterState,
   QueryConfusionMatrixState,
+  QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
@@ -376,7 +376,7 @@ const UtterancesTable: React.FC<Props> = ({
     <Box className={classes.gridContainer}>
       <div className={classes.gridHeaderActions}>
         <Description
-          text="View insights on individual utterances with details results and annotations."
+          text="Explore the utterances and propose actions. Click on a row for the utterance details."
           link="/exploration-space/utterances-table/"
         />
         <Button

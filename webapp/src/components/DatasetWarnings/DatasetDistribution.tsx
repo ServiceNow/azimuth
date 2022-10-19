@@ -9,13 +9,13 @@ import { DatasetWarningGroup } from "types/api";
 const DESCRIPTION = {
   "General Warnings": (
     <Description
-      text="See class distributions differences."
+      text="Investigate issues with class size, class imbalance and dataset shift."
       link="/dataset-warnings/#general-warnings"
     />
   ),
   "Syntactic Warnings": (
     <Description
-      text="Review the length of utterances between your training and test data."
+      text="Review the length of utterances between your training and evaluation data."
       link="/dataset-warnings/#syntactic-warnings"
     />
   ),

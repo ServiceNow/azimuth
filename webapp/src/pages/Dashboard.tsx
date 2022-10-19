@@ -52,7 +52,7 @@ const Dashboard = () => {
         <Box display="flex" flexDirection="column">
           <Typography variant="h2">Dashboard</Typography>
           <Description
-            text="Explore the analyses of your datasets and models."
+            text="Explore the analyses of your datasets and pipelines."
             link="/"
           />
         </Box>
@@ -69,11 +69,11 @@ const Dashboard = () => {
       </Box>
       {datasetInfo?.availableDatasetSplits.train && (
         <PreviewCard
-          title="Dataset Class Distribution Analysis"
-          to={`/${jobId}/dataset_class_distribution_analysis${searchString}`}
+          title="Dataset Warnings"
+          to={`/${jobId}/dataset_warnings${searchString}`}
           description={
             <Description
-              text="Compare the class distribution of your training and evaluation sets."
+              text="Detect issues related to class size, class imbalance or dataset shift between your training and evaluation sets."
               link="/dataset-warnings/"
             />
           }
@@ -85,8 +85,8 @@ const Dashboard = () => {
       )}
       {isPipelineSelected(pipeline) && (
         <PreviewCard
-          title="Performance Analysis"
-          to={`/${jobId}/performance_analysis${searchString}`}
+          title="Prediction Quality by Data Subpopulation"
+          to={`/${jobId}/prediction_quality${searchString}`}
           linkButtonText="Compare pipelines"
           description={performanceAnalysisDescription}
         >

@@ -105,7 +105,7 @@ const Exploration = () => {
                 >
                   <TabPipelineRequired
                     value="performance_overview"
-                    label="Performance Overview"
+                    label="Prediction Quality Overview"
                     pipeline={pipeline}
                   />
                   <TabPipelineRequired
@@ -120,7 +120,7 @@ const Exploration = () => {
                 isPipelineSelected(pipeline) && (
                   <>
                     <Description
-                      text="Assess the quality of the metrics for any given subset of data."
+                      text="Analyze the metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
                       link="/exploration-space/performance-overview/"
                     />
                     <Metrics
