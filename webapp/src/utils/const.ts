@@ -89,3 +89,5 @@ export const SMART_TAG_FAMILY_PRETTY_NAMES = {
   pipelineComparison: "Pipeline Comparison",
   uncertain: "Uncertain",
 } as const;
+
+export type SmartTagFamily = typeof SMART_TAG_FAMILIES[number];

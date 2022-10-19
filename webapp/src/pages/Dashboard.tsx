@@ -7,14 +7,16 @@ import Description from "components/Description";
 import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
 import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
+import SmartTagsTable from "components/SmartTagsTable";
 import ThresholdPlot from "components/ThresholdPlot";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
-import { behavioralTestingDescription } from "./PerturbationTestingSummary";
 import { performanceAnalysisDescription } from "./PerformanceAnalysis";
+import { behavioralTestingDescription } from "./PerturbationTestingSummary";
+import { smartTagsDescription } from "./SmartTags";
 import { postprocessingDescription } from "./Threshold";
 
 const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
@@ -95,6 +97,25 @@ const Dashboard = () => {
             pipeline={pipeline}
             availableDatasetSplits={datasetInfo?.availableDatasetSplits}
           />
+        </PreviewCard>
+      )}
+      {isPipelineSelected(pipeline) && (
+        <PreviewCard
+          title="Smart Tags Aggregation"
+          to={`/${jobId}/smart_tags${searchString}`}
+          description={smartTagsDescription}
+        >
+          <Box
+            display="flex"
+            flexDirection="column"
+            maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}
+          >
+            <SmartTagsTable
+              jobId={jobId}
+              pipeline={pipeline}
+              availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+            />
+          </Box>
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) &&
