@@ -46,7 +46,7 @@ def test_compute_on_dataset_split(
     assert syntactic_warnings.name == "Syntactic Warnings"
 
     # Test general_warnings
-    assert len(general_warnings.warnings) == 2
+    assert len(general_warnings.warnings) == 3
 
     # Test Number of samples per class
     nb_samples_class = general_warnings.warnings[0]
@@ -56,6 +56,14 @@ def test_compute_on_dataset_split(
     assert sum(nb_samples_class_eval_values) == len(mod.get_dataset_split(DatasetSplitName.eval))
     assert len(nb_samples_class.plots.overall.data) > 0
     assert nb_samples_class.plots.overall.layout
+
+    # Test Class Imbalance
+    class_imbalance_warnings = general_warnings.warnings[0]
+    perc_values = [x.data[0].value for x in class_imbalance_warnings.comparisons]
+    # All percentage values should be higher than -100.
+    assert (np.array(perc_values) >= -100).all()
+    assert len(class_imbalance_warnings.plots.overall.data) > 0
+    assert class_imbalance_warnings.plots.overall.layout
 
     # Test Class representation
     class_repr = general_warnings.warnings[1]

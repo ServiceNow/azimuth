@@ -126,6 +126,7 @@ class DatasetWarningsOptions(BaseModel):
     max_delta_representation: float = 0.05
     max_delta_mean_tokens: float = 3.0
     max_delta_std_tokens: float = 3.0
+    max_delta_class_imbalance: float = 0.5
 
 
 class SyntaxOptions(BaseModel):

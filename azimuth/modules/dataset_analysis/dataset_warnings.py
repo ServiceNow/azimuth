@@ -11,6 +11,7 @@ from azimuth.config import DatasetWarningConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import ComparisonModule
 from azimuth.plots.dataset_warnings import (
+    class_imbalance_plot,
     class_representation,
     min_nb_samples_plot,
     nb_tokens_plot,
@@ -80,6 +81,15 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         alert_eval_nb_min: List[bool] = eval_dist < min_num_per_class
         alert_nb_min: List[bool] = alert_train_nb_min + alert_eval_nb_min
 
+        train_mean = np.mean(train_dist)
+        eval_mean = np.mean(eval_dist)
+        perc_imb_train = (train_dist - train_mean) / train_mean
+        perc_imb_eval = (eval_dist - eval_mean) / eval_mean
+        max_delta_imb = self.config.dataset_warnings.max_delta_class_imbalance
+        alert_imb_train: List[bool] = np.abs(perc_imb_train) > max_delta_imb
+        alert_imb_eval: List[bool] = np.abs(perc_imb_eval) > max_delta_imb
+        alert_imb: List[bool] = alert_imb_train + alert_imb_eval
+
         train_dist_norm = train_dist / sum(train_dist)
         eval_dist_norm = eval_dist / sum(eval_dist)
         max_delta_representation = self.config.dataset_warnings.max_delta_representation
@@ -114,6 +124,41 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                     train_dist,
                     eval_dist,
                     min_num_per_class,
+                    alert_train_nb_min,
+                    alert_eval_nb_min,
+                    class_names,
+                ),
+            ),
+            DatasetWarning(
+                name=f"Class imbalance" f" (>{max_delta_imb*100:.0f}%)",
+                description=f"Relative difference between the number of "
+                f"samples per class and the mean in each dataset split is above "
+                f"{max_delta_imb*100:.0f}%.",
+                columns=["training", "evaluation"],
+                format=FormatType.Percentage,
+                comparisons=[
+                    DatasetDistributionComparison(
+                        name=class_names[i],
+                        alert=alert_imb[i],
+                        data=[
+                            DatasetDistributionComparisonValue(
+                                value=perc_imb_train[i], alert=alert_imb_train[i]
+                            ),
+                            DatasetDistributionComparisonValue(
+                                value=perc_imb_eval[i], alert=alert_imb_eval[i]
+                            ),
+                        ],
+                    )
+                    for i, _ in enumerate(alert_imb)
+                ],
+                plots=class_imbalance_plot(
+                    train_dist,
+                    eval_dist,
+                    train_mean,
+                    eval_mean,
+                    max_delta_imb,
+                    alert_imb_train,
+                    alert_imb_eval,
                     class_names,
                 ),
             ),
