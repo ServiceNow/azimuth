@@ -14,6 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
+import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { postprocessingDescription } from "./Threshold";
 
 const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
@@ -85,12 +86,9 @@ const Dashboard = () => {
       {isPipelineSelected(pipeline) && (
         <PreviewCard
           title="Performance Analysis"
-          description={
-            <Description
-              text="Assess model performance through prediction metrics."
-              link="/#performance-analysis"
-            />
-          }
+          to={`/${jobId}/performance_analysis${searchString}`}
+          linkButtonText="Compare pipelines"
+          description={performanceAnalysisDescription}
         >
           <PerformanceAnalysis
             jobId={jobId}

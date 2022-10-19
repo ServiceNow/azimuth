@@ -1,13 +1,5 @@
 import { Settings } from "@mui/icons-material";
-import {
-  Box,
-  Breadcrumbs,
-  IconButton,
-  Link,
-  MenuItem,
-  Select,
-  Typography,
-} from "@mui/material";
+import { Box, Breadcrumbs, IconButton, Link, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -20,7 +12,8 @@ import {
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import { constructSearchString } from "utils/helpers";
-import HelpMenu from "./HelpMenu";
+import HelpMenu from "components/HelpMenu";
+import PipelineSelect from "components/PipelineSelect";
 
 const useStyles = makeStyles((theme) => ({
   jobHeader: {
@@ -96,6 +89,10 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
+          pathname: `/${jobId}/performance_analysis`,
+          name: "Performance Analysis",
+        },
+        {
           pathname: `/${jobId}/settings`,
           name: "Settings",
         },
@@ -154,24 +151,13 @@ const PageHeader = () => {
                   <span className={classes.label}>Project:</span>
                   <span>{datasetInfo.projectName}</span>
                 </Typography>
-                <Select
-                  variant="standard"
-                  displayEmpty
-                  value={pipeline.pipelineIndex ?? ""}
-                  sx={{ ".MuiSelect-select": { paddingY: 0 } }}
-                  onChange={({ target: { value } }) =>
-                    setPipeline(typeof value === "number" ? value : undefined)
-                  }
-                >
-                  <MenuItem value="">
-                    <em>No pipeline</em>
-                  </MenuItem>
-                  {config?.pipelines?.map((pipeline, pipelineIndex) => (
-                    <MenuItem key={pipelineIndex} value={pipelineIndex}>
-                      {pipeline.name}
-                    </MenuItem>
-                  ))}
-                </Select>
+                {config && (
+                  <PipelineSelect
+                    selectedPipeline={pipeline.pipelineIndex}
+                    onChange={setPipeline}
+                    pipelines={config.pipelines!}
+                  />
+                )}
               </>
             )}
             <IconButton

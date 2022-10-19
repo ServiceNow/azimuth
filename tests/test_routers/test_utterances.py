@@ -74,6 +74,18 @@ def test_get_utterances(app: FastAPI, monkeypatch):
     assert len(first_utterance["modelSaliency"]) == 2
 
 
+def test_get_utterances_empty_filters(app: FastAPI):
+    client = TestClient(app)
+    resp = client.get("/dataset_splits/eval/utterances?utterance=yukongold").json()
+    assert len(resp["utterances"]) == 0
+
+    # This used to fail when we were filtering on an empty dataset
+    resp = client.get(
+        "/dataset_splits/eval/utterances?utterance=yukongold&data_action=relabel"
+    ).json()
+    assert len(resp["utterances"]) == 0
+
+
 def test_get_utterances_no_pipeline(app: FastAPI, monkeypatch):
     import azimuth.routers.v1.utterances as utt_module
 
