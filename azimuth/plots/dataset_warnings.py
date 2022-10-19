@@ -241,45 +241,47 @@ def class_imbalance_plot(
         train_nb_sample, eval_nb_sample, alert_train, alert_eval, cls_names, order
     )
     num_classes = len(cls_names)
+    y1_eval = num_classes + 2
+    y1_train = num_classes + 1
     common_args = dict(layer="below", line_width=1, y0=-1)
+    common_args_rect = dict(type="rect", opacity=0.3, **common_args)
+    fig.add_shape(
+        x0=eval_mean * (1 - max_perc_delta),
+        x1=eval_mean * (1 + max_perc_delta),
+        y1=y1_eval,
+        line_color=Colors.DataViz1,
+        fillcolor=Colors.DataViz1,
+        **common_args_rect,
+    )
+    fig.add_shape(
+        x0=train_mean * (1 - max_perc_delta),
+        x1=train_mean * (1 + max_perc_delta),
+        y1=y1_train,
+        line_color=Colors.DataViz2,
+        fillcolor=Colors.DataViz2,
+        **common_args_rect,
+    )
     common_args_line = dict(type="line", line_dash="dot", **common_args)
     fig.add_shape(
         x0=eval_mean,
         x1=eval_mean,
-        y1=num_classes + 2,
+        y1=y1_eval,
         line_color=Colors.DataViz1,
         **common_args_line,
     )
     fig.add_shape(
         x0=train_mean,
         x1=train_mean,
-        y1=num_classes + 1,
+        y1=y1_train,
         line_color=Colors.DataViz2,
         **common_args_line,
     )
-    common_args_rect = dict(type="rect", opacity=0.3, **common_args)
-    fig.add_shape(
-        x0=eval_mean - max_perc_delta * eval_mean,
-        x1=eval_mean + max_perc_delta * eval_mean,
-        y1=num_classes + 2,
-        fillcolor=Colors.DataViz1,
-        line_color=Colors.DataViz1,
-        **common_args_rect,
-    )
-    fig.add_shape(
-        x0=train_mean - max_perc_delta * train_mean,
-        x1=train_mean + max_perc_delta * train_mean,
-        y1=num_classes + 1,
-        fillcolor=Colors.DataViz2,
-        line_color=Colors.DataViz1,
-        **common_args_rect,
-    )
     common_args_ann = dict(yanchor="top", font=dict(color=Colors.Text), showarrow=False)
     fig.add_annotation(
-        text=f"Mean in eval: {eval_mean:.2f}", x=eval_mean, y=num_classes + 2, **common_args_ann
+        text=f"Mean in eval: {eval_mean:.2f}", x=eval_mean, y=y1_eval, **common_args_ann
     )
     fig.add_annotation(
-        text=f"Mean in train: {train_mean:.2f}", x=train_mean, y=num_classes + 1, **common_args_ann
+        text=f"Mean in train: {train_mean:.2f}", x=train_mean, y=y1_train, **common_args_ann
     )
 
     return DatasetWarningPlots(overall=json.loads(fig.to_json()), per_class=None)

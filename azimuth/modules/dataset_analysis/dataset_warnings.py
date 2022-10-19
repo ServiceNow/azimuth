@@ -77,18 +77,18 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         eval_dist = eval_mng.class_distribution(labels_only=True)
         class_names = train_mng.get_class_names(labels_only=True)
         min_num_per_class = self.config.dataset_warnings.min_num_per_class
-        alert_train_nb_min: List[bool] = train_dist < min_num_per_class
-        alert_eval_nb_min: List[bool] = eval_dist < min_num_per_class
-        alert_nb_min: List[bool] = alert_train_nb_min + alert_eval_nb_min
+        alert_train_nb_min = train_dist < min_num_per_class
+        alert_eval_nb_min = eval_dist < min_num_per_class
+        alert_nb_min = alert_train_nb_min | alert_eval_nb_min
 
         train_mean = np.mean(train_dist)
         eval_mean = np.mean(eval_dist)
-        perc_imb_train = (train_dist - train_mean) / train_mean
-        perc_imb_eval = (eval_dist - eval_mean) / eval_mean
+        perc_imb_train = train_dist / train_mean - 1
+        perc_imb_eval = eval_dist / eval_mean - 1
         max_delta_imb = self.config.dataset_warnings.max_delta_class_imbalance
-        alert_imb_train: List[bool] = np.abs(perc_imb_train) > max_delta_imb
-        alert_imb_eval: List[bool] = np.abs(perc_imb_eval) > max_delta_imb
-        alert_imb: List[bool] = alert_imb_train + alert_imb_eval
+        alert_imb_train = np.abs(perc_imb_train) > max_delta_imb
+        alert_imb_eval = np.abs(perc_imb_eval) > max_delta_imb
+        alert_imb = alert_imb_train | alert_imb_eval
 
         train_dist_norm = train_dist / sum(train_dist)
         eval_dist_norm = eval_dist / sum(eval_dist)
