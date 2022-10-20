@@ -189,7 +189,7 @@ const SmartTagsTable: React.FC<{
         columnGap={4}
         sx={{ overscrollBehaviorX: "contain" }} // Stops accidental navigation on horizontal scroll with touch pad
       >
-        {sortedRows?.flatMap((classCount, classIndex) => (
+        {sortedRows?.map((classCount, classIndex) => (
           <React.Fragment key={classCount.filterValue}>
             <Typography
               variant="subtitle2"
