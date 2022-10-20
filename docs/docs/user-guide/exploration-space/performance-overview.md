@@ -1,13 +1,13 @@
-# Performance Overview
+# Prediction Overview
 
-The Performance Overview centralizes the **metrics**, the **confidence histogram** and two **word
+The Prediction Overview centralizes the **metrics**, the **confidence histogram** and two **word
 clouds** to show important words from the utterances.
 
 ![Screenshot](../../_static/images/exploration-space/performance-overview.png)
 
 ## Metrics
 
-Assess the quality of the model with different performance metrics. Hover over the information icon
+Assess the quality of the model with different metrics. Hover over the information icon
 to see more information on each metric.
 
 ![Screenshot](../../_static/images/exploration-space/metrics.png)

@@ -2,10 +2,10 @@
 
 Datasets can suffer from a variety of issues, such as class imbalance, classes with low sample counts, and dataset shift. These warnings help detect some of these issues.
 
-![](../_static/images/dataset-class-distribution-analysis/dataset-warnings-1.png)
-![](../_static/images/dataset-class-distribution-analysis/dataset-warnings-2.png)
-![](../_static/images/dataset-class-distribution-analysis/dataset-warnings-3.png)
-TODO
+![](../_static/images/dataset-warnings/dataset-warnings-1.png)
+![](../_static/images/dataset-warnings/dataset-warnings-2.png)
+![](../_static/images/dataset-warnings/dataset-warnings-3.png)
+![](../_static/images/dataset-warnings/dataset-warnings-4.png)
 
 ## Missing samples
 
