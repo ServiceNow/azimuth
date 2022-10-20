@@ -6,6 +6,7 @@
 - **New dataset warning**: Added new class imbalance warnings.
 - **Pipeline Comparison**: Added a new pipeline comparison mode in the pipeline metrics table to compare the metrics on different pipelines.
 - **New Smart Tag Analysis**: Added a new plot where smart tag patterns over classes can be easily examined in one view.
+- **New loading screen**: When the start-up tasks are running, a new loading screen displays the status of all the tasks. 
 
 ### Changed
 - **Renaming**: Some sections were renamed in the UI, such as:
