@@ -120,7 +120,7 @@ const Exploration = () => {
                 isPipelineSelected(pipeline) && (
                   <>
                     <Description
-                      text="Analyze the metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
+                      text="Analyze metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
                       link="/exploration-space/performance-overview/"
                     />
                     <Metrics

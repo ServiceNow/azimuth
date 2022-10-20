@@ -10,7 +10,7 @@ import { isPipelineSelected } from "utils/helpers";
 
 export const performanceAnalysisDescription = (
   <Description
-    text="Analyze the metrics on different data subpopulations."
+    text="Analyze metrics for different data subpopulations."
     link="/#prediction-quality"
   />
 );
