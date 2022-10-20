@@ -9,7 +9,10 @@ import { PIPELINE_REQUIRED_TIP } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
 
 export const smartTagsDescription = (
-  <Description text="Identify patterns between smart tags and classes." />
+  <Description
+    text="Identify patterns between smart tags and classes."
+    link="/#smart-tag-analysis"
+  />
 );
 
 const SmartTags = () => {
