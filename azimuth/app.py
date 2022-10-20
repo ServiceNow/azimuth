@@ -8,7 +8,7 @@ from typing import Dict, Optional
 import structlog
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
-from starlette.status import HTTP_404_NOT_FOUND
+from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
 from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config
@@ -66,6 +66,11 @@ def get_ready_flag() -> Optional[Event]:
 
 def get_config() -> Optional[AzimuthConfig]:
     return _azimuth_config
+
+
+def require_editable_config(config: AzimuthConfig = Depends(get_config)):
+    if config.read_only_config:
+        raise HTTPException(HTTP_403_FORBIDDEN, detail="The Azimuth config is currently read-only.")
 
 
 def start_app(config_path, debug=False) -> FastAPI:

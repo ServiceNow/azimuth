@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- New field in the config to block changes to the config when the app is launched.
 - Added new class imbalance warnings
 - Added a new page to compare different pipelines in the performance analysis table.
 
