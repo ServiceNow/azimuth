@@ -16,7 +16,7 @@ each class.
 ## Class Imbalance
 
 In this second analysis, Azimuth detects class imbalance issues. It raises a flag for all classes
-where the relative difference between the number of samples in that class and the mean sample count in a dataset split is above
+where the relative difference between the number of samples in that class and the mean sample count per class in a dataset split is above
 a certain threshold `Y`. The default is 50%.
 
 ## Dataset Shift
@@ -25,8 +25,7 @@ A **discrepancy** between the training and evaluation splits can cause problems 
 example, the model may **not have a representative sample** of examples to train on, making it **generalize poorly**
 in production.
 
-Alternatively, you might be measuring the performance of the model on an evaluation set that may **
-not be a good indicator of the performance in production**. Distribution analysis aims to give
+Alternatively, if your evaluation set does not come from the same data distribution as the data in production, measuring model performance on this evaluation set may **not be a good indicator of the performance in production**. Distribution analysis aims to give
 warnings when the training and evaluation sets look too different in some aspect of the data.
 
 ### Representation mismatch
