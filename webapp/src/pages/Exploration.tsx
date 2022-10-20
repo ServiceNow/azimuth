@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type MainView = "performance_overview" | "confusion_matrix" | "utterances";
+type MainView = "prediction_overview" | "confusion_matrix" | "utterances";
 
 const Exploration = () => {
   const classes = useStyles();
@@ -104,8 +104,8 @@ const Exploration = () => {
                   onChange={(_, value) => setMainView(value)}
                 >
                   <TabPipelineRequired
-                    value="performance_overview"
-                    label="Prediction Quality Overview"
+                    value="prediction_overview"
+                    label="Prediction Overview"
                     pipeline={pipeline}
                   />
                   <TabPipelineRequired
@@ -116,7 +116,7 @@ const Exploration = () => {
                   <Tab value="utterances" label="Utterances Table" />
                 </Tabs>
               </Box>
-              {mainView === "performance_overview" &&
+              {mainView === "prediction_overview" &&
                 isPipelineSelected(pipeline) && (
                   <>
                     <Description

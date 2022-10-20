@@ -60,7 +60,7 @@ const Dashboard = () => {
           color="secondary"
           variant="contained"
           component={Link}
-          to={`/${jobId}/dataset_splits/eval/performance_overview${searchString}`}
+          to={`/${jobId}/dataset_splits/eval/prediction_overview${searchString}`}
           sx={{ gap: 1 }}
         >
           <Telescope fontSize="large" />
@@ -85,8 +85,8 @@ const Dashboard = () => {
       )}
       {isPipelineSelected(pipeline) && (
         <PreviewCard
-          title="Prediction Quality by Data Subpopulation"
-          to={`/${jobId}/prediction_quality${searchString}`}
+          title="Pipeline Metrics by Data Subpopulation"
+          to={`/${jobId}/pipeline_metrics${searchString}`}
           linkButtonText="Compare pipelines"
           description={performanceAnalysisDescription}
         >

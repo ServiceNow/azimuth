@@ -89,8 +89,8 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/prediction_quality`,
-          name: "Prediction Quality by Data Subpopulation",
+          pathname: `/${jobId}/pipeline_metrics`,
+          name: "Pipeline Metrics by Data Subpopulation",
         },
         {
           pathname: `/${jobId}/settings`,

@@ -52,7 +52,7 @@ const DatasetSplitRedirect = () => {
 
   return (
     <Redirect
-      to={`/${jobId}/dataset_splits/${datasetSplitName}/performance_overview?pipeline_index=0`}
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview?pipeline_index=0`}
     />
   );
 };
@@ -125,7 +125,7 @@ export default class App extends React.Component<Props> {
                                 <UtteranceDetail />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/prediction_quality" exact>
+                            <Route path="/:jobId/pipeline_metrics" exact>
                               <BasicLayout>
                                 <PerformanceAnalysis />
                               </BasicLayout>
