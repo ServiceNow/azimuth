@@ -131,7 +131,7 @@ They are the following:
 * Specify the name of the project, passing `NAME`.
 * You can specify the device on which to run Azimuth, with `DEVICE` being one of `auto`, `gpu` or `cpu`. If
   none is provided, `auto` will be used. Ex: `DEVICE=gpu`.
-* Specify `AZ_LOCKED=1` to lock the config once Azimuth is launched.
+* Specify `READ_ONLY_CONFIG=1` to lock the config once Azimuth is launched.
 
 !!! note "Config file prevails over environment variables"
 

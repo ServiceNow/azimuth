@@ -11,7 +11,7 @@ These fields are generic and can be adapted based on the user's machine.
         batch_size: int = 32
         use_cuda: Union[Literal["auto"], bool] = "auto"
         large_dask_cluster: bool = False
-        locked: bool = False
+        read_only_config: bool = False
     ```
 
 === "Config Example"
@@ -56,7 +56,7 @@ and let the user-code take care of it.
 
 The memory of the dask cluster is usually 6GB. If your models are big or if you encounter garbage collection errors,  you can set the memory to 12GB by setting `large_dask_cluster` to `True`.
 
-## Locked
+## Read-Only Config
 
 :blue_circle: **Default value**: False
 

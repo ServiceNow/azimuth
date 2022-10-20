@@ -9,7 +9,7 @@ from azimuth.app import (
     get_config,
     get_task_manager,
     initialize_managers,
-    require_unlocked_app,
+    require_editable_config,
 )
 from azimuth.config import AzimuthConfig, AzimuthValidationError
 from azimuth.task_manager import TaskManager
@@ -39,7 +39,7 @@ def get_config_def(
     description="Update the config using a changeset.",
     tags=TAGS,
     response_model=AzimuthConfig,
-    dependencies=[Depends(require_unlocked_app)],
+    dependencies=[Depends(require_editable_config)],
 )
 def update_config(
     task_manager: TaskManager = Depends(get_task_manager),

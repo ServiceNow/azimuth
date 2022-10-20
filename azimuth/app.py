@@ -68,9 +68,9 @@ def get_config() -> Optional[AzimuthConfig]:
     return _azimuth_config
 
 
-def require_unlocked_app(config: AzimuthConfig = Depends(get_config)):
-    if config.locked:
-        raise HTTPException(HTTP_403_FORBIDDEN, detail="Azimuth is currently locked.")
+def require_editable_config(config: AzimuthConfig = Depends(get_config)):
+    if config.read_only_config:
+        raise HTTPException(HTTP_403_FORBIDDEN, detail="The Azimuth config is currently read-only.")
 
 
 def start_app(config_path, debug=False) -> FastAPI:
