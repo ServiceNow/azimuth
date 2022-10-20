@@ -76,14 +76,15 @@ nav:
       - Dashboard:
           - user-guide/index.md
           - user-guide/dataset-warnings.md
+          - user-guide/pipeline-metrics-comparison.md
           - user-guide/smart-tag-analysis.md
           - user-guide/behavioral-testing-summary.md
           - user-guide/post-processing-analysis.md
       - Exploration Space:
           - user-guide/exploration-space/index.md
-          - user-guide/exploration-space/performance-overview.md
+          - user-guide/exploration-space/prediction-overview.md
           - user-guide/exploration-space/confusion-matrix.md
-          - user-guide/exploration-space/utterances-table.md
+          - user-guide/exploration-space/utterance-table.md
           - user-guide/exploration-space/utterance-details.md
       - user-guide/settings.md
       - user-guide/custom-utterances.md

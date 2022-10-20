@@ -3,7 +3,7 @@
 In the utterance table or the utterance details, annotations can be added to indicate whether an
 action should be taken for each data sample. The annotations can be exported with
 the dataset from
-the [:material-link: Utterances Table](../user-guide/exploration-space/utterances-table.md).
+the [:material-link: Utterances Table](../user-guide/exploration-space/utterance-table.md).
 
 <figure markdown>
   ![Image title](../_static/images/key-concepts/proposed-actions.png)
