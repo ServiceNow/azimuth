@@ -113,7 +113,7 @@ const Exploration = () => {
                     label="Confusion Matrix"
                     pipeline={pipeline}
                   />
-                  <Tab value="utterances" label="Utterances Table" />
+                  <Tab value="utterances" label="Utterance Table" />
                 </Tabs>
               </Box>
               {mainView === "prediction_overview" &&
