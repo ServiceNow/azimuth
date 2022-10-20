@@ -3,7 +3,7 @@
 **Welcome to Azimuth!**
 
 Explore the different analyses and tools of Azimuth using the dashboard. Navigate through the
-different sections to get a deeper understanding of the dataset and the model.
+different sections to get a deeper understanding of the dataset and the pipeline.
 
 !!! info "Use Azimuth with no pipeline, or with multiple pipelines"
 
@@ -33,30 +33,28 @@ The top banner contains useful information and links.
     [**Exploration Space**](exploration-space/index.md) to explore and interact with the utterances
     and the predictions.
 
-## Dataset Class Distribution Analysis
+## Dataset Warnings
 
-The Distribution Analysis section highlights **gaps between the class distributions** of the
-training and the evaluation sets.
+The dataset warnings section highlights issues related to **class size**, **class imbalance** and **dataset shift**, i.e. differences between the data distributions of the training and the evaluation sets.
 
-![Screenshot](../_static/images/dashboard/dataset-class-distribution-analysis.png)
+![Screenshot](../_static/images/dashboard/dataset-warnings.png)
 
 * **Missing samples**: Verify if each intent has sufficient samples in both sets.
+* **Class imbalance**: Flag when some classes suffer from imbalance in either split.
 * **Representation mismatch**: Assess that the representation of each intent is similar in both
   sets.
 * **Length mismatch**: Verify that the utterances' length are similar for each intent in both sets.
 
-Select `View Details` to get
-to [:material-link: Dataset Class Distribution Analysis](dataset-warnings.md).
+Select `View Details` to get to [:material-link: Dataset Warnings](dataset-warnings.md).
 
-## Performance Analysis
+## Pipeline Metrics by Data Subpopulation
 
-The Performance Analysis section summarizes the model performance in terms of the [**prediction
-outcomes**](../key-concepts/outcomes.md) and **metrics** available in Azimuth. Change the value in
-the dropdown :material-arrow-down-drop-circle-outline: to see the metrics broken down per label,
-predicted class, or smart tag families. Use the toggle to alternate between the performance on the
-training set or on the evaluation set.
+This section summarizes the quality of the predictions in terms of the [**prediction
+outcomes**](../key-concepts/outcomes.md) and **metrics** available in Azimuth, for different data subpopulations. Change the value in the dropdown :material-arrow-down-drop-circle-outline: to see the metrics broken down per label, predicted class, or smart tag families. Use the toggle to alternate between the training set or on the evaluation set.
 
 The user can click on any row in the table to get directly to the exploration space with the corresponding filters applied. This allows for further investigation of errors. As an example, clicking on the row with the label `freeze_account` will bring the user to the exploration space with that same filter applied. This works with prediction classes and smart tags too.
+
+Click on `Compare pipelines` to display the table fullscreen and compare all metrics across pipelines, as explained in [Pipeline Metrics Comparison](pipeline-metrics-comparison.md).
 
 !!! tip "Sort the table and hide columns"
 
@@ -68,7 +66,7 @@ The user can click on any row in the table to get directly to the exploration sp
     corresponding column, or multiple ones by selecting 'Show columns'. However, the table columns
     will reappear if the page is refreshed.
 
-![Screenshot](../_static/images/dashboard/performance-analysis.png)
+![Screenshot](../_static/images/dashboard/pipeline-metrics.png)
 
 !!! tip "Go to the exploration space to interact with metrics"
 

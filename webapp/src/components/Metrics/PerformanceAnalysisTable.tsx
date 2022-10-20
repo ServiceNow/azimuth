@@ -172,10 +172,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             basePipeline,
             ...(comparedPipeline !== undefined &&
               comparedPipelineData && {
-                comparedPipeline:
-                  comparedPipelineData.metricsPerFilter[
-                    selectedMetricPerFilterOption
-                  ][index],
+                comparedPipeline: comparedPipelineData.metricsPerFilter[
+                  selectedMetricPerFilterOption
+                ].find(
+                  ({ filterValue }) => filterValue === basePipeline.filterValue
+                ),
               }),
           })
         ),

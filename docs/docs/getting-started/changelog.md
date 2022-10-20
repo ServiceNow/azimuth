@@ -1,5 +1,27 @@
 # Releases
 
+## [2.4.0] - 2022-10-20
+
+### Added
+- **New dataset warning**: Added new class imbalance warnings.
+- **Pipeline Comparison**: Added a new pipeline comparison mode in the pipeline metrics table to compare the metrics on different pipelines.
+- **New Smart Tag Analysis**: Added a new plot where smart tag patterns over classes can be easily examined in one view.
+
+### Changed
+- **Renaming**: Some sections were renamed in the UI, such as:
+  - Dataset Class Distribution Analysis -> Dataset Warnings
+  - Performance Analysis -> Pipeline Metrics by Data Subpopulation
+  - Performance Overview -> Prediction Overview
+- **Proposed actions**: We added a new action, `merge_classes`, and renamed `consider_new_class` to `define_new_class`.
+- **Improved Confusion Matrix**: The order of the classes in the confusion matrix is now smarter: classes where the model gets similarly confused will be closer to one another. The rejection class is always the last row/column in the confusion matrix. A toggle allows the user to keep the original order from the dataset if preferred.
+- **Refactoring**: We improved the `MetricsPerFilter` module (which generates the pipeline metrics by data subpopulation table). It now takes ~5 times less time to compute.
+- **New config fields**: The memory of the dask cluster can now be set to large (12GB) for bigger models. The config can also be in read-only mode, to prevent users from changing its values.
+- **Offline Mode**: Azimuth can now be launched without internet.
+
+### Fixed
+- Fixed an issue related to HuggingFace where filtering on an empty dataset would result in an error.
+
+
 ## [2.3.0] - 2022-08-17
 
 ### Added
@@ -77,7 +99,7 @@
 - New Smart Tags `pipeline_disagreement` and `incorrect_for_all_pipelines` as a first step for
   pipeline comparison. See section "Pipeline Comparison" [here](../key-concepts/smart-tags.md).
 - Links on top words to filter utterances that contain it. See the section "Word
-  Clouds" [here](../user-guide/exploration-space/performance-overview.md).
+  Clouds" [here](../user-guide/exploration-space/prediction-overview.md).
 
 ## [2.0.0] - 2022-04-12
 

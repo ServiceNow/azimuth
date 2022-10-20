@@ -1,43 +1,38 @@
-# Dataset Class Distribution Analysis
+# Dataset Warnings
 
-A **discrepancy** between the training and evaluation sets can cause problems with a model. For
-example, the model may **not have a representative sample** of examples to train on, making it **
-hard to generalize**
-in production.
+Datasets can suffer from a variety of issues, such as class imbalance, classes with low sample counts, and dataset shift. These warnings help detect some of these issues.
 
-Alternatively, you might be measuring the performance of the model on an evaluation set that may **
-not be a good indicator of the performance in production**. Distribution analysis aims to give
-warnings when the training and evaluation sets look too different in some aspect of the data.
+![](../_static/images/dataset-warnings/dataset-warnings-1.png)
+![](../_static/images/dataset-warnings/dataset-warnings-2.png)
+![](../_static/images/dataset-warnings/dataset-warnings-3.png)
+![](../_static/images/dataset-warnings/dataset-warnings-4.png)
 
-![](../_static/images/dataset-class-distribution-analysis/dataset-warnings-1.png)
-![](../_static/images/dataset-class-distribution-analysis/dataset-warnings-2.png)
-![](../_static/images/dataset-class-distribution-analysis/dataset-warnings-3.png)
-
-## General Warnings
-
-Azimuth performs 2 analyses to assess class size in the training vs evaluation sets.
-
-### Missing samples
+## Missing samples
 
 In this first analysis, the application flags when a class has **fewer than `X`** (default is 20)
 samples in either the training or the evaluation set. The plot helps to visualize the values for
 each class.
 
-### Class Imbalance
+## Class Imbalance
 
 In this second analysis, Azimuth detects class imbalance issues. It raises a flag for all classes
-where the relative difference between the number of samples and the mean in a dataset split is above
+where the relative difference between the number of samples in that class and the mean sample count per class in a dataset split is above
 a certain threshold `Y`. The default is 50%.
+
+## Dataset Shift
+
+A **discrepancy** between the training and evaluation splits can cause problems with a model. For
+example, the model may **not have a representative sample** of examples to train on, making it **generalize poorly**
+in production.
+
+Alternatively, if your evaluation set does not come from the same data distribution as the data in production, measuring model performance on this evaluation set may **not be a good indicator of the performance in production**. Distribution analysis aims to give
+warnings when the training and evaluation sets look too different in some aspect of the data.
 
 ### Representation mismatch
 
-The third analysis flags if a class is **over-represented** in the evaluation set (relative to
+This analysis flags when a class is **over-represented** in the evaluation set (relative to
 other classes) or the training set. If the delta between the percentage of a class in each set is
 above `Z`% (default is 5%), the analysis flags it.
-
-## Syntactic Warnings
-
-Syntactic warnings indicate differences in the syntax of the utterances between each set.
 
 ### Length mismatch
 

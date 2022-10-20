@@ -2,9 +2,9 @@
 
 The Exploration Space includes the datasets and predictions of your model in an interactive way.
 Explore the utterances and the predictions, spot patterns in errors, and annotate the data to
-trigger further work to improve the model's performance.
+indicate further work to improve the model's predictions.
 
-![Screenshot](../../_static/images/exploration-space/performance-overview.png)
+![Screenshot](../../_static/images/exploration-space/prediction-overview.png)
 
 !!! tip "Access from dashboard"
 
@@ -23,7 +23,7 @@ panel. Both training and evaluation sets can be explored.
     pipelines compare. This space also exists without selecting any pipelines, to perform dataset
     analysis.
 
-### [Performance Overview](performance-overview.md)
+### [Prediction Overview](prediction-overview.md)
 
 * Assess the quality of the metrics for any given subset of the data.
 * Visualize the distribution of the confidence scores, according to prediction outcome.
@@ -33,7 +33,7 @@ panel. Both training and evaluation sets can be explored.
 
 * Visualize the model confusion between each pair of intents.
 
-### [Utterances Table](utterances-table.md)
+### [Utterance Table](utterance-table.md)
 
 * Explore the utterances, with their labels, predictions, and smart tags.
 * Access all utterance details, including the detailed prediction results, the behavioral tests, and
@@ -113,8 +113,8 @@ filters are listed below.
   filters** within a category, respectively `NO_SMART_TAGS` and `NO_ACTION`.
 
 ##### Search
+![Screenshot](../../_static/images/control-panel/filter-search.png){: style="width:400px"}
 
 * Use the search bar to find specific filters.
-  ![Screenshot](../../_static/images/control-panel/filter-search.png){: style="width:400px"}
 
 --8<-- "includes/abbreviations.md"
