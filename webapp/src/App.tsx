@@ -1,16 +1,16 @@
 import React from "react";
 import {
   BrowserRouter as Router,
-  Switch,
-  Route,
   Redirect,
+  Route,
+  Switch,
   useParams,
 } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import {
+  StyledEngineProvider,
   Theme,
   ThemeProvider,
-  StyledEngineProvider,
 } from "@mui/material/styles";
 import AppLayout from "components/AppLayout";
 import BasicLayout from "components/BasicLayout";
@@ -52,7 +52,7 @@ const DatasetSplitRedirect = () => {
 
   return (
     <Redirect
-      to={`/${jobId}/dataset_splits/${datasetSplitName}/performance_overview?pipeline_index=0`}
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview?pipeline_index=0`}
     />
   );
 };
@@ -112,10 +112,7 @@ export default class App extends React.Component<Props> {
                                 <Threshold />
                               </BasicLayout>
                             </Route>
-                            <Route
-                              path="/:jobId/dataset_class_distribution_analysis"
-                              exact
-                            >
+                            <Route path="/:jobId/dataset_warnings" exact>
                               <BasicLayout>
                                 <WarningsOverview />
                               </BasicLayout>
@@ -128,7 +125,7 @@ export default class App extends React.Component<Props> {
                                 <UtteranceDetail />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/performance_analysis" exact>
+                            <Route path="/:jobId/pipeline_metrics" exact>
                               <BasicLayout>
                                 <PerformanceAnalysis />
                               </BasicLayout>

@@ -89,8 +89,8 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/performance_analysis`,
-          name: "Performance Analysis",
+          pathname: `/${jobId}/pipeline_metrics`,
+          name: "Pipeline Metrics by Data Subpopulation",
         },
         {
           pathname: `/${jobId}/settings`,
@@ -101,8 +101,8 @@ const PageHeader = () => {
           name: "Threshold Comparison",
         },
         {
-          pathname: `/${jobId}/dataset_class_distribution_analysis`,
-          name: "Dataset Class Distribution Analysis",
+          pathname: `/${jobId}/dataset_warnings`,
+          name: "Dataset Warnings",
         },
         {
           pathname: `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`,

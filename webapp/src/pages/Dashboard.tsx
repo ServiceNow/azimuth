@@ -52,7 +52,7 @@ const Dashboard = () => {
         <Box display="flex" flexDirection="column">
           <Typography variant="h2">Dashboard</Typography>
           <Description
-            text="Explore the analyses of your datasets and models."
+            text="Explore the analyses of your datasets and pipelines."
             link="/"
           />
         </Box>
@@ -60,7 +60,7 @@ const Dashboard = () => {
           color="secondary"
           variant="contained"
           component={Link}
-          to={`/${jobId}/dataset_splits/eval/performance_overview${searchString}`}
+          to={`/${jobId}/dataset_splits/eval/prediction_overview${searchString}`}
           sx={{ gap: 1 }}
         >
           <Telescope fontSize="large" />
@@ -69,11 +69,11 @@ const Dashboard = () => {
       </Box>
       {datasetInfo?.availableDatasetSplits.train && (
         <PreviewCard
-          title="Dataset Class Distribution Analysis"
-          to={`/${jobId}/dataset_class_distribution_analysis${searchString}`}
+          title="Dataset Warnings"
+          to={`/${jobId}/dataset_warnings${searchString}`}
           description={
             <Description
-              text="Compare the class distribution of your training and evaluation sets."
+              text="Investigate issues related to class size, class imbalance, or dataset shift between your training and evaluation sets."
               link="/dataset-warnings/"
             />
           }
@@ -85,8 +85,8 @@ const Dashboard = () => {
       )}
       {isPipelineSelected(pipeline) && (
         <PreviewCard
-          title="Performance Analysis"
-          to={`/${jobId}/performance_analysis${searchString}`}
+          title="Pipeline Metrics by Data Subpopulation"
+          to={`/${jobId}/pipeline_metrics${searchString}`}
           linkButtonText="Compare pipelines"
           description={performanceAnalysisDescription}
         >
