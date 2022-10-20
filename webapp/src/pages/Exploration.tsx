@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type MainView = "performance_overview" | "confusion_matrix" | "utterances";
+type MainView = "prediction_overview" | "confusion_matrix" | "utterances";
 
 const Exploration = () => {
   const classes = useStyles();
@@ -104,8 +104,8 @@ const Exploration = () => {
                   onChange={(_, value) => setMainView(value)}
                 >
                   <TabPipelineRequired
-                    value="performance_overview"
-                    label="Performance Overview"
+                    value="prediction_overview"
+                    label="Prediction Overview"
                     pipeline={pipeline}
                   />
                   <TabPipelineRequired
@@ -113,14 +113,14 @@ const Exploration = () => {
                     label="Confusion Matrix"
                     pipeline={pipeline}
                   />
-                  <Tab value="utterances" label="Utterances Table" />
+                  <Tab value="utterances" label="Utterance Table" />
                 </Tabs>
               </Box>
-              {mainView === "performance_overview" &&
+              {mainView === "prediction_overview" &&
                 isPipelineSelected(pipeline) && (
                   <>
                     <Description
-                      text="Assess the quality of the metrics for any given subset of data."
+                      text="Analyze metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
                       link="/exploration-space/performance-overview/"
                     />
                     <Metrics
