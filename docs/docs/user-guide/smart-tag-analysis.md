@@ -30,13 +30,13 @@ interpreted as references to rows.
 
 ### Table controls
 - Use the toggle to alternate between the training and evaluation sets.
-- The `Transpose rows/columns` toggle transposes the table and thus the axes for each bar
+- The `Transpose` toggle transposes the table and thus the axes for each bar
   plot.
     - The default view aides analysis of each smart tag across all classes, which may be a
       good starting point for assessing overall dataset and pipeline patterns.
     - In contrast, the transposed view groups bars for each class on its own axis. This
       makes it easier to investigate patterns for a specific class that has been identified
-      as needing further analysis, such one with greater misclassification rates.
+      as needing further analysis, such as one with greater misclassification rates.
 
 ### Columns
 - The first column shows the class variable for which other values are presented. Use the

@@ -82,12 +82,11 @@ sample counts and prediction accuracies.
 Use the dropdown :material-arrow-down-drop-circle-outline: to switch between values for labels or
 for predictions. Use the toggle to alternate between the training and evaluation sets.
 
-The `Transpose rows/columns` toggle transposes the table and thus the axes for each bar plot.
+The `Transpose` toggle transposes the table and thus the axes for each bar plot.
 The default view aides analysis of each smart tag across all classes, whereas
 the transposed view makes it easier to investigate the smart tag pattern for a specific class.
 
-Click on any bar in the table to get directly to the exploration space with the corresponding
-filters applied, including prediction outcomes. Select `View details` to get to
+Select `View details` to get to
 [:material-link: Smart Tag Analysis](smart-tag-analysis.md).
 
 !!! tip "Sort the table by bar plot columns"
