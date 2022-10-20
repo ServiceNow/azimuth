@@ -13,7 +13,7 @@
     
     
       
-        <title>Dataset Class Distribution Analysis - Azimuth documentation</title>
+        <title>Dataset Warnings - Azimuth documentation</title>
       
     
     
@@ -67,7 +67,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dataset-class-distribution-analysis" class="md-skip">
+        <a href="#dataset-warnings" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Dataset Class Distribution Analysis
+              Dataset Warnings
             
           </span>
         </div>
@@ -844,6 +844,8 @@
         
           
         
+          
+        
       
       
         
@@ -882,12 +884,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Dataset Class Distribution Analysis
+          Dataset Warnings
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Dataset Class Distribution Analysis
+        Dataset Warnings
       </a>
       
         
@@ -906,26 +908,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#general-warnings" class="md-nav__link">
-    General Warnings
-  </a>
-  
-    <nav class="md-nav" aria-label="General Warnings">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#missing-samples" class="md-nav__link">
     Missing samples
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#class-imbalance" class="md-nav__link">
     Class Imbalance
   </a>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-shift" class="md-nav__link">
+    Dataset Shift
+  </a>
+  
+    <nav class="md-nav" aria-label="Dataset Shift">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#representation-mismatch" class="md-nav__link">
@@ -933,19 +935,6 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#syntactic-warnings" class="md-nav__link">
-    Syntactic Warnings
-  </a>
-  
-    <nav class="md-nav" aria-label="Syntactic Warnings">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#length-mismatch" class="md-nav__link">
@@ -970,6 +959,20 @@
   
 </nav>
       
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline-metrics-comparison/" class="md-nav__link">
+        Pipeline Metrics Comparison
+      </a>
     </li>
   
 
@@ -1066,8 +1069,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../exploration-space/performance-overview/" class="md-nav__link">
-        Performance Overview
+      <a href="../exploration-space/prediction-overview/" class="md-nav__link">
+        Prediction Overview
       </a>
     </li>
   
@@ -1094,8 +1097,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../exploration-space/utterances-table/" class="md-nav__link">
-        Utterances Table
+      <a href="../exploration-space/utterance-table/" class="md-nav__link">
+        Utterance Table
       </a>
     </li>
   
@@ -1655,26 +1658,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#general-warnings" class="md-nav__link">
-    General Warnings
-  </a>
-  
-    <nav class="md-nav" aria-label="General Warnings">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#missing-samples" class="md-nav__link">
     Missing samples
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#class-imbalance" class="md-nav__link">
     Class Imbalance
   </a>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-shift" class="md-nav__link">
+    Dataset Shift
+  </a>
+  
+    <nav class="md-nav" aria-label="Dataset Shift">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#representation-mismatch" class="md-nav__link">
@@ -1682,19 +1685,6 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#syntactic-warnings" class="md-nav__link">
-    Syntactic Warnings
-  </a>
-  
-    <nav class="md-nav" aria-label="Syntactic Warnings">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#length-mismatch" class="md-nav__link">
@@ -1735,33 +1725,30 @@
   </a>
 
 
-<h1 id="dataset-class-distribution-analysis">Dataset Class Distribution Analysis</h1>
-<p>A <strong>discrepancy</strong> between the training and evaluation sets can cause problems with a model. For
-example, the model may <strong>not have a representative sample</strong> of examples to train on, making it <strong>
-hard to generalize</strong>
-in production.</p>
-<p>Alternatively, you might be measuring the performance of the model on an evaluation set that may <strong>
-not be a good indicator of the performance in production</strong>. Distribution analysis aims to give
-warnings when the training and evaluation sets look too different in some aspect of the data.</p>
-<p><img alt="" src="../../_static/images/dataset-class-distribution-analysis/dataset-warnings-1.png" />
-<img alt="" src="../../_static/images/dataset-class-distribution-analysis/dataset-warnings-2.png" />
-<img alt="" src="../../_static/images/dataset-class-distribution-analysis/dataset-warnings-3.png" /></p>
-<h2 id="general-warnings">General Warnings</h2>
-<p>Azimuth performs 2 analyses to assess class size in the training vs evaluation sets.</p>
-<h3 id="missing-samples">Missing samples</h3>
+<h1 id="dataset-warnings">Dataset Warnings</h1>
+<p>Datasets can suffer from a variety of issues, such as class imbalance, classes with low sample counts, and dataset shift. These warnings help detect some of these issues.</p>
+<p><img alt="" src="../../_static/images/dataset-warnings/dataset-warnings-1.png" />
+<img alt="" src="../../_static/images/dataset-warnings/dataset-warnings-2.png" />
+<img alt="" src="../../_static/images/dataset-warnings/dataset-warnings-3.png" />
+<img alt="" src="../../_static/images/dataset-warnings/dataset-warnings-4.png" /></p>
+<h2 id="missing-samples">Missing samples</h2>
 <p>In this first analysis, the application flags when a class has <strong>fewer than <code>X</code></strong> (default is 20)
 samples in either the training or the evaluation set. The plot helps to visualize the values for
 each class.</p>
-<h3 id="class-imbalance">Class Imbalance</h3>
+<h2 id="class-imbalance">Class Imbalance</h2>
 <p>In this second analysis, Azimuth detects class imbalance issues. It raises a flag for all classes
-where the relative difference between the number of samples and the mean in a dataset split is above
+where the relative difference between the number of samples in that class and the mean sample count per class in a dataset split is above
 a certain threshold <code>Y</code>. The default is 50%.</p>
+<h2 id="dataset-shift">Dataset Shift</h2>
+<p>A <strong>discrepancy</strong> between the training and evaluation splits can cause problems with a model. For
+example, the model may <strong>not have a representative sample</strong> of examples to train on, making it <strong>generalize poorly</strong>
+in production.</p>
+<p>Alternatively, if your evaluation set does not come from the same data distribution as the data in production, measuring model performance on this evaluation set may <strong>not be a good indicator of the performance in production</strong>. Distribution analysis aims to give
+warnings when the training and evaluation sets look too different in some aspect of the data.</p>
 <h3 id="representation-mismatch">Representation mismatch</h3>
-<p>The third analysis flags if a class is <strong>over-represented</strong> in the evaluation set (relative to
+<p>This analysis flags when a class is <strong>over-represented</strong> in the evaluation set (relative to
 other classes) or the training set. If the delta between the percentage of a class in each set is
 above <code>Z</code>% (default is 5%), the analysis flags it.</p>
-<h2 id="syntactic-warnings">Syntactic Warnings</h2>
-<p>Syntactic warnings indicate differences in the syntax of the utterances between each set.</p>
 <h3 id="length-mismatch">Length mismatch</h3>
 <p>Length mismatch compares the number of <strong>tokens per utterance</strong> in both sets. The application flags
 a warning if the mean and/or standard deviation between the 2 distributions is above <code>A</code> and <code>B</code> (
@@ -1805,13 +1792,13 @@ in <a href="../../reference/configuration/analyses/dataset_warnings/"><span clas
       
       
         
-        <a href="../behavioral-testing-summary/" class="md-footer__link md-footer__link--next" aria-label="Next: Behavioral Testing Summary" rel="next">
+        <a href="../pipeline-metrics-comparison/" class="md-footer__link md-footer__link--next" aria-label="Next: Pipeline Metrics Comparison" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Behavioral Testing Summary
+              Pipeline Metrics Comparison
             </div>
           </div>
           <div class="md-footer__button md-icon">

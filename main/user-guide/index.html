@@ -844,6 +844,8 @@
         
           
         
+          
+        
       
       
         
@@ -873,7 +875,21 @@
   
     <li class="md-nav__item">
       <a href="dataset-warnings/" class="md-nav__link">
-        Dataset Class Distribution Analysis
+        Dataset Warnings
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="pipeline-metrics-comparison/" class="md-nav__link">
+        Pipeline Metrics Comparison
       </a>
     </li>
   
@@ -971,8 +987,8 @@
   
   
     <li class="md-nav__item">
-      <a href="exploration-space/performance-overview/" class="md-nav__link">
-        Performance Overview
+      <a href="exploration-space/prediction-overview/" class="md-nav__link">
+        Prediction Overview
       </a>
     </li>
   
@@ -999,8 +1015,8 @@
   
   
     <li class="md-nav__item">
-      <a href="exploration-space/utterances-table/" class="md-nav__link">
-        Utterances Table
+      <a href="exploration-space/utterance-table/" class="md-nav__link">
+        Utterance Table
       </a>
     </li>
   
@@ -1567,15 +1583,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataset-class-distribution-analysis" class="md-nav__link">
-    Dataset Class Distribution Analysis
+  <a href="#dataset-warnings" class="md-nav__link">
+    Dataset Warnings
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-analysis" class="md-nav__link">
-    Performance Analysis
+  <a href="#pipeline-metrics-by-data-subpopulation" class="md-nav__link">
+    Pipeline Metrics by Data Subpopulation
   </a>
   
 </li>
@@ -1617,7 +1633,7 @@
 <h1 id="dashboard">Dashboard</h1>
 <p><strong>Welcome to Azimuth!</strong></p>
 <p>Explore the different analyses and tools of Azimuth using the dashboard. Navigate through the
-different sections to get a deeper understanding of the dataset and the model.</p>
+different sections to get a deeper understanding of the dataset and the pipeline.</p>
 <div class="admonition info">
 <p class="admonition-title">Use Azimuth with no pipeline, or with multiple pipelines</p>
 <p>Azimuth can be launched without any pipelines. All the information related to the pipelines
@@ -1643,25 +1659,22 @@ pipelines.</p>
 <a href="exploration-space/"><strong>Exploration Space</strong></a> to explore and interact with the utterances
 and the predictions.</p>
 </div>
-<h2 id="dataset-class-distribution-analysis">Dataset Class Distribution Analysis</h2>
-<p>The Distribution Analysis section highlights <strong>gaps between the class distributions</strong> of the
-training and the evaluation sets.</p>
-<p><img alt="Screenshot" src="../_static/images/dashboard/dataset-class-distribution-analysis.png" /></p>
+<h2 id="dataset-warnings">Dataset Warnings</h2>
+<p>The dataset warnings section highlights issues related to <strong>class size</strong>, <strong>class imbalance</strong> and <strong>dataset shift</strong>, i.e. differences between the data distributions of the training and the evaluation sets.</p>
+<p><img alt="Screenshot" src="../_static/images/dashboard/dataset-warnings.png" /></p>
 <ul>
 <li><strong>Missing samples</strong>: Verify if each intent has sufficient samples in both sets.</li>
+<li><strong>Class imbalance</strong>: Flag when some classes suffer from imbalance in either split.</li>
 <li><strong>Representation mismatch</strong>: Assess that the representation of each intent is similar in both
   sets.</li>
 <li><strong>Length mismatch</strong>: Verify that the utterances' length are similar for each intent in both sets.</li>
 </ul>
-<p>Select <code>View Details</code> to get
-to <a href="dataset-warnings/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Dataset Class Distribution Analysis</a>.</p>
-<h2 id="performance-analysis">Performance Analysis</h2>
-<p>The Performance Analysis section summarizes the model performance in terms of the <a href="../key-concepts/outcomes/"><strong>prediction
-outcomes</strong></a> and <strong>metrics</strong> available in Azimuth. Change the value in
-the dropdown <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8m-5 6 5 5 5-5H7Z"/></svg></span> to see the metrics broken down per label,
-predicted class, or smart tag families. Use the toggle to alternate between the performance on the
-training set or on the evaluation set.</p>
+<p>Select <code>View Details</code> to get to <a href="dataset-warnings/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Dataset Warnings</a>.</p>
+<h2 id="pipeline-metrics-by-data-subpopulation">Pipeline Metrics by Data Subpopulation</h2>
+<p>This section summarizes the quality of the predictions in terms of the <a href="../key-concepts/outcomes/"><strong>prediction
+outcomes</strong></a> and <strong>metrics</strong> available in Azimuth, for different data subpopulations. Change the value in the dropdown <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8m-5 6 5 5 5-5H7Z"/></svg></span> to see the metrics broken down per label, predicted class, or smart tag families. Use the toggle to alternate between the training set or on the evaluation set.</p>
 <p>The user can click on any row in the table to get directly to the exploration space with the corresponding filters applied. This allows for further investigation of errors. As an example, clicking on the row with the label <code>freeze_account</code> will bring the user to the exploration space with that same filter applied. This works with prediction classes and smart tags too.</p>
+<p>Click on <code>Compare pipelines</code> to display the table fullscreen and compare all metrics across pipelines, as explained in <a href="pipeline-metrics-comparison/">Pipeline Metrics Comparison</a>.</p>
 <div class="admonition tip">
 <p class="admonition-title">Sort the table and hide columns</p>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m18 21-4-4h3V7h-3l4-4 4 4h-3v10h3M2 19v-2h10v2M2 13v-2h7v2M2 7V5h4v2H2Z"/></svg></span> Click a column header to sort the values in ascending or descending order.
@@ -1671,7 +1684,7 @@ The default order is descending by the number of utterances, except for
 corresponding column, or multiple ones by selecting 'Show columns'. However, the table columns
 will reappear if the page is refreshed.</p>
 </div>
-<p><img alt="Screenshot" src="../_static/images/dashboard/performance-analysis.png" /></p>
+<p><img alt="Screenshot" src="../_static/images/dashboard/pipeline-metrics.png" /></p>
 <div class="admonition tip">
 <p class="admonition-title">Go to the exploration space to interact with metrics</p>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M512 256c0 141.2-114.7 256-256 256C114.8 512 0 397.3 0 256S114.7 0 256 0s256 114.7 256 256zm-32 0c0-123.2-100.3-224-224-224C132.5 32 32 132.5 32 256s100.5 224 224 224 224-100.5 224-224zM160.9 124.6l86.9 37.1-37.1 86.9-86.9-37.1 37.1-86.9zm110 169.1 46.6 94h-14.6l-50-100-48.9 100h-14l51.1-106.9-22.3-9.4 6-14 68.6 29.1-6 14.3-16.5-7.1zm-11.8-116.3 68.6 29.4-29.4 68.3L230 246l29.1-68.6zm80.3 42.9 54.6 23.1-23.4 54.3-54.3-23.1 23.1-54.3z"/></svg></span> The same metrics are available on the
@@ -1747,13 +1760,13 @@ postprocessors, i.e. when postprocessors are set at <code>null</code>.</p>
       
       
         
-        <a href="dataset-warnings/" class="md-footer__link md-footer__link--next" aria-label="Next: Dataset Class Distribution Analysis" rel="next">
+        <a href="dataset-warnings/" class="md-footer__link md-footer__link--next" aria-label="Next: Dataset Warnings" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Dataset Class Distribution Analysis
+              Dataset Warnings
             </div>
           </div>
           <div class="md-footer__button md-icon">
