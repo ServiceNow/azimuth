@@ -2,7 +2,7 @@
 
 The Exploration Space includes the datasets and predictions of your model in an interactive way.
 Explore the utterances and the predictions, spot patterns in errors, and annotate the data to
-trigger further work to improve the model's predictions.
+indicate further work to improve the model's predictions.
 
 ![Screenshot](../../_static/images/exploration-space/prediction-overview.png)
 
