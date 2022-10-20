@@ -74,6 +74,37 @@ Click on `Compare pipelines` to display the table fullscreen and compare all met
     [:material-link: Exploration Space](exploration-space/index.md), where you can filter by any
     combination of values, and see more information on what each metric represents.
 
+## Smart Tag Analysis
+
+The Smart Tag Analysis shows the proportion of samples that have been tagged by each smart tag
+family, broken down by [**prediction outcomes**](../key-concepts/outcomes.md), along with
+sample counts and prediction accuracies.
+Use the dropdown :material-arrow-down-drop-circle-outline: to switch between values for labels or
+for predictions. Use the toggle to alternate between the training and evaluation sets.
+
+The `Transpose` toggle transposes the table and thus the axes for each bar plot.
+The default view aides analysis of each smart tag across all classes, whereas
+the transposed view makes it easier to investigate the smart tag pattern for a specific class.
+
+Select `View details` to get to
+[:material-link: Smart Tag Analysis](smart-tag-analysis.md).
+
+!!! tip "Sort the table by bar plot columns"
+
+    :material-sort: Click a column header (or row label if transposed) to sort the values in
+    ascending or descending order. This works for bar plot columns as well as numerical columns.
+    The default order is descending by the number of utterances, except for
+    the rejection class, which will be first.
+
+![Screenshot](../_static/images/dashboard/smart-tag-analysis.png)
+
+
+!!! tip "Go to the exploration space to see samples"
+
+    :fontawesome-brands-wpexplorer: Clicking on a bar takes you to the exploration space with
+    corresponding filters applied, where you can further explore the tagged samples,
+    including the specific smart tags applied.
+
 ## Behavioral Testing
 
 The Behavioral Testing section summarizes the behavioral testing performance. The **failure rates**
