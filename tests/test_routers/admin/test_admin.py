@@ -26,6 +26,7 @@ def test_get_config(app: FastAPI):
             "max_delta_representation": 0.05,
             "max_delta_std_tokens": 3.0,
             "min_num_per_class": 20,
+            "max_delta_class_imbalance": 0.5,
         },
         "large_dask_cluster": False,
         "metrics": {

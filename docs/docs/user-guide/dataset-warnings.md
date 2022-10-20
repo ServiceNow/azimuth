@@ -23,11 +23,17 @@ In this first analysis, the application flags when a class has **fewer than `X`*
 samples in either the training or the evaluation set. The plot helps to visualize the values for
 each class.
 
+### Class Imbalance
+
+In this second analysis, Azimuth detects class imbalance issues. It raises a flag for all classes
+where the relative difference between the number of samples and the mean in a dataset split is above
+a certain threshold `Y`. The default is 50%.
+
 ### Representation mismatch
 
-The second analysis flags if a class is **over-represented** in the evaluation set (relative to
+The third analysis flags if a class is **over-represented** in the evaluation set (relative to
 other classes) or the training set. If the delta between the percentage of a class in each set is
-above `Y`% (default is 5%), the analysis flags it.
+above `Z`% (default is 5%), the analysis flags it.
 
 ## Syntactic Warnings
 
@@ -36,10 +42,10 @@ Syntactic warnings indicate differences in the syntax of the utterances between 
 ### Length mismatch
 
 Length mismatch compares the number of **tokens per utterance** in both sets. The application flags
-a warning if the mean and/or standard deviation between the 2 distributions is above `Z `and `W` (
+a warning if the mean and/or standard deviation between the 2 distributions is above `A` and `B` (
 default is 3 for both) respectively.
 
 ## Configuration
 
-All thresholds mentioned (`X`/`Y`/`Z`/`W`) can be modified in the config file, as explained
+All thresholds mentioned (`X`/`Y`/`Z`/`A`/`B`) can be modified in the config file, as explained
 in [:material-link: Dataset Warnings Configuration](../reference/configuration/analyses/dataset_warnings.md).

@@ -11,8 +11,9 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
-Added a new page to compare different pipelines in the performance analysis table.
 - New field in the config to block changes to the config when the app is launched.
+- Added new class imbalance warnings
+- Added a new page to compare different pipelines in the performance analysis table.
 
 ### Changed
 - Added a proposed action: `merge_classes`, and rename `consider_new_class` to `define_new_class`.

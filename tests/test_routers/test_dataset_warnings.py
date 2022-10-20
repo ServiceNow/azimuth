@@ -41,6 +41,32 @@ def test_dataset_warnings(app: FastAPI) -> None:
                     "name": "Missing samples (<20)",
                 },
                 {
+                    "columns": ["training", "evaluation"],
+                    "comparisons": [
+                        {
+                            "alert": False,
+                            "data": [
+                                {"alert": False, "value": 0.09523809523809534},
+                                {"alert": False, "value": 0.04761904761904767},
+                            ],
+                            "name": "negative",
+                        },
+                        {
+                            "alert": False,
+                            "data": [
+                                {"alert": False, "value": -0.09523809523809523},
+                                {"alert": False, "value": -0.04761904761904767},
+                            ],
+                            "name": "positive",
+                        },
+                    ],
+                    "description": "Relative difference between the number of "
+                    "samples per class and the mean in each dataset "
+                    "split is above 50%.",
+                    "format": "Percentage",
+                    "name": "Class imbalance (>50%)",
+                },
+                {
                     "columns": ["abs. diff."],
                     "comparisons": [
                         {
