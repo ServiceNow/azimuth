@@ -35,12 +35,12 @@ The top banner contains useful information and links.
 
 ## Dataset Warnings
 
-The dataset warnings section highlights issues related to **class size**, **class imbalance** and **dataset shift**, i.e. gaps between the class distributions of the training and the evaluation sets.
+The dataset warnings section highlights issues related to **class size**, **class imbalance** and **dataset shift**, i.e. differences between the data distributions of the training and the evaluation sets.
 
 ![Screenshot](../_static/images/dashboard/dataset-class-distribution-analysis.png) #TODO
 
 * **Missing samples**: Verify if each intent has sufficient samples in both sets.
-* **Class imbalance**: Flag if some classes are suffering from imbalance in either sets.
+* **Class imbalance**: Flag when some classes suffer from imbalance in either split.
 * **Representation mismatch**: Assess that the representation of each intent is similar in both
   sets.
 * **Length mismatch**: Verify that the utterances' length are similar for each intent in both sets.
