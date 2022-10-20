@@ -76,6 +76,7 @@ nav:
       - Dashboard:
           - user-guide/index.md
           - user-guide/dataset-warnings.md
+          - user-guide/smart-tag-analysis.md
           - user-guide/behavioral-testing-summary.md
           - user-guide/post-processing-analysis.md
       - Exploration Space:
