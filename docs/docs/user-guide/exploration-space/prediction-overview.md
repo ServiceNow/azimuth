@@ -3,7 +3,7 @@
 The Prediction Overview centralizes the **metrics**, the **confidence histogram** and two **word
 clouds** to show important words from the utterances.
 
-![Screenshot](../../_static/images/exploration-space/performance-overview.png)
+![Screenshot](../../_static/images/exploration-space/prediction-overview.png)
 
 ## Metrics
 

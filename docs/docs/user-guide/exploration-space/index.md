@@ -4,7 +4,7 @@ The Exploration Space includes the datasets and predictions of your model in an 
 Explore the utterances and the predictions, spot patterns in errors, and annotate the data to
 trigger further work to improve the model's predictions.
 
-![Screenshot](../../_static/images/exploration-space/performance-overview.png)
+![Screenshot](../../_static/images/exploration-space/prediction-overview.png)
 
 !!! tip "Access from dashboard"
 
@@ -23,7 +23,7 @@ panel. Both training and evaluation sets can be explored.
     pipelines compare. This space also exists without selecting any pipelines, to perform dataset
     analysis.
 
-### [Prediction Overview](performance-overview.md)
+### [Prediction Overview](prediction-overview.md)
 
 * Assess the quality of the metrics for any given subset of the data.
 * Visualize the distribution of the confidence scores, according to prediction outcome.

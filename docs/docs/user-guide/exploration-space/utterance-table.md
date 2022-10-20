@@ -1,4 +1,4 @@
-# Utterances Table
+# Utterance Table
 
 The utterance table view contains **all the utterances with their predictions**. The table also
 includes information such as smart tags and proposed actions, if applicable.

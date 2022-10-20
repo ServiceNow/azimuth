@@ -99,7 +99,7 @@
 - New Smart Tags `pipeline_disagreement` and `incorrect_for_all_pipelines` as a first step for
   pipeline comparison. See section "Pipeline Comparison" [here](../key-concepts/smart-tags.md).
 - Links on top words to filter utterances that contain it. See the section "Word
-  Clouds" [here](../user-guide/exploration-space/performance-overview.md).
+  Clouds" [here](../user-guide/exploration-space/prediction-overview.md).
 
 ## [2.0.0] - 2022-04-12
 
