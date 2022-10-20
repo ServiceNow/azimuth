@@ -32,6 +32,7 @@ import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
 import Settings from "pages/Settings";
 import NotFound from "pages/NotFound";
+import SmartTags from "pages/SmartTags";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -85,6 +86,11 @@ export default class App extends React.Component<Props> {
                             <Route path="/:jobId/settings" exact>
                               <BasicLayout>
                                 <Settings />
+                              </BasicLayout>
+                            </Route>
+                            <Route path="/:jobId/smart_tags" exact>
+                              <BasicLayout>
+                                <SmartTags />
                               </BasicLayout>
                             </Route>
                             <Route
