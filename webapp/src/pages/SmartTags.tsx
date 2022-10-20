@@ -20,7 +20,7 @@ const SmartTags = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100%">
-      <Typography variant="h4">Smart Tags Aggregation</Typography>
+      <Typography variant="h4">Smart Tag Analysis</Typography>
       {smartTagsDescription}
       {isPipelineSelected(pipeline) ? (
         <Paper

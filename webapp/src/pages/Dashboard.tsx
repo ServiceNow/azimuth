@@ -101,7 +101,7 @@ const Dashboard = () => {
       )}
       {isPipelineSelected(pipeline) && (
         <PreviewCard
-          title="Smart Tags Aggregation"
+          title="Smart Tag Analysis"
           to={`/${jobId}/smart_tags${searchString}`}
           description={smartTagsDescription}
         >

@@ -264,7 +264,7 @@ const SmartTagsTable: React.FC<{
           }}
         >
           <TableSortLabel {...getSortLabelProps("accuracy")}>
-            Class Accuracy
+            Accuracy
           </TableSortLabel>
         </Typography>
         <Typography
@@ -416,7 +416,9 @@ const SmartTagsTable: React.FC<{
                             width="100%"
                             to={`/${jobId}/dataset_splits/${datasetSplitName}/performance_overview${constructSearchString(
                               {
-                                label: [row.filterValue],
+                                [selectedMetricPerFilterOption]: [
+                                  row.filterValue,
+                                ],
                                 outcome: [outcome],
                                 [family]: smartTags(family),
                                 ...pipeline,
