@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <img width=60% src="docs/docs/_static/images/exploration-space/performance-overview.png">
+  <img width=60% src="docs/docs/_static/images/exploration-space/prediction-overview.png">
 </p>
 
 ## Overview
