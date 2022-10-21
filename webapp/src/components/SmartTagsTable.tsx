@@ -184,7 +184,9 @@ const SmartTagsTable: React.FC<{
       </Box>
       <Box
         display="grid"
-        gridAutoColumns="min-content"
+        gridTemplateColumns={`repeat(${transpose ? 1 : 3}, min-content)`}
+        gridAutoColumns={160}
+        gridAutoRows="min-content"
         overflow="auto"
         columnGap={4}
         sx={{ overscrollBehaviorX: "contain" }} // Stops accidental navigation on horizontal scroll with touch pad
@@ -343,7 +345,6 @@ const SmartTagsTable: React.FC<{
                   borderLeft="solid 1px"
                   borderRight="solid 1px"
                   paddingY={0.5}
-                  width={160}
                   {...{
                     [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
                     [`grid${transpose ? "Row" : "Column"}`]: familyIndex + 4,
@@ -414,7 +415,7 @@ const SmartTagsTable: React.FC<{
                           <Link
                             component={RouterLink}
                             width="100%"
-                            to={`/${jobId}/dataset_splits/${datasetSplitName}/performance_overview${constructSearchString(
+                            to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview${constructSearchString(
                               {
                                 [selectedMetricPerFilterOption]: [
                                   row.filterValue,
