@@ -1,5 +1,13 @@
 # Releases
 
+## [2.4.1] - 2022-10-21
+
+### Fixed
+- Fixed Smart Tab Analysis table
+  - Column headers exceeding plots' width
+  - Links to Prediction Overview
+  - `Total` row squished when transposed and with a high number of rows
+
 ## [2.4.0] - 2022-10-20
 
 ### Added
@@ -21,7 +29,6 @@
 
 ### Fixed
 - Fixed an issue related to HuggingFace where filtering on an empty dataset would result in an error.
-
 
 ## [2.3.0] - 2022-08-17
 

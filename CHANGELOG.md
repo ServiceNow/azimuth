@@ -19,9 +19,5 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
-- Fixed Smart Tab Analysis table
-  - Column headers exceeding plots' width
-  - Links to Prediction Overview
-  - `Total` row squished when transposed and with a high number of rows
 
 ### Security
