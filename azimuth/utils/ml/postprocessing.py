@@ -5,6 +5,7 @@ import numpy as np
 from scipy.special import expit, softmax
 
 from azimuth.types import AliasModel, Array
+from azimuth.types.outcomes import OutcomeName
 
 
 class PostProcessingIO(AliasModel):
@@ -26,15 +27,17 @@ class PostProcessingIO(AliasModel):
         )
 
 
-class PreprocessingStep(AliasModel):
-    order: int
-    text: List[str]
-    class_name: str
+class PredictionDetails(AliasModel):
+    predictions: List[str]
+    prediction: str
+    confidences: List[float]
+    outcome: OutcomeName
 
-    def __getitem__(self, item: int) -> "PreprocessingStep":
-        return PreprocessingStep(
-            order=self.order, text=[self.text[item]], class_name=self.class_name
-        )
+
+class PostprocessingStepItem(AliasModel):
+    order: int
+    output: PredictionDetails
+    class_name: str
 
 
 class PostprocessingStep(AliasModel):

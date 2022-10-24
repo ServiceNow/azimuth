@@ -391,8 +391,8 @@ export interface components {
       postprocessedConfidences: number[];
       modelOutcome: components["schemas"]["OutcomeName"];
       postprocessedOutcome: components["schemas"]["OutcomeName"];
-      preprocessingSteps: components["schemas"]["PreprocessingStep"][];
-      postprocessingSteps: components["schemas"]["PostprocessingStep"][];
+      preprocessingSteps: components["schemas"]["PreprocessingStepItem"][];
+      postprocessingSteps: components["schemas"]["PostprocessingStepItem"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -566,28 +566,28 @@ export interface components {
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
-    PostProcessingIO: {
-      texts: string[];
-      logits: { [key: string]: any };
-      preds: { [key: string]: any };
-      probs: { [key: string]: any };
-    };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
-    PostprocessingStep: {
+    PostprocessingStepItem: {
       order: number;
-      output: components["schemas"]["PostProcessingIO"];
+      output: components["schemas"]["PredictionDetails"];
       className: string;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
-    PreprocessingStep: {
+    PredictionDetails: {
+      predictions: string[];
+      prediction: string;
+      confidences: number[];
+      outcome: components["schemas"]["OutcomeName"];
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    PreprocessingStepItem: {
       order: number;
-      text: string[];
+      text: string;
       className: string;
     };
     PunctuationTestOptions: {

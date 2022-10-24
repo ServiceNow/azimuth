@@ -17,11 +17,8 @@ from azimuth.modules.base_classes import ModelContractModule
 from azimuth.modules.task_execution import get_task_result
 from azimuth.types import DatasetColumn, InputResponse, ModuleOptions, SupportedMethod
 from azimuth.types.task import PredictionResponse, SaliencyResponse
-from azimuth.utils.ml.postprocessing import (
-    PostProcessingIO,
-    PostprocessingStep,
-    PreprocessingStep,
-)
+from azimuth.utils.ml.postprocessing import PostProcessingIO, PostprocessingStep
+from azimuth.utils.ml.preprocessing import PreprocessingStep
 from azimuth.utils.project import postprocessing_editable
 
 EPSILON = 1e-6

@@ -22,7 +22,14 @@ from azimuth.types import (
 )
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse, SaliencyResponse
-from azimuth.utils.ml.postprocessing import PostProcessingIO, PostprocessingStep
+from azimuth.utils.ml.model_performance import compute_outcome
+from azimuth.utils.ml.postprocessing import (
+    PostProcessingIO,
+    PostprocessingStep,
+    PostprocessingStepItem,
+    PredictionDetails,
+)
+from azimuth.utils.ml.preprocessing import PreprocessingStepItem
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.validation import assert_not_none
 
@@ -183,10 +190,10 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
         return postprocessing_steps
 
     def _save_result(self, res, dm):
-        table_key = self._get_table_key()
-
         # Save result in a DatasetSplitManager
         if len(res) > 0 and isinstance(res[0], PredictionResponse):
+            table_key = self._get_table_key()
+            class_names = dm.get_class_names()
             res_casted = cast(List[PredictionResponse], res)
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.model_predictions,
@@ -222,10 +229,30 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 features=[
                     {
                         "preprocessing_steps": [
-                            step.dict() for step in pred_res.preprocessing_steps
+                            PreprocessingStepItem(
+                                order=step.order, class_name=step.class_name, text=step.text[0]
+                            ).dict()
+                            for step in pred_res.preprocessing_steps
                         ],
                         "postprocessing_steps": [
-                            step.dict() for step in pred_res.postprocessing_steps
+                            PostprocessingStepItem(
+                                order=step.order,
+                                class_name=step.class_name,
+                                output=PredictionDetails(
+                                    predictions=[
+                                        class_names[cl_idx]
+                                        for cl_idx in reversed(np.argsort(step.output.probs[0]))
+                                    ],
+                                    prediction=class_names[step.output.preds[0]],
+                                    confidences=[
+                                        prob for prob in reversed(np.sort(step.output.probs[0]))
+                                    ],
+                                    outcome=compute_outcome(
+                                        step.output.preds[0], pred_res.label, dm.rejection_class_idx
+                                    ),
+                                ),
+                            ).dict()
+                            for step in pred_res.postprocessing_steps
                         ],
                     }
                     for pred_res in res_casted
