@@ -1,3 +1,4 @@
+import _ from "lodash";
 import {
   Box,
   Button,
@@ -8,12 +9,18 @@ import {
   FormGroup,
   FormHelperText,
   InputBaseComponentProps,
+  Link,
   TextField,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig } from "types/api";
+import { Info } from "@mui/icons-material";
+
+const DOCS_URL =
+  "https://servicenow.github.io/azimuth/main/reference/configuration/";
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
@@ -46,6 +53,20 @@ const Settings: React.FC = () => {
     />
   );
 
+  const displayConfigTitle = (title: string, link: string) => (
+    <Box display="flex" gap={1} marginTop={0.5}>
+      <Typography variant="body1">{title}</Typography>
+      <Link
+        href={DOCS_URL + link}
+        variant="body2"
+        color="secondary"
+        target="_blank"
+      >
+        <Info color="primary" fontSize="small" sx={{ marginTop: 0.5 }} />
+      </Link>
+    </Box>
+  );
+
   const displaySubFields = (
     config: keyof AzimuthConfig,
     label: string,
@@ -62,18 +83,15 @@ const Settings: React.FC = () => {
         shrink: true,
       }}
       defaultValue={value}
+      disabled={!Boolean(resultingConfig[config])}
       inputProps={limit}
       variant="standard"
       onChange={(event) =>
-        setPartialConfig({
-          ...partialConfig,
-          ...{
-            [config]: {
-              ...[partialConfig[config]],
-              [field]: Number(event.target.value),
-            },
-          },
-        })
+        setPartialConfig(
+          _.merge(partialConfig, {
+            [config]: { [field]: Number(event.target.value) },
+          })
+        )
       }
     />
   );
@@ -84,42 +102,40 @@ const Settings: React.FC = () => {
         <FormGroup>
           <FormControlLabel
             control={switchNullOrDefault("behavioral_testing")}
-            label="Behavioral testing"
+            label={displayConfigTitle(
+              "Behavioral testing",
+              "analyses/behavioral_testing/"
+            )}
           />
           <FormControlLabel
             control={switchNullOrDefault("similarity")}
-            label="Similarity"
+            label={displayConfigTitle("Similarity", "analyses/similarity/")}
           />
-          {Boolean(resultingConfig.similarity) && (
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              sx={{
-                "& .MuiTextField-root": { width: "25ch" },
-              }}
-              gap={1}
-            >
-              {displaySubFields(
-                "similarity",
-                "Conflicting neighbors threshold",
-                "conflicting_neighbors_threshold",
-                { min: 0, max: 1, step: 0.1 },
-                resultingConfig.similarity?.conflicting_neighbors_threshold
-              )}
-              {displaySubFields(
-                "similarity",
-                "No close threshold",
-                "no_close_threshold",
-                { min: 0, max: 1, step: 0.1 },
-                resultingConfig.similarity?.no_close_threshold
-              )}
-            </Box>
-          )}
-          <FormControlLabel
-            control={switchNullOrDefault("dataset_warnings")}
-            label="Dataset Warnings"
-          />
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            sx={{
+              "& .MuiTextField-root": { width: "25ch" },
+            }}
+            gap={1}
+          >
+            {displaySubFields(
+              "similarity",
+              "Conflicting neighbors threshold",
+              "conflicting_neighbors_threshold",
+              { min: 0, max: 1, step: 0.1 },
+              resultingConfig.similarity?.conflicting_neighbors_threshold
+            )}
+            {displaySubFields(
+              "similarity",
+              "No close threshold",
+              "no_close_threshold",
+              { min: 0, max: 1, step: 0.1 },
+              resultingConfig.similarity?.no_close_threshold
+            )}
+          </Box>
+          {displayConfigTitle("Dataset Warnings", "analyses/dataset_warnings/")}
           {Boolean(resultingConfig.dataset_warnings) && (
             <Box
               display="flex"
@@ -167,10 +183,7 @@ const Settings: React.FC = () => {
               )}
             </Box>
           )}
-          <FormControlLabel
-            control={switchNullOrDefault("syntax")}
-            label="Syntax"
-          />
+          {displayConfigTitle("Syntax", "analyses/syntax/")}
           {Boolean(resultingConfig.syntax) && (
             <Box
               display="flex"
@@ -197,10 +210,7 @@ const Settings: React.FC = () => {
               )}
             </Box>
           )}
-          <FormControlLabel
-            control={switchNullOrDefault("uncertainty")}
-            label="Uncertainity"
-          />
+          {displayConfigTitle("Uncertainty", "model_contract/#uncertainty")}
           {Boolean(resultingConfig.uncertainty) && (
             <Box
               display="flex"
@@ -232,7 +242,14 @@ const Settings: React.FC = () => {
             </Box>
           )}
         </FormGroup>
-        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={1}
+          marginRight={25}
+          sx={{ position: "sticky", bottom: 5 }}
+        >
           <Button
             variant="contained"
             onClick={() => updateConfig({ jobId, body: partialConfig })}
