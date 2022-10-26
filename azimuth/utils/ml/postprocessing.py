@@ -19,6 +19,7 @@ class PostProcessingIO(AliasModel):
         return np.allclose(self.probs.sum(-1), 1.0)
 
     def __getitem__(self, item: int) -> "PostProcessingIO":
+        """Useful to get from a batch result to a single utterance result."""
         return PostProcessingIO(
             texts=[self.texts[item]],
             logits=self.logits[item][np.newaxis, ...],
@@ -28,24 +29,34 @@ class PostProcessingIO(AliasModel):
 
 
 class PredictionDetails(AliasModel):
+    # Prediction class names, sorted by confidences
     predictions: List[str]
+    # Predicted class, which can be different than the first element of predictions, when
+    # thresholding for instance.
     prediction: str
+    # Sorted confidences
     confidences: List[float]
+    # Outcome based on label and prediction
     outcome: OutcomeName
 
 
 class PostprocessingStepItem(AliasModel):
+    """Class for saving the results in the dataset and the routes."""
+
     order: int
     output: PredictionDetails
     class_name: str
 
 
 class PostprocessingStep(AliasModel):
+    """Class received from the pipeline, and used in the Prediction Module."""
+
     order: int
     output: PostProcessingIO
     class_name: str
 
     def __getitem__(self, item: int) -> "PostprocessingStep":
+        """Useful to get from a batch result to a single utterance result."""
         return PostprocessingStep(
             order=self.order, output=self.output[item], class_name=self.class_name
         )

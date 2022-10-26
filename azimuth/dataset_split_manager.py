@@ -215,6 +215,7 @@ class DatasetSplitManager:
             DatasetColumn.postprocessed_confidences,
             DatasetColumn.model_outcome,
             DatasetColumn.postprocessed_outcome,
+            DatasetColumn.pipeline_steps,
             DatasetColumn.confidence_bin_idx,
             DatasetColumn.token_count,
             DatasetColumn.neighbors_train,

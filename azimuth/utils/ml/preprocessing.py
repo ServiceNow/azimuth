@@ -7,17 +7,22 @@ from azimuth.types import AliasModel
 
 
 class PreprocessingStepItem(AliasModel):
+    """Class for saving the results in the dataset and the routes."""
+
     order: int
     text: str
     class_name: str
 
 
 class PreprocessingStep(AliasModel):
+    """Class received from the pipeline, and used in the Prediction Module."""
+
     order: int
     text: List[str]
     class_name: str
 
     def __getitem__(self, item: int) -> "PreprocessingStep":
+        """Useful to get from a batch result to a single utterance result."""
         return PreprocessingStep(
             order=self.order, text=[self.text[item]], class_name=self.class_name
         )

@@ -562,10 +562,7 @@ export interface components {
       datasetSplitName?: components["schemas"]["DatasetSplitName"];
       dataActions: { [key: string]: { [key: string]: boolean } };
     };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
+    /** Class for saving the results in the dataset and the routes. */
     PostprocessingStepItem: {
       order: number;
       output: components["schemas"]["PredictionDetails"];
@@ -581,10 +578,7 @@ export interface components {
       confidences: number[];
       outcome: components["schemas"]["OutcomeName"];
     };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
+    /** Class for saving the results in the dataset and the routes. */
     PreprocessingStepItem: {
       order: number;
       text: string;

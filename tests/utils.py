@@ -135,6 +135,7 @@ def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
             DatasetColumn.model_confidences: [i / len(ds), 1 - i / len(ds)],
             # 0.9 simulates temperature scaling
             DatasetColumn.postprocessed_confidences: [0.9 * (i / len(ds)), 1 - 0.9 * (i / len(ds))],
+            DatasetColumn.pipeline_steps: [],
             DatasetColumn.confidence_bin_idx: np.random.randint(1, 20),
         },
         with_indices=True,

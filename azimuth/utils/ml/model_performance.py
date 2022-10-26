@@ -28,6 +28,18 @@ def sorted_by_utterance_count_with_last(metrics: List[T], index_to_put_first: in
 
 
 def compute_outcome(prediction: int, label: int, rejection_class_idx) -> OutcomeName:
+    """Compute prediction outcome based on the prediction and label.
+
+    Note: It was moved out of the OutcomesModule class for circular import issues.
+
+    Args:
+        prediction: Class index of the prediction
+        label: Class index of the label
+        rejection_class_idx: Class index of the rejection class
+
+    Returns:
+        Outcome value
+    """
     if prediction == label:
         if label == rejection_class_idx:
             return OutcomeName.CorrectAndRejected

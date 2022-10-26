@@ -138,6 +138,7 @@ def test_to_csv(simple_text_config):
         < index[DatasetColumn.postprocessed_confidences]
         < index[DatasetColumn.model_outcome]
         < index[DatasetColumn.postprocessed_outcome]
+        < index[DatasetColumn.pipeline_steps]
         < index[DatasetColumn.confidence_bin_idx]
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()

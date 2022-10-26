@@ -214,6 +214,7 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             json_output.append(
                 PredictionResponse(
                     label=label,
+                    # The __getitem__ method allows to get from batch results to utterance results
                     model_output=model_output[idx],
                     postprocessed_output=postprocessed_output[idx],
                     preprocessing_steps=[
