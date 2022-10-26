@@ -9,7 +9,7 @@ other type of dataset or model.
 
 * [:material-link: Defining Datasets](dataset.md)
 * [:material-link: Defining a Model](model.md)
-* [:material-link: Defining Postprocessors](postprocessors.md)
+* [:material-link: Defining Postprocessors](processors.md)
 * [:material-link: Defining Metrics](metric.md)
 
 ## What is a Custom Object?

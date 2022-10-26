@@ -82,7 +82,7 @@ probs = softmax(np.random.rand(NUM_SAMPLES, NUM_CLASSES), -1)
 
 If your model already includes post-processing, or if you decide to create your own post-processing
 in Azimuth (we already support thresholding and temperature scaling), it will need to output
-a `PipelineOutputProtocol` or `PipelineOutputProtocolV2`. More details can be found in [Define Postprocessors](postprocessors.md).
+a `PipelineOutputProtocol` or `PipelineOutputProtocolV2`. More details can be found in [Define Postprocessors](processors.md).
 
 ## Model contracts
 
