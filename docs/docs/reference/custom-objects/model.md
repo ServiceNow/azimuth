@@ -2,7 +2,7 @@
 
 A model is defined as a function that takes an utterance as input and outputs a `SupportedOutput`
 (defined below). Some models will output probabilities, whereas other models are "pipelines" which
-include post-processing steps. Azimuth supports both these use cases. The `model_contract` field
+include pre-processing and/or post-processing steps. Azimuth supports both these use cases. The `model_contract` field
 from the config will determine how Azimuth will interface with the model, as detailed in this
 section.
 
@@ -45,12 +45,13 @@ import transformers
 from torch import Tensor  # (1)
 
 from azimuth.modules.model_contracts.text_classification import (
-    PipelineOutputProtocol)
+    PipelineOutputProtocol, PipelineOutputProtocolV2)
 
 SupportedOutput = Union[np.ndarray,
                         Tensor,
                         transformers.file_utils.ModelOutput,
-                        PipelineOutputProtocol]
+                        PipelineOutputProtocol,
+                        PipelineOutputProtocolV2]
 ```
 
 1. `Tensor` from `TensorFlow` is also supported.
@@ -81,7 +82,7 @@ probs = softmax(np.random.rand(NUM_SAMPLES, NUM_CLASSES), -1)
 
 If your model already includes post-processing, or if you decide to create your own post-processing
 in Azimuth (we already support thresholding and temperature scaling), it will need to output
-a `PipelineOutputProtocol`. More details can be found in [Define Postprocessors](postprocessors.md).
+a `PipelineOutputProtocol` or `PipelineOutputProtocolV2`. More details can be found in [Define Postprocessors](postprocessors.md).
 
 ## Model contracts
 

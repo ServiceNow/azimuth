@@ -1,8 +1,9 @@
-# Defining Postprocessors
+# Defining Processors
 
-Postprocessors can be applied after any model in Azimuth.
+- **Preprocessors** cannot be defined in Azimuth, but if they are included in the [user pipeline](#pipeline-with-processing), the tool can display the results of the preprocessing steps.
+- **Postprocessors** can be included as part of the [user pipeline](#pipeline-with-processing), similar to preprocessors, and defined in Azimuth, either by leveraging the [default postprocessors](#default-postprocessors), or [defining new ones](#user-defined-postprocessors).
 
-## Default Postprocessors in Azimuth
+## Default Postprocessors
 
 By default, Azimuth applies thresholding at 0.5. It also supports Temperature Scaling.
 
@@ -12,28 +13,54 @@ in the `PipelineDefinition`.
 - For Temperature Scaling : `{"postprocessors": [{"temperature": 1}]}`
 - For Thresholding : `{"postprocessors": [{"threshold": 0.5}]}`
 
-## Model with its own postprocessing
+## Pipeline with Processing
 
-If your model already includes postprocessing, as explained
+If your pipeline already call preprocessing and/or postprocessing steps, as explained
 in [:material-link: Define a Model](model.md), the model prediction signature needs to have a
-specific output, `PipelineOutputProtocol`, that will contain both the predictions from the model,
-and the post-processed predictions.
+specific output, `PipelineOutputProtocol` or `PipelineOutputProtocolV2`.
 
-```python
-from typing import Protocol
+Both classes need to contain the model and post-processed predictions.
+The difference between both classes is the presence of two extra fields in V2, that allows to
+return the intermediate results of the preprocessing and postprocessing steps, so that they can be
+displayed in the UI.
 
-from azimuth.utils.ml.postprocessing import PostProcessingIO
+=== "PipelineOutputProtocol"
+
+    ```python
+    from typing import Protocol
+
+    from azimuth.utils.ml.postprocessing import PostProcessingIO
 
 
-class PipelineOutputProtocol(Protocol):
-    """Class containing result of a batch"""
+    class PipelineOutputProtocol(Protocol):
+        """Class containing result of a batch"""
+        model_output: PostProcessingIO  # (1)
+        postprocessor_output: PostProcessingIO  # (2)
+    ```
 
-    model_output: PostProcessingIO  # (1)
-    postprocessor_output: PostProcessingIO  # (2)
-```
+    1. model output before passing through post-processing: texts, logits, probs, preds
+    2. output after passing through post-processing: pre-processed texts, logits, probs, preds
 
-1. model output before passing through post-processing stage: texts, logits, probs, preds
-2. output after passing through post-processing: pre-processed texts, logits, probs, preds
+=== "PipelineOutputProtocolV2"
+
+    ```python
+    from typing import Protocol
+
+    from azimuth.utils.ml.postprocessing import PostProcessingIO
+
+
+    class PipelineOutputProtocolV2(Protocol):
+    """Class containing result of a batch with pre and postprocessing steps"""
+        model_output: PostProcessingIO # (1)
+        postprocessor_output: PostProcessingIO # (2)
+        preprocessing_steps: List[Dict[str, Union[str, List[str], int]]] # (3)
+        postprocessing_steps: List[Dict[str, Union[str, PostProcessingIO, int]]] # (4)
+    ```
+
+    1. model output before passing through post-processing: texts, logits, probs, preds
+    2. output after passing through post-processing: pre-processed texts, logits, probs, preds
+    3. list of preprocessing steps with the intermediate results. See Preprocessing Steps below.
+    4. list of postprocessing steps with the intermediate results. See Postprocessing Steps below.
 
 `PostProcessingIO` is defined as the following.
 
@@ -59,33 +86,114 @@ In your code, you don't have to extend `PipelineOutputProtocol` or `PostProcessi
 your own library, and as long as the fields match, Azimuth will accept it. This is done so that our
 users don't have to add Azimuth as a dependency.
 
-```python
-@dataclass
-class PostprocessingData:
-    texts: List[str]  # len [num_samples]
-    logits: np.ndarray  # shape [num_samples, classes]
-    preds: np.ndarray  # shape [num_samples]
-    probs: np.ndarray  # shape [num_samples, classes]
+!!! example
+
+    ```python
+    @dataclass
+    class PostprocessingData:
+        texts: List[str]  # len [num_samples]
+        logits: np.ndarray  # shape [num_samples, classes]
+        preds: np.ndarray  # shape [num_samples]
+        probs: np.ndarray  # shape [num_samples, classes]
 
 
-### Valid
+    ### Valid
 
-class MyPipelineOutput(BaseModel):  # Could be dataclass as well.
-    model_output: PostprocessingData
-    postprocessor_output: PostprocessingData
+    class MyPipelineOutput(BaseModel):  # Could be dataclass as well.
+        model_output: PostprocessingData
+        postprocessor_output: PostprocessingData
 
 
-### Invalid because the field names do not match
+    ### Invalid because the field names do not match
 
-class MyPipelineOutput(BaseModel):
-    predictions: MyPipelineOutput
-    postprocessed_predictions: MyPipelineOutput
-```
+    class MyPipelineOutput(BaseModel):
+        predictions: MyPipelineOutput
+        postprocessed_predictions: MyPipelineOutput
+    ```
 
 ### In the Config
 
 `{"postprocessors": null}` should then be added to the config, to avoid re-postprocessing in
 Azimuth.
+
+### `PipelineOutputProtocolV2`
+If using V2, to new fields need to be provided: preprocessing steps and postprocessing steps.
+
+The preprocessing steps need to be returned as a a `List` of `Dict` with the following fields and types.
+
+=== "Dict Fields and Types"
+
+    ```python
+    from typing import List
+
+    class_name: str  # (1)
+    text: List[str]  # (2)
+    order: int # (3)
+    ```
+
+    1. Name of the pre-processing step, usually the name of the Python class.
+    2. Text of the utterance after the pre-processing step.
+    3. Order of the pre-processing step.
+
+=== "Example"
+
+    ```python
+    [
+        {
+            'class_name': 'PunctuationRemoval',  # (1)
+            'text': ['Test'],  # (2)
+            'order': 1 # (3)
+        },
+        {
+            'class_name': 'LowerCase',
+            'text': ['test'],
+            'order': 2
+        }
+    ]
+    ```
+
+The postprocessing steps also need to be returned as a `List` of `Dict` with the following fields and types.
+
+=== "Dict Fields and Types"
+
+    ```python
+    from typing import List
+
+    class_name: str  # (1)
+    output: PostProcessingIO  # (2)
+    order: int # (3)
+    ```
+
+    1. Name of the post-processing step, usually the name of the Python class.
+    2. Prediction results after this step.
+    3. Order of the post-processing step.
+
+=== "Example"
+
+    ```python
+    [
+        {
+            'class_name': 'TemperatureScaling',
+            'output': PostprocessorOutput(
+                texts='',
+                logits=array([[-0.20875366 -0.25494186]], dtype=float32),
+                probs=array([[0.511545 0.488455]], dtype=float32),
+                preds=array([0])),
+            'order': 0
+        },
+        {
+            'class_name': 'Thresholding',
+            'output': PostprocessorOutput(
+                texts=None,
+                features=None,
+                logits=array([[-0.20875366 -0.25494186]], dtype=float32),
+                probs=array([[0.511545 0.488455]], dtype=float32),
+                preds=array([2])),
+            'order': 1
+        }
+    ]
+    ```
+
 ## User-Defined Postprocessors
 
 Similarly to a model and a dataset, users can add their own postprocessors in Azimuth with custom

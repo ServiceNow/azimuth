@@ -163,7 +163,7 @@ Objects**](index.md).
 * **`postprocessors`** defines the postprocessors. Azimuth offers some default values for
   temperature scaling and thresholding. Users can also provide their own postprocessor functions, or
   disabled them (`postprocessors: null`).
-  [:material-link: Defining Postprocessors](../custom-objects/postprocessors.md) details the
+  [:material-link: Defining Processors](../custom-objects/postprocessors.md) details the
   different use cases.
 
 !!! tip "Beginner users should start with simple use cases"
