@@ -4,9 +4,9 @@
 
 ### Fixed
 - Fixed Smart Tab Analysis table
-  - Column headers exceeding plots' width
-  - Links to Prediction Overview
-  - `Total` row squished when transposed and with a high number of rows
+    - Column headers exceeding plots' width
+    - Links to Prediction Overview
+    - `Total` row squished when transposed and with a high number of rows
 
 ## [2.4.0] - 2022-10-20
 
@@ -18,9 +18,9 @@
 
 ### Changed
 - **Renaming**: Some sections were renamed in the UI, such as:
-  - Dataset Class Distribution Analysis -> Dataset Warnings
-  - Performance Analysis -> Pipeline Metrics by Data Subpopulation
-  - Performance Overview -> Prediction Overview
+    - Dataset Class Distribution Analysis -> Dataset Warnings
+    - Performance Analysis -> Pipeline Metrics by Data Subpopulation
+    - Performance Overview -> Prediction Overview
 - **Proposed actions**: We added a new action, `merge_classes`, and renamed `consider_new_class` to `define_new_class`.
 - **Improved Confusion Matrix**: The order of the classes in the confusion matrix is now smarter: classes where the model gets similarly confused will be closer to one another. The rejection class is always the last row/column in the confusion matrix. A toggle allows the user to keep the original order from the dataset if preferred.
 - **Refactoring**: We improved the `MetricsPerFilter` module (which generates the pipeline metrics by data subpopulation table). It now takes ~5 times less time to compute.
