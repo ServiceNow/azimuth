@@ -5,6 +5,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -147,7 +148,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
 
   // Track table sort model to keep 'overall' at top.
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
-    { field: "utteranceCount", sort: "desc" },
+    { field: "basePipelineUtteranceCount", sort: "desc" },
   ]);
   // We must redefine columns when selectedMetricPerFilterOption changes.
   // The Table then loses any uncontrolled (internal) states. So, we must
@@ -253,6 +254,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
+                        zIndex="tooltip"
                         gap={1}
                       >
                         {longHeader}
@@ -348,8 +350,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
-            description,
-            ...groupHeader(pipeline, metricName),
+            ...groupHeader(
+              pipeline,
+              <Tooltip title={description}>
+                <Typography variant="caption" fontSize={14}>
+                  {metricName}
+                </Typography>
+              </Tooltip>
+            ),
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
               metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
             renderCell: ({ value }: GridCellParams<number | undefined>) =>
@@ -385,8 +393,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
-        ...groupHeader(pipeline, "ECE"),
-        description: ECE_TOOLTIP,
+        ...groupHeader(
+          pipeline,
+          <Tooltip title={ECE_TOOLTIP}>
+            <Typography variant="caption" fontSize={14}>
+              ECE
+            </Typography>
+          </Tooltip>
+        ),
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
           value !== undefined && (
