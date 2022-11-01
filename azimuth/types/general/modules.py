@@ -23,6 +23,7 @@ class SupportedMethod(SupportedTask):
 
 
 class SupportedModule(SupportedTask):
+    ClassOverlap = "ClassOverlap"
     ConfidenceBinIndex = "ConfidenceBinIndex"
     ConfidenceHistogram = "ConfidenceHistogram"
     ConfusionMatrix = "ConfusionMatrix"

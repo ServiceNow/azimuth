@@ -4,6 +4,7 @@
 import azimuth.modules.model_performance.outcomes
 from azimuth.modules import perturbation_testing
 from azimuth.modules.dataset_analysis import (
+    class_overlap,
     dataset_warnings,
     similarity_analysis,
     syntax_tagging,
@@ -31,6 +32,7 @@ model_contract_methods = {
 # Black formats this in a way where the line is too long.
 # fmt: off
 modules = {
+    SupportedModule.ClassOverlap: class_overlap.ClassOverlapModule,
     SupportedModule.ConfidenceBinIndex: confidence_binning.ConfidenceBinIndexModule,
     SupportedModule.ConfidenceHistogram: confidence_binning.ConfidenceHistogramModule,
     SupportedModule.ConfusionMatrix: confusion_matrix.ConfusionMatrixModule,

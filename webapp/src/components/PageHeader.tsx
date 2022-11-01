@@ -55,8 +55,14 @@ const PageHeader = () => {
 
   const history = useHistory();
   const location = useLocation();
-  const { confusionMatrix, filters, pagination, pipeline, postprocessing } =
-    useQueryState();
+  const {
+    classOverlap,
+    confusionMatrix,
+    filters,
+    pagination,
+    pipeline,
+    postprocessing,
+  } = useQueryState();
 
   // If present, preserve pipelineIndex when navigating, but nothing else
   const searchString = constructSearchString(pipeline);
@@ -64,6 +70,7 @@ const PageHeader = () => {
   const setPipeline = (pipelineIndex?: number) => {
     history.push(
       `${location.pathname}${constructSearchString({
+        ...classOverlap,
         ...confusionMatrix,
         ...filters,
         ...pagination,
@@ -87,6 +94,10 @@ const PageHeader = () => {
         {
           pathname: `/${jobId}/behavioral_testing_summary`,
           name: "Behavioral Testing Summary",
+        },
+        {
+          pathname: `/${jobId}/class_analysis`,
+          name: "Class Analysis",
         },
         {
           pathname: `/${jobId}/pipeline_metrics`,

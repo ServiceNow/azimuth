@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { toast } from "react-toastify";
 import {
+  QueryClassOverlapState,
   QueryFilterState,
   QueryPaginationState,
   QueryPipelineState,
@@ -41,6 +42,11 @@ const convertSearchParams = <T>(
 export const parseSearchString = (searchString: string) => {
   const q = new URLSearchParams(searchString);
   return {
+    classOverlap: convertSearchParams<QueryClassOverlapState>(q, {
+      selfOverlap: (s) => s !== null || undefined,
+      scaleByClass: (s) => s === null && undefined,
+      overlapThreshold: convertNumber,
+    }),
     confusionMatrix: convertSearchParams<QueryConfusionMatrixState>(q, {
       normalize: (s) => s === null && undefined,
       reorderClasses: (s) => s === null && undefined,

@@ -23,7 +23,7 @@ current focus is on text classification.
   **interactions and visualizations** available.
 * [:material-link: Reference](reference/index.md) details the config file and the custom objects
   which allow **configuring** Azimuth with different datasets and pipelines.
-* [:material-link: Development](development/setup.md) guides on how to develop and **contribute** to
+* [:material-link: Development](development/index.md) guides on how to develop and **contribute** to
   the repo.
 
 ## :octicons-question-16: Support
