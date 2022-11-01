@@ -191,6 +191,14 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     selectedMetricPerFilterOption,
   ]);
 
+  const fieldWithTooltip = (tooltip: string, label: string) => (
+    <Tooltip title={tooltip}>
+      <Typography variant="caption" fontSize={14}>
+        {label}
+      </Typography>
+    </Tooltip>
+  );
+
   const columns = React.useMemo((): Column<Row>[] => {
     const metricsEntries = Object.entries(metricInfo ?? {});
 
@@ -350,14 +358,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
-            ...groupHeader(
-              pipeline,
-              <Tooltip title={description}>
-                <Typography variant="caption" fontSize={14}>
-                  {metricName}
-                </Typography>
-              </Tooltip>
-            ),
+            ...groupHeader(pipeline, fieldWithTooltip(description, metricName)),
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
               metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
             renderCell: ({ value }: GridCellParams<number | undefined>) =>
@@ -393,14 +394,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
-        ...groupHeader(
-          pipeline,
-          <Tooltip title={ECE_TOOLTIP}>
-            <Typography variant="caption" fontSize={14}>
-              ECE
-            </Typography>
-          </Tooltip>
-        ),
+        ...groupHeader(pipeline, fieldWithTooltip(ECE_TOOLTIP, "ECE")),
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
           value !== undefined && (
@@ -437,8 +431,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   ]);
 
   React.useEffect(() => {
-    config &&
-      config.pipelines &&
+    config?.pipelines &&
       config.pipelines.length > 1 &&
       config.pipelines.map(
         (_, index) =>
