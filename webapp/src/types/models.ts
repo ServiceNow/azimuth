@@ -5,6 +5,12 @@ import {
   UtterancesSortableColumn,
 } from "types/api";
 
+export type QueryClassOverlapState = {
+  selfOverlap?: true;
+  scaleByClass?: false;
+  overlapThreshold?: number;
+};
+
 export type QueryArrayFiltersState = {
   label?: string[];
   prediction?: string[];
@@ -44,7 +50,8 @@ export type QueryConfusionMatrixState = {
   reorderClasses?: false;
 };
 
-export type QueryState = QueryFilterState &
+export type QueryState = QueryClassOverlapState &
+  QueryFilterState &
   QueryPaginationState &
   QueryPipelineState &
   QueryPostprocessingState &

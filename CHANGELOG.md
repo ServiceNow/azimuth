@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- New class analysis section, with class overlap detection. More details are available in the User Guide and in the Key Concepts.
 
 ### Changed
 

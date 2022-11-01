@@ -47,6 +47,60 @@ The dataset warnings section highlights issues related to **class size**, **clas
 
 Select `View Details` to get to [:material-link: Dataset Warnings](dataset-warnings.md).
 
+## Class Analysis
+
+The Class Analysis section gives an overview of the similarity between class pairs. In some
+cases, high similarity may be associated with poor class definitions, mislabelling, and/or model
+confusion.
+
+Select `View details` to access the [:material-link: Class
+Analysis](class-analysis) page with an interactive
+[Class Overlap Plot](class-analysis.md#class-overlap-plot).
+
+### Table Content
+
+The Class Analysis table presents class pairs that have nonzero class overlap or pipeline
+confusion.
+
+* **Class overlap** is calculated for class pairs in the training data based on the locations of
+  utterances in embedding space, as described in
+  [:material-link: Class Similarity](../key-concepts/class-similarity.md). Because it is
+  determined on a dataset alone, it does not require a pipeline to be supplied.
+* **Utterances with overlap** indicates the percentage of samples in the source class that are
+  determined to overlap the target class, as well as the sample count with overlap
+  relative to the total sample count for the source class. This is also based on the training data.
+* **Pipeline confusion** is presented if a pipeline is provided. Pipeline confusion indicates
+  confusion of the source class for the target class (i.e., the confusion matrix cell
+  where the label is the source class and the prediction is the target class), for the
+  evaluation data.
+
+As overlap indicates semantic similarity in embedding space, it may or may not be associated
+with pipeline confusion.
+
+For example, if high overlap is due to mislabeling or poor class differentiation, it may be
+associated with pipeline confusion. On the other hand, it's possible to have a pair of classes
+that are semantically very similar, but have a distinguishing feature that the model can learn,
+such as specific nouns. In these cases, class overlap may be expected, but not associated with
+model confusion.
+
+Thus, overlap values can help direct attention to dataset characteristics to explore to
+determine whether a change should be made (typically data augmentation or relabeling) or if the
+semantic overlap is acceptable.
+
+!!! note "Training vs Evaluation Data"
+
+    Note that Class Overlap is calculated on the training data, whereas Pipeline Confusion is
+    calculated on the evaluation data. Thus, the two analyses have different source class sample
+    counts.
+
+![](../_static/images/key-concepts/class-analysis-table.png)
+
+!!! tip "Sorting"
+
+    :material-sort: The data is ordered by overlap value, in descending order. Click the overlap
+    or confusion value headers to sort the values in ascending or descending order.
+
+
 ## Pipeline Metrics by Data Subpopulation
 
 This section summarizes the quality of the predictions in terms of the [**prediction
