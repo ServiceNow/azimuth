@@ -13,7 +13,7 @@ import ThresholdPlot from "components/ThresholdPlot";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { getDatasetInfoEndpoint } from "services/api";
+import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
 import { classAnalysisDescription } from "./ClassAnalysis";
 import { performanceAnalysisDescription } from "./PerformanceAnalysis";
@@ -26,6 +26,8 @@ const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
 const Dashboard = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { pipeline, searchString } = useQueryState();
+
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
 
   const {
     data: datasetInfo,
@@ -100,7 +102,12 @@ const Dashboard = () => {
         <PreviewCard
           title="Pipeline Metrics by Data Subpopulation"
           to={`/${jobId}/pipeline_metrics${searchString}`}
-          linkButtonText="Compare pipelines"
+          linkButtonText={
+            (config?.pipelines &&
+              config?.pipelines?.length > 1 &&
+              "Compare pipelines") ||
+            undefined
+          }
           description={performanceAnalysisDescription}
         >
           <PerformanceAnalysis

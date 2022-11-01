@@ -437,6 +437,13 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   ]);
 
   React.useEffect(() => {
+    config &&
+      config.pipelines &&
+      config.pipelines.length > 1 &&
+      config.pipelines.map(
+        (_, index) =>
+          index !== pipeline.pipelineIndex && setComparedPipeline(index)
+      );
     if (comparedPipeline === pipeline.pipelineIndex) {
       setComparedPipeline(undefined);
     }
@@ -554,7 +561,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
-        {config && (
+        {config?.pipelines && config.pipelines?.length > 1 && (
           <Box display="flex" flexDirection="row" alignItems="center">
             <FormControlLabel
               label={`Compare Baseline (${
