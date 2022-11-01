@@ -2,8 +2,7 @@
 
 ## What is it?
 
-Class analysis is an aspect of similarity analysis. As such, it is based on the relative locations
-of utterances in embedding space, and only requires training data to be supplied.
+Class analysis includes an aspect of similarity analysis, which is based on the relative locations of utterances in embedding space. Because of this, it only requires training data to be supplied.
 
 Class analysis extends other
 [:material-link: Similarity Analysis](./similarity.md) features to
