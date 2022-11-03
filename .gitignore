@@ -1,5 +1,4 @@
 # Custom
-.circleci
 *.hdf5
 *.h5
 local_configs
