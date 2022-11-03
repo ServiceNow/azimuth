@@ -205,14 +205,12 @@ def test_pred_smart_tags_2class(simple_text_config):
 )
 def test_structured_output_text_classification(simple_text_config, model_contract):
     simple_text_config.pipelines[0] = PipelineDefinition(
-        **{
-            "name": "StructuredOutputModel",
-            "model": {
-                "class_name": "tests.test_loading_resources.config_structured_output",
-                "kwargs": {"num_classes": 2},
-            },
-            "postprocessors": None,
-        }
+        name="StructuredOutputModel",
+        model={
+            "class_name": "tests.test_loading_resources.config_structured_output",
+            "kwargs": {"num_classes": 2},
+        },
+        postprocessors=None,
     )
     mod = model_contract(
         dataset_split_name=DatasetSplitName.eval,
