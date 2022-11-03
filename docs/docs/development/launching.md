@@ -97,3 +97,23 @@ yarn start
   make CFG_PATH=/config/examples/.../conf.json launch
   ```
   _Note that the path starts with `/config` as we mount `./config:/config`._
+
+### Launch multiple instances
+
+You can launch multiple instances of Azimuth (e.g., to compare effects of code changes) by
+specifying front-end and back-end ports.
+
+To specify the back-end port, start the back-end with using:
+  ```
+  make CFG_PATH={path to config file} PORT={back-end port number} launch.local
+  ```
+
+To connect the front-end to this back-end, start the front-end using:
+  ```
+  REACT_APP_BACKEND_PORT={back-end port number} PORT={front-end port number} yarn start
+  ```
+
+!!! tip "Use appropriate port numbers"
+    Make sure that your back-end port numbers match for both commands, and that you specify ports
+    that are not already in use. When ports are not specified, the defaults are 8091 for the back-
+    end and 3000 for the front-end.
