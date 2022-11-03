@@ -1,6 +1,7 @@
 
 config_folder = "local_configs"
 pwd := $(shell pwd)
+export PORT := 8091
 
 define UPDATE_CONFIG_PYSCRIPT
 from collections.abc import Sequence
@@ -50,7 +51,7 @@ local_configs:
 
 .PHONY: launch.local
 launch.local:
-	poetry run python runner.py ${CFG_PATH}
+	poetry run python runner.py ${CFG_PATH} --port ${PORT}
 
 .PHONY: clean
 clean:
