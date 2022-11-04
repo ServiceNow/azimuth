@@ -14,6 +14,7 @@ Released changes are shown in the
 - New class analysis section, with class overlap detection. More details are available in the User Guide and in the Key Concepts.
 
 ### Changed
+- The default port for the front end will now be 3000, the React default, instead of 3005.
 
 ### Deprecated/Breaking Changes
 

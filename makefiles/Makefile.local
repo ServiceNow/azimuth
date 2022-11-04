@@ -50,7 +50,7 @@ local_configs:
 
 .PHONY: launch.local
 launch.local:
-	poetry run python runner.py ${CFG_PATH}
+	poetry run python runner.py ${CFG_PATH} ${if ${PORT},--port ${PORT}}
 
 .PHONY: clean
 clean:
