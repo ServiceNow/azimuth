@@ -1629,6 +1629,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#launch-multiple-instances" class="md-nav__link">
+    Launch multiple instances
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1714,6 +1721,13 @@
           <li class="md-nav__item">
   <a href="#launch-using-docker" class="md-nav__link">
     Launch Using Docker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#launch-multiple-instances" class="md-nav__link">
+    Launch multiple instances
   </a>
   
 </li>
@@ -1836,6 +1850,21 @@ will delete all cache folders beginning with <code>CLINC</code>.</p>
 </code></pre></div>
   <em>Note that the path starts with <code>/config</code> as we mount <code>./config:/config</code>.</em></li>
 </ul>
+<h3 id="launch-multiple-instances">Launch multiple instances</h3>
+<p>You can launch multiple instances of Azimuth (e.g., to compare effects of code changes) by
+specifying front-end and back-end ports.</p>
+<p>To specify the back-end port, start the back end using:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>make CFG_PATH={path to config file} PORT={back-end port} launch.local
+</code></pre></div></p>
+<p>To connect the front end to this back end, start the front end using:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>REACT_APP_BACKEND_PORT={back-end port} PORT={front-end port} yarn start
+</code></pre></div></p>
+<div class="admonition tip">
+<p class="admonition-title">Use appropriate port numbers</p>
+<p>Make sure that your back-end ports match for both commands, and that you specify ports
+that are not already in use. When ports are not specified, the defaults are 8091 for the back 
+end and 3000 for the front end.</p>
+</div>
 
 
 
