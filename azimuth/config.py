@@ -92,7 +92,6 @@ class PipelineDefinition(BaseSettings):
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
     ] = Field(
         [
-            TemperatureScaling(temperature=1.0),
             ThresholdConfig(threshold=0.5),
         ]
     )

@@ -190,105 +190,106 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
         return postprocessing_steps
 
     def _save_result(self, res, dm):
-        # Save result in a DatasetSplitManager
-        table_key = self._get_table_key()
-        class_names = dm.get_class_names()
-        res_casted = cast(List[PredictionResponse], res)
-        dm.add_column_to_prediction_table(
-            key=DatasetColumn.model_predictions,
-            features=[
-                [cl_idx for cl_idx in reversed(np.argsort(pred_res.model_output.probs[0]))]
-                for pred_res in res_casted
-            ],
-            table_key=table_key,
-        )
-        dm.add_column_to_prediction_table(
-            key=DatasetColumn.model_confidences,
-            features=[
-                [prob for prob in reversed(np.sort(pred_res.model_output.probs[0]))]
-                for pred_res in res_casted
-            ],
-            table_key=table_key,
-        )
-        dm.add_column_to_prediction_table(
-            key=DatasetColumn.postprocessed_prediction,
-            features=[int(pred_res.postprocessed_output.preds[0]) for pred_res in res_casted],
-            table_key=table_key,
-        ),
-        dm.add_column_to_prediction_table(
-            key=DatasetColumn.postprocessed_confidences,
-            features=[
-                [prob for prob in reversed(np.sort(pred_res.postprocessed_output.probs[0]))]
-                for pred_res in res_casted
-            ],
-            table_key=table_key,
-        )
-        dm.add_column_to_prediction_table(
-            key=DatasetColumn.pipeline_steps,
-            features=[
-                {
-                    "preprocessing_steps": [
-                        PreprocessingStepItem(
-                            order=step.order, class_name=step.class_name, text=step.text[0]
-                        ).dict()
-                        for step in pred_res.preprocessing_steps
-                    ],
-                    "postprocessing_steps": [
-                        PostprocessingStepItem(
-                            order=step.order,
-                            class_name=step.class_name,
-                            output=PredictionDetails(
-                                predictions=[
-                                    class_names[cl_idx]
-                                    for cl_idx in reversed(np.argsort(step.output.probs[0]))
-                                ],
-                                prediction=class_names[step.output.preds[0]],
-                                confidences=[
-                                    prob for prob in reversed(np.sort(step.output.probs[0]))
-                                ],
-                                outcome=compute_outcome(
-                                    step.output.preds[0], pred_res.label, dm.rejection_class_idx
-                                ),
-                            ),
-                        ).dict()
-                        for step in pred_res.postprocessing_steps
-                    ],
-                }
-                for pred_res in res_casted
-            ],
-            table_key=table_key,
-        )
-
-        if table_key.use_bma:
-            # Epistemic uncertainty is only computed when use_bma is set to True, hence why the
-            # smart tag is only computed on that condition.
-            high_epistemic = {
-                idx: {
-                    SmartTag.high_epistemic_uncertainty: r.epistemic
-                    > self.config.uncertainty.high_epistemic_threshold
-                }
-                for idx, r in enumerate(res_casted)
-            }
-            # We save the smart tag with use_bma=False so the smart tag can be retrieved in the
-            # prediction table with the regular key, as the other tags.
-            non_bma_table_key = dataclasses.replace(table_key, use_bma=False)
-            dm.add_tags(high_epistemic, table_key=non_bma_table_key)
-        else:
-            # These tags only need to be computed for the prediction table with the regular key
-            # (use_bma=False)
-            pred_tags = self.get_pred_tags(
-                label=dm.get_dataset_split(table_key=table_key)[self.config.columns.label],
-                model_predictions=dm.get_dataset_split(table_key=table_key)[
-                    DatasetColumn.model_predictions
+        if isinstance(res[0], PredictionResponse):
+            # Save result in a DatasetSplitManager
+            table_key = self._get_table_key()
+            class_names = dm.get_class_names()
+            res_casted = cast(List[PredictionResponse], res)
+            dm.add_column_to_prediction_table(
+                key=DatasetColumn.model_predictions,
+                features=[
+                    [cl_idx for cl_idx in reversed(np.argsort(pred_res.model_output.probs[0]))]
+                    for pred_res in res_casted
                 ],
-                postprocessed_prediction=dm.get_dataset_split(table_key=table_key)[
-                    DatasetColumn.postprocessed_prediction
-                ],
-            )
-            dm.add_tags(
-                {idx: pred_tag_row for idx, pred_tag_row in enumerate(pred_tags)},
                 table_key=table_key,
             )
+            dm.add_column_to_prediction_table(
+                key=DatasetColumn.model_confidences,
+                features=[
+                    [prob for prob in reversed(np.sort(pred_res.model_output.probs[0]))]
+                    for pred_res in res_casted
+                ],
+                table_key=table_key,
+            )
+            dm.add_column_to_prediction_table(
+                key=DatasetColumn.postprocessed_prediction,
+                features=[int(pred_res.postprocessed_output.preds[0]) for pred_res in res_casted],
+                table_key=table_key,
+            ),
+            dm.add_column_to_prediction_table(
+                key=DatasetColumn.postprocessed_confidences,
+                features=[
+                    [prob for prob in reversed(np.sort(pred_res.postprocessed_output.probs[0]))]
+                    for pred_res in res_casted
+                ],
+                table_key=table_key,
+            )
+            dm.add_column_to_prediction_table(
+                key=DatasetColumn.pipeline_steps,
+                features=[
+                    {
+                        "preprocessing_steps": [
+                            PreprocessingStepItem(
+                                order=step.order, class_name=step.class_name, text=step.text[0]
+                            ).dict()
+                            for step in pred_res.preprocessing_steps
+                        ],
+                        "postprocessing_steps": [
+                            PostprocessingStepItem(
+                                order=step.order,
+                                class_name=step.class_name,
+                                output=PredictionDetails(
+                                    predictions=[
+                                        class_names[cl_idx]
+                                        for cl_idx in reversed(np.argsort(step.output.probs[0]))
+                                    ],
+                                    prediction=class_names[step.output.preds[0]],
+                                    confidences=[
+                                        prob for prob in reversed(np.sort(step.output.probs[0]))
+                                    ],
+                                    outcome=compute_outcome(
+                                        step.output.preds[0], pred_res.label, dm.rejection_class_idx
+                                    ),
+                                ),
+                            ).dict()
+                            for step in pred_res.postprocessing_steps
+                        ],
+                    }
+                    for pred_res in res_casted
+                ],
+                table_key=table_key,
+            )
+
+            if table_key.use_bma:
+                # Epistemic uncertainty is only computed when use_bma is set to True, hence why the
+                # smart tag is only computed on that condition.
+                high_epistemic = {
+                    idx: {
+                        SmartTag.high_epistemic_uncertainty: r.epistemic
+                        > self.config.uncertainty.high_epistemic_threshold
+                    }
+                    for idx, r in enumerate(res_casted)
+                }
+                # We save the smart tag with use_bma=False so the smart tag can be retrieved in the
+                # prediction table with the regular key, as the other tags.
+                non_bma_table_key = dataclasses.replace(table_key, use_bma=False)
+                dm.add_tags(high_epistemic, table_key=non_bma_table_key)
+            else:
+                # These tags only need to be computed for the prediction table with the regular key
+                # (use_bma=False)
+                pred_tags = self.get_pred_tags(
+                    label=dm.get_dataset_split(table_key=table_key)[self.config.columns.label],
+                    model_predictions=dm.get_dataset_split(table_key=table_key)[
+                        DatasetColumn.model_predictions
+                    ],
+                    postprocessed_prediction=dm.get_dataset_split(table_key=table_key)[
+                        DatasetColumn.postprocessed_prediction
+                    ],
+                )
+                dm.add_tags(
+                    {idx: pred_tag_row for idx, pred_tag_row in enumerate(pred_tags)},
+                    table_key=table_key,
+                )
 
     @staticmethod
     def get_pred_tags(
