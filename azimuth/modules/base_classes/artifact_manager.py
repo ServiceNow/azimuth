@@ -123,7 +123,7 @@ class ArtifactManager:
         return self.tokenizer
 
     def get_metric(self, config, name: str, **kwargs):
-        hash: Hash = md5_hash({**{"name": name}, **kwargs})
+        hash: Hash = md5_hash({"name": name, **kwargs})
         if hash not in self.metrics:
             self.metrics[hash] = load_custom_object(config.metrics[name], **kwargs)
         return self.metrics[hash]

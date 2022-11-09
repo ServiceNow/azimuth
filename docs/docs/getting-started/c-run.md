@@ -53,7 +53,7 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 
 ```yaml
 {
-  "name": "CLINC-151", # (1)
+  "name": "CLINC150", # (1)
   "dataset": {
     "class_name": "datasets.load_dataset", # (2)
     "args": [ # (3)

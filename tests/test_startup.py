@@ -126,7 +126,7 @@ def my_dataset_fn(valid):
 
 def test_validation_priority(simple_text_config):
     simple_text_config.dataset = CustomObject(
-        **{"class_name": "tests.test_modules.test_module.my_dataset_fn", "kwargs": {"valid": True}}
+        class_name="tests.test_modules.test_module.my_dataset_fn", kwargs={"valid": True}
     )
     simple_table_key = get_table_key(simple_text_config)
     ds = load_dataset_split_managers_from_config(simple_text_config)[
@@ -136,7 +136,7 @@ def test_validation_priority(simple_text_config):
 
     # Otherwise, we take validation
     simple_text_config.dataset = CustomObject(
-        **{"class_name": "tests.test_modules.test_module.my_dataset_fn", "kwargs": {"valid": False}}
+        class_name="tests.test_modules.test_module.my_dataset_fn", kwargs={"valid": False}
     )
     ds = load_dataset_split_managers_from_config(simple_text_config)[
         DatasetSplitName.eval
