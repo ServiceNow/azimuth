@@ -91,11 +91,9 @@ def test_post_process(simple_text_config):
     # model.
     assert np.all([pred.model_output.preds == pred.postprocessed_output.preds for pred in res_low])
     # The prediction of the last pipeline step should be the same as the postprocessed prediction.
-    assert np.all(
-        [
-            pred.postprocessed_output.preds == pred.postprocessing_steps[-1].output.preds
-            for pred in res_low
-        ]
+    assert all(
+        pred.postprocessed_output.preds == pred.postprocessing_steps[-1].output.preds
+        for pred in res_low
     )
 
     res_high = cast(List[PredictionResponse], mod_high.compute_on_dataset_split())

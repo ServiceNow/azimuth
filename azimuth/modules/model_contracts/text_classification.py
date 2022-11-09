@@ -37,15 +37,11 @@ class PipelineOutputProtocol(Protocol):
 
 
 @runtime_checkable
-class PipelineOutputProtocolV2(Protocol):
+class PipelineOutputProtocolV2(PipelineOutputProtocol, Protocol):
     """Class containing result of a batch with pre and postprocessing steps"""
 
-    # model output without passing through post-processing stage: texts, logits, probs, preds
-    model_output: PostProcessingIO
-    # output after passing through post-processing: pre-processed texts, logits, probs, preds
-    postprocessor_output: PostProcessingIO
-    preprocessing_steps: List[Dict[str, Union[str, List[str], int]]]
-    postprocessing_steps: List[Dict[str, Union[str, PostProcessingIO, int]]]
+    preprocessing_steps: List[Dict[str, Union[str, List[str]]]]
+    postprocessing_steps: List[Dict[str, Union[str, PostProcessingIO]]]
 
 
 SupportedOutput = Union[
@@ -244,31 +240,17 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         Returns:
             Raw and postprocessed output.
         """
-        if isinstance(pipeline_output, PipelineOutputProtocolV2):
+        if isinstance(pipeline_output, PipelineOutputProtocol):
             # User is following our contract, we can work with it.
-            # Constructing new objects so indexing works.
-            return (
-                PostProcessingIO(
-                    texts=input_batch[self.config.columns.text_input],
-                    probs=pipeline_output.model_output.probs,
-                    preds=pipeline_output.model_output.preds,
-                    logits=pipeline_output.model_output.logits,
-                ),
-                PostProcessingIO(
-                    texts=input_batch[self.config.columns.text_input],
-                    probs=pipeline_output.postprocessor_output.probs,
-                    preds=pipeline_output.postprocessor_output.preds,
-                    logits=pipeline_output.postprocessor_output.logits,
-                ),
-                [
-                    PreprocessingStep(
-                        order=step["order"], class_name=step["class_name"], text=step["text"]
-                    )
+            # Constructing PostProcessingIO object so indexing works.
+
+            if isinstance(pipeline_output, PipelineOutputProtocolV2):
+                preprocessing_steps = [
+                    PreprocessingStep(class_name=step["class_name"], text=step["text"])
                     for step in pipeline_output.preprocessing_steps
-                ],
-                [
+                ]
+                postprocessing_steps = [
                     PostprocessingStep(
-                        order=step["order"],
                         class_name=step["class_name"],
                         output=PostProcessingIO(
                             texts=input_batch[self.config.columns.text_input],
@@ -278,11 +260,10 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
                         ),
                     )
                     for step in pipeline_output.postprocessing_steps
-                ],
-            )
-        if isinstance(pipeline_output, PipelineOutputProtocol):
-            # User is following our contract, we can work with it.
-            # Constructing PostProcessingIO object so indexing works.
+                ]
+            else:
+                preprocessing_steps, postprocessing_steps = [], []
+
             return (
                 PostProcessingIO(
                     texts=input_batch[self.config.columns.text_input],
@@ -296,8 +277,8 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
                     preds=pipeline_output.postprocessor_output.preds,
                     logits=pipeline_output.postprocessor_output.logits,
                 ),
-                [],
-                [],
+                preprocessing_steps,
+                postprocessing_steps,
             )
 
         rejection_class_idx = self.get_dataset_split_manager().rejection_class_idx

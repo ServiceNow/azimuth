@@ -20,8 +20,8 @@ in [:material-link: Define a Model](model.md), the model prediction signature ne
 specific output, `PipelineOutputProtocol` or `PipelineOutputProtocolV2`.
 
 Both classes need to contain the model and post-processed predictions.
-The difference between both classes is the presence of two extra fields in V2, that allows to
-return the intermediate results of the preprocessing and postprocessing steps, so that they can be
+The difference between the two classes is the presence of two extra attributes in V2 to
+return the intermediate results of the preprocessing and postprocessing steps. Those will be
 displayed in the UI.
 
 === "PipelineOutputProtocol"
@@ -49,18 +49,14 @@ displayed in the UI.
     from azimuth.utils.ml.postprocessing import PostProcessingIO
 
 
-    class PipelineOutputProtocolV2(Protocol):
+    class PipelineOutputProtocolV2(PipelineOutputProtocol, Protocol):
     """Class containing result of a batch with pre and postprocessing steps"""
-        model_output: PostProcessingIO # (1)
-        postprocessor_output: PostProcessingIO # (2)
-        preprocessing_steps: List[Dict[str, Union[str, List[str], int]]] # (3)
-        postprocessing_steps: List[Dict[str, Union[str, PostProcessingIO, int]]] # (4)
+        preprocessing_steps: List[Dict[str, Union[str, List[str]]]] # (1)
+        postprocessing_steps: List[Dict[str, Union[str, PostProcessingIO]]] # (2)
     ```
 
-    1. model output before passing through post-processing: texts, logits, probs, preds
-    2. output after passing through post-processing: pre-processed texts, logits, probs, preds
-    3. list of preprocessing steps with the intermediate results. See Preprocessing Steps below.
-    4. list of postprocessing steps with the intermediate results. See Postprocessing Steps below.
+    1. list of preprocessing steps with the intermediate results. See Preprocessing Steps below.
+    2. list of postprocessing steps with the intermediate results. See Postprocessing Steps below.
 
 `PostProcessingIO` is defined as the following.
 
@@ -117,23 +113,19 @@ users don't have to add Azimuth as a dependency.
 Azimuth.
 
 ### `PipelineOutputProtocolV2`
-If using V2, to new fields need to be provided: preprocessing steps and postprocessing steps.
+If using V2, two new fields need to be provided: preprocessing steps and postprocessing steps.
 
-The preprocessing steps need to be returned as a a `List` of `Dict` with the following fields and types.
+The preprocessing steps need to be returned as a `List` of `Dict` with the following keys and types.
 
 === "Dict Fields and Types"
 
     ```python
-    from typing import List
-
     class_name: str  # (1)
     text: List[str]  # (2)
-    order: int # (3)
     ```
 
     1. Name of the pre-processing step, usually the name of the Python class.
     2. Text of the utterance after the pre-processing step.
-    3. Order of the pre-processing step.
 
 === "Example"
 
@@ -142,12 +134,10 @@ The preprocessing steps need to be returned as a a `List` of `Dict` with the fol
         {
             'class_name': 'PunctuationRemoval',  # (1)
             'text': ['Test'],  # (2)
-            'order': 1 # (3)
         },
         {
             'class_name': 'LowerCase',
             'text': ['test'],
-            'order': 2
         }
     ]
     ```
@@ -161,12 +151,10 @@ The postprocessing steps also need to be returned as a `List` of `Dict` with the
 
     class_name: str  # (1)
     output: PostProcessingIO  # (2)
-    order: int # (3)
     ```
 
     1. Name of the post-processing step, usually the name of the Python class.
     2. Prediction results after this step.
-    3. Order of the post-processing step.
 
 === "Example"
 
@@ -179,7 +167,6 @@ The postprocessing steps also need to be returned as a `List` of `Dict` with the
                 logits=array([[-0.20875366 -0.25494186]], dtype=float32),
                 probs=array([[0.511545 0.488455]], dtype=float32),
                 preds=array([0])),
-            'order': 0
         },
         {
             'class_name': 'Thresholding',
@@ -189,7 +176,6 @@ The postprocessing steps also need to be returned as a `List` of `Dict` with the
                 logits=array([[-0.20875366 -0.25494186]], dtype=float32),
                 probs=array([[0.511545 0.488455]], dtype=float32),
                 preds=array([2])),
-            'order': 1
         }
     ]
     ```

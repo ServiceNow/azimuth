@@ -26,10 +26,10 @@ from azimuth.utils.ml.model_performance import compute_outcome
 from azimuth.utils.ml.postprocessing import (
     PostProcessingIO,
     PostprocessingStep,
-    PostprocessingStepItem,
+    PostprocessingStepAPIResponse,
     PredictionDetails,
 )
-from azimuth.utils.ml.preprocessing import PreprocessingStepItem
+from azimuth.utils.ml.preprocessing import PreprocessingStepAPIResponse
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.validation import assert_not_none
 
@@ -167,7 +167,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
         postprocessors = self.config.pipelines[self.mod_options.pipeline_index].postprocessors
         postprocessing_steps = []
         if postprocessors is not None:
-            for order, post in enumerate(postprocessors):
+            for post in postprocessors:
                 # Q: Why do we reload the postprocessors all the time?
                 # A: We should memoize it based on the module options, but that can get complicated.
                 #    It is less burdensome to just reload it.
@@ -182,7 +182,6 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
 
                 postprocessing_steps.append(
                     PostprocessingStep(
-                        order=order,
                         class_name=class_name,
                         output=output,
                     )
@@ -229,14 +228,13 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 features=[
                     {
                         "preprocessing_steps": [
-                            PreprocessingStepItem(
-                                order=step.order, class_name=step.class_name, text=step.text[0]
+                            PreprocessingStepAPIResponse(
+                                class_name=step.class_name, text=step.text[0]
                             ).dict()
                             for step in pred_res.preprocessing_steps
                         ],
                         "postprocessing_steps": [
-                            PostprocessingStepItem(
-                                order=step.order,
+                            PostprocessingStepAPIResponse(
                                 class_name=step.class_name,
                                 output=PredictionDetails(
                                     predictions=[

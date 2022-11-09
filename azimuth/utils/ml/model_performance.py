@@ -40,12 +40,8 @@ def compute_outcome(prediction: int, label: int, rejection_class_idx) -> Outcome
     Returns:
         Outcome value
     """
+    rejected = prediction == rejection_class_idx
     if prediction == label:
-        if label == rejection_class_idx:
-            return OutcomeName.CorrectAndRejected
-        else:
-            return OutcomeName.CorrectAndPredicted
-    elif prediction == rejection_class_idx:
-        return OutcomeName.IncorrectAndRejected
+        return OutcomeName.CorrectAndRejected if rejected else OutcomeName.CorrectAndPredicted
     else:
-        return OutcomeName.IncorrectAndPredicted
+        return OutcomeName.IncorrectAndRejected if rejected else OutcomeName.IncorrectAndPredicted

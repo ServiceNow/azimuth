@@ -29,21 +29,25 @@ class PostProcessingIO(AliasModel):
 
 
 class PredictionDetails(AliasModel):
-    # Prediction class names, sorted by confidences
+    """Details of the predictions.
+
+    Args:
+        predictions: Prediction class names, sorted by confidences
+        prediction: Predicted class, which can be different than the first element of predictions,
+            when thresholding for instance.
+        confidences: Sorted confidences
+        outcome: Outcome based on label and prediction
+    """
+
     predictions: List[str]
-    # Predicted class, which can be different than the first element of predictions, when
-    # thresholding for instance.
     prediction: str
-    # Sorted confidences
     confidences: List[float]
-    # Outcome based on label and prediction
     outcome: OutcomeName
 
 
-class PostprocessingStepItem(AliasModel):
+class PostprocessingStepAPIResponse(AliasModel):
     """Class for saving the results in the dataset and the routes."""
 
-    order: int
     output: PredictionDetails
     class_name: str
 
@@ -51,15 +55,12 @@ class PostprocessingStepItem(AliasModel):
 class PostprocessingStep(AliasModel):
     """Class received from the pipeline, and used in the Prediction Module."""
 
-    order: int
     output: PostProcessingIO
     class_name: str
 
     def __getitem__(self, item: int) -> "PostprocessingStep":
         """Useful to get from a batch result to a single utterance result."""
-        return PostprocessingStep(
-            order=self.order, output=self.output[item], class_name=self.class_name
-        )
+        return PostprocessingStep(output=self.output[item], class_name=self.class_name)
 
 
 class Postprocessing(abc.ABC):

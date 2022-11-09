@@ -66,7 +66,6 @@ def test_pipeline_steps(simple_text_config):
             ds[DatasetColumn.pipeline_steps][0]["postprocessing_steps"][order]["className"]
             == class_name
         )
-        assert ds[DatasetColumn.pipeline_steps][0]["postprocessing_steps"][order]["order"] == order
     # The prediction of the last pipeline step should be the same as the postprocessed prediction.
     class_names = dm.get_class_names()
     assert [
