@@ -102,13 +102,9 @@ launched without any pipeline.
     class PipelineDefinition(BaseSettings):
         name: str # (1)
         model: CustomObject # (2)
-        postprocessors: Optional[List[ # (3)
-            Union[TemperatureScaling, ThresholdConfig, CustomObject]]] = Field(
-            [
-                TemperatureScaling(temperature=1.0),
-                ThresholdConfig(threshold=0.5),
-            ]
-        )
+        postprocessors: Optional[ # (3)
+            List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
+        ] = Field([ThresholdConfig(threshold=0.5)], nullable=True)
     ```
 
     1. Add a name to the pipeline to easily recognize it from the webapp.

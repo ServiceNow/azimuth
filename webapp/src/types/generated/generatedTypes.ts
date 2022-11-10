@@ -542,9 +542,11 @@ export interface components {
     PipelineDefinition: {
       name: string;
       model: components["schemas"]["CustomObject"];
-      postprocessors?: (Partial<components["schemas"]["TemperatureScaling"]> &
-        Partial<components["schemas"]["ThresholdConfig"]> &
-        Partial<components["schemas"]["CustomObject"]>)[];
+      postprocessors?:
+        | (Partial<components["schemas"]["TemperatureScaling"]> &
+            Partial<components["schemas"]["ThresholdConfig"]> &
+            Partial<components["schemas"]["CustomObject"]>)[]
+        | null;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure

@@ -87,14 +87,9 @@ class ThresholdConfig(BaseSettings, CustomObject):
 class PipelineDefinition(BaseSettings):
     name: str
     model: CustomObject
-    # Postprocessors
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
-    ] = Field(
-        [
-            ThresholdConfig(threshold=0.5),
-        ]
-    )
+    ] = Field([ThresholdConfig(threshold=0.5)], nullable=True)
 
     @property
     def threshold(self) -> Optional[float]:
