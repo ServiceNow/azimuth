@@ -19,7 +19,7 @@ class PostProcessingIO(AliasModel):
         return np.allclose(self.probs.sum(-1), 1.0)
 
     def __getitem__(self, item: int) -> "PostProcessingIO":
-        """Useful to get from a batch result to a single utterance result."""
+        """Get a single utterance result from a batch result."""
         return PostProcessingIO(
             texts=[self.texts[item]],
             logits=self.logits[item][np.newaxis, ...],

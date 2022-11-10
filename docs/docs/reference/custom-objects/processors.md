@@ -232,20 +232,20 @@ Let's define a postprocessor that will do Temperature scaling:
 
 === "Configuration file"
 
-    ``` json
+    ```json
 
     "pipelines": [
-          {
+        {
             "model": ...,
             "postprocessors": [
-                  {
+                {
                     "class_name": "loading_resources.TemperatureScaling",
                     "remote": "/azimuth_shr",
                     "kwargs": {"temperature": 3}
-                  }
-                 ]
-         }
-      ]
+                }
+            ]
+        }
+    ]
     ```
 
 --8<-- "includes/abbreviations.md"
