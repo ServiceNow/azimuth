@@ -1,10 +1,19 @@
-import { Box, Paper, Tab, Tabs, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Stack,
+  Tab,
+  Tabs,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
 import Description from "components/Description";
 import Loading from "components/Loading";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
+import Steps from "components/Steps";
 import TabPipelineRequired from "components/TabPipelineRequired";
 import PerturbedUtterances from "components/Utterance/PerturbedUtterances";
 import SimilarUtterances from "components/Utterance/SimilarUtterances";
@@ -25,7 +34,7 @@ import {
   OUTCOME_COLOR,
   SMART_TAG_FAMILIES,
 } from "utils/const";
-import { formatRatioAsPercentageString } from "utils/format";
+import { camelToTitleCase, formatRatioAsPercentageString } from "utils/format";
 import { isPipelineSelected } from "utils/helpers";
 
 const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
@@ -88,6 +97,14 @@ export const UtteranceDetail = () => {
     { skip: view !== "similarity" }
   );
 
+  // Raw states will be capped to the number of steps later. This is necessary
+  // when selecting a different pipeline with a different number of steps.
+  const [preprocessingStepRaw, setPreprocessingStep] = React.useState(0);
+
+  // Index from the right, so we can initialize to the last step
+  // without the need for postprocessingSteps.length before it is loaded.
+  const [postprocessingStepRaw, setPostprocessingStep] = React.useState(0);
+
   if (!utterance) {
     // utterance will be defined while utteranceIsFetching after changing the
     // dataAction tag, in which case we want to render the utterance.
@@ -109,6 +126,36 @@ export const UtteranceDetail = () => {
 
   const { modelPrediction } = utterance;
 
+  const preprocessingSteps = [
+    { className: "Initial", text: utterance.utterance },
+    ...(modelPrediction?.preprocessingSteps ?? []),
+  ];
+
+  const postprocessingSteps = modelPrediction && [
+    {
+      className: "ModelOutput",
+      output: {
+        predictions: modelPrediction.modelPredictions,
+        prediction: modelPrediction.modelPredictions[0],
+        confidences: modelPrediction.modelConfidences,
+        outcome: modelPrediction.modelOutcome,
+      },
+    },
+    ...modelPrediction.postprocessingSteps,
+  ];
+
+  const preprocessingStep =
+    preprocessingStepRaw < preprocessingSteps.length
+      ? preprocessingStepRaw
+      : preprocessingSteps.length - 1;
+
+  const postprocessingStep =
+    postprocessingSteps && postprocessingStepRaw < postprocessingSteps.length
+      ? postprocessingSteps.length - 1 - postprocessingStepRaw
+      : 0;
+
+  const output = postprocessingSteps?.[postprocessingStep].output;
+
   return (
     <Box display="flex" flexDirection="column" gap={2} height="100%">
       <Description
@@ -121,15 +168,18 @@ export const UtteranceDetail = () => {
           alignItems: "center",
           display: "grid",
           gridAutoFlow: "column",
-          gridTemplateColumns: `auto 1fr`,
+          gridTemplateColumns: `auto minmax(0, 2fr) ${
+            isPipelineSelected(pipeline) ? "auto minmax(0, 1fr)" : ""
+          }`,
           gridTemplateRows: "repeat(2, auto)",
-          paddingX: 4,
-          paddingY: 2,
+          padding: 4,
+          rowGap: 2,
           "& > *": {
-            padding: 2,
+            paddingX: 2,
           },
           "& > .header": {
             borderBottom: (theme) => `thin ${theme.palette.divider} solid`,
+            height: "100%",
           },
         }}
       >
@@ -140,16 +190,29 @@ export const UtteranceDetail = () => {
         </Tooltip>
         <Typography variant="body2">{utteranceId}</Typography>
 
-        <Typography variant="subtitle2" className="header">
-          Utterance
-        </Typography>
+        <Box className="header">
+          <Typography variant="subtitle2">Utterance</Typography>
+          {preprocessingSteps.length > 1 && (
+            <Steps
+              setStep={setPreprocessingStep}
+              step={preprocessingStep}
+              stepNames={preprocessingSteps.map(({ className }) =>
+                camelToTitleCase(className)
+              )}
+              roundedStart
+            />
+          )}
+        </Box>
         <Box display="flex" alignItems="center">
           <UtteranceSaliency
             variant="subtitle1"
             tooltip
-            utterance={utterance}
+            utterance={preprocessingSteps[preprocessingStep].text}
+            modelSaliency={
+              preprocessingStep === 0 ? utterance.modelSaliency : null
+            }
           />
-          <CopyButton text={utterance.utterance} />
+          <CopyButton text={preprocessingSteps[preprocessingStep].text} />
         </Box>
 
         <Typography variant="subtitle2" className="header">
@@ -157,26 +220,37 @@ export const UtteranceDetail = () => {
         </Typography>
         <Typography variant="body2">{utterance.label}</Typography>
 
-        {modelPrediction && (
+        {output && (
           <>
-            <Typography variant="subtitle2" className="header">
-              Prediction
-            </Typography>
-            <Box
+            <Box className="header">
+              <Typography variant="subtitle2">Prediction</Typography>
+              {postprocessingSteps.length > 1 && (
+                <Steps
+                  setStep={(step) =>
+                    setPostprocessingStep(postprocessingSteps.length - 1 - step)
+                  }
+                  step={postprocessingStep}
+                  stepNames={postprocessingSteps.map(({ className }) =>
+                    camelToTitleCase(className)
+                  )}
+                  roundedEnd
+                />
+              )}
+            </Box>
+            <Stack
+              height={88}
+              justifyContent="center"
               sx={{
                 "& > p:first-of-type > span": {
                   color: (theme) =>
-                    theme.palette[
-                      OUTCOME_COLOR[modelPrediction.postprocessedOutcome]
-                    ].main,
+                    theme.palette[OUTCOME_COLOR[output.outcome]].main,
                   fontWeight: "bold",
                 },
               }}
             >
-              {modelPrediction.postprocessedPrediction !==
-                modelPrediction.modelPredictions[0] && (
+              {output.prediction !== output.predictions[0] && (
                 <Typography variant="body2">
-                  <span>{modelPrediction.postprocessedPrediction}</span>
+                  <span>{output.prediction}</span>
                   {isPipelineSelected(pipeline) &&
                     utterancesResponse?.confidenceThreshold !== null &&
                     ` (< ${formatRatioAsPercentageString(
@@ -184,17 +258,13 @@ export const UtteranceDetail = () => {
                     )})`}
                 </Typography>
               )}
-              {modelPrediction.modelPredictions
-                .slice(0, 3)
-                .map((prediction, i) => (
-                  <Typography key={prediction} variant="body2">
-                    <span>{prediction}</span> at{" "}
-                    {formatRatioAsPercentageString(
-                      modelPrediction.postprocessedConfidences[i]
-                    )}
-                  </Typography>
-                ))}
-            </Box>
+              {output.predictions.slice(0, 3).map((prediction, i) => (
+                <Typography key={prediction} variant="body2">
+                  <span>{prediction}</span> at{" "}
+                  {formatRatioAsPercentageString(output.confidences[i])}
+                </Typography>
+              ))}
+            </Stack>
           </>
         )}
 

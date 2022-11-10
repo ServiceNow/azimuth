@@ -188,7 +188,7 @@ const UtterancesTable: React.FC<Props> = ({
 
   const renderUtterance = ({ row }: GridCellParams<string, Row>) => (
     <HoverableDataCell>
-      <UtteranceSaliency utterance={row} />
+      <UtteranceSaliency {...row} />
     </HoverableDataCell>
   );
 
