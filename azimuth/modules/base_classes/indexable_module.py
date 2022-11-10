@@ -174,11 +174,10 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 fn = load_custom_object(post, **kwargs)
                 output = fn(output)
                 # When updating to python 3.9, use .removeprefix()
-                class_name = (
-                    post.class_name[32:]
-                    if post.class_name.startswith("azimuth.utils.ml.postprocessing.")
-                    else post.class_name
-                )
+                prefix = f"{PostprocessingStep.__module__}."
+                class_name = post.class_name
+                if class_name.startswith(prefix):
+                    class_name = class_name[len(prefix) :]
 
                 postprocessing_steps.append(
                     PostprocessingStep(
@@ -197,7 +196,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.model_predictions,
                 features=[
-                    [cl_idx for cl_idx in reversed(np.argsort(pred_res.model_output.probs[0]))]
+                    list(np.argsort(pred_res.model_output.probs[0])[::-1])
                     for pred_res in res_casted
                 ],
                 table_key=table_key,
@@ -205,8 +204,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.model_confidences,
                 features=[
-                    [prob for prob in reversed(np.sort(pred_res.model_output.probs[0]))]
-                    for pred_res in res_casted
+                    list(np.sort(pred_res.model_output.probs[0])[::-1]) for pred_res in res_casted
                 ],
                 table_key=table_key,
             )
@@ -218,7 +216,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.postprocessed_confidences,
                 features=[
-                    [prob for prob in reversed(np.sort(pred_res.postprocessed_output.probs[0]))]
+                    list(np.sort(pred_res.postprocessed_output.probs[0])[::-1])
                     for pred_res in res_casted
                 ],
                 table_key=table_key,
@@ -239,12 +237,10 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                                 output=PredictionDetails(
                                     predictions=[
                                         class_names[cl_idx]
-                                        for cl_idx in reversed(np.argsort(step.output.probs[0]))
+                                        for cl_idx in np.argsort(step.output.probs[0])[::-1]
                                     ],
                                     prediction=class_names[step.output.preds[0]],
-                                    confidences=[
-                                        prob for prob in reversed(np.sort(step.output.probs[0]))
-                                    ],
+                                    confidences=list(np.sort(step.output.probs[0])[::-1]),
                                     outcome=compute_outcome(
                                         step.output.preds[0], pred_res.label, dm.rejection_class_idx
                                     ),
