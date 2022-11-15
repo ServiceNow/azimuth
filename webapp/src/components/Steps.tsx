@@ -19,7 +19,7 @@ const Steps: React.FC<{
   // The stepName Typography has an absolute position to avoid making the button
   // group wider (and triggering hover styling) while still taking all the
   // available space relative to this outer Box
-  <Box display="flex" position="relative">
+  <Box display="flex" overflow="auto" position="relative">
     <Box display="flex" alignItems="center">
       {stepNames.map((stepName, i) => (
         <ToggleButton
@@ -71,6 +71,7 @@ const Steps: React.FC<{
         left={stepNames.length * WIDTH}
         right={0}
         marginLeft={1}
+        minWidth={90}
         sx={{
           pointerEvents: "none",
           "&::after": {
