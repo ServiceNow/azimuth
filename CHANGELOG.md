@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Pipeline pre/post-processing steps breakdown in the utterance detail page.
 
 ### Changed
 
