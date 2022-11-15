@@ -166,7 +166,7 @@ def my_dataset_fn(valid):
 
 def test_validation_priority(simple_text_config):
     simple_text_config.dataset = CustomObject(
-        **{"class_name": "tests.test_modules.test_module.my_dataset_fn", "kwargs": {"valid": True}}
+        class_name="tests.test_modules.test_module.my_dataset_fn", kwargs={"valid": True}
     )
     mod = IndexableModule(
         DatasetSplitName.eval, config=simple_text_config, mod_options=ModuleOptions(indices=[0, 1])
@@ -176,7 +176,7 @@ def test_validation_priority(simple_text_config):
 
     # Otherwise, we take validation
     simple_text_config.dataset = CustomObject(
-        **{"class_name": "tests.test_modules.test_module.my_dataset_fn", "kwargs": {"valid": False}}
+        class_name="tests.test_modules.test_module.my_dataset_fn", kwargs={"valid": False}
     )
     mod.clear_cache()
     mod = Module(DatasetSplitName.eval, config=simple_text_config)

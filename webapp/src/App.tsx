@@ -32,6 +32,7 @@ import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
 import Settings from "pages/Settings";
 import NotFound from "pages/NotFound";
+import ClassAnalysis from "pages/ClassAnalysis";
 import SmartTags from "pages/SmartTags";
 
 declare module "@mui/styles/defaultTheme" {
@@ -86,6 +87,11 @@ export default class App extends React.Component<Props> {
                             <Route path="/:jobId/settings" exact>
                               <BasicLayout>
                                 <Settings />
+                              </BasicLayout>
+                            </Route>
+                            <Route path="/:jobId/class_analysis" exact>
+                              <BasicLayout maxWidth="md">
+                                <ClassAnalysis />
                               </BasicLayout>
                             </Route>
                             <Route path="/:jobId/smart_tags" exact>

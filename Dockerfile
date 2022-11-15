@@ -38,7 +38,7 @@ RUN poetry config virtualenvs.create false && \
 # Install the project.
 COPY . /app/
 RUN poetry install --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
-# If on GPU, we replace onnxruntime by onnxruntime-gpu.
+# If on GPU, replace onnxruntime by onnxruntime-gpu.
 ARG DEVICE=cpu
 RUN if [ "$DEVICE" = "gpu" ] ; then pip uninstall -y onnxruntime && pip install onnxruntime-gpu  ; fi
 ENV CFG_PATH="/config/nlp_sa/conf.json"

@@ -26,6 +26,14 @@ export interface paths {
     /** Update the config using a changeset. */
     patch: operations["update_config_admin_config_patch"];
   };
+  "/class_analysis/plot": {
+    /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
+    get: operations["get_class_overlap_plot_class_analysis_plot_get"];
+  };
+  "/class_analysis": {
+    /** Get data for class overlap, confusion, and related utterance counts. */
+    get: operations["get_class_analysis_class_analysis_get"];
+  };
   "/tags": {
     /** Post new data_action tags */
     post: operations["post_data_actions_tags_post"];
@@ -137,6 +145,34 @@ export interface components {
       fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
       typo?: components["schemas"]["TypoTestOptions"];
       seed?: number;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    ClassAnalysisClassPair: {
+      sourceClass: string;
+      targetClass: string;
+      overlapScoreTrain: number;
+      pipelineConfusionEval: number | null;
+      utteranceCountSourceTrain: number;
+      utteranceCountSourceEval: number;
+      utteranceCountWithOverlapTrain: number;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    ClassAnalysisResponse: {
+      classPairs: components["schemas"]["ClassAnalysisClassPair"][];
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    ClassOverlapPlotResponse: {
+      plot: components["schemas"]["PlotSpecification"];
+      defaultOverlapThreshold: number;
     };
     ColumnConfiguration: {
       text_input?: string;
@@ -876,6 +912,55 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": { [key: string]: any };
+      };
+    };
+  };
+  /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
+  get_class_overlap_plot_class_analysis_plot_get: {
+    parameters: {
+      query: {
+        /** Whether to include overlap of a class with itself. */
+        self_overlap?: boolean;
+        /** Whether to scale overlap values by class sample counts. */
+        scale_by_class?: boolean;
+        /** Plot overlap greater than this value (`None` sets threshold to show ~10 class pairs). */
+        overlap_threshold?: number;
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ClassOverlapPlotResponse"];
+        };
+      };
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get data for class overlap, confusion, and related utterance counts. */
+  get_class_analysis_class_analysis_get: {
+    parameters: {
+      query: {
+        pipeline_index?: number;
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ClassAnalysisResponse"];
+        };
+      };
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
       };
     };
   };

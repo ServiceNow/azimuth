@@ -214,7 +214,8 @@ class TaskManager:
         """Utils method to get the status of everything."""
         cluster = (self.cluster.workers,)
         return {
-            **{"cluster": cluster, "config": self.config.dict()},
+            "cluster": cluster,
+            "config": self.config.dict(),
             **self.get_all_tasks_status(task=None),
         }
 

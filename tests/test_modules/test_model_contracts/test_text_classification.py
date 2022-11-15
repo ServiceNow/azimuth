@@ -192,18 +192,16 @@ def test_temperature_scaling(simple_text_config):
         cfg = AzimuthConfig(
             **{
                 **simple_text_config.dict(by_alias=True),
-                **{
-                    "pipelines": [
-                        PipelineDefinition(
-                            name="MyModel",
-                            model=simple_text_config.pipelines[0].model,
-                            postprocessors=[
-                                {"temperature": temp},
-                                {"threshold": simple_text_config.pipelines[-1].threshold},
-                            ],
-                        )
-                    ]
-                },
+                "pipelines": [
+                    PipelineDefinition(
+                        name="MyModel",
+                        model=simple_text_config.pipelines[0].model,
+                        postprocessors=[
+                            {"temperature": temp},
+                            {"threshold": simple_text_config.pipelines[-1].threshold},
+                        ],
+                    )
+                ],
             }
         )
         predictions.append(

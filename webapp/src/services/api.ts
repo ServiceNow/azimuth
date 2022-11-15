@@ -62,6 +62,8 @@ const tagTypes = [
   "SimilarUtterances",
   "Status",
   "ConfusionMatrix",
+  "ClassAnalysisPlot",
+  "ClassAnalysis",
 ] as const;
 
 type Tag = typeof tagTypes[number];
@@ -195,6 +197,26 @@ export const api = createApi({
           method: "get",
         }),
         "Something went wrong fetching similar utterances"
+      ),
+    }),
+    getClassAnalysis: build.query({
+      providesTags: () => [{ type: "ClassAnalysis" }],
+      queryFn: responseToData(
+        fetchApi({
+          path: "/class_analysis",
+          method: "get",
+        }),
+        "Something went wrong fetching class analysis"
+      ),
+    }),
+    getClassAnalysisPlot: build.query({
+      providesTags: () => [{ type: "ClassAnalysisPlot" }],
+      queryFn: responseToData(
+        fetchApi({
+          path: "/class_analysis/plot",
+          method: "get",
+        }),
+        "Something went wrong fetching spectral clustering class overlap data"
       ),
     }),
     updateDataActions: build.mutation<
@@ -355,6 +377,8 @@ export const {
   getMetrics: getMetricsEndpoint,
   getMetricsPerFilter: getMetricsPerFilterEndpoint,
   getCustomMetricInfo: getCustomMetricInfoEndpoint,
+  getClassAnalysisPlot: getClassAnalysisPlotEndpoint,
+  getClassAnalysis: getClassAnalysisEndpoint,
   getOutcomeCountPerThreshold: getOutcomeCountPerThresholdEndpoint,
   getOutcomeCountPerFilter: getOutcomeCountPerFilterEndpoint,
   getUtteranceCountPerFilter: getUtteranceCountPerFilterEndpoint,

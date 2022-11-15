@@ -11,9 +11,11 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- New class analysis section, with class overlap detection. More details are available in the User Guide and in the Key Concepts.
 - Pipeline pre/post-processing steps breakdown in the utterance detail page.
 
 ### Changed
+- The default port for the front end will now be 3000, the React default, instead of 3005.
 
 ### Deprecated/Breaking Changes
 
