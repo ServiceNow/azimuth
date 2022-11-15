@@ -1,4 +1,5 @@
 <p align="center">
+Hello
   <br>
   <img width=50% src="docs/docs/_static/azimuth_logo_universal_color.png">
   <br>
