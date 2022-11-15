@@ -39,14 +39,47 @@ def test_save_result(simple_text_config):
     # Testing that there is more no intent in the column "postprocessed_prediction"
     # than in "model_predictions[0]".
     rejection_class_idx = dm.rejection_class_idx
+    ds = dm.get_dataset_split(mod._get_table_key())
     assert len(
-        dm.get_dataset_split(mod._get_table_key()).filter(
-            lambda x: x[DatasetColumn.postprocessed_prediction] == rejection_class_idx
+        ds.filter(lambda x: x[DatasetColumn.postprocessed_prediction] == rejection_class_idx)
+    ) > len(ds.filter(lambda x: x[DatasetColumn.model_predictions][0] == rejection_class_idx))
+
+
+def test_pipeline_steps(simple_text_config):
+    mod = HFTextClassificationModule(
+        dataset_split_name=DatasetSplitName.eval,
+        config=simple_text_config,
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
+        ),
+    )
+    dm = mod.get_dataset_split_manager(DatasetSplitName.eval)
+    mod.save_result(mod.compute_on_dataset_split(), dm)
+    ds = dm.get_dataset_split(mod._get_table_key())
+
+    # Two postprocessing_steps are set by default, Temperature Scaling and Thresholding
+    assert np.all(
+        [len(res["postprocessing_steps"]) == 2 for res in ds[DatasetColumn.pipeline_steps]]
+    )
+    for order, class_name in enumerate(("TemperatureScaling", "Thresholding")):
+        assert (
+            ds[DatasetColumn.pipeline_steps][0]["postprocessing_steps"][order]["className"]
+            == class_name
         )
-    ) > len(
-        dm.get_dataset_split(mod._get_table_key()).filter(
-            lambda x: x[DatasetColumn.model_predictions][0] == rejection_class_idx
-        )
+    # The prediction of the last pipeline step should be the same as the postprocessed prediction.
+    class_names = dm.get_class_names()
+    assert [
+        res["postprocessing_steps"][-1]["output"]["prediction"]
+        for res in ds[DatasetColumn.pipeline_steps]
+    ] == [class_names[idx] for idx in ds[DatasetColumn.postprocessed_prediction]]
+    # Same for confidences
+    assert [
+        res["postprocessing_steps"][-1]["output"]["confidences"]
+        for res in ds[DatasetColumn.pipeline_steps]
+    ] == ds[DatasetColumn.postprocessed_confidences]
+    # Pre-processing Steps should be empty for HF pipelines
+    assert np.all(
+        [len(res["preprocessing_steps"]) == 0 for res in ds[DatasetColumn.pipeline_steps]]
     )
 
 
@@ -78,6 +111,8 @@ def test_high_epistemic_tag(simple_text_config):
             model_output=mocked_output,
             postprocessed_output=mocked_output,
             label=1,
+            preprocessing_steps=[],
+            postprocessing_steps=[],
         )
         for epis in epistemic
     ]
@@ -152,9 +187,9 @@ def test_pred_smart_tags(clinc_text_config):
         }
     )
 
-    model_output, postprocessed_output = mod.get_postprocessed_output(batch, model_output)
+    model_output, postprocessed_output, _, _ = mod.get_postprocessed_output(batch, model_output)
     res = mod._parse_prediction_output(
-        batch, model_output, postprocessed_output, np.random.random(len(ds))
+        batch, model_output, postprocessed_output, [], [], np.random.random(len(ds))
     )
 
     mod.save_result(res, dm)

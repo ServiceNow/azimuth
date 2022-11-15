@@ -90,6 +90,11 @@ def test_post_process(simple_text_config):
     # With a low threshold, the post-processing is not affecting the predicted class with a random
     # model.
     assert np.all([pred.model_output.preds == pred.postprocessed_output.preds for pred in res_low])
+    # The prediction of the last pipeline step should be the same as the postprocessed prediction.
+    assert all(
+        pred.postprocessed_output.preds == pred.postprocessing_steps[-1].output.preds
+        for pred in res_low
+    )
 
     res_high = cast(List[PredictionResponse], mod_high.compute_on_dataset_split())
     # With a high threshold, the post-processing is affecting all predicted classes with a random
@@ -98,6 +103,13 @@ def test_post_process(simple_text_config):
     # Assessing prediction is rejection_class
     rejection_class_idx = mod_high.get_dataset_split_manager().rejection_class_idx
     assert np.all([pred.postprocessed_output.preds == rejection_class_idx for pred in res_high])
+    # The prediction of the last pipeline step should be the same as the postprocessed prediction.
+    assert np.all(
+        [
+            pred.postprocessed_output.preds == pred.postprocessing_steps[-1].output.preds
+            for pred in res_high
+        ]
+    )
 
     # Try with threshold set at 0.
     mod_none = HFTextClassificationModule(
@@ -115,6 +127,12 @@ def test_post_process(simple_text_config):
     rejection_class_idx = mod_none.get_dataset_split_manager().rejection_class_idx
     # No prediction should be the rejection class.
     assert np.all([pred.postprocessed_output.preds != rejection_class_idx for pred in res_none])
+    assert np.all(
+        [
+            pred.postprocessed_output.preds == pred.postprocessing_steps[-1].output.preds
+            for pred in res_none
+        ]
+    )
 
 
 def test_post_process_file_based(file_text_config_top1):
@@ -150,6 +168,8 @@ def test_post_process_file_based(file_text_config_top1):
             for pred_low, pred_high in zip(res_low, res_high)
         ]
     )
+    # No postprocessing steps for file-based.
+    assert np.all([len(pred.postprocessing_steps) == 0 for pred in res_low])
 
 
 def test_get_input(dask_client, simple_text_config):
@@ -203,6 +223,12 @@ def test_temperature_scaling(simple_text_config):
     )
     assert np.isclose(
         pred.postprocessed_output.probs.sum(), pred_tempered.postprocessed_output.probs.sum()
+    )
+    # The tempered probs at step 0 in the postprocessing_steps should be
+    # the same as the postprocessed probs.
+    assert pred_tempered.postprocessing_steps[0].class_name == "TemperatureScaling"
+    assert np.allclose(
+        pred_tempered.postprocessed_output.probs, pred_tempered.postprocessing_steps[0].output.probs
     )
 
     # Verify that temp=1 is the original pred.

@@ -107,7 +107,7 @@ nav:
           - reference/custom-objects/index.md
           - reference/custom-objects/dataset.md
           - reference/custom-objects/model.md
-          - reference/custom-objects/postprocessors.md
+          - reference/custom-objects/processors.md
           - reference/custom-objects/metric.md
   - Development:
       - development/index.md

@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import abc
-from typing import Any, List, Protocol, Tuple, Union, cast, runtime_checkable
+from typing import Any, Dict, List, Protocol, Tuple, Union, cast, runtime_checkable
 
 import numpy as np
 import tensorflow
@@ -17,7 +17,8 @@ from azimuth.modules.base_classes import ModelContractModule
 from azimuth.modules.task_execution import get_task_result
 from azimuth.types import DatasetColumn, InputResponse, ModuleOptions, SupportedMethod
 from azimuth.types.task import PredictionResponse, SaliencyResponse
-from azimuth.utils.ml.postprocessing import PostProcessingIO
+from azimuth.utils.ml.postprocessing import PostProcessingIO, PostprocessingStep
+from azimuth.utils.ml.preprocessing import PreprocessingStep
 from azimuth.utils.project import postprocessing_editable
 
 EPSILON = 1e-6
@@ -33,6 +34,14 @@ class PipelineOutputProtocol(Protocol):
     model_output: PostProcessingIO
     # output after passing through post-processing: pre-processed texts, logits, probs, preds
     postprocessor_output: PostProcessingIO
+
+
+@runtime_checkable
+class PipelineOutputProtocolV2(PipelineOutputProtocol, Protocol):
+    """Class containing result of a batch with pre and postprocessing steps"""
+
+    preprocessing_steps: List[Dict[str, Union[str, List[str]]]]
+    postprocessing_steps: List[Dict[str, Union[str, PostProcessingIO]]]
 
 
 SupportedOutput = Union[
@@ -121,9 +130,19 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             epistemic_all.append(pred.epistemic)
 
         # Call post_processing and reconstruct product output
-        model_output, postprocessed_output = self.get_postprocessed_output(batch, pipeline_out)
+        (
+            model_output,
+            postprocessed_output,
+            preprocessing_steps,
+            postprocessing_steps,
+        ) = self.get_postprocessed_output(batch, pipeline_out)
         return self._parse_prediction_output(
-            batch, model_output, postprocessed_output, epistemic_all
+            batch,
+            model_output,
+            postprocessed_output,
+            preprocessing_steps,
+            postprocessing_steps,
+            epistemic_all,
         )
 
     def extract_probs_from_output(self, model_out: Any) -> np.ndarray:
@@ -169,6 +188,8 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         input_batch: Dataset,
         model_output: PostProcessingIO,
         postprocessed_output: PostProcessingIO,
+        preprocessing_steps: List[PreprocessingStep],
+        postprocessing_steps: List[PostprocessingStep],
         epistemic: List[float],
     ) -> List[PredictionResponse]:
         """Take the pipeline output and return a PredictionResponse.
@@ -189,8 +210,15 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             json_output.append(
                 PredictionResponse(
                     label=label,
+                    # The __getitem__ method allows to get from batch results to utterance results
                     model_output=model_output[idx],
                     postprocessed_output=postprocessed_output[idx],
+                    preprocessing_steps=[
+                        preprocessing_step[idx] for preprocessing_step in preprocessing_steps
+                    ],
+                    postprocessing_steps=[
+                        postprocessing_step[idx] for postprocessing_step in postprocessing_steps
+                    ],
                     entropy=entropy(postprocessed_output[idx].probs[0]),
                     epistemic=epis,
                 )
@@ -200,7 +228,9 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
 
     def get_postprocessed_output(
         self, input_batch: Dataset, pipeline_output
-    ) -> Tuple[PostProcessingIO, PostProcessingIO]:
+    ) -> Tuple[
+        PostProcessingIO, PostProcessingIO, List[PreprocessingStep], List[PostprocessingStep]
+    ]:
         """Get postprocessed output from model output.
 
         Args:
@@ -213,6 +243,27 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         if isinstance(pipeline_output, PipelineOutputProtocol):
             # User is following our contract, we can work with it.
             # Constructing PostProcessingIO object so indexing works.
+
+            if isinstance(pipeline_output, PipelineOutputProtocolV2):
+                preprocessing_steps = [
+                    PreprocessingStep(class_name=step["class_name"], text=step["text"])
+                    for step in pipeline_output.preprocessing_steps
+                ]
+                postprocessing_steps = [
+                    PostprocessingStep(
+                        class_name=step["class_name"],
+                        output=PostProcessingIO(
+                            texts=input_batch[self.config.columns.text_input],
+                            probs=cast(PostProcessingIO, step["output"]).probs,
+                            preds=cast(PostProcessingIO, step["output"]).preds,
+                            logits=cast(PostProcessingIO, step["output"]).logits,
+                        ),
+                    )
+                    for step in pipeline_output.postprocessing_steps
+                ]
+            else:
+                preprocessing_steps, postprocessing_steps = [], []
+
             return (
                 PostProcessingIO(
                     texts=input_batch[self.config.columns.text_input],
@@ -226,6 +277,8 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
                     preds=pipeline_output.postprocessor_output.preds,
                     logits=pipeline_output.postprocessor_output.logits,
                 ),
+                preprocessing_steps,
+                postprocessing_steps,
             )
 
         rejection_class_idx = self.get_dataset_split_manager().rejection_class_idx
@@ -244,12 +297,14 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             probs=probs,
             preds=np.argmax(probs, axis=-1),
         )
-        postprocessed_output = self.run_postprocessing(
+        postprocessed_steps = self.run_postprocessing(
             model_out_formatted,
             threshold=rejection_class_threshold,
             rejection_class_idx=rejection_class_idx,
         )
-        return model_out_formatted, postprocessed_output
+        postprocessed_output = postprocessed_steps[-1].output
+        # Preprocessing steps are not supported at the moment for HF pipelines
+        return model_out_formatted, postprocessed_output, [], postprocessed_steps
 
     def empty_saliency_from_batch(self, batch) -> List[SaliencyResponse]:
         """Return dummy output to not break API consumers.

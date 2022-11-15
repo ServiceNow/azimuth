@@ -38,9 +38,9 @@ class FileBasedTextClassificationModule(TextClassificationNoSaliencyModule):
         model = self.get_model()
         model_out = model(batch, self.dataset_split_name)
         # Ignore postprocessing as we expect file-based to be postprocessed already.
-        raw, _ = self.get_postprocessed_output(batch, model_out)
+        raw, _, _, _ = self.get_postprocessed_output(batch, model_out)
         epistemic = [0.0] * len(batch[DatasetColumn.row_idx])
-        return self._parse_prediction_output(batch, raw, raw, epistemic)
+        return self._parse_prediction_output(batch, raw, raw, [], [], epistemic)
 
     def post_process(self, batch: Dataset) -> List[PredictionResponse]:
         """In File-Based, predictions from the file are already post-processed.

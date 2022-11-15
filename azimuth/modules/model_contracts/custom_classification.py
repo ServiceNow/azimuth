@@ -44,6 +44,13 @@ class CustomTextClassificationModule(TextClassificationNoSaliencyModule):
         # dummy epistemic
         epistemic = [0.0] * len(utterances)
         model_out = model(utterances)
-        raw, postprocessed = self.get_postprocessed_output(batch, model_out)
+        (
+            raw,
+            postprocessed,
+            preprocessing_steps,
+            postprocessing_steps,
+        ) = self.get_postprocessed_output(batch, model_out)
 
-        return self._parse_prediction_output(batch, raw, postprocessed, epistemic)
+        return self._parse_prediction_output(
+            batch, raw, postprocessed, preprocessing_steps, postprocessing_steps, epistemic
+        )

@@ -1,4 +1,5 @@
 import {
+  camelToTitleCase,
   formatNumberAsString,
   formatRatioAsPercentageString,
 } from "utils/format";
@@ -32,4 +33,28 @@ test("formatRatioASPercentageString", () => {
   expect(formatRatioAsPercentageString(0.0001, 0)).toBe("0.01%");
   expect(formatRatioAsPercentageString(0.009, 0)).toBe("1%");
   expect(formatRatioAsPercentageString(1, 0)).toBe("100%");
+});
+
+describe("camelToTitleCase", () => {
+  it("should convert CamelCase to TitleCase", () => {
+    expect(camelToTitleCase("SimpleCamelCase")).toBe("Simple Camel Case");
+  });
+  it("should support acronyms", () => {
+    expect(camelToTitleCase("FAISSModule")).toBe("FAISS Module");
+  });
+  it("should support numbers in acronyms", () => {
+    expect(camelToTitleCase("B2BCommerce")).toBe("B2B Commerce");
+  });
+  it("should support numbers at the end of acronyms", () => {
+    expect(camelToTitleCase("HDF5Cache")).toBe("HDF5 Cache");
+  });
+  it("should support numbers at the beginning of acronyms", () => {
+    expect(camelToTitleCase("My2FAAuth")).toBe("My 2FA Auth");
+  });
+  it("should support spaces already there between words", () => {
+    expect(camelToTitleCase("Simple Camel Case")).toBe("Simple Camel Case");
+  });
+  it("should support spaces already there between words and acronyms", () => {
+    expect(camelToTitleCase("FAISS Module")).toBe("FAISS Module");
+  });
 });

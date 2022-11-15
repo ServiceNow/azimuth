@@ -187,6 +187,7 @@ def get_utterances(
                 DatasetColumn.postprocessed_prediction,
                 DatasetColumn.model_confidences,
                 DatasetColumn.postprocessed_confidences,
+                DatasetColumn.pipeline_steps,
                 dataset_split_manager.config.columns.label,
                 dataset_split_manager.config.columns.text_input,
                 DatasetColumn.model_outcome,
@@ -201,6 +202,8 @@ def get_utterances(
                 postprocessed_confidences=data[DatasetColumn.postprocessed_confidences],
                 model_outcome=data[DatasetColumn.model_outcome],
                 postprocessed_outcome=data[DatasetColumn.postprocessed_outcome],
+                preprocessing_steps=data[DatasetColumn.pipeline_steps]["preprocessing_steps"],
+                postprocessing_steps=data[DatasetColumn.pipeline_steps]["postprocessing_steps"],
             )
             for data in ds
         ]

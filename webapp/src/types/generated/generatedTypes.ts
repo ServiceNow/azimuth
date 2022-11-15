@@ -427,6 +427,8 @@ export interface components {
       postprocessedConfidences: number[];
       modelOutcome: components["schemas"]["OutcomeName"];
       postprocessedOutcome: components["schemas"]["OutcomeName"];
+      preprocessingSteps: components["schemas"]["PreprocessingStepAPIResponse"][];
+      postprocessingSteps: components["schemas"]["PostprocessingStepAPIResponse"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -576,9 +578,11 @@ export interface components {
     PipelineDefinition: {
       name: string;
       model: components["schemas"]["CustomObject"];
-      postprocessors?: (Partial<components["schemas"]["TemperatureScaling"]> &
-        Partial<components["schemas"]["ThresholdConfig"]> &
-        Partial<components["schemas"]["CustomObject"]>)[];
+      postprocessors?:
+        | (Partial<components["schemas"]["TemperatureScaling"]> &
+            Partial<components["schemas"]["ThresholdConfig"]> &
+            Partial<components["schemas"]["CustomObject"]>)[]
+        | null;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -595,6 +599,32 @@ export interface components {
     PostDataActionRequest: {
       datasetSplitName?: components["schemas"]["DatasetSplitName"];
       dataActions: { [key: string]: { [key: string]: boolean } };
+    };
+    /** Class for saving the results in the dataset and the routes. */
+    PostprocessingStepAPIResponse: {
+      output: components["schemas"]["PredictionDetails"];
+      className: string;
+    };
+    /**
+     * Details of the predictions.
+     *
+     * Args:
+     *     predictions: Prediction class names, sorted by confidences
+     *     prediction: Predicted class, which can be different than the first element of predictions,
+     *         when thresholding for instance.
+     *     confidences: Sorted confidences
+     *     outcome: Outcome based on label and prediction
+     */
+    PredictionDetails: {
+      predictions: string[];
+      prediction: string;
+      confidences: number[];
+      outcome: components["schemas"]["OutcomeName"];
+    };
+    /** Class for saving the results in the dataset and the routes. */
+    PreprocessingStepAPIResponse: {
+      text: string;
+      className: string;
     };
     PunctuationTestOptions: {
       threshold?: number;

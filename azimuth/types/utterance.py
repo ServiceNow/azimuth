@@ -13,6 +13,8 @@ from azimuth.types.model_performance import (
 )
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import DataAction
+from azimuth.utils.ml.postprocessing import PostprocessingStepAPIResponse
+from azimuth.utils.ml.preprocessing import PreprocessingStepAPIResponse
 
 
 class ModelPrediction(AliasModel):
@@ -22,6 +24,12 @@ class ModelPrediction(AliasModel):
     postprocessed_confidences: List[float] = Field(..., tittle="Postprocessed Confidences")
     model_outcome: OutcomeName = Field(..., title="Model Outcome")
     postprocessed_outcome: OutcomeName = Field(..., title="Postprocessed Outcome")
+    preprocessing_steps: List[PreprocessingStepAPIResponse] = Field(
+        ..., title="Preprocessing Steps"
+    )
+    postprocessing_steps: List[PostprocessingStepAPIResponse] = Field(
+        ..., title="Postprocessing Steps"
+    )
 
 
 class ModelSaliency(AliasModel):

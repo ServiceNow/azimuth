@@ -14,6 +14,7 @@ from azimuth.modules.task_execution import get_task_result
 from azimuth.types import DatasetColumn, SupportedMethod
 from azimuth.types.outcomes import OutcomeName, OutcomeResponse
 from azimuth.types.task import PredictionResponse
+from azimuth.utils.ml.model_performance import compute_outcome
 from azimuth.utils.validation import assert_not_none
 
 
@@ -24,18 +25,6 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
         "threshold",
         "pipeline_index",
     }
-
-    @classmethod
-    def compute_outcome(cls, prediction: int, label: int, rejection_class_idx) -> OutcomeName:
-        if prediction == label:
-            if label == rejection_class_idx:
-                return OutcomeName.CorrectAndRejected
-            else:
-                return OutcomeName.CorrectAndPredicted
-        elif prediction == rejection_class_idx:
-            return OutcomeName.IncorrectAndRejected
-        else:
-            return OutcomeName.IncorrectAndPredicted
 
     def _get_predictions(self, without_postprocessing: bool) -> ndarray:
         mod_options = self.mod_options.copy(deep=True)
@@ -72,13 +61,13 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
 
         model_predictions = self._get_predictions(without_postprocessing=True)
         model_outcomes: List[OutcomeName] = [
-            self.compute_outcome(y_pred, label, dm.rejection_class_idx)
+            compute_outcome(y_pred, label, dm.rejection_class_idx)
             for y_pred, label in zip(model_predictions, labels)
         ]
 
         postprocessed_predictions = self._get_predictions(without_postprocessing=False)
         postprocessed_outcomes: List[OutcomeName] = [
-            self.compute_outcome(y_pred, label, dm.rejection_class_idx)
+            compute_outcome(y_pred, label, dm.rejection_class_idx)
             for y_pred, label in zip(postprocessed_predictions, labels)
         ]
 

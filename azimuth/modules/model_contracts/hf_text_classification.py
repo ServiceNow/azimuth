@@ -86,9 +86,21 @@ class HFTextClassificationModule(TextClassificationModule):
         else:
             epistemic = [0.0] * len(utterances)
             pipeline_out = model(utterances, num_workers=0, batch_size=self.config.batch_size)
-        model_output, postprocessed_output = self.get_postprocessed_output(batch, pipeline_out)
+        (
+            model_output,
+            postprocessed_output,
+            preprocessing_steps,
+            postprocessing_steps,
+        ) = self.get_postprocessed_output(batch, pipeline_out)
 
-        return self._parse_prediction_output(batch, model_output, postprocessed_output, epistemic)
+        return self._parse_prediction_output(
+            batch,
+            model_output,
+            postprocessed_output,
+            preprocessing_steps,
+            postprocessing_steps,
+            epistemic,
+        )
 
     def saliency(self, batch: Dataset) -> List[SaliencyResponse]:
         """Get saliency maps for a batch of utterances using InputXGrad.
