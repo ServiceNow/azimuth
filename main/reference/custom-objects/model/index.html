@@ -9,7 +9,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.9">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
     
     
       
@@ -17,7 +17,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.20d9efc8.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.472b142f.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.08040f6c.min.css">
@@ -55,7 +55,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
   
     
     
@@ -117,7 +117,7 @@
           
           
           
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
           
             <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
@@ -127,7 +127,7 @@
           
           
           
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
           
             <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
@@ -1671,8 +1671,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../postprocessors/" class="md-nav__link">
-        Defining Postprocessors
+      <a href="../processors/" class="md-nav__link">
+        Defining Processors
       </a>
     </li>
   
@@ -2020,7 +2020,7 @@
 <h1 id="defining-a-model">Defining a Model</h1>
 <p>A model is defined as a function that takes an utterance as input and outputs a <code>SupportedOutput</code>
 (defined below). Some models will output probabilities, whereas other models are "pipelines" which
-include post-processing steps. Azimuth supports both these use cases. The <code>model_contract</code> field
+include pre-processing and/or post-processing steps. Azimuth supports both these use cases. The <code>model_contract</code> field
 from the config will determine how Azimuth will interface with the model, as detailed in this
 section.</p>
 <h2 id="model-definition">Model Definition</h2>
@@ -2052,12 +2052,13 @@ supported outputs are the same for all model contracts.</p>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>  <span class="c1"># (1)</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kn">from</span> <span class="nn">azimuth.modules.model_contracts.text_classification</span> <span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">PipelineOutputProtocol</span><span class="p">)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">PipelineOutputProtocol</span><span class="p">,</span> <span class="n">PipelineOutputProtocolV2</span><span class="p">)</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">SupportedOutput</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>                        <span class="n">Tensor</span><span class="p">,</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>                        <span class="n">transformers</span><span class="o">.</span><span class="n">file_utils</span><span class="o">.</span><span class="n">ModelOutput</span><span class="p">,</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>                        <span class="n">PipelineOutputProtocol</span><span class="p">]</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>                        <span class="n">PipelineOutputProtocol</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>                        <span class="n">PipelineOutputProtocolV2</span><span class="p">]</span>
 </code></pre></div>
 <ol>
 <li><code>Tensor</code> from <code>TensorFlow</code> is also supported.</li>
@@ -2103,7 +2104,7 @@ supported outputs.</p>
 </table>
 <p>If your model already includes post-processing, or if you decide to create your own post-processing
 in Azimuth (we already support thresholding and temperature scaling), it will need to output
-a <code>PipelineOutputProtocol</code>. More details can be found in <a href="../postprocessors/">Define Postprocessors</a>.</p>
+a <code>PipelineOutputProtocol</code> or <code>PipelineOutputProtocolV2</code>. More details can be found in <a href="../processors/">Define Postprocessors</a>.</p>
 <h2 id="model-contracts">Model contracts</h2>
 <p>To differentiate between the different types of models, Azimuth uses a field named
 <code>model_contract</code>.</p>
@@ -2391,13 +2392,13 @@ file-based models.</p>
       
       
         
-        <a href="../postprocessors/" class="md-footer__link md-footer__link--next" aria-label="Next: Defining Postprocessors" rel="next">
+        <a href="../processors/" class="md-footer__link md-footer__link--next" aria-label="Next: Defining Processors" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Defining Postprocessors
+              Defining Processors
             </div>
           </div>
           <div class="md-footer__button md-icon">
