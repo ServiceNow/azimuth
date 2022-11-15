@@ -109,11 +109,15 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+
   const [comparedPipeline, setComparedPipeline] = React.useState<
     number | undefined
-  >();
-
-  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+  >(
+    config?.pipelines && config.pipelines.length > 1
+      ? (pipeline.pipelineIndex + 1) % config.pipelines.length
+      : undefined
+  );
 
   const { data: metricInfo } = getCustomMetricInfoEndpoint.useQuery({
     jobId,
@@ -191,11 +195,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     selectedMetricPerFilterOption,
   ]);
 
-  const fieldWithTooltip = (tooltip: string, label: string) => (
+  const reactNodeWithTooltip = (tooltip: string, nodeText: string) => (
     <Tooltip title={tooltip}>
-      <Typography variant="caption" fontSize={14}>
-        {label}
-      </Typography>
+      <Typography variant="inherit">{nodeText}</Typography>
     </Tooltip>
   );
 
@@ -262,7 +264,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
-                        zIndex="tooltip"
+                        zIndex={1}
                         gap={1}
                       >
                         {longHeader}
@@ -358,7 +360,10 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
-            ...groupHeader(pipeline, fieldWithTooltip(description, metricName)),
+            ...groupHeader(
+              pipeline,
+              reactNodeWithTooltip(description, metricName)
+            ),
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
               metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
             renderCell: ({ value }: GridCellParams<number | undefined>) =>
@@ -394,7 +399,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
-        ...groupHeader(pipeline, fieldWithTooltip(ECE_TOOLTIP, "ECE")),
+        ...groupHeader(pipeline, reactNodeWithTooltip(ECE_TOOLTIP, "ECE")),
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
           value !== undefined && (
@@ -431,12 +436,6 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   ]);
 
   React.useEffect(() => {
-    config?.pipelines &&
-      config.pipelines.length > 1 &&
-      config.pipelines.map(
-        (_, index) =>
-          index !== pipeline.pipelineIndex && setComparedPipeline(index)
-      );
     if (comparedPipeline === pipeline.pipelineIndex) {
       setComparedPipeline(undefined);
     }
@@ -554,11 +553,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
-        {config?.pipelines && config.pipelines?.length > 1 && (
+        {config?.pipelines && config.pipelines.length > 1 && (
           <Box display="flex" flexDirection="row" alignItems="center">
             <FormControlLabel
               label={`Compare Baseline (${
-                config.pipelines?.[pipeline.pipelineIndex].name
+                config.pipelines[pipeline.pipelineIndex].name
               }) with:`}
               labelPlacement="start"
               sx={{ gap: 1, paddingRight: 2 }}

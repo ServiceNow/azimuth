@@ -103,10 +103,9 @@ const Dashboard = () => {
           title="Pipeline Metrics by Data Subpopulation"
           to={`/${jobId}/pipeline_metrics${searchString}`}
           linkButtonText={
-            (config?.pipelines &&
-              config?.pipelines?.length > 1 &&
-              "Compare pipelines") ||
-            undefined
+            config?.pipelines && config.pipelines.length > 1
+              ? "Compare pipelines"
+              : undefined
           }
           description={performanceAnalysisDescription}
         >
