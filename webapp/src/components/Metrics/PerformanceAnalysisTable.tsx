@@ -111,9 +111,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
 
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
 
-  const [comparedPipeline, setComparedPipeline] = React.useState<
-    number | undefined
-  >(
+  const [comparedPipeline, setComparedPipeline] = React.useState(
     config?.pipelines && config.pipelines.length > 1
       ? (pipeline.pipelineIndex + 1) % config.pipelines.length
       : undefined
@@ -195,9 +193,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     selectedMetricPerFilterOption,
   ]);
 
-  const reactNodeWithTooltip = (tooltip: string, nodeText: string) => (
+  const typographyWithTooltip = (tooltip: string, typography: string) => (
     <Tooltip title={tooltip}>
-      <Typography variant="inherit">{nodeText}</Typography>
+      <Typography variant="inherit">{typography}</Typography>
     </Tooltip>
   );
 
@@ -362,7 +360,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             field: `${pipeline}${metricName}`,
             ...groupHeader(
               pipeline,
-              reactNodeWithTooltip(description, metricName)
+              typographyWithTooltip(description, metricName)
             ),
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
               metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
@@ -399,7 +397,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
-        ...groupHeader(pipeline, reactNodeWithTooltip(ECE_TOOLTIP, "ECE")),
+        ...groupHeader(pipeline, typographyWithTooltip(ECE_TOOLTIP, "ECE")),
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
           value !== undefined && (
