@@ -22,5 +22,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- ONNX models on GPU
 
 ### Security
