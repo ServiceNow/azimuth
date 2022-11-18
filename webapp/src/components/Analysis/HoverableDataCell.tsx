@@ -2,9 +2,9 @@ import React from "react";
 import { Box, Paper, Popper } from "@mui/material";
 import { gridClasses } from "@mui/x-data-grid";
 
-function isOverflown(element: Element) {
-  return element.scrollWidth > element.clientWidth;
-}
+const isOverflown = (element: Element) =>
+  element.scrollWidth > element.clientWidth ||
+  element.scrollHeight > element.clientHeight;
 
 type GridCellExpandProps = {
   autoWidth?: boolean;
@@ -52,9 +52,9 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
 
   return (
     <>
-      <div ref={cellValue} className={gridClasses.cellContent}>
+      <Box ref={cellValue} className={gridClasses.cellContent} maxHeight="100%">
         {children}
-      </div>
+      </Box>
       <Box
         ref={wrapper}
         height="100%"

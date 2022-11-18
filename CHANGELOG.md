@@ -22,6 +22,7 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
-- ONNX models on GPU
+- ONNX models on GPU.
+- Preserve white spaces in utterances. That includes `\n`s, `\t`s, and consecutive spaces.
 
 ### Security

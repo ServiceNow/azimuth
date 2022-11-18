@@ -51,7 +51,7 @@ const UtteranceSaliency: React.FC<Props> = ({
   modelSaliency,
 }) => {
   return (
-    <Typography display="inline" variant={variant}>
+    <Typography display="inline" variant={variant} whiteSpace="pre-wrap">
       {modelSaliency ? Tokens({ tooltip, ...modelSaliency }) : utterance}
     </Typography>
   );
