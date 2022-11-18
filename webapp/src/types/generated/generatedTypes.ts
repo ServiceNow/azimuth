@@ -751,6 +751,7 @@ export interface components {
       dataAction: components["schemas"]["DataAction"];
       label: string;
       utterance: string;
+      overlappedClasses: number[];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure

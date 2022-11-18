@@ -23,3 +23,4 @@ class DatasetColumn(str, Enum):
     token_count = "token_count"
     neighbors_train = f"neighbors_{DatasetSplitName.train}"
     neighbors_eval = f"neighbors_{DatasetSplitName.eval}"
+    overlapped_classes = "overlapped_classes"

@@ -35,6 +35,7 @@ class SupportedModule(SupportedTask):
     Outcome = "Outcome"
     OutcomeCountPerFilter = "OutcomeCountPerFilter"
     OutcomeCountPerThreshold = "OutcomeCountPerThreshold"
+    OverlapTagging = "OverlapTagging"
     PerturbationTesting = "PerturbationTesting"
     PerturbationTestingMerged = "PerturbationTestingMerged"
     PerturbationTestingSummary = "PerturbationTestingSummary"

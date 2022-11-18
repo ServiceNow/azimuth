@@ -38,6 +38,7 @@ class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str]):
     data_action: DataAction = Field(..., title="Data action tag")
     label: str = Field(..., title="Label")
     utterance: str = Field(..., title="Utterance")
+    overlapped_classes: List[int] = Field(..., title="Overlapped classes")
 
 
 class GetUtterancesResponse(AliasModel):
@@ -47,7 +48,7 @@ class GetUtterancesResponse(AliasModel):
         ..., title="Confidence threshold in selected pipeline (if any)", nullable=True
     )
 
-    class Config:
+    class Config:  # TODO: Correct schema
         schema_extra = {
             "example": {
                 "utterances": [

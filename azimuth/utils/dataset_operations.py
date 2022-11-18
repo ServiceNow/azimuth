@@ -114,6 +114,17 @@ def filter_dataset_split(
                     for tag_f in tags_in_family
                 )
             )
+    if (
+        len(filters.overlapped_classes) > 0
+        and DatasetColumn.overlapped_classes in dataset_split.column_names  # train only
+        and dataset_split.num_rows != 0
+    ):
+        dataset_split = dataset_split.filter(
+            lambda x: all(
+                class_id in x[DatasetColumn.overlapped_classes]
+                for class_id in filters.overlapped_classes
+            )
+        )
 
     return dataset_split
 

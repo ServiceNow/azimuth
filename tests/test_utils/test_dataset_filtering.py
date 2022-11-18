@@ -203,5 +203,22 @@ def test_dataset_filtering_without_postprocessing(simple_text_config):
     assert len(ds_filtered_with_postprocessing) != len(ds_filtered_without_postprocessing)
 
 
+def test_dataset_filtering_overlap(simple_text_config):
+    dm = generate_mocked_dm(simple_text_config, "train")
+    ds = dm.get_dataset_split(get_table_key(simple_text_config))
+    assert (
+        filter_dataset_split(
+            ds, filters=DatasetFilters(overlapped_classes=[2]), config=dm.config
+        ).shape[0]
+        == 0
+    ), "Filtering included examples that should be dropped."
+    assert (
+        filter_dataset_split(
+            ds, filters=DatasetFilters(overlapped_classes=[1]), config=dm.config
+        ).shape[0]
+        > 0
+    ), "Filtering did not include any rows (and should have)."
+
+
 if __name__ == "__main__":
     pytest.main()

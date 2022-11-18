@@ -44,6 +44,7 @@ modules = {
     SupportedModule.Outcome: azimuth.modules.model_performance.outcomes.OutcomesModule,
     SupportedModule.OutcomeCountPerFilter: outcome_count.OutcomeCountPerFilterModule,
     SupportedModule.OutcomeCountPerThreshold: outcome_count.OutcomeCountPerThresholdModule,
+    SupportedModule.OverlapTagging: class_overlap.OverlapTaggingModule,
     SupportedModule.PerturbationTesting: perturbation_testing.PerturbationTestingModule,
     SupportedModule.PerturbationTestingMerged: perturbation_testing.PerturbationTestingMergedModule,
     SupportedModule.PerturbationTestingSummary:

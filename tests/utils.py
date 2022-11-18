@@ -127,6 +127,7 @@ def get_table_key(config, use_bma=False):
 
 
 def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
+    # Always using DatasetSplitName.eval as a base table since the data is mocked.
     ds = load_dataset_from_config(config)[DatasetSplitName.eval]
     ds = ds.map(
         lambda x, i: {
@@ -167,6 +168,7 @@ def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
                 [np.random.randint(1, 1000), np.random.rand()] for i in range(0, 20)
             ],
             DatasetColumn.token_count: np.random.randint(5, 12),
+            DatasetColumn.overlapped_classes: np.random.choice([[0], [1], [0, 1]]),
         }
     )
 

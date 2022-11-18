@@ -9,12 +9,14 @@ import numpy as np
 from spectral_metric.estimator import CumulativeGradientEstimator
 
 from azimuth.config import SimilarityConfig
-from azimuth.modules.base_classes import AggregationModule
+from azimuth.dataset_split_manager import DatasetSplitManager
+from azimuth.modules.base_classes import AggregationModule, DatasetResultModule
 from azimuth.modules.dataset_analysis.similarity_analysis import FAISSModule
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types import Array, DatasetSplitName
+from azimuth.types import Array, DatasetColumn, DatasetSplitName
 from azimuth.types.class_overlap import ClassOverlapResponse
 from azimuth.types.similarity_analysis import FAISSResponse
+from azimuth.types.tag import TaggingResponse
 
 
 def take(generator, length):
@@ -47,7 +49,7 @@ def get_volume(dt) -> float:
 class ClassOverlapModule(AggregationModule[SimilarityConfig]):
     allowed_splits = {DatasetSplitName.train}
 
-    def compute_on_dataset_split(self):
+    def compute_on_dataset_split(self) -> List[ClassOverlapResponse]:  # type: ignore
         # We use the train set to get the features.
         train_dm = self.get_dataset_split_manager(DatasetSplitName.train)
         train_features = np.array(self._get_features(DatasetSplitName.train))
@@ -86,3 +88,50 @@ class ClassOverlapModule(AggregationModule[SimilarityConfig]):
         )
         result = get_task_result(mod, List[FAISSResponse])
         return [r.features for r in result]
+
+
+class OverlapTaggingModule(DatasetResultModule[SimilarityConfig]):
+    """Finds overlap and sets overlap smart tags for each utterance in the train split."""
+
+    def compute_on_dataset_split(self) -> List[TaggingResponse]:  # type: ignore
+        if self.dataset_split_name == DatasetSplitName.train:
+            mod = ClassOverlapModule(dataset_split_name=DatasetSplitName.train, config=self.config)
+            result = get_task_result(mod, List[ClassOverlapResponse])[0]
+            similarity_arrays = result.similarity_arrays
+
+            # Pull overlap array to first dictionary level and set overlap to False when i==j
+            res = {
+                sample_ix: [
+                    overlap > 0 if n != class_ix else False
+                    for n, overlap in enumerate(sample_arrays.sample_probability_norm)
+                ]
+                for class_ix, all_sample_arrays in similarity_arrays.items()
+                for sample_ix, sample_arrays in all_sample_arrays.items()
+            }
+            sample_count = len(res.keys())
+
+            return [
+                TaggingResponse(
+                    tags={},
+                    adds={
+                        DatasetColumn.overlapped_classes: [
+                            i for i, overlap_bool in enumerate(res[sample_ix]) if overlap_bool
+                        ]
+                    },
+                )
+                for sample_ix in range(sample_count)
+            ]
+        else:
+            return [[]] * self.get_dataset_split_manager(self.dataset_split_name).num_rows
+
+    def _save_result(self, res: List[TaggingResponse], dm: DatasetSplitManager):  # type: ignore
+        """Save tags for class overlap.
+
+        Args:
+            res: Results from `compute_on_dataset_split`
+            dm: the dataset_split manager used to get `res`.
+        """
+        if dm.name == DatasetSplitName.train:
+            # We don't need the table key as this is not a "prediction tag"
+            for col_name in res[0].adds.keys():
+                dm.add_column(key=col_name, features=[r.adds[col_name] for r in res])

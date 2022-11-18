@@ -106,3 +106,19 @@ def test_perturbed_utterances(app: FastAPI, monkeypatch):
     ).json()
     # Utterance 1 has 15 perturbation tests
     assert len(resp) == 15
+
+
+def test_get_utterances_overlapped_classes(app: FastAPI) -> None:
+    client = TestClient(app)
+    resp = client.get("/dataset_splits/train/utterances?limit=10&offset=0").json()
+    assert "overlappedClasses" in resp["utterances"][0].keys(), "overlappedClasses should be output"
+
+    resp_train = client.get("/dataset_splits/train/utterances?overlappedClasses=positive").json()
+    assert (
+        1 in resp_train["utterances"][0]["overlappedClasses"]
+    ), "Returned utterances should overlap with class 1"
+
+    resp_eval = client.get("/dataset_splits/eval/utterances?overlappedClasses=positive").json()
+    assert (
+        len(resp_eval["utterances"][0]["overlappedClasses"]) == 0
+    ), "Eval dataset should not have overlapped_classes"

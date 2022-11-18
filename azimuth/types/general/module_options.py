@@ -24,11 +24,13 @@ class AbsDatasetFilters(AliasModel):
 class DatasetFilters(AbsDatasetFilters):
     label: List[int] = []
     prediction: List[int] = []
+    overlapped_classes: List[int] = []
 
 
 class NamedDatasetFilters(AbsDatasetFilters):
     label: List[str] = []
     prediction: List[str] = []
+    overlapped_classes: List[str] = []
 
     def to_dataset_filters(self, class_names: List[str]) -> DatasetFilters:
         return DatasetFilters(
@@ -40,6 +42,7 @@ class NamedDatasetFilters(AbsDatasetFilters):
             outcome=self.outcome,
             smart_tags=self.smart_tags,
             utterance=self.utterance,
+            overlapped_classes=[class_names.index(cl) for cl in self.overlapped_classes],
         )
 
 

@@ -239,6 +239,9 @@ def get_utterances(
             utterance=data[dataset_split_manager.config.columns.text_input],
             model_prediction=model_prediction,
             model_saliency=model_saliency,
+            overlapped_classes=data[DatasetColumn.overlapped_classes]
+            if DatasetColumn.overlapped_classes in ds.column_names
+            else [],
             # Smart tags families
             **{
                 family.value: [t for t in tags_in_family if tag[t]]
