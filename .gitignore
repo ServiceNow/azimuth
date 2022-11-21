@@ -9,6 +9,7 @@ cache
 !poetry.lock
 !yarn.lock
 tests/logs.txt
+webapp/openapi.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
