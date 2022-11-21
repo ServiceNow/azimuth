@@ -45,22 +45,26 @@ class Module(DaskModule[ConfigScope]):
         super().__init__(dataset_split_name, config)
 
     def _get_name(self) -> str:
-        options_to_consider = self.mod_options.dict()
-        # Indices are excluded, since the cache for all indices should be in the same folder.
-        options_to_consider = self.mod_options.dict(exclude={"indices"})
+        # indices are excluded, since the cache for all indices should be in the same folder.
+        # model_contract_method_name are excluded too because it's already in the task_name.
+        options_to_consider = self.mod_options.dict(
+            exclude={"indices", "model_contract_method_name"}, exclude_defaults=True
+        )
         attributes_to_consider = self.config.dict(
             include={
                 k: ...
                 for k in set(AzimuthConfig.__fields__.keys()).difference(
                     CommonFieldsConfig.__fields__.keys()
                 )
-            }
+            },
+            exclude_defaults=True,
         )
 
-        return (
-            f"{self.task_name}_{self.dataset_split_name}"
-            f"_{md5_hash(options_to_consider)[:5]}_{md5_hash(attributes_to_consider)[:5]}"
-        )
+        # Hashing values so the file name doesn't get too long.
+        options_hash = {f"{k}": f"{md5_hash(v)[:5]}" for k, v in options_to_consider.items()}
+        attributes_hash = {f"{k}": f"{md5_hash(v)[:5]}" for k, v in attributes_to_consider.items()}
+
+        return f"{self.task_name}_{self.dataset_split_name}" f"_{options_hash}_{attributes_hash}"
 
     def get_caching_indices(self) -> List[int]:
         return self.mod_options.indices or self.get_indices()
