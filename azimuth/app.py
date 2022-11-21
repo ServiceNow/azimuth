@@ -2,6 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import logging
+import shutil
 from threading import Event
 from typing import Dict, Optional
 
@@ -98,6 +99,8 @@ def start_app(config_path, debug=False) -> FastAPI:
     azimuth_config = load_azimuth_config(config_path)
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
+    # Copy config file in artifact_path for ease of retrieval.
+    shutil.copyfile(config_path, f"{azimuth_config.get_artifact_path()}/conf.json")
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
