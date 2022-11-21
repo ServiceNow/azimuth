@@ -39,6 +39,7 @@ class LanguageDefaultValues(AliasModel):
     spacy_model: SupportedSpacyModels
     subj_tags: List[str]
     obj_tags: List[str]
+    faiss_encoder: str
 
 
 config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
@@ -48,6 +49,7 @@ config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
         spacy_model="en_core_web_sm",
         subj_tags=["nsubj", "nsubjpass"],
         obj_tags=["dobj", "pobj", "obj"],
+        faiss_encoder="all-MiniLM-L12-v2",
     ),
     SupportedLanguage.fr: LanguageDefaultValues(
         suffix_list=["svp", "s'il vous plaît", "merci", "super"],
@@ -55,6 +57,7 @@ config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
         spacy_model="fr_core_news_md",
         subj_tags=["nsubj", "nsubj:pass"],
         obj_tags=["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
+        faiss_encoder="distiluse-base-multilingual-cased-v1",
     ),
 }
 
@@ -208,7 +211,7 @@ class BehavioralTestingOptions(BaseModel):
 
 
 class SimilarityOptions(BaseModel):
-    faiss_encoder: str = "all-MiniLM-L12-v2"
+    faiss_encoder: str = ""  # Language-based dynamic default value
     # Threshold to use when finding conflicting neighbors.
     conflicting_neighbors_threshold: float = 0.9
     # Threshold to determine whether there are close neighbors.
@@ -369,6 +372,8 @@ class LanguageConfig(CommonFieldsConfig):
         syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
         syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
         syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
+        similarity = values["similarity"]
+        similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
         return values
 
 

@@ -139,3 +139,7 @@ def test_french_defaults_and_override():
     assert (
         cfg.syntax.obj_tags == config_defaults_per_language[SupportedLanguage.fr].obj_tags
     ), "Config did not take default French value for spacy_model"
+    assert (
+        cfg.similarity.faiss_encoder
+        == config_defaults_per_language[SupportedLanguage.fr].faiss_encoder
+    ), "Config did not take default French value for faiss encoder"
