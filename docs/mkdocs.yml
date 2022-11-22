@@ -91,6 +91,7 @@ nav:
       - Configuration:
           - reference/configuration/index.md
           - reference/configuration/project.md
+          - reference/configuration/language.md
           - reference/configuration/model_contract.md
           - reference/configuration/common.md
           - Analyses Customization:

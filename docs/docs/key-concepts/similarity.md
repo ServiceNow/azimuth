@@ -27,9 +27,7 @@ the [:material-link: Utterances Details](../user-guide/exploration-space/utteran
 ### Similarity Computation
 
 To get utterance embeddings, Azimuth uses a **sentence encoder** (from
-[sentence-transformers](https://github.com/UKPLab/sentence-transformers); see the
-[:material-link: Similarity Analysis Config](../reference/configuration/analyses/similarity.md)
-for defaults) based on a **BERT** architecture
+[sentence-transformers](https://github.com/UKPLab/sentence-transformers)) based on a **BERT** architecture
 ([Reimers and Gurevych, 2019](https://arxiv.org/abs/1908.10084)[^1]). It then computes
 the **cosine similarity** (via a **dot product on normalized embeddings**) between each utterance in
 the dataset and all other utterances in both dataset splits (training and evaluation).
@@ -67,8 +65,9 @@ dataset splits.)
 ### Configuration
 
 [:material-link: Similarity Analysis Configuration](../reference/configuration/analyses/similarity.md)
-details how to change the encoder for the embeddings on which similarity is computed, as well as the
-two thresholds used to determine the smart tags.
+presents language-based defaults for the encoder used for the embeddings on which similarity is
+computed, and details how to change this encoder as well as the two thresholds used to determine
+the smart tags.
 
 [^1]: Reimers, Nils, and Iryna Gurevych. "Sentence-bert: Sentence embeddings using siamese
 bert-networks." arXiv preprint arXiv:1908.10084 (2019).

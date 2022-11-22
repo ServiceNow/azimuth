@@ -8,7 +8,7 @@ syntax-related smart tags. More details are explained in
 [:material-link: Syntax Analysis](../../../key-concepts/syntax-analysis.md).
 
 Note that language-related defaults are dynamically selected based on the language specified in the
-[:material-link: Project Config](./project.md) (default is English). As such, the spaCy model and
+[:material-link: Project Config](../project.md) (default is English). As such, the spaCy model and
 dependency tag lists will generally not need to be modified.
 
 === "Class Definition"
@@ -26,11 +26,9 @@ dependency tag lists will generally not need to be modified.
 
     1. Maximum number of tokens for a sentence to be tagged as short (e.g <=3 for the default)
     2. Minimum number of tokens for a sentence to be tagged as long (e.g >=16 for the default)
-    3. spaCy model to use for syntax tagging. English default is `"en_core_web_sm"`.
-    4. spaCy dependency tags used to determine whether a word is a subject (noun). English
-    default is `["nsubj", "nsubjpass"]`.
-    5. spaCy dependency tags used to determine whether a word is an object (noun). English
-    default is `["dobj", "pobj", "obj"]`.
+    3. spaCy model to use for syntax tagging.
+    4. spaCy dependency tags used to determine whether a word is a subject (noun).
+    5. spaCy dependency tags used to determine whether a word is an object (noun).
 
 === "Config Example"
 
@@ -41,5 +39,48 @@ dependency tag lists will generally not need to be modified.
       }
     }
     ```
+
+=== "English defaults"
+
+    ```python
+    import spacy
+    from spacy.lang.en import English
+
+    # Part of Speech
+    subj_tags = ["nsubj", "nsubjpass"]
+    obj_tags = ["dobj", "pobj", "dobj"]
+    verb_tags = ["VERB", "AUX"]  # Not user configurable # (1)
+    spacy_model = spacy.load("en_core_web_sm")
+
+    # Not user configurable
+    # Sentencizer; English() should work for other languages that have similar sentence conventions.
+    spacy_pipeline = English()
+    spacy_pipeline.add_pipe("sentencizer")  # (2)
+    ```
+
+    1. Tags to detect a verb in a sentence.
+    2. Used to compute the number of sentences in an utterance.
+
+=== "French defaults"
+
+    ```python
+    import spacy
+    from spacy.lang.en import English
+
+    # Part of Speech
+    subj_tags = ["nsubj", "nsubj:pass"]
+    obj_tags = ["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"]
+    verb_tags = ["VERB", "AUX"]  # Not user configurable # (1)
+    spacy_model = spacy.load("fr_core_news_md")
+
+    # Not user configurable
+    # Sentencizer; English() should work for other languages that have similar sentence conventions.
+    spacy_pipeline = English()
+    spacy_pipeline.add_pipe("sentencizer")  # (2)
+
+    ```
+
+    1. Tags to detect a verb in a sentence.
+    2. Used to compute the number of sentences in an utterance.
 
 --8<-- "includes/abbreviations.md"
