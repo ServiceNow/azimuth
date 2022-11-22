@@ -30,6 +30,13 @@ def test_get_config(app: FastAPI):
         },
         "large_dask_cluster": False,
         "metrics": {
+            "Accuracy": {
+                "additional_kwargs": {},
+                "args": [],
+                "class_name": "datasets.load_metric",
+                "kwargs": {"path": "accuracy"},
+                "remote": None,
+            },
             "F1": {
                 "additional_kwargs": {"average": "weighted"},
                 "args": [],
