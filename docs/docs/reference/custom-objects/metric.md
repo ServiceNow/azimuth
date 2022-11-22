@@ -36,6 +36,12 @@ with precision, recall and F1 below.
     ``` json
     {
       "metrics": {
+        "Accuracy": {
+          "class_name": "datasets.load_metric",
+          "kwargs": {
+            "path": "accuracy"
+          }
+        },
         "Precision": {
           "class_name": "datasets.load_metric",
           "kwargs": {
