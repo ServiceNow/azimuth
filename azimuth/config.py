@@ -335,28 +335,6 @@ class ModelContractConfig(CommonFieldsConfig):
         return pipeline_definitions
 
 
-class PerturbationTestingConfig(ModelContractConfig):
-    # Perturbation Testing configuration to define which test and with which params to run.
-    behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
-    )
-
-
-class SimilarityConfig(CommonFieldsConfig):
-    # Similarity configuration to define the encoder and the similarity threshold.
-    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
-
-
-class DatasetWarningConfig(CommonFieldsConfig):
-    # Dataset warnings configuration to change thresholds that trigger warnings
-    dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
-
-
-class SyntaxConfig(CommonFieldsConfig):
-    # Syntax configuration to change thresholds that determine short and long sentences.
-    syntax: SyntaxOptions = SyntaxOptions()
-
-
 class LanguageConfig(CommonFieldsConfig):
     # Language configuration sets multiple config values; see reference dictionary for details
     language: SupportedLanguage = SupportedLanguage.en
@@ -372,9 +350,32 @@ class LanguageConfig(CommonFieldsConfig):
         syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
         syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
         syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
-        similarity = values["similarity"]
-        similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
+        if values["similarity"]:
+            similarity = values["similarity"]
+            similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
         return values
+
+
+class PerturbationTestingConfig(ModelContractConfig, LanguageConfig):
+    # Perturbation Testing configuration to define which test and with which params to run.
+    behavioral_testing: Optional[BehavioralTestingOptions] = Field(
+        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
+    )
+
+
+class SimilarityConfig(LanguageConfig):
+    # Similarity configuration to define the encoder and the similarity threshold.
+    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
+
+
+class DatasetWarningConfig(CommonFieldsConfig):
+    # Dataset warnings configuration to change thresholds that trigger warnings
+    dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
+
+
+class SyntaxConfig(LanguageConfig):
+    # Syntax configuration to change thresholds that determine short and long sentences.
+    syntax: SyntaxOptions = SyntaxOptions()
 
 
 class AzimuthConfig(
