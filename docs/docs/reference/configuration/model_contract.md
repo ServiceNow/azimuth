@@ -217,9 +217,9 @@ Example: `distilbert.embeddings.word_embeddings`.
 
 ## Metrics
 
-:blue_circle: **Default value**: Precision and Recall. See in the config example below.
+:blue_circle: **Default value**: Accuracy, Precision, Recall and F1. See in the config example below.
 
-By default, Azimuth will compute Precision, Recall and F1 on the dataset. `metrics` leverages custom
+By default, Azimuth will compute the metrics listed above. `metrics` leverages custom
 objects, with an additional field which allow defining `kwargs`
 to be sent to the metric `compute()` function.
 
@@ -253,6 +253,12 @@ your own, as detailed in [:material-link: Defining Metrics](../custom-objects/me
     ```json
     {
       "metrics": {
+        "Accuracy": {
+          "class_name": "datasets.load_metric",
+          "kwargs": {
+            "path": "accuracy"
+          }
+        },
         "Precision": {
           "class_name": "datasets.load_metric",
           "kwargs": {

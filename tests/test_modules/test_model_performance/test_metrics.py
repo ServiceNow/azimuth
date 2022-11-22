@@ -50,6 +50,12 @@ def test_metrics(tiny_text_config):
 
     # Check that outcome count match utterance count
     assert sum(metrics_res.outcome_count.values()) == len(ds)
+    # Check that outcome and accuracy are close.
+    assert np.isclose(
+        metrics_res.custom_metrics["Accuracy"],
+        metrics_res.outcome_count[OutcomeName.CorrectAndPredicted]
+        + metrics_res.outcome_count[OutcomeName.CorrectAndRejected] / len(ds),
+    )
 
     # Changing the filters changes the values.
     metrics_mod_filters = MetricsModule(

@@ -251,6 +251,9 @@ class ModelContractConfig(CommonFieldsConfig):
     saliency_layer: Optional[str] = None
     # Custom HuggingFace metrics
     metrics: Dict[str, MetricDefinition] = {
+        "Accuracy": MetricDefinition(
+            class_name="datasets.load_metric", kwargs={"path": "accuracy"}
+        ),
         "Precision": MetricDefinition(
             class_name="datasets.load_metric",
             kwargs={"path": "precision"},
