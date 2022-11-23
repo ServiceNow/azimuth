@@ -34,6 +34,11 @@ actions**. It currently only supports **text classification use cases**.
 Our [documentation](https://servicenow.github.io/azimuth) contains all the instructions and
 references to use Azimuth.
 
+## :octicons-video-16: Our YouTube Playlist
+<div style="display: flex; justify-content: center;">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8" title="Azimuth Playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
 ### Documentation Structure
 
 * [Getting Started](https://servicenow.github.io/azimuth/getting-started)
