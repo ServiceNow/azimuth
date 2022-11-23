@@ -45,8 +45,8 @@ class Module(DaskModule[ConfigScope]):
         super().__init__(dataset_split_name, config)
 
     def _get_name(self) -> str:
-        # indices are excluded, since the cache for all indices should be in the same folder.
-        # model_contract_method_name are excluded too because it's already in the task_name.
+        # indices are excluded since the cache for all indices should be in the same folder.
+        # model_contract_method_name is excluded since it's already in the task_name.
         options_to_consider = self.mod_options.dict(
             exclude={"indices", "model_contract_method_name"}, exclude_defaults=True
         )
