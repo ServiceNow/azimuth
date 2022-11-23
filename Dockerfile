@@ -10,6 +10,7 @@ FROM build_${DEVICE}
 
 # Set to "dev" for dev deps
 ARG STAGE="production"
+ARG DEVICE=cpu
 
 ENV STAGE=${STAGE} \
   PYTHONFAULTHANDLER=1 \
