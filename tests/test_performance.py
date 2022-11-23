@@ -24,7 +24,7 @@ def test_dataset_processing_speed(simple_text_config):
     start = time.perf_counter()
     ds = mod.get_dataset_split()
     stop = time.perf_counter()
-    assert (stop - start) <= 0.008
+    assert (stop - start) <= 0.01
 
     # Filtering on the prediction
     start = time.perf_counter()
@@ -34,4 +34,4 @@ def test_dataset_processing_speed(simple_text_config):
         config=simple_text_config,
     )
     stop = time.perf_counter()
-    assert (stop - start) <= 0.0001
+    assert (stop - start) <= 0.0002
