@@ -34,11 +34,11 @@ COPY poetry.lock pyproject.toml /app/
 
 WORKDIR /app
 RUN poetry config virtualenvs.create false && \
-  poetry install -E ${DEVICE} --no-interaction --no-ansi --no-root $(/usr/bin/test $STAGE == production && echo "--no-dev")
+  poetry install --extras ${DEVICE} --no-interaction --no-ansi --no-root $(/usr/bin/test $STAGE == production && echo "--no-dev")
 
 # Install the project.
 COPY . /app/
-RUN poetry install -E ${DEVICE} --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
+RUN poetry install --extras ${DEVICE} --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
 ENV CFG_PATH="/config/nlp_sa/conf.json"
 ENV PORT=8091
 CMD ["sh","-c","umask 0002; python runner.py ${CFG_PATH} --port ${PORT}"]
