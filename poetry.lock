@@ -1752,6 +1752,22 @@ onnx = "*"
 onnxruntime = ">=1.6.0"
 
 [[package]]
+name = "onnxruntime-gpu"
+version = "1.12.1"
+description = "ONNX Runtime is a runtime accelerator for Machine Learning models"
+category = "main"
+optional = true
+python-versions = "*"
+
+[package.dependencies]
+coloredlogs = "*"
+flatbuffers = "*"
+numpy = ">=1.21.0"
+packaging = "*"
+protobuf = "*"
+sympy = "*"
+
+[[package]]
 name = "opt-einsum"
 version = "3.3.0"
 description = "Optimizing numpys einsum function"
@@ -3357,10 +3373,14 @@ python-versions = ">=3.7"
 docs = ["jaraco.packaging (>=8.2)", "rst.linker (>=1.9)", "sphinx"]
 testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.0.1)", "pytest-flake8", "pytest-mypy"]
 
+[extras]
+cpu = ["onnxruntime"]
+gpu = ["onnxruntime-gpu"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "ad252a9ca47742194fccc1d4af84e920f81e82daa78153e28820d206fe3fb153"
+content-hash = "137156e4203387e560ab90b0602afec72c8b3b89a1cad99eefb8512193d64e79"
 
 [metadata.files]
 absl-py = [
@@ -4715,6 +4735,16 @@ onnxruntime-extensions = [
     {file = "onnxruntime_extensions-0.3.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:1e92836bd733a57ac221c19b20248bc2350f2cad6dcb36e43f461503caa80cae"},
     {file = "onnxruntime_extensions-0.3.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:40f1ca5c4724b5c5bd6d301e855402ff03fb41c4e647d6c2edfce4fb84280e4d"},
     {file = "onnxruntime_extensions-0.3.1-cp39-cp39-win_amd64.whl", hash = "sha256:3b5b7e76ace2edb05e69a86de4ee2ceef5e17fff2c280a9c1bcbf3293cab32d8"},
+]
+onnxruntime-gpu = [
+    {file = "onnxruntime_gpu-1.12.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:42b0393c5122ed90fa2eb76192a486261d86e9526ccb78b2a98923c22791d2d1"},
+    {file = "onnxruntime_gpu-1.12.1-cp310-cp310-win_amd64.whl", hash = "sha256:ecfe97335027e569d4f46725ba89316041e562b8c499690e25e11cfee4601cd1"},
+    {file = "onnxruntime_gpu-1.12.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e2be6f7f5a1ce0bc8471ce42e10eab92cfb19d0748b857edcb5320b5e98311b7"},
+    {file = "onnxruntime_gpu-1.12.1-cp37-cp37m-win_amd64.whl", hash = "sha256:d73204323aefebe4eecab9fcf76e22b1a00394e3d838c2962a28a27301186b73"},
+    {file = "onnxruntime_gpu-1.12.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b37872527d03d3df10756408ca44014bd6ac354a044ab1c4286cd42dc138e518"},
+    {file = "onnxruntime_gpu-1.12.1-cp38-cp38-win_amd64.whl", hash = "sha256:296bd9733986cb7517d15bef5535c555d3f863963a71e6575e92d2a854aee61d"},
+    {file = "onnxruntime_gpu-1.12.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8e46d0724ce54c5908c5760037b78de741fbd48962b370c29ebc20e608b30eda"},
+    {file = "onnxruntime_gpu-1.12.1-cp39-cp39-win_amd64.whl", hash = "sha256:fd919373be35b9ba54210688265df38ad5e19a530449385c40dab51da407345d"},
 ]
 opt-einsum = [
     {file = "opt_einsum-3.3.0-py3-none-any.whl", hash = "sha256:2455e59e3947d3c275477df7f5205b30635e266fe6dc300e3d9f9646bfcea147"},

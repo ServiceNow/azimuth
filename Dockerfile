@@ -30,20 +30,14 @@ RUN curl -sSL https://install.python-poetry.org | python - --version 1.2.0 \
 
 # Install dependencies.
 COPY poetry.lock pyproject.toml /app/
-# When building for GPU, replace onnxruntime with onnxruntime-gpu.
-ARG DEVICE=cpu
-RUN if [ "$DEVICE" = "gpu" ]; then \
-  sed -i 's/^onnxruntime = /onnxruntime-gpu = /' pyproject.toml; \
-  poetry lock --no-update; \
-fi
 
 WORKDIR /app
 RUN poetry config virtualenvs.create false && \
- poetry install --no-interaction --no-ansi --no-root $(/usr/bin/test $STAGE == production && echo "--no-dev")
+  poetry install -E ${DEVICE} --no-interaction --no-ansi --no-root $(/usr/bin/test $STAGE == production && echo "--no-dev")
 
 # Install the project.
 COPY . /app/
-RUN poetry install --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
+RUN poetry install -E ${DEVICE} --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
 ENV CFG_PATH="/config/nlp_sa/conf.json"
 ENV PORT=8091
 CMD ["sh","-c","umask 0002; python runner.py ${CFG_PATH} --port ${PORT}"]

@@ -43,7 +43,7 @@ It will just take longer, and does not allow for fast debugging.
         If you get an error while launching the back end, common causes can be that the `poetry`
         has new dependencies or the configs were changed. Be sure to run:
         ```bash
-        poetry install
+        poetry install -E cpu
         make local_configs
         ```
 
