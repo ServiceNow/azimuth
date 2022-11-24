@@ -217,7 +217,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
     };
     /** An enumeration. */
@@ -348,7 +348,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       /** Keyword arguments supplied to `compute`. */
       additional_kwargs?: { [key: string]: any };
@@ -712,7 +712,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       temperature?: number;
     };
@@ -730,7 +730,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       threshold?: number;
     };
