@@ -1,4 +1,4 @@
-import { Box, Link, Typography } from "@mui/material";
+import { Box, Link, Typography, useTheme } from "@mui/material";
 import useResizeObserver from "hooks/useResizeObserver";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
@@ -37,6 +37,8 @@ const TopWords: React.FC<Props> = ({
   wordCounts,
   palette = "success",
 }) => {
+  const theme = useTheme();
+
   // It is impossible to know how large the word cloud will end up being so we have to scale it down to fit the parent if it is too big
   const [contentRef, contentWidth, contentHeight] = useResizeObserver();
   const [wrapperRef, wrapperWidth, wrapperHeight] = useResizeObserver();
@@ -93,7 +95,9 @@ const TopWords: React.FC<Props> = ({
                 ...pipeline,
                 ...postprocessing,
               })}`}
-              color={(theme) => theme.palette[palette].dark}
+              // Despite color's type allowing for `(theme) => `,
+              // it results in an uncaught error that crashes the app.
+              color={theme.palette[palette].dark}
               display="block"
               fontSize={`${Math.max(
                 maxFontSizeInEm * count * normalizingScaleFactor,
