@@ -1,4 +1,4 @@
-import { Box, Slider, Typography, useTheme } from "@mui/material";
+import { Box, Slider, Typography } from "@mui/material";
 import React from "react";
 
 const step = 5;
@@ -21,8 +21,6 @@ const FilterSlider: React.FC<Props> = ({
   filterRange,
   setFilterRange,
 }) => {
-  const theme = useTheme();
-
   const filterRangePercentage = React.useMemo(
     // Rounding to mitigate floating point errors
     // Keeping some decimals in case the user specified some in the URL
@@ -55,8 +53,8 @@ const FilterSlider: React.FC<Props> = ({
   };
 
   return (
-    <Box padding={theme.spacing(0, 1)}>
-      <Box display="flex" gap={theme.spacing(1)} alignItems="center">
+    <Box paddingX={1}>
+      <Box display="flex" gap={1} alignItems="center">
         <Typography variant="subtitle2">{label}</Typography>
         {(range[0] > 0 || range[1] < 100) && (
           <Typography variant="body2">
@@ -64,7 +62,7 @@ const FilterSlider: React.FC<Props> = ({
           </Typography>
         )}
       </Box>
-      <Box padding={theme.spacing(0, 2)}>
+      <Box paddingX={2}>
         <Slider
           aria-labelledby={label}
           size="small"
