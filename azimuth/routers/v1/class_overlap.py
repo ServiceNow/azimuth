@@ -124,7 +124,7 @@ def get_class_analysis(
             DatasetSplitName.eval,
             task_manager=task_manager,
             mod_options=ModuleOptions(
-                pipeline_index=pipeline_index, cf_normalized=False, cf_reorder_classes=False
+                pipeline_index=pipeline_index, cf_normalize=False, cf_reorder_classes=False
             ),
             last_update=dataset_split_managers[DatasetSplitName.eval].last_update,
         )[0]
