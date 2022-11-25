@@ -243,7 +243,7 @@ const Settings: React.FC = () => {
         const current_postprocessor = pipeline?.postprocessors?.find(
           (_, index) => index === postprocessorIdx
         );
-        const updatedPostprocessor = _.assign({}, current_postprocessor, {
+        const updatedPostprocessor = _.merge({}, current_postprocessor, {
           [field]: Number(event.target.value),
         });
         const updatedPipeline = [
@@ -613,7 +613,12 @@ const Settings: React.FC = () => {
           paddingY: 2,
         }}
       >
-        <Button variant="contained">Discard</Button>
+        <Button
+          variant="contained"
+          onClick={() => setPartialConfig({ ...data })}
+        >
+          Discard
+        </Button>
         <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
           <Button
             variant="contained"
