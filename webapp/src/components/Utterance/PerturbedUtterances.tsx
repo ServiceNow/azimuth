@@ -59,7 +59,7 @@ export const perturbedUtterancesColumns: Column<Row>[] = [
           <Typography variant="body2" key={i}>
             <Typography
               component="span"
-              variant="body2"
+              variant="inherit"
               fontWeight={800}
               color={(theme) =>
                 theme.palette[
