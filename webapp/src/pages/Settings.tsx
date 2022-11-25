@@ -64,7 +64,7 @@ const ANALYSES_CUSTOMIZATION: (keyof AzimuthConfig)[] = [
   "similarity",
 ];
 
-const CUSTOM_METRICS: string[] = ["Precision", "Recall", "F1"];
+const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
@@ -80,10 +80,6 @@ const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { data, isError, isFetching } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig] = updateConfigEndpoint.useMutation();
-
-  const [partialFormConfig, setPartialFormConfig] = React.useState<
-    Partial<AzimuthConfig> | undefined
-  >(data ?? undefined);
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
@@ -286,8 +282,13 @@ const Settings: React.FC = () => {
       ? setPartialConfig({
           ...partialConfig,
           ...{
-            metrics: _.merge(resultingConfig?.metrics, {
-              [metricName]: partialFormConfig?.metrics?.[metricName],
+            metrics: _.merge({}, resultingConfig?.metrics, {
+              [metricName]: {
+                class_name: "datasets.load_metric",
+                kwargs: {
+                  path: metricName.toLowerCase(),
+                },
+              },
             }),
           },
         })
@@ -308,16 +309,16 @@ const Settings: React.FC = () => {
         justifyContent="flex-start"
         marginLeft={2}
       >
-        {displayReadonlyFields("name", partialFormConfig?.name)}
+        {displayReadonlyFields("name", resultingConfig?.name)}
         {displayReadonlyFields(
           "rejection class",
-          partialFormConfig?.rejection_class
+          resultingConfig?.rejection_class
         )}
       </Box>
       <Box display="flex" flexDirection="row" marginLeft={2}>
         {displaySubSectionTitle("Columns")}
-        {partialFormConfig?.columns &&
-          Object.entries(partialFormConfig.columns).map(
+        {resultingConfig?.columns &&
+          Object.entries(resultingConfig.columns).map(
             ([field, value], index) => (
               <Box key={index} gap={(theme) => theme.spacing(1)}>
                 {displayReadonlyFields(field, value)}
@@ -335,14 +336,14 @@ const Settings: React.FC = () => {
       >
         {displayReadonlyFields(
           "class name",
-          partialFormConfig?.dataset?.class_name
+          resultingConfig?.dataset?.class_name
         )}
-        {displayReadonlyFields("remote", partialFormConfig?.dataset?.remote)}
+        {displayReadonlyFields("remote", resultingConfig?.dataset?.remote)}
       </Box>
-      {partialFormConfig?.dataset?.kwargs && (
+      {resultingConfig?.dataset?.kwargs && (
         <Box display="flex" flexDirection="row" marginLeft={2} gap={5}>
           {displaySubSectionTitle("Kwargs")}
-          {Object.entries(partialFormConfig?.dataset?.kwargs).map(
+          {Object.entries(resultingConfig?.dataset?.kwargs).map(
             ([field, value], index) => (
               <Box key={index} gap={(theme) => theme.spacing(1)}>
                 {displayReadonlyFields(field, String(value))}
@@ -351,11 +352,11 @@ const Settings: React.FC = () => {
           )}
         </Box>
       )}
-      {partialFormConfig?.dataset?.args &&
-        partialFormConfig?.dataset?.args.length > 0 && (
+      {resultingConfig?.dataset?.args &&
+        resultingConfig?.dataset?.args.length > 0 && (
           <Box display="flex" flexDirection="row" marginLeft={2} gap={5}>
             {displaySubSectionTitle("args")}
-            {Object.entries(partialFormConfig?.dataset?.args).map(
+            {Object.entries(resultingConfig?.dataset?.args).map(
               ([field, value], index) => (
                 <Box key={index} gap={(theme) => theme.spacing(1)}>
                   {displayReadonlyFields(field, String(value))}
@@ -377,18 +378,18 @@ const Settings: React.FC = () => {
       >
         {displayReadonlyFields(
           "model_contract",
-          partialFormConfig?.model_contract
+          resultingConfig?.model_contract
         )}
         {displayReadonlyFields(
           "saliency layer",
-          partialFormConfig?.saliency_layer
+          resultingConfig?.saliency_layer
         )}
       </Box>
       {divider}
       <Box display="flex" flexDirection="row" marginLeft={2}>
         {displaySubSectionTitle("uncertainty")}
-        {partialFormConfig?.uncertainty &&
-          Object.entries(partialFormConfig.uncertainty).map(
+        {resultingConfig?.uncertainty &&
+          Object.entries(resultingConfig.uncertainty).map(
             ([field, value], index) =>
               field !== "faiss_encoder" && (
                 <Box
@@ -405,8 +406,8 @@ const Settings: React.FC = () => {
       </Box>
       {divider}
       {displaySectionTitle("Pipelines")}
-      {partialFormConfig?.pipelines &&
-        partialFormConfig.pipelines.map(
+      {resultingConfig?.pipelines &&
+        resultingConfig.pipelines.map(
           ({ name, model, postprocessors }, index) => (
             <Box
               key={index}
@@ -437,9 +438,11 @@ const Settings: React.FC = () => {
                   marginLeft={2}
                 >
                   {displaySubSectionTitle("kwargs")}
-                  {Object.entries(model.kwargs).map(([key, value]) =>
-                    displayReadonlyFields(key, String(value))
-                  )}
+                  {Object.entries(model.kwargs).map(([key, value], index) => (
+                    <Box key={index}>
+                      {displayReadonlyFields(key, String(value))}
+                    </Box>
+                  ))}
                 </Box>
               )}
               {model.args && model.args.length > 0 && (
@@ -451,9 +454,11 @@ const Settings: React.FC = () => {
                   marginLeft={2}
                 >
                   {displaySubSectionTitle("args")}
-                  {Object.entries(model.args).map(([key, value]) =>
-                    displayReadonlyFields(key, String(value))
-                  )}
+                  {Object.entries(model.args).map(([key, value], index) => (
+                    <Box key={index}>
+                      {displayReadonlyFields(key, String(value))}
+                    </Box>
+                  ))}
                 </Box>
               )}
               <Box
@@ -542,15 +547,15 @@ const Settings: React.FC = () => {
   const getAnalysesCustomization = () => (
     <Box display="flex" flexDirection="column" gap={2}>
       {ANALYSES_CUSTOMIZATION.map((customizationConfig, index) => (
-        <Box display="flex" flexDirection="column" gap={1}>
-          <Box key={index} display="flex" flexDirection="row" gap={2}>
+        <Box key={index} display="flex" flexDirection="column" gap={1}>
+          <Box display="flex" flexDirection="row" gap={2}>
             {customizationConfig === "similarity"
               ? displayToggleSectionTitle(
                   customizationConfig,
                   customizationConfig
                 )
               : displaySectionTitle(customizationConfig)}
-            {Object.entries(partialFormConfig?.[customizationConfig] ?? {}).map(
+            {Object.entries(resultingConfig?.[customizationConfig] ?? {}).map(
               ([field, value], index) =>
                 field !== "faiss_encoder" && (
                   <Box
