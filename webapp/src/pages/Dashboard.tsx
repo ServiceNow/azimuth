@@ -58,7 +58,7 @@ const Dashboard = () => {
           <Typography variant="h2">Dashboard</Typography>
           <Description
             text="Explore the analyses of your datasets and pipelines."
-            link="/"
+            link="user-guide/"
           />
         </Box>
         <Button
@@ -79,7 +79,7 @@ const Dashboard = () => {
           description={
             <Description
               text="Investigate issues related to class size, class imbalance, or dataset shift between your training and evaluation sets."
-              link="/dataset-warnings/"
+              link="user-guide/dataset-warnings/"
             />
           }
         >

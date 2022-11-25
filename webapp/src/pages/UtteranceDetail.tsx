@@ -41,13 +41,13 @@ const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
   similarity: (
     <Description
       text="Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class."
-      link="/exploration-space/utterance-details/#semantically-similar-utterances"
+      link="user-guide/exploration-space/utterance-details/#semantically-similar-utterances"
     />
   ),
   perturbedUtterances: (
     <Description
       text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations."
-      link="/exploration-space/utterance-details/#behavioral-tests"
+      link="user-guide/exploration-space/utterance-details/#behavioral-tests"
     />
   ),
 };
@@ -160,7 +160,7 @@ export const UtteranceDetail = () => {
     <Box display="flex" flexDirection="column" gap={2} height="100%">
       <Description
         text="Inspect the details of all of the analyses that have been performed on this utterance."
-        link="/exploration-space/utterance-details/"
+        link="user-guide/exploration-space/utterance-details/"
       />
       <Paper
         variant="outlined"

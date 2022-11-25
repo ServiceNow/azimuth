@@ -23,6 +23,13 @@ import { getClassOverlapPlotEndpoint } from "services/api";
 import { QueryClassOverlapState } from "types/models";
 import { constructSearchString } from "utils/helpers";
 
+export const classAnalysisDescription = (
+  <Description
+    text="Assess overlap between class pairs."
+    link="user-guide/class-analysis/"
+  />
+);
+
 const OVERLAP_THRESHOLD_INPUT_PROPS = { step: 0.01, min: 0, max: 1 };
 
 const ClassOverlap = () => {

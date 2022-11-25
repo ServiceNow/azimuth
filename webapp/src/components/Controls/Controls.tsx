@@ -217,7 +217,7 @@ const Controls: React.FC<Props> = ({
           <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
             <TuneIcon />
             <Typography variant="subtitle2">Controls</Typography>
-            <Description link="/exploration-space/#control-panel" />
+            <Description link="user-guide/exploration-space/#control-panel" />
           </Box>
         )}
         <Button

@@ -11,7 +11,7 @@ import { isPipelineSelected } from "utils/helpers";
 export const performanceAnalysisDescription = (
   <Description
     text="Analyze metrics for different data subpopulations."
-    link="/#pipeline-metrics-by-data-subpopulation"
+    link="user-guide/pipeline-metrics-comparison/"
   />
 );
 

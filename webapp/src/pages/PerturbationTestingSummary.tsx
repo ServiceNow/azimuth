@@ -11,7 +11,7 @@ import { isPipelineSelected } from "utils/helpers";
 export const behavioralTestingDescription = (
   <Description
     text="Assess your pipeline's linguistic capabilities with Robustness Invariance tests."
-    link="/behavioral-testing-summary/"
+    link="user-guide/behavioral-testing-summary/"
   />
 );
 

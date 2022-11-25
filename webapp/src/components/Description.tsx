@@ -1,8 +1,8 @@
-import LinkIcon from "@mui/icons-material/Link";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Box, Typography, Link } from "@mui/material";
 import React from "react";
 
-const DOCS_URL = "https://servicenow.github.io/azimuth/user-guide";
+const DOCS_URL = "https://servicenow.github.io/azimuth/main/";
 
 type Props = {
   text?: string;
@@ -24,7 +24,7 @@ const Description: React.FC<Props> = ({ text, link }) => {
           color="secondary"
           target="_blank"
         >
-          <LinkIcon sx={{ marginRight: 0.5, marginY: "-5px" }} />
+          <OpenInNewIcon sx={{ marginRight: 0.5, marginY: "-5px" }} />
           Learn more
         </Link>
       )}

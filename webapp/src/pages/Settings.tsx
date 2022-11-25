@@ -1,67 +1,174 @@
-import { Info } from "@mui/icons-material";
 import {
   Box,
   Button,
   Checkbox,
-  Chip,
-  FormControl,
+  Divider,
   FormControlLabel,
-  FormGroup,
   FormHelperText,
   InputBaseComponentProps,
-  Link,
   Paper,
   TextField,
   Typography,
 } from "@mui/material";
 import _ from "lodash";
 import React from "react";
+import AccordianLayout from "components/AccordianLayout";
 import { useParams } from "react-router-dom";
 import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
-import { AzimuthConfig } from "types/api";
+import { AzimuthConfig, PipelineDefinition } from "types/api";
 
-const DOCS_URL = "https://servicenow.github.io/azimuth/main/reference/";
-const FIELDS_WIDTH = 380;
+type stepper = { [key: string]: InputBaseComponentProps };
+const STEPPER: stepper = {
+  iterations: { min: 0, max: 100, step: 1 },
+  high_epistemic_threshold: { min: 0, max: 1, step: 0.1 },
+  conflicting_neighbors_threshold: { min: 0, max: 1, step: 0.1 },
+  no_close_threshold: { min: 0, max: 1, step: 0.1 },
+  min_num_per_class: { min: 0, max: 100, step: 10 },
+  max_delta_class_imbalance: { min: 0, max: 1, step: 0.1 },
+  max_delta_representation: { min: 0, max: 0.1, step: 0.01 },
+  max_delta_mean_tokens: { min: 0.0, max: 10.0, step: 1.0 },
+  max_delta_std_tokens: { min: 0.0, max: 10.0, step: 1.0 },
+  short_sentence_max_token: { min: 0, max: 100, step: 1 },
+  long_sentence_min_token: { min: 0, max: 100, step: 1 },
+};
+
+type section = {
+  name: string;
+  description: string;
+  docURL: string;
+};
+
+const configSection: section[] = [
+  {
+    name: "Project Config",
+    description:
+      "Contains mandatory fields that specify the dataset to load in Azimuth",
+    docURL: "reference/configuration/project/",
+  },
+  {
+    name: "Model Contract Config",
+    description:
+      "Defines how Azimuth interacts with the ML pipelines and the metrics",
+    docURL: "reference/configuration/model_contract/",
+  },
+  {
+    name: "Analyses Customization",
+    description: "Four analyses configured in Azimuth",
+    docURL: "reference/configuration/analyses/",
+  },
+];
+
+const ANALYSES_CUSTOMIZATION: (keyof AzimuthConfig)[] = [
+  "dataset_warnings",
+  "syntax",
+  "similarity",
+];
+
+const CUSTOM_METRICS: string[] = ["Precision", "Recall", "F1"];
+
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
-  "pipelines",
-  "metrics",
   "behavioral_testing",
   "similarity",
   "dataset_warnings",
   "syntax",
+  "pipelines",
   "uncertainty",
+  "metrics",
 ];
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
-
   const { data, isError, isFetching } = getConfigEndpoint.useQuery({ jobId });
-
   const [updateConfig] = updateConfigEndpoint.useMutation();
+
+  const [partialFormConfig, setPartialFormConfig] = React.useState<
+    Partial<AzimuthConfig> | undefined
+  >(data ?? undefined);
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
-
   const resultingConfig = { ...data, ...partialConfig };
 
-  const handleCustomMetricDelete = (name: string) => {
-    resultingConfig?.metrics &&
-      Object.keys(resultingConfig?.metrics)
-        .filter((metric) => metric !== name)
-        .map((metricName) =>
-          setPartialConfig(
-            _.merge(partialConfig, {
-              metrics: {
-                [metricName]: resultingConfig?.metrics?.[metricName],
-              },
-            })
-          )
-        );
-  };
-  const switchNullOrDefault = (field: keyof AzimuthConfig) => (
+  const divider = <Divider sx={{ margin: 1 }} />;
+
+  const displaySectionTitle = (section: string) => (
+    <Box sx={{ m: 1, width: "20ch" }}>
+      <Typography textTransform="capitalize" variant="caption" fontSize={16}>
+        {section}
+      </Typography>
+    </Box>
+  );
+
+  const displaySubSectionTitle = (section: string) => (
+    <Box sx={{ m: 1, width: "20ch" }}>
+      <Typography textTransform="capitalize" variant="caption" fontSize={14}>
+        {section}
+      </Typography>
+    </Box>
+  );
+
+  const displayToggleSectionTitle = (
+    config: keyof AzimuthConfig,
+    section: string = config
+  ) => (
+    <Box sx={{ m: 1, width: "20ch" }}>
+      {switchNullOrDefault(config, Boolean(resultingConfig[config]))}
+      <Typography textTransform="capitalize" variant="caption" fontSize={15}>
+        {section}
+      </Typography>
+    </Box>
+  );
+
+  const displayPostprocessorToggleSection = (pipeline: PipelineDefinition) => (
+    <Box sx={{ m: 1, width: "20ch" }}>
+      <Checkbox
+        sx={{ paddingLeft: 0 }}
+        size="small"
+        checked={Boolean(pipeline.postprocessors)}
+        disabled={isError || isFetching}
+        onChange={(event) => {
+          const existedPipeline = partialConfig.pipelines
+            ? partialConfig.pipelines.find(({ name }) => name === pipeline.name)
+            : undefined;
+          const updatedPipeline = [
+            {
+              ...pipeline,
+              postprocessors: event.target.checked ? [] : null,
+            },
+          ];
+          existedPipeline
+            ? setPartialConfig({
+                ...partialConfig,
+                pipelines: _.unionBy(
+                  updatedPipeline,
+                  partialConfig.pipelines,
+                  "name"
+                ),
+              })
+            : setPartialConfig({
+                ...partialConfig,
+                pipelines: _.unionBy(
+                  updatedPipeline,
+                  resultingConfig?.pipelines,
+                  "name"
+                ),
+              });
+        }}
+      />
+      <Typography textTransform="capitalize" variant="caption" fontSize={15}>
+        Postprocessors
+      </Typography>
+    </Box>
+  );
+
+  const switchNullOrDefault = (
+    field: keyof AzimuthConfig,
+    selected: boolean
+  ) => (
     <Checkbox
-      checked={Boolean(resultingConfig[field])}
+      sx={{ paddingLeft: 0 }}
+      checked={selected}
       disabled={isError || isFetching}
       onChange={(_, checked) =>
         setPartialConfig({ ...partialConfig, [field]: checked ? {} : null })
@@ -69,58 +176,41 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displayConfigTitle = (title: string, link?: string) => (
-    <Box display="flex" gap={1}>
-      <Typography variant="body1">{title}</Typography>
-      {link && (
-        <Link
-          href={DOCS_URL + link}
-          variant="body2"
-          color="secondary"
-          target="_blank"
-        >
-          <Info color="primary" fontSize="small" />
-        </Link>
-      )}
-    </Box>
+  const displayReadonlyFields = (label: string, value: string | undefined) => (
+    <TextField
+      key={String(value)}
+      sx={{
+        m: 1,
+        width: "32ch",
+      }}
+      size="small"
+      variant="standard"
+      label={<Typography fontWeight="bold">{label}</Typography>}
+      value={value}
+      disabled={isError || isFetching}
+      InputProps={{
+        readOnly: true,
+        disableUnderline: true,
+        style: { textTransform: "capitalize", fontSize: 14 },
+      }}
+    />
   );
-
-  const displayReadonlyFields = (
-    label: React.ReactElement,
-    defaultValue: string | undefined
-  ) =>
-    defaultValue ? (
-      <TextField
-        sx={{ width: FIELDS_WIDTH }}
-        label={label}
-        defaultValue={defaultValue}
-        InputProps={{
-          readOnly: true,
-        }}
-        variant="standard"
-      />
-    ) : (
-      <></>
-    );
 
   const displaySubFields = (
     config: keyof AzimuthConfig,
-    label: string,
     field: string,
-    limit: InputBaseComponentProps,
     value: number | undefined
   ) => (
     <TextField
-      sx={{ width: FIELDS_WIDTH, marginLeft: 5, marginBottom: 2 }}
-      id={field}
-      label={label}
+      key={field}
+      sx={{ m: 1, width: "16ch" }}
+      size="small"
+      label={field}
       type="number"
-      InputLabelProps={{
-        shrink: true,
-      }}
       defaultValue={value}
       disabled={!Boolean(resultingConfig[config])}
-      inputProps={limit}
+      inputProps={STEPPER[field]}
+      InputProps={{ style: { fontSize: 14 } }}
       variant="standard"
       onChange={(event) =>
         setPartialConfig(
@@ -132,371 +222,412 @@ const Settings: React.FC = () => {
     />
   );
 
-  return (
-    <Paper variant="outlined" sx={{ height: "100%", padding: 4 }}>
+  const displayPostprocessorSubField = (
+    pipeline: PipelineDefinition,
+    field: string,
+    postprocessorIdx: number,
+    value: number | undefined
+  ) => (
+    <TextField
+      key={field}
+      sx={{ m: 1, width: "16ch" }}
+      size="small"
+      label={field}
+      type="number"
+      InputLabelProps={{
+        shrink: true,
+      }}
+      defaultValue={value}
+      inputProps={{ min: 0, max: 1, step: 0.1 }}
+      variant="standard"
+      onChange={(event) => {
+        const existedPipeline = partialConfig.pipelines
+          ? partialConfig.pipelines.find(({ name }) => name === pipeline.name)
+          : undefined;
+        const current_postprocessor = pipeline?.postprocessors?.find(
+          (_, index) => index === postprocessorIdx
+        );
+        const updatedPostprocessor = _.assign({}, current_postprocessor, {
+          [field]: Number(event.target.value),
+        });
+        const updatedPipeline = [
+          {
+            ...pipeline,
+            postprocessors: _.unionBy(
+              [updatedPostprocessor],
+              pipeline.postprocessors,
+              "class_name"
+            ),
+          },
+        ];
+        existedPipeline
+          ? setPartialConfig({
+              ...partialConfig,
+              pipelines: _.unionBy(
+                updatedPipeline,
+                partialConfig.pipelines,
+                "name"
+              ),
+            })
+          : setPartialConfig({
+              ...partialConfig,
+              pipelines: _.unionBy(
+                updatedPipeline,
+                resultingConfig?.pipelines,
+                "name"
+              ),
+            });
+      }}
+    />
+  );
+
+  const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
+    checked
+      ? setPartialConfig({
+          ...partialConfig,
+          ...{
+            metrics: _.merge(resultingConfig?.metrics, {
+              [metricName]: partialFormConfig?.metrics?.[metricName],
+            }),
+          },
+        })
+      : setPartialConfig({
+          ...partialConfig,
+          ...{
+            metrics: _.omit(resultingConfig?.metrics, metricName),
+          },
+        });
+  };
+
+  const getProjectConfigSection = () => (
+    <Box display="flex" flexDirection="column">
+      {displaySectionTitle("General")}
       <Box
         display="flex"
         flexDirection="row"
-        justifyContent="space-around"
-        gap={3}
-        sx={{
-          position: "sticky",
-          margin: 2,
-          background: (theme) => theme.palette.background.paper,
-        }}
+        justifyContent="flex-start"
+        marginLeft={2}
       >
+        {displayReadonlyFields("name", partialFormConfig?.name)}
         {displayReadonlyFields(
-          displayConfigTitle("Config name", "configuration/project/#name"),
-          resultingConfig.name
-        )}
-        {displayReadonlyFields(
-          displayConfigTitle(
-            "Dataset class name",
-            "configuration/project/#dataset"
-          ),
-          resultingConfig.dataset?.class_name
-        )}
-        {displayReadonlyFields(
-          displayConfigTitle(
-            "Model contract",
-            "configuration/model_contract/#model-contract"
-          ),
-          resultingConfig.model_contract
+          "rejection class",
+          partialFormConfig?.rejection_class
         )}
       </Box>
+      <Box display="flex" flexDirection="row" marginLeft={2}>
+        {displaySubSectionTitle("Columns")}
+        {partialFormConfig?.columns &&
+          Object.entries(partialFormConfig.columns).map(
+            ([field, value], index) => (
+              <Box key={index} gap={(theme) => theme.spacing(1)}>
+                {displayReadonlyFields(field, value)}
+              </Box>
+            )
+          )}
+      </Box>
+      {divider}
+      {displaySectionTitle("Dataset")}
       <Box
         display="flex"
-        flexDirection="column"
-        sx={{
-          width: "100%",
-          height: "95%",
-          overflow: "scroll",
-          paddingX: 20,
-          paddingY: 2,
-        }}
+        flexDirection="row"
+        justifyContent="flex-start"
+        marginLeft={2}
       >
-        {displayConfigTitle(
-          "Pipelines",
-          "configuration/model_contract/#pipelines"
+        {displayReadonlyFields(
+          "class name",
+          partialFormConfig?.dataset?.class_name
         )}
-        {resultingConfig?.pipelines?.map(
+        {displayReadonlyFields("remote", partialFormConfig?.dataset?.remote)}
+      </Box>
+      {partialFormConfig?.dataset?.kwargs && (
+        <Box display="flex" flexDirection="row" marginLeft={2} gap={5}>
+          {displaySubSectionTitle("Kwargs")}
+          {Object.entries(partialFormConfig?.dataset?.kwargs).map(
+            ([field, value], index) => (
+              <Box key={index} gap={(theme) => theme.spacing(1)}>
+                {displayReadonlyFields(field, String(value))}
+              </Box>
+            )
+          )}
+        </Box>
+      )}
+      {partialFormConfig?.dataset?.args &&
+        partialFormConfig?.dataset?.args.length > 0 && (
+          <Box display="flex" flexDirection="row" marginLeft={2} gap={5}>
+            {displaySubSectionTitle("args")}
+            {Object.entries(partialFormConfig?.dataset?.args).map(
+              ([field, value], index) => (
+                <Box key={index} gap={(theme) => theme.spacing(1)}>
+                  {displayReadonlyFields(field, String(value))}
+                </Box>
+              )
+            )}
+          </Box>
+        )}
+    </Box>
+  );
+  const getModalContractConfigSection = () => (
+    <Box display="flex" flexDirection="column">
+      {displaySectionTitle("General")}
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="flex-start"
+        marginLeft={2}
+      >
+        {displayReadonlyFields(
+          "model_contract",
+          partialFormConfig?.model_contract
+        )}
+        {displayReadonlyFields(
+          "saliency layer",
+          partialFormConfig?.saliency_layer
+        )}
+      </Box>
+      {divider}
+      <Box display="flex" flexDirection="row" marginLeft={2}>
+        {displaySubSectionTitle("uncertainty")}
+        {partialFormConfig?.uncertainty &&
+          Object.entries(partialFormConfig.uncertainty).map(
+            ([field, value], index) =>
+              field !== "faiss_encoder" && (
+                <Box
+                  key={index}
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="flex-start"
+                  gap={5}
+                >
+                  {displaySubFields("uncertainty", field, value)}
+                </Box>
+              )
+          )}
+      </Box>
+      {divider}
+      {displaySectionTitle("Pipelines")}
+      {partialFormConfig?.pipelines &&
+        partialFormConfig.pipelines.map(
           ({ name, model, postprocessors }, index) => (
             <Box
-              key={name}
+              key={index}
               display="flex"
               flexDirection="column"
-              marginX={4}
-              marginY={1}
+              gap={1}
+              marginLeft={2}
+              border="1px solid rgba(0, 0, 0, 0.12)"
             >
+              {displaySectionTitle(name)}
               <Box
                 display="flex"
                 flexDirection="row"
                 justifyContent="flex-start"
                 gap={5}
+                marginLeft={2}
               >
-                {displayReadonlyFields(displayConfigTitle("name"), name)}
-                {displayReadonlyFields(
-                  displayConfigTitle("model"),
-                  model.class_name
-                )}
+                {displaySubSectionTitle("Model")}
+                {displayReadonlyFields("Class name", model.class_name)}
+                {displayReadonlyFields("Remote", model.remote)}
               </Box>
-              <Box display="flex" flexDirection="column" marginY={1}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={Boolean(postprocessors)}
-                      disabled={isError || isFetching}
-                      onChange={(_, checked) =>
-                        setPartialConfig({
-                          ...partialConfig,
-                          pipelines: [
-                            {
-                              ...{ name, model },
-                              postprocessors: checked ? [] : null,
-                            },
-                          ],
-                        })
-                      }
-                    />
-                  }
-                  label={displayConfigTitle(
-                    "Postprocessors",
-                    "custom-objects/postprocessors/"
+              {model.kwargs && (
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="flex-start"
+                  gap={5}
+                  marginLeft={2}
+                >
+                  {displaySubSectionTitle("kwargs")}
+                  {Object.entries(model.kwargs).map(([key, value]) =>
+                    displayReadonlyFields(key, String(value))
                   )}
-                />
-                {postprocessors &&
-                  postprocessors.map(
-                    ({ class_name, temperature, threshold }) => (
+                </Box>
+              )}
+              {model.args && model.args.length > 0 && (
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="flex-start"
+                  gap={5}
+                  marginLeft={2}
+                >
+                  {displaySubSectionTitle("args")}
+                  {Object.entries(model.args).map(([key, value]) =>
+                    displayReadonlyFields(key, String(value))
+                  )}
+                </Box>
+              )}
+              <Box
+                display="flex"
+                flexDirection="column"
+                marginLeft={2}
+                marginBottom={2}
+              >
+                {displayPostprocessorToggleSection({
+                  name,
+                  model,
+                  postprocessors,
+                })}
+                <Box
+                  key={index}
+                  display="flex"
+                  flexDirection="column"
+                  gap={1}
+                  marginLeft={2}
+                >
+                  {postprocessors &&
+                    postprocessors.map((postprocessor, index) => (
                       <Box
+                        key={index}
                         display="flex"
                         flexDirection="row"
                         justifyContent="flex-start"
-                        gap={4}
-                        marginLeft={4}
+                        gap={5}
+                        marginX={2}
+                        padding={1}
+                        border="1px solid rgba(0, 0, 0, 0.12)"
                       >
                         {displayReadonlyFields(
-                          displayConfigTitle("name"),
-                          class_name
+                          "class name",
+                          postprocessor.class_name
                         )}
-                        {temperature && (
-                          <TextField
-                            sx={{
-                              width: FIELDS_WIDTH,
-                              marginLeft: 5,
-                              marginBottom: 2,
-                            }}
-                            id="temperature"
-                            label="Temperature"
-                            type="number"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            value={temperature}
-                            inputProps={{ min: 0, max: 1, step: 0.1 }}
-                            variant="standard"
-                            onChange={(event) =>
-                              setPartialConfig({
-                                ...partialConfig,
-                                pipelines: [
-                                  {
-                                    ...{ name, model },
-                                    postprocessors: [
-                                      {
-                                        temperature: Number(event.target.value),
-                                      },
-                                    ],
-                                  },
-                                ],
-                              })
-                            }
-                          />
-                        )}
-                        {threshold && (
-                          <TextField
-                            sx={{
-                              width: FIELDS_WIDTH,
-                              marginLeft: 5,
-                              marginBottom: 2,
-                            }}
-                            id="threshold"
-                            label="Threshold"
-                            type="number"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            value={threshold}
-                            inputProps={{ min: 0, max: 1, step: 0.1 }}
-                            variant="standard"
-                            onChange={(event) =>
-                              setPartialConfig({
-                                ...partialConfig,
-                                pipelines: [
-                                  {
-                                    ...{ name, model },
-                                    postprocessors: [
-                                      {
-                                        threshold: Number(event.target.value),
-                                      },
-                                    ],
-                                  },
-                                ],
-                              })
-                            }
-                          />
-                        )}
+                        {postprocessor?.temperature &&
+                          displayPostprocessorSubField(
+                            { name, model, postprocessors },
+                            "temperature",
+                            index,
+                            postprocessor?.temperature
+                          )}
+                        {postprocessor?.threshold &&
+                          displayPostprocessorSubField(
+                            { name, model, postprocessors },
+                            "threshold",
+                            index,
+                            postprocessor?.threshold
+                          )}
                       </Box>
-                    )
-                  )}
+                    ))}
+                </Box>
               </Box>
             </Box>
           )
         )}
-        {resultingConfig?.metrics && (
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="flex-start"
-            gap={1}
-            margin={2}
-          >
-            {displayConfigTitle("Metrics: ", "custom-objects/metric/")}
-            {Object.keys(resultingConfig.metrics).map((metricName) => (
-              <Chip
-                label={metricName}
-                variant="outlined"
-                onDelete={() => handleCustomMetricDelete(metricName)}
-              />
-            ))}
-          </Box>
-        )}
-        <FormControl>
-          <FormGroup>
+      {divider}
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="flex-start"
+        gap={1}
+      >
+        {displaySectionTitle("metrics")}
+        {CUSTOM_METRICS.map((metricName, index) => (
+          <Box key={index} display="flex">
             <FormControlLabel
-              control={switchNullOrDefault("behavioral_testing")}
-              label={displayConfigTitle(
-                "Perturbation testing",
-                "configuration/analyses/behavioral_testing/"
-              )}
+              control={
+                <Checkbox
+                  checked={Boolean(resultingConfig.metrics?.[metricName])}
+                  color="primary"
+                  onChange={(e) =>
+                    handleCustomMetricUpdate(e.target.checked, metricName)
+                  }
+                />
+              }
+              label={metricName}
             />
-            <FormControlLabel
-              control={switchNullOrDefault("similarity")}
-              label={displayConfigTitle(
-                "Similarity",
-                "configuration/analyses/similarity/"
-              )}
-            />
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              gap={1}
-            >
-              {displaySubFields(
-                "similarity",
-                "Conflicting neighbors threshold",
-                "conflicting_neighbors_threshold",
-                { min: 0, max: 1, step: 0.1 },
-                resultingConfig.similarity?.conflicting_neighbors_threshold
-              )}
-              {displaySubFields(
-                "similarity",
-                "No close threshold",
-                "no_close_threshold",
-                { min: 0, max: 1, step: 0.1 },
-                resultingConfig.similarity?.no_close_threshold
-              )}
-            </Box>
-            {displayConfigTitle(
-              "Dataset Warnings",
-              "configuration/analyses/dataset_warnings/"
-            )}
-            {Boolean(resultingConfig.dataset_warnings) && (
-              <Box
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                gap={1}
-              >
-                {displaySubFields(
-                  "dataset_warnings",
-                  "Min num per class",
-                  "min_num_per_class",
-                  { min: 0, max: 100, step: 10 },
-                  resultingConfig.dataset_warnings?.min_num_per_class
-                )}
-                {displaySubFields(
-                  "dataset_warnings",
-                  "Max delta representation",
-                  "max_delta_representation",
-                  { min: 0, max: 0.1, step: 0.01 },
-                  resultingConfig.dataset_warnings?.max_delta_representation
-                )}
-                {displaySubFields(
-                  "dataset_warnings",
-                  "Max delta mean tokens",
-                  "max_delta_mean_tokens",
-                  { min: 0.0, max: 10.0, step: 1.0 },
-                  resultingConfig.dataset_warnings?.max_delta_mean_tokens
-                )}
-                {displaySubFields(
-                  "dataset_warnings",
-                  "Max delta std tokens",
-                  "max_delta_std_tokens",
-                  { min: 0.0, max: 10.0, step: 1.0 },
-                  resultingConfig.dataset_warnings?.max_delta_std_tokens
-                )}
-                {displaySubFields(
-                  "dataset_warnings",
-                  "Max delta class imbalance",
-                  "max_delta_class_imbalance",
-                  { min: 0, max: 1, step: 0.1 },
-                  resultingConfig.dataset_warnings?.max_delta_class_imbalance
-                )}
-              </Box>
-            )}
-            {displayConfigTitle("Syntax", "configuration/analyses/syntax/")}
-            {Boolean(resultingConfig.syntax) && (
-              <Box
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                gap={1}
-              >
-                {displaySubFields(
-                  "syntax",
-                  "Short sentence max token",
-                  "short_sentence_max_token",
-                  { min: 0, max: 100, step: 1 },
-                  resultingConfig.syntax?.short_sentence_max_token
-                )}
-                {displaySubFields(
-                  "syntax",
-                  "Long sentence min token",
-                  "long_sentence_min_token",
-                  { min: 0, max: 100, step: 1 },
-                  resultingConfig.syntax?.long_sentence_min_token
-                )}
-              </Box>
-            )}
-            {displayConfigTitle(
-              "Uncertainty",
-              "configuration/model_contract/#uncertainty"
-            )}
-            {Boolean(resultingConfig.uncertainty) && (
-              <Box
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                gap={1}
-              >
-                {displaySubFields(
-                  "uncertainty",
-                  "Iterations",
-                  "iterations",
-                  {
-                    min: 0,
-                    max: 100,
-                    step: 1,
-                  },
-                  resultingConfig.uncertainty?.iterations
-                )}
-                {displaySubFields(
-                  "uncertainty",
-                  "High epistemic threshold",
-                  "high_epistemic_threshold",
-                  { min: 0, max: 1, step: 0.1 },
-                  resultingConfig.uncertainty?.high_epistemic_threshold
-                )}
-              </Box>
-            )}
-          </FormGroup>
-          {console.log(partialConfig)}
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            gap={1}
-            sx={{ position: "sticky", bottom: 5 }}
-          >
-            <Button
-              variant="contained"
-              onClick={() => updateConfig({ jobId, body: partialConfig })}
-            >
-              Apply
-            </Button>
-            {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
-              <FormHelperText error sx={{ textAlign: "center" }}>
-                Warning!
-                <br />
-                These changes may trigger some time-consuming computations.
-                <br />
-                Azimuth will not be usable until they complete.
-              </FormHelperText>
-            )}
           </Box>
-        </FormControl>
+        ))}
       </Box>
-    </Paper>
+    </Box>
+  );
+
+  const getAnalysesCustomization = () => (
+    <Box display="flex" flexDirection="column" gap={2}>
+      {ANALYSES_CUSTOMIZATION.map((customizationConfig, index) => (
+        <Box display="flex" flexDirection="column" gap={1}>
+          <Box key={index} display="flex" flexDirection="row" gap={2}>
+            {customizationConfig === "similarity"
+              ? displayToggleSectionTitle(
+                  customizationConfig,
+                  customizationConfig
+                )
+              : displaySectionTitle(customizationConfig)}
+            {Object.entries(partialFormConfig?.[customizationConfig] ?? {}).map(
+              ([field, value], index) =>
+                field !== "faiss_encoder" && (
+                  <Box
+                    key={index}
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="flex-start"
+                    gap={5}
+                  >
+                    {displaySubFields(customizationConfig, field, value)}
+                  </Box>
+                )
+            )}
+          </Box>
+          {divider}
+        </Box>
+      ))}
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="flex-start"
+        gap={5}
+      >
+        {displayToggleSectionTitle(
+          "behavioral_testing",
+          "Perturbation Testing"
+        )}
+      </Box>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ height: "100%" }}>
+      <Paper
+        variant="outlined"
+        sx={{ height: "85%", padding: 2, overflow: "auto" }}
+      >
+        <Typography variant="subtitle1">
+          View and edit certain fields from your config file. Once your changes
+          are saved, expect some delays for recomputing the affected tasks.
+        </Typography>
+        {configSection.map((section, index) => (
+          <AccordianLayout key={index} {...section}>
+            {index === 0 && getProjectConfigSection()}
+            {index === 1 && getModalContractConfigSection()}
+            {index === 2 && getAnalysesCustomization()}
+          </AccordianLayout>
+        ))}
+      </Paper>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingY: 2,
+        }}
+      >
+        <Button variant="contained">Discard</Button>
+        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+          <Button
+            variant="contained"
+            onClick={() => updateConfig({ jobId, body: partialConfig })}
+          >
+            Apply
+          </Button>
+          {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
+            <FormHelperText error sx={{ textAlign: "center" }}>
+              Warning!
+              <br />
+              These changes may trigger some time-consuming computations.
+              <br />
+              Azimuth will not be usable until they complete.
+            </FormHelperText>
+          )}
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
