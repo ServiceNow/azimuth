@@ -34,6 +34,14 @@ actions**. It currently only supports **text classification use cases**.
 Our [documentation](https://servicenow.github.io/azimuth) contains all the instructions and
 references to use Azimuth.
 
+### YouTube Playlist
+
+<p align="center">
+  <a href="https://www.youtube.com/playlist?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8">
+    <img src="docs/docs/_static/images/youtube.png" width="560" height="315" />
+  </a>
+</p>
+
 ### Documentation Structure
 
 * [Getting Started](https://servicenow.github.io/azimuth/getting-started)
