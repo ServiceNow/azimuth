@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 import orjson
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Extra, Field
 
 from azimuth.utils.conversion import orjson_dumps
 from azimuth.utils.pydantic_utils import create_model
@@ -44,6 +44,7 @@ class AliasModel(BaseModel):  # noqa: D205,D415
     class Config:
         allow_population_by_field_name = True
         alias_generator = to_camel_case
+        extra = Extra.forbid
         json_encoders = {np.ndarray: lambda x: x.tolist()}
         json_loads = orjson.loads
         json_dumps = orjson_dumps
