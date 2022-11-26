@@ -37,7 +37,7 @@ references to use Azimuth.
 ### YouTube Playlist
 
 <p align="center">
-  <a href="https://youtu.be/REtWwMZswuU?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8">
+  <a href="https://www.youtube.com/playlist?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8">
     <img src="docs/docs/_static/images/youtube.png" width="560" height="315" />
   </a>
 </p>
