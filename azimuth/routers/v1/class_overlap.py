@@ -123,7 +123,9 @@ def get_class_analysis(
             SupportedModule.ConfusionMatrix,
             DatasetSplitName.eval,
             task_manager=task_manager,
-            mod_options=ModuleOptions(pipeline_index=pipeline_index, cf_normalized=False),
+            mod_options=ModuleOptions(
+                pipeline_index=pipeline_index, cf_normalize=False, cf_reorder_classes=False
+            ),
             last_update=dataset_split_managers[DatasetSplitName.eval].last_update,
         )[0]
         if pipeline_index is not None
