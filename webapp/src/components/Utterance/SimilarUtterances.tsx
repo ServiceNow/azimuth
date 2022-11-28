@@ -1,5 +1,5 @@
 import { Warning } from "@mui/icons-material";
-import { Tooltip, useTheme } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import { GridCellParams, GridRow } from "@mui/x-data-grid";
 import CopyButton from "components/CopyButton";
@@ -37,7 +37,6 @@ const SimilarUtterances: React.FC<Props> = ({
   utterances,
 }) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   const rows: Row[] = utterances.map((utterance) => ({
     ...utterance,
@@ -99,10 +98,10 @@ const SimilarUtterances: React.FC<Props> = ({
           {value !== baseUtterance.label && (
             <Tooltip title="Different from base utterance">
               <Warning
-                sx={{
+                sx={(theme) => ({
                   color: theme.palette.warning.main,
                   marginRight: 1,
-                }}
+                })}
               />
             </Tooltip>
           )}

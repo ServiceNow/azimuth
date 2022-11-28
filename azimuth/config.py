@@ -38,7 +38,7 @@ class CustomObject(BaseModel):  # type: ignore
     kwargs: Dict[str, Union["CustomObject", Any]] = {}
     remote: Optional[str] = Field(
         None,
-        description="Relative path to class." " `class` needs to be accessible from this path.",
+        description="Relative path to class. `class_name` needs to be accessible from this path.",
     )
 
 

@@ -1,6 +1,7 @@
-import React from "react";
 import { Box, Link, Typography, useTheme } from "@mui/material";
 import useResizeObserver from "hooks/useResizeObserver";
+import React from "react";
+import { Link as RouterLink } from "react-router-dom";
 import {
   QueryConfusionMatrixState,
   QueryFilterState,
@@ -9,7 +10,6 @@ import {
   QueryPostprocessingState,
   WordCount,
 } from "types/models";
-import { Link as RouterLink } from "react-router-dom";
 import { constructSearchString } from "utils/helpers";
 
 const maxFontSizeInEm = 3;
@@ -57,9 +57,9 @@ const TopWords: React.FC<Props> = ({
       height="100%"
       padding={1}
       width="100%"
-      sx={{
+      sx={(theme) => ({
         backgroundColor: theme.palette.grey[50],
-      }}
+      })}
     >
       <Box
         ref={contentRef}
@@ -68,7 +68,7 @@ const TopWords: React.FC<Props> = ({
         flexDirection="row"
         flexWrap="wrap"
         justifyContent="center"
-        minHeight={theme.spacing(2)}
+        minHeight={(theme) => theme.spacing(2)}
         sx={{
           transform: `scale(${fitScale})`,
           transformOrigin: "top center",
@@ -77,7 +77,7 @@ const TopWords: React.FC<Props> = ({
         {wordCounts.length === 0 ? (
           <Typography
             align="center"
-            color={theme.palette.grey[400]}
+            color={(theme) => theme.palette.grey[400]}
             paddingTop="10%"
           >
             No word count data.
@@ -95,6 +95,8 @@ const TopWords: React.FC<Props> = ({
                 ...pipeline,
                 ...postprocessing,
               })}`}
+              // Despite color's type allowing for `(theme) => `,
+              // it results in an uncaught error that crashes the app.
               color={theme.palette[palette].dark}
               display="block"
               fontSize={`${Math.max(

@@ -1,5 +1,5 @@
+import { Box, Skeleton } from "@mui/material";
 import React from "react";
-import { Box, Skeleton, useTheme } from "@mui/material";
 
 const GAP = 2;
 
@@ -9,8 +9,6 @@ const TopWordsSkeleton = ({
   rowCount = 4,
   wordWidthMaxMinRatio = 6,
 }: Props) => {
-  const theme = useTheme();
-
   const randomness = wordWidthMaxMinRatio - 1;
   return (
     <Box
@@ -20,9 +18,9 @@ const TopWordsSkeleton = ({
       height="100%"
       padding={GAP}
       width="100%"
-      sx={{
+      sx={(theme) => ({
         backgroundColor: theme.palette.grey[50],
-      }}
+      })}
     >
       {Array.from(Array(rowCount), (_, row) => (
         <Box

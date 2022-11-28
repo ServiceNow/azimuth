@@ -11,7 +11,6 @@ import {
   Switch,
   Tooltip,
   Typography,
-  useTheme,
 } from "@mui/material";
 import {
   QueryFilterState,
@@ -74,7 +73,6 @@ const Controls: React.FC<Props> = ({
   postprocessing,
   searchString,
 }) => {
-  const theme = useTheme();
   const [searchValue, setSearchValue] = useState("");
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const history = useHistory();
@@ -201,11 +199,11 @@ const Controls: React.FC<Props> = ({
       border="1px solid rgba(0, 0, 0, 0.12)"
       boxSizing="content-box"
       overflow="hidden"
-      sx={{
+      sx={(theme) => ({
         borderTopRightRadius: theme.shape.borderRadius,
         borderBottomRightRadius: theme.shape.borderRadius,
         backgroundColor: "white",
-      }}
+      })}
       animate={{
         width: isCollapsed
           ? FILTER_CONTAINER_CLOSED_WIDTH
@@ -305,10 +303,10 @@ const Controls: React.FC<Props> = ({
             <OutlinedInput
               fullWidth
               placeholder="Outcome, label, prediction, smart tag, action"
-              sx={{
+              sx={(theme) => ({
                 borderRadius: theme.spacing(2),
                 height: theme.spacing(4),
-              }}
+              })}
               value={searchValue}
               onChange={(event) => handleSearchChange(event.target.value)}
               endAdornment={

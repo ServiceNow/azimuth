@@ -1,16 +1,15 @@
-import React from "react";
-
-import makeStyles from "@mui/styles/makeStyles";
-
 import { Info } from "@mui/icons-material";
 import {
   Box,
   BoxProps,
   Skeleton,
+  Theme,
   Tooltip,
   tooltipClasses,
   Typography,
 } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
+import React from "react";
 
 const useStyles = makeStyles(() => ({
   popper: {
@@ -25,7 +24,7 @@ type Props = {
   description: string;
   isLoading: boolean;
   value?: string;
-  color?: string;
+  color?: string | ((theme: Theme) => string);
   flexDirection?: BoxProps["flexDirection"];
 };
 
