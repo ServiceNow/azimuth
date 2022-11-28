@@ -35,7 +35,7 @@ def test_dataset_manager_tags(a_text_dataset, simple_text_config):
     simple_table_key = get_table_key(simple_text_config)
     assert os.path.exists(ds_mng._save_path)
     assert all(t in ds_mng.get_dataset_split(simple_table_key).column_names for t in tags)
-    assert (np.array(ds_mng.get_dataset_split(simple_table_key)["red"]) == False).all()  # noqa
+    assert np.array(ds_mng.get_dataset_split(simple_table_key)["red"]).sum() == 0
 
     # We can tags stuff!
     tags_data = {1: {"red": True}, 2: {"red": True, "blue": True}}

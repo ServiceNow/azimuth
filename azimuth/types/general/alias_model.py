@@ -26,7 +26,7 @@ def to_camel_case(string: str) -> str:
     return "".join(words)
 
 
-class AliasModel(BaseModel):  # noqa: D205,D415
+class AliasModel(BaseModel):
     """This model should be used as the base for any model that defines aliases to ensure
     that all fields are represented correctly.
     """
