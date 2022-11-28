@@ -17,6 +17,7 @@ from azimuth.types.model_performance import (
 )
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
+    DATASET_SMART_TAG_FAMILIES,
     SMART_TAGS_FAMILY_MAPPING,
     SmartTag,
     SmartTagFamily,
@@ -65,15 +66,22 @@ def get_count_per_filter(
         tag_family: Counter(
             **{
                 SmartTag.no_smart_tag: sum(
-                    ds.to_pandas()[list(set(tags).intersection(ds.column_names))]  # type: ignore
+                    ds.to_pandas()[  # type: ignore[index, misc]
+                        list(
+                            set(SMART_TAGS_FAMILY_MAPPING[tag_family]).intersection(ds.column_names)
+                        )
+                    ]
                     .to_numpy()
                     .sum(1)
                     == 0
                 )
             },
-            **{t: sum(ds[t]) if t in ds.column_names else 0 for t in tags},
+            **{
+                t: sum(ds[t]) if t in ds.column_names else 0
+                for t in SMART_TAGS_FAMILY_MAPPING[tag_family]
+            },
         )
-        for tag_family, tags in SMART_TAGS_FAMILY_MAPPING.items()
+        for tag_family in DATASET_SMART_TAG_FAMILIES
     }
     data_action_counter: Counter = Counter(**{t: sum(ds[t]) for t in ALL_DATA_ACTIONS})
 
