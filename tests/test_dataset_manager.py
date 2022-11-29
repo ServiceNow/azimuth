@@ -15,6 +15,7 @@ from azimuth.config import AzimuthValidationError
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import ALL_STANDARD_TAGS, ALL_TAGS
+from azimuth.utils.project import load_dataset_from_config
 from tests.test_loading_resources import load_sst2_dataset
 from tests.utils import generate_mocked_dm, get_table_key
 
@@ -351,4 +352,60 @@ def test_rejection_class_check(simple_text_config, a_text_dataset):
             config=simple_text_config,
             initial_tags=[],
             dataset_split=a_text_dataset,
+        )
+
+
+def test_default_persistent_id(clinc_text_config):
+    dataset_split_name = DatasetSplitName.eval
+    ds = load_dataset_from_config(clinc_text_config)[dataset_split_name]
+    persistent_id = clinc_text_config.columns.persistent_id
+    assert persistent_id not in ds.column_names, f"{persistent_id} should not be in clinc dataset."
+    dm = DatasetSplitManager(
+        dataset_split_name,
+        clinc_text_config,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=ds,
+    )
+    assert (
+        persistent_id in dm.get_dataset_split().column_names
+    ), f"{persistent_id} should be in clinc dataset after DatasetSplitManager creation."
+
+
+def test_custom_persistent_id(simple_text_config, a_text_dataset):
+    simple_text_config_persistent_id = simple_text_config.copy()
+    simple_text_config_persistent_id.columns.persistent_id = "idx"
+    dm = DatasetSplitManager(
+        DatasetSplitName.eval,
+        simple_text_config_persistent_id,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=a_text_dataset,
+    )
+
+    assert (
+        simple_text_config_persistent_id.columns.persistent_id
+        in dm.get_dataset_split().column_names
+    )
+
+    simple_text_config_new_persistent_id = simple_text_config.copy()
+    simple_text_config_new_persistent_id.columns.persistent_id = "yukongold"
+    with pytest.raises(ValueError, match="not found in the dataset"):
+        DatasetSplitManager(
+            DatasetSplitName.eval,
+            simple_text_config_new_persistent_id,
+            initial_tags=ALL_STANDARD_TAGS,
+            dataset_split=a_text_dataset,
+        )
+
+    # TODO Bug that will be fixed when updating datasets.
+    # 872 should be replaced by len(a_text_dataset).
+    dataset_length = 872
+    a_text_dataset_new_col = a_text_dataset.add_column(
+        name="yukongold", column=[1] * dataset_length
+    )
+    with pytest.raises(ValueError, match="need to be unique"):
+        DatasetSplitManager(
+            DatasetSplitName.eval,
+            simple_text_config_new_persistent_id,
+            initial_tags=ALL_STANDARD_TAGS,
+            dataset_split=a_text_dataset_new_col,
         )

@@ -94,9 +94,8 @@ class DatasetSplitManager:
             if dataset_split is None:
                 raise ValueError("No dataset_split cached, can't initialize.")
             log.info("Initializing tags", tags=initial_tags)
-            self._base_dataset_split, self._malformed_dataset = self._split_malformed(dataset_split)
-            self._base_dataset_split = self._init_dataset_split(
-                self._base_dataset_split, self._tags
+            self._base_dataset_split, self._malformed_dataset = self._load_base_dataset_split(
+                dataset_split
             )
             self._save_base_dataset_split()
         else:
@@ -152,6 +151,21 @@ class DatasetSplitManager:
                 malformed = self.load_cache(self._malformed_path)
             return ds, malformed
         return None
+
+    def _load_base_dataset_split(self, dataset_split) -> Tuple[Dataset, Dataset]:
+        base_dataset_split, malformed_dataset = self._split_malformed(dataset_split)
+
+        # Checking if a persistent id was provided.
+        persistent_id = self.config.columns.persistent_id
+        if persistent_id != DatasetColumn.row_idx:  # Default value
+            if persistent_id not in base_dataset_split.column_names:
+                raise ValueError(f"Persistent ID named {persistent_id} not found in the dataset.")
+            else:
+                all_persistent_ids = base_dataset_split[persistent_id]
+                if len(all_persistent_ids) > len(set(all_persistent_ids)):
+                    raise ValueError(f"Persistent IDs in {persistent_id} column need to be unique.")
+        base_dataset_split = self._init_dataset_split(base_dataset_split, self._tags)
+        return base_dataset_split, malformed_dataset
 
     def _save_base_dataset_split(self):
         # NOTE: We should not have the Index in `self.dataset_split`.
