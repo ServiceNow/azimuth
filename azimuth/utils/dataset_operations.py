@@ -62,7 +62,12 @@ def filter_dataset_split(
         and dataset_split.num_rows != 0
     ):
         by = filters.utterance.lower()
-        dataset_split = dataset_split.filter(lambda x: by in x[config.columns.text_input].lower())
+        # Filter in utterances or if string matches a known row_idx or persistent_id
+        dataset_split = dataset_split.filter(
+            lambda x: by in x[config.columns.text_input].lower()
+            or by == str(x[DatasetColumn.row_idx])
+            or by == str(x[config.columns.persistent_id])
+        )
     if len(filters.prediction) > 0 and dataset_split.num_rows != 0:
         prediction_column = (
             DatasetColumn.model_predictions

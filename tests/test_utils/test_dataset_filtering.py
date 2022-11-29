@@ -53,6 +53,7 @@ def test_dataset_filtering(simple_text_config):
         == 1
     )
     assert filtered_len(DatasetFilters(utterance="some")) == 2
+    assert filtered_len(DatasetFilters(utterance="32")) == 1, "Utterance with index 32"
     assert filtered_len(DatasetFilters(prediction=[1])) == 5
 
     # We can filter by combinations of filter
