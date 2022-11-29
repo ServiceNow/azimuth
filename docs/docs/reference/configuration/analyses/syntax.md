@@ -3,12 +3,12 @@
 :blue_circle: **Default value:** `SyntaxOptions()`
 
 In the Syntax config, users can modify thresholds to determine what is considered a short
-or a long sentence, as well as select the spaCy model and the dependency tags used for
+or a long sentence, as well as select the spaCy model and the dependency tags used for certain
 syntax-related smart tags. More details are explained in
 [:material-link: Syntax Analysis](../../../key-concepts/syntax-analysis.md).
 
 Note that language-related defaults are dynamically selected based on the language specified in the
-[:material-link: Project Config](../project.md) (default is English). As such, the spaCy model and
+[:material-link: Language Config](../language.md) (default is English). As such, the spaCy model and
 dependency tag lists will generally not need to be modified.
 
 === "Class Definition"
@@ -44,43 +44,22 @@ dependency tag lists will generally not need to be modified.
 
     ```python
     import spacy
-    from spacy.lang.en import English
 
     # Part of Speech
     subj_tags = ["nsubj", "nsubjpass"]
     obj_tags = ["dobj", "pobj", "dobj"]
-    verb_tags = ["VERB", "AUX"]  # Not user configurable # (1)
     spacy_model = spacy.load("en_core_web_sm")
-
-    # Not user configurable
-    # Sentencizer; English() should work for other languages that have similar sentence conventions.
-    spacy_pipeline = English()
-    spacy_pipeline.add_pipe("sentencizer")  # (2)
     ```
-
-    1. Tags to detect a verb in a sentence.
-    2. Used to compute the number of sentences in an utterance.
 
 === "French defaults"
 
     ```python
     import spacy
-    from spacy.lang.en import English
 
     # Part of Speech
     subj_tags = ["nsubj", "nsubj:pass"]
     obj_tags = ["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"]
-    verb_tags = ["VERB", "AUX"]  # Not user configurable # (1)
     spacy_model = spacy.load("fr_core_news_md")
-
-    # Not user configurable
-    # Sentencizer; English() should work for other languages that have similar sentence conventions.
-    spacy_pipeline = English()
-    spacy_pipeline.add_pipe("sentencizer")  # (2)
-
     ```
-
-    1. Tags to detect a verb in a sentence.
-    2. Used to compute the number of sentences in an utterance.
 
 --8<-- "includes/abbreviations.md"

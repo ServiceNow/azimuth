@@ -7,7 +7,7 @@
 [:material-link: Behavioral Testing](../../../key-concepts/behavioral-testing.md) in the Key
 Concepts section explains how the different configuration attributes will affect the tests results.
 Note that language-related defaults are dynamically selected based on the language specified in the
-[:material-link: Project Config](../project.md) (default is English).
+[:material-link: Language Config](../language.md) (default is English).
 
 If your machine does not have a lot of computing power, `behavioral_testing` can be set to `null`.
 It can be enabled later on in the application.

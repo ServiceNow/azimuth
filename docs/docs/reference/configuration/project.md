@@ -140,13 +140,4 @@ The field `rejection_class` requires the class to be present in the dataset. If 
 have a rejection class, set the value to `null`. More details on the rejection class are available
 in [Prediction Outcomes](../../key-concepts/outcomes.md).
 
-## Language
-
-:blue_circle: **Default value**: `"en"`
-
-The field `language` determines how Azimuth will process the dataset for language-related
-analyses. Azimuth currently supports English (`"en"`) and French (`"fr"`). More details are
-available in [Syntax Analysis](../../key-concepts/syntax-analysis.md) and
-[Behavioral Testing](../../key-concepts/behavioral-testing.md).
-
 --8<-- "includes/abbreviations.md"

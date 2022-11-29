@@ -26,4 +26,14 @@ For language-specific defaults, see
         language: SupportedLanguage = SupportedLanguage.en
     ```
 
+=== "Config Example"
+
+    For example, to change the language to French:
+
+    ```json
+    {
+      "language": "fr"
+    }
+    ```
+
 --8<-- "includes/abbreviations.md"

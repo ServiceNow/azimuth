@@ -5,8 +5,9 @@
 **Environment Variable**: `SIMILARITY`
 
 In Key Concepts, [:material-link: Similarity Analysis](../../../key-concepts/similarity.md) explains
-how the different configuration attributes will affect the analysis results. Note that language-related defaults are dynamically selected based on the language specified in the
-[:material-link: Project Config](../project.md) (default is English).
+how the different configuration attributes will affect the analysis results. Note that
+language-related defaults are dynamically selected based on the language specified in the
+[:material-link: Language Config](../language.md) (default is English).
 
 If your machine does not have a lot of computing power, `similarity` can be set to `null`. It can be
 enabled later on in the application.

@@ -23,11 +23,24 @@ to a category according to its grammatical properties. Examples could be 'verb',
 
 Azimuth uses [spaCy](https://github.com/explosion/spaCy), an open-source library, to perform
 part-of-speech (POS) and dependency tagging on each token of an utterance. It is set up for all
-languages supported by Azimuth (currently English and French). Azimuth then computes the smart
-tags `missing_subj`, `missing_verb`, and `missing_obj` based on the presence of tokens specified
-in the
-[:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md), and the
-smart tag `multiple_sentences` based on a spaCy sentencizer.
+languages supported by Azimuth. Azimuth then computes the smart tags `missing_subj`, `missing_verb`,
+and `missing_obj` based on the presence of certain tags. Subjects and objects are identified by
+dependency tags that are language-dependent and specified in the
+[:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md), whereas
+verbs are identified by POS tags that are consistent across languages (shown below). The smart
+tag `multiple_sentences` is based on a spaCy sentencizer:
+
+```python
+import spacy
+from spacy.lang.en import English
+
+# Part of Speech
+verb_tags = ["VERB", "AUX"]
+
+# Sentencizer; English() should work for other languages that have similar sentence conventions.
+spacy_pipeline = English()
+spacy_pipeline.add_pipe("sentencizer")
+```
 
 ### Token Count
 
