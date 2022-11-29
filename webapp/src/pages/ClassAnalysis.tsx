@@ -1,7 +1,6 @@
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   Box,
-  debounce,
   FormControlLabel,
   FormGroup,
   IconButton,
