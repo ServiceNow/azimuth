@@ -41,8 +41,12 @@ const ClassOverlap = () => {
     ...classOverlap,
   });
 
+  // Control overlap threshold with a `string` (and not with a `number`) so for
+  // example when hitting backspace after `0.01`, you get `0.0` (and not `0`).
   const [overlapThreshold, setOverlapThreshold] = React.useState(
-    classOverlap.overlapThreshold
+    classOverlap.overlapThreshold === undefined
+      ? undefined
+      : String(classOverlap.overlapThreshold)
   );
 
   const setQuery = (newClassOverlap: QueryClassOverlapState) =>
@@ -182,10 +186,12 @@ const ClassOverlap = () => {
                     "& .MuiSlider-track": { border: "none" }, // compensate bug with track="inverted"
                   }}
                   {...OVERLAP_THRESHOLD_INPUT_PROPS}
-                  value={overlapThreshold ?? data.defaultOverlapThreshold}
+                  value={Number(
+                    overlapThreshold ?? data.defaultOverlapThreshold
+                  )}
                   onChange={(_, value) => {
-                    if (value !== overlapThreshold) {
-                      setOverlapThreshold(value as number);
+                    if (value !== Number(overlapThreshold)) {
+                      setOverlapThreshold(String(value));
                     }
                   }}
                   onChangeCommitted={(_, value) => {
