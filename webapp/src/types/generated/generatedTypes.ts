@@ -179,6 +179,7 @@ export interface components {
       raw_text_input?: string;
       label?: string;
       failed_parsing_reason?: string;
+      persistent_id?: string;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure

@@ -181,6 +181,8 @@ class ColumnConfiguration(BaseModel):
     label: str = "label"
     # Optional column to specify whether an example has failed preprocessing.
     failed_parsing_reason: str = "failed_parsing_reason"
+    # Unique identifier for every example
+    persistent_id: str = "row_idx"
 
 
 class ProjectConfig(BaseSettings):

@@ -129,9 +129,9 @@ def test_to_csv(simple_text_config):
     index = {c: i for i, c in enumerate(df.columns)}
     assert (
         index[DatasetColumn.row_idx]
-        < index[DatasetColumn.idx]
-        < index["utterance"]
-        < index["label"]
+        == index[simple_text_config.columns.persistent_id]  # By default persistent_id is row_idx
+        < index[simple_text_config.columns.text_input]
+        < index[simple_text_config.columns.label]
         < index[DatasetColumn.model_predictions]
         < index[DatasetColumn.postprocessed_prediction]
         < index[DatasetColumn.model_confidences]
@@ -172,9 +172,9 @@ def test_to_csv_no_model(simple_text_config):
     index = {c: i for i, c in enumerate(df.columns)}
     assert (
         index[DatasetColumn.row_idx]
-        < index[DatasetColumn.idx]
-        < index["utterance"]
-        < index["label"]
+        == index[simple_text_config.columns.persistent_id]  # By default persistent_id is row_idx
+        < index[simple_text_config.columns.text_input]
+        < index[simple_text_config.columns.label]
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()
 

@@ -205,7 +205,7 @@ class DatasetSplitManager:
 
         order = [
             DatasetColumn.row_idx,
-            DatasetColumn.idx,
+            self.config.columns.persistent_id,
             self.config.columns.raw_text_input,
             self.config.columns.text_input,
             self.config.columns.label,
@@ -222,14 +222,17 @@ class DatasetSplitManager:
             DatasetColumn.neighbors_eval,
             *self._tags,
         ]
-        order = [c for c in order if c in self.get_dataset_split(table_key).column_names]
+        order_unique = list(dict.fromkeys(order))  # persistent_id can be called row_idx.
+        order_unique = [
+            c for c in order_unique if c in self.get_dataset_split(table_key).column_names
+        ]
 
         # The following allows for new or extra columns to end up here automatically,
         # instead of being lost if we were to hardcode the whole list.
-        omit = {*order, FEATURES, FEATURE_FAISS}
+        omit = {*order_unique, FEATURES, FEATURE_FAISS}
         rest = [c for c in self.get_dataset_split(table_key).column_names if c not in omit]
 
-        columns = order + rest
+        columns = order_unique + rest
 
         # pd.to_csv() instead of HF version to avoid unintended type conversions (list to array)
         df = pd.DataFrame(self.get_dataset_split_with_class_names(table_key)).reindex(
