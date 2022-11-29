@@ -141,7 +141,7 @@ def remove_or_add_final_punctuation(
         perturb_utt = original[:-1]
         perturbation_type = PerturbationType.Deletion
     # Replace with specified punctuation if last character is another punctuation sign.
-    elif any([p in last_char for p in [".", "!", "?", ","]]):
+    elif last_char in [".", "!", "?", ","]:
         perturb_utt = original[:-1].rstrip() + punctuation_sign
         perturbation_type = PerturbationType.Replacement
     # Add specified punctuation otherwise.
@@ -305,14 +305,14 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
                     min_char=4,
                     aug_word_max=nb_typo,
                     aug_char_p=0.1 * nb_typo,
-                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue to be added
+                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue #315
                 ),
                 nac.RandomCharAug(
                     action="delete",
                     min_char=4,
                     aug_word_max=nb_typo,
                     aug_char_p=0.1 * nb_typo,
-                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue to be added
+                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue #315
                 ),
             ]
         )
@@ -326,7 +326,7 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
             # While nlpaug fixes their useless print, we ignore it.
             perturbed_utterance = aug.augment(original, n=1)
         # nac alters spacing around punctuation (e.g., around '; after $; before ?) and replaces
-        # apostrophes with quotes; revert to original.
+        # apostrophes with quotes; revert to original. (See nlpaug issue #313)
         punctuations = re_punctuation.split(original)[::2]
         words = re_punctuation.split(perturbed_utterance)[1::2]
         perturbed_utterance = "".join(

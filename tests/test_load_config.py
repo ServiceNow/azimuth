@@ -143,3 +143,11 @@ def test_french_defaults_and_override():
         cfg.similarity.faiss_encoder
         == config_defaults_per_language[SupportedLanguage.fr].faiss_encoder
     ), "Config did not take default French value for faiss encoder"
+    assert (
+        cfg.behavioral_testing.neutral_token.suffix_list
+        == config_defaults_per_language[SupportedLanguage.fr].suffix_list
+    ), "Config did not take default French value for suffix list (neutral tokens)"
+    assert (
+        cfg.behavioral_testing.neutral_token.prefix_list
+        == config_defaults_per_language[SupportedLanguage.fr].prefix_list
+    ), "Config did not take default French value for prefix list (neutral tokens)"

@@ -148,7 +148,6 @@ def simple_text_config_french(tmp_path):
         model_contract="hf_text_classification",
         saliency_layer="distilbert.embeddings.word_embeddings",
         rejection_class=None,
-        behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
         language=SupportedLanguage.fr,
     )
 

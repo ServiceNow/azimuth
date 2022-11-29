@@ -337,7 +337,42 @@ class ModelContractConfig(CommonFieldsConfig):
 
 class LanguageConfig(CommonFieldsConfig):
     # Language configuration sets multiple config values; see reference dictionary for details
+    # Language should only determine other config values and not be referenced in modules.
     language: SupportedLanguage = SupportedLanguage.en
+
+
+class PerturbationTestingConfig(ModelContractConfig):
+    # Perturbation Testing configuration to define which test and with which params to run.
+    behavioral_testing: Optional[BehavioralTestingOptions] = Field(
+        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
+    )
+
+
+class SimilarityConfig(CommonFieldsConfig):
+    # Similarity configuration to define the encoder and the similarity threshold.
+    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
+
+
+class DatasetWarningConfig(CommonFieldsConfig):
+    # Dataset warnings configuration to change thresholds that trigger warnings
+    dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
+
+
+class SyntaxConfig(CommonFieldsConfig):
+    # Syntax configuration to change thresholds that determine short and long sentences.
+    syntax: SyntaxOptions = SyntaxOptions()
+
+
+class AzimuthConfig(
+    PerturbationTestingConfig,
+    SimilarityConfig,
+    DatasetWarningConfig,
+    SyntaxConfig,
+    LanguageConfig,
+    extra=Extra.forbid,
+):
+    # Before adding attributes: Remember that dependence on an attribute in AzimuthConfig will
+    # cause a module to include all other configs in its scope.
 
     @root_validator()
     def dynamic_language_config_values(cls, values):
@@ -354,40 +389,6 @@ class LanguageConfig(CommonFieldsConfig):
             similarity = values["similarity"]
             similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
         return values
-
-
-class PerturbationTestingConfig(ModelContractConfig, LanguageConfig):
-    # Perturbation Testing configuration to define which test and with which params to run.
-    behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
-    )
-
-
-class SimilarityConfig(LanguageConfig):
-    # Similarity configuration to define the encoder and the similarity threshold.
-    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
-
-
-class DatasetWarningConfig(CommonFieldsConfig):
-    # Dataset warnings configuration to change thresholds that trigger warnings
-    dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
-
-
-class SyntaxConfig(LanguageConfig):
-    # Syntax configuration to change thresholds that determine short and long sentences.
-    syntax: SyntaxOptions = SyntaxOptions()
-
-
-class AzimuthConfig(
-    PerturbationTestingConfig,
-    SimilarityConfig,
-    DatasetWarningConfig,
-    SyntaxConfig,
-    LanguageConfig,
-    extra=Extra.forbid,
-):
-    # Do not add fields!! as modules (scope-dependent) would be recomputed when a field is changed.
-    pass
 
 
 def load_azimuth_config(config_path: str) -> AzimuthConfig:
