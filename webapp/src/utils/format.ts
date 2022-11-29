@@ -11,3 +11,6 @@ export const formatRatioAsPercentageString = (
   value: number,
   digits: number = 2
 ) => `${formatNumberAsString(100 * value, digits)}%`;
+
+export const camelToTitleCase = (camelCase: string) =>
+  camelCase.replace(/(?<=[a-z])(?=[A-Z0-9])|(?<=[A-Z0-9])(?=[A-Z][a-z])/g, " ");

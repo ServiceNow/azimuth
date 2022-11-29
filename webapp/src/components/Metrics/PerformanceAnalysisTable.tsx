@@ -5,6 +5,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -26,7 +27,7 @@ import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import DeltaComputationBar from "components/Metrics/DeltaComputationBar";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
 import PipelineSelect from "components/PipelineSelect";
-import { Table, Column, RowProps } from "components/Table";
+import { Column, RowProps, Table } from "components/Table";
 import VisualBar from "components/VisualBar";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -108,11 +109,13 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
-  const [comparedPipeline, setComparedPipeline] = React.useState<
-    number | undefined
-  >();
-
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
+
+  const [comparedPipeline, setComparedPipeline] = React.useState(
+    config?.pipelines && config.pipelines.length > 1
+      ? (pipeline.pipelineIndex + 1) % config.pipelines.length
+      : undefined
+  );
 
   const { data: metricInfo } = getCustomMetricInfoEndpoint.useQuery({
     jobId,
@@ -147,7 +150,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
 
   // Track table sort model to keep 'overall' at top.
   const [sortModel, setSortModel] = React.useState<GridSortModel>([
-    { field: "utteranceCount", sort: "desc" },
+    { field: "basePipelineUtteranceCount", sort: "desc" },
   ]);
   // We must redefine columns when selectedMetricPerFilterOption changes.
   // The Table then loses any uncontrolled (internal) states. So, we must
@@ -172,10 +175,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             basePipeline,
             ...(comparedPipeline !== undefined &&
               comparedPipelineData && {
-                comparedPipeline:
-                  comparedPipelineData.metricsPerFilter[
-                    selectedMetricPerFilterOption
-                  ][index],
+                comparedPipeline: comparedPipelineData.metricsPerFilter[
+                  selectedMetricPerFilterOption
+                ].find(
+                  ({ filterValue }) => filterValue === basePipeline.filterValue
+                ),
               }),
           })
         ),
@@ -188,6 +192,12 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     comparedPipeline,
     selectedMetricPerFilterOption,
   ]);
+
+  const typographyWithTooltip = (tooltip: string, typography: string) => (
+    <Tooltip title={tooltip}>
+      <Typography variant="inherit">{typography}</Typography>
+    </Tooltip>
+  );
 
   const columns = React.useMemo((): Column<Row>[] => {
     const metricsEntries = Object.entries(metricInfo ?? {});
@@ -252,6 +262,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
+                        zIndex={1}
                         gap={1}
                       >
                         {longHeader}
@@ -347,8 +358,10 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
           ...pipelines.map<Column<Row>>((pipeline) => ({
             ...METRIC_COLUMN,
             field: `${pipeline}${metricName}`,
-            description,
-            ...groupHeader(pipeline, metricName),
+            ...groupHeader(
+              pipeline,
+              typographyWithTooltip(description, metricName)
+            ),
             valueGetter: ({ row: { [pipeline]: metrics } }) =>
               metrics ? metrics.customMetrics[metricName] ?? NaN : undefined,
             renderCell: ({ value }: GridCellParams<number | undefined>) =>
@@ -384,8 +397,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
       ...pipelines.map<Column<Row>>((pipeline) => ({
         ...METRIC_COLUMN,
         field: `${pipeline}ECE`,
-        ...groupHeader(pipeline, "ECE"),
-        description: ECE_TOOLTIP,
+        ...groupHeader(pipeline, typographyWithTooltip(ECE_TOOLTIP, "ECE")),
         valueGetter: ({ row }) => row[pipeline]?.ece,
         renderCell: ({ value }: GridCellParams<number | undefined>) =>
           value !== undefined && (
@@ -450,7 +462,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/performance_overview${constructSearchString(
+      to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/prediction_overview${constructSearchString(
         {
           ...(props.row.id !== OVERALL_ROW_ID && {
             [selectedMetricPerFilterOption]: [
@@ -539,11 +551,11 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
             onChange={setSelectedDatasetSplit}
           />
         </Box>
-        {config && (
+        {config?.pipelines && config.pipelines.length > 1 && (
           <Box display="flex" flexDirection="row" alignItems="center">
             <FormControlLabel
               label={`Compare Baseline (${
-                config.pipelines?.[pipeline.pipelineIndex].name
+                config.pipelines[pipeline.pipelineIndex].name
               }) with:`}
               labelPlacement="start"
               sx={{ gap: 1, paddingRight: 2 }}

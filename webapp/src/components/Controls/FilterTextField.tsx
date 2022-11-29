@@ -53,24 +53,27 @@ const FilterTextField: React.FC<Props> = ({
   return (
     <Box paddingX={1}>
       <Typography variant="subtitle2">{label}</Typography>
-      <Box display="flex" alignItems="center" gap={1} paddingY={1}>
-        <Search />
-        <Input
-          endAdornment={
-            liveValue ? (
-              <InputAdornment position="end">
-                <IconButton size="small" onClick={handleClear}>
-                  <Clear />
-                </IconButton>
-              </InputAdornment>
-            ) : null
-          }
-          fullWidth
-          placeholder={placeholder}
-          value={liveValue ?? ""}
-          onChange={(event) => handleChange(event.target.value || undefined)}
-        />
-      </Box>
+      <Input
+        startAdornment={
+          <InputAdornment position="start">
+            <Search />
+          </InputAdornment>
+        }
+        endAdornment={
+          liveValue ? (
+            <InputAdornment position="end">
+              <IconButton size="small" onClick={handleClear}>
+                <Clear />
+              </IconButton>
+            </InputAdornment>
+          ) : null
+        }
+        fullWidth
+        placeholder={placeholder}
+        value={liveValue ?? ""}
+        onChange={(event) => handleChange(event.target.value || undefined)}
+        sx={{ marginBottom: 1 }}
+      />
     </Box>
   );
 };

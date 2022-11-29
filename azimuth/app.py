@@ -8,7 +8,7 @@ from typing import Dict, Optional
 import structlog
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
-from starlette.status import HTTP_404_NOT_FOUND
+from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
 from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config
@@ -66,6 +66,11 @@ def get_ready_flag() -> Optional[Event]:
 
 def get_config() -> Optional[AzimuthConfig]:
     return _azimuth_config
+
+
+def require_editable_config(config: AzimuthConfig = Depends(get_config)):
+    if config.read_only_config:
+        raise HTTPException(HTTP_403_FORBIDDEN, detail="The Azimuth config is currently read-only.")
 
 
 def start_app(config_path, debug=False) -> FastAPI:
@@ -132,6 +137,7 @@ def create_app() -> FastAPI:
     # Setup routes
     from azimuth.routers.v1.admin import router as admin_router
     from azimuth.routers.v1.app import router as app_router
+    from azimuth.routers.v1.class_overlap import router as class_overlap_router
     from azimuth.routers.v1.custom_utterances import router as custom_utterances_router
     from azimuth.routers.v1.dataset_warnings import router as dataset_warnings_router
     from azimuth.routers.v1.export import router as export_router
@@ -156,6 +162,11 @@ def create_app() -> FastAPI:
     api_router = APIRouter()
     api_router.include_router(app_router, prefix="")
     api_router.include_router(admin_router, prefix="/admin")
+    api_router.include_router(
+        class_overlap_router,
+        prefix="/class_analysis",
+        dependencies=[Depends(require_application_ready)],
+    )
     api_router.include_router(tags_router, prefix="/tags", dependencies=[])
     api_router.include_router(
         confidence_histogram_router,

@@ -70,19 +70,23 @@ nav:
           - key-concepts/saliency.md
           - key-concepts/syntax-analysis.md
           - key-concepts/similarity.md
+          - key-concepts/class-similarity.md
           - key-concepts/behavioral-testing.md
           - key-concepts/uncertainty.md
   - User Guide:
       - Dashboard:
           - user-guide/index.md
           - user-guide/dataset-warnings.md
+          - user-guide/class-analysis.md
+          - user-guide/pipeline-metrics-comparison.md
+          - user-guide/smart-tag-analysis.md
           - user-guide/behavioral-testing-summary.md
           - user-guide/post-processing-analysis.md
       - Exploration Space:
           - user-guide/exploration-space/index.md
-          - user-guide/exploration-space/performance-overview.md
+          - user-guide/exploration-space/prediction-overview.md
           - user-guide/exploration-space/confusion-matrix.md
-          - user-guide/exploration-space/utterances-table.md
+          - user-guide/exploration-space/utterance-table.md
           - user-guide/exploration-space/utterance-details.md
       - user-guide/settings.md
       - user-guide/custom-utterances.md
@@ -104,7 +108,7 @@ nav:
           - reference/custom-objects/index.md
           - reference/custom-objects/dataset.md
           - reference/custom-objects/model.md
-          - reference/custom-objects/postprocessors.md
+          - reference/custom-objects/processors.md
           - reference/custom-objects/metric.md
   - Development:
       - development/index.md

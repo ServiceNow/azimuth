@@ -1,8 +1,12 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
-import { classNames } from "utils/helpers";
+import React from "react";
 import { FormatType, DatasetDistributionComparison } from "types/api";
+import {
+  formatNumberAsString,
+  formatRatioAsPercentageString,
+} from "utils/format";
+import { classNames } from "utils/helpers";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -32,11 +36,11 @@ const useStyles = makeStyles((theme) => ({
 const getFormatter = (format: FormatType) => {
   switch (format) {
     case "Decimal":
-      return (data: number) => data.toFixed(2);
+      return (data: number) => formatNumberAsString(data);
     case "Integer":
-      return (data: number) => data;
+      return (data: number) => formatNumberAsString(data, 0);
     case "Percentage":
-      return (data: number) => (100 * data).toFixed(0);
+      return (data: number) => formatRatioAsPercentageString(data, 0);
     default:
       return (data: number) => data;
   }
@@ -95,7 +99,7 @@ const MetricsDataGrid = (props: Props) => {
                   classes.column
                 )}
               >
-                {cell.value !== null ? formatter(cell.value) : "-"}
+                {formatter(cell.value ?? NaN)}
               </Typography>
             ))}
           </React.Fragment>

@@ -122,7 +122,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   } else if (error || data === undefined) {
     return (
       <Box alignItems="center" display="grid" justifyItems="center">
-        <img src={noData} width="50%" alt="no dataset info" />
+        <img src={noData} width="50%" alt="No confusion matrix data" />
         <Typography>{error?.message || UNKNOWN_ERROR}</Typography>
       </Box>
     );

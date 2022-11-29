@@ -55,8 +55,14 @@ const PageHeader = () => {
 
   const history = useHistory();
   const location = useLocation();
-  const { confusionMatrix, filters, pagination, pipeline, postprocessing } =
-    useQueryState();
+  const {
+    classOverlap,
+    confusionMatrix,
+    filters,
+    pagination,
+    pipeline,
+    postprocessing,
+  } = useQueryState();
 
   // If present, preserve pipelineIndex when navigating, but nothing else
   const searchString = constructSearchString(pipeline);
@@ -64,6 +70,7 @@ const PageHeader = () => {
   const setPipeline = (pipelineIndex?: number) => {
     history.push(
       `${location.pathname}${constructSearchString({
+        ...classOverlap,
         ...confusionMatrix,
         ...filters,
         ...pagination,
@@ -89,8 +96,12 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/performance_analysis`,
-          name: "Performance Analysis",
+          pathname: `/${jobId}/class_analysis`,
+          name: "Class Analysis",
+        },
+        {
+          pathname: `/${jobId}/pipeline_metrics`,
+          name: "Pipeline Metrics by Data Subpopulation",
         },
         {
           pathname: `/${jobId}/settings`,
@@ -101,8 +112,8 @@ const PageHeader = () => {
           name: "Threshold Comparison",
         },
         {
-          pathname: `/${jobId}/dataset_class_distribution_analysis`,
-          name: "Dataset Class Distribution Analysis",
+          pathname: `/${jobId}/dataset_warnings`,
+          name: "Dataset Warnings",
         },
         {
           pathname: `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`,

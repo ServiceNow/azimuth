@@ -1,5 +1,5 @@
 {
-  "name": "CLINC-151",
+  "name": "CLINC150",
   "dataset": {
     "class_name": "datasets.load_dataset",
     "args": [

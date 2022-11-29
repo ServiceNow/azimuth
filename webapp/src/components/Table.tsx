@@ -67,7 +67,7 @@ export interface Props<Row> extends DataGridProps {
 export const Table = <Row extends { id: GridRowId }>({
   components,
   pageSize,
-  sx,
+  sx = [], // Handled as recommended in https://mui.com/system/getting-started/the-sx-prop/#passing-the-sx-prop
   ...props
 }: Props<Row>) => (
   <DataGrid
@@ -92,17 +92,19 @@ export const Table = <Row extends { id: GridRowId }>({
       ...(props.pagination && { Pagination: CustomPagination }),
       ...components,
     }}
-    sx={{
-      border: "none",
-      "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within, & .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within":
-        {
-          outline: "none",
+    sx={[
+      {
+        border: "none",
+        "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within, & .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within":
+          {
+            outline: "none",
+          },
+        "& .MuiDataGrid-columnHeaderTitle, & .MuiDataGrid-columnHeader": {
+          fontWeight: "bold",
         },
-      "& .MuiDataGrid-columnHeaderTitle, & .MuiDataGrid-columnHeader": {
-        fontWeight: "bold",
       },
-      ...sx,
-    }}
+      ...(Array.isArray(sx) ? sx : [sx]),
+    ]}
     {...props}
   />
 );

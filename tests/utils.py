@@ -25,6 +25,7 @@ from azimuth.types.tag import (
     ALL_SMART_TAGS,
     ALL_STANDARD_TAGS,
 )
+from azimuth.utils.ml.model_performance import compute_outcome
 from azimuth.utils.project import load_dataset_from_config
 
 _AZ_ROOT = Path(__file__).parents[1].resolve()
@@ -134,6 +135,7 @@ def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
             DatasetColumn.model_confidences: [i / len(ds), 1 - i / len(ds)],
             # 0.9 simulates temperature scaling
             DatasetColumn.postprocessed_confidences: [0.9 * (i / len(ds)), 1 - 0.9 * (i / len(ds))],
+            DatasetColumn.pipeline_steps: [],
             DatasetColumn.confidence_bin_idx: np.random.randint(1, 20),
         },
         with_indices=True,
@@ -154,10 +156,10 @@ def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
     )
     ds = ds.map(
         lambda x: {
-            DatasetColumn.model_outcome: OutcomesModule.compute_outcome(
+            DatasetColumn.model_outcome: compute_outcome(
                 x[DatasetColumn.model_predictions][0], x["label"], rejection_class_idx
             ),
-            DatasetColumn.postprocessed_outcome: OutcomesModule.compute_outcome(
+            DatasetColumn.postprocessed_outcome: compute_outcome(
                 x[DatasetColumn.postprocessed_prediction], x["label"], rejection_class_idx
             ),
             DatasetColumn.neighbors_train: [

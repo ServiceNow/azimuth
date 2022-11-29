@@ -1,3 +1,6 @@
+# Copyright ServiceNow, Inc. 2021 – 2022
+# This source code is licensed under the Apache 2.0 license found in the LICENSE file
+# in the root directory of this source tree.
 from typing import Dict
 
 import structlog
@@ -5,7 +8,12 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import ValidationError
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 
-from azimuth.app import get_config, get_task_manager, initialize_managers
+from azimuth.app import (
+    get_config,
+    get_task_manager,
+    initialize_managers,
+    require_editable_config,
+)
 from azimuth.config import AzimuthConfig, AzimuthValidationError
 from azimuth.task_manager import TaskManager
 
@@ -34,6 +42,7 @@ def get_config_def(
     description="Update the config using a changeset.",
     tags=TAGS,
     response_model=AzimuthConfig,
+    dependencies=[Depends(require_editable_config)],
 )
 def update_config(
     task_manager: TaskManager = Depends(get_task_manager),

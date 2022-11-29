@@ -7,7 +7,7 @@
     <img alt="Tests" src="https://github.com/ServiceNow/azimuth/actions/workflows/pythonci.yml/badge.svg"/></a>
   <a href="https://servicenow.github.io/azimuth">
     <img alt="Documentation" src="https://github.com/ServiceNow/azimuth/actions/workflows/docs_cd.yml/badge.svg"/></a>
-  <a href="https://join.slack.com/t/newworkspace-5wx1461/shared_invite/zt-16x8eqt1h-ho3Hh6ilcN7FpZyLkjr9oA">
+  <a href="https://join.slack.com/t/azimuth-org/shared_invite/zt-1i9eu48n9-7NnCXHw5VzUs~gs20xHxyg">
     <img alt="Slack" src="https://img.shields.io/badge/slack-chat-green.svg?logo=slack"/></a>
   <a href="./LICENSE">
     <img alt="Licence" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <img width=60% src="docs/docs/_static/images/exploration-space/performance-overview.png">
+  <img width=60% src="docs/docs/_static/images/exploration-space/prediction-overview.png">
 </p>
 
 ## Overview
@@ -33,6 +33,14 @@ actions**. It currently only supports **text classification use cases**.
 
 Our [documentation](https://servicenow.github.io/azimuth) contains all the instructions and
 references to use Azimuth.
+
+### YouTube Playlist
+
+<p align="center">
+  <a href="https://www.youtube.com/playlist?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8">
+    <img src="docs/docs/_static/images/youtube.png" width="560" height="315" />
+  </a>
+</p>
 
 ### Documentation Structure
 

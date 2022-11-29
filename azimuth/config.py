@@ -81,7 +81,7 @@ class CustomObject(BaseModel):  # type: ignore
     kwargs: Dict[str, Union["CustomObject", Any]] = {}
     remote: Optional[str] = Field(
         None,
-        description="Relative path to class." " `class` needs to be accessible from this path.",
+        description="Relative path to class. `class_name` needs to be accessible from this path.",
     )
 
 
@@ -130,15 +130,9 @@ class ThresholdConfig(BaseSettings, CustomObject):
 class PipelineDefinition(BaseSettings):
     name: str
     model: CustomObject
-    # Postprocessors
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
-    ] = Field(
-        [
-            TemperatureScaling(temperature=1.0),
-            ThresholdConfig(threshold=0.5),
-        ]
-    )
+    ] = Field([ThresholdConfig(threshold=0.5)], nullable=True)
 
     @property
     def threshold(self) -> Optional[float]:
@@ -166,6 +160,7 @@ class PipelineDefinition(BaseSettings):
 
 class DatasetWarningsOptions(BaseModel):
     min_num_per_class: int = 20
+    max_delta_class_imbalance: float = 0.5
     max_delta_representation: float = 0.05
     max_delta_mean_tokens: float = 3.0
     max_delta_std_tokens: float = 3.0
@@ -271,6 +266,8 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # Memory of the dask cluster. Regular is 6GB, Large is 12GB.
     # For bigger models, large might be needed.
     large_dask_cluster: bool = False
+    # Disable configuration changes
+    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG")
 
     def get_artifact_path(self) -> str:
         """Generate a path for caching.
@@ -300,6 +297,9 @@ class ModelContractConfig(CommonFieldsConfig):
     saliency_layer: Optional[str] = None
     # Custom HuggingFace metrics
     metrics: Dict[str, MetricDefinition] = {
+        "Accuracy": MetricDefinition(
+            class_name="datasets.load_metric", kwargs={"path": "accuracy"}
+        ),
         "Precision": MetricDefinition(
             class_name="datasets.load_metric",
             kwargs={"path": "precision"},

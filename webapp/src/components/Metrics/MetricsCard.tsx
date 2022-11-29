@@ -1,5 +1,5 @@
 import { MoreHoriz } from "@mui/icons-material";
-import { Box, IconButton, Popover, useTheme } from "@mui/material";
+import { Box, IconButton, Popover } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 
@@ -17,7 +17,6 @@ type Props = {
 
 const MetricsCard: React.FC<Props> = ({ children, popover, rowCount = 1 }) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
@@ -34,7 +33,7 @@ const MetricsCard: React.FC<Props> = ({ children, popover, rowCount = 1 }) => {
         gridTemplateRows={`repeat(${rowCount}, 1fr)`}
         padding={1}
         position="relative"
-        sx={{ backgroundColor: theme.palette.grey[50] }}
+        sx={(theme) => ({ backgroundColor: theme.palette.grey[50] })}
       >
         {children}
         {popover && (

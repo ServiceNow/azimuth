@@ -26,6 +26,14 @@ export interface paths {
     /** Update the config using a changeset. */
     patch: operations["update_config_admin_config_patch"];
   };
+  "/class_analysis/plot": {
+    /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
+    get: operations["get_class_overlap_plot_class_analysis_plot_get"];
+  };
+  "/class_analysis": {
+    /** Get data for class overlap, confusion, and related utterance counts. */
+    get: operations["get_class_analysis_class_analysis_get"];
+  };
   "/tags": {
     /** Post new data_action tags */
     post: operations["post_data_actions_tags_post"];
@@ -121,6 +129,7 @@ export interface components {
       batch_size?: number;
       use_cuda?: Partial<"auto"> & Partial<boolean>;
       large_dask_cluster?: boolean;
+      read_only_config?: boolean;
       language?: components["schemas"]["SupportedLanguage"];
       syntax?: components["schemas"]["SyntaxOptions"];
       dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
@@ -137,6 +146,34 @@ export interface components {
       fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
       typo?: components["schemas"]["TypoTestOptions"];
       seed?: number;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    ClassAnalysisClassPair: {
+      sourceClass: string;
+      targetClass: string;
+      overlapScoreTrain: number;
+      pipelineConfusionEval: number | null;
+      utteranceCountSourceTrain: number;
+      utteranceCountSourceEval: number;
+      utteranceCountWithOverlapTrain: number;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    ClassAnalysisResponse: {
+      classPairs: components["schemas"]["ClassAnalysisClassPair"][];
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    ClassOverlapPlotResponse: {
+      plot: components["schemas"]["PlotSpecification"];
+      defaultOverlapThreshold: number;
     };
     ColumnConfiguration: {
       text_input?: string;
@@ -181,7 +218,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
     };
     /** An enumeration. */
@@ -282,6 +319,7 @@ export interface components {
     };
     DatasetWarningsOptions: {
       min_num_per_class?: number;
+      max_delta_class_imbalance?: number;
       max_delta_representation?: number;
       max_delta_mean_tokens?: number;
       max_delta_std_tokens?: number;
@@ -311,7 +349,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       /** Keyword arguments supplied to `compute`. */
       additional_kwargs?: { [key: string]: any };
@@ -390,6 +428,8 @@ export interface components {
       postprocessedConfidences: number[];
       modelOutcome: components["schemas"]["OutcomeName"];
       postprocessedOutcome: components["schemas"]["OutcomeName"];
+      preprocessingSteps: components["schemas"]["PreprocessingStepAPIResponse"][];
+      postprocessingSteps: components["schemas"]["PostprocessingStepAPIResponse"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -539,9 +579,11 @@ export interface components {
     PipelineDefinition: {
       name: string;
       model: components["schemas"]["CustomObject"];
-      postprocessors?: (Partial<components["schemas"]["TemperatureScaling"]> &
-        Partial<components["schemas"]["ThresholdConfig"]> &
-        Partial<components["schemas"]["CustomObject"]>)[];
+      postprocessors?:
+        | (Partial<components["schemas"]["TemperatureScaling"]> &
+            Partial<components["schemas"]["ThresholdConfig"]> &
+            Partial<components["schemas"]["CustomObject"]>)[]
+        | null;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -558,6 +600,32 @@ export interface components {
     PostDataActionRequest: {
       datasetSplitName?: components["schemas"]["DatasetSplitName"];
       dataActions: { [key: string]: { [key: string]: boolean } };
+    };
+    /** Class for saving the results in the dataset and the routes. */
+    PostprocessingStepAPIResponse: {
+      output: components["schemas"]["PredictionDetails"];
+      className: string;
+    };
+    /**
+     * Details of the predictions.
+     *
+     * Args:
+     *     predictions: Prediction class names, sorted by confidences
+     *     prediction: Predicted class, which can be different than the first element of predictions,
+     *         when thresholding for instance.
+     *     confidences: Sorted confidences
+     *     outcome: Outcome based on label and prediction
+     */
+    PredictionDetails: {
+      predictions: string[];
+      prediction: string;
+      confidences: number[];
+      outcome: components["schemas"]["OutcomeName"];
+    };
+    /** Class for saving the results in the dataset and the routes. */
+    PreprocessingStepAPIResponse: {
+      text: string;
+      className: string;
     };
     PunctuationTestOptions: {
       threshold?: number;
@@ -652,7 +720,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       temperature?: number;
     };
@@ -670,7 +738,7 @@ export interface components {
         [key: string]: Partial<components["schemas"]["CustomObject"]> &
           Partial<{ [key: string]: any }>;
       };
-      /** Relative path to class. `class` needs to be accessible from this path. */
+      /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       threshold?: number;
     };
@@ -852,6 +920,55 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": { [key: string]: any };
+      };
+    };
+  };
+  /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
+  get_class_overlap_plot_class_analysis_plot_get: {
+    parameters: {
+      query: {
+        /** Whether to include overlap of a class with itself. */
+        self_overlap?: boolean;
+        /** Whether to scale overlap values by class sample counts. */
+        scale_by_class?: boolean;
+        /** Plot overlap greater than this value (`None` sets threshold to show ~10 class pairs). */
+        overlap_threshold?: number;
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ClassOverlapPlotResponse"];
+        };
+      };
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get data for class overlap, confusion, and related utterance counts. */
+  get_class_analysis_class_analysis_get: {
+    parameters: {
+      query: {
+        pipeline_index?: number;
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ClassAnalysisResponse"];
+        };
+      };
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
       };
     };
   };

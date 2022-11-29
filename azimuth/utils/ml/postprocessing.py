@@ -1,3 +1,6 @@
+# Copyright ServiceNow, Inc. 2021 – 2022
+# This source code is licensed under the Apache 2.0 license found in the LICENSE file
+# in the root directory of this source tree.
 import abc
 from typing import List
 
@@ -5,6 +8,7 @@ import numpy as np
 from scipy.special import expit, softmax
 
 from azimuth.types import AliasModel, Array
+from azimuth.types.outcomes import OutcomeName
 
 
 class PostProcessingIO(AliasModel):
@@ -18,12 +22,48 @@ class PostProcessingIO(AliasModel):
         return np.allclose(self.probs.sum(-1), 1.0)
 
     def __getitem__(self, item: int) -> "PostProcessingIO":
+        """Get a single utterance result from a batch result."""
         return PostProcessingIO(
             texts=[self.texts[item]],
             logits=self.logits[item][np.newaxis, ...],
             preds=self.preds[item][np.newaxis, ...],
             probs=self.probs[item][np.newaxis, ...],
         )
+
+
+class PredictionDetails(AliasModel):
+    """Details of the predictions.
+
+    Args:
+        predictions: Prediction class names, sorted by confidences
+        prediction: Predicted class, which can be different than the first element of predictions,
+            when thresholding for instance.
+        confidences: Sorted confidences
+        outcome: Outcome based on label and prediction
+    """
+
+    predictions: List[str]
+    prediction: str
+    confidences: List[float]
+    outcome: OutcomeName
+
+
+class PostprocessingStepAPIResponse(AliasModel):
+    """Class for saving the results in the dataset and the routes."""
+
+    output: PredictionDetails
+    class_name: str
+
+
+class PostprocessingStep(AliasModel):
+    """Class received from the pipeline, and used in the Prediction Module."""
+
+    output: PostProcessingIO
+    class_name: str
+
+    def __getitem__(self, item: int) -> "PostprocessingStep":
+        """Useful to get from a batch result to a single utterance result."""
+        return PostprocessingStep(output=self.output[item], class_name=self.class_name)
 
 
 class Postprocessing(abc.ABC):

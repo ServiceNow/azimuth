@@ -102,13 +102,9 @@ launched without any pipeline.
     class PipelineDefinition(BaseSettings):
         name: str # (1)
         model: CustomObject # (2)
-        postprocessors: Optional[List[ # (3)
-            Union[TemperatureScaling, ThresholdConfig, CustomObject]]] = Field(
-            [
-                TemperatureScaling(temperature=1.0),
-                ThresholdConfig(threshold=0.5),
-            ]
-        )
+        postprocessors: Optional[ # (3)
+            List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
+        ] = Field([ThresholdConfig(threshold=0.5)], nullable=True)
     ```
 
     1. Add a name to the pipeline to easily recognize it from the webapp.
@@ -163,7 +159,7 @@ Objects**](index.md).
 * **`postprocessors`** defines the postprocessors. Azimuth offers some default values for
   temperature scaling and thresholding. Users can also provide their own postprocessor functions, or
   disabled them (`postprocessors: null`).
-  [:material-link: Defining Postprocessors](../custom-objects/postprocessors.md) details the
+  [:material-link: Defining Processors](../custom-objects/processors.md) details the
   different use cases.
 
 !!! tip "Beginner users should start with simple use cases"
@@ -221,9 +217,9 @@ Example: `distilbert.embeddings.word_embeddings`.
 
 ## Metrics
 
-:blue_circle: **Default value**: Precision and Recall. See in the config example below.
+:blue_circle: **Default value**: Accuracy, Precision, Recall and F1. See in the config example below.
 
-By default, Azimuth will compute Precision, Recall and F1 on the dataset. `metrics` leverages custom
+By default, Azimuth will compute the metrics listed above. `metrics` leverages custom
 objects, with an additional field which allow defining `kwargs`
 to be sent to the metric `compute()` function.
 
@@ -257,6 +253,12 @@ your own, as detailed in [:material-link: Defining Metrics](../custom-objects/me
     ```json
     {
       "metrics": {
+        "Accuracy": {
+          "class_name": "datasets.load_metric",
+          "kwargs": {
+            "path": "accuracy"
+          }
+        },
         "Precision": {
           "class_name": "datasets.load_metric",
           "kwargs": {

@@ -1,0 +1,49 @@
+{
+  "name": "CLINC150 multi pipelines",
+  "dataset": {
+    "class_name": "datasets.load_dataset",
+    "args": [
+      "clinc_oos",
+      "imbalanced"
+    ]
+  },
+  "columns": {
+    "text_input": "text",
+    "label": "intent"
+  },
+  "rejection_class": "oos",
+  "model_contract": "hf_text_classification",
+  "pipelines": [
+    {
+      "model": {
+        "class_name": "loading_resources.load_hf_text_classif_pipeline",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "checkpoint_path": "transformersbook/distilbert-base-uncased-distilled-clinc"
+        }
+      }
+    },
+    {
+      "model": {
+        "class_name": "loading_resources.load_hf_text_classif_pipeline",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "checkpoint_path": "transformersbook/distilbert-base-uncased-distilled-clinc"
+        }
+      },
+      "postprocessors": [
+        {
+          "threshold": 0.3
+        },
+        {
+          "temperature": 0.8
+        }
+      ]
+    }
+  ],
+  "saliency_layer": "distilbert.embeddings.word_embeddings",
+  "batch_size": 128,
+  "uncertainty": {
+    "iterations": 20
+  }
+}

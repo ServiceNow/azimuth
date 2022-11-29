@@ -53,7 +53,7 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 
 ```yaml
 {
-  "name": "CLINC-151", # (1)
+  "name": "CLINC150", # (1)
   "dataset": {
     "class_name": "datasets.load_dataset", # (2)
     "args": [ # (3)
@@ -131,6 +131,7 @@ They are the following:
 * Specify the name of the project, passing `NAME`.
 * You can specify the device on which to run Azimuth, with `DEVICE` being one of `auto`, `gpu` or `cpu`. If
   none is provided, `auto` will be used. Ex: `DEVICE=gpu`.
+* Specify `READ_ONLY_CONFIG=1` to lock the config once Azimuth is launched.
 
 !!! note "Config file prevails over environment variables"
 

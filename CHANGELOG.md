@@ -14,17 +14,18 @@ Released changes are shown in the
 - Azimuth now works on French datasets (and pipelines)! Language can be selected in the config,
   and language-specific defaults for syntax-tagging and behavioral tests (neutral tokens) will be
   set dynamically (or can be altered manually).
-- Added a new page to compare different pipelines in the performance analysis table.
-
+- New class analysis section, with class overlap detection. More details are available in the User Guide and in the Key Concepts.
+- Pipeline pre/post-processing steps breakdown in the utterance detail page.
 
 ### Changed
-- Added a proposed action: `merge_classes`, and rename `consider_new_class` to `define_new_class`.
-- The order of the classes in the confusion matrix is now smarter: classes where the model gets similarly confused will be closer to one another. The rejection class is always the last row/column in the confusion matrix. A toggle allows the user to keep the original order from the dataset if preferred.
+- The default port for the front end will now be 3000, the React default, instead of 3005.
 
 ### Deprecated/Breaking Changes
 
 ### Removed
 
 ### Fixed
+- ONNX models on GPU.
+- Preserve white spaces in utterances. That includes `\n`s, `\t`s, and consecutive spaces.
 
 ### Security

@@ -33,11 +33,15 @@ with precision, recall and F1 below.
 
 === "Config Example"
 
-    By default, Azimuth loads Precision, Recall and F1 with `average=weighted`:
-
     ``` json
     {
       "metrics": {
+        "Accuracy": {
+          "class_name": "datasets.load_metric",
+          "kwargs": {
+            "path": "accuracy"
+          }
+        },
         "Precision": {
           "class_name": "datasets.load_metric",
           "kwargs": {

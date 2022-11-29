@@ -31,7 +31,7 @@ const customTheme: Theme = createTheme({
       light: "#63CCFF",
       main: "#03A9F4",
       dark: "#006DB3",
-      contrastText: "white",
+      contrastText: "#fff",
     },
     success: {
       main: "#00B686",

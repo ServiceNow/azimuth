@@ -55,7 +55,7 @@ def test_config_shortcut():
     assert isinstance(mod.postprocessors[1], ThresholdConfig)
 
 
-DEFAULT_CONFIG = {
+MINIMAL_CONFIG = {
     "model_contract": "hf_text_classification",
     "dataset": {"class_name": "potato"},
 }
@@ -64,30 +64,22 @@ DEFAULT_CONFIG = {
 def test_pipeline_names():
     # Happy path, no name anywhere
     cfg = AzimuthConfig(
-        **{
-            **DEFAULT_CONFIG,
-            **{
-                "pipelines": [
-                    {"model": {"class_name": "model1"}},
-                    {"model": {"class_name": "model2"}},
-                ]
-            },
-        }
+        **MINIMAL_CONFIG,
+        pipelines=[
+            {"model": {"class_name": "model1"}},
+            {"model": {"class_name": "model2"}},
+        ],
     )
     names = [pipeline.name for pipeline in cfg.pipelines]
     assert names == ["Pipeline_0", "Pipeline_1"]
 
     # One pipeline is named
     cfg = AzimuthConfig(
-        **{
-            **DEFAULT_CONFIG,
-            **{
-                "pipelines": [
-                    {"name": "PotatoPipeline", "model": {"class_name": "model1"}},
-                    {"model": {"class_name": "model2"}},
-                ]
-            },
-        }
+        **MINIMAL_CONFIG,
+        pipelines=[
+            {"name": "PotatoPipeline", "model": {"class_name": "model1"}},
+            {"model": {"class_name": "model2"}},
+        ],
     )
     names = [pipeline.name for pipeline in cfg.pipelines]
     assert names == ["PotatoPipeline", "Pipeline_1"]
@@ -95,30 +87,22 @@ def test_pipeline_names():
     # Test duplicates
     with pytest.raises(ValidationError):
         cfg = AzimuthConfig(
-            **{
-                **DEFAULT_CONFIG,
-                **{
-                    "pipelines": [
-                        {"name": "PotatoPipeline", "model": {"class_name": "model1"}},
-                        {"name": "PotatoPipeline", "model": {"class_name": "model2"}},
-                    ],
-                    "name": "SuperProject",
-                },
-            }
+            **MINIMAL_CONFIG,
+            pipelines=[
+                {"name": "PotatoPipeline", "model": {"class_name": "model1"}},
+                {"name": "PotatoPipeline", "model": {"class_name": "model2"}},
+            ],
+            name="SuperProject",
         )
 
     # More duplicates
     with pytest.raises(ValidationError):
         cfg = AzimuthConfig(
-            **{
-                **DEFAULT_CONFIG,
-                **{
-                    "pipelines": [
-                        {"name": "Pipeline_1", "model": {"class_name": "model1"}},
-                        {"model": {"class_name": "model2"}},
-                    ],
-                },
-            }
+            **MINIMAL_CONFIG,
+            pipelines=[
+                {"name": "Pipeline_1", "model": {"class_name": "model1"}},
+                {"model": {"class_name": "model2"}},
+            ],
         )
 
 
@@ -126,7 +110,7 @@ def test_french_defaults_and_override():
     subj_tags_potatoes = ["russet", "yukon_gold"]
     cfg = AzimuthConfig(
         **{
-            **DEFAULT_CONFIG,
+            **MINIMAL_CONFIG,
             **{"language": "fr", "syntax": {"subj_tags": subj_tags_potatoes}},
         }
     )

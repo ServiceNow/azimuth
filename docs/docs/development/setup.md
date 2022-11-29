@@ -55,7 +55,7 @@ We use `poetry` as our dependency manager for the back end.
 
 * Install the dependencies.
     ```shell
-    poetry install
+    poetry install --extras cpu
     ```
 
 ### Docker (Optional)

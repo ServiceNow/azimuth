@@ -1,16 +1,16 @@
 import React from "react";
 import {
   BrowserRouter as Router,
-  Switch,
-  Route,
   Redirect,
+  Route,
+  Switch,
   useParams,
 } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import {
+  StyledEngineProvider,
   Theme,
   ThemeProvider,
-  StyledEngineProvider,
 } from "@mui/material/styles";
 import AppLayout from "components/AppLayout";
 import BasicLayout from "components/BasicLayout";
@@ -32,6 +32,8 @@ import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
 import Settings from "pages/Settings";
 import NotFound from "pages/NotFound";
+import ClassAnalysis from "pages/ClassAnalysis";
+import SmartTags from "pages/SmartTags";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -52,7 +54,7 @@ const DatasetSplitRedirect = () => {
 
   return (
     <Redirect
-      to={`/${jobId}/dataset_splits/${datasetSplitName}/performance_overview?pipeline_index=0`}
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview?pipeline_index=0`}
     />
   );
 };
@@ -87,6 +89,16 @@ export default class App extends React.Component<Props> {
                                 <Settings />
                               </BasicLayout>
                             </Route>
+                            <Route path="/:jobId/class_analysis" exact>
+                              <BasicLayout maxWidth="md">
+                                <ClassAnalysis />
+                              </BasicLayout>
+                            </Route>
+                            <Route path="/:jobId/smart_tags" exact>
+                              <BasicLayout>
+                                <SmartTags />
+                              </BasicLayout>
+                            </Route>
                             <Route
                               path="/:jobId/dataset_splits/:datasetSplitName"
                               exact
@@ -112,10 +124,7 @@ export default class App extends React.Component<Props> {
                                 <Threshold />
                               </BasicLayout>
                             </Route>
-                            <Route
-                              path="/:jobId/dataset_class_distribution_analysis"
-                              exact
-                            >
+                            <Route path="/:jobId/dataset_warnings" exact>
                               <BasicLayout>
                                 <WarningsOverview />
                               </BasicLayout>
@@ -128,7 +137,7 @@ export default class App extends React.Component<Props> {
                                 <UtteranceDetail />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/performance_analysis" exact>
+                            <Route path="/:jobId/pipeline_metrics" exact>
                               <BasicLayout>
                                 <PerformanceAnalysis />
                               </BasicLayout>

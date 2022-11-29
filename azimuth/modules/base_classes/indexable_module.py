@@ -22,7 +22,14 @@ from azimuth.types import (
 )
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse, SaliencyResponse
-from azimuth.utils.ml.postprocessing import PostProcessingIO
+from azimuth.utils.ml.model_performance import compute_outcome
+from azimuth.utils.ml.postprocessing import (
+    PostProcessingIO,
+    PostprocessingStep,
+    PostprocessingStepAPIResponse,
+    PredictionDetails,
+)
+from azimuth.utils.ml.preprocessing import PreprocessingStepAPIResponse
 from azimuth.utils.object_loader import load_custom_object
 from azimuth.utils.validation import assert_not_none
 
@@ -138,7 +145,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
         # Compute saliency on the batch.
         ...
 
-    def run_postprocessing(self, output: PostProcessingIO, **kwargs) -> PostProcessingIO:
+    def run_postprocessing(self, output: PostProcessingIO, **kwargs) -> List[PostprocessingStep]:
         """
         Run all postprocessors defined in `self.config` on a batch.
 
@@ -158,6 +165,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 f" and pipeline definitions (got {self.config.pipelines})."
             )
         postprocessors = self.config.pipelines[self.mod_options.pipeline_index].postprocessors
+        postprocessing_steps = []
         if postprocessors is not None:
             for post in postprocessors:
                 # Q: Why do we reload the postprocessors all the time?
@@ -165,18 +173,30 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 #    It is less burdensome to just reload it.
                 fn = load_custom_object(post, **kwargs)
                 output = fn(output)
-        return output
+                # When updating to python 3.9, use .removeprefix()
+                prefix = f"{PostprocessingStep.__module__}."
+                class_name = post.class_name
+                if class_name.startswith(prefix):
+                    class_name = class_name[len(prefix) :]
+
+                postprocessing_steps.append(
+                    PostprocessingStep(
+                        class_name=class_name,
+                        output=output,
+                    )
+                )
+        return postprocessing_steps
 
     def _save_result(self, res, dm):
-        table_key = self._get_table_key()
-
-        # Save result in a DatasetSplitManager
-        if len(res) > 0 and isinstance(res[0], PredictionResponse):
+        if isinstance(res[0], PredictionResponse):
+            # Save result in a DatasetSplitManager
+            table_key = self._get_table_key()
+            class_names = dm.get_class_names()
             res_casted = cast(List[PredictionResponse], res)
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.model_predictions,
                 features=[
-                    [cl_idx for cl_idx in reversed(np.argsort(pred_res.model_output.probs[0]))]
+                    list(np.argsort(pred_res.model_output.probs[0])[::-1])
                     for pred_res in res_casted
                 ],
                 table_key=table_key,
@@ -184,8 +204,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.model_confidences,
                 features=[
-                    [prob for prob in reversed(np.sort(pred_res.model_output.probs[0]))]
-                    for pred_res in res_casted
+                    list(np.sort(pred_res.model_output.probs[0])[::-1]) for pred_res in res_casted
                 ],
                 table_key=table_key,
             )
@@ -197,7 +216,39 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
             dm.add_column_to_prediction_table(
                 key=DatasetColumn.postprocessed_confidences,
                 features=[
-                    [prob for prob in reversed(np.sort(pred_res.postprocessed_output.probs[0]))]
+                    list(np.sort(pred_res.postprocessed_output.probs[0])[::-1])
+                    for pred_res in res_casted
+                ],
+                table_key=table_key,
+            )
+            dm.add_column_to_prediction_table(
+                key=DatasetColumn.pipeline_steps,
+                features=[
+                    {
+                        "preprocessing_steps": [
+                            PreprocessingStepAPIResponse(
+                                class_name=step.class_name, text=step.text[0]
+                            ).dict()
+                            for step in pred_res.preprocessing_steps
+                        ],
+                        "postprocessing_steps": [
+                            PostprocessingStepAPIResponse(
+                                class_name=step.class_name,
+                                output=PredictionDetails(
+                                    predictions=[
+                                        class_names[cl_idx]
+                                        for cl_idx in np.argsort(step.output.probs[0])[::-1]
+                                    ],
+                                    prediction=class_names[step.output.preds[0]],
+                                    confidences=list(np.sort(step.output.probs[0])[::-1]),
+                                    outcome=compute_outcome(
+                                        step.output.preds[0], pred_res.label, dm.rejection_class_idx
+                                    ),
+                                ),
+                            ).dict()
+                            for step in pred_res.postprocessing_steps
+                        ],
+                    }
                     for pred_res in res_casted
                 ],
                 table_key=table_key,

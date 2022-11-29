@@ -1,0 +1,46 @@
+{
+  "name": "CLINC Demo multi pipelines",
+  "pipelines": [
+    {
+      "model": {
+        "class_name": "loading_resources.load_hf_text_classif_pipeline",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "checkpoint_path": "/azimuth_shr/files/clinc-demo/CLINC150_trained_model"
+        }
+      }
+    },
+    {
+      "model": {
+        "class_name": "loading_resources.load_hf_text_classif_pipeline",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "checkpoint_path": "/azimuth_shr/files/clinc-demo/CLINC150_trained_model"
+        }
+      },
+      "postprocessors": [
+        {
+          "threshold": 0.3
+        },
+        {
+          "temperature": 0.8
+        }
+      ]
+    }
+  ],
+  "dataset": {
+    "class_name": "loading_resources.load_CLINC150_data",
+    "remote": "/azimuth_shr",
+    "kwargs": {
+      "python_loader": "/azimuth_shr/data/CLINC150.py",
+      "full_path": "/azimuth_shr/files/clinc-demo/oos-eval/data/data_demo.json"
+    }
+  },
+  "batch_size": 64,
+  "saliency_layer": "distilbert.embeddings.word_embeddings",
+  "model_contract": "hf_text_classification",
+  "rejection_class": "NO_INTENT",
+  "uncertainty": {
+    "iterations": 20
+  }
+}

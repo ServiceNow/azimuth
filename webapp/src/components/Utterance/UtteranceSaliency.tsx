@@ -34,7 +34,8 @@ const useStyles = makeStyles(() => ({
 type Props = {
   variant?: Variant;
   tooltip?: boolean;
-  utterance: Utterance;
+  utterance: string;
+  modelSaliency: Utterance["modelSaliency"];
 };
 
 type TokensProps = {
@@ -46,10 +47,11 @@ type TokensProps = {
 const UtteranceSaliency: React.FC<Props> = ({
   variant = "body2",
   tooltip = false,
-  utterance: { modelSaliency, utterance },
+  utterance,
+  modelSaliency,
 }) => {
   return (
-    <Typography display="inline" variant={variant}>
+    <Typography display="inline" variant={variant} whiteSpace="pre-wrap">
       {modelSaliency ? Tokens({ tooltip, ...modelSaliency }) : utterance}
     </Typography>
   );

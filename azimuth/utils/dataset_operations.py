@@ -51,14 +51,22 @@ def filter_dataset_split(
                 <= x[confidence_column][0]
                 <= filters.confidence_max
             )
-    if len(filters.label) > 0 and config.columns.label in dataset_split.column_names:
+    if (
+        len(filters.label) > 0
+        and config.columns.label in dataset_split.column_names
+        and dataset_split.num_rows != 0
+    ):
         dataset_split = dataset_split.filter(lambda x: x[config.columns.label] in filters.label)
-    if filters.utterance is not None and config.columns.text_input in dataset_split.column_names:
+    if (
+        filters.utterance is not None
+        and config.columns.text_input in dataset_split.column_names
+        and dataset_split.num_rows != 0
+    ):
         by = clean_utterance(filters.utterance)
         dataset_split = dataset_split.filter(
             lambda x: by in clean_utterance(x[config.columns.text_input])
         )
-    if len(filters.prediction) > 0:
+    if len(filters.prediction) > 0 and dataset_split.num_rows != 0:
         prediction_column = (
             DatasetColumn.model_predictions
             if without_postprocessing
@@ -73,7 +81,7 @@ def filter_dataset_split(
                 dataset_split = dataset_split.filter(
                     lambda x: x[DatasetColumn.postprocessed_prediction] in filters.prediction
                 )
-    if len(filters.data_action) > 0:
+    if len(filters.data_action) > 0 and dataset_split.num_rows != 0:
         # We do OR for data_action tags.
         dataset_split = dataset_split.filter(
             lambda x: any(
@@ -81,7 +89,7 @@ def filter_dataset_split(
                 for v in filters.data_action
             )
         )
-    if len(filters.outcome) > 0:
+    if len(filters.outcome) > 0 and dataset_split.num_rows != 0:
         outcome_column = (
             DatasetColumn.model_outcome
             if without_postprocessing
@@ -94,8 +102,10 @@ def filter_dataset_split(
         # For each smart tag family, we do OR, but AND between families
         # If NO_SMART_TAGS, it is none of them.
         family = cast(SmartTagFamily, key)
-        if len(tags_in_family) > 0 and all(
-            tag in dataset_split.column_names for tag in SMART_TAGS_FAMILY_MAPPING[family]
+        if (
+            len(tags_in_family) > 0
+            and all(tag in dataset_split.column_names for tag in SMART_TAGS_FAMILY_MAPPING[family])
+            and dataset_split.num_rows != 0
         ):
             dataset_split = dataset_split.filter(
                 lambda x: any(

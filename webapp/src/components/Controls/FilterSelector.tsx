@@ -9,7 +9,6 @@ import {
   Tooltip,
   Typography,
   TypographyProps,
-  useTheme,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import FilterDistribution from "components/Controls/FilterDistribution";
@@ -41,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
     listStyle: "none",
     overflow: "hidden",
     padding: 0,
-    marginBottom: theme.spacing(1.5),
     margin: 0,
   },
   option: {
@@ -104,7 +102,6 @@ const FilterSelector = <FilterValue extends string>({
   prettyNames,
 }: Props<FilterValue>) => {
   const classes = useStyles();
-  const theme = useTheme();
 
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
@@ -236,7 +233,7 @@ const FilterSelector = <FilterValue extends string>({
             <motion.ul
               className={classes.options}
               animate={{
-                maxHeight: theme.spacing(numberVisible * 3.5),
+                maxHeight: numberVisible * 28,
               }}
               transition={transition}
             >

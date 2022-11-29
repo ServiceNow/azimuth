@@ -1,19 +1,19 @@
 import {
   Box,
   Paper,
+  Stack,
   Tab,
   Tabs,
-  Theme,
   Tooltip,
   Typography,
 } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
 import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
 import Description from "components/Description";
 import Loading from "components/Loading";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
+import Steps from "components/Steps";
 import TabPipelineRequired from "components/TabPipelineRequired";
 import PerturbedUtterances from "components/Utterance/PerturbedUtterances";
 import SimilarUtterances from "components/Utterance/SimilarUtterances";
@@ -27,14 +27,14 @@ import {
   getSimilarUtterancesEndpoint,
   getUtterancesEndpoint,
 } from "services/api";
-import { DatasetSplitName, Outcome } from "types/api";
+import { DatasetSplitName } from "types/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
   ID_TOOLTIP,
   OUTCOME_COLOR,
   SMART_TAG_FAMILIES,
 } from "utils/const";
-import { formatRatioAsPercentageString } from "utils/format";
+import { camelToTitleCase, formatRatioAsPercentageString } from "utils/format";
 import { isPipelineSelected } from "utils/helpers";
 
 const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
@@ -51,44 +51,6 @@ const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
     />
   ),
 };
-const useStyles = makeStyles<Theme, { outcome?: Outcome }>((theme) => ({
-  tags: {
-    display: "grid",
-    gridTemplateColumns: "auto auto",
-    gridTemplateRows: theme.spacing(3),
-    gap: theme.spacing(1),
-  },
-  tabContent: {
-    flex: 1,
-  },
-  utteranceContainer: {
-    alignItems: "center",
-    display: "grid",
-    gridAutoFlow: "column",
-    gridTemplateColumns: `auto 1fr`,
-    gridTemplateRows: "repeat(2, auto)",
-    padding: theme.spacing(2, 4),
-    "& > *": {
-      padding: theme.spacing(2),
-    },
-    "& > *:nth-child(odd)": {
-      borderBottom: `thin ${theme.palette.divider} solid`,
-      fontWeight: "bold",
-    },
-  },
-  testsAndSimilarity: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-  },
-  prediction: {
-    "&:first-child > span": {
-      color: ({ outcome }) =>
-        outcome && theme.palette[OUTCOME_COLOR[outcome]].main,
-      fontWeight: "bold",
-    },
-  },
-}));
 
 export const UtteranceDetail = () => {
   const { jobId, utteranceId, datasetSplitName } = useParams<{
@@ -135,9 +97,13 @@ export const UtteranceDetail = () => {
     { skip: view !== "similarity" }
   );
 
-  const classes = useStyles({
-    outcome: utterance?.modelPrediction?.postprocessedOutcome,
-  });
+  // Raw states will be capped to the number of steps later. This is necessary
+  // when selecting a different pipeline with a different number of steps.
+  const [preprocessingStepRaw, setPreprocessingStep] = React.useState(0);
+
+  // Index from the right, so we can initialize to the last step
+  // without the need for postprocessingSteps.length before it is loaded.
+  const [postprocessingStepRaw, setPostprocessingStep] = React.useState(0);
 
   if (!utterance) {
     // utterance will be defined while utteranceIsFetching after changing the
@@ -158,41 +124,133 @@ export const UtteranceDetail = () => {
     ? SMART_TAG_FAMILIES
     : DATASET_SMART_TAG_FAMILIES;
 
+  const { modelPrediction } = utterance;
+
+  const preprocessingSteps = [
+    { className: "Initial", text: utterance.utterance },
+    ...(modelPrediction?.preprocessingSteps ?? []),
+  ];
+
+  const postprocessingSteps = modelPrediction && [
+    {
+      className: "ModelOutput",
+      output: {
+        predictions: modelPrediction.modelPredictions,
+        prediction: modelPrediction.modelPredictions[0],
+        confidences: modelPrediction.modelConfidences,
+        outcome: modelPrediction.modelOutcome,
+      },
+    },
+    ...modelPrediction.postprocessingSteps,
+  ];
+
+  const preprocessingStep =
+    preprocessingStepRaw < preprocessingSteps.length
+      ? preprocessingStepRaw
+      : preprocessingSteps.length - 1;
+
+  const postprocessingStep =
+    postprocessingSteps && postprocessingStepRaw < postprocessingSteps.length
+      ? postprocessingSteps.length - 1 - postprocessingStepRaw
+      : 0;
+
+  const output = postprocessingSteps?.[postprocessingStep].output;
+
   return (
     <Box display="flex" flexDirection="column" gap={2} height="100%">
       <Description
         text="Inspect the details of all of the analyses that have been performed on this utterance."
         link="/exploration-space/utterance-details/"
       />
-      <Paper variant="outlined" className={classes.utteranceContainer}>
+      <Paper
+        variant="outlined"
+        sx={{
+          alignItems: "center",
+          display: "grid",
+          gridAutoFlow: "column",
+          gridTemplateColumns: `auto minmax(0, 2fr) ${
+            isPipelineSelected(pipeline) ? "auto minmax(0, 1fr)" : ""
+          }`,
+          gridTemplateRows: "repeat(2, auto)",
+          padding: 4,
+          rowGap: 2,
+          "& > *": {
+            paddingX: 2,
+          },
+          "& > .header": {
+            borderBottom: (theme) => `thin ${theme.palette.divider} solid`,
+            height: "100%",
+          },
+        }}
+      >
         <Tooltip title={ID_TOOLTIP}>
-          <Typography>Id</Typography>
+          <Typography variant="subtitle2" className="header">
+            Id
+          </Typography>
         </Tooltip>
         <Typography variant="body2">{utteranceId}</Typography>
 
-        <Typography>Utterance</Typography>
+        <Box className="header">
+          <Typography variant="subtitle2">Utterance</Typography>
+          {preprocessingSteps.length > 1 && (
+            <Steps
+              setStep={setPreprocessingStep}
+              step={preprocessingStep}
+              stepNames={preprocessingSteps.map(({ className }) =>
+                camelToTitleCase(className)
+              )}
+              roundedStart
+            />
+          )}
+        </Box>
         <Box display="flex" alignItems="center">
           <UtteranceSaliency
             variant="subtitle1"
             tooltip
-            utterance={utterance}
+            utterance={preprocessingSteps[preprocessingStep].text}
+            modelSaliency={
+              preprocessingStep === 0 ? utterance.modelSaliency : null
+            }
           />
-          <CopyButton text={utterance.utterance} />
+          <CopyButton text={preprocessingSteps[preprocessingStep].text} />
         </Box>
 
-        <Typography>Label</Typography>
+        <Typography variant="subtitle2" className="header">
+          Label
+        </Typography>
         <Typography variant="body2">{utterance.label}</Typography>
 
-        {utterance.modelPrediction && (
+        {output && (
           <>
-            <Typography>Prediction</Typography>
-            <Box>
-              {utterance.modelPrediction.postprocessedPrediction !==
-                utterance.modelPrediction.modelPredictions[0] && (
-                <Typography variant="body2" className={classes.prediction}>
-                  <span>
-                    {utterance.modelPrediction.postprocessedPrediction}
-                  </span>
+            <Box className="header">
+              <Typography variant="subtitle2">Prediction</Typography>
+              {postprocessingSteps.length > 1 && (
+                <Steps
+                  setStep={(step) =>
+                    setPostprocessingStep(postprocessingSteps.length - 1 - step)
+                  }
+                  step={postprocessingStep}
+                  stepNames={postprocessingSteps.map(({ className }) =>
+                    camelToTitleCase(className)
+                  )}
+                  roundedEnd
+                />
+              )}
+            </Box>
+            <Stack
+              height={88}
+              justifyContent="center"
+              sx={{
+                "& > p:first-of-type > span": {
+                  color: (theme) =>
+                    theme.palette[OUTCOME_COLOR[output.outcome]].main,
+                  fontWeight: "bold",
+                },
+              }}
+            >
+              {output.prediction !== output.predictions[0] && (
+                <Typography variant="body2">
+                  <span>{output.prediction}</span>
                   {isPipelineSelected(pipeline) &&
                     utterancesResponse?.confidenceThreshold !== null &&
                     ` (< ${formatRatioAsPercentageString(
@@ -200,28 +258,20 @@ export const UtteranceDetail = () => {
                     )})`}
                 </Typography>
               )}
-              {utterance.modelPrediction.modelPredictions
-                .slice(0, 3)
-                .map((prediction, i) => (
-                  <Typography
-                    key={prediction}
-                    variant="body2"
-                    className={classes.prediction}
-                  >
-                    <span>{prediction}</span> at{" "}
-                    {formatRatioAsPercentageString(
-                      utterance.modelPrediction?.postprocessedConfidences[
-                        i
-                      ] as number
-                    )}
-                  </Typography>
-                ))}
-            </Box>
+              {output.predictions.slice(0, 3).map((prediction, i) => (
+                <Typography key={prediction} variant="body2">
+                  <span>{prediction}</span> at{" "}
+                  {formatRatioAsPercentageString(output.confidences[i])}
+                </Typography>
+              ))}
+            </Stack>
           </>
         )}
 
-        <Typography>Smart Tags</Typography>
-        <Box className={classes.tags}>
+        <Typography variant="subtitle2" className="header">
+          Smart Tags
+        </Typography>
+        <Box display="grid" gap={1} gridTemplateColumns="auto auto">
           {smartTagFamilies.map(
             (family) =>
               utterance[family].length > 0 && (
@@ -235,7 +285,9 @@ export const UtteranceDetail = () => {
           )}
         </Box>
 
-        <Typography>Proposed Action</Typography>
+        <Typography variant="subtitle2" className="header">
+          Proposed Action
+        </Typography>
         <Box>
           <UtteranceDataAction
             utteranceIds={[index]}
@@ -247,8 +299,10 @@ export const UtteranceDetail = () => {
       </Paper>
       <Paper
         variant="outlined"
-        className={classes.testsAndSimilarity}
         sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
           gap: 4,
           padding: 4,
           paddingTop: 2.5,
@@ -283,7 +337,7 @@ export const UtteranceDetail = () => {
             />
           </Box>
         )}
-        <div className={classes.tabContent}>
+        <Box flex={1}>
           {view === "similarity" && (
             <SimilarUtterances
               baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
@@ -300,7 +354,7 @@ export const UtteranceDetail = () => {
               index={Number(utteranceId)}
             />
           )}
-        </div>
+        </Box>
       </Paper>
     </Box>
   );

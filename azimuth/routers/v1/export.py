@@ -191,5 +191,5 @@ def make_utterance_level_result(
                 original_utterance=utterance[dm.config.columns.text_input],
                 original_confidence=utterance[DatasetColumn.postprocessed_confidences][0],
                 label=dm.get_class_names()[utterance[dm.config.columns.label]],
-                **{**test.dict(), **{"prediction": dm.get_class_names()[test.prediction]}},
+                **{**test.dict(), "prediction": dm.get_class_names()[test.prediction]},
             ).dict()

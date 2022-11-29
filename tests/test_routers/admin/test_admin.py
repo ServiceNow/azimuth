@@ -37,10 +37,18 @@ def test_get_config(app: FastAPI):
             "max_delta_representation": 0.05,
             "max_delta_std_tokens": 3.0,
             "min_num_per_class": 20,
+            "max_delta_class_imbalance": 0.5,
         },
         "language": "en",
         "large_dask_cluster": False,
         "metrics": {
+            "Accuracy": {
+                "additional_kwargs": {},
+                "args": [],
+                "class_name": "datasets.load_metric",
+                "kwargs": {"path": "accuracy"},
+                "remote": None,
+            },
             "F1": {
                 "additional_kwargs": {"average": "weighted"},
                 "args": [],
@@ -93,6 +101,7 @@ def test_get_config(app: FastAPI):
         },
         "uncertainty": {"high_epistemic_threshold": 0.1, "iterations": 1},
         "use_cuda": False,
+        "read_only_config": False,
     }
 
 

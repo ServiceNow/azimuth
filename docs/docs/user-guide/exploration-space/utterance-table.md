@@ -1,9 +1,9 @@
-# Utterances Table
+# Utterance Table
 
 The utterance table view contains **all the utterances with their predictions**. The table also
 includes information such as smart tags and proposed actions, if applicable.
 
-![](../../_static/images/exploration-space/utterances-table.png)
+![](../../_static/images/exploration-space/utterance-table.png)
 
 To see **more details on an utterance**, click any row, which will open
 the [:material-link: Utterance Details](utterance-details.md) page.

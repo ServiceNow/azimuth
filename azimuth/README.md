@@ -68,10 +68,6 @@ For distributed computing we use `Dask`. In local mode, it is similar to `concur
 
 #### Known issues
 
-* [On Github Action] When a worker goes OOM, you will see errors such as
-    `distributed.comm.core.CommClosedError: in <closed TCP>: Stream is closed`
-    `distributed.scheduler.KilledWorker`
-  * To fix this, reduce your test load by supplying less indices or use smaller models/datasets.
 * [Anytime] A future might get lost. This can happens when a worker dies or when the scheduler restarts.
   * To fix this, you can call `future.retry()`.
   * Tracked in #58
