@@ -45,11 +45,6 @@ const ClassOverlap = () => {
     classOverlap.overlapThreshold
   );
 
-  React.useEffect(
-    () => setOverlapThreshold(classOverlap.overlapThreshold),
-    [classOverlap.overlapThreshold]
-  );
-
   const setQuery = (newClassOverlap: QueryClassOverlapState) =>
     history.push(
       `/${jobId}/class_analysis${constructSearchString({
@@ -204,8 +199,9 @@ const ClassOverlap = () => {
                   type="number"
                   value={overlapThreshold ?? data.defaultOverlapThreshold}
                   inputProps={OVERLAP_THRESHOLD_INPUT_PROPS}
-                  onChange={(event) => {
-                    setQuery({ overlapThreshold: Number(event.target.value) });
+                  onChange={({ target: { value } }) => {
+                    setOverlapThreshold(value);
+                    setQuery({ overlapThreshold: Number(value) });
                   }}
                 />
                 <Tooltip title="Reset threshold" arrow>
@@ -215,6 +211,7 @@ const ClassOverlap = () => {
                       color="secondary"
                       disabled={classOverlap.overlapThreshold === undefined}
                       onClick={() => {
+                        setOverlapThreshold(undefined);
                         setQuery({ overlapThreshold: undefined });
                       }}
                     >
