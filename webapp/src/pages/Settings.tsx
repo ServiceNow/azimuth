@@ -59,7 +59,8 @@ const Settings: React.FC = () => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
-  const resultingConfig = _.merge(data, partialConfig);
+
+  const resultingConfig = { ...data, ...partialConfig };
 
   const divider = <Divider sx={{ margin: 1 }} />;
 
