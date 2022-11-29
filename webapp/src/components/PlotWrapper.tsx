@@ -1,11 +1,11 @@
 import { Warning } from "@mui/icons-material";
 import { Box, MenuItem, Select } from "@mui/material";
 import _ from "lodash";
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import Plot, { PlotParams } from "react-plotly.js";
 import { DatasetWarning } from "types/api";
 
-export const ResponsivePlotWrapper: React.FC<PlotParams> = (props) => {
+export const ResponsivePlotWrapper: React.FC<PlotParams> = memo((props) => {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
 
@@ -32,29 +32,31 @@ export const ResponsivePlotWrapper: React.FC<PlotParams> = (props) => {
       <PlotWrapper {...props} layout={{ ...props.layout, width }} />
     </Box>
   );
-};
+});
 
-export const PlotWrapper: React.FC<PlotParams> = (props) => {
+export const PlotWrapper: React.FC<PlotParams> = memo((props) => {
   // Because of the plotly library mutating the passed props, we have to clone the props here
   // because on rerendered they would not match the object plotly is now using
   // https://github.com/plotly/react-plotly.js/issues/43
   const clone = _.cloneDeep(props);
 
   return <Plot {...clone} config={{ displayModeBar: false }} />;
-};
+});
 
 type Props = {
   component?: typeof PlotWrapper | typeof ResponsivePlotWrapper;
   warning: DatasetWarning;
 };
 
-export const WarningPlot: React.FC<Props> = ({
-  component: Component = PlotWrapper,
-  warning: {
-    plots: { overall, perClass },
-    comparisons,
-  },
-}) => {
+export const WarningPlot: React.FC<Props> = memo((props) => {
+  const {
+    component: Component = PlotWrapper,
+    warning: {
+      plots: { overall, perClass },
+      comparisons,
+    },
+  } = props;
+
   const [view, setView] = React.useState("");
 
   return (
@@ -84,4 +86,4 @@ export const WarningPlot: React.FC<Props> = ({
       )}
     </Box>
   );
-};
+});
