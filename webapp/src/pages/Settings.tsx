@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import _ from "lodash";
 import React from "react";
-import AccordianLayout from "components/AccordianLayout";
+import AccordionLayout from "components/AccordionLayout";
 import { useParams } from "react-router-dom";
 import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
@@ -32,32 +32,6 @@ const STEPPER: stepper = {
   long_sentence_min_token: { min: 0, max: 100, step: 1 },
 };
 
-type section = {
-  name: string;
-  description: string;
-  docURL: string;
-};
-
-const configSection: section[] = [
-  {
-    name: "Project Config",
-    description:
-      "Contains mandatory fields that specify the dataset to load in Azimuth",
-    docURL: "reference/configuration/project/",
-  },
-  {
-    name: "Model Contract Config",
-    description:
-      "Defines how Azimuth interacts with the ML pipelines and the metrics",
-    docURL: "reference/configuration/model_contract/",
-  },
-  {
-    name: "Analyses Customization",
-    description: "Four analyses configured in Azimuth",
-    docURL: "reference/configuration/analyses/",
-  },
-];
-
 const ANALYSES_CUSTOMIZATION: (keyof AzimuthConfig)[] = [
   "dataset_warnings",
   "syntax",
@@ -65,6 +39,7 @@ const ANALYSES_CUSTOMIZATION: (keyof AzimuthConfig)[] = [
 ];
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
+const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
@@ -146,7 +121,7 @@ const Settings: React.FC = () => {
                 ...partialConfig,
                 pipelines: _.unionBy(
                   updatedPipeline,
-                  resultingConfig?.pipelines,
+                  resultingConfig.pipelines,
                   "name"
                 ),
               });
@@ -219,6 +194,7 @@ const Settings: React.FC = () => {
   );
 
   const displayPostprocessorSubField = (
+    pipelineIndex: number,
     pipeline: PipelineDefinition,
     field: string,
     postprocessorIdx: number,
@@ -237,42 +213,30 @@ const Settings: React.FC = () => {
       inputProps={{ min: 0, max: 1, step: 0.1 }}
       variant="standard"
       onChange={(event) => {
-        const existedPipeline = partialConfig.pipelines
-          ? partialConfig.pipelines.find(({ name }) => name === pipeline.name)
-          : undefined;
-        const current_postprocessor = pipeline?.postprocessors?.find(
-          (_, index) => index === postprocessorIdx
-        );
-        const updatedPostprocessor = _.merge({}, current_postprocessor, {
-          [field]: Number(event.target.value),
+        setPartialConfig({
+          ...partialConfig,
+          pipelines: _.unionBy(
+            [
+              {
+                ...pipeline,
+                postprocessors: _.unionBy(
+                  [
+                    _.merge({}, pipeline?.postprocessors?.[postprocessorIdx], {
+                      [field]: Number(event.target.value),
+                      kwargs: { [field]: Number(event.target.value) },
+                    }),
+                  ],
+                  pipeline.postprocessors,
+                  "class_name"
+                ),
+              },
+            ],
+            partialConfig.pipelines?.[pipelineIndex]
+              ? partialConfig.pipelines
+              : resultingConfig.pipelines,
+            "name"
+          ),
         });
-        const updatedPipeline = [
-          {
-            ...pipeline,
-            postprocessors: _.unionBy(
-              [updatedPostprocessor],
-              pipeline.postprocessors,
-              "class_name"
-            ),
-          },
-        ];
-        existedPipeline
-          ? setPartialConfig({
-              ...partialConfig,
-              pipelines: _.unionBy(
-                updatedPipeline,
-                partialConfig.pipelines,
-                "name"
-              ),
-            })
-          : setPartialConfig({
-              ...partialConfig,
-              pipelines: _.unionBy(
-                updatedPipeline,
-                resultingConfig?.pipelines,
-                "name"
-              ),
-            });
       }}
     />
   );
@@ -282,12 +246,17 @@ const Settings: React.FC = () => {
       ? setPartialConfig({
           ...partialConfig,
           ...{
-            metrics: _.merge({}, resultingConfig?.metrics, {
+            metrics: _.merge({}, resultingConfig.metrics, {
               [metricName]: {
                 class_name: "datasets.load_metric",
                 kwargs: {
                   path: metricName.toLowerCase(),
                 },
+                additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
+                  metricName
+                )
+                  ? { average: "weighted" }
+                  : {},
               },
             }),
           },
@@ -295,7 +264,7 @@ const Settings: React.FC = () => {
       : setPartialConfig({
           ...partialConfig,
           ...{
-            metrics: _.omit(resultingConfig?.metrics, metricName),
+            metrics: _.omit(resultingConfig.metrics, metricName),
           },
         });
   };
@@ -309,15 +278,15 @@ const Settings: React.FC = () => {
         justifyContent="flex-start"
         marginLeft={2}
       >
-        {displayReadonlyFields("name", resultingConfig?.name)}
+        {displayReadonlyFields("name", resultingConfig.name)}
         {displayReadonlyFields(
           "rejection class",
-          resultingConfig?.rejection_class
+          resultingConfig.rejection_class
         )}
       </Box>
       <Box display="flex" flexDirection="row" marginLeft={2}>
         {displaySubSectionTitle("Columns")}
-        {resultingConfig?.columns &&
+        {resultingConfig.columns &&
           Object.entries(resultingConfig.columns).map(
             ([field, value], index) => (
               <Box key={index} gap={(theme) => theme.spacing(1)}>
@@ -336,14 +305,14 @@ const Settings: React.FC = () => {
       >
         {displayReadonlyFields(
           "class name",
-          resultingConfig?.dataset?.class_name
+          resultingConfig.dataset?.class_name
         )}
-        {displayReadonlyFields("remote", resultingConfig?.dataset?.remote)}
+        {displayReadonlyFields("remote", resultingConfig.dataset?.remote)}
       </Box>
-      {resultingConfig?.dataset?.kwargs && (
+      {resultingConfig.dataset?.kwargs && (
         <Box display="flex" flexDirection="row" marginLeft={2} gap={5}>
           {displaySubSectionTitle("Kwargs")}
-          {Object.entries(resultingConfig?.dataset?.kwargs).map(
+          {Object.entries(resultingConfig.dataset?.kwargs).map(
             ([field, value], index) => (
               <Box key={index} gap={(theme) => theme.spacing(1)}>
                 {displayReadonlyFields(field, String(value))}
@@ -352,11 +321,11 @@ const Settings: React.FC = () => {
           )}
         </Box>
       )}
-      {resultingConfig?.dataset?.args &&
-        resultingConfig?.dataset?.args.length > 0 && (
+      {resultingConfig.dataset?.args &&
+        resultingConfig.dataset?.args.length > 0 && (
           <Box display="flex" flexDirection="row" marginLeft={2} gap={5}>
             {displaySubSectionTitle("args")}
-            {Object.entries(resultingConfig?.dataset?.args).map(
+            {Object.entries(resultingConfig.dataset?.args).map(
               ([field, value], index) => (
                 <Box key={index} gap={(theme) => theme.spacing(1)}>
                   {displayReadonlyFields(field, String(value))}
@@ -378,17 +347,17 @@ const Settings: React.FC = () => {
       >
         {displayReadonlyFields(
           "model_contract",
-          resultingConfig?.model_contract
+          resultingConfig.model_contract
         )}
         {displayReadonlyFields(
           "saliency layer",
-          resultingConfig?.saliency_layer
+          resultingConfig.saliency_layer
         )}
       </Box>
       {divider}
       <Box display="flex" flexDirection="row" marginLeft={2}>
         {displaySubSectionTitle("uncertainty")}
-        {resultingConfig?.uncertainty &&
+        {resultingConfig.uncertainty &&
           Object.entries(resultingConfig.uncertainty).map(
             ([field, value], index) =>
               field !== "faiss_encoder" && (
@@ -406,11 +375,11 @@ const Settings: React.FC = () => {
       </Box>
       {divider}
       {displaySectionTitle("Pipelines")}
-      {resultingConfig?.pipelines &&
+      {resultingConfig.pipelines &&
         resultingConfig.pipelines.map(
-          ({ name, model, postprocessors }, index) => (
+          ({ name, model, postprocessors }, pipelineIndex) => (
             <Box
-              key={index}
+              key={pipelineIndex}
               display="flex"
               flexDirection="column"
               gap={1}
@@ -473,44 +442,45 @@ const Settings: React.FC = () => {
                   postprocessors,
                 })}
                 <Box
-                  key={index}
+                  key={pipelineIndex}
                   display="flex"
                   flexDirection="column"
                   gap={1}
                   marginLeft={2}
                 >
-                  {postprocessors &&
-                    postprocessors.map((postprocessor, index) => (
-                      <Box
-                        key={index}
-                        display="flex"
-                        flexDirection="row"
-                        justifyContent="flex-start"
-                        gap={5}
-                        marginX={2}
-                        padding={1}
-                        border="1px solid rgba(0, 0, 0, 0.12)"
-                      >
-                        {displayReadonlyFields(
-                          "class name",
-                          postprocessor.class_name
+                  {postprocessors?.map((postprocessor, index) => (
+                    <Box
+                      key={index}
+                      display="flex"
+                      flexDirection="row"
+                      justifyContent="flex-start"
+                      gap={5}
+                      marginX={2}
+                      padding={1}
+                      border="1px solid rgba(0, 0, 0, 0.12)"
+                    >
+                      {displayReadonlyFields(
+                        "class name",
+                        postprocessor.class_name
+                      )}
+                      {postprocessor?.temperature &&
+                        displayPostprocessorSubField(
+                          pipelineIndex,
+                          { name, model, postprocessors },
+                          "temperature",
+                          index,
+                          postprocessor?.temperature
                         )}
-                        {postprocessor?.temperature &&
-                          displayPostprocessorSubField(
-                            { name, model, postprocessors },
-                            "temperature",
-                            index,
-                            postprocessor?.temperature
-                          )}
-                        {postprocessor?.threshold &&
-                          displayPostprocessorSubField(
-                            { name, model, postprocessors },
-                            "threshold",
-                            index,
-                            postprocessor?.threshold
-                          )}
-                      </Box>
-                    ))}
+                      {postprocessor?.threshold &&
+                        displayPostprocessorSubField(
+                          pipelineIndex,
+                          { name, model, postprocessors },
+                          "threshold",
+                          index,
+                          postprocessor?.threshold
+                        )}
+                    </Box>
+                  ))}
                 </Box>
               </Box>
             </Box>
@@ -555,7 +525,7 @@ const Settings: React.FC = () => {
                   customizationConfig
                 )
               : displaySectionTitle(customizationConfig)}
-            {Object.entries(resultingConfig?.[customizationConfig] ?? {}).map(
+            {Object.entries(resultingConfig[customizationConfig] ?? {}).map(
               ([field, value], index) =>
                 field !== "faiss_encoder" && (
                   <Box
@@ -597,13 +567,27 @@ const Settings: React.FC = () => {
           View and edit certain fields from your config file. Once your changes
           are saved, expect some delays for recomputing the affected tasks.
         </Typography>
-        {configSection.map((section, index) => (
-          <AccordianLayout key={index} {...section}>
-            {index === 0 && getProjectConfigSection()}
-            {index === 1 && getModalContractConfigSection()}
-            {index === 2 && getAnalysesCustomization()}
-          </AccordianLayout>
-        ))}
+        <AccordionLayout
+          name="Project Config"
+          description="Contains mandatory fields that specify the dataset to load in Azimuth"
+          link="reference/configuration/project/"
+        >
+          {getProjectConfigSection()}
+        </AccordionLayout>
+        <AccordionLayout
+          name="Model Contract Config"
+          description="Defines how Azimuth interacts with the ML pipelines and the metrics"
+          link="reference/configuration/model_contract/"
+        >
+          {getModalContractConfigSection()}
+        </AccordionLayout>
+        <AccordionLayout
+          name="Analyses Customization"
+          description="Four analyses configured in Azimuth"
+          link="reference/configuration/analyses/"
+        >
+          {getAnalysesCustomization()}
+        </AccordionLayout>
       </Paper>
       <Box
         sx={{
@@ -613,10 +597,7 @@ const Settings: React.FC = () => {
           paddingY: 2,
         }}
       >
-        <Button
-          variant="contained"
-          onClick={() => setPartialConfig({ ...data })}
-        >
+        <Button variant="contained" onClick={() => setPartialConfig({})}>
           Discard
         </Button>
         <Box display="flex" flexDirection="column" alignItems="center" gap={1}>

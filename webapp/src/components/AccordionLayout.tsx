@@ -13,14 +13,14 @@ import Description from "components/Description";
 type Props = {
   name: string;
   description: string;
-  docURL: string;
+  link: string;
   children: React.ReactNode;
 };
 
-const AccordianLayout: React.FC<Props> = ({
+const AccordionLayout: React.FC<Props> = ({
   name,
   description,
-  docURL,
+  link,
   children,
 }) => {
   return (
@@ -37,7 +37,7 @@ const AccordianLayout: React.FC<Props> = ({
         </Typography>
         <Box display="flex" gap={2}>
           <Typography variant="body1">{description}</Typography>
-          <Description link={docURL} />
+          <Description link={link} />
         </Box>
       </AccordionSummary>
       <AccordionDetails>
@@ -48,4 +48,4 @@ const AccordianLayout: React.FC<Props> = ({
   );
 };
 
-export default React.memo(AccordianLayout);
+export default React.memo(AccordionLayout);
