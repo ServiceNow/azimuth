@@ -59,7 +59,7 @@ const Settings: React.FC = () => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
-  const resultingConfig = { ...data, ...partialConfig };
+  const resultingConfig = _.merge(data, partialConfig);
 
   const divider = <Divider sx={{ margin: 1 }} />;
 
@@ -91,7 +91,10 @@ const Settings: React.FC = () => {
     </Box>
   );
 
-  const displayPostprocessorToggleSection = (pipeline: PipelineDefinition) => (
+  const displayPostprocessorToggleSection = (
+    pipeline: PipelineDefinition,
+    pipelineIndex: number
+  ) => (
     <Box sx={{ m: 1, width: "20ch" }}>
       <Checkbox
         sx={{ paddingLeft: 0 }}
@@ -99,32 +102,21 @@ const Settings: React.FC = () => {
         checked={Boolean(pipeline.postprocessors)}
         disabled={isError || isFetching}
         onChange={(event) => {
-          const existedPipeline = partialConfig.pipelines
-            ? partialConfig.pipelines.find(({ name }) => name === pipeline.name)
-            : undefined;
-          const updatedPipeline = [
-            {
-              ...pipeline,
-              postprocessors: event.target.checked ? [] : null,
-            },
-          ];
-          existedPipeline
-            ? setPartialConfig({
-                ...partialConfig,
-                pipelines: _.unionBy(
-                  updatedPipeline,
-                  partialConfig.pipelines,
-                  "name"
-                ),
-              })
-            : setPartialConfig({
-                ...partialConfig,
-                pipelines: _.unionBy(
-                  updatedPipeline,
-                  resultingConfig.pipelines,
-                  "name"
-                ),
-              });
+          setPartialConfig({
+            ...partialConfig,
+            pipelines: _.unionBy(
+              [
+                {
+                  ...pipeline,
+                  postprocessors: event.target.checked ? [] : null,
+                },
+              ],
+              partialConfig.pipelines?.[pipelineIndex]
+                ? partialConfig.pipelines
+                : resultingConfig.pipelines,
+              "name"
+            ),
+          });
         }}
       />
       <Typography textTransform="capitalize" variant="caption" fontSize={15}>
@@ -178,7 +170,7 @@ const Settings: React.FC = () => {
       size="small"
       label={field}
       type="number"
-      defaultValue={value}
+      value={value}
       disabled={!Boolean(resultingConfig[config])}
       inputProps={STEPPER[field]}
       InputProps={{ style: { fontSize: 14 } }}
@@ -209,7 +201,7 @@ const Settings: React.FC = () => {
       InputLabelProps={{
         shrink: true,
       }}
-      defaultValue={value}
+      value={value}
       inputProps={{ min: 0, max: 1, step: 0.1 }}
       variant="standard"
       onChange={(event) => {
@@ -436,11 +428,14 @@ const Settings: React.FC = () => {
                 marginLeft={2}
                 marginBottom={2}
               >
-                {displayPostprocessorToggleSection({
-                  name,
-                  model,
-                  postprocessors,
-                })}
+                {displayPostprocessorToggleSection(
+                  {
+                    name,
+                    model,
+                    postprocessors,
+                  },
+                  pipelineIndex
+                )}
                 <Box
                   key={pipelineIndex}
                   display="flex"
@@ -463,21 +458,21 @@ const Settings: React.FC = () => {
                         "class name",
                         postprocessor.class_name
                       )}
-                      {postprocessor?.temperature &&
+                      {postprocessor.temperature &&
                         displayPostprocessorSubField(
                           pipelineIndex,
                           { name, model, postprocessors },
                           "temperature",
                           index,
-                          postprocessor?.temperature
+                          postprocessor.temperature
                         )}
-                      {postprocessor?.threshold &&
+                      {postprocessor.threshold &&
                         displayPostprocessorSubField(
                           pipelineIndex,
                           { name, model, postprocessors },
                           "threshold",
                           index,
-                          postprocessor?.threshold
+                          postprocessor.threshold
                         )}
                     </Box>
                   ))}
