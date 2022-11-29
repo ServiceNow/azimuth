@@ -7,6 +7,7 @@ import {
   InputAdornment,
   Typography,
 } from "@mui/material";
+import useDebounced from "hooks/useDebounced";
 import React from "react";
 
 type Props = {
@@ -26,19 +27,9 @@ const FilterTextField: React.FC<Props> = ({
 
   React.useEffect(() => setLiveValue(filterValue), [filterValue]);
 
-  const setFilterValueDebounced = React.useMemo(
-    () => debounce(setFilterValue, 500),
-    [setFilterValue]
-  );
+  const setFilterValueDebounced = useDebounced(setFilterValue);
 
-  // Cancel debounced execution when the component unmounts,
-  // for example when navigating to Dashboard while continuously typing.
-  React.useEffect(
-    () => setFilterValueDebounced.clear,
-    [setFilterValueDebounced]
-  );
-
-  const handleChange = (value?: string) => {
+  const handleChange = (value: string | undefined) => {
     setLiveValue(value);
     setFilterValueDebounced(value);
   };

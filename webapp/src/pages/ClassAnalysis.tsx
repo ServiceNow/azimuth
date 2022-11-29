@@ -1,20 +1,22 @@
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
-  Typography,
   Box,
-  Slider,
-  Paper,
-  Switch,
+  debounce,
   FormControlLabel,
-  Tooltip,
   FormGroup,
   IconButton,
+  Paper,
+  Slider,
+  Switch,
   TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import Description from "components/Description";
 import Loading from "components/Loading";
 import { PlotWrapper } from "components/PlotWrapper";
+import useDebounced from "hooks/useDebounced";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useHistory, useParams } from "react-router-dom";
@@ -49,14 +51,19 @@ const ClassOverlap = () => {
       : String(classOverlap.overlapThreshold)
   );
 
-  const setQuery = (newClassOverlap: QueryClassOverlapState) =>
-    history.push(
-      `/${jobId}/class_analysis${constructSearchString({
-        ...pipeline,
-        ...classOverlap,
-        ...newClassOverlap,
-      })}`
-    );
+  const setQuery = React.useCallback(
+    (newClassOverlap: QueryClassOverlapState) =>
+      history.push(
+        `/${jobId}/class_analysis${constructSearchString({
+          ...pipeline,
+          ...classOverlap,
+          ...newClassOverlap,
+        })}`
+      ),
+    [history, jobId, pipeline, classOverlap]
+  );
+
+  const setQueryDebounced = useDebounced(setQuery);
 
   const checkValid = data?.plot.data[0].node.x.length > 0;
 
@@ -197,6 +204,7 @@ const ClassOverlap = () => {
                   onChangeCommitted={(_, value) => {
                     if (value !== classOverlap?.overlapThreshold) {
                       setQuery({ overlapThreshold: value as number });
+                      setQueryDebounced.clear();
                     }
                   }}
                 />
@@ -207,7 +215,7 @@ const ClassOverlap = () => {
                   inputProps={OVERLAP_THRESHOLD_INPUT_PROPS}
                   onChange={({ target: { value } }) => {
                     setOverlapThreshold(value);
-                    setQuery({ overlapThreshold: Number(value) });
+                    setQueryDebounced({ overlapThreshold: Number(value) });
                   }}
                 />
                 <Tooltip title="Reset threshold" arrow>
@@ -219,6 +227,7 @@ const ClassOverlap = () => {
                       onClick={() => {
                         setOverlapThreshold(undefined);
                         setQuery({ overlapThreshold: undefined });
+                        setQueryDebounced.clear();
                       }}
                     >
                       <RestartAltIcon fontSize="large" />
