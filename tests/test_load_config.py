@@ -109,10 +109,9 @@ def test_pipeline_names():
 def test_french_defaults_and_override():
     subj_tags_potatoes = ["russet", "yukon_gold"]
     cfg = AzimuthConfig(
-        **{
-            **MINIMAL_CONFIG,
-            **{"language": "fr", "syntax": {"subj_tags": subj_tags_potatoes}},
-        }
+        **MINIMAL_CONFIG,
+        language="fr",
+        syntax={"subj_tags": subj_tags_potatoes},
     )
     assert (
         cfg.syntax.subj_tags == subj_tags_potatoes
