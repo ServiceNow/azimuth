@@ -7,6 +7,7 @@ from typing import Any, List
 
 import numpy as np
 import pytest
+from datasets import ClassLabel
 
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.dataset_analysis.dataset_warnings import DatasetWarningsModule
@@ -88,8 +89,13 @@ def add_rejection_class(mod, monkeypatch):
     # Adding a rejection class
     eval_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.eval)
     train_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.train)
-    eval_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
-    train_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
+    existing_classes = eval_dm.get_class_names(labels_only=True)
+    eval_dm._base_dataset_split.features["label"] = ClassLabel(
+        num_classes=3, names=existing_classes + ["NO_INTENT"]
+    )
+    train_dm._base_dataset_split.features["label"] = ClassLabel(
+        num_classes=3, names=existing_classes + ["NO_INTENT"]
+    )
     eval_dm._base_dataset_split = eval_dm._base_dataset_split.map(
         lambda u, i: {"label": 2 if i % 10 == 0 else u["label"]}, with_indices=True
     )
