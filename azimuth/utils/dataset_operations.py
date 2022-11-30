@@ -15,6 +15,7 @@ from azimuth.types.tag import (
     SmartTag,
     SmartTagFamily,
 )
+from azimuth.utils.utterance import clean_utterance
 
 
 def filter_dataset_split(
@@ -61,8 +62,10 @@ def filter_dataset_split(
         and config.columns.text_input in dataset_split.column_names
         and dataset_split.num_rows != 0
     ):
-        by = filters.utterance.lower()
-        dataset_split = dataset_split.filter(lambda x: by in x[config.columns.text_input].lower())
+        by = clean_utterance(filters.utterance)
+        dataset_split = dataset_split.filter(
+            lambda x: by in clean_utterance(x[config.columns.text_input])
+        )
     if len(filters.prediction) > 0 and dataset_split.num_rows != 0:
         prediction_column = (
             DatasetColumn.model_predictions

@@ -2,6 +2,8 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import contextlib
+import re
+from itertools import zip_longest
 from typing import List
 
 import nlpaug.augmenter.char as nac
@@ -18,6 +20,8 @@ from azimuth.utils.validation import assert_not_none
 This file contains functions that perturb an utterance, and can be used by
 PerturbationTestingModule.
 """
+
+re_punctuation = re.compile(r"(\w+)")
 
 
 def add_neutral_token(
@@ -137,8 +141,8 @@ def remove_or_add_final_punctuation(
         perturb_utt = original[:-1]
         perturbation_type = PerturbationType.Deletion
     # Replace with specified punctuation if last character is another punctuation sign.
-    elif any([p in last_char for p in [".", "!", "?", ","]]):
-        perturb_utt = original[:-1] + punctuation_sign
+    elif last_char in [".", "!", "?", ","]:
+        perturb_utt = original[:-1].rstrip() + punctuation_sign
         perturbation_type = PerturbationType.Replacement
     # Add specified punctuation otherwise.
     else:
@@ -286,15 +290,29 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
     augmentations = []
     perturbation_types = []
     behavioral_testing_config = assert_not_none(config.behavioral_testing)
+    # Special chars limited for all augs to facilitate cleaning up nac spacing/punctuation below
     for nb_typo in range(1, behavioral_testing_config.typo.nb_typos_per_utterance + 1):
         augmentations.extend(
             [
-                nac.KeyboardAug(min_char=4, aug_word_max=nb_typo, aug_char_p=0.1 * nb_typo),
-                nac.RandomCharAug(
-                    action="swap", min_char=4, aug_word_max=nb_typo, aug_char_p=0.1 * nb_typo
+                nac.KeyboardAug(
+                    min_char=4,
+                    aug_word_max=nb_typo,
+                    aug_char_p=0.1 * nb_typo,
+                    include_special_char=False,
                 ),
                 nac.RandomCharAug(
-                    action="delete", min_char=4, aug_word_max=nb_typo, aug_char_p=0.1 * nb_typo
+                    action="swap",
+                    min_char=4,
+                    aug_word_max=nb_typo,
+                    aug_char_p=0.1 * nb_typo,
+                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue #315
+                ),
+                nac.RandomCharAug(
+                    action="delete",
+                    min_char=4,
+                    aug_word_max=nb_typo,
+                    aug_char_p=0.1 * nb_typo,
+                    spec_char="_",  # Breaks/includes others if min_char=1; nlpaug issue #315
                 ),
             ]
         )
@@ -307,9 +325,14 @@ def typo(original: str, config: PerturbationTestingConfig) -> List[PerturbedUtte
         with contextlib.redirect_stdout(None):
             # While nlpaug fixes their useless print, we ignore it.
             perturbed_utterance = aug.augment(original, n=1)
-        # Issue 854 nac adds spaces between the hyphen and $ sign.
-        perturbed_utterance = perturbed_utterance.replace(" ' ", "'")
-        perturbed_utterance = perturbed_utterance.replace("$ ", "$")
+        # nac alters spacing around punctuation (e.g., around '; after $; before ?) and replaces
+        # apostrophes with quotes; revert to original. (See nlpaug issue #313)
+        punctuations = re_punctuation.split(original)[::2]
+        words = re_punctuation.split(perturbed_utterance)[1::2]
+        perturbed_utterance = "".join(
+            punctuation + word
+            for punctuation, word in zip_longest(punctuations, words, fillvalue="")
+        )
         perturbations = get_utterances_diff(original, perturbed_utterance)
         results.append(
             PerturbedUtteranceDetails(

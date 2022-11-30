@@ -1,7 +1,6 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
 from azimuth.modules.dataset_analysis.syntax_tagging import SyntaxTaggingModule
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag
@@ -57,3 +56,45 @@ def test_syntax_tagging(simple_text_config):
     # Tags should changed for utterances below, based on new config values
     assert not json_output_2[2].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
     assert not json_output_2[3].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
+
+
+def test_syntax_tagging_french(simple_text_config_french):
+    mod = SyntaxTaggingModule(
+        DatasetSplitName.eval,
+        simple_text_config_french,
+    )
+
+    assert mod is not None
+    batch = {
+        DatasetColumn.idx: [0, 1, 2, 3],
+        "utterance": [
+            "adore les biscuits!",
+            "c'est terrible. C'est horrible pour moi d'écrire ce test, mais je m'amuse bien.",
+            f"J{chr(8217)}aimerais aller",  # Single quote; sm model struggled with j'aimerais subj
+            "le sucre et les biscuits!",  # As currently implemented, no subject or object
+            "Indiquez-moi l'état de mes demandes",  # First word (a) capitalized and (b) verb
+        ],
+        "label": [0, 1, 0, 1, 0],
+    }
+    json_output = mod.compute(batch)
+    assert len(json_output) == 5
+
+    assert json_output[0].tags[SmartTag.no_subj]
+    assert not any([json_output[0].tags[SmartTag.no_obj], json_output[0].tags[SmartTag.no_verb]])
+
+    assert not json_output[1].tags[SmartTag.no_subj]
+    assert not json_output[1].tags[SmartTag.no_obj]
+    assert not json_output[1].tags[SmartTag.no_verb]
+
+    assert not any([json_output[2].tags[SmartTag.no_subj], json_output[2].tags[SmartTag.no_verb]])
+    assert json_output[2].tags[SmartTag.no_obj]
+
+    assert json_output[3].tags[SmartTag.no_subj]
+    assert json_output[3].tags[SmartTag.no_obj]
+    assert json_output[3].tags[SmartTag.no_verb]
+
+    assert not json_output[4].tags[SmartTag.no_verb]
+
+    # Sentencizer is from English model but should work for French
+    assert not any(json_output[i].tags[SmartTag.multi_sent] for i in [0, 2, 3])
+    assert json_output[1].tags[SmartTag.multi_sent]

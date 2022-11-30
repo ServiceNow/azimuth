@@ -21,33 +21,26 @@ the length of the utterances in the training set and the evaluation set.
 **Part-of-speech** (POS) tagging is a common technique to tag each word in a given text as belonging
 to a category according to its grammatical properties. Examples could be 'verb', or 'direct object'.
 
-Azimuth uses [spaCy](https://github.com/explosion/spaCy), an open-source library, to perform POS
-tagging on each token of an utterance. It is currently set up for **English**
-only.
+Azimuth uses [spaCy](https://github.com/explosion/spaCy), an open-source library, to perform
+part-of-speech (POS) and dependency tagging on each token of an utterance. It is set up for all
+languages supported by Azimuth. Azimuth then computes the smart tags `missing_subj`, `missing_verb`,
+and `missing_obj` based on the presence of certain tags. Subjects and objects are identified by
+dependency tags that are language-dependent and specified in the
+[:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md), whereas
+verbs are identified by POS tags that are consistent across languages (shown below). The smart
+tag `multiple_sentences` is based on a spaCy sentencizer:
 
 ```python
 import spacy
 from spacy.lang.en import English
 
-# Sentencizer
-spacy_pipeline = English()
-spacy_pipeline.add_pipe("sentencizer")  # (5)
-
 # Part of Speech
-subj_tags = ["nsubj", "nsubjpass"]  # (1)
-obj_tags = ["dobj", "pobj", "dobj"]  # (2)
-verb_tags = ["VERB", "AUX"]  # (3)
-spacy_pos = spacy.load("en_core_web_sm")  # (4)
+verb_tags = ["VERB", "AUX"]
+
+# Sentencizer; English() should work for other languages that have similar sentence conventions.
+spacy_pipeline = English()
+spacy_pipeline.add_pipe("sentencizer")
 ```
-
-1. Tags to detect a subject in a sentence.
-2. Tags to detect an object in a sentence.
-3. Tags to detect a verb in a sentence.
-4. Parser to determine the POS tags in an utterance.
-5. Used to compute the number of sentences in an utterance.
-
-Based on this, the following smart tags are computed: `multiple_sentences`, `missing_subj`
-, `missing_verb` and `missing_obj`.
 
 ### Token Count
 
@@ -64,7 +57,8 @@ Based on the token count, the `long_sentence` and `short_sentence` smart tags ar
 ## Configuration
 
 [:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md)
-explains how to edit the thresholds to determine what is considered a short or long sentence.
+explains how to edit the thresholds to determine what is considered a short or long sentence,
+the tags used to detect subjects and objects, and the spaCy model used to parse utterances.
 
 
 --8<-- "includes/abbreviations.md"

@@ -19,12 +19,14 @@ the reference.
 ## Config Scopes
 
 1. [:material-link: Project Config](./project.md) :red_circle:
-    * Mandatory fields to define the name of the project and the dataset information.
-2. [:material-link: Model Contract Config](./model_contract.md) :orange_circle:
+    * Mainly mandatory fields to define the name of the project and the dataset information.
+2. [:material-link: Language Config](./language.md) :yellow_circle:
+    * Specifies the model and dataset language used to set several language-based defaults.
+3. [:material-link: Model Contract Config](./model_contract.md) :orange_circle:
     * Defines how Azimuth interacts with the models/pipelines.
-3. [:material-link: Common Fields Config](./common.md) :blue_circle:
+4. [:material-link: Common Fields Config](./common.md) :blue_circle:
     * Fields that are common to many applications (batch size for example).
-4. [:material-link: Customize Azimuth Analyses](analyses/index.md):
+5. [:material-link: Customize Azimuth Analyses](analyses/index.md):
    In these sections, different analyses in Azimuth can be configured.
     1. [:material-link: Behavioral Testing Config](analyses/behavioral_testing.md) :blue_circle:
         * Defines how the behavioral tests are generated.

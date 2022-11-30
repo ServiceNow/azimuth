@@ -11,6 +11,9 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Azimuth now works on French datasets (and pipelines)! Language can be selected in the config,
+  and language-specific defaults for syntax-tagging and behavioral tests (neutral tokens) will be
+  set dynamically (or can be altered manually).
 - New class analysis section, with class overlap detection. More details are available in the User Guide and in the Key Concepts.
 - Pipeline pre/post-processing steps breakdown in the utterance detail page.
 

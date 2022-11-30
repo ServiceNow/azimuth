@@ -130,6 +130,7 @@ export interface components {
       use_cuda?: Partial<"auto"> & Partial<boolean>;
       large_dask_cluster?: boolean;
       read_only_config?: boolean;
+      language?: components["schemas"]["SupportedLanguage"];
       syntax?: components["schemas"]["SyntaxOptions"];
       dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
       similarity?: components["schemas"]["SimilarityOptions"];
@@ -690,13 +691,20 @@ export interface components {
       startupTasksStatus: { [key: string]: string };
     };
     /** An enumeration. */
+    SupportedLanguage: "en" | "fr";
+    /** An enumeration. */
     SupportedModelContract:
       | "hf_text_classification"
       | "file_based_text_classification"
       | "custom_text_classification";
+    /** An enumeration. */
+    SupportedSpacyModels: "" | "en_core_web_sm" | "fr_core_news_md";
     SyntaxOptions: {
       short_sentence_max_token?: number;
       long_sentence_min_token?: number;
+      spacy_model?: components["schemas"]["SupportedSpacyModels"];
+      subj_tags?: string[];
+      obj_tags?: string[];
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.

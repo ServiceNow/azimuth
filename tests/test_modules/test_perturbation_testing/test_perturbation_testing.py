@@ -1,6 +1,8 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+import re
+
 from azimuth.modules.perturbation_testing.perturbation_testing import (
     PerturbationTestingModule,
 )
@@ -18,6 +20,7 @@ from azimuth.types.tag import SmartTag
 from azimuth.utils.ml.perturbation_functions import (
     get_utterances_diff,
     remove_or_add_contractions,
+    remove_or_add_final_punctuation,
     typo,
 )
 from azimuth.utils.ml.perturbation_test import PerturbationTest
@@ -125,6 +128,24 @@ def test_typo_hyphens(simple_text_config):
             == simple_text_config.behavioral_testing.typo.nb_typos_per_utterance
             and "'" not in perturbed_utterance_detail.perturbations
         )
+
+
+def test_typo_aug_fixes(simple_text_config):
+    # Many opportunities for nac to alter: quote, apostrophe, spacing around punctuation
+    original = "Allô ! Je l’adore. Est-ce que c'est $42?"
+    re_punctuation = re.compile(r"(\w+)")
+    punctuation_original = re_punctuation.split(original)[::2]
+    perturbed_utterance_details = typo(original, simple_text_config)
+    perturbed_utterance = perturbed_utterance_details[0].perturbed_utterance
+    punctuation_perturbed = re_punctuation.split(perturbed_utterance)[::2]
+    assert punctuation_original == punctuation_perturbed, (
+        f"Augmenter has introduced spacing or punctuation errors.\noriginal: "
+        f"{original}\nperturbed: {perturbed_utterance}"
+    )
+
+    perturbed_utterance_details_b = remove_or_add_final_punctuation(original, ".")
+    perturbed_utterance_b = perturbed_utterance_details_b[0].perturbed_utterance
+    assert perturbed_utterance_b[-2] != " ", "Penultimate space incorrectly kept."
 
 
 def test_if_failed(simple_text_config):

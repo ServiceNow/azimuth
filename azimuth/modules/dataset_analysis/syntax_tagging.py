@@ -18,23 +18,19 @@ from azimuth.types.tag import (
     SmartTagFamily,
     TaggingResponse,
 )
+from azimuth.utils.utterance import clean_utterance
 from azimuth.utils.validation import assert_not_none
 
 
 class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
     """Calculate smart tags related to syntax."""
 
-    # sentencizer
+    # Sentencizer; English() should work for other languages that have similar sentence conventions.
     spacy_pipeline = English()
     spacy_pipeline.add_pipe("sentencizer")
 
-    # part of speech
-    subj_tags = ["nsubj", "nsubjpass"]
-    obj_tags = ["dobj", "pobj", "dobj"]
-
-    # we use pos_ for verb since for the moment it is more reliable
+    # we use pos_ for verb since it is simpler and more reliable than dep_
     verb_tags = ["VERB", "AUX"]
-    spacy_pos = spacy.load("en_core_web_sm")
 
     def compute(self, batch: Dataset) -> List[TaggingResponse]:  # type: ignore
         """Get smart tags for provided indices.
@@ -46,6 +42,7 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
             tags: Newly calculated tags.
 
         """
+        spacy_pos = spacy.load(self.config.syntax.spacy_model)
 
         utterances = batch[self.config.columns.text_input]
 
@@ -81,10 +78,10 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
                 if len(tokens) <= syntax_options.short_sentence_max_token:
                     tag[SmartTag.short] = True
 
-                tokens = self.spacy_pos(utterance)
-                sub_toks = [tok for tok in tokens if (tok.dep_ in self.subj_tags)]
-                obj_toks = [tok for tok in tokens if (tok.dep_ in self.obj_tags)]
-                vrb_toks = [tok for tok in tokens if (tok.pos_ in self.verb_tags)]
+                tokens_doc = spacy_pos(clean_utterance(utterance))
+                sub_toks = [tok for tok in tokens_doc if (tok.dep_ in self.config.syntax.subj_tags)]
+                obj_toks = [tok for tok in tokens_doc if (tok.dep_ in self.config.syntax.obj_tags)]
+                vrb_toks = [tok for tok in tokens_doc if (tok.pos_ in self.verb_tags)]
 
                 if len(sub_toks) == 0:
                     tag[SmartTag.no_subj] = True

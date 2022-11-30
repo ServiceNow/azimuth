@@ -86,10 +86,10 @@ _robustness_ of the model.
     * `Replacement`: Keyboard proximity-based typos inserted in a word.
 
 * `Neutral Token`: Default neutral tokens are added to the utterance.
-    * `PreInsertion`: One of ["pls", "please", "hello", "greetings"] is added at the beginning of
-      the utterance.
-    * `PostInsertion`: One of ["pls", "please", "thank you", "appreciated"] is added at the end of
-      an utterance.
+    * `PreInsertion`: One string from a list of prefixes is added at the beginning of the
+      utterance. The English default is ["pls", "please", "hello", "greetings"].
+    * `PostInsertion`: One of string from a list of suffixes is added at the end of an utterance.
+      The English default is ["pls", "please", "thank you", "appreciated"].
 
 * `Contractions`: This test is applied only when the utterance contains a relevant expression that
   can be contracted or expanded. The list is taken from

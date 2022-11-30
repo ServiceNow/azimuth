@@ -4,19 +4,62 @@
 
 import argparse
 import os
+from enum import Enum
 from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
 from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, validator
 
-from azimuth.types import SupportedModelContract
+from azimuth.types import AliasModel, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
 
 REQUIRED_EXT = {"csv", "json"}
+
+
+class SupportedLanguage(str, Enum):
+    en = "en"
+    fr = "fr"
+
+
+# spaCy models must be in pyproject.toml to be loaded by Azimuth
+class SupportedSpacyModels(str, Enum):
+    use_default = ""
+    en_core_web_sm = "en_core_web_sm"
+    fr_core_news_md = "fr_core_news_md"
+
+
+# To see all dep tag options for a spacy model: spacy.load(SPACY_MODEL).get_pipe("parser").labels
+class LanguageDefaultValues(AliasModel):
+    suffix_list: List[str]
+    prefix_list: List[str]
+    spacy_model: SupportedSpacyModels
+    subj_tags: List[str]
+    obj_tags: List[str]
+    faiss_encoder: str
+
+
+config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
+    SupportedLanguage.en: LanguageDefaultValues(
+        suffix_list=["pls", "please", "thank you", "appreciated"],
+        prefix_list=["pls", "please", "hello", "greetings"],
+        spacy_model="en_core_web_sm",
+        subj_tags=["nsubj", "nsubjpass"],
+        obj_tags=["dobj", "pobj", "obj"],
+        faiss_encoder="all-MiniLM-L12-v2",
+    ),
+    SupportedLanguage.fr: LanguageDefaultValues(
+        suffix_list=["svp", "s'il vous plaît", "merci", "super"],
+        prefix_list=["svp", "s'il vous plaît", "bonjour", "allô"],
+        spacy_model="fr_core_news_md",
+        subj_tags=["nsubj", "nsubj:pass"],
+        obj_tags=["obj", "iobj", "obl:arg", "obl:agent", "obl:mod"],
+        faiss_encoder="distiluse-base-multilingual-cased-v1",
+    ),
+}
 
 
 def parse_args():
@@ -126,12 +169,15 @@ class DatasetWarningsOptions(BaseModel):
 class SyntaxOptions(BaseModel):
     short_sentence_max_token: int = 3
     long_sentence_min_token: int = 16
+    spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
+    subj_tags: List[str] = []  # Language-based dynamic default value
+    obj_tags: List[str] = []  # Language-based dynamic default value
 
 
 class NeutralTokenOptions(BaseModel):
     threshold: float = 1
-    suffix_list: List[str] = ["pls", "please", "thank you", "appreciated"]
-    prefix_list: List[str] = ["pls", "please", "hello", "greetings"]
+    suffix_list: List[str] = []  # Language-based default value
+    prefix_list: List[str] = []  # Language-based default value
 
 
 class PunctuationTestOptions(BaseModel):
@@ -160,7 +206,7 @@ class BehavioralTestingOptions(BaseModel):
 
 
 class SimilarityOptions(BaseModel):
-    faiss_encoder: str = "all-MiniLM-L12-v2"
+    faiss_encoder: str = ""  # Language-based dynamic default value
     # Threshold to use when finding conflicting neighbors.
     conflicting_neighbors_threshold: float = 0.9
     # Threshold to determine whether there are close neighbors.
@@ -289,6 +335,12 @@ class ModelContractConfig(CommonFieldsConfig):
         return pipeline_definitions
 
 
+class LanguageConfig(CommonFieldsConfig):
+    # Language config sets multiple config values; see `config_defaults_per_language` for details
+    # Language should only determine other config values and not be referenced in modules.
+    language: SupportedLanguage = SupportedLanguage.en
+
+
 class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
     behavioral_testing: Optional[BehavioralTestingOptions] = Field(
@@ -316,10 +368,27 @@ class AzimuthConfig(
     SimilarityConfig,
     DatasetWarningConfig,
     SyntaxConfig,
+    LanguageConfig,
     extra=Extra.forbid,
 ):
-    # This class should remain empty!
-    pass
+    # Before adding attributes: Remember that dependence on an attribute in AzimuthConfig will
+    # force a module to include all other configs in its scope.
+
+    @root_validator()
+    def dynamic_language_config_values(cls, values):
+        defaults = config_defaults_per_language[values["language"]]
+        if values["behavioral_testing"]:
+            neutral_token = values["behavioral_testing"].neutral_token
+            neutral_token.prefix_list = neutral_token.prefix_list or defaults.prefix_list
+            neutral_token.suffix_list = neutral_token.suffix_list or defaults.suffix_list
+        syntax = values["syntax"]
+        syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
+        syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
+        syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
+        if values["similarity"]:
+            similarity = values["similarity"]
+            similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
+        return values
 
 
 def load_azimuth_config(config_path: str) -> AzimuthConfig:
