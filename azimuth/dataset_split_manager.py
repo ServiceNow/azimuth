@@ -236,17 +236,13 @@ class DatasetSplitManager:
             DatasetColumn.neighbors_eval,
             *self._tags,
         ]
-        order_unique = list(dict.fromkeys(order))  # persistent_id can be called row_idx.
-        order_unique = [
-            c for c in order_unique if c in self.get_dataset_split(table_key).column_names
-        ]
+        available_columns = self.get_dataset_split(table_key).column_names
+        order = [c for c in order if c in available_columns]
 
-        # The following allows for new or extra columns to end up here automatically,
+        # This *available_columns allows for new or extra columns to end up here automatically,
         # instead of being lost if we were to hardcode the whole list.
-        omit = {*order_unique, FEATURES, FEATURE_FAISS}
-        rest = [c for c in self.get_dataset_split(table_key).column_names if c not in omit]
-
-        columns = order_unique + rest
+        # The dict.fromkeys() avoids duplicates.
+        columns = list(dict.fromkeys([*order, *available_columns]))
 
         # pd.to_csv() instead of HF version to avoid unintended type conversions (list to array)
         df = pd.DataFrame(self.get_dataset_split_with_class_names(table_key)).reindex(
