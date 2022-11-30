@@ -1304,6 +1304,8 @@
         
           
         
+          
+        
       
       
         
@@ -1334,6 +1336,20 @@
     <li class="md-nav__item">
       <a href="../../reference/configuration/project/" class="md-nav__link">
         Project Config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/configuration/language/" class="md-nav__link">
+        Language Config
       </a>
     </li>
   
@@ -1377,7 +1393,7 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5" type="checkbox" id="__nav_5_2_5" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6" type="checkbox" id="__nav_5_2_6" >
       
       
       
@@ -1401,14 +1417,14 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../../reference/configuration/analyses/">Analyses Customization</a>
           
-            <label for="__nav_5_2_5">
+            <label for="__nav_5_2_6">
               <span class="md-nav__icon md-icon"></span>
             </label>
           
         </div>
       
       <nav class="md-nav" aria-label="Analyses Customization" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_5">
+        <label class="md-nav__title" for="__nav_5_2_6">
           <span class="md-nav__icon md-icon"></span>
           Analyses Customization
         </label>
@@ -1973,10 +1989,10 @@ dataset and model.</p>
 <li>
 <p><code>Neutral Token</code>: Default neutral tokens are added to the utterance.</p>
 <ul>
-<li><code>PreInsertion</code>: One of ["pls", "please", "hello", "greetings"] is added at the beginning of
-  the utterance.</li>
-<li><code>PostInsertion</code>: One of ["pls", "please", "thank you", "appreciated"] is added at the end of
-  an utterance.</li>
+<li><code>PreInsertion</code>: One string from a list of prefixes is added at the beginning of the
+  utterance. The English default is ["pls", "please", "hello", "greetings"].</li>
+<li><code>PostInsertion</code>: One of string from a list of suffixes is added at the end of an utterance.
+  The English default is ["pls", "please", "thank you", "appreciated"].</li>
 </ul>
 </li>
 <li>

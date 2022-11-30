@@ -1284,6 +1284,8 @@
         
           
         
+          
+        
       
       
         
@@ -1314,6 +1316,20 @@
     <li class="md-nav__item">
       <a href="../../reference/configuration/project/" class="md-nav__link">
         Project Config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/configuration/language/" class="md-nav__link">
+        Language Config
       </a>
     </li>
   
@@ -1357,7 +1373,7 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5" type="checkbox" id="__nav_5_2_5" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6" type="checkbox" id="__nav_5_2_6" >
       
       
       
@@ -1381,14 +1397,14 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../../reference/configuration/analyses/">Analyses Customization</a>
           
-            <label for="__nav_5_2_5">
+            <label for="__nav_5_2_6">
               <span class="md-nav__icon md-icon"></span>
             </label>
           
         </div>
       
       <nav class="md-nav" aria-label="Analyses Customization" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_5">
+        <label class="md-nav__title" for="__nav_5_2_6">
           <span class="md-nav__icon md-icon"></span>
           Analyses Customization
         </label>
@@ -1790,31 +1806,24 @@ the length of the utterances in the training set and the evaluation set.</p>
 <h3 id="pos-tags"><abbr title="Part-of-speech">POS</abbr> Tags</h3>
 <p><strong>Part-of-speech</strong> (<abbr title="Part-of-speech">POS</abbr>) tagging is a common technique to tag each word in a given text as belonging
 to a category according to its grammatical properties. Examples could be 'verb', or 'direct object'.</p>
-<p>Azimuth uses <a href="https://github.com/explosion/spaCy">spaCy</a>, an open-source library, to perform <abbr title="Part-of-speech">POS</abbr>
-tagging on each token of an utterance. It is currently set up for <strong>English</strong>
-only.</p>
+<p>Azimuth uses <a href="https://github.com/explosion/spaCy">spaCy</a>, an open-source library, to perform
+part-of-speech (<abbr title="Part-of-speech">POS</abbr>) and dependency tagging on each token of an utterance. It is set up for all
+languages supported by Azimuth. Azimuth then computes the smart tags <code>missing_subj</code>, <code>missing_verb</code>,
+and <code>missing_obj</code> based on the presence of certain tags. Subjects and objects are identified by
+dependency tags that are language-dependent and specified in the
+<a href="../../reference/configuration/analyses/syntax/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Syntax Analysis Config</a>, whereas
+verbs are identified by <abbr title="Part-of-speech">POS</abbr> tags that are consistent across languages (shown below). The smart
+tag <code>multiple_sentences</code> is based on a spaCy sentencizer:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">spacy</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span> <span class="nn">spacy.lang.en</span> <span class="kn">import</span> <span class="n">English</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Sentencizer</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">spacy_pipeline</span> <span class="o">=</span> <span class="n">English</span><span class="p">()</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">spacy_pipeline</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">(</span><span class="s2">&quot;sentencizer&quot;</span><span class="p">)</span>  <span class="c1"># (5)</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Part of Speech</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">subj_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nsubj&quot;</span><span class="p">,</span> <span class="s2">&quot;nsubjpass&quot;</span><span class="p">]</span>  <span class="c1"># (1)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">obj_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dobj&quot;</span><span class="p">,</span> <span class="s2">&quot;pobj&quot;</span><span class="p">,</span> <span class="s2">&quot;dobj&quot;</span><span class="p">]</span>  <span class="c1"># (2)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">verb_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;VERB&quot;</span><span class="p">,</span> <span class="s2">&quot;AUX&quot;</span><span class="p">]</span>  <span class="c1"># (3)</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">spacy_pos</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;en_core_web_sm&quot;</span><span class="p">)</span>  <span class="c1"># (4)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Part of Speech</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">verb_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;VERB&quot;</span><span class="p">,</span> <span class="s2">&quot;AUX&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Sentencizer; English() should work for other languages that have similar sentence conventions.</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">spacy_pipeline</span> <span class="o">=</span> <span class="n">English</span><span class="p">()</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">spacy_pipeline</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">(</span><span class="s2">&quot;sentencizer&quot;</span><span class="p">)</span>
 </code></pre></div>
-<ol>
-<li>Tags to detect a subject in a sentence.</li>
-<li>Tags to detect an object in a sentence.</li>
-<li>Tags to detect a verb in a sentence.</li>
-<li>Parser to determine the <abbr title="Part-of-speech">POS</abbr> tags in an utterance.</li>
-<li>Used to compute the number of sentences in an utterance.</li>
-</ol>
-<p>Based on this, the following smart tags are computed: <code>multiple_sentences</code>, <code>missing_subj</code>
-, <code>missing_verb</code> and <code>missing_obj</code>.</p>
 <h3 id="token-count">Token Count</h3>
 <p>To compute the number of tokens per utterance, the following <strong>tokenizer</strong> is used:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
@@ -1824,7 +1833,8 @@ only.</p>
 <p>Based on the token count, the <code>long_sentence</code> and <code>short_sentence</code> smart tags are computed.</p>
 <h2 id="configuration">Configuration</h2>
 <p><a href="../../reference/configuration/analyses/syntax/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Syntax Analysis Config</a>
-explains how to edit the thresholds to determine what is considered a short or long sentence.</p>
+explains how to edit the thresholds to determine what is considered a short or long sentence,
+the tags used to detect subjects and objects, and the spaCy model used to parse utterances.</p>
 
 
 

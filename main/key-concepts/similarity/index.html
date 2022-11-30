@@ -1304,6 +1304,8 @@
         
           
         
+          
+        
       
       
         
@@ -1334,6 +1336,20 @@
     <li class="md-nav__item">
       <a href="../../reference/configuration/project/" class="md-nav__link">
         Project Config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/configuration/language/" class="md-nav__link">
+        Language Config
       </a>
     </li>
   
@@ -1377,7 +1393,7 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5" type="checkbox" id="__nav_5_2_5" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6" type="checkbox" id="__nav_5_2_6" >
       
       
       
@@ -1401,14 +1417,14 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../../reference/configuration/analyses/">Analyses Customization</a>
           
-            <label for="__nav_5_2_5">
+            <label for="__nav_5_2_6">
               <span class="md-nav__icon md-icon"></span>
             </label>
           
         </div>
       
       <nav class="md-nav" aria-label="Analyses Customization" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_5">
+        <label class="md-nav__title" for="__nav_5_2_6">
           <span class="md-nav__icon md-icon"></span>
           Analyses Customization
         </label>
@@ -1835,9 +1851,9 @@ the <a href="../../user-guide/exploration-space/utterance-details/"><span class=
 </figure>
 <h2 id="how-is-it-computed">How is it Computed?</h2>
 <h3 id="similarity-computation">Similarity Computation</h3>
-<p>To get utterance embeddings, Azimuth uses a <strong>sentence encoder</strong> (<code>all-MiniLM-L12-v2</code>
-from <a href="https://github.com/UKPLab/sentence-transformers">sentence-transformers</a>) based on a <strong><abbr title="Bidirectional Encoder Representations from Transformers">BERT</abbr></strong>
-architecture (<a href="https://arxiv.org/abs/1908.10084">Reimers and Gurevych, 2019</a><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>). It then computes
+<p>To get utterance embeddings, Azimuth uses a <strong>sentence encoder</strong> (from
+<a href="https://github.com/UKPLab/sentence-transformers">sentence-transformers</a>) based on a <strong><abbr title="Bidirectional Encoder Representations from Transformers">BERT</abbr></strong> architecture
+(<a href="https://arxiv.org/abs/1908.10084">Reimers and Gurevych, 2019</a><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>). It then computes
 the <strong>cosine similarity</strong> (via a <strong>dot product on normalized embeddings</strong>) between each utterance in
 the dataset and all other utterances in both dataset splits (training and evaluation).</p>
 <p>On the <a href="../../user-guide/exploration-space/utterance-details/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Utterances Details</a>,
@@ -1865,8 +1881,9 @@ utterance in the test set will be compared to its neighbors in both the training
 dataset splits.)</p>
 <h3 id="configuration">Configuration</h3>
 <p><a href="../../reference/configuration/analyses/similarity/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Similarity Analysis Configuration</a>
-details how to change the encoder for the embeddings on which similarity is computed, as well as the
-two thresholds used to determine the smart tags.</p>
+presents language-based defaults for the encoder used for the embeddings on which similarity is
+computed, and details how to change this encoder as well as the two thresholds used to determine
+the smart tags.</p>
 <div class="footnote">
 <hr />
 <ol>

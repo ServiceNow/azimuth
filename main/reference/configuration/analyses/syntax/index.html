@@ -1202,6 +1202,8 @@
         
           
         
+          
+        
       
       
         
@@ -1232,6 +1234,20 @@
     <li class="md-nav__item">
       <a href="../../project/" class="md-nav__link">
         Project Config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../language/" class="md-nav__link">
+        Language Config
       </a>
     </li>
   
@@ -1277,7 +1293,7 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5" type="checkbox" id="__nav_5_2_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6" type="checkbox" id="__nav_5_2_6" checked>
       
       
       
@@ -1301,14 +1317,14 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../">Analyses Customization</a>
           
-            <label for="__nav_5_2_5">
+            <label for="__nav_5_2_6">
               <span class="md-nav__icon md-icon"></span>
             </label>
           
         </div>
       
       <nav class="md-nav" aria-label="Analyses Customization" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_5">
+        <label class="md-nav__title" for="__nav_5_2_6">
           <span class="md-nav__icon md-icon"></span>
           Analyses Customization
         </label>
@@ -1651,9 +1667,14 @@
 
 <h1 id="syntax-analysis-config">Syntax Analysis Config</h1>
 <p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value:</strong> <code>SyntaxOptions()</code></p>
-<p>Some thresholds can be modified to determine what is considered a short or a long sentence, as explained in
+<p>In the Syntax config, users can modify thresholds to determine what is considered a short
+or a long sentence, as well as select the spaCy model and the dependency tags used for certain
+syntax-related smart tags. More details are explained in
 <a href="../../../../key-concepts/syntax-analysis/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Syntax Analysis</a>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Class Definition</label><label for="__tabbed_1_2">Config Example</label></div>
+<p>Note that language-related defaults are dynamically selected based on the language specified in the
+<a href="../../language/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Language Config</a> (default is English). As such, the spaCy model and
+dependency tag lists will generally not need to be modified.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Class Definition</label><label for="__tabbed_1_2">Config Example</label><label for="__tabbed_1_3">English defaults</label><label for="__tabbed_1_4">French defaults</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
@@ -1661,10 +1682,16 @@
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">class</span> <span class="nc">SyntaxOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">short_sentence_max_token</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># (1)</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">long_sentence_min_token</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span> <span class="c1"># (2)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">spacy_model</span><span class="p">:</span> <span class="n">SupportedSpacyModels</span> <span class="o">=</span> <span class="n">SupportedSpacyModels</span><span class="o">.</span><span class="n">use_default</span>  <span class="c1"># Language-based default (3)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">subj_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Language-based default value (4)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">obj_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Language-based default value (5)</span>
 </code></pre></div>
 <ol>
 <li>Maximum number of tokens for a sentence to be tagged as short (e.g &lt;=3 for the default)</li>
 <li>Minimum number of tokens for a sentence to be tagged as long (e.g &gt;=16 for the default)</li>
+<li>spaCy model to use for syntax tagging.</li>
+<li>spaCy dependency tags used to determine whether a word is a subject (noun).</li>
+<li>spaCy dependency tags used to determine whether a word is an object (noun).</li>
 </ol>
 </div>
 <div class="tabbed-block">
@@ -1673,6 +1700,24 @@
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;short_sentence_max_token&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="w"></span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">spacy</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Part of Speech</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">subj_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nsubj&quot;</span><span class="p">,</span> <span class="s2">&quot;nsubjpass&quot;</span><span class="p">]</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">obj_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dobj&quot;</span><span class="p">,</span> <span class="s2">&quot;pobj&quot;</span><span class="p">,</span> <span class="s2">&quot;dobj&quot;</span><span class="p">]</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">spacy_model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;en_core_web_sm&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span> <span class="nn">spacy</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Part of Speech</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">subj_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nsubj&quot;</span><span class="p">,</span> <span class="s2">&quot;nsubj:pass&quot;</span><span class="p">]</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">obj_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="s2">&quot;iobj&quot;</span><span class="p">,</span> <span class="s2">&quot;obl:arg&quot;</span><span class="p">,</span> <span class="s2">&quot;obl:agent&quot;</span><span class="p">,</span> <span class="s2">&quot;obl:mod&quot;</span><span class="p">]</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">spacy_model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;fr_core_news_md&quot;</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </div>
