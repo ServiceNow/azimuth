@@ -6,6 +6,8 @@
 
 [:material-link: Behavioral Testing](../../../key-concepts/behavioral-testing.md) in the Key
 Concepts section explains how the different configuration attributes will affect the tests results.
+Note that language-related defaults are dynamically selected based on the language specified in the
+[:material-link: Language Config](../language.md) (default is English).
 
 If your machine does not have a lot of computing power, `behavioral_testing` can be set to `null`.
 It can be enabled later on in the application.
@@ -20,8 +22,8 @@ It can be enabled later on in the application.
 
     class NeutralTokenOptions(BaseModel):
         threshold: float = 1  # (5)
-        suffix_list: List[str] = ["pls", "please", "thank you", "appreciated"]
-        prefix_list: List[str] = ["pls", "please", "hello", "greetings"]
+        suffix_list: List[str] = []  # Language-based default value # (6)
+        prefix_list: List[str] = []  # Language-based default value # (7)
 
 
     class PunctuationTestOptions(BaseModel):
@@ -51,10 +53,12 @@ It can be enabled later on in the application.
     3. Threshold that defines the confidence gap above which the test will fail.
     4. Threshold that defines the confidence gap above which the test will fail.
     5. Threshold that defines the confidence gap above which the test will fail.
+    6. Strings appended to end of utterances for neutral token tests.
+    7. Strings prepended to beginning of utterances for neutral token tests.
 
 === "Config Example"
 
-    For example, if the user wants to change the threshold for the punctuation test:
+    For example, to change the threshold for the punctuation test:
 
     ```json
     {
@@ -72,6 +76,22 @@ It can be enabled later on in the application.
     {
       "behavioral_testing": null
     }
+    ```
+
+=== "English defaults"
+
+    ```python
+    # Neutral tokens
+    suffix_list = ["pls", "please", "thank you", "appreciated"]
+    prefix_list = ["pls", "please", "hello", "greetings"]
+    ```
+
+=== "French defaults"
+
+    ```python
+    # Neutral tokens
+    suffix_list = ["svp", "s'il vous plaît", "merci", "super"]
+    prefix_list = ["svp", "s'il vous plaît", "bonjour", "allô"]
     ```
 
 --8<-- "includes/abbreviations.md"

@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { ResponsivePlotWrapper } from "components/PlotWrapper";
 import React from "react";
 import { getMetricsEndpoint, getCustomMetricInfoEndpoint } from "services/api";
@@ -47,8 +47,6 @@ const Metrics: React.FC<Props> = ({
   pipeline,
   postprocessing,
 }) => {
-  const theme = useTheme();
-
   const { data: metrics, isFetching } = getMetricsEndpoint.useQuery({
     jobId,
     datasetSplitName,
@@ -89,7 +87,7 @@ const Metrics: React.FC<Props> = ({
                 ? `${metrics.outcomeCount[outcome]} out of ${metrics.utteranceCount} utterances\n${OUTCOME_DESCRIPTIONS[outcome]}`
                 : OUTCOME_DESCRIPTIONS[outcome]
             }
-            color={theme.palette[OUTCOME_COLOR[outcome]].main}
+            color={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
           />
         ))}
       </MetricsCard>

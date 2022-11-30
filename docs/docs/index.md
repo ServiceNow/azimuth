@@ -12,6 +12,12 @@ While this version of Azimuth focuses on **NLP classification problems**, the to
 adapted to apply to other data types and models, e.g. vision or tabular use cases. However, the
 current focus is on text classification.
 
+## :material-youtube: YouTube Playlist
+
+<div style="display: flex; justify-content: center;">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8" title="Azimuth Playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
 ## :material-file-tree: Documentation Structure
 
 * [:material-link: Getting Started](getting-started/index.md) contains all the instructions to **

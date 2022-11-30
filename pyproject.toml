@@ -23,7 +23,8 @@ tensorflow-text = "~2.8.0"
 tensorflow-estimator = "~2.8.0"
 onnx = "^1.12.0"
 onnxruntime-extensions = "0.3.1"
-onnxruntime = "1.12.1"
+onnxruntime = { version = "1.12.1", optional = true }
+onnxruntime-gpu = { version = "1.12.1", optional = true }
 scipy = "^1.6.3"
 spectral-metric = "0.6.1"
 torch = { version = "1.9.0", source = "PyPI" }
@@ -33,6 +34,7 @@ transformers = "4.16.2"
 sentence-transformers = "2.1.0"
 spacy = "3.1.5"
 en_core_web_sm = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.1.0/en_core_web_sm-3.1.0.tar.gz#egg=en_core_web_sm"}
+fr_core_news_md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.1.0/fr_core_news_md-3.1.0.tar.gz#egg=fr_core_news_md"}
 nlpaug = "1.1.10"
 datasets = "1.16.1"
 
@@ -80,6 +82,10 @@ pyinstrument = "^4.3.0"
 # Documentation
 mkdocs = "^1.2.3"
 mkdocs-material = "^8.1.7"
+
+[tool.poetry.extras]
+cpu = ["onnxruntime"]
+gpu = ["onnxruntime-gpu"]
 
 
 [build-system]

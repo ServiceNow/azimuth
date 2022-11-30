@@ -3,7 +3,6 @@ import Loading from "components/Loading";
 import { WarningPlot } from "components/PlotWrapper";
 import React from "react";
 import { getDatasetWarningsEndpoint } from "services/api";
-import { DatasetWarning } from "types/api";
 import PreviewToggle from "./PreviewToggle";
 import PreviewToggleButton from "./PreviewToggleButton";
 
@@ -15,10 +14,10 @@ const WarningsPreview: React.FC<{ jobId: string }> = ({ jobId }) => {
     isFetching,
   } = getDatasetWarningsEndpoint.useQuery({ jobId });
 
-  const warnings = React.useMemo<(DatasetWarning | undefined)[]>(
+  const warnings = React.useMemo(
     () =>
       datasetWarningGroups?.flatMap(({ warnings }) => warnings) ||
-      Array.from(Array(3), () => undefined),
+      Array.from(Array(4), () => undefined),
     [datasetWarningGroups]
   );
 

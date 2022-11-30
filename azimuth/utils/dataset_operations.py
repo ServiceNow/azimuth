@@ -15,6 +15,7 @@ from azimuth.types.tag import (
     SmartTag,
     SmartTagFamily,
 )
+from azimuth.utils.utterance import clean_utterance
 
 
 def filter_dataset_split(
@@ -61,10 +62,11 @@ def filter_dataset_split(
         and config.columns.text_input in dataset_split.column_names
         and dataset_split.num_rows != 0
     ):
-        by = filters.utterance.lower()
+        by = filters.utterance
+        by_clean = clean_utterance(by)
         # Filter in utterances or if string matches a known row_idx or persistent_id
         dataset_split = dataset_split.filter(
-            lambda x: by in x[config.columns.text_input].lower()
+            lambda x: by_clean in clean_utterance(x[config.columns.text_input])
             or by == str(x[DatasetColumn.row_idx])
             or by == str(x[config.columns.persistent_id])
         )

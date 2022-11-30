@@ -8,8 +8,10 @@ from pydantic import ValidationError
 from azimuth.config import (
     AzimuthConfig,
     PipelineDefinition,
+    SupportedLanguage,
     TemperatureScaling,
     ThresholdConfig,
+    config_defaults_per_language,
 )
 
 CURR_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -102,3 +104,33 @@ def test_pipeline_names():
                 {"model": {"class_name": "model2"}},
             ],
         )
+
+
+def test_french_defaults_and_override():
+    subj_tags_potatoes = ["russet", "yukon_gold"]
+    cfg = AzimuthConfig(
+        **MINIMAL_CONFIG,
+        language="fr",
+        syntax={"subj_tags": subj_tags_potatoes},
+    )
+    assert (
+        cfg.syntax.subj_tags == subj_tags_potatoes
+    ), "Config did not take user-provided values for subj_tags"
+    assert (
+        cfg.syntax.spacy_model == config_defaults_per_language[SupportedLanguage.fr].spacy_model
+    ), "Config did not take default French value for spacy_model"
+    assert (
+        cfg.syntax.obj_tags == config_defaults_per_language[SupportedLanguage.fr].obj_tags
+    ), "Config did not take default French value for spacy_model"
+    assert (
+        cfg.similarity.faiss_encoder
+        == config_defaults_per_language[SupportedLanguage.fr].faiss_encoder
+    ), "Config did not take default French value for faiss encoder"
+    assert (
+        cfg.behavioral_testing.neutral_token.suffix_list
+        == config_defaults_per_language[SupportedLanguage.fr].suffix_list
+    ), "Config did not take default French value for suffix list (neutral tokens)"
+    assert (
+        cfg.behavioral_testing.neutral_token.prefix_list
+        == config_defaults_per_language[SupportedLanguage.fr].prefix_list
+    ), "Config did not take default French value for prefix list (neutral tokens)"
