@@ -159,11 +159,11 @@ class DatasetSplitManager:
         persistent_id = self.config.columns.persistent_id
         if persistent_id != DatasetColumn.row_idx:  # Default value
             if persistent_id not in base_dataset_split.column_names:
-                raise ValueError(f"Persistent ID named {persistent_id} not found in the dataset.")
-            else:
-                all_persistent_ids = base_dataset_split[persistent_id]
-                if len(all_persistent_ids) > len(set(all_persistent_ids)):
-                    raise ValueError(f"Persistent IDs in {persistent_id} column need to be unique.")
+                raise ValueError(f"Persistent id named {persistent_id} not found in the dataset.")
+
+            all_persistent_ids = base_dataset_split[persistent_id]
+            if len(all_persistent_ids) > len(set(all_persistent_ids)):
+                raise ValueError(f"Persistent ids in {persistent_id} column need to be unique.")
         base_dataset_split = self._init_dataset_split(base_dataset_split, self._tags)
         return base_dataset_split, malformed_dataset
 
