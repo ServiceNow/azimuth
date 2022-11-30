@@ -336,7 +336,7 @@ class ModelContractConfig(CommonFieldsConfig):
 
 
 class LanguageConfig(CommonFieldsConfig):
-    # Language configuration sets multiple config values; see `config_defaults_per_language` for details
+    # Language config sets multiple config values; see `config_defaults_per_language` for details
     # Language should only determine other config values and not be referenced in modules.
     language: SupportedLanguage = SupportedLanguage.en
 
