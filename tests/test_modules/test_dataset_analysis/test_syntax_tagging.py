@@ -65,7 +65,6 @@ def test_syntax_tagging_french(simple_text_config_french):
 
     assert mod is not None
     batch = {
-        DatasetColumn.idx: [0, 1, 2, 3],
         "utterance": [
             "adore les biscuits!",
             "c'est terrible. C'est horrible pour moi d'écrire ce test, mais je m'amuse bien.",
