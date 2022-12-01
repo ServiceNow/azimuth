@@ -1,17 +1,17 @@
-# Class Analysis
+# Class Overlap
 
-Class Analysis assesses the similarity between pairs of classes. In some cases, high similarity
-may be associated with poor class definitions, mislabelling, and/or model confusion.
+Class Overlap assesses the semantic overlap between pairs of classes. In some cases, high
+overlap may be associated with poor class definitions, mislabelling, and/or model confusion.
 
-**Class overlap** is determined with a dataset alone, as described in
-[:material-link: Class Similarity](../key-concepts/class-similarity.md). Calculations use the
-locations of utterances in embedding space, as described in
+**Class overlap** is determined with a dataset alone, based on the locations of utterances in
+embedding space, as described in
 [:material-link: Similarity Analysis](../key-concepts/similarity.md).
 
 ## Class Overlap Plot
 
-The Class Overlap plot shows class overlap as flows between source and target classes, displayed
-as nodes on the left (source) and right (target) sides of the plot. Flows between class nodes
+The Class Overlap plot shows semantic overlap in the training data as flows between source and
+target classes, displayed as nodes on the left (source) and right (target) sides of the plot.
+Flows between class nodes
 indicate the extent to which samples in a source class are in neighborhoods typified by
 other classes (class overlap) or its own class (self overlap). Wider flows indicate greater
 overlap values.
@@ -31,7 +31,6 @@ Plot options:
 * **Scale by class**: Class overlap values are normalized by source class, such that the sum of
   all overlaps for a source class (self and otherwise) is 1.  This toggle multiples overlap
   values by class sample sizes, changing node size and flow width accordingly.
-
 
 These options allow for different aspects of exploration of class overlap.
 
@@ -55,7 +54,7 @@ comparison).
 <figure markdown>
 ![](../_static/images/key-concepts/class-overlap-plot.png)
 <figcaption>
-Class Overlap plot on the Class Analysis page, accessed via the Dashboard.
+Class Overlap plot on the Class Overlap page, accessed via the Dashboard.
 </figcaption>
 </figure>
 

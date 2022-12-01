@@ -7,7 +7,7 @@ analysis can be quite powerful given that **no trained ML model is needed**; onl
 be supplied.
 
 Within Azimuth, different similarity analyses are provided to determine how similar utterances are
-within a class, across classes, and so on. This can help indicate whether classes are well-defined,
+within a class, between classes, and so on. This can help indicate whether classes are well-defined,
 or whether changes should be made to improve the dataset, such as by redefining classes, relabeling
 or omitting data, or augmenting the dataset.
 
@@ -15,7 +15,13 @@ or omitting data, or augmenting the dataset.
 
 In Azimuth, the similarity analysis is used to derive [:material-link: Smart Tags](smart-tags.md),
 and also to show the most similar utterances in both dataset splits on
-the [:material-link: Utterances Details](../user-guide/exploration-space/utterance-details.md).
+the [:material-link: Utterances Details](../user-guide/exploration-space/utterance-details.md)
+(see below).
+
+Similarity is also used for class overlap, which assesses the semantic overlap between pairs of
+classes. Class overlap is presented in the [Class Overlap Dashboard
+Section](../user-guide/index.md#class-overlap) as well as the
+[:material-link: Class Overlap](../user-guide/class-overlap.md) page.
 
 <figure markdown>
   ![Image title](../_static/images/exploration-space/utterance-details-similarity.png)
@@ -62,6 +68,36 @@ and/or `conflicting_neighbors_eval`, based on which dataset split is being exami
 utterance in the test set will be compared to its neighbors in both the training and evaluation
 dataset splits.)
 
+### Class Overlap
+
+#### Class Overlap Value
+
+Class overlap is calculated using utterance embeddings, which are computed as described in
+[:material-link: Similarity Analysis](./similarity.md).
+
+Class overlap for class *C<sub>i</sub>* (source class) with class *C<sub>j</sub>* (target class) is
+defined as the area of the feature (embedding) space in which an utterance in class
+*C<sub>i</sub>* has a greater probability of being in class *C<sub>j</sub>* than in class
+*C<sub>i</sub>*.
+
+To approximate this probability, we make use of the
+[`spectral-metric`](https://github.com/Dref360/spectral-metric) package
+([Branchaud-Charron, 2019](https://arxiv.org/abs/1905.07299)[^2]). The probability of a sample
+being in a specified class is determined based on the representation of this class in the
+sample's 20 nearest neighbors, as well as the hypervolume containing these neighbors (Parzen
+window). Class overlap for the *C<sub>i</sub>* with the *C<sub>j</sub>* is calculated as the mean
+probability across all samples in *C<sub>i</sub>*. The similarity matrix *S* from `spectral-metric`
+contains these probabilities for all class pairs. Note that probabilities are normalized by the
+source class, to sum to 1.
+
+#### Samples with overlap
+
+Individual samples from a source class are determined to have overlap with a target class when
+their probability of being in the target class is greater than 0, which is the same as saying
+that at least one of their 20 nearest neighbors are from the target class. This is a
+conservative metric, on which we anticipate iterating in the future.
+
+
 ### Configuration
 
 [:material-link: Similarity Analysis Configuration](../reference/configuration/analyses/similarity.md)
@@ -71,5 +107,8 @@ the smart tags.
 
 [^1]: Reimers, Nils, and Iryna Gurevych. "Sentence-bert: Sentence embeddings using siamese
 bert-networks." arXiv preprint arXiv:1908.10084 (2019).
+[^2]: Branchaud-Charron, Frederic, Andrew Achkar, and Pierre-Marc Jodoin. "Spectral metric for
+dataset complexity assessment." Proceedings of the IEEE/CVF Conference on Computer Vision and
+Pattern Recognition. 2019.
 
 --8<-- "includes/abbreviations.md"
