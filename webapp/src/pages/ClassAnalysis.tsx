@@ -99,11 +99,14 @@ const ClassOverlap = () => {
               }
               link="/class-analysis/"
             />
-            <Description
-              text={
-                "\nFlows between class nodes indicate whether a source class's utterances are in neighborhoods typified by other classes (class overlap) or its own class (self-overlap). For each source class, class overlap and self-overlap flows sum to 1, unless total flow is scaled by class size. Greatest class overlap is towards the top. Colors group flows from the same source class."
-              }
-            />
+            <Typography variant="body2" marginTop={0.25}>
+              Flows between class nodes indicate whether a source class's
+              utterances are in neighborhoods typified by other classes (class
+              overlap) or its own class (self-overlap). For each source class,
+              class overlap and self-overlap flows sum to 1, unless total flow
+              is scaled by class size. Greatest class overlap is towards the
+              top. Colors group flows from the same source class.
+            </Typography>
           </Box>
           <Box display="flex" gap={4} alignSelf="center">
             <Box width={700}>
