@@ -79,7 +79,6 @@ def file_based_ds_from_paths(
 ):
     return {
         "class_name": "tests.test_loading_resources.load_file_dataset",
-        "args": ["csv"],
         "kwargs": {
             "data_files": {
                 "train": train,
