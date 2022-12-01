@@ -71,18 +71,24 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           flex: 1,
           field: "sourceClass",
           headerName: "Source Class",
+          description:
+            "The class of the samples being analyzed. For pipeline confusion, this is" +
+            " the class label.",
         },
         {
           flex: 1,
           field: "targetClass",
           headerName: "Target Class",
+          description:
+            "The class that the source class may look like, through the lens of the dataset or the model. For pipeline confusion, this is the prediction.",
         },
         {
           flex: 1,
           type: "number",
           field: "overlapScoreTrain",
-          headerName: "Overlap Score",
-          description: "Normalized overlap score (training set)",
+          headerName: "Semantic Overlap Score",
+          description:
+            "Class overlap measures the extent to which source class samples are semantically similar to target class samples, in the training data. The score comes from both the proportion of samples and their degree of similarity.",
           valueFormatter: twoDigitFormatter,
         },
         {
@@ -90,7 +96,8 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           type: "number",
           field: "pipelineConfusionEval",
           headerName: "Pipeline Confusion",
-          description: "Confusion value (evaluation set)",
+          description:
+            "Pipeline confusion indicates whether source class samples in the evaluation set are predicted to be in the target class.",
           valueGetter: ({ row }) =>
             (row.pipelineConfusionEval as number) /
             row.utteranceCountSourceEval,
@@ -102,8 +109,9 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           flex: 1,
           type: "number",
           field: "utteranceCountWithOverlapTrain",
-          headerName: "Utterances with overlap",
-          description: "Source class utterances with overlap (training set)",
+          headerName: "Utterances with Overlap",
+          description:
+            "Percent of source class samples that semantically overlap the target class (all in the training set).",
           valueGetter: ({ row }) =>
             row.utteranceCountWithOverlapTrain / row.utteranceCountSourceTrain,
           renderCell: ({ value, row }: GridCellParams<number, Row>) =>

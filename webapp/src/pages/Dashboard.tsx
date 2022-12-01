@@ -15,7 +15,6 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
 import { isPipelineSelected } from "utils/helpers";
-import { classAnalysisDescription } from "./ClassAnalysis";
 import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
 import { smartTagsDescription } from "./SmartTags";
@@ -91,9 +90,14 @@ const Dashboard = () => {
       )}
       {datasetInfo?.similarityAvailable && (
         <PreviewCard
-          title="Class Analysis"
+          title="Class Overlap"
           to={`/${jobId}/class_analysis${searchString}`}
-          description={classAnalysisDescription}
+          description={
+            <Description
+              text="Assess semantic overlap between class pairs and compare to pipeline confusion."
+              link="/class-analysis/"
+            />
+          }
         >
           <ClassAnalysisTable jobId={jobId} pipeline={pipeline} />
         </PreviewCard>
