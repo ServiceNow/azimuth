@@ -1,4 +1,3 @@
-# flake8: noqa F841
 """
 Note - This is a copied from the another internal repo.
 Also inspired by https://gist.github.com/tboquet/588955d846c03de66b87c8bca0fb99cb
