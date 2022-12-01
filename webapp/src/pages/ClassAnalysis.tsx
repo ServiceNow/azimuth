@@ -62,7 +62,9 @@ const ClassOverlap = () => {
     [history, jobId, pipeline, classOverlap]
   );
 
-  const setQueryDebounced = useDebounced(setQuery);
+  const commitOverlapThreshold = useDebounced(
+    (overlapThreshold: number | undefined) => setQuery({ overlapThreshold })
+  );
 
   const checkValid = data?.plot.data[0].node.x.length > 0;
 
@@ -202,8 +204,7 @@ const ClassOverlap = () => {
                   }}
                   onChangeCommitted={(_, value) => {
                     if (value !== classOverlap?.overlapThreshold) {
-                      setQuery({ overlapThreshold: value as number });
-                      setQueryDebounced.clear();
+                      commitOverlapThreshold.now(value as number);
                     }
                   }}
                 />
@@ -214,7 +215,7 @@ const ClassOverlap = () => {
                   inputProps={OVERLAP_THRESHOLD_INPUT_PROPS}
                   onChange={({ target: { value } }) => {
                     setOverlapThreshold(value);
-                    setQueryDebounced({ overlapThreshold: Number(value) });
+                    commitOverlapThreshold.debounce(Number(value));
                   }}
                 />
                 <Tooltip title="Reset threshold" arrow>
@@ -225,8 +226,7 @@ const ClassOverlap = () => {
                       disabled={classOverlap.overlapThreshold === undefined}
                       onClick={() => {
                         setOverlapThreshold(undefined);
-                        setQuery({ overlapThreshold: undefined });
-                        setQueryDebounced.clear();
+                        commitOverlapThreshold.now(undefined);
                       }}
                     >
                       <RestartAltIcon fontSize="large" />

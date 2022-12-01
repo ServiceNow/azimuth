@@ -26,18 +26,16 @@ const FilterTextField: React.FC<Props> = ({
 
   React.useEffect(() => setLiveValue(filterValue), [filterValue]);
 
-  const setFilterValueDebounced = useDebounced(setFilterValue);
+  const commitFilterValue = useDebounced(setFilterValue);
 
   const handleChange = (value: string | undefined) => {
     setLiveValue(value);
-    setFilterValueDebounced(value);
+    commitFilterValue.debounce(value);
   };
 
   const handleClear = () => {
     setLiveValue(undefined);
-    // Clear filter value with no delay.
-    setFilterValue(undefined);
-    setFilterValueDebounced.clear();
+    commitFilterValue.now(undefined);
   };
 
   return (
