@@ -62,8 +62,8 @@ const tagTypes = [
   "SimilarUtterances",
   "Status",
   "ConfusionMatrix",
-  "ClassAnalysisPlot",
-  "ClassAnalysis",
+  "ClassOverlapPlot",
+  "ClassOverlap",
 ] as const;
 
 type Tag = typeof tagTypes[number];
@@ -199,8 +199,8 @@ export const api = createApi({
         "Something went wrong fetching similar utterances"
       ),
     }),
-    getClassAnalysis: build.query({
-      providesTags: () => [{ type: "ClassAnalysis" }],
+    getClassOverlap: build.query({
+      providesTags: () => [{ type: "ClassOverlap" }],
       queryFn: responseToData(
         fetchApi({
           path: "/class_overlap",
@@ -209,8 +209,8 @@ export const api = createApi({
         "Something went wrong fetching class overlap"
       ),
     }),
-    getClassAnalysisPlot: build.query({
-      providesTags: () => [{ type: "ClassAnalysisPlot" }],
+    getClassOverlapPlot: build.query({
+      providesTags: () => [{ type: "ClassOverlapPlot" }],
       queryFn: responseToData(
         fetchApi({
           path: "/class_overlap/plot",
@@ -377,8 +377,8 @@ export const {
   getMetrics: getMetricsEndpoint,
   getMetricsPerFilter: getMetricsPerFilterEndpoint,
   getCustomMetricInfo: getCustomMetricInfoEndpoint,
-  getClassAnalysisPlot: getClassAnalysisPlotEndpoint,
-  getClassAnalysis: getClassAnalysisEndpoint,
+  getClassOverlapPlot: getClassOverlapPlotEndpoint,
+  getClassOverlap: getClassOverlapEndpoint,
   getOutcomeCountPerThreshold: getOutcomeCountPerThresholdEndpoint,
   getOutcomeCountPerFilter: getOutcomeCountPerFilterEndpoint,
   getUtteranceCountPerFilter: getUtteranceCountPerFilterEndpoint,

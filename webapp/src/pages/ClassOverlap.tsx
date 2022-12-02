@@ -18,7 +18,7 @@ import { PlotWrapper } from "components/PlotWrapper";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { getClassAnalysisPlotEndpoint } from "services/api";
+import { getClassOverlapPlotEndpoint } from "services/api";
 import { QueryClassOverlapState } from "types/models";
 import { constructSearchString } from "utils/helpers";
 
@@ -29,7 +29,7 @@ const ClassOverlap = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { classOverlap, pipeline } = useQueryState();
 
-  const { data, error, isFetching } = getClassAnalysisPlotEndpoint.useQuery({
+  const { data, error, isFetching } = getClassOverlapPlotEndpoint.useQuery({
     jobId,
     ...classOverlap,
   });

@@ -151,7 +151,15 @@ export interface components {
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
-    ClassAnalysisClassPair: {
+    ClassOverlapPlotResponse: {
+      plot: components["schemas"]["PlotSpecification"];
+      defaultOverlapThreshold: number;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    ClassOverlapTableClassPair: {
       sourceClass: string;
       targetClass: string;
       overlapScoreTrain: number;
@@ -164,16 +172,8 @@ export interface components {
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
-    ClassAnalysisResponse: {
-      classPairs: components["schemas"]["ClassAnalysisClassPair"][];
-    };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
-    ClassOverlapPlotResponse: {
-      plot: components["schemas"]["PlotSpecification"];
-      defaultOverlapThreshold: number;
+    ClassOverlapTableResponse: {
+      classPairs: components["schemas"]["ClassOverlapTableClassPair"][];
     };
     ColumnConfiguration: {
       text_input?: string;
@@ -961,7 +961,7 @@ export interface operations {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["ClassAnalysisResponse"];
+          "application/json": components["schemas"]["ClassOverlapTableResponse"];
         };
       };
       /** Validation Error */

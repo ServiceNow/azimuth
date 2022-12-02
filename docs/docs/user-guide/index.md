@@ -98,7 +98,7 @@ semantic overlap is acceptable.
     calculated on the evaluation data. Thus, the two analyses have different source class sample
     counts.
 
-![](../_static/images/key-concepts/class-analysis-table.png)
+![](../_static/images/key-concepts/class-overlap-table.png)
 
 !!! tip "Sorting"
 

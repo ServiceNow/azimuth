@@ -14,10 +14,10 @@ from azimuth.plots.sankey_plot import make_sankey_plot
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.types.class_overlap import (
-    ClassAnalysisClassPair,
-    ClassAnalysisResponse,
     ClassOverlapPlotResponse,
     ClassOverlapResponse,
+    ClassOverlapTableClassPair,
+    ClassOverlapTableResponse,
 )
 from azimuth.types.model_performance import ConfusionMatrixResponse
 from azimuth.utils.project import similarity_available
@@ -90,7 +90,7 @@ def get_class_overlap_plot(
     summary="Get class overlap table.",
     description="Get data for class overlap, confusion, and related utterance counts.",
     tags=TAGS,
-    response_model=ClassAnalysisResponse,
+    response_model=ClassOverlapTableResponse,
 )
 def get_class_overlap(
     task_manager: TaskManager = Depends(get_task_manager),
@@ -98,7 +98,7 @@ def get_class_overlap(
         get_all_dataset_split_managers
     ),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
-) -> ClassAnalysisResponse:
+) -> ClassOverlapTableResponse:
     dm = dataset_split_managers[DatasetSplitName.train]
     class_counts_train = dm.class_distribution()
     class_counts_eval = dataset_split_managers[DatasetSplitName.eval].class_distribution()
@@ -133,7 +133,7 @@ def get_class_overlap(
     )
 
     class_pairs_list = [
-        ClassAnalysisClassPair(
+        ClassOverlapTableClassPair(
             source_class=class_names[i],
             target_class=class_names[j],
             overlap_score_train=class_overlap_result.s_matrix[i, j],
@@ -151,6 +151,6 @@ def get_class_overlap(
         )
     ]
 
-    api_result = ClassAnalysisResponse(class_pairs=class_pairs_list)
+    api_result = ClassOverlapTableResponse(class_pairs=class_pairs_list)
 
     return api_result

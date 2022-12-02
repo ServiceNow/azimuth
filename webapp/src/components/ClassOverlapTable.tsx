@@ -2,20 +2,20 @@ import React from "react";
 import { Box } from "@mui/material";
 import { GridValueFormatterParams, GridCellParams } from "@mui/x-data-grid";
 import { QueryPipelineState } from "types/models";
-import { getClassAnalysisEndpoint } from "services/api";
+import { getClassOverlapEndpoint } from "services/api";
 import { formatRatioAsPercentageString } from "utils/format";
 import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
 import { Table } from "./Table";
-import { ClassAnalysisClassPair } from "types/api";
+import { ClassOverlapTableClassPair } from "types/api";
 import { isPipelineSelected } from "utils/helpers";
 
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
 
-type Row = ClassAnalysisClassPair & { id: number };
+type Row = ClassOverlapTableClassPair & { id: number };
 type Props = {
   jobId: string;
   pipeline: QueryPipelineState;
@@ -23,8 +23,8 @@ type Props = {
 const twoDigitFormatter = ({ value }: GridValueFormatterParams) =>
   isNaN(value as number) ? "--" : (value as number).toFixed(2);
 
-const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
-  const { data, isFetching, error } = getClassAnalysisEndpoint.useQuery({
+const ClassOverlapTable: React.FC<Props> = ({ jobId, pipeline }) => {
+  const { data, isFetching, error } = getClassOverlapEndpoint.useQuery({
     jobId,
     ...pipeline,
   });
@@ -143,4 +143,4 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
   );
 };
 
-export default React.memo(ClassAnalysisTable);
+export default React.memo(ClassOverlapTable);

@@ -30,7 +30,7 @@ class ClassOverlapPlotResponse(AliasModel):
     default_overlap_threshold: float
 
 
-class ClassAnalysisClassPair(AliasModel):
+class ClassOverlapTableClassPair(AliasModel):
     source_class: str = Field(..., title="Source class")
     target_class: str = Field(..., title="Target class")
     overlap_score_train: float = Field(..., title="Overlap score on train")
@@ -46,5 +46,5 @@ class ClassAnalysisClassPair(AliasModel):
     )
 
 
-class ClassAnalysisResponse(AliasModel):
-    class_pairs: List[ClassAnalysisClassPair] = Field(..., title="Class pair overlap data")
+class ClassOverlapTableResponse(AliasModel):
+    class_pairs: List[ClassOverlapTableClassPair] = Field(..., title="Class pair overlap data")

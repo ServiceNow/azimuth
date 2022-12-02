@@ -3,7 +3,7 @@ import noData from "assets/void.svg";
 import PerturbationTestingPreview from "components/Analysis/PerturbationTestingPreview";
 import PreviewCard from "components/Analysis/PreviewCard";
 import WarningsPreview from "components/Analysis/WarningsPreview";
-import ClassAnalysisTable from "components/ClassAnalysisTable";
+import ClassOverlapTable from "components/ClassOverlapTable";
 import Description from "components/Description";
 import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
@@ -99,7 +99,7 @@ const Dashboard = () => {
             />
           }
         >
-          <ClassAnalysisTable jobId={jobId} pipeline={pipeline} />
+          <ClassOverlapTable jobId={jobId} pipeline={pipeline} />
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) && (
