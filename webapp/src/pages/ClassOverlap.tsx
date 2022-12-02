@@ -119,7 +119,9 @@ const ClassOverlap = () => {
                     alignSelf="flex-end"
                     paddingBottom={2}
                   >
-                    No data for the threshold - {classOverlap?.overlapThreshold}
+                    No data for the threshold{" "}
+                    {classOverlap.overlapThreshold ??
+                      data.defaultOverlapThreshold}
                   </Typography>
                   <img src={noData} alt="No data for the threshold" />
                 </Box>
