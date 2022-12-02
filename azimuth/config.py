@@ -77,8 +77,8 @@ class AzimuthValidationError(Exception):
 # Mypy does not like a variable named kwargs.
 class CustomObject(BaseModel):  # type: ignore
     class_name: str = Field(..., title="Class name to load.")
-    args: List[Union["CustomObject", Any]] = []
-    kwargs: Dict[str, Union["CustomObject", Any]] = {}
+    args: List[Any] = []
+    kwargs: Dict[str, Any] = {}
     remote: Optional[str] = Field(
         None,
         description="Relative path to class. `class_name` needs to be accessible from this path.",
