@@ -27,5 +27,6 @@ Released changes are shown in the
 ### Fixed
 - ONNX models on GPU.
 - Preserve white spaces in utterances. That includes `\n`s, `\t`s, and consecutive spaces.
+- Fix predictions with 100% confidence not showing up in the confidence histogram and in the ECE.
 
 ### Security
