@@ -14,6 +14,7 @@ from azimuth.types import (
     SupportedMethod,
     SupportedModule,
 )
+from tests.utils import generate_mocked_dm
 
 
 def test_get_all_task(tiny_text_task_manager):
@@ -85,7 +86,9 @@ def test_clearing_cache(tiny_text_config):
     assert not any([m and d for m, d in cached.values()])
 
 
-def test_expired_task(tiny_text_task_manager):
+def test_expired_task(tiny_text_task_manager, tiny_text_config):
+    # Generating fake dm so modules don't fail because of missing columns.
+    generate_mocked_dm(tiny_text_config)
     current_update = time.time()
     pipeline_index_option = ModuleOptions(pipeline_index=0)
     _, pred_task = tiny_text_task_manager.get_task(
@@ -120,7 +123,7 @@ def test_expired_task(tiny_text_task_manager):
     )
     assert pred_task.done() and confusion_matrix_task.done()
 
-    # If we update the dataset_split, bin task will be recomputed
+    # If we update the dataset_split, confusion matrix task will be recomputed
     current_update = time.time()
     _, pred_task = tiny_text_task_manager.get_task(
         SupportedMethod.Predictions,
