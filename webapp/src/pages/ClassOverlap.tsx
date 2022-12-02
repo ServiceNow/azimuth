@@ -97,7 +97,7 @@ const ClassOverlap = () => {
               text={
                 "Assess magnitude of overlap and select class pairs to explore further. For suggested workflow:"
               }
-              link="/class-overlap/"
+              link="/class-overlap/#suggested_workflow/"
             />
             <Typography variant="body2" marginTop={0.25}>
               Flows between class nodes indicate whether a source class's
