@@ -16,6 +16,9 @@ Released changes are shown in the
 
 ### Changed
 - The default port for the front end will now be 3000, the React default, instead of 3005.
+- Improved class overlap threshold number picker.
+  - Control input value with a `string` instead of with a `number` so for example when hitting backspace after `0.01`, you get `0.0` instead of `0` (as maybe you wanted to type `2` and get `0.02`).
+  - Debounce number picker to reduce calls to back end.
 
 ### Deprecated/Breaking Changes
 
