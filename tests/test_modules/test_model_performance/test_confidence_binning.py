@@ -77,6 +77,25 @@ def test_confidence_histogram(tiny_text_config):
     assert count_rej_class_with_post > count_rej_class_without_post
 
 
+def test_confidence_histogram_100_percent_confidence(file_text_config_top1):
+    save_predictions(file_text_config_top1)
+    save_outcomes(file_text_config_top1)
+
+    mod = ConfidenceHistogramModule(
+        DatasetSplitName.eval,
+        file_text_config_top1,
+        mod_options=ModuleOptions(pipeline_index=0),
+    )
+    bins = mod.compute_on_dataset_split()[0].bins
+    ds = mod.get_dataset_split()
+
+    assert len(bins) == CONFIDENCE_BINS_COUNT
+    # We should have at least one sample with 100% confidence for the test to be relevant.
+    assert 1 in np.max(ds[DatasetColumn.postprocessed_confidences], axis=1)
+    # We should have the right number of samples.
+    assert sum(count for b in bins for count in b.outcome_count.values()) == len(ds)
+
+
 def test_confidence_histogram_empty(simple_text_config, apply_mocked_startup_task):
     mod = ConfidenceHistogramModule(
         DatasetSplitName.eval,
