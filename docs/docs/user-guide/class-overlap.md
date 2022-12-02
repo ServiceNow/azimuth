@@ -9,13 +9,14 @@ embedding space, as described in
 
 ## Class Overlap Plot
 
-The Class Overlap plot shows semantic overlap in the training data as flows between source and
-target classes, displayed as nodes on the left (source) and right (target) sides of the plot.
-Flows between class nodes indicate the extent to which samples in a source class are in
-neighborhoods typified by other classes (class overlap) or its own class (self-overlap). For
-each source class, class overlap and self-overlap flows sum to 1, unless total flow is scaled by
-class size.
+The Class Overlap plot shows the extent to which source classes semantically overlap target 
+classes, all in the training data. The source class is the class label, and the target class is 
+the class that the source class may look like, based on its nearest neighbors. As such, flows 
+between class nodes indicate whether samples in a source class are in neighborhoods typified 
+by other classes (class overlap) or its own class (self overlap). For each source class, class 
+overlap and self-overlap values sum to 1, unless values are scaled by class size.
 
+Overlap is displayed as flows from source class (nodes on the left) to target classes (right).
 Nodes are ordered with flows for greatest overlap values towards the top, so as to highlight these
 class pairs. Wider flows indicate greater overlap values. Colors group flows from the same
 source class. The plot is interactive, in that nodes can be moved and reordered via dragging.
@@ -44,28 +45,26 @@ navigate them, we suggest the following workflow:
   scores in the dataset. Vary the minimum displayed overlap value to see all dataset overlap or
   to focus on the class pairs with the greatest overlap scores.
 - Because Scale By Class Size is on, this view will emphasize overlapping classes with greater
-  sample counts. Depending on the context, you may not be concerned about class overlap from
-  source classes with few samples in the training data. Alternatively, if you only have a few
-  samples from a certain class with high business value, you may want to prioritize their having
-  clear, non-overlapping class definitions.
+  sample counts. This is useful if you are less concerned about class overlap from
+  source classes with few samples in the training data. However, if you want to further investigate
+  classes with high overlap values but fewer samples, either for better understanding your dataset 
+  or because some classes might have high business value, then you can toggle `Scale By Class Size`
+  to off, as explained in step 2.
 
 #### 2. Toggle Scale By Class Size:
 
 - When Scale By Class Size is turned off, total flows (class overlap and self-overlap) sum to 1.
   This view emphasizes class pairs with the greatest class overlap scores, regardless of
   whether the source class has many samples in it.
-- By toggling Scale By Class Size, a user can assess the importance of class overlap from a
-  given source class in the context of the rest of the dataset. For example, a small class may
-  have a high overlap value, but when scaled by class size, it may be negligible in the context
-  of class overlap throughout the dataset.
+- This is useful to further understand class overlap for classes that have relatively fewer
+  samples in them, which might not have been as visible during the analysis at step 1.
 
 #### 3. Toggle Self-Overlap :
 
 - For any given class, turning on Self-Overlap lets you compare the extent to which its samples
   semantically overlap other classes (class overlap) vs. samples of its own class (self-overlap).
   For example, if self-overlap is much higher than class overlap, class overlap may be less
-  problematic for this class, and vice versa. Your interpretation and next steps may depend on
-  the business value of the class in question.
+  problematic for this class, and vice versa.
 
 !!! tip
 
