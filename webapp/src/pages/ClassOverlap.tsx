@@ -113,11 +113,7 @@ const ClassOverlap = () => {
               {checkValid ? (
                 <PlotWrapper {...data.plot} />
               ) : (
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignSelf="flex-start"
-                >
+                <Box display="flex" flexDirection="column">
                   <Typography
                     variant="h4"
                     alignSelf="flex-end"
@@ -125,11 +121,7 @@ const ClassOverlap = () => {
                   >
                     No data for the threshold - {classOverlap?.overlapThreshold}
                   </Typography>
-                  <img
-                    src={noData}
-                    alt="No data for the threshold"
-                    height="10%"
-                  />
+                  <img src={noData} alt="No data for the threshold" />
                 </Box>
               )}
             </Box>
