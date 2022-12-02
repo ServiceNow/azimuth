@@ -203,17 +203,17 @@ export const api = createApi({
       providesTags: () => [{ type: "ClassAnalysis" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_analysis",
+          path: "/class_overlap",
           method: "get",
         }),
-        "Something went wrong fetching class analysis"
+        "Something went wrong fetching class overlap"
       ),
     }),
     getClassAnalysisPlot: build.query({
       providesTags: () => [{ type: "ClassAnalysisPlot" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_analysis/plot",
+          path: "/class_overlap/plot",
           method: "get",
         }),
         "Something went wrong fetching spectral clustering class overlap data"

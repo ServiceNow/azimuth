@@ -89,7 +89,7 @@ export default class App extends React.Component<Props> {
                                 <Settings />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/class_analysis" exact>
+                            <Route path="/:jobId/class_overlap" exact>
                               <BasicLayout maxWidth="md">
                                 <ClassAnalysis />
                               </BasicLayout>

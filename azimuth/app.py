@@ -164,7 +164,7 @@ def create_app() -> FastAPI:
     api_router.include_router(admin_router, prefix="/admin")
     api_router.include_router(
         class_overlap_router,
-        prefix="/class_analysis",
+        prefix="/class_overlap",
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(tags_router, prefix="/tags", dependencies=[])

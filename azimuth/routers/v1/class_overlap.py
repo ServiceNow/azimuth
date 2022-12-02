@@ -92,7 +92,7 @@ def get_class_overlap_plot(
     tags=TAGS,
     response_model=ClassAnalysisResponse,
 )
-def get_class_analysis(
+def get_class_overlap(
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_managers: Dict[DatasetSplitName, DatasetSplitManager] = Depends(
         get_all_dataset_split_managers

@@ -45,7 +45,7 @@ const ClassOverlap = () => {
 
   const setQuery = (newClassOverlap: QueryClassOverlapState) =>
     history.push(
-      `/${jobId}/class_analysis${constructSearchString({
+      `/${jobId}/class_overlap${constructSearchString({
         ...pipeline,
         ...classOverlap,
         ...newClassOverlap,
