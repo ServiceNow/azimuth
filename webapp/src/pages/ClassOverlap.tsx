@@ -151,7 +151,7 @@ const ClassOverlap = () => {
                         }}
                       />
                     }
-                    label="Self-Overlap"
+                    label="Self-overlap"
                   />
                 </Tooltip>
                 <Tooltip
@@ -169,7 +169,7 @@ const ClassOverlap = () => {
                         }}
                       />
                     }
-                    label="Scale By Class Size"
+                    label="Scale by class size"
                   />
                 </Tooltip>
               </FormGroup>
