@@ -72,8 +72,7 @@ dataset splits.)
 
 #### Class Overlap Value
 
-Class overlap is calculated using utterance embeddings, which are computed as described in
-[:material-link: Similarity Analysis](./similarity.md).
+Class overlap is calculated using utterance embeddings, which are computed as described above.
 
 Class overlap for class *C<sub>i</sub>* (source class) with class *C<sub>j</sub>* (target class) is
 defined as the area of the feature (embedding) space in which an utterance in class

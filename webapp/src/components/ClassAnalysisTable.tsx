@@ -72,15 +72,14 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           field: "sourceClass",
           headerName: "Source Class",
           description:
-            "The class of the samples being analyzed. For pipeline confusion, this is" +
-            " the class label.",
+            "The class label of the samples being analyzed.",
         },
         {
           flex: 1,
           field: "targetClass",
           headerName: "Target Class",
           description:
-            "The class that the source class may look like, through the lens of the dataset or the model. For pipeline confusion, this is the prediction.",
+            "The class that the source class may look like. For pipeline confusion, this is the prediction.",
         },
         {
           flex: 1,
