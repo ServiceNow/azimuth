@@ -105,7 +105,7 @@ def simple_text_config_multi_pipeline(simple_text_config):
 @pytest.fixture
 def tiny_text_config(simple_text_config) -> AzimuthConfig:
     tiny_text_config = simple_text_config.copy(deep=True)
-    tiny_text_config.dataset.kwargs["max_dataset_len"] = 2
+    tiny_text_config.dataset.kwargs["max_dataset_len"] = 4
     return tiny_text_config
 
 
