@@ -68,7 +68,7 @@ make download_demo
 make CFG_PATH=/config/development/clinc/conf.json launch
 ```
 
-Once the startup tasks are completed, you will be able to access Azimuth at `http://0.0.0.0:8080`.
+Once the startup tasks are completed, you will be able to access Azimuth at `http://localhost:8080`.
 To learn more about Azimuth's features, refer to
 our [Key Concepts](https://servicenow.github.io/azimuth/key-concepts) and
 our [User Guide](https://servicenow.github.io/azimuth/user-guide).

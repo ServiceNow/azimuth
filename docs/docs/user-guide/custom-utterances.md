@@ -2,7 +2,7 @@
 
 Azimuth has limited support for "custom utterances", i.e. utterances not part of the initial dataset.
 
-Azimuth offers support through API routes accessible locally at [`http://0.0.0.0:8091/docs#/Custom%20Utterances%20v1`](http://0.0.0.0:8091/docs#/Custom%20Utterances%20v1).
+Azimuth offers support through API routes accessible locally at [`http://localhost:8091/docs#/Custom%20Utterances%20v1`](http://localhost:8091/docs#/Custom%20Utterances%20v1).
 
 ## Data augmentation
 
@@ -18,7 +18,7 @@ To augment a list of utterances, you can follow these intructions:
     utterances = ["welcome to Azimuth",
                   "Don't forget to star our repo!"]
 
-    response = requests.get("http://0.0.0.0:8091/custom_utterances/perturbed_utterances",
+    response = requests.get("http://localhost:8091/custom_utterances/perturbed_utterances",
                             params={"utterances": utterances}).json()
     pprint([r["perturbedUtterance"] for r in response])
     ```
@@ -47,7 +47,7 @@ If a pipeline allows it, you can get saliency of a custom utterance by doing the
     utterances = ["welcome to Azimuth",
                   "Don't forget to star our repo!"]
 
-    response = requests.get("http://0.0.0.0:8091/custom_utterances/saliency",
+    response = requests.get("http://localhost:8091/custom_utterances/saliency",
                             params={"utterances": utterances, "pipeline_index": 0}).json()
     pprint(response)
     ```
