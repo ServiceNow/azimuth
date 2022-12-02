@@ -109,11 +109,17 @@ const ClassOverlap = () => {
             </Typography>
           </Box>
           <Box display="flex" gap={4} alignSelf="center">
-            <Box width={700}>
+            <Box width={700} display="flex" flexDirection="column">
               {checkValid ? (
-                <PlotWrapper {...data.plot} />
+                <>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="subtitle2">Source class</Typography>
+                    <Typography variant="subtitle2">Target class</Typography>
+                  </Box>
+                  <PlotWrapper {...data.plot} />
+                </>
               ) : (
-                <Box display="flex" flexDirection="column">
+                <>
                   <Typography
                     variant="h4"
                     alignSelf="flex-end"
@@ -124,7 +130,7 @@ const ClassOverlap = () => {
                       data.defaultOverlapThreshold}
                   </Typography>
                   <img src={noData} alt="No data for the threshold" />
-                </Box>
+                </>
               )}
             </Box>
             <Box
