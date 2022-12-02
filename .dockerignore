@@ -3,7 +3,9 @@ azimuth_shr/files
 azimuth_shr/sentence_transformers
 azimuth_shr/tfhub
 cache
+config
 dist
+docs
 .coverage*
 
 # Must be kept in sync with webapp/.dockerignore

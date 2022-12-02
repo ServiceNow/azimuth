@@ -1,9 +1,0 @@
-FROM squidfunk/mkdocs-material as building
-COPY . /app
-WORKDIR /app/docs
-RUN mkdocs build
-
-FROM python:3.9.5-slim
-COPY --from=0 /app/docs/site .
-EXPOSE 8080
-CMD ["python", "-m", "http.server", "8080"]
