@@ -89,8 +89,8 @@ const Settings: React.FC = () => {
     config: keyof AzimuthConfig,
     section: string = config
   ) => (
-    <Box display="flex" flexDirection="row" sx={{ m: 1, width: "20ch" }}>
-      <Typography textTransform="capitalize" variant="body2">
+    <Box display="flex" flexDirection="row">
+      <Typography textTransform="capitalize" variant="subtitle2">
         {section}
       </Typography>
       {switchNullOrDefault(config, Boolean(resultingConfig[config]))}
@@ -98,13 +98,11 @@ const Settings: React.FC = () => {
   );
 
   const displayPostprocessorToggleSection = (pipeline: PipelineDefinition) => (
-    <Box display="flex" flexDirection="row" sx={{ m: 1, width: "20ch" }}>
-      <Typography textTransform="capitalize" variant="subtitle2">
-        Postprocessors
-      </Typography>
+    <Box sx={{ m: 1, width: "20ch" }} display="flex" flexDirection="row">
+      <Typography variant="subtitle2">Postprocessors</Typography>
       <Checkbox
-        sx={{ paddingTop: 0 }}
         size="small"
+        sx={{ paddingTop: 0.5 }}
         checked={Boolean(pipeline.postprocessors)}
         disabled={isError || isFetching}
         onChange={(event) => {
@@ -116,7 +114,7 @@ const Settings: React.FC = () => {
                   ...pipeline,
                   postprocessors: event.target.checked
                     ? _.find(data?.pipelines, ["name", pipeline.name])
-                        ?.postprocessors
+                        ?.postprocessors ?? []
                     : null,
                 },
               ],
@@ -136,7 +134,7 @@ const Settings: React.FC = () => {
     selected: boolean
   ) => (
     <Checkbox
-      sx={{ paddingTop: 0 }}
+      sx={{ paddingTop: 0.5 }}
       size="small"
       checked={selected}
       disabled={isError || isFetching}
@@ -156,6 +154,15 @@ const Settings: React.FC = () => {
       sx={{
         m: 1,
         width: "32ch",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        "&:hover": {
+          whiteSpace: "normal",
+          overflow: "initial",
+          overflowWrap: "break-word",
+          wordWrap: "break-word",
+        },
       }}
       size="small"
       variant="standard"
@@ -168,7 +175,7 @@ const Settings: React.FC = () => {
       InputProps={{
         readOnly: true,
         disableUnderline: true,
-        style: { textTransform: "capitalize", fontSize: 14 },
+        style: { fontSize: 14 },
       }}
     />
   );
@@ -180,7 +187,19 @@ const Settings: React.FC = () => {
   ) => (
     <TextField
       id={field}
-      sx={{ m: 1, width: "16ch" }}
+      sx={{
+        m: 1,
+        width: "16ch",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        "&:hover": {
+          whiteSpace: "normal",
+          overflow: "initial",
+          overflowWrap: "break-word",
+          wordWrap: "break-word",
+        },
+      }}
       size="small"
       label={field}
       type="number"
@@ -193,7 +212,9 @@ const Settings: React.FC = () => {
           _.merge({}, partialConfig, {
             [config]: _.merge(
               { [field]: Number(event.target.value) },
-              config in partialConfig ? {} : _.get(resultingConfig, config)
+              config in partialConfig
+                ? _.get(partialConfig, config)
+                : _.get(resultingConfig, config)
             ),
           })
         )
@@ -209,7 +230,19 @@ const Settings: React.FC = () => {
   ) => (
     <TextField
       key={postprocessorIdx}
-      sx={{ m: 1, width: "16ch" }}
+      sx={{
+        m: 1,
+        width: "16ch",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        "&:hover": {
+          whiteSpace: "normal",
+          overflow: "initial",
+          overflowWrap: "break-word",
+          wordWrap: "break-word",
+        },
+      }}
       size="small"
       label={field}
       type="number"
@@ -277,23 +310,22 @@ const Settings: React.FC = () => {
   };
 
   const getProjectConfigSection = () => (
-    <Box display="flex" flexDirection="column">
-      {displaySectionTitle("General")}
+    <Box display="flex" flexDirection="column" justifyContent="flex-start">
+      {displaySectionTitle("general")}
       <Box
         display="flex"
         flexDirection="row"
         justifyContent="flex-start"
         marginLeft={2}
+        gap={5}
       >
         {displayReadonlyFields("name", resultingConfig.name)}
         {displayReadonlyFields(
           "rejection class",
           resultingConfig.rejection_class
         )}
-        <Box display="flex" flexDirection="column">
-          <Typography textTransform="capitalize" variant="caption">
-            Columns
-          </Typography>
+        <Box display="flex" flexDirection="column" paddingTop={1}>
+          <Typography variant="caption">columns</Typography>
           <Typography variant="body2">
             text_input: {resultingConfig.columns?.text_input}
           </Typography>
@@ -303,12 +335,13 @@ const Settings: React.FC = () => {
         </Box>
       </Box>
       {divider}
-      {displaySectionTitle("Dataset")}
+      {displaySectionTitle("dataset")}
       <Box
         display="flex"
         flexDirection="row"
         justifyContent="flex-start"
         marginLeft={2}
+        gap={5}
       >
         {displayReadonlyFields(
           "class name",
@@ -316,21 +349,36 @@ const Settings: React.FC = () => {
         )}
         {displayReadonlyFields("remote", resultingConfig.dataset?.remote)}
         {resultingConfig.dataset?.kwargs && (
-          <Box display="flex" flexDirection="column" marginLeft={1}>
-            <Typography textTransform="capitalize" variant="caption">
-              kwargs
-            </Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            paddingTop={1}
+            sx={{
+              m: 1,
+              width: "32ch",
+            }}
+          >
+            <Typography variant="caption">kwargs</Typography>
             {Object.entries(resultingConfig.dataset?.kwargs).map(
               ([field, value], index) => (
-                <Box
+                <Typography
                   key={index}
-                  gap={(theme) => theme.spacing(1)}
-                  marginLeft={1}
+                  variant="body2"
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    "&:hover": {
+                      whiteSpace: "normal",
+                      overflow: "initial",
+                      overflowWrap: "break-word",
+                      wordWrap: "break-word",
+                    },
+                  }}
                 >
-                  <Typography variant="body2">
-                    {field}: {value}
-                  </Typography>
-                </Box>
+                  {field}: {value}
+                  {value}
+                </Typography>
               )
             )}
           </Box>
@@ -343,15 +391,23 @@ const Settings: React.FC = () => {
               </Typography>
               {Object.entries(resultingConfig.dataset?.args).map(
                 ([field, value], index) => (
-                  <Box
+                  <Typography
                     key={index}
-                    gap={(theme) => theme.spacing(1)}
-                    marginLeft={1}
+                    variant="body2"
+                    sx={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      "&:hover": {
+                        whiteSpace: "normal",
+                        overflow: "initial",
+                        overflowWrap: "break-word",
+                        wordWrap: "break-word",
+                      },
+                    }}
                   >
-                    <Typography variant="body2">
-                      {field}: {value}
-                    </Typography>
-                  </Box>
+                    {field}: {value}
+                  </Typography>
                 )
               )}
             </Box>
@@ -361,7 +417,7 @@ const Settings: React.FC = () => {
   );
   const getModalContractConfigSection = () => (
     <Box display="flex" flexDirection="column">
-      {displaySectionTitle("General")}
+      {displaySectionTitle("general")}
       <Box
         display="flex"
         flexDirection="row"
@@ -433,32 +489,11 @@ const Settings: React.FC = () => {
         </Box>
       </Box>
       {divider}
-      <Box display="flex" flexDirection="column" justifyContent="flex-start">
-        {displaySectionTitle("metrics")}
-        {CUSTOM_METRICS.map((metricName, index) => (
-          <FormControlLabel
-            key={index}
-            sx={{ marginLeft: 2 }}
-            control={
-              <Checkbox
-                size="small"
-                checked={Boolean(resultingConfig.metrics?.[metricName])}
-                color="primary"
-                onChange={(e) =>
-                  handleCustomMetricUpdate(e.target.checked, metricName)
-                }
-              />
-            }
-            label={metricName}
-          />
-        ))}
-      </Box>
-      {divider}
-      {displaySectionTitle("Pipelines")}
+      {displaySectionTitle("pipelines")}
       {resultingConfig.pipelines &&
         _.sortBy(resultingConfig.pipelines, "name").map(
           ({ name, model, postprocessors }, pipelineIndex) => (
-            <>
+            <div key={pipelineIndex}>
               {displaySectionTitle(name)}
               <Box
                 key={pipelineIndex}
@@ -468,7 +503,7 @@ const Settings: React.FC = () => {
                 margin={1}
                 border="1px solid rgba(0, 0, 0, 0.12)"
               >
-                {displaySectionTitle("Model")}
+                {displaySectionTitle("model")}
                 <Box
                   display="flex"
                   flexDirection="row"
@@ -485,15 +520,25 @@ const Settings: React.FC = () => {
                       </Typography>
                       {Object.entries(model.kwargs).map(
                         ([field, value], index) => (
-                          <Box
+                          <Typography
                             key={index}
-                            gap={(theme) => theme.spacing(1)}
-                            marginLeft={1}
+                            variant="body2"
+                            sx={{
+                              m: 1,
+                              width: "32ch",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              "&:hover": {
+                                whiteSpace: "normal",
+                                overflow: "initial",
+                                overflowWrap: "break-word",
+                                wordWrap: "break-word",
+                              },
+                            }}
                           >
-                            <Typography variant="body2">
-                              {field}: {value}
-                            </Typography>
-                          </Box>
+                            {field}: {value}
+                          </Typography>
                         )
                       )}
                     </Box>
@@ -505,15 +550,25 @@ const Settings: React.FC = () => {
                       </Typography>
                       {Object.entries(model.args).map(
                         ([field, value], index) => (
-                          <Box
+                          <Typography
                             key={index}
-                            gap={(theme) => theme.spacing(1)}
-                            marginLeft={1}
+                            variant="body2"
+                            sx={{
+                              m: 1,
+                              width: "32ch",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              "&:hover": {
+                                whiteSpace: "normal",
+                                overflow: "initial",
+                                overflowWrap: "break-word",
+                                wordWrap: "break-word",
+                              },
+                            }}
                           >
-                            <Typography variant="body2">
-                              {field}: {value}
-                            </Typography>
-                          </Box>
+                            {field}: {value}
+                          </Typography>
                         )
                       )}
                     </Box>
@@ -569,9 +624,29 @@ const Settings: React.FC = () => {
                   </Box>
                 </Box>
               </Box>
-            </>
+            </div>
           )
         )}
+      <Box display="flex" flexDirection="column" justifyContent="flex-start">
+        {displaySectionTitle("metrics")}
+        {CUSTOM_METRICS.map((metricName, index) => (
+          <FormControlLabel
+            key={index}
+            sx={{ marginLeft: 2 }}
+            control={
+              <Checkbox
+                size="small"
+                checked={Boolean(resultingConfig.metrics?.[metricName])}
+                color="primary"
+                onChange={(e) =>
+                  handleCustomMetricUpdate(e.target.checked, metricName)
+                }
+              />
+            }
+            label={<Typography variant="body2">{metricName}</Typography>}
+          />
+        ))}
+      </Box>
     </Box>
   );
 
@@ -683,10 +758,9 @@ const Settings: React.FC = () => {
                   marginRight: 0.5,
                 }}
               />
-              Warning!. These changes may trigger some time-consuming
-              computations.
+              Warning! These changes may trigger some time-consuming
               <br />
-              Azimuth will not be usable until they complete.
+              computations. Azimuth will not be usable until they complete.
             </FormHelperText>
           )}
           <Button

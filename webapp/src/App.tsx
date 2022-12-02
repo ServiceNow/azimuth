@@ -85,7 +85,7 @@ export default class App extends React.Component<Props> {
                               </BasicLayout>
                             </Route>
                             <Route path="/:jobId/settings" exact>
-                              <BasicLayout>
+                              <BasicLayout maxWidth="md">
                                 <Settings />
                               </BasicLayout>
                             </Route>
