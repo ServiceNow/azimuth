@@ -38,10 +38,11 @@ const Metric: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const tooltip = description
-    .trim()
-    .split("\n")
-    .map((paragraph) => <Typography variant="inherit">{paragraph}</Typography>);
+  const tooltip = (
+    <Typography variant="inherit" whiteSpace="pre-wrap">
+      {description.trim()}
+    </Typography>
+  );
 
   return (
     <Box display="flex" justifyContent="flex-end">
