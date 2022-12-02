@@ -3,25 +3,16 @@ import { fireEvent, screen } from "@testing-library/react";
 import AccordionLayout from "components/AccordionLayout";
 import { renderWithTheme } from "mocks/utils";
 
-type Props = {
-  name: string;
-  description: string;
-  link: string;
-  children: React.ReactNode;
-};
-
-const renderAccordionLayout = (accordionLayout: Props) =>
-  renderWithTheme(<AccordionLayout {...accordionLayout} />);
-
 describe("AccordionLayout", () => {
-  it("should display name, description and description component on the accordian layout", () => {
-    renderAccordionLayout({
+  it("should display name, description and description component on the accordion layout", () => {
+    const props = {
       name: "Project Config",
       description:
         "Contains mandatory fields that specify the dataset to load in Azimuth",
       link: "reference/configuration/project/",
       children: <Typography>Project Config Section</Typography>,
-    });
+    };
+    renderWithTheme(<AccordionLayout {...props} />);
     expect(screen.getByText("Project Config")).toBeVisible();
     expect(
       screen.getByText(

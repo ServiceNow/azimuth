@@ -28,6 +28,7 @@ const AccordionLayout: React.FC<Props> = ({
       <AccordionSummary expandIcon={<ExpandMoreIcon />} id={name}>
         <Typography
           variant="body1"
+          fontWeight="bold"
           sx={{
             width: "15%",
             flexShrink: 0,
