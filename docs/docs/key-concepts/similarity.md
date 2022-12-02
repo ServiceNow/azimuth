@@ -83,7 +83,7 @@ To approximate this probability, we make use of the
 [`spectral-metric`](https://github.com/Dref360/spectral-metric) package
 ([Branchaud-Charron, 2019](https://arxiv.org/abs/1905.07299)[^2]). The probability of a sample
 being in a specified class is determined based on the representation of this class in the
-sample's 20 nearest neighbors, as well as the hypervolume containing these neighbors (Parzen
+sample's 5 nearest neighbors, as well as the hypervolume containing these neighbors (Parzen
 window). Class overlap for the *C<sub>i</sub>* with the *C<sub>j</sub>* is calculated as the mean
 probability across all samples in *C<sub>i</sub>*. The similarity matrix *S* from `spectral-metric`
 contains these probabilities for all class pairs. Note that probabilities are normalized by the
@@ -93,7 +93,7 @@ source class, to sum to 1.
 
 Individual samples from a source class are determined to have overlap with a target class when
 their probability of being in the target class is greater than 0, which is the same as saying
-that at least one of their 20 nearest neighbors are from the target class. This is a
+that at least one of their 5 nearest neighbors are from the target class. This is a
 conservative metric, on which we anticipate iterating in the future.
 
 
