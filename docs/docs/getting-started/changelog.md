@@ -1,5 +1,21 @@
 # Releases
 
+## [2.5.0] - 2022-12-05
+
+### Added
+- **Support for french**: Azimuth now works on French datasets (and pipelines)! Language can be selected in the config, and language-specific defaults for syntax-tagging and behavioral tests (neutral tokens) will be set dynamically (or can be altered manually). [See Reference](../reference/configuration/language.md).
+- **Class Overlap**: New class analysis section, with class overlap detection. More details are available in the [User Guide](../user-guide/class-overlap.md) and in the [Key Concepts](../key-concepts/similarity.md).
+- **Pre/Post-processing Steps**: The details of the pipeline pre/post-processing steps are now visible in the utterance details page.
+- **Accuracy metric**: Accuracy was added as a default metric.
+
+### Changed
+- The default port for the front end will now be 3000, the React default, instead of 3005.
+
+### Fixed
+- ONNX models on GPU.
+- Preserve white spaces in utterances. That includes `\n`s, `\t`s, and consecutive spaces.
+- Fix predictions with 100% confidence not showing up in the confidence histogram and in the ECE.
+
 ## [2.4.1] - 2022-10-21
 
 ### Fixed
