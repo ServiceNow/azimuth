@@ -95,7 +95,7 @@ const Dashboard = () => {
           description={
             <Description
               text="Assess semantic overlap between class pairs and compare to pipeline confusion."
-              link="/class-analysis/"
+              link="/class-overlap/"
             />
           }
         >

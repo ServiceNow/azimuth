@@ -71,8 +71,7 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           flex: 1,
           field: "sourceClass",
           headerName: "Source Class",
-          description:
-            "The class label of the samples being analyzed.",
+          description: "The class label of the samples being analyzed.",
         },
         {
           flex: 1,

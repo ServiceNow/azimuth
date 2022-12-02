@@ -61,7 +61,7 @@ const ClassOverlap = () => {
         {
           <Description
             text="Assess semantic overlap between class pairs."
-            link="/class-analysis/"
+            link="/class-overlap/"
           />
         }
       </Box>
@@ -97,7 +97,7 @@ const ClassOverlap = () => {
               text={
                 "Assess magnitude of overlap and select class pairs to explore further. For suggested workflow:"
               }
-              link="/class-analysis/"
+              link="/class-overlap/"
             />
             <Typography variant="body2" marginTop={0.25}>
               Flows between class nodes indicate whether a source class's
