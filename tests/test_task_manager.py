@@ -6,7 +6,8 @@ import time
 
 import pytest
 
-from azimuth.modules.base_classes import Module
+from azimuth.config import SyntaxConfig
+from azimuth.modules.base_classes import AggregationModule, FilterableModule, Module
 from azimuth.task_manager import TaskManager, TaskManagerLockedException
 from azimuth.types import (
     DatasetSplitName,
@@ -14,7 +15,6 @@ from azimuth.types import (
     SupportedMethod,
     SupportedModule,
 )
-from tests.utils import generate_mocked_dm
 
 
 def test_get_all_task(tiny_text_task_manager):
@@ -88,57 +88,68 @@ def test_clearing_cache(tiny_text_config):
 
 def test_expired_task(tiny_text_task_manager, tiny_text_config):
     # Generating fake dm so modules don't fail because of missing columns.
-    generate_mocked_dm(tiny_text_config)
+    class ExpirableModule(FilterableModule[SyntaxConfig]):
+        def compute(self, batch):
+            return ["ExpirableModule"]
+
+    class NotExpirableModule(AggregationModule[SyntaxConfig]):
+        def compute(self, batch):
+            return ["NotExpirableModule"]
+
     current_update = time.time()
-    pipeline_index_option = ModuleOptions(pipeline_index=0)
-    _, pred_task = tiny_text_task_manager.get_task(
-        SupportedMethod.Predictions,
+    mod_option = ModuleOptions()
+
+    tiny_text_task_manager.register_task("ExpirableModule", ExpirableModule)
+    tiny_text_task_manager.register_task("NotExpirableModule", NotExpirableModule)
+
+    _, not_expirable_task = tiny_text_task_manager.get_task(
+        "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=pipeline_index_option,
+        mod_options=mod_option,
     )
     # Get an expirable task
-    _, confusion_matrix_task = tiny_text_task_manager.get_task(
-        SupportedModule.ConfusionMatrix,
+    _, expirable_task = tiny_text_task_manager.get_task(
+        "NotExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=pipeline_index_option,
+        mod_options=mod_option,
         last_update=current_update,
     )
-    assert not pred_task.done() and not confusion_matrix_task.done()
-    _ = confusion_matrix_task.wait(), pred_task.wait()
+    assert not not_expirable_task.done() and not expirable_task.done()
+    _ = expirable_task.wait(), not_expirable_task.wait()
 
     # If we don't change the time, the task are cached
-    _, pred_task = tiny_text_task_manager.get_task(
-        SupportedMethod.Predictions,
+    _, not_expirable_task = tiny_text_task_manager.get_task(
+        "NotExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=pipeline_index_option,
+        mod_options=mod_option,
     )
     # Get an expirable task
-    _, confusion_matrix_task = tiny_text_task_manager.get_task(
-        SupportedModule.ConfusionMatrix,
+    _, expirable_task = tiny_text_task_manager.get_task(
+        "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=pipeline_index_option,
+        mod_options=mod_option,
         last_update=current_update,
     )
-    assert pred_task.done() and confusion_matrix_task.done()
+    assert not_expirable_task.done() and expirable_task.done()
 
-    # If we update the dataset_split, confusion matrix task will be recomputed
+    # If we update the dataset_split, the expirable task will be recomputed
     current_update = time.time()
-    _, pred_task = tiny_text_task_manager.get_task(
-        SupportedMethod.Predictions,
+    _, not_expirable_task = tiny_text_task_manager.get_task(
+        "NotExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=pipeline_index_option,
+        mod_options=mod_option,
     )
     # Get an expirable task
-    _, confusion_matrix_task = tiny_text_task_manager.get_task(
-        SupportedModule.ConfusionMatrix,
+    _, expirable_task = tiny_text_task_manager.get_task(
+        "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=pipeline_index_option,
+        mod_options=mod_option,
         last_update=current_update,
     )
-    assert pred_task.done() and not confusion_matrix_task.done()
+    assert not_expirable_task.done() and not expirable_task.done()
 
 
 def test_lock(tiny_text_task_manager):
