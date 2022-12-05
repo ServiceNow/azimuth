@@ -92,7 +92,7 @@ running a demo.
        make CFG_PATH=/config/development/clinc/conf.json launch
        ```
 
-3. The **app will be accessible** at [http://0.0.0.0:8080](http://0.0.0.0:8080) after a few minutes
+3. The **app will be accessible** at [http://localhost:8080](http://localhost:8080) after a few minutes
    of waiting. The screen will indicate that the start-up tasks have started. When it is completed,
    the application will be loaded.
 4. Skim the [:material-link: Key Concepts](../key-concepts/index.md) section to get a high-level

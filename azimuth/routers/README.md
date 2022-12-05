@@ -16,4 +16,4 @@ api_router.include_router(
 ```
 
 You can now test your application by running `poetry run python runner.py $CFG_PATH --debug`.
-The swagger will be up at `0.0.0.0:8091/docs` and you can test your route.
+The swagger will be up at `localhost:8091/docs` and you can test your route.
