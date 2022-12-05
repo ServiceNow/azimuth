@@ -121,7 +121,7 @@ const Exploration = () => {
                   <>
                     <Description
                       text="Analyze metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
-                      link="/exploration-space/performance-overview/"
+                      link="/exploration-space/prediction-overview/"
                     />
                     <Metrics
                       jobId={jobId}
