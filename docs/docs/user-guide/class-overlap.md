@@ -42,13 +42,13 @@ navigate them, we suggest the following workflow:
 #### 1. Default view: `Self-overlap` off, `Scale by class size` on
 
 - Start here. This view shows you the class pairs with the greatest (scaled) semantic overlap
-  scores in the dataset. Vary the minimum displayed overlap value to see all dataset overlap or
+  scores in the dataset. Vary the `Minimum displayed overlap value` to see all dataset overlap or
   to focus on the class pairs with the greatest overlap scores.
 - Because `Scale by class size` is on, this view will emphasize overlapping classes with greater
   sample counts. This is useful if you are less concerned about class overlap from
   source classes with few samples in the training data. However, if you want to further investigate
   classes with high overlap values but fewer samples, either for better understanding your dataset
-  or because some classes might have high business value, then you can toggle `Scale By Class Size`
+  or because some classes might have high business value, then you can toggle `Scale by class size`
   to off, as explained in step 2.
 
 #### 2. Toggle `Scale by class size` off:
