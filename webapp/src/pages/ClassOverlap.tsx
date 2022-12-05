@@ -56,7 +56,10 @@ const ClassOverlap = () => {
   );
 
   const commitOverlapThreshold = useDebounced(
-    (overlapThreshold: number | undefined) => setQuery({ overlapThreshold })
+    React.useCallback(
+      (overlapThreshold: number | undefined) => setQuery({ overlapThreshold }),
+      [setQuery]
+    )
   );
 
   const checkValid = data?.plot.data[0].node.x.length > 0;
