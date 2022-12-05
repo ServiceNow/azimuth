@@ -243,6 +243,7 @@ def get_utterances(
             model_prediction=model_prediction,
             model_saliency=model_saliency,
             # Smart tags families
+            # type: ignore[call-arg]  # TODO Remove once we update pydantic and mypy
             **{
                 family.value: [t for t in tags_in_family if tag[t]]
                 if family in available_families

@@ -154,7 +154,13 @@ class MetricsModule(FilterableModule[ModelContractConfig]):
         metrics_res = res[0]
         plot_args = metrics_res.ece_plot_args
         fig = plot_args and json.loads(make_ece_figure(*plot_args).to_json())
-        res_with_plot = MetricsAPIResponse(**metrics_res.dict(), ece_plot=fig)
+        res_with_plot = MetricsAPIResponse(
+            outcome_count=metrics_res.outcome_count,
+            utterance_count=metrics_res.utterance_count,
+            custom_metrics=metrics_res.custom_metrics,
+            ece=metrics_res.ece,
+            ece_plot=fig,
+        )
         return [res_with_plot]
 
     def make_probabilities(self) -> np.ndarray:
@@ -196,11 +202,19 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
         accumulator = []
         for filter_value, filters in filters_dict.items():
             ds_filtered = filter_dataset_split(ds, filters, config=self.config)
-            metric = MetricsModule(
+            metrics = MetricsModule(
                 dataset_split_name=self.dataset_split_name,
                 config=self.config,
             ).compute_metrics(ds_filtered)[0]
-            accumulator.append(MetricsPerFilterValue(**metric.dict(), filter_value=filter_value))
+            accumulator.append(
+                MetricsPerFilterValue(
+                    outcome_count=metrics.outcome_count,
+                    utterance_count=metrics.utterance_count,
+                    custom_metrics=metrics.custom_metrics,
+                    ece=metrics.ece,
+                    filter_value=filter_value,
+                )
+            )
         return accumulator
 
     def compute_on_dataset_split(self) -> List[MetricsPerFilterModuleResponse]:  # type: ignore

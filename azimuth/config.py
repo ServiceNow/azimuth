@@ -77,8 +77,8 @@ class AzimuthValidationError(Exception):
 # Mypy does not like a variable named kwargs.
 class CustomObject(BaseModel):  # type: ignore
     class_name: str = Field(..., title="Class name to load.")
-    args: List[Union["CustomObject", Any]] = []
-    kwargs: Dict[str, Union["CustomObject", Any]] = {}
+    args: List[Any] = []
+    kwargs: Dict[str, Any] = {}
     remote: Optional[str] = Field(
         None,
         description="Relative path to class. `class_name` needs to be accessible from this path.",
@@ -371,8 +371,8 @@ class AzimuthConfig(
     LanguageConfig,
     extra=Extra.forbid,
 ):
-    # Before adding attributes: Remember that dependence on an attribute in AzimuthConfig will
-    # force a module to include all other configs in its scope.
+    # Reminder: If a module depends on an attribute in AzimuthConfig, the module will be forced to
+    # include all other configs in its scope.
 
     @root_validator()
     def dynamic_language_config_values(cls, values):

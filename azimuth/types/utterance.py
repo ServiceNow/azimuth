@@ -37,7 +37,7 @@ class ModelSaliency(AliasModel):
     saliencies: List[float] = Field(..., title="Saliency")
 
 
-class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str]):
+class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str], AliasModel):
     index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
     model_prediction: Optional[ModelPrediction] = Field(
         ..., title="Model prediction", nullable=True

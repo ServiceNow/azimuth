@@ -60,7 +60,10 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
         if len(ds) > 0:
             # Get the bin index for each prediction.
             confidences = np.max(get_confidences_from_ds(ds, without_postprocessing), axis=1)
-            bin_indices = np.floor(confidences * CONFIDENCE_BINS_COUNT)
+            bin_indices = np.minimum(
+                np.floor(confidences * CONFIDENCE_BINS_COUNT),
+                CONFIDENCE_BINS_COUNT - 1,  # So that 100% falls in the last bin
+            )
 
             # Create the records. We drop the last bin as it's the maximum.
             result = []

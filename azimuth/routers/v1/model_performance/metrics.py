@@ -89,7 +89,7 @@ def get_metrics_per_filter(
         last_update=dataset_split_manager.last_update,
     )[0]
 
-    metrics_result: MetricsPerFilterModuleResponse = get_standard_task_result(
+    metrics_result: MetricsModuleResponse = get_standard_task_result(
         SupportedModule.Metrics,
         dataset_split_name,
         task_manager,
@@ -99,7 +99,15 @@ def get_metrics_per_filter(
 
     api_result = MetricsPerFilterAPIResponse(
         **metrics_per_filter_result.dict(),
-        metrics_overall=[MetricsPerFilterValue(**metrics_result.dict(), filter_value="overall")]
+        metrics_overall=[
+            MetricsPerFilterValue(
+                outcome_count=metrics_result.outcome_count,
+                utterance_count=metrics_result.utterance_count,
+                custom_metrics=metrics_result.custom_metrics,
+                ece=metrics_result.ece,
+                filter_value="overall",
+            )
+        ]
     )
 
     return api_result

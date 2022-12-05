@@ -12,6 +12,7 @@ from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKe
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName
 from azimuth.types.tag import (
+    ALL_DATA_ACTIONS,
     DataAction,
     DataActionMapping,
     DataActionResponse,
@@ -60,4 +61,9 @@ def post_data_actions(
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=e.args[0])
     task_manager.clear_worker_cache()
     updated_tags = dataset.get_tags(list(request_data.data_actions.keys()), table_key=table_key)
-    return DataActionResponse(data_actions=[DataActionMapping(**x) for x in updated_tags])
+    return DataActionResponse(
+        data_actions=[
+            DataActionMapping(**{data_action: x[data_action] for data_action in ALL_DATA_ACTIONS})
+            for x in updated_tags
+        ]
+    )

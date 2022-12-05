@@ -106,6 +106,7 @@ filter_files = true
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 python_version = 3.8
+show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true

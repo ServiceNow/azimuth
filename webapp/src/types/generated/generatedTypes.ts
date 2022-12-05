@@ -212,12 +212,8 @@ export interface components {
     };
     CustomObject: {
       class_name: string;
-      args?: (Partial<components["schemas"]["CustomObject"]> &
-        Partial<{ [key: string]: any }>)[];
-      kwargs?: {
-        [key: string]: Partial<components["schemas"]["CustomObject"]> &
-          Partial<{ [key: string]: any }>;
-      };
+      args?: { [key: string]: any }[];
+      kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
     };
@@ -343,12 +339,8 @@ export interface components {
     };
     MetricDefinition: {
       class_name: string;
-      args?: (Partial<components["schemas"]["CustomObject"]> &
-        Partial<{ [key: string]: any }>)[];
-      kwargs?: {
-        [key: string]: Partial<components["schemas"]["CustomObject"]> &
-          Partial<{ [key: string]: any }>;
-      };
+      args?: { [key: string]: any }[];
+      kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       /** Keyword arguments supplied to `compute`. */
@@ -714,12 +706,8 @@ export interface components {
      */
     TemperatureScaling: {
       class_name?: "azimuth.utils.ml.postprocessing.TemperatureScaling";
-      args?: (Partial<components["schemas"]["CustomObject"]> &
-        Partial<{ [key: string]: any }>)[];
-      kwargs?: {
-        [key: string]: Partial<components["schemas"]["CustomObject"]> &
-          Partial<{ [key: string]: any }>;
-      };
+      args?: { [key: string]: any }[];
+      kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       temperature?: number;
@@ -732,12 +720,8 @@ export interface components {
      */
     ThresholdConfig: {
       class_name?: "azimuth.utils.ml.postprocessing.Thresholding";
-      args?: (Partial<components["schemas"]["CustomObject"]> &
-        Partial<{ [key: string]: any }>)[];
-      kwargs?: {
-        [key: string]: Partial<components["schemas"]["CustomObject"]> &
-          Partial<{ [key: string]: any }>;
-      };
+      args?: { [key: string]: any }[];
+      kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
       remote?: string;
       threshold?: number;
