@@ -3,8 +3,8 @@ import { components } from "types/generated/generatedTypes";
 export type AzimuthConfig = components["schemas"]["AzimuthConfig"];
 export type AvailableDatasetSplits =
   components["schemas"]["AvailableDatasetSplits"];
-export type ClassAnalysisClassPair =
-  components["schemas"]["ClassAnalysisClassPair"];
+export type ClassOverlapTableClassPair =
+  components["schemas"]["ClassOverlapTableClassPair"];
 export type ConfidenceBinDetails =
   components["schemas"]["ConfidenceBinDetails"];
 export type ConfidenceHistogramResponse =

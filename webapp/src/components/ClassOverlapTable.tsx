@@ -2,20 +2,20 @@ import React from "react";
 import { Box } from "@mui/material";
 import { GridValueFormatterParams, GridCellParams } from "@mui/x-data-grid";
 import { QueryPipelineState } from "types/models";
-import { getClassAnalysisEndpoint } from "services/api";
+import { getClassOverlapEndpoint } from "services/api";
 import { formatRatioAsPercentageString } from "utils/format";
 import SeeMoreLess, {
   INITIAL_NUMBER_VISIBLE,
   useMoreLess,
 } from "components/SeeMoreLess";
 import { Table } from "./Table";
-import { ClassAnalysisClassPair } from "types/api";
+import { ClassOverlapTableClassPair } from "types/api";
 import { isPipelineSelected } from "utils/helpers";
 
 const ROW_HEIGHT = 35;
 const FOOTER_HEIGHT = 40;
 
-type Row = ClassAnalysisClassPair & { id: number };
+type Row = ClassOverlapTableClassPair & { id: number };
 type Props = {
   jobId: string;
   pipeline: QueryPipelineState;
@@ -23,8 +23,8 @@ type Props = {
 const twoDigitFormatter = ({ value }: GridValueFormatterParams) =>
   isNaN(value as number) ? "--" : (value as number).toFixed(2);
 
-const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
-  const { data, isFetching, error } = getClassAnalysisEndpoint.useQuery({
+const ClassOverlapTable: React.FC<Props> = ({ jobId, pipeline }) => {
+  const { data, isFetching, error } = getClassOverlapEndpoint.useQuery({
     jobId,
     ...pipeline,
   });
@@ -71,18 +71,22 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           flex: 1,
           field: "sourceClass",
           headerName: "Source Class",
+          description: "The class label of the samples being analyzed.",
         },
         {
           flex: 1,
           field: "targetClass",
           headerName: "Target Class",
+          description:
+            "The class that the source class may look like. For pipeline confusion, this is the prediction.",
         },
         {
           flex: 1,
           type: "number",
           field: "overlapScoreTrain",
-          headerName: "Overlap Score",
-          description: "Normalized overlap score (training set)",
+          headerName: "Semantic Overlap Score",
+          description:
+            "Class overlap measures the extent to which source class samples are semantically similar to target class samples, in the training data. The score comes from both the proportion of samples and their degree of similarity.",
           valueFormatter: twoDigitFormatter,
         },
         {
@@ -90,7 +94,8 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           type: "number",
           field: "pipelineConfusionEval",
           headerName: "Pipeline Confusion",
-          description: "Confusion value (evaluation set)",
+          description:
+            "Pipeline confusion indicates whether source class samples in the evaluation set are predicted to be in the target class.",
           valueGetter: ({ row }) =>
             (row.pipelineConfusionEval as number) /
             row.utteranceCountSourceEval,
@@ -102,8 +107,9 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
           flex: 1,
           type: "number",
           field: "utteranceCountWithOverlapTrain",
-          headerName: "Utterances with overlap",
-          description: "Source class utterances with overlap (training set)",
+          headerName: "Utterances with Overlap",
+          description:
+            "Percent of source class samples that semantically overlap the target class (all in the training set).",
           valueGetter: ({ row }) =>
             row.utteranceCountWithOverlapTrain / row.utteranceCountSourceTrain,
           renderCell: ({ value, row }: GridCellParams<number, Row>) =>
@@ -137,4 +143,4 @@ const ClassAnalysisTable: React.FC<Props> = ({ jobId, pipeline }) => {
   );
 };
 
-export default React.memo(ClassAnalysisTable);
+export default React.memo(ClassOverlapTable);
