@@ -1,20 +1,21 @@
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
-  Typography,
   Box,
-  Slider,
-  Paper,
-  Switch,
   FormControlLabel,
-  Tooltip,
   FormGroup,
   IconButton,
+  Paper,
+  Slider,
+  Switch,
   TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import Description from "components/Description";
 import Loading from "components/Loading";
 import { PlotWrapper } from "components/PlotWrapper";
+import useDebounced from "hooks/useDebounced";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useHistory, useParams } from "react-router-dom";
@@ -41,23 +42,29 @@ const ClassOverlap = () => {
     ...classOverlap,
   });
 
+  // Control overlap threshold with a `string` (and not with a `number`) so for
+  // example when hitting backspace after `0.01`, you get `0.0` (and not `0`).
   const [overlapThreshold, setOverlapThreshold] = React.useState(
-    classOverlap.overlapThreshold
+    classOverlap.overlapThreshold === undefined
+      ? undefined
+      : String(classOverlap.overlapThreshold)
   );
 
-  React.useEffect(
-    () => setOverlapThreshold(classOverlap.overlapThreshold),
-    [classOverlap.overlapThreshold]
+  const setQuery = React.useCallback(
+    (newClassOverlap: QueryClassOverlapState) =>
+      history.push(
+        `/${jobId}/class_analysis${constructSearchString({
+          ...pipeline,
+          ...classOverlap,
+          ...newClassOverlap,
+        })}`
+      ),
+    [history, jobId, pipeline, classOverlap]
   );
 
-  const setQuery = (newClassOverlap: QueryClassOverlapState) =>
-    history.push(
-      `/${jobId}/class_analysis${constructSearchString({
-        ...pipeline,
-        ...classOverlap,
-        ...newClassOverlap,
-      })}`
-    );
+  const commitOverlapThreshold = useDebounced(
+    (overlapThreshold: number | undefined) => setQuery({ overlapThreshold })
+  );
 
   const checkValid = data?.plot.data[0].node.x.length > 0;
 
@@ -187,15 +194,17 @@ const ClassOverlap = () => {
                     "& .MuiSlider-track": { border: "none" }, // compensate bug with track="inverted"
                   }}
                   {...OVERLAP_THRESHOLD_INPUT_PROPS}
-                  value={overlapThreshold ?? data.defaultOverlapThreshold}
+                  value={Number(
+                    overlapThreshold ?? data.defaultOverlapThreshold
+                  )}
                   onChange={(_, value) => {
-                    if (value !== overlapThreshold) {
-                      setOverlapThreshold(value as number);
+                    if (value !== Number(overlapThreshold)) {
+                      setOverlapThreshold(String(value));
                     }
                   }}
                   onChangeCommitted={(_, value) => {
                     if (value !== classOverlap?.overlapThreshold) {
-                      setQuery({ overlapThreshold: value as number });
+                      commitOverlapThreshold.now(value as number);
                     }
                   }}
                 />
@@ -204,8 +213,9 @@ const ClassOverlap = () => {
                   type="number"
                   value={overlapThreshold ?? data.defaultOverlapThreshold}
                   inputProps={OVERLAP_THRESHOLD_INPUT_PROPS}
-                  onChange={(event) => {
-                    setQuery({ overlapThreshold: Number(event.target.value) });
+                  onChange={({ target: { value } }) => {
+                    setOverlapThreshold(value);
+                    commitOverlapThreshold.debounce(Number(value));
                   }}
                 />
                 <Tooltip title="Reset threshold" arrow>
@@ -215,7 +225,8 @@ const ClassOverlap = () => {
                       color="secondary"
                       disabled={classOverlap.overlapThreshold === undefined}
                       onClick={() => {
-                        setQuery({ overlapThreshold: undefined });
+                        setOverlapThreshold(undefined);
+                        commitOverlapThreshold.now(undefined);
                       }}
                     >
                       <RestartAltIcon fontSize="large" />
