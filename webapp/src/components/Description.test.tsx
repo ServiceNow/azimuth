@@ -3,13 +3,13 @@ import Description from "components/Description";
 import { renderWithTheme } from "mocks/utils";
 
 describe("Description", () => {
-  test("display description with just text", async () => {
+  it("should display description with text only", async () => {
     renderWithTheme(<Description text="test description" />);
 
     screen.getByText("test description");
   });
 
-  test("display description with both link and text", async () => {
+  it("should display description with both link and text", async () => {
     renderWithTheme(
       <Description
         text="test description"

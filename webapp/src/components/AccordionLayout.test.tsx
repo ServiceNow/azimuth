@@ -8,7 +8,7 @@ describe("AccordionLayout", () => {
     const props = {
       name: "Project Config",
       description:
-        "Contains mandatory fields that specify the dataset to load in Azimuth",
+        "contains mandatory fields that specify the dataset to load in Azimuth",
       link: "reference/configuration/project/",
       children: <Typography>Project Config Section</Typography>,
     };
@@ -16,7 +16,7 @@ describe("AccordionLayout", () => {
     expect(screen.getByText("Project Config")).toBeVisible();
     expect(
       screen.getByText(
-        "Contains mandatory fields that specify the dataset to load in Azimuth"
+        "contains mandatory fields that specify the dataset to load in Azimuth"
       )
     ).toBeVisible();
     const link: HTMLAnchorElement = screen.getByRole("link");

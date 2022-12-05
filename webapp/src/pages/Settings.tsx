@@ -19,8 +19,7 @@ import { useParams } from "react-router-dom";
 import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
 
-type stepper = { [key: string]: InputBaseComponentProps };
-const STEPPER: stepper = {
+const STEPPER: Record<string, InputBaseComponentProps> = {
   iterations: { min: 0, max: 100, step: 1 },
   high_epistemic_threshold: { min: 0, max: 1, step: 0.1 },
   conflicting_neighbors_threshold: { min: 0, max: 1, step: 0.1 },
@@ -99,21 +98,21 @@ const Settings: React.FC = () => {
   );
 
   const displayPostprocessorToggleSection = (pipeline: PipelineDefinition) => (
-    <Box sx={{ m: 1, width: "20ch" }} display="flex" flexDirection="row">
+    <Box display="flex" flexDirection="row" marginLeft={1}>
       <Typography variant="subtitle2">Postprocessors</Typography>
       <Checkbox
         size="small"
         sx={{ paddingTop: 0.5 }}
         checked={Boolean(pipeline.postprocessors)}
         disabled={isError || isFetching}
-        onChange={(event) => {
+        onChange={(...[, checked]) => {
           setPartialConfig({
             ...partialConfig,
             pipelines: _.unionBy(
               [
                 {
                   ...pipeline,
-                  postprocessors: event.target.checked
+                  postprocessors: checked
                     ? _.find(data?.pipelines, ["name", pipeline.name])
                         ?.postprocessors ?? []
                     : null,
@@ -139,12 +138,10 @@ const Settings: React.FC = () => {
       size="small"
       checked={selected}
       disabled={isError || isFetching}
-      onChange={(event) =>
+      onChange={(...[, checked]) =>
         setPartialConfig({
           ...partialConfig,
-          [field]: event.target.checked
-            ? data?.[field] ?? CONFIG_SUB_FIELDS[field]
-            : null,
+          [field]: checked ? data?.[field] ?? CONFIG_SUB_FIELDS[field] : null,
         })
       }
     />
@@ -166,32 +163,18 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displaySubFields = (
+  const displayNumberField = (
     config: keyof AzimuthConfig,
     field: string,
     value: number | undefined
   ) => (
     <TextField
       id={field}
-      sx={{
-        m: 1,
-        width: "16ch",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        "&:hover": {
-          whiteSpace: "normal",
-          overflow: "initial",
-          overflowWrap: "break-word",
-          wordWrap: "break-word",
-        },
-      }}
       size="small"
       label={<Typography fontWeight="bold">{field}</Typography>}
       type="number"
       value={value}
       disabled={!Boolean(resultingConfig[config])}
-      inputProps={(STEPPER[field], { "data-testid": `${field}` })}
       variant="standard"
       onChange={(event) =>
         setPartialConfig(
@@ -208,7 +191,7 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displayPostprocessorSubField = (
+  const displayPostprocessorNumberField = (
     pipeline: PipelineDefinition,
     field: string,
     postprocessorIdx: number,
@@ -218,16 +201,7 @@ const Settings: React.FC = () => {
       key={postprocessorIdx}
       sx={{
         m: 1,
-        width: "16ch",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        "&:hover": {
-          whiteSpace: "normal",
-          overflow: "initial",
-          overflowWrap: "break-word",
-          wordWrap: "break-word",
-        },
+        width: "15ch",
       }}
       size="small"
       label={<Typography fontWeight="bold">{field}</Typography>}
@@ -399,52 +373,51 @@ const Settings: React.FC = () => {
             )}
           </Box>
         )}
-        {resultingConfig.dataset?.args &&
-          resultingConfig.dataset.args.length > 0 && (
-            <Box display="flex" flexDirection="column" paddingTop={1}>
-              <Typography variant="caption">args</Typography>
-              {Object.entries(resultingConfig.dataset.args).map(
-                ([field, value], index) => (
-                  <Box
-                    key={index}
-                    display="flex"
-                    flexDirection="row"
-                    justifyContent="flex-start"
+        {resultingConfig.dataset?.args?.length && (
+          <Box display="flex" flexDirection="column" paddingTop={1}>
+            <Typography variant="caption">args</Typography>
+            {Object.entries(resultingConfig.dataset.args).map(
+              ([field, value], index) => (
+                <Box
+                  key={index}
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="flex-start"
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      s: 1,
+                      width: "100px",
+                      whiteSpace: "normal",
+                    }}
                   >
+                    {field}:
+                  </Typography>
+                  <Tooltip title={value} placement="bottom">
                     <Typography
                       variant="body2"
                       sx={{
                         s: 1,
                         width: "100px",
-                        whiteSpace: "normal",
+                        lineHeight: "initial",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
-                      {field}:
+                      {value}
                     </Typography>
-                    <Tooltip title={value} placement="bottom">
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          s: 1,
-                          width: "100px",
-                          lineHeight: "initial",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {value}
-                      </Typography>
-                    </Tooltip>
-                  </Box>
-                )
-              )}
-            </Box>
-          )}
+                  </Tooltip>
+                </Box>
+              )
+            )}
+          </Box>
+        )}
       </Box>
     </Box>
   );
-  const getModalContractConfigSection = () => (
+  const getModelContractConfigSection = () => (
     <Box display="flex" flexDirection="column" justifyContent="flex-start">
       {displaySectionTitle("general")}
       <Box
@@ -587,7 +560,7 @@ const Settings: React.FC = () => {
                     )}
                   </Box>
                 )}
-                {model.args && model.args.length > 0 && (
+                {model?.args?.length && (
                   <Box display="flex" flexDirection="column" paddingTop={1}>
                     <Typography variant="caption">args</Typography>
                     {Object.entries(model.args).map(([field, value], index) => (
@@ -628,54 +601,52 @@ const Settings: React.FC = () => {
                   </Box>
                 )}
               </Box>
-              <Box display="flex" flexDirection="column" marginBottom={2}>
-                {displayPostprocessorToggleSection({
-                  name,
-                  model,
-                  postprocessors,
-                })}
-                <Box
-                  key={pipelineIndex}
-                  display="flex"
-                  flexDirection="column"
-                  gap={1}
-                  marginLeft={2}
-                >
-                  {postprocessors &&
-                    _.sortBy(postprocessors, "class_name").map(
-                      (postprocessor, index) => (
-                        <Box
-                          key={index}
-                          display="flex"
-                          flexDirection="row"
-                          justifyContent="flex-start"
-                          gap={5}
-                          padding={1}
-                          marginX={2}
-                          border="1px solid rgba(0, 0, 0, 0.12)"
-                        >
-                          {displayReadonlyFields(
-                            "class_name",
-                            postprocessor.class_name
+              {displayPostprocessorToggleSection({
+                name,
+                model,
+                postprocessors,
+              })}
+              <Box
+                key={pipelineIndex}
+                display="flex"
+                flexDirection="column"
+                gap={1}
+                margin={2}
+              >
+                {postprocessors &&
+                  _.sortBy(postprocessors, "class_name").map(
+                    (postprocessor, index) => (
+                      <Box
+                        key={index}
+                        display="flex"
+                        flexDirection="row"
+                        justifyContent="flex-start"
+                        gap={2}
+                        padding={1}
+                        marginX={2}
+                        border="1px solid rgba(0, 0, 0, 0.12)"
+                      >
+                        {displayReadonlyFields(
+                          "class_name",
+                          postprocessor.class_name
+                        )}
+                        {postprocessor.temperature &&
+                          displayPostprocessorNumberField(
+                            { name, model, postprocessors },
+                            "temperature",
+                            index,
+                            postprocessor.temperature
                           )}
-                          {postprocessor.temperature &&
-                            displayPostprocessorSubField(
-                              { name, model, postprocessors },
-                              "temperature",
-                              index,
-                              postprocessor.temperature
-                            )}
-                          {postprocessor.threshold &&
-                            displayPostprocessorSubField(
-                              { name, model, postprocessors },
-                              "threshold",
-                              index,
-                              postprocessor.threshold
-                            )}
-                        </Box>
-                      )
-                    )}
-                </Box>
+                        {postprocessor.threshold &&
+                          displayPostprocessorNumberField(
+                            { name, model, postprocessors },
+                            "threshold",
+                            index,
+                            postprocessor.threshold
+                          )}
+                      </Box>
+                    )
+                  )}
               </Box>
             </Box>
           )
@@ -719,7 +690,15 @@ const Settings: React.FC = () => {
                   customizationConfig
                 )
               : displaySectionTitle(customizationConfig)}
-            <Box display="flex" flexDirection="row" gap={2} marginLeft={2}>
+            <Box
+              display="flex"
+              flexDirection="row"
+              gap={5}
+              marginLeft={2}
+              sx={{
+                "& .MuiTextField-root": { m: 1, width: "15ch" },
+              }}
+            >
               {_.sortBy(
                 Object.entries(
                   resultingConfig[customizationConfig] ??
@@ -734,9 +713,10 @@ const Settings: React.FC = () => {
                       display="flex"
                       flexDirection="row"
                       justifyContent="flex-start"
+                      marginLeft={2}
                       gap={5}
                     >
-                      {displaySubFields(customizationConfig, field, value)}
+                      {displayNumberField(customizationConfig, field, value)}
                     </Box>
                   )
               )}
@@ -769,7 +749,7 @@ const Settings: React.FC = () => {
           description="defines how Azimuth interacts with the ML pipelines and the metrics"
           link="reference/configuration/model_contract/"
         >
-          {getModalContractConfigSection()}
+          {getModelContractConfigSection()}
         </AccordionLayout>
         <AccordionLayout
           name="Analyses Customization"
