@@ -1,5 +1,10 @@
 # Releases
 
+## [2.5.1] - 2022-12-05
+
+### Fixed
+- Ignore `language` environment variable as we have seen conflicts with it on certain machines.
+
 ## [2.5.0] - 2022-12-05
 
 ### Added
