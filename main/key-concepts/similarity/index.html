@@ -685,8 +685,6 @@
         
           
         
-          
-        
       
       
         <label class="md-nav__link" for="__nav_3_5">
@@ -825,6 +823,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#class-overlap" class="md-nav__link">
+    Class Overlap
+  </a>
+  
+    <nav class="md-nav" aria-label="Class Overlap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-overlap-value" class="md-nav__link">
+    Class Overlap Value
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#samples-with-overlap" class="md-nav__link">
+    Samples with overlap
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     Configuration
   </a>
@@ -840,20 +865,6 @@
   
 </nav>
       
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../class-similarity/" class="md-nav__link">
-        Class Similarity
-      </a>
     </li>
   
 
@@ -1012,8 +1023,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/class-analysis/" class="md-nav__link">
-        Class Analysis
+      <a href="../../user-guide/class-overlap/" class="md-nav__link">
+        Class Overlap
       </a>
     </li>
   
@@ -1800,6 +1811,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#class-overlap" class="md-nav__link">
+    Class Overlap
+  </a>
+  
+    <nav class="md-nav" aria-label="Class Overlap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#class-overlap-value" class="md-nav__link">
+    Class Overlap Value
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#samples-with-overlap" class="md-nav__link">
+    Samples with overlap
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     Configuration
   </a>
@@ -1837,13 +1875,18 @@
 analysis can be quite powerful given that <strong>no trained <abbr title="Machine Learning">ML</abbr> model is needed</strong>; only a dataset needs to
 be supplied.</p>
 <p>Within Azimuth, different similarity analyses are provided to determine how similar utterances are
-within a class, across classes, and so on. This can help indicate whether classes are well-defined,
+within a class, between classes, and so on. This can help indicate whether classes are well-defined,
 or whether changes should be made to improve the dataset, such as by redefining classes, relabeling
 or omitting data, or augmenting the dataset.</p>
 <h2 id="where-is-this-used-in-azimuth">Where is this used in Azimuth?</h2>
 <p>In Azimuth, the similarity analysis is used to derive <a href="../smart-tags/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Smart Tags</a>,
 and also to show the most similar utterances in both dataset splits on
-the <a href="../../user-guide/exploration-space/utterance-details/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Utterances Details</a>.</p>
+the <a href="../../user-guide/exploration-space/utterance-details/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Utterances Details</a>
+(see below).</p>
+<p>Similarity is also used for class overlap, which assesses the semantic overlap between pairs of
+classes. Class overlap is presented in the <a href="../../user-guide/#class-overlap">Class Overlap Dashboard
+Section</a> as well as the
+<a href="../../user-guide/class-overlap/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Class Overlap</a> page.</p>
 <figure>
 <p><img alt="Image title" src="../../_static/images/exploration-space/utterance-details-similarity.png" />
   </p>
@@ -1879,6 +1922,27 @@ different class, it will be tagged as <code>conflicting_neighbors_train</code>
 and/or <code>conflicting_neighbors_eval</code>, based on which dataset split is being examined. (E.g., an
 utterance in the test set will be compared to its neighbors in both the training and evaluation
 dataset splits.)</p>
+<h3 id="class-overlap">Class Overlap</h3>
+<h4 id="class-overlap-value">Class Overlap Value</h4>
+<p>Class overlap is calculated using utterance embeddings, which are computed as described above.</p>
+<p>Class overlap for class <em>C<sub>i</sub></em> (source class) with class <em>C<sub>j</sub></em> (target class) is
+defined as the area of the feature (embedding) space in which an utterance in class
+<em>C<sub>i</sub></em> has a greater probability of being in class <em>C<sub>j</sub></em> than in class
+<em>C<sub>i</sub></em>.</p>
+<p>To approximate this probability, we make use of the
+<a href="https://github.com/Dref360/spectral-metric"><code>spectral-metric</code></a> package
+(<a href="https://arxiv.org/abs/1905.07299">Branchaud-Charron, 2019</a><sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>). The probability of a sample
+being in a specified class is determined based on the representation of this class in the
+sample's 5 nearest neighbors, as well as the hypervolume containing these neighbors (Parzen
+window). Class overlap for the <em>C<sub>i</sub></em> with the <em>C<sub>j</sub></em> is calculated as the mean
+probability across all samples in <em>C<sub>i</sub></em>. The similarity matrix <em>S</em> from <code>spectral-metric</code>
+contains these probabilities for all class pairs. Note that probabilities are normalized by the
+source class, to sum to 1.</p>
+<h4 id="samples-with-overlap">Samples with overlap</h4>
+<p>Individual samples from a source class are determined to have overlap with a target class when
+their probability of being in the target class is greater than 0, which is the same as saying
+that at least one of their 5 nearest neighbors are from the target class. This is a
+conservative metric, on which we anticipate iterating in the future.</p>
 <h3 id="configuration">Configuration</h3>
 <p><a href="../../reference/configuration/analyses/similarity/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Similarity Analysis Configuration</a>
 presents language-based defaults for the encoder used for the embeddings on which similarity is
@@ -1890,6 +1954,11 @@ the smart tags.</p>
 <li id="fn:1">
 <p>Reimers, Nils, and Iryna Gurevych. "Sentence-bert: Sentence embeddings using siamese
 bert-networks." arXiv preprint arXiv:1908.10084 (2019).&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Branchaud-Charron, Frederic, Andrew Achkar, and Pierre-Marc Jodoin. "Spectral metric for
+dataset complexity assessment." Proceedings of the IEEE/CVF Conference on Computer Vision and
+Pattern Recognition. 2019.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
@@ -1929,13 +1998,13 @@ bert-networks." arXiv preprint arXiv:1908.10084 (2019).&#160;<a class="footnote-
       
       
         
-        <a href="../class-similarity/" class="md-footer__link md-footer__link--next" aria-label="Next: Class Similarity" rel="next">
+        <a href="../behavioral-testing/" class="md-footer__link md-footer__link--next" aria-label="Next: Behavioral Testing" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Class Similarity
+              Behavioral Testing
             </div>
           </div>
           <div class="md-footer__button md-icon">

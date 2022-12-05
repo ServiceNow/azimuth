@@ -681,8 +681,6 @@
         
           
         
-          
-        
       
       
         <label class="md-nav__link" for="__nav_3_5">
@@ -733,20 +731,6 @@
     <li class="md-nav__item">
       <a href="../key-concepts/similarity/" class="md-nav__link">
         Similarity Analysis
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../key-concepts/class-similarity/" class="md-nav__link">
-        Class Similarity
       </a>
     </li>
   
@@ -910,8 +894,8 @@
   
   
     <li class="md-nav__item">
-      <a href="class-analysis/" class="md-nav__link">
-        Class Analysis
+      <a href="class-overlap/" class="md-nav__link">
+        Class Overlap
       </a>
     </li>
   
@@ -1656,11 +1640,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#class-analysis" class="md-nav__link">
-    Class Analysis
+  <a href="#class-overlap" class="md-nav__link">
+    Class Overlap
   </a>
   
-    <nav class="md-nav" aria-label="Class Analysis">
+    <nav class="md-nav" aria-label="Class Overlap">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1763,30 +1747,34 @@ and the predictions.</p>
 <li><strong>Length mismatch</strong>: Verify that the utterances' length are similar for each intent in both sets.</li>
 </ul>
 <p>Select <code>View Details</code> to get to <a href="dataset-warnings/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Dataset Warnings</a>.</p>
-<h2 id="class-analysis">Class Analysis</h2>
-<p>The Class Analysis section gives an overview of the similarity between class pairs. In some
-cases, high similarity may be associated with poor class definitions, mislabelling, and/or model
+<h2 id="class-overlap">Class Overlap</h2>
+<p>The Class Overlap section gives an overview of the semantic overlap between class pairs. In some
+cases, high overlap may be associated with poor class definitions, mislabelling, and/or model
 confusion.</p>
-<p>Select <code>View details</code> to access the <a href="class-analysis"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Class
-Analysis</a> page with an interactive
-<a href="class-analysis/#class-overlap-plot">Class Overlap Plot</a>.</p>
+<p>Select <code>View details</code> to access the <a href="class-overlap/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Class
+Overlap</a> page with an interactive
+<a href="class-overlap/#class-overlap-plot">Class Overlap Plot</a>.</p>
 <h3 id="table-content">Table Content</h3>
-<p>The Class Analysis table presents class pairs that have nonzero class overlap or pipeline
+<p>The Class Overlap table presents class pairs that have nonzero class overlap or pipeline
 confusion.</p>
+<p>Each row shows a source class and a target class, where the source class is the class of the
+samples being analyzed (e.g., class label for pipeline confusion), and the target class is the
+class that the source class may look like, through the lens of the dataset or the model (e.g.,
+prediction for pipeline confusion).</p>
 <ul>
-<li><strong>Class overlap</strong> is calculated for class pairs in the training data based on the locations of
-  utterances in embedding space, as described in
-  <a href="../key-concepts/class-similarity/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Class Similarity</a>. Because it is
+<li><strong>Semantic Overlap Score</strong>s are calculated for class pairs in the training data based on the
+  locations of utterances in embedding space, as described in
+  <a href="../key-concepts/similarity/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Similarity Analysis</a>. Because it is
   determined on a dataset alone, it does not require a pipeline to be supplied.</li>
-<li><strong>Utterances with overlap</strong> indicates the percentage of samples in the source class that are
+<li><strong>Utterances with Overlap</strong> indicates the percentage of samples in the source class that are
   determined to overlap the target class, as well as the sample count with overlap
   relative to the total sample count for the source class. This is also based on the training data.</li>
-<li><strong>Pipeline confusion</strong> is presented if a pipeline is provided. Pipeline confusion indicates
+<li><strong>Pipeline Confusion</strong> is presented if a pipeline is provided. Pipeline confusion indicates
   confusion of the source class for the target class (i.e., the confusion matrix cell
   where the label is the source class and the prediction is the target class), for the
   evaluation data.</li>
 </ul>
-<p>As overlap indicates semantic similarity in embedding space, it may or may not be associated
+<p>As class overlap indicates semantic similarity in embedding space, it may or may not be associated
 with pipeline confusion.</p>
 <p>For example, if high overlap is due to mislabeling or poor class differentiation, it may be
 associated with pipeline confusion. On the other hand, it's possible to have a pair of classes
@@ -1802,7 +1790,7 @@ semantic overlap is acceptable.</p>
 calculated on the evaluation data. Thus, the two analyses have different source class sample
 counts.</p>
 </div>
-<p><img alt="" src="../_static/images/key-concepts/class-analysis-table.png" /></p>
+<p><img alt="" src="../_static/images/key-concepts/class-overlap-table.png" /></p>
 <div class="admonition tip">
 <p class="admonition-title">Sorting</p>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m18 21-4-4h3V7h-3l4-4 4 4h-3v10h3M2 19v-2h10v2M2 13v-2h7v2M2 7V5h4v2H2Z"/></svg></span> The data is ordered by overlap value, in descending order. Click the overlap
