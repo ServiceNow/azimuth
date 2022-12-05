@@ -96,8 +96,8 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/class_analysis`,
-          name: "Class Analysis",
+          pathname: `/${jobId}/class_overlap`,
+          name: "Class Overlap",
         },
         {
           pathname: `/${jobId}/pipeline_metrics`,

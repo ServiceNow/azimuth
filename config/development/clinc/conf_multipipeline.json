@@ -2,6 +2,7 @@
   "name": "CLINC Demo multi pipelines",
   "pipelines": [
     {
+      "name": "DistilBert TH=0.5 T=1",
       "model": {
         "class_name": "loading_resources.load_hf_text_classif_pipeline",
         "remote": "/azimuth_shr",
@@ -11,6 +12,7 @@
       }
     },
     {
+      "name": "DistilBert TH=0.3 T=0.8",
       "model": {
         "class_name": "loading_resources.load_hf_text_classif_pipeline",
         "remote": "/azimuth_shr",
