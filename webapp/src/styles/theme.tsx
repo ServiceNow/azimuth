@@ -41,6 +41,7 @@ const customTheme: Theme = createTheme({
     },
     warning: {
       main: "#FD9700",
+      contrastText: "#FF7043",
     },
     error: {
       main: "#E32437",

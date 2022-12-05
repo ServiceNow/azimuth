@@ -36,6 +36,7 @@ const AccordionLayout: React.FC<Props> = ({
         >
           {name}
         </Typography>
+        <Divider orientation="vertical" flexItem sx={{ marginX: 2 }} />
         <Box display="flex" gap={2}>
           <Typography variant="body1">{description}</Typography>
           <Description link={link} />

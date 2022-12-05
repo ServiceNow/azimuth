@@ -1,4 +1,4 @@
-import { Info } from "@mui/icons-material";
+import { Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -9,6 +9,7 @@ import {
   InputBaseComponentProps,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import _ from "lodash";
@@ -78,7 +79,7 @@ const Settings: React.FC = () => {
   const divider = <Divider sx={{ marginY: 1 }} />;
 
   const displaySectionTitle = (section: string) => (
-    <Box sx={{ m: 1, width: "15ch" }}>
+    <Box sx={{ m: 1, width: "100px" }}>
       <Typography textTransform="capitalize" variant="subtitle2">
         {section}
       </Typography>
@@ -151,27 +152,12 @@ const Settings: React.FC = () => {
 
   const displayReadonlyFields = (label: string, value: string | undefined) => (
     <TextField
-      sx={{
-        m: 1,
-        width: "32ch",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        "&:hover": {
-          whiteSpace: "normal",
-          overflow: "initial",
-          overflowWrap: "break-word",
-          wordWrap: "break-word",
-        },
-      }}
+      sx={{ m: 1, width: "40ch" }}
       size="small"
       variant="standard"
       label={<Typography fontWeight="bold">{label}</Typography>}
       value={value}
       disabled={isError || isFetching}
-      inputProps={{
-        "data-testid": `${label}`,
-      }}
       InputProps={{
         readOnly: true,
         disableUnderline: true,
@@ -201,7 +187,7 @@ const Settings: React.FC = () => {
         },
       }}
       size="small"
-      label={field}
+      label={<Typography fontWeight="bold">{field}</Typography>}
       type="number"
       value={value}
       disabled={!Boolean(resultingConfig[config])}
@@ -244,7 +230,7 @@ const Settings: React.FC = () => {
         },
       }}
       size="small"
-      label={field}
+      label={<Typography fontWeight="bold">{field}</Typography>}
       type="number"
       InputLabelProps={{
         shrink: true,
@@ -321,17 +307,41 @@ const Settings: React.FC = () => {
       >
         {displayReadonlyFields("name", resultingConfig.name)}
         {displayReadonlyFields(
-          "rejection class",
+          "rejection_class",
           resultingConfig.rejection_class
         )}
         <Box display="flex" flexDirection="column" paddingTop={1}>
           <Typography variant="caption">columns</Typography>
-          <Typography variant="body2">
-            text_input: {resultingConfig.columns?.text_input}
-          </Typography>
-          <Typography variant="body2">
-            label: {resultingConfig.columns?.label}
-          </Typography>
+          <Box display="flex" flexDirection="row">
+            <Typography
+              sx={{
+                s: 1,
+                width: "100px",
+                whiteSpace: "normal",
+              }}
+              variant="body2"
+            >
+              text_input:
+            </Typography>
+            <Typography variant="body2">
+              {resultingConfig.columns?.text_input}
+            </Typography>
+          </Box>
+          <Box display="flex" flexDirection="row">
+            <Typography
+              sx={{
+                s: 1,
+                width: "100px",
+                whiteSpace: "normal",
+              }}
+              variant="body2"
+            >
+              label:
+            </Typography>
+            <Typography variant="body2">
+              {resultingConfig.columns?.label}
+            </Typography>
+          </Box>
         </Box>
       </Box>
       {divider}
@@ -344,70 +354,89 @@ const Settings: React.FC = () => {
         gap={5}
       >
         {displayReadonlyFields(
-          "class name",
+          "class_name",
           resultingConfig.dataset?.class_name
         )}
         {displayReadonlyFields("remote", resultingConfig.dataset?.remote)}
         {resultingConfig.dataset?.kwargs && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            paddingTop={1}
-            sx={{
-              m: 1,
-              width: "32ch",
-            }}
-          >
+          <Box display="flex" flexDirection="column" paddingTop={1}>
             <Typography variant="caption">kwargs</Typography>
-            {Object.entries(resultingConfig.dataset?.kwargs).map(
+            {Object.entries(resultingConfig.dataset.kwargs).map(
               ([field, value], index) => (
-                <Typography
+                <Box
                   key={index}
-                  variant="body2"
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    "&:hover": {
-                      whiteSpace: "normal",
-                      overflow: "initial",
-                      overflowWrap: "break-word",
-                      wordWrap: "break-word",
-                    },
-                  }}
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="flex-start"
                 >
-                  {field}: {value}
-                  {value}
-                </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      s: 1,
+                      width: "100px",
+                      whiteSpace: "normal",
+                    }}
+                  >
+                    {field}:
+                  </Typography>
+                  <Tooltip title={value} placement="bottom">
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        s: 1,
+                        width: "100px",
+                        lineHeight: "initial",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {value}
+                    </Typography>
+                  </Tooltip>
+                </Box>
               )
             )}
           </Box>
         )}
         {resultingConfig.dataset?.args &&
-          resultingConfig.dataset?.args.length > 0 && (
-            <Box display="flex" flexDirection="column" marginLeft={1}>
-              <Typography textTransform="capitalize" variant="caption">
-                args
-              </Typography>
-              {Object.entries(resultingConfig.dataset?.args).map(
+          resultingConfig.dataset.args.length > 0 && (
+            <Box display="flex" flexDirection="column" paddingTop={1}>
+              <Typography variant="caption">args</Typography>
+              {Object.entries(resultingConfig.dataset.args).map(
                 ([field, value], index) => (
-                  <Typography
+                  <Box
                     key={index}
-                    variant="body2"
-                    sx={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      "&:hover": {
-                        whiteSpace: "normal",
-                        overflow: "initial",
-                        overflowWrap: "break-word",
-                        wordWrap: "break-word",
-                      },
-                    }}
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="flex-start"
                   >
-                    {field}: {value}
-                  </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        s: 1,
+                        width: "100px",
+                        whiteSpace: "normal",
+                      }}
+                    >
+                      {field}:
+                    </Typography>
+                    <Tooltip title={value} placement="bottom">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          s: 1,
+                          width: "100px",
+                          lineHeight: "initial",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {value}
+                      </Typography>
+                    </Tooltip>
+                  </Box>
                 )
               )}
             </Box>
@@ -416,49 +445,42 @@ const Settings: React.FC = () => {
     </Box>
   );
   const getModalContractConfigSection = () => (
-    <Box display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column" justifyContent="flex-start">
       {displaySectionTitle("general")}
       <Box
         display="flex"
         flexDirection="row"
         justifyContent="flex-start"
         marginLeft={2}
+        gap={5}
       >
         {displayReadonlyFields(
           "model_contract",
           resultingConfig.model_contract
         )}
         {displayReadonlyFields(
-          "saliency layer",
+          "saliency_layer",
           resultingConfig.saliency_layer
         )}
-        <Box display="flex" flexDirection="column" marginLeft={1}>
-          <Typography textTransform="capitalize" variant="caption">
-            Uncertainty
-          </Typography>
+        <Box display="flex" flexDirection="column" paddingTop={1}>
+          <Typography variant="caption">uncertainty</Typography>
           {resultingConfig.uncertainty &&
             _.sortBy(Object.entries(resultingConfig.uncertainty)).map(
               ([field, value], index) => (
-                <Box
-                  key={index}
-                  display="flex"
-                  flexDirection="row"
-                  gap={(theme) => theme.spacing(0.5)}
-                >
+                <Box key={index} display="flex" flexDirection="row">
                   <Typography
-                    textTransform="capitalize"
-                    variant="body2"
-                    marginTop={1}
                     sx={{
                       s: 1,
                       width: "20ch",
+                      whiteSpace: "normal",
                     }}
+                    variant="body2"
                   >
                     {field}:
                   </Typography>
                   <TextField
                     id={field}
-                    sx={{ s: 1, width: "5.5ch" }}
+                    sx={{ s: 1, width: "5ch" }}
                     size="small"
                     type="number"
                     value={value}
@@ -489,142 +511,173 @@ const Settings: React.FC = () => {
         </Box>
       </Box>
       {divider}
-      {displaySectionTitle("pipelines")}
+      <Box sx={{ m: 1, width: "100px", marginTop: 1 }}>
+        <Typography variant="body1" fontWeight="bold">
+          Pipelines
+        </Typography>
+      </Box>
       {resultingConfig.pipelines &&
         _.sortBy(resultingConfig.pipelines, "name").map(
           ({ name, model, postprocessors }, pipelineIndex) => (
-            <div key={pipelineIndex}>
-              {displaySectionTitle(name)}
+            <Box
+              key={pipelineIndex}
+              display="flex"
+              flexDirection="column"
+              margin={(theme) => theme.spacing(2, 3)}
+              border="1px solid rgba(0, 0, 0, 0.12)"
+            >
+              {displaySectionTitle("general")}
               <Box
-                key={pipelineIndex}
                 display="flex"
-                flexDirection="column"
-                gap={1}
-                margin={1}
-                border="1px solid rgba(0, 0, 0, 0.12)"
+                flexDirection="row"
+                justifyContent="flex-start"
+                marginLeft={2}
               >
-                {displaySectionTitle("model")}
+                {displayReadonlyFields("name", name)}
+              </Box>
+              {displaySectionTitle("model")}
+              <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="flex-start"
+                gap={5}
+                marginLeft={2}
+              >
+                {displayReadonlyFields("class_name", model.class_name)}
+                {displayReadonlyFields("remote", model.remote)}
+                {model.kwargs && (
+                  <Box display="flex" flexDirection="column" paddingTop={1}>
+                    <Typography variant="caption">kwargs</Typography>
+                    {Object.entries(model.kwargs).map(
+                      ([field, value], index) => (
+                        <Box
+                          key={index}
+                          display="flex"
+                          flexDirection="row"
+                          justifyContent="flex-start"
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              s: 1,
+                              width: "auto",
+                              lineHeight: "initial",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {field}:
+                          </Typography>
+                          <Tooltip title={value} placement="bottom">
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                s: 1,
+                                width: "100px",
+                                lineHeight: "initial",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {value}
+                            </Typography>
+                          </Tooltip>
+                        </Box>
+                      )
+                    )}
+                  </Box>
+                )}
+                {model.args && model.args.length > 0 && (
+                  <Box display="flex" flexDirection="column" paddingTop={1}>
+                    <Typography variant="caption">args</Typography>
+                    {Object.entries(model.args).map(([field, value], index) => (
+                      <Box
+                        key={index}
+                        display="flex"
+                        flexDirection="row"
+                        justifyContent="flex-start"
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            s: 1,
+                            width: "auto",
+                            lineHeight: "initial",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {field}:
+                        </Typography>
+                        <Tooltip title={value} placement="bottom">
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              s: 1,
+                              width: "100px",
+                              lineHeight: "initial",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {value}
+                          </Typography>
+                        </Tooltip>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+              <Box display="flex" flexDirection="column" marginBottom={2}>
+                {displayPostprocessorToggleSection({
+                  name,
+                  model,
+                  postprocessors,
+                })}
                 <Box
+                  key={pipelineIndex}
                   display="flex"
-                  flexDirection="row"
-                  justifyContent="flex-start"
-                  gap={5}
+                  flexDirection="column"
+                  gap={1}
                   marginLeft={2}
                 >
-                  {displayReadonlyFields("Class name", model.class_name)}
-                  {displayReadonlyFields("Remote", model.remote)}
-                  {model.kwargs && (
-                    <Box display="flex" flexDirection="column" marginLeft={1}>
-                      <Typography textTransform="capitalize" variant="caption">
-                        kwargs
-                      </Typography>
-                      {Object.entries(model.kwargs).map(
-                        ([field, value], index) => (
-                          <Typography
-                            key={index}
-                            variant="body2"
-                            sx={{
-                              m: 1,
-                              width: "32ch",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              "&:hover": {
-                                whiteSpace: "normal",
-                                overflow: "initial",
-                                overflowWrap: "break-word",
-                                wordWrap: "break-word",
-                              },
-                            }}
-                          >
-                            {field}: {value}
-                          </Typography>
-                        )
-                      )}
-                    </Box>
-                  )}
-                  {model.args && model.args.length > 0 && (
-                    <Box display="flex" flexDirection="column" marginLeft={1}>
-                      <Typography textTransform="capitalize" variant="caption">
-                        args
-                      </Typography>
-                      {Object.entries(model.args).map(
-                        ([field, value], index) => (
-                          <Typography
-                            key={index}
-                            variant="body2"
-                            sx={{
-                              m: 1,
-                              width: "32ch",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              "&:hover": {
-                                whiteSpace: "normal",
-                                overflow: "initial",
-                                overflowWrap: "break-word",
-                                wordWrap: "break-word",
-                              },
-                            }}
-                          >
-                            {field}: {value}
-                          </Typography>
-                        )
-                      )}
-                    </Box>
-                  )}
-                </Box>
-                <Box display="flex" flexDirection="column" marginBottom={2}>
-                  {displayPostprocessorToggleSection({
-                    name,
-                    model,
-                    postprocessors,
-                  })}
-                  <Box
-                    key={pipelineIndex}
-                    display="flex"
-                    flexDirection="column"
-                    gap={1}
-                    marginLeft={2}
-                  >
-                    {postprocessors &&
-                      _.sortBy(postprocessors, "class_name").map(
-                        (postprocessor, index) => (
-                          <Box
-                            key={index}
-                            display="flex"
-                            flexDirection="row"
-                            justifyContent="flex-start"
-                            gap={5}
-                            padding={1}
-                            marginX={2}
-                            border="1px solid rgba(0, 0, 0, 0.12)"
-                          >
-                            {displayReadonlyFields(
-                              "class name",
-                              postprocessor.class_name
+                  {postprocessors &&
+                    _.sortBy(postprocessors, "class_name").map(
+                      (postprocessor, index) => (
+                        <Box
+                          key={index}
+                          display="flex"
+                          flexDirection="row"
+                          justifyContent="flex-start"
+                          gap={5}
+                          padding={1}
+                          marginX={2}
+                          border="1px solid rgba(0, 0, 0, 0.12)"
+                        >
+                          {displayReadonlyFields(
+                            "class_name",
+                            postprocessor.class_name
+                          )}
+                          {postprocessor.temperature &&
+                            displayPostprocessorSubField(
+                              { name, model, postprocessors },
+                              "temperature",
+                              index,
+                              postprocessor.temperature
                             )}
-                            {postprocessor.temperature &&
-                              displayPostprocessorSubField(
-                                { name, model, postprocessors },
-                                "temperature",
-                                index,
-                                postprocessor.temperature
-                              )}
-                            {postprocessor.threshold &&
-                              displayPostprocessorSubField(
-                                { name, model, postprocessors },
-                                "threshold",
-                                index,
-                                postprocessor.threshold
-                              )}
-                          </Box>
-                        )
-                      )}
-                  </Box>
+                          {postprocessor.threshold &&
+                            displayPostprocessorSubField(
+                              { name, model, postprocessors },
+                              "threshold",
+                              index,
+                              postprocessor.threshold
+                            )}
+                        </Box>
+                      )
+                    )}
                 </Box>
               </Box>
-            </div>
+            </Box>
           )
         )}
       <Box display="flex" flexDirection="column" justifyContent="flex-start">
@@ -652,7 +705,7 @@ const Settings: React.FC = () => {
 
   const getAnalysesCustomization = () =>
     ANALYSES_CUSTOMIZATION.map((customizationConfig, index) => (
-      <Box key={index} display="flex" flexDirection="column" gap={1}>
+      <Box key={index} display="flex" flexDirection="column" gap={5}>
         {customizationConfig === "behavioral_testing" ? (
           displayToggleSectionTitle(
             "behavioral_testing",
@@ -706,21 +759,21 @@ const Settings: React.FC = () => {
         </Typography>
         <AccordionLayout
           name="Project Config"
-          description="Contains mandatory fields that specify the dataset to load in Azimuth"
+          description="contains mandatory fields that specify the dataset to load in Azimuth"
           link="reference/configuration/project/"
         >
           {getProjectConfigSection()}
         </AccordionLayout>
         <AccordionLayout
           name="Model Contract Config"
-          description="Defines how Azimuth interacts with the ML pipelines and the metrics"
+          description="defines how Azimuth interacts with the ML pipelines and the metrics"
           link="reference/configuration/model_contract/"
         >
           {getModalContractConfigSection()}
         </AccordionLayout>
         <AccordionLayout
           name="Analyses Customization"
-          description="Four analyses configured in Azimuth"
+          description="four analyses configured in Azimuth"
           link="reference/configuration/analyses/"
         >
           {getAnalysesCustomization()}
@@ -743,22 +796,20 @@ const Settings: React.FC = () => {
           flexDirection="row"
           justifyContent="flex-end"
           alignItems="center"
-          gap={1}
+          gap={2}
         >
           {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
-            <FormHelperText
-              sx={{
-                color: (theme) => theme.palette.warning.main,
-              }}
-            >
-              <Info
+            <FormHelperText>
+              <Warning
                 color="primary"
-                fontSize="small"
                 sx={{
-                  marginRight: 0.5,
+                  position: "relative",
+                  top: 3,
+                  right: 0.5,
+                  color: (theme) => theme.palette.warning.contrastText,
                 }}
               />
-              Warning! These changes may trigger some time-consuming
+              These changes may trigger some time-consuming
               <br />
               computations. Azimuth will not be usable until they complete.
             </FormHelperText>
