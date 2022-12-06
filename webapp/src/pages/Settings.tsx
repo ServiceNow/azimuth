@@ -89,7 +89,7 @@ const Settings: React.FC = () => {
     config: keyof AzimuthConfig,
     section: string = config
   ) => (
-    <Box display="flex" flexDirection="row">
+    <Box display="flex" flexDirection="row" marginLeft={1.5}>
       <Typography textTransform="capitalize" variant="subtitle2">
         {section}
       </Typography>
@@ -98,7 +98,7 @@ const Settings: React.FC = () => {
   );
 
   const displayPostprocessorToggleSection = (pipeline: PipelineDefinition) => (
-    <Box display="flex" flexDirection="row" marginLeft={1}>
+    <Box display="flex" flexDirection="row" padding={1}>
       <Typography variant="subtitle2">Postprocessors</Typography>
       <Checkbox
         size="small"
@@ -206,9 +206,6 @@ const Settings: React.FC = () => {
       size="small"
       label={<Typography fontWeight="bold">{field}</Typography>}
       type="number"
-      InputLabelProps={{
-        shrink: true,
-      }}
       value={value}
       inputProps={{ min: 0, max: 1, step: 0.1, "data-testid": `${field}` }}
       variant="standard"
@@ -291,7 +288,6 @@ const Settings: React.FC = () => {
               sx={{
                 s: 1,
                 width: "100px",
-                whiteSpace: "normal",
               }}
               variant="body2"
             >
@@ -306,7 +302,6 @@ const Settings: React.FC = () => {
               sx={{
                 s: 1,
                 width: "100px",
-                whiteSpace: "normal",
               }}
               variant="body2"
             >
@@ -324,8 +319,10 @@ const Settings: React.FC = () => {
         display="flex"
         flexDirection="row"
         justifyContent="flex-start"
+        alignContent="start"
+        flexWrap="wrap"
+        gap={(theme) => theme.spacing(1, 5)}
         marginLeft={2}
-        gap={5}
       >
         {displayReadonlyFields(
           "class_name",
@@ -348,7 +345,6 @@ const Settings: React.FC = () => {
                     sx={{
                       s: 1,
                       width: "100px",
-                      whiteSpace: "normal",
                     }}
                   >
                     {field}:
@@ -359,7 +355,6 @@ const Settings: React.FC = () => {
                       sx={{
                         s: 1,
                         width: "100px",
-                        lineHeight: "initial",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -373,47 +368,46 @@ const Settings: React.FC = () => {
             )}
           </Box>
         )}
-        {resultingConfig.dataset?.args?.length && (
-          <Box display="flex" flexDirection="column" paddingTop={1}>
-            <Typography variant="caption">args</Typography>
-            {Object.entries(resultingConfig.dataset.args).map(
-              ([field, value], index) => (
-                <Box
-                  key={index}
-                  display="flex"
-                  flexDirection="row"
-                  justifyContent="flex-start"
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      s: 1,
-                      width: "100px",
-                      whiteSpace: "normal",
-                    }}
+        {resultingConfig.dataset?.args &&
+          resultingConfig.dataset.args.length > 0 && (
+            <Box display="flex" flexDirection="column" paddingTop={1}>
+              <Typography variant="caption">args</Typography>
+              {Object.entries(resultingConfig.dataset.args).map(
+                ([field, value], index) => (
+                  <Box
+                    key={index}
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="flex-start"
                   >
-                    {field}:
-                  </Typography>
-                  <Tooltip title={value} placement="bottom">
                     <Typography
                       variant="body2"
                       sx={{
                         s: 1,
                         width: "100px",
-                        lineHeight: "initial",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
                       }}
                     >
-                      {value}
+                      {field}:
                     </Typography>
-                  </Tooltip>
-                </Box>
-              )
-            )}
-          </Box>
-        )}
+                    <Tooltip title={value} placement="bottom">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          s: 1,
+                          width: "100px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {value}
+                      </Typography>
+                    </Tooltip>
+                  </Box>
+                )
+              )}
+            </Box>
+          )}
       </Box>
     </Box>
   );
@@ -497,6 +491,7 @@ const Settings: React.FC = () => {
               display="flex"
               flexDirection="column"
               margin={(theme) => theme.spacing(2, 3)}
+              padding={1}
               border="1px solid rgba(0, 0, 0, 0.12)"
             >
               {displaySectionTitle("general")}
@@ -513,7 +508,9 @@ const Settings: React.FC = () => {
                 display="flex"
                 flexDirection="row"
                 justifyContent="flex-start"
-                gap={5}
+                alignContent="center"
+                flexWrap="wrap"
+                gap={(theme) => theme.spacing(1, 5)}
                 marginLeft={2}
               >
                 {displayReadonlyFields("class_name", model.class_name)}
@@ -534,7 +531,6 @@ const Settings: React.FC = () => {
                             sx={{
                               s: 1,
                               width: "auto",
-                              lineHeight: "initial",
                               whiteSpace: "nowrap",
                             }}
                           >
@@ -546,7 +542,6 @@ const Settings: React.FC = () => {
                               sx={{
                                 s: 1,
                                 width: "100px",
-                                lineHeight: "initial",
                                 whiteSpace: "nowrap",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
@@ -560,7 +555,47 @@ const Settings: React.FC = () => {
                     )}
                   </Box>
                 )}
-                {model?.args?.length && (
+                {model.kwargs && (
+                  <Box display="flex" flexDirection="column" paddingTop={1}>
+                    <Typography variant="caption">kwargs</Typography>
+                    {Object.entries(model.kwargs).map(
+                      ([field, value], index) => (
+                        <Box
+                          key={index}
+                          display="flex"
+                          flexDirection="row"
+                          justifyContent="flex-start"
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              s: 1,
+                              width: "auto",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {field}:
+                          </Typography>
+                          <Tooltip title={value} placement="bottom">
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                s: 1,
+                                width: "100px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {value}
+                            </Typography>
+                          </Tooltip>
+                        </Box>
+                      )
+                    )}
+                  </Box>
+                )}
+                {model?.args && model.args.length > 0 && (
                   <Box display="flex" flexDirection="column" paddingTop={1}>
                     <Typography variant="caption">args</Typography>
                     {Object.entries(model.args).map(([field, value], index) => (
@@ -575,7 +610,6 @@ const Settings: React.FC = () => {
                           sx={{
                             s: 1,
                             width: "auto",
-                            lineHeight: "initial",
                             whiteSpace: "nowrap",
                           }}
                         >
@@ -587,7 +621,6 @@ const Settings: React.FC = () => {
                             sx={{
                               s: 1,
                               width: "100px",
-                              lineHeight: "initial",
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
@@ -676,7 +709,13 @@ const Settings: React.FC = () => {
 
   const getAnalysesCustomization = () =>
     ANALYSES_CUSTOMIZATION.map((customizationConfig, index) => (
-      <Box key={index} display="flex" flexDirection="column" gap={5}>
+      <Box
+        key={index}
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-start"
+        gap={5}
+      >
         {customizationConfig === "behavioral_testing" ? (
           displayToggleSectionTitle(
             "behavioral_testing",
@@ -694,7 +733,6 @@ const Settings: React.FC = () => {
               display="flex"
               flexDirection="row"
               gap={5}
-              marginLeft={2}
               sx={{
                 "& .MuiTextField-root": { m: 1, width: "15ch" },
               }}
@@ -738,14 +776,14 @@ const Settings: React.FC = () => {
           are saved, expect some delays for recomputing the affected tasks.
         </Typography>
         <AccordionLayout
-          name="Project Config"
+          name="Project Configurations"
           description="contains mandatory fields that specify the dataset to load in Azimuth"
           link="reference/configuration/project/"
         >
           {getProjectConfigSection()}
         </AccordionLayout>
         <AccordionLayout
-          name="Model Contract Config"
+          name="Model Contract Configurations"
           description="defines how Azimuth interacts with the ML pipelines and the metrics"
           link="reference/configuration/model_contract/"
         >

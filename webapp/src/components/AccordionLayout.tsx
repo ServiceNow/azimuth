@@ -30,7 +30,7 @@ const AccordionLayout: React.FC<Props> = ({
           variant="body1"
           fontWeight="bold"
           sx={{
-            width: "15%",
+            width: "20%",
             flexShrink: 0,
           }}
         >
