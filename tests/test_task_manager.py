@@ -87,7 +87,6 @@ def test_clearing_cache(tiny_text_config):
 
 
 def test_expired_task(tiny_text_task_manager, tiny_text_config):
-    # Generating fake dm so modules don't fail because of missing columns.
     class ExpirableModule(FilterableModule[SyntaxConfig]):
         def compute(self, batch):
             return ["ExpirableModule"]
@@ -97,22 +96,19 @@ def test_expired_task(tiny_text_task_manager, tiny_text_config):
             return ["NotExpirableModule"]
 
     current_update = time.time()
-    mod_option = ModuleOptions()
 
     tiny_text_task_manager.register_task("ExpirableModule", ExpirableModule)
     tiny_text_task_manager.register_task("NotExpirableModule", NotExpirableModule)
 
     _, not_expirable_task = tiny_text_task_manager.get_task(
-        "ExpirableModule",
+        "NotExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=mod_option,
     )
     # Get an expirable task
     _, expirable_task = tiny_text_task_manager.get_task(
-        "NotExpirableModule",
+        "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=mod_option,
         last_update=current_update,
     )
     assert not not_expirable_task.done() and not expirable_task.done()
@@ -123,13 +119,11 @@ def test_expired_task(tiny_text_task_manager, tiny_text_config):
         "NotExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=mod_option,
     )
     # Get an expirable task
     _, expirable_task = tiny_text_task_manager.get_task(
         "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=mod_option,
         last_update=current_update,
     )
     assert not_expirable_task.done() and expirable_task.done()
@@ -140,13 +134,11 @@ def test_expired_task(tiny_text_task_manager, tiny_text_config):
         "NotExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
         last_update=current_update,
-        mod_options=mod_option,
     )
     # Get an expirable task
     _, expirable_task = tiny_text_task_manager.get_task(
         "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=mod_option,
         last_update=current_update,
     )
     assert not_expirable_task.done() and not expirable_task.done()
