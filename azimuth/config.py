@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 import structlog
 from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, validator
 
-from azimuth.types import AliasModel, SupportedModelContract
+from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 
 log = structlog.get_logger(__file__)
@@ -227,6 +227,8 @@ class ColumnConfiguration(BaseModel):
     label: str = "label"
     # Optional column to specify whether an example has failed preprocessing.
     failed_parsing_reason: str = "failed_parsing_reason"
+    # Unique identifier for every example
+    persistent_id: str = DatasetColumn.row_idx
 
 
 class ProjectConfig(BaseSettings):

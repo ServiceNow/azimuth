@@ -94,9 +94,8 @@ class DatasetSplitManager:
             if dataset_split is None:
                 raise ValueError("No dataset_split cached, can't initialize.")
             log.info("Initializing tags", tags=initial_tags)
-            self._base_dataset_split, self._malformed_dataset = self._split_malformed(dataset_split)
-            self._base_dataset_split = self._init_dataset_split(
-                self._base_dataset_split, self._tags
+            self._base_dataset_split, self._malformed_dataset = self._load_base_dataset_split(
+                dataset_split
             )
             self._save_base_dataset_split()
         else:
@@ -153,6 +152,21 @@ class DatasetSplitManager:
             return ds, malformed
         return None
 
+    def _load_base_dataset_split(self, dataset_split) -> Tuple[Dataset, Dataset]:
+        base_dataset_split, malformed_dataset = self._split_malformed(dataset_split)
+
+        # Checking if a persistent id was provided.
+        persistent_id = self.config.columns.persistent_id
+        if persistent_id != DatasetColumn.row_idx:  # Default value
+            if persistent_id not in base_dataset_split.column_names:
+                raise ValueError(f"Persistent id named {persistent_id} not found in the dataset.")
+
+            all_persistent_ids = base_dataset_split[persistent_id]
+            if len(all_persistent_ids) > len(set(all_persistent_ids)):
+                raise ValueError(f"Persistent ids in {persistent_id} column need to be unique.")
+        base_dataset_split = self._init_dataset_split(base_dataset_split, self._tags)
+        return base_dataset_split, malformed_dataset
+
     def _save_base_dataset_split(self):
         # NOTE: We should not have the Index in `self.dataset_split`.
         with FileLock(self._file_lock):
@@ -205,7 +219,7 @@ class DatasetSplitManager:
 
         order = [
             DatasetColumn.row_idx,
-            DatasetColumn.idx,
+            self.config.columns.persistent_id,
             self.config.columns.raw_text_input,
             self.config.columns.text_input,
             self.config.columns.label,
@@ -222,14 +236,13 @@ class DatasetSplitManager:
             DatasetColumn.neighbors_eval,
             *self._tags,
         ]
-        order = [c for c in order if c in self.get_dataset_split(table_key).column_names]
+        available_columns = self.get_dataset_split(table_key).column_names
+        order = [c for c in order if c in available_columns]
 
-        # The following allows for new or extra columns to end up here automatically,
+        # This *available_columns allows for new or extra columns to end up here automatically,
         # instead of being lost if we were to hardcode the whole list.
-        omit = {*order, FEATURES, FEATURE_FAISS}
-        rest = [c for c in self.get_dataset_split(table_key).column_names if c not in omit]
-
-        columns = order + rest
+        # The dict.fromkeys() avoids duplicates.
+        columns = list(dict.fromkeys([*order, *available_columns]))
 
         # pd.to_csv() instead of HF version to avoid unintended type conversions (list to array)
         df = pd.DataFrame(self.get_dataset_split_with_class_names(table_key)).reindex(

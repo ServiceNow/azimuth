@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 from azimuth.modules.dataset_analysis.syntax_tagging import SyntaxTaggingModule
-from azimuth.types import DatasetColumn, DatasetSplitName
+from azimuth.types import DatasetSplitName
 from azimuth.types.tag import SmartTag
 
 
@@ -14,7 +14,6 @@ def test_syntax_tagging(simple_text_config):
 
     assert mod is not None
     batch = {
-        DatasetColumn.idx: [0, 1, 2, 3],
         "utterance": [
             "detect files.",
             "this is hell. It is terribly horrible for me to write this test but I am having fun.",
@@ -66,7 +65,6 @@ def test_syntax_tagging_french(simple_text_config_french):
 
     assert mod is not None
     batch = {
-        DatasetColumn.idx: [0, 1, 2, 3],
         "utterance": [
             "adore les biscuits!",
             "c'est terrible. C'est horrible pour moi d'écrire ce test, mais je m'amuse bien.",

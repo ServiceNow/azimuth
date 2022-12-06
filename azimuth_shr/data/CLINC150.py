@@ -67,7 +67,6 @@ class CLINC150Dataset(datasets.GeneratorBasedBuilder):
                     "label": datasets.ClassLabel(
                         num_classes=len(SUBSET_INTENTS), names=SUBSET_INTENTS
                     ),
-                    "idx": datasets.Value("int16"),
                 }
             ),
         )
@@ -110,7 +109,6 @@ class CLINC150Dataset(datasets.GeneratorBasedBuilder):
                     yield sample_idx, {
                         "utterance": sample[0].lower(),
                         "label": intent_name,
-                        "idx": sample_idx,
                     }
                     sample_idx += 1
 
@@ -119,6 +117,5 @@ class CLINC150Dataset(datasets.GeneratorBasedBuilder):
                 yield sample_idx, {
                     "utterance": sample[0].lower(),
                     "label": "NO_INTENT",
-                    "idx": sample_idx,
                 }
                 sample_idx += 1

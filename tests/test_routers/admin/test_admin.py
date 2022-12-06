@@ -23,6 +23,7 @@ def test_get_config(app: FastAPI):
         "columns": {
             "failed_parsing_reason": "failed_parsing_reason",
             "label": "label",
+            "persistent_id": "row_idx",
             "raw_text_input": "utterance_raw",
             "text_input": "utterance",
         },
