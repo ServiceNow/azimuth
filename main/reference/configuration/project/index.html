@@ -1840,6 +1840,11 @@ follows:</p>
 <td><code>label</code></td>
 <td>The class label for the utterance, as type <code>datasets.ClassLabel</code>.</td>
 </tr>
+<tr>
+<td><code>persistent_id</code></td>
+<td><code>persistent_id</code></td>
+<td>A unique identifier for each utterance, as type <code>datasets.Value("int16")</code> or <code>datasets.Value("string")</code>.</td>
+</tr>
 </tbody>
 </table>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Class Definition</label><label for="__tabbed_3_2">Config Example</label></div>
@@ -1852,12 +1857,14 @@ follows:</p>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">raw_text_input</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utterance_raw&quot;</span> <span class="c1"># (2)</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span> <span class="c1"># (3)</span>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">failed_parsing_reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;failed_parsing_reason&quot;</span> <span class="c1"># (4)</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">persistent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;row_idx&quot;</span> <span class="c1"># (5)</span>
 </code></pre></div>
 <ol>
 <li>Column for the text input that will be send to the pipeline.</li>
 <li>Optional column for the raw text input (before any pre-processing). Unused at the moment.</li>
 <li>Features column for the label</li>
 <li>Optional column to specify whether an example has failed preprocessing. Unused at the moment.</li>
+<li>Unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed.</li>
 </ol>
 </div>
 <div class="tabbed-block">
