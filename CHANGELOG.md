@@ -19,5 +19,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Showing long utterances fully on hover in similar and perturbed utterances tables.
 
 ### Security

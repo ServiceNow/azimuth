@@ -1,5 +1,6 @@
 import { Box, Tooltip, Typography } from "@mui/material";
 import { GridCellParams } from "@mui/x-data-grid";
+import HoverableDataCell from "components/Analysis/HoverableDataCell";
 import CheckIcon from "components/Icons/Check";
 import XIcon from "components/Icons/X";
 import { Column, Table } from "components/Table";
@@ -89,6 +90,14 @@ export const perturbedUtterancesColumns: Column<Row>[] = [
     flex: 1,
     minWidth: 408,
     sortable: false,
+    cellClassName: "hoverableDataCell",
+    renderCell: ({ value }: GridCellParams<string>) => (
+      <HoverableDataCell>
+        <Typography variant="inherit" whiteSpace="pre-wrap">
+          {value}
+        </Typography>
+      </HoverableDataCell>
+    ),
   },
   {
     field: "prediction",
@@ -171,6 +180,11 @@ const PerturbedUtterances: React.FC<Props> = (props) => {
       error={error}
       loading={isFetching}
       rows={rows}
+      sx={{
+        "& .hoverableDataCell": {
+          position: "relative",
+        },
+      }}
     />
   );
 };
