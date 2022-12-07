@@ -57,6 +57,8 @@ Select `View details` to access the [:material-link: Class
 Overlap](class-overlap.md) page with an interactive
 [Class Overlap Plot](class-overlap.md#class-overlap-plot).
 
+![](../_static/images/class-overlap/class-overlap-table.png)
+
 ### Table Content
 
 The Class Overlap table presents class pairs that have nonzero class overlap or pipeline
@@ -97,8 +99,6 @@ semantic overlap is acceptable.
     Note that Class Overlap is calculated on the training data, whereas Pipeline Confusion is
     calculated on the evaluation data. Thus, the two analyses have different source class sample
     counts.
-
-![](../_static/images/key-concepts/class-overlap-table.png)
 
 !!! tip "Sorting"
 
