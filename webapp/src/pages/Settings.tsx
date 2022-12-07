@@ -64,6 +64,13 @@ const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "metrics",
 ];
 
+const ANALYSES_CUSTOMIZATION_IGNORE_FIELDS: string[] = [
+  "spacy_model",
+  "subj_tags",
+  "obj_tags",
+  "faiss_encoder",
+];
+
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { data, isError, isFetching } = getConfigEndpoint.useQuery({ jobId });
@@ -745,7 +752,7 @@ const Settings: React.FC = () => {
                 )
               ).map(
                 ([field, value], index) =>
-                  field !== "faiss_encoder" && (
+                  !ANALYSES_CUSTOMIZATION_IGNORE_FIELDS.includes(field) && (
                     <Box
                       key={index}
                       display="flex"
