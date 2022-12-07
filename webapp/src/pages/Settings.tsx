@@ -154,6 +154,47 @@ const Settings: React.FC = () => {
     />
   );
 
+  const displayArgumentsList = (
+    name: string,
+    argEntries: Record<string, string> | Record<string, string>[]
+  ) => (
+    <Box display="flex" flexDirection="column" paddingTop={1}>
+      <Typography variant="caption">{name}</Typography>
+      {Object.entries(argEntries).map(([field, value], index) => (
+        <Box
+          key={index}
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-start"
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              s: 1,
+              width: "100%",
+            }}
+          >
+            {field}:
+          </Typography>
+          <Tooltip title={value} placement="bottom">
+            <Typography
+              variant="body2"
+              sx={{
+                s: 1,
+                width: "20ch",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {value}
+            </Typography>
+          </Tooltip>
+        </Box>
+      ))}
+    </Box>
+  );
+
   const displayReadonlyFields = (label: string, value: string | undefined) => (
     <TextField
       sx={{ m: 1, width: "40ch" }}
@@ -336,85 +377,11 @@ const Settings: React.FC = () => {
           resultingConfig.dataset?.class_name
         )}
         {displayReadonlyFields("remote", resultingConfig.dataset?.remote)}
-        {resultingConfig.dataset?.kwargs && (
-          <Box display="flex" flexDirection="column" paddingTop={1}>
-            <Typography variant="caption">kwargs</Typography>
-            {Object.entries(resultingConfig.dataset.kwargs).map(
-              ([field, value], index) => (
-                <Box
-                  key={index}
-                  display="flex"
-                  flexDirection="row"
-                  justifyContent="flex-start"
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      s: 1,
-                      width: "100px",
-                    }}
-                  >
-                    {field}:
-                  </Typography>
-                  <Tooltip title={value} placement="bottom">
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        s: 1,
-                        width: "100px",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {value}
-                    </Typography>
-                  </Tooltip>
-                </Box>
-              )
-            )}
-          </Box>
-        )}
+        {resultingConfig.dataset?.kwargs &&
+          displayArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
         {resultingConfig.dataset?.args &&
-          resultingConfig.dataset.args.length > 0 && (
-            <Box display="flex" flexDirection="column" paddingTop={1}>
-              <Typography variant="caption">args</Typography>
-              {Object.entries(resultingConfig.dataset.args).map(
-                ([field, value], index) => (
-                  <Box
-                    key={index}
-                    display="flex"
-                    flexDirection="row"
-                    justifyContent="flex-start"
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        s: 1,
-                        width: "100px",
-                      }}
-                    >
-                      {field}:
-                    </Typography>
-                    <Tooltip title={value} placement="bottom">
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          s: 1,
-                          width: "100px",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {value}
-                      </Typography>
-                    </Tooltip>
-                  </Box>
-                )
-              )}
-            </Box>
-          )}
+          resultingConfig.dataset.args.length > 0 &&
+          displayArgumentsList("args", resultingConfig.dataset.args)}
       </Box>
     </Box>
   );
@@ -522,124 +489,10 @@ const Settings: React.FC = () => {
               >
                 {displayReadonlyFields("class_name", model.class_name)}
                 {displayReadonlyFields("remote", model.remote)}
-                {model.kwargs && (
-                  <Box display="flex" flexDirection="column" paddingTop={1}>
-                    <Typography variant="caption">kwargs</Typography>
-                    {Object.entries(model.kwargs).map(
-                      ([field, value], index) => (
-                        <Box
-                          key={index}
-                          display="flex"
-                          flexDirection="row"
-                          justifyContent="flex-start"
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              s: 1,
-                              width: "auto",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {field}:
-                          </Typography>
-                          <Tooltip title={value} placement="bottom">
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                s: 1,
-                                width: "100px",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {value}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      )
-                    )}
-                  </Box>
-                )}
-                {model.kwargs && (
-                  <Box display="flex" flexDirection="column" paddingTop={1}>
-                    <Typography variant="caption">kwargs</Typography>
-                    {Object.entries(model.kwargs).map(
-                      ([field, value], index) => (
-                        <Box
-                          key={index}
-                          display="flex"
-                          flexDirection="row"
-                          justifyContent="flex-start"
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              s: 1,
-                              width: "auto",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {field}:
-                          </Typography>
-                          <Tooltip title={value} placement="bottom">
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                s: 1,
-                                width: "100px",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {value}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      )
-                    )}
-                  </Box>
-                )}
-                {model?.args && model.args.length > 0 && (
-                  <Box display="flex" flexDirection="column" paddingTop={1}>
-                    <Typography variant="caption">args</Typography>
-                    {Object.entries(model.args).map(([field, value], index) => (
-                      <Box
-                        key={index}
-                        display="flex"
-                        flexDirection="row"
-                        justifyContent="flex-start"
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            s: 1,
-                            width: "auto",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {field}:
-                        </Typography>
-                        <Tooltip title={value} placement="bottom">
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              s: 1,
-                              width: "100px",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {value}
-                          </Typography>
-                        </Tooltip>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
+                {model.kwargs && displayArgumentsList("kwargs", model.kwargs)}
+                {model?.args &&
+                  model.args.length > 0 &&
+                  displayArgumentsList("args", model.args)}
               </Box>
               {displayPostprocessorToggleSection({
                 name,
