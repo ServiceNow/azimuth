@@ -21,6 +21,13 @@ Nodes are ordered with flows for greatest overlap values towards the top, so as 
 class pairs. Wider flows indicate greater overlap values. Colors group flows from the same
 source class. The plot is interactive, in that nodes can be moved and reordered via dragging.
 
+<figure markdown>
+![](../_static/images/class-overlap/class-overlap-plot.png)
+<figcaption>
+Class Overlap plot on the Class Overlap page, accessed via the Dashboard.
+</figcaption>
+</figure>
+
 ### Plot options
 
 * **Minimum displayed overlap value**: This value determines which overlap flows will be displayed
@@ -70,11 +77,3 @@ navigate them, we suggest the following workflow:
 
     :material-restart: Click the reset button next to the overlap threshold value to reset to
     the default threshold.
-
-<figure markdown>
-![](../_static/images/key-concepts/class-overlap-plot.png)
-<figcaption>
-Class Overlap plot on the Class Overlap page, accessed via the Dashboard.
-</figcaption>
-</figure>
-
