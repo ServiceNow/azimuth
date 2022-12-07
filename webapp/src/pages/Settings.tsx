@@ -594,7 +594,7 @@ const Settings: React.FC = () => {
               flexDirection="row"
               gap={5}
               sx={{
-                "& .MuiTextField-root": { m: 1, width: "15ch" },
+                "& .MuiTextField-root": { m: 1, width: "18ch" },
               }}
             >
               {_.sortBy(
