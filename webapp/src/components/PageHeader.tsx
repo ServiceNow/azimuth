@@ -162,11 +162,11 @@ const PageHeader = () => {
                   <span className={classes.label}>Project:</span>
                   <span>{datasetInfo.projectName}</span>
                 </Typography>
-                {config && (
+                {config?.pipelines && (
                   <PipelineSelect
                     selectedPipeline={pipeline.pipelineIndex}
                     onChange={setPipeline}
-                    pipelines={config.pipelines!}
+                    pipelines={config.pipelines}
                   />
                 )}
               </>
