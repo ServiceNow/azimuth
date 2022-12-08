@@ -235,9 +235,10 @@ const Settings: React.FC = () => {
       onChange={(event) =>
         setPartialConfig({
           ...partialConfig,
-          [config]: _.assign({}, resultingConfig[config], {
+          [config]: {
+            ...(resultingConfig[config] as Partial<AzimuthConfig>),
             [field]: Number(event.target.value),
-          }),
+          },
         })
       }
     />
@@ -432,9 +433,10 @@ const Settings: React.FC = () => {
                     onChange={(event) =>
                       setPartialConfig({
                         ...partialConfig,
-                        uncertainty: _.assign({}, resultingConfig.uncertainty, {
+                        uncertainty: {
+                          ...resultingConfig.uncertainty,
                           [field]: Number(event.target.value),
-                        }),
+                        },
                       })
                     }
                   />
