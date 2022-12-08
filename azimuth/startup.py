@@ -41,12 +41,22 @@ class Startup:
     # The names of other start-up tasks to wait for.
     dependency_names: List[str] = field(default_factory=list)
     run_on_all_pipelines: bool = False
+    dataset_split_names: List[DatasetSplitName] = field(
+        default_factory=lambda: [DatasetSplitName.train, DatasetSplitName.eval]
+    )
 
 
 START_UP_THREAD_NAME = "Azimuth_Startup"
 
-SIMILARITY_TASKS = [
-    Startup("neighbors_tags", SupportedModule.NeighborsTagging),
+SIMILARITY_TASKS = [Startup("neighbors_tags", SupportedModule.NeighborsTagging)]
+
+SIMILARITY_TRAIN_TASKS = [
+    Startup(
+        "class_overlap",
+        SupportedModule.ClassOverlap,
+        dependency_names=["prediction", "neighbors_tags"],
+        dataset_split_names=[DatasetSplitName.train],
+    )
 ]
 
 BMA_PREDICTION_TASKS = [
@@ -59,12 +69,37 @@ BMA_PREDICTION_TASKS = [
 ]
 
 PERTURBATION_TESTING_TASKS = [
-    Startup("perturbation_testing", SupportedModule.PerturbationTesting, run_on_all_pipelines=True)
+    Startup(
+        "perturbation_testing",
+        SupportedModule.PerturbationTesting,
+        dependency_names=["prediction"],
+        run_on_all_pipelines=True,
+    ),
+    Startup(
+        "perturbation_testing_summary",
+        SupportedModule.PerturbationTestingSummary,
+        dependency_names=["perturbation_testing"],
+        run_on_all_pipelines=True,
+        dataset_split_names=[DatasetSplitName.all],
+    ),
 ]
 
 PIPELINE_COMPARISON_TASKS = [
     Startup(
-        "prediction_comparison", SupportedModule.PredictionComparison, run_on_all_pipelines=False
+        "prediction_comparison",
+        SupportedModule.PredictionComparison,
+        dependency_names=["prediction"],
+        run_on_all_pipelines=False,
+    )
+]
+
+POSTPROCESSING_EVAL_TASKS = [
+    Startup(
+        "outcome_count_per_threshold",
+        SupportedModule.OutcomeCountPerThreshold,
+        dependency_names=["prediction", "outcome_count"],
+        run_on_all_pipelines=True,
+        dataset_split_names=[DatasetSplitName.eval],
     )
 ]
 
@@ -126,6 +161,7 @@ def make_startup_tasks(
     mod_options: Dict,
     dependencies: List[DaskModule],
     pipeline_index: Optional[int],
+    dataset_split_names: List[DatasetSplitName],
 ) -> Dict[DatasetSplitName, DaskModule]:
     """
     Apply `module` on all indices of all dataset split names and call `save_results` at the end.
@@ -137,6 +173,7 @@ def make_startup_tasks(
         mod_options: Special kwargs for the Module.
         dependencies: Which modules to include as dependency.
         pipeline_index: On which pipeline to run the startup task.
+        dataset_split_names: List of DatasetSplitName on which to run the task.
 
     Returns:
         Named Modules with the tasks.
@@ -146,7 +183,8 @@ def make_startup_tasks(
     dms = {k: v for k, v in dataset_split_managers.items() if v is not None}
     tasks: Dict[DatasetSplitName, DaskModule] = {}
 
-    for dataset_split_name, dm in dms.items():
+    available_datasets_splits = list(set(dataset_split_names) & set(dms))
+    for dataset_split_name in available_datasets_splits:
         _, maybe_task = task_manager.get_task(
             task_name=supported_module,
             dataset_split_name=dataset_split_name,
@@ -154,8 +192,9 @@ def make_startup_tasks(
             mod_options=ModuleOptions(pipeline_index=pipeline_index, **mod_options),
         )
         task = assert_not_none(maybe_task)
-        if task.future is not None:
-            # If we had to launch something, register the callback.
+        task_launched = task.future is not None
+        if task_launched:
+            dm = dms[dataset_split_name] if dataset_split_name != DatasetSplitName.all else dms
             task.add_done_callback(on_end, dm=dm, task_manager=task_manager)
         tasks[dataset_split_name] = task
     return tasks
@@ -192,23 +231,16 @@ def startup_tasks(
             start_up_tasks += BMA_PREDICTION_TASKS
         if config.pipelines is not None and len(config.pipelines) > 1:
             start_up_tasks += PIPELINE_COMPARISON_TASKS
+        # TODO We only check pipeline_index=0, but we should check all pipelines.
+        if postprocessing_editable(task_manager.config, 0):
+            start_up_tasks += POSTPROCESSING_EVAL_TASKS
     if similarity_available(task_manager.config):
         start_up_tasks += SIMILARITY_TASKS
+        if DatasetSplitName.train in dataset_split_managers:
+            start_up_tasks += SIMILARITY_TRAIN_TASKS
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
-    # TODO We only check pipeline_index=0, but we should not run on pipeline that do not support it.
-    if predictions_available(config) and postprocessing_editable(task_manager.config, 0):
-        start_up_tasks_eval_only: List[Startup] = [
-            Startup(
-                "outcome_count_per_threshold",
-                SupportedModule.OutcomeCountPerThreshold,
-                dependency_names=["prediction", "outcome_count"],
-                run_on_all_pipelines=True,
-            )
-        ]
-        eval_dm = {DatasetSplitName.eval: dataset_split_managers[DatasetSplitName.eval]}
-        mods.update(start_tasks_for_dms(config, eval_dm, task_manager, start_up_tasks_eval_only))
     # Start a thread to monitor the status.
     th = threading.Thread(
         target=wait_for_startup, args=(mods, task_manager), name=START_UP_THREAD_NAME
@@ -258,6 +290,7 @@ def start_tasks_for_dms(
                         mod_options=startup.mod_options,
                         dependencies=dep_mods,
                         pipeline_index=pipeline_index,
+                        dataset_split_names=startup.dataset_split_names,
                     ).items()
                 }
             )
