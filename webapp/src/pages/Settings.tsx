@@ -98,14 +98,27 @@ const Settings: React.FC = () => {
   );
 
   const displayToggleSectionTitle = (
-    config: keyof AzimuthConfig,
-    section: string = config
+    field: keyof AzimuthConfig,
+    section: string = field
   ) => (
     <Box display="flex" flexDirection="row" marginLeft={1.5}>
       <Typography textTransform="capitalize" variant="subtitle2">
         {section}
       </Typography>
-      {switchNullOrDefault(config, Boolean(resultingConfig[config]))}
+      <Checkbox
+        sx={{ paddingTop: 0.5 }}
+        size="small"
+        checked={Boolean(resultingConfig[field])}
+        disabled={isError || isFetching}
+        onChange={(...[, checked]) =>
+          setPartialConfig({
+            ...partialConfig,
+            [field]: checked
+              ? config![field] ?? CONFIG_SUB_FIELDS[field]
+              : null,
+          })
+        }
+      />
     </Box>
   );
 
@@ -138,24 +151,6 @@ const Settings: React.FC = () => {
         }
       />
     </Box>
-  );
-
-  const switchNullOrDefault = (
-    field: keyof AzimuthConfig,
-    selected: boolean
-  ) => (
-    <Checkbox
-      sx={{ paddingTop: 0.5 }}
-      size="small"
-      checked={selected}
-      disabled={isError || isFetching}
-      onChange={(...[, checked]) =>
-        setPartialConfig({
-          ...partialConfig,
-          [field]: checked ? config![field] ?? CONFIG_SUB_FIELDS[field] : null,
-        })
-      }
-    />
   );
 
   const displayArgumentsList = (
