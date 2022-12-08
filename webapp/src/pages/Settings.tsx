@@ -404,7 +404,7 @@ const Settings: React.FC = () => {
         <Box display="flex" flexDirection="column" paddingTop={1}>
           <Typography variant="caption">uncertainty</Typography>
           {resultingConfig.uncertainty &&
-            _.sortBy(Object.entries(resultingConfig.uncertainty)).map(
+            Object.entries(resultingConfig.uncertainty).map(
               ([field, value], index) => (
                 <Box key={index} display="flex" flexDirection="row">
                   <Typography
@@ -452,7 +452,7 @@ const Settings: React.FC = () => {
         </Typography>
       </Box>
       {resultingConfig.pipelines &&
-        _.sortBy(resultingConfig.pipelines, "name").map(
+        resultingConfig.pipelines.map(
           ({ name, model, postprocessors }, pipelineIndex) => (
             <Box
               key={pipelineIndex}
@@ -500,42 +500,39 @@ const Settings: React.FC = () => {
                 gap={1}
                 margin={2}
               >
-                {postprocessors &&
-                  _.sortBy(postprocessors, "class_name").map(
-                    (postprocessor, index) => (
-                      <Box
-                        key={index}
-                        display="flex"
-                        flexDirection="row"
-                        justifyContent="flex-start"
-                        gap={2}
-                        padding={1}
-                        marginX={2}
-                        border="1px solid rgba(0, 0, 0, 0.12)"
-                      >
-                        {displayReadonlyFields(
-                          "class_name",
-                          postprocessor.class_name
-                        )}
-                        {postprocessor.temperature !== undefined &&
-                          displayPostprocessorNumberField(
-                            pipelineIndex,
-                            { name, model, postprocessors },
-                            "temperature",
-                            index,
-                            postprocessor.temperature
-                          )}
-                        {postprocessor.threshold !== undefined &&
-                          displayPostprocessorNumberField(
-                            pipelineIndex,
-                            { name, model, postprocessors },
-                            "threshold",
-                            index,
-                            postprocessor.threshold
-                          )}
-                      </Box>
-                    )
-                  )}
+                {postprocessors?.map((postprocessor, index) => (
+                  <Box
+                    key={index}
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="flex-start"
+                    gap={2}
+                    padding={1}
+                    marginX={2}
+                    border="1px solid rgba(0, 0, 0, 0.12)"
+                  >
+                    {displayReadonlyFields(
+                      "class_name",
+                      postprocessor.class_name
+                    )}
+                    {postprocessor.temperature !== undefined &&
+                      displayPostprocessorNumberField(
+                        pipelineIndex,
+                        { name, model, postprocessors },
+                        "temperature",
+                        index,
+                        postprocessor.temperature
+                      )}
+                    {postprocessor.threshold !== undefined &&
+                      displayPostprocessorNumberField(
+                        pipelineIndex,
+                        { name, model, postprocessors },
+                        "threshold",
+                        index,
+                        postprocessor.threshold
+                      )}
+                  </Box>
+                ))}
               </Box>
             </Box>
           )
@@ -593,12 +590,10 @@ const Settings: React.FC = () => {
                 "& .MuiTextField-root": { m: 1, width: "18ch" },
               }}
             >
-              {_.sortBy(
-                Object.entries(
-                  resultingConfig[customizationConfig] ??
-                    CONFIG_SUB_FIELDS[customizationConfig] ??
-                    {}
-                )
+              {Object.entries(
+                resultingConfig[customizationConfig] ??
+                  CONFIG_SUB_FIELDS[customizationConfig] ??
+                  {}
               ).map(
                 ([field, value], index) =>
                   !ANALYSES_CUSTOMIZATION_IGNORE_FIELDS.includes(field) && (
