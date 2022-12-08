@@ -20,5 +20,6 @@ Released changes are shown in the
 
 ### Fixed
 - Showing long utterances fully on hover in similar and perturbed utterances tables.
+- Webapp crash when no pipeline.
 
 ### Security
