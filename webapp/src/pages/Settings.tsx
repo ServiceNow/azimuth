@@ -49,6 +49,7 @@ const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
     min_num_per_class: 0,
   },
   similarity: { conflicting_neighbors_threshold: 0, no_close_threshold: 0 },
+  behavioral_testing: {},
 };
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
@@ -73,14 +74,18 @@ const ANALYSES_CUSTOMIZATION_IGNORE_FIELDS: string[] = [
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
-  const { data, isError, isFetching } = getConfigEndpoint.useQuery({ jobId });
+  const {
+    data: config,
+    isError,
+    isFetching,
+  } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig] = updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
 
-  const resultingConfig = { ...data, ...partialConfig };
+  const resultingConfig = { ...config, ...partialConfig };
 
   const divider = <Divider sx={{ marginY: 1 }} />;
 
@@ -104,7 +109,10 @@ const Settings: React.FC = () => {
     </Box>
   );
 
-  const displayPostprocessorToggleSection = (pipeline: PipelineDefinition) => (
+  const displayPostprocessorToggleSection = (
+    pipelineIndex: number,
+    pipeline: PipelineDefinition
+  ) => (
     <Box display="flex" flexDirection="row" padding={1}>
       <Typography variant="subtitle2">Postprocessors</Typography>
       <Checkbox
@@ -112,26 +120,22 @@ const Settings: React.FC = () => {
         sx={{ paddingTop: 0.5 }}
         checked={Boolean(pipeline.postprocessors)}
         disabled={isError || isFetching}
-        onChange={(...[, checked]) => {
+        onChange={(...[, checked]) =>
           setPartialConfig({
             ...partialConfig,
-            pipelines: _.unionBy(
-              [
-                {
-                  ...pipeline,
-                  postprocessors: checked
-                    ? _.find(data?.pipelines, ["name", pipeline.name])
-                        ?.postprocessors ?? []
-                    : null,
-                },
-              ],
-              _.has(partialConfig, "pipelines")
-                ? partialConfig.pipelines
-                : resultingConfig.pipelines,
-              "name"
-            ),
-          });
-        }}
+            pipelines: [
+              // TODO refactor pipelineIndex if we want to support adding or removing pipelines
+              ...resultingConfig.pipelines!.slice(0, pipelineIndex),
+              {
+                ...pipeline,
+                postprocessors: checked
+                  ? config!.pipelines![pipelineIndex].postprocessors ?? []
+                  : null,
+              },
+              ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+            ],
+          })
+        }
       />
     </Box>
   );
@@ -148,7 +152,7 @@ const Settings: React.FC = () => {
       onChange={(...[, checked]) =>
         setPartialConfig({
           ...partialConfig,
-          [field]: checked ? data?.[field] ?? CONFIG_SUB_FIELDS[field] : null,
+          [field]: checked ? config![field] ?? CONFIG_SUB_FIELDS[field] : null,
         })
       }
     />
@@ -156,7 +160,7 @@ const Settings: React.FC = () => {
 
   const displayArgumentsList = (
     name: string,
-    argEntries: Record<string, string> | Record<string, string>[]
+    argEntries: Record<string, any> | any[]
   ) => (
     <Box display="flex" flexDirection="column" paddingTop={1}>
       <Typography variant="caption">{name}</Typography>
@@ -222,24 +226,25 @@ const Settings: React.FC = () => {
       label={<Typography fontWeight="bold">{field}</Typography>}
       type="number"
       value={value}
-      disabled={!Boolean(resultingConfig[config])}
+      inputProps={{
+        ...STEPPER[field],
+        style: { fontSize: 14 },
+      }}
+      disabled={!resultingConfig[config]}
       variant="standard"
       onChange={(event) =>
-        setPartialConfig(
-          _.merge({}, partialConfig, {
-            [config]: _.merge(
-              { [field]: Number(event.target.value) },
-              config in partialConfig
-                ? _.get(partialConfig, config)
-                : _.get(resultingConfig, config)
-            ),
-          })
-        )
+        setPartialConfig({
+          ...partialConfig,
+          [config]: _.assign({}, resultingConfig[config], {
+            [field]: Number(event.target.value),
+          }),
+        })
       }
     />
   );
 
   const displayPostprocessorNumberField = (
+    pipelineIndex: number,
     pipeline: PipelineDefinition,
     field: string,
     postprocessorIdx: number,
@@ -255,32 +260,27 @@ const Settings: React.FC = () => {
       label={<Typography fontWeight="bold">{field}</Typography>}
       type="number"
       value={value}
-      inputProps={{ min: 0, max: 1, step: 0.1, "data-testid": `${field}` }}
+      inputProps={{ min: 0, max: 1, step: 0.1 }}
       variant="standard"
       onChange={(event) =>
         setPartialConfig({
           ...partialConfig,
-          pipelines: _.unionBy(
-            [
-              {
-                ...pipeline,
-                postprocessors: _.unionBy(
-                  [
-                    _.merge({}, pipeline?.postprocessors?.[postprocessorIdx], {
-                      [field]: Number(event.target.value),
-                      kwargs: { [field]: Number(event.target.value) },
-                    }),
-                  ],
-                  pipeline.postprocessors,
-                  "class_name"
-                ),
-              },
-            ],
-            _.has(partialConfig, "pipelines")
-              ? partialConfig.pipelines
-              : resultingConfig.pipelines,
-            "name"
-          ),
+          pipelines: [
+            ...resultingConfig.pipelines!.slice(0, pipelineIndex),
+            {
+              ...pipeline,
+              postprocessors: [
+                ...pipeline.postprocessors!.slice(0, postprocessorIdx),
+                {
+                  ...pipeline.postprocessors![postprocessorIdx],
+                  [field]: Number(event.target.value),
+                  kwargs: { [field]: Number(event.target.value) },
+                },
+                ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
+              ],
+            },
+            ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+          ],
         })
       }
     />
@@ -290,27 +290,24 @@ const Settings: React.FC = () => {
     checked
       ? setPartialConfig({
           ...partialConfig,
-          ...{
-            metrics: _.merge({}, resultingConfig.metrics, {
-              [metricName]: {
-                class_name: "datasets.load_metric",
-                kwargs: {
-                  path: metricName.toLowerCase(),
-                },
-                additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
-                  metricName
-                )
-                  ? { average: "weighted" }
-                  : {},
+          metrics: {
+            ...resultingConfig.metrics,
+            [metricName]: {
+              class_name: "datasets.load_metric",
+              kwargs: {
+                path: metricName.toLowerCase(),
               },
-            }),
+              additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
+                metricName
+              )
+                ? { average: "weighted" }
+                : {},
+            },
           },
         })
       : setPartialConfig({
           ...partialConfig,
-          ...{
-            metrics: _.omit(resultingConfig.metrics, metricName),
-          },
+          metrics: _.omit(resultingConfig.metrics, metricName),
         });
   };
 
@@ -425,25 +422,20 @@ const Settings: React.FC = () => {
                     size="small"
                     type="number"
                     value={value}
-                    disabled={!Boolean(resultingConfig.uncertainty)}
+                    disabled={!resultingConfig.uncertainty}
                     style={{ fontSize: 14 }}
-                    inputProps={
-                      (STEPPER[field],
-                      { "data-testid": `${field}` },
-                      { style: { fontSize: 14 } })
-                    }
+                    inputProps={{
+                      ...STEPPER[field],
+                      style: { fontSize: 14 },
+                    }}
                     variant="standard"
                     onChange={(event) =>
-                      setPartialConfig(
-                        _.merge({}, partialConfig, {
-                          uncertainty: _.merge(
-                            { [field]: Number(event.target.value) },
-                            _.has(partialConfig, "uncertainty")
-                              ? {}
-                              : _.get(resultingConfig, "uncertainty")
-                          ),
-                        })
-                      )
+                      setPartialConfig({
+                        ...partialConfig,
+                        uncertainty: _.assign({}, resultingConfig.uncertainty, {
+                          [field]: Number(event.target.value),
+                        }),
+                      })
                     }
                   />
                 </Box>
@@ -490,11 +482,11 @@ const Settings: React.FC = () => {
                 {displayReadonlyFields("class_name", model.class_name)}
                 {displayReadonlyFields("remote", model.remote)}
                 {model.kwargs && displayArgumentsList("kwargs", model.kwargs)}
-                {model?.args &&
+                {model.args &&
                   model.args.length > 0 &&
                   displayArgumentsList("args", model.args)}
               </Box>
-              {displayPostprocessorToggleSection({
+              {displayPostprocessorToggleSection(pipelineIndex, {
                 name,
                 model,
                 postprocessors,
@@ -523,15 +515,17 @@ const Settings: React.FC = () => {
                           "class_name",
                           postprocessor.class_name
                         )}
-                        {postprocessor.temperature &&
+                        {postprocessor.temperature !== undefined &&
                           displayPostprocessorNumberField(
+                            pipelineIndex,
                             { name, model, postprocessors },
                             "temperature",
                             index,
                             postprocessor.temperature
                           )}
-                        {postprocessor.threshold &&
+                        {postprocessor.threshold !== undefined &&
                           displayPostprocessorNumberField(
+                            pipelineIndex,
                             { name, model, postprocessors },
                             "threshold",
                             index,
@@ -679,12 +673,11 @@ const Settings: React.FC = () => {
           {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
             <FormHelperText>
               <Warning
-                color="primary"
+                color="warning"
                 sx={{
                   position: "relative",
                   top: 3,
                   right: 0.5,
-                  color: (theme) => theme.palette.warning.contrastText,
                 }}
               />
               These changes may trigger some time-consuming
