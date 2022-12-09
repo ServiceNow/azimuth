@@ -12,9 +12,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import AccordionLayout from "components/AccordionLayout";
 import _ from "lodash";
 import React from "react";
-import AccordionLayout from "components/AccordionLayout";
 import { useParams } from "react-router-dom";
 import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
