@@ -31,18 +31,18 @@ analyses**. The application leverages different tools, including robustness test
 similarity analysis and saliency maps, unified by concepts such as **smart tags** and **proposed
 actions**. It currently only supports **text classification use cases**.
 
+### Live Demo
+
+Play with Azimuth on CLINC-OOS and a DistilBert model with a [live demo](https://azimuth-demo.net/).
+
+### Published Paper at [EMNLP](https://2022.emnlp.org/)
+
+Our paper was accepted as a [system demo at EMNLP 2022](https://www.servicenow.com/research/publication/gabrielle-gauthier-melancon-azim-emnlp2022.html). More information will be available soon. 
+
+### Documentation
+
 Our [documentation](https://servicenow.github.io/azimuth) contains all the instructions and
 references to use Azimuth.
-
-### YouTube Playlist
-
-<p align="center">
-  <a href="https://www.youtube.com/playlist?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8">
-    <img src="docs/docs/_static/images/youtube.png" width="560" height="315" />
-  </a>
-</p>
-
-### Documentation Structure
 
 * [Getting Started](https://servicenow.github.io/azimuth/getting-started)
   contains all the instructions to **install** and **launch** the app.
@@ -54,7 +54,15 @@ references to use Azimuth.
   different **contracts** which allow **configuring** Azimuth with different datasets and pipelines.
 * [Development](https://servicenow.github.io/azimuth/development) guides on how to develop and
   **contribute** to the repo.
+  
+### YouTube Playlist
 
+<p align="center">
+  <a href="https://www.youtube.com/playlist?list=PLdq4WQvLzJCnJmInRYBSfeCWLiHbX55V8">
+    <img src="docs/docs/_static/images/youtube.png" width="560" height="315" />
+  </a>
+</p>
+  
 ## Run Our Demo
 
 After installing the requirements, as explained
@@ -117,6 +125,10 @@ add other `README` files in appropriate places, and don't forget to edit them if
 ├── docker-compose-gpu.yml # Extension to use Azimuth with gpus.
 └── runner.py # Application entrypoint.
 ```
+
+## Contact
+
+To contact us, join our [slack](https://join.slack.com/t/azimuth-org/shared_invite/zt-1i9eu48n9-7NnCXHw5VzUs~gs20xHxyg) or send us an [email](azimuth-team@servicenow.com)!
 
 ## License
 
