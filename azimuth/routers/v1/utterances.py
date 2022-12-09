@@ -77,16 +77,6 @@ class UtterancesSortableColumn(str, Enum):
     confidence = "confidence"
 
 
-def get_sort_mapping(config=Depends(get_config)):
-    return {
-        UtterancesSortableColumn.index: DatasetColumn.row_idx,
-        UtterancesSortableColumn.utterance: config.columns.text_input,
-        UtterancesSortableColumn.label: config.columns.label,
-        UtterancesSortableColumn.prediction: DatasetColumn.postprocessed_prediction,
-        UtterancesSortableColumn.confidence: "_top_conf",
-    }
-
-
 @router.get(
     "",
     summary="Get table view",
@@ -102,7 +92,6 @@ def get_utterances(
         UtterancesSortableColumn.index, title="Column to sort utterances by", alias="sort"
     ),
     descending: bool = Query(False, title="Descending"),
-    sort_mapping: Dict[UtterancesSortableColumn, str] = Depends(get_sort_mapping),
     task_manager: TaskManager = Depends(get_task_manager),
     config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
@@ -110,12 +99,6 @@ def get_utterances(
     pagination: Optional[PaginationParams] = Depends(get_pagination),
     without_postprocessing: bool = Query(False, title="Without Postprocessing"),
 ) -> GetUtterancesResponse:
-    if (
-        sort_by in {UtterancesSortableColumn.confidence, UtterancesSortableColumn.prediction}
-        and pipeline_index is None
-    ):
-        sort_by = UtterancesSortableColumn.index
-
     threshold = (
         config.pipelines[pipeline_index].threshold
         if config.pipelines is not None
@@ -152,15 +135,35 @@ def get_utterances(
 
     if indices is not None:
         if len(set(indices) - set(ds[DatasetColumn.row_idx])) > 0:
-            raise HTTPException(404, detail=f"Indices not found after filtering {indices}")
+            raise HTTPException(
+                HTTP_404_NOT_FOUND, detail=f"Indices not found after filtering {indices}"
+            )
         ds = ds.filter(lambda i: i in indices, input_columns=DatasetColumn.row_idx)
 
     # We create _top_conf because we can't sort on a column made of lists.
     # Starts with underscore to emphasize that
     # this should not be used elsewhere and it is not saved.
-    if sort_by is UtterancesSortableColumn.confidence:
-        ds = ds.map(lambda i: {"_top_conf": i[DatasetColumn.postprocessed_confidences][0]})
-    ds = ds.sort(sort_mapping[sort_by], reverse=descending)
+    if sort_by == UtterancesSortableColumn.confidence and pipeline_index is not None:
+        sort_by_column = "_top_conf"
+        column = (
+            DatasetColumn.model_confidences
+            if without_postprocessing
+            else DatasetColumn.postprocessed_confidences
+        )
+        ds = ds.map(lambda i: {sort_by_column: i[column][0]})
+    elif sort_by == UtterancesSortableColumn.prediction and pipeline_index is not None:
+        if without_postprocessing:
+            sort_by_column = "_top_prediction"
+            ds = ds.map(lambda i: {sort_by_column: i[DatasetColumn.model_predictions][0]})
+        else:
+            sort_by_column = DatasetColumn.postprocessed_prediction
+    elif sort_by == UtterancesSortableColumn.utterance:
+        sort_by_column = config.columns.text_input
+    elif sort_by == UtterancesSortableColumn.label:
+        sort_by_column = config.columns.label
+    else:
+        sort_by_column = DatasetColumn.row_idx
+    ds = ds.sort(sort_by_column, reverse=descending)
 
     utterance_count = len(ds)  # Before pagination to get the full length.
     if pagination is not None:
