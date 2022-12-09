@@ -18,6 +18,7 @@ import AccordionLayout from "components/AccordionLayout";
 import { useParams } from "react-router-dom";
 import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
+import { PickByValue } from "types/models";
 
 const STEPPER: Record<string, InputBaseComponentProps> = {
   iterations: { min: 0, max: 100, step: 1 },
@@ -33,7 +34,9 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
   long_sentence_min_token: { min: 0, max: 100, step: 1 },
 };
 
-const ANALYSES_CUSTOMIZATION: (keyof AzimuthConfig)[] = [
+type SubConfigKeys = keyof PickByValue<AzimuthConfig, object>;
+
+const ANALYSES_CUSTOMIZATION: SubConfigKeys[] = [
   "dataset_warnings",
   "syntax",
   "similarity",
@@ -211,7 +214,7 @@ const Settings: React.FC = () => {
   );
 
   const displayNumberField = (
-    config: keyof AzimuthConfig,
+    config: SubConfigKeys,
     field: string,
     value: number | undefined
   ) => (
@@ -231,7 +234,7 @@ const Settings: React.FC = () => {
         setPartialConfig({
           ...partialConfig,
           [config]: {
-            ...(resultingConfig[config] as Partial<AzimuthConfig>),
+            ...resultingConfig[config],
             [field]: Number(event.target.value),
           },
         })
