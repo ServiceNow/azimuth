@@ -1,6 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from typing import List
 
 from fastapi import FastAPI
 from starlette.testclient import TestClient
@@ -29,22 +30,40 @@ def test_get_similar(app: FastAPI) -> None:
     assert len(resp) == 2
 
 
-def test_utterances(app: FastAPI):
+def test_get_utterances(app: FastAPI):
     client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances").json()
     assert len(resp["utterances"]) == 42
     assert resp["utteranceCount"] == 42
-    first_idx = resp["utterances"][0]["index"]
+    indices = [u["index"] for u in resp["utterances"]]
+    assert all(a <= b for a, b in zip(indices[:-1], indices[1:])), indices
 
+
+def is_sorted(numbers: List[float], descending=False):
+    return all(a >= b if descending else a <= b for a, b in zip(numbers[:-1], numbers[1:]))
+
+
+def test_get_utterances_sort_confidence(app: FastAPI):
+    client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0&sort=confidence").json()
-    first_idx_sorted = resp["utterances"][0]["index"]
-    assert first_idx_sorted != first_idx
+    assert len(resp["utterances"]) == 42
+    assert resp["utteranceCount"] == 42
+    assert is_sorted(
+        [u["modelPrediction"]["postprocessedConfidences"][0] for u in resp["utterances"]]
+    )
 
+
+def test_get_utterances_sort_unavailable_column(app: FastAPI):
+    client = TestClient(app)
     # The `sort=confidence` is ignored because no pipeline is specified
     resp = client.get("/dataset_splits/eval/utterances?sort=confidence").json()
-    first_idx_ignored = resp["utterances"][0]["index"]
-    assert first_idx_ignored == first_idx
+    assert len(resp["utterances"]) == 42
+    assert resp["utteranceCount"] == 42
+    assert is_sorted([u["index"] for u in resp["utterances"]])
 
+
+def test_get_utterances_pagination(app: FastAPI):
+    client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances?limit=10&offset=10").json()
     assert len(resp["utterances"]) == 10
     assert resp["utteranceCount"] == 42
@@ -61,7 +80,7 @@ def test_utterances(app: FastAPI):
     assert resp.status_code == 400
 
 
-def test_get_utterances(app: FastAPI, monkeypatch):
+def test_get_utterances_saliency(app: FastAPI, monkeypatch):
     import azimuth.routers.v1.utterances as utt_module
 
     monkeypatch.setattr(utt_module, "saliency_available", lambda x: True)
