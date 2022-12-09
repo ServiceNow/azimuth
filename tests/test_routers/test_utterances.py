@@ -52,6 +52,38 @@ def test_get_utterances_sort_confidence(app: FastAPI):
         [u["modelPrediction"]["postprocessedConfidences"][0] for u in resp["utterances"]]
     )
 
+    resp = client.get(
+        "/dataset_splits/eval/utterances?pipeline_index=0&sort=confidence"
+        "&without_postprocessing=true"
+    ).json()
+    assert len(resp["utterances"]) == 42
+    assert resp["utteranceCount"] == 42
+    assert is_sorted([u["modelPrediction"]["modelConfidences"][0] for u in resp["utterances"]])
+
+
+def test_get_utterances_sort_prediction(app: FastAPI):
+    client = TestClient(app)
+    resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0&sort=prediction").json()
+    assert len(resp["utterances"]) == 42
+    assert resp["utteranceCount"] == 42
+    assert is_sorted([u["modelPrediction"]["postprocessedPrediction"] for u in resp["utterances"]])
+
+    resp = client.get(
+        "/dataset_splits/eval/utterances?pipeline_index=0&sort=prediction"
+        "&without_postprocessing=true"
+    ).json()
+    assert len(resp["utterances"]) == 42
+    assert resp["utteranceCount"] == 42
+    assert is_sorted([u["modelPrediction"]["modelPredictions"][0] for u in resp["utterances"]])
+
+
+def test_get_utterances_sort_descending(app: FastAPI):
+    client = TestClient(app)
+    resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0&descending=true").json()
+    assert len(resp["utterances"]) == 42
+    assert resp["utteranceCount"] == 42
+    assert is_sorted([u["index"] for u in resp["utterances"]], descending=True)
+
 
 def test_get_utterances_sort_unavailable_column(app: FastAPI):
     client = TestClient(app)
