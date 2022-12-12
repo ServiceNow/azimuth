@@ -140,9 +140,9 @@ def get_utterances(
             )
         ds = ds.filter(lambda i: i in indices, input_columns=DatasetColumn.row_idx)
 
-    # We create _top_conf because we can't sort on a column made of lists.
-    # Starts with underscore to emphasize that
-    # this should not be used elsewhere and it is not saved.
+    # We create _top_conf and _top_prediction because we can't sort on columns made of lists.
+    # They start with an underscore to emphasize that they are not saved and that therefore they
+    # should not be used anywhere else.
     if sort_by == UtterancesSortableColumn.confidence and pipeline_index is not None:
         sort_by_column = "_top_conf"
         column = (
