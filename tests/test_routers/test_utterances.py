@@ -30,17 +30,16 @@ def test_get_similar(app: FastAPI) -> None:
     assert len(resp) == 2
 
 
+def is_sorted(numbers: List[float], descending=False):
+    return all(a >= b if descending else a <= b for a, b in zip(numbers[:-1], numbers[1:]))
+
+
 def test_get_utterances(app: FastAPI):
     client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances").json()
     assert len(resp["utterances"]) == 42
     assert resp["utteranceCount"] == 42
-    indices = [u["index"] for u in resp["utterances"]]
-    assert all(a <= b for a, b in zip(indices[:-1], indices[1:])), indices
-
-
-def is_sorted(numbers: List[float], descending=False):
-    return all(a >= b if descending else a <= b for a, b in zip(numbers[:-1], numbers[1:]))
+    assert is_sorted([u["index"] for u in resp["utterances"]])
 
 
 def test_get_utterances_sort_confidence(app: FastAPI):
