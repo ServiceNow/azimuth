@@ -13,4 +13,5 @@ export const formatRatioAsPercentageString = (
 ) => `${formatNumberAsString(100 * value, digits)}%`;
 
 export const camelToTitleCase = (camelCase: string) =>
-  camelCase.replace(/(?<=[a-z])(?=[A-Z0-9])|(?<=[A-Z0-9])(?=[A-Z][a-z])/g, " ");
+  // Safari and iOS browsers don't support lookbehind in regular expressions.
+  camelCase.replace(/([a-z])(?=[A-Z0-9])|([A-Z0-9])(?=[A-Z][a-z])/g, "$1$2 ");
