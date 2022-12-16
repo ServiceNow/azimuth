@@ -22,5 +22,6 @@ Released changes are shown in the
 - Showing long utterances fully on hover in similar and perturbed utterances tables.
 - Webapp crash when no pipeline.
 - Sort confidence or prediction without postprocessing.
+- Crash on Safari and iOS browsers as they don't support lookbehind in regular expressions.
 
 ### Security
