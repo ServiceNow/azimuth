@@ -54,7 +54,7 @@ SIMILARITY_TRAIN_TASKS = [
     Startup(
         "class_overlap",
         SupportedModule.ClassOverlap,
-        dependency_names=["prediction", "neighbors_tags"],
+        dependency_names=["neighbors_tags"],
         dataset_split_names=[DatasetSplitName.train],
     )
 ]
