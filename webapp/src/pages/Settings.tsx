@@ -636,22 +636,22 @@ const Settings: React.FC = () => {
           are saved, expect some delays for recomputing the affected tasks.
         </Typography>
         <AccordionLayout
-          name="Project Configurations"
-          description="contains mandatory fields that specify the dataset to load in Azimuth"
+          name="Project Configuration"
+          description="View the fields that define the dataset to load in Azimuth."
           link="reference/configuration/project/"
         >
           {getProjectConfigSection()}
         </AccordionLayout>
         <AccordionLayout
-          name="Model Contract Configurations"
-          description="defines how Azimuth interacts with the ML pipelines and the metrics"
+          name="Model Contract Configuration"
+          description="View and edit some fields that define the ML pipelines and the metrics."
           link="reference/configuration/model_contract/"
         >
           {getModelContractConfigSection()}
         </AccordionLayout>
         <AccordionLayout
           name="Analyses Customization"
-          description="four analyses configured in Azimuth"
+          description="Enable or disable some analyses and edit corresponding thresholds."
           link="reference/configuration/analyses/"
         >
           {getAnalysesCustomization()}
