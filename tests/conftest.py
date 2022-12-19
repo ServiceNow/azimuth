@@ -105,7 +105,7 @@ def simple_text_config_multi_pipeline(simple_text_config):
 @pytest.fixture
 def tiny_text_config(simple_text_config) -> AzimuthConfig:
     tiny_text_config = simple_text_config.copy(deep=True)
-    tiny_text_config.dataset.kwargs["max_dataset_len"] = 2
+    tiny_text_config.dataset.kwargs["max_dataset_len"] = 4
     return tiny_text_config
 
 
@@ -194,11 +194,14 @@ def file_text_config_no_intent(file_text_config_top1):
 
 
 @pytest.fixture
-def clinc_text_config(simple_text_config):
-    clinc_text_config = simple_text_config.copy(deep=True)
-    clinc_text_config.dataset = DATASET_CLINC150_CFG
-    clinc_text_config.rejection_class = "NO_INTENT"
-    clinc_text_config.name = "clinc-test"
+def clinc_text_config(tmp_path):
+    clinc_text_config = AzimuthConfig(
+        name="clinc-test",
+        dataset=DATASET_CLINC150_CFG,
+        rejection_class="NO_INTENT",
+        pipelines=[PIPELINE_CFG],
+        artifact_path=str(tmp_path),
+    )
     clinc_text_config.pipelines[0].postprocessors[0].temperature = 1
     clinc_text_config.pipelines[0].postprocessors[0].kwargs["temperature"] = 1
     clinc_text_config.pipelines[0].postprocessors[-1].threshold = 0.5

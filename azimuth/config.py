@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 import structlog
 from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, validator
 
-from azimuth.types import AliasModel, SupportedModelContract
+from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 
 log = structlog.get_logger(__file__)
@@ -77,8 +77,8 @@ class AzimuthValidationError(Exception):
 # Mypy does not like a variable named kwargs.
 class CustomObject(BaseModel):  # type: ignore
     class_name: str = Field(..., title="Class name to load.")
-    args: List[Union["CustomObject", Any]] = []
-    kwargs: Dict[str, Union["CustomObject", Any]] = {}
+    args: List[Any] = []
+    kwargs: Dict[str, Any] = {}
     remote: Optional[str] = Field(
         None,
         description="Relative path to class. `class_name` needs to be accessible from this path.",
@@ -227,6 +227,8 @@ class ColumnConfiguration(BaseModel):
     label: str = "label"
     # Optional column to specify whether an example has failed preprocessing.
     failed_parsing_reason: str = "failed_parsing_reason"
+    # Unique identifier for every example
+    persistent_id: str = DatasetColumn.row_idx
 
 
 class ProjectConfig(BaseSettings):
@@ -338,7 +340,8 @@ class ModelContractConfig(CommonFieldsConfig):
 class LanguageConfig(CommonFieldsConfig):
     # Language config sets multiple config values; see `config_defaults_per_language` for details
     # Language should only determine other config values and not be referenced in modules.
-    language: SupportedLanguage = SupportedLanguage.en
+    # The default `language` environment variable was conflicting on certain machines.
+    language: SupportedLanguage = Field(SupportedLanguage.en, env=[])
 
 
 class PerturbationTestingConfig(ModelContractConfig):

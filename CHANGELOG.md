@@ -11,21 +11,17 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
-- Azimuth now works on French datasets (and pipelines)! Language can be selected in the config,
-  and language-specific defaults for syntax-tagging and behavioral tests (neutral tokens) will be
-  set dynamically (or can be altered manually).
-- New class analysis section, with class overlap detection. More details are available in the User Guide and in the Key Concepts.
-- Pipeline pre/post-processing steps breakdown in the utterance detail page.
 
 ### Changed
-- The default port for the front end will now be 3000, the React default, instead of 3005.
 
 ### Deprecated/Breaking Changes
 
 ### Removed
 
 ### Fixed
-- ONNX models on GPU.
-- Preserve white spaces in utterances. That includes `\n`s, `\t`s, and consecutive spaces.
+- Showing long utterances fully on hover in similar and perturbed utterances tables.
+- Webapp crash when no pipeline.
+- Sort confidence or prediction without postprocessing.
+- Crash on Safari and iOS browsers as they don't support lookbehind in regular expressions.
 
 ### Security

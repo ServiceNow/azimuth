@@ -96,8 +96,8 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/class_analysis`,
-          name: "Class Analysis",
+          pathname: `/${jobId}/class_overlap`,
+          name: "Class Overlap",
         },
         {
           pathname: `/${jobId}/pipeline_metrics`,
@@ -162,13 +162,11 @@ const PageHeader = () => {
                   <span className={classes.label}>Project:</span>
                   <span>{datasetInfo.projectName}</span>
                 </Typography>
-                {config && (
-                  <PipelineSelect
-                    selectedPipeline={pipeline.pipelineIndex}
-                    onChange={setPipeline}
-                    pipelines={config.pipelines!}
-                  />
-                )}
+                <PipelineSelect
+                  selectedPipeline={pipeline.pipelineIndex}
+                  onChange={setPipeline}
+                  pipelines={config?.pipelines ?? []}
+                />
               </>
             )}
             <IconButton

@@ -36,7 +36,7 @@ test("formatRatioASPercentageString", () => {
 });
 
 describe("camelToTitleCase", () => {
-  it("should convert CamelCase to TitleCase", () => {
+  it("should convert CamelCase to Title Case", () => {
     expect(camelToTitleCase("SimpleCamelCase")).toBe("Simple Camel Case");
   });
   it("should support acronyms", () => {

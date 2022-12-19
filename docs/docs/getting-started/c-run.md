@@ -105,7 +105,7 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
     ```
     make launch
     ```
-4. The **app will be accessible** at `http://0.0.0.0:8080` after a few minutes of waiting. The
+4. The **app will be accessible** at `http://localhost:8080` after a few minutes of waiting. The
    start-up tasks will start.
 
 ## Advanced Settings

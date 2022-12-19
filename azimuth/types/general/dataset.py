@@ -12,7 +12,6 @@ class DatasetSplitName(str, Enum):
 
 class DatasetColumn(str, Enum):
     row_idx = "row_idx"
-    idx = "idx"
     model_predictions = "model_predictions"
     postprocessed_prediction = "postprocessed_prediction"
     pipeline_steps = "pipeline_steps"

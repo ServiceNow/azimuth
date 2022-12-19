@@ -563,7 +563,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
                 <PipelineSelect
                   selectedPipeline={comparedPipeline}
                   onChange={setComparedPipeline}
-                  pipelines={config.pipelines!}
+                  pipelines={config.pipelines}
                   disabledPipelines={[pipeline.pipelineIndex]}
                 />
               }

@@ -47,34 +47,41 @@ The dataset warnings section highlights issues related to **class size**, **clas
 
 Select `View Details` to get to [:material-link: Dataset Warnings](dataset-warnings.md).
 
-## Class Analysis
+## Class Overlap
 
-The Class Analysis section gives an overview of the similarity between class pairs. In some
-cases, high similarity may be associated with poor class definitions, mislabelling, and/or model
+The Class Overlap section gives an overview of the semantic overlap between class pairs. In some
+cases, high overlap may be associated with poor class definitions, mislabelling, and/or model
 confusion.
 
 Select `View details` to access the [:material-link: Class
-Analysis](class-analysis) page with an interactive
-[Class Overlap Plot](class-analysis.md#class-overlap-plot).
+Overlap](class-overlap.md) page with an interactive
+[Class Overlap Plot](class-overlap.md#class-overlap-plot).
+
+![](../_static/images/class-overlap/class-overlap-table.png)
 
 ### Table Content
 
-The Class Analysis table presents class pairs that have nonzero class overlap or pipeline
+The Class Overlap table presents class pairs that have nonzero class overlap or pipeline
 confusion.
 
-* **Class overlap** is calculated for class pairs in the training data based on the locations of
-  utterances in embedding space, as described in
-  [:material-link: Class Similarity](../key-concepts/class-similarity.md). Because it is
+Each row shows a source class and a target class, where the source class is the class of the
+samples being analyzed (e.g., class label for pipeline confusion), and the target class is the
+class that the source class may look like, through the lens of the dataset or the model (e.g.,
+prediction for pipeline confusion).
+
+* **Semantic Overlap Score**s are calculated for class pairs in the training data based on the
+  locations of utterances in embedding space, as described in
+  [:material-link: Similarity Analysis](../key-concepts/similarity.md). Because it is
   determined on a dataset alone, it does not require a pipeline to be supplied.
-* **Utterances with overlap** indicates the percentage of samples in the source class that are
+* **Utterances with Overlap** indicates the percentage of samples in the source class that are
   determined to overlap the target class, as well as the sample count with overlap
   relative to the total sample count for the source class. This is also based on the training data.
-* **Pipeline confusion** is presented if a pipeline is provided. Pipeline confusion indicates
+* **Pipeline Confusion** is presented if a pipeline is provided. Pipeline confusion indicates
   confusion of the source class for the target class (i.e., the confusion matrix cell
   where the label is the source class and the prediction is the target class), for the
   evaluation data.
 
-As overlap indicates semantic similarity in embedding space, it may or may not be associated
+As class overlap indicates semantic similarity in embedding space, it may or may not be associated
 with pipeline confusion.
 
 For example, if high overlap is due to mislabeling or poor class differentiation, it may be
@@ -92,8 +99,6 @@ semantic overlap is acceptable.
     Note that Class Overlap is calculated on the training data, whereas Pipeline Confusion is
     calculated on the evaluation data. Thus, the two analyses have different source class sample
     counts.
-
-![](../_static/images/key-concepts/class-analysis-table.png)
 
 !!! tip "Sorting"
 

@@ -12,7 +12,11 @@ type Props = {
 const Description: React.FC<Props> = ({ text, link }) => {
   return (
     <Box display="flex" gap={1}>
-      {text && <Typography variant="body2">{text}</Typography>}
+      {text && (
+        <Typography variant="body2" whiteSpace="pre-wrap">
+          {text}
+        </Typography>
+      )}
       {link && (
         <Link
           href={DOCS_URL + link}

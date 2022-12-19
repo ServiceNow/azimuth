@@ -12,7 +12,7 @@
     "@mui/x-data-grid": "^5.6.1",
     "@reduxjs/toolkit": "^1.8.1",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "framer-motion": "^4.1.17",
     "lodash": "^4.17.21",
     "plotly.js": "^1.58.4",

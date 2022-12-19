@@ -1,33 +1,27 @@
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
-  Typography,
   Box,
-  Slider,
-  Paper,
-  Switch,
   FormControlLabel,
-  Tooltip,
   FormGroup,
   IconButton,
+  Paper,
+  Slider,
+  Switch,
   TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import Description from "components/Description";
 import Loading from "components/Loading";
 import { PlotWrapper } from "components/PlotWrapper";
+import useDebounced from "hooks/useDebounced";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { getClassAnalysisPlotEndpoint } from "services/api";
+import { getClassOverlapPlotEndpoint } from "services/api";
 import { QueryClassOverlapState } from "types/models";
 import { constructSearchString } from "utils/helpers";
-
-export const classAnalysisDescription = (
-  <Description
-    text="Assess overlap between class pairs."
-    link="/class-analysis/"
-  />
-);
 
 const OVERLAP_THRESHOLD_INPUT_PROPS = { step: 0.01, min: 0, max: 1 };
 
@@ -36,36 +30,50 @@ const ClassOverlap = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { classOverlap, pipeline } = useQueryState();
 
-  const { data, error, isFetching } = getClassAnalysisPlotEndpoint.useQuery({
+  const { data, error, isFetching } = getClassOverlapPlotEndpoint.useQuery({
     jobId,
     ...classOverlap,
   });
 
+  // Control overlap threshold with a `string` (and not with a `number`) so for
+  // example when hitting backspace after `0.01`, you get `0.0` (and not `0`).
   const [overlapThreshold, setOverlapThreshold] = React.useState(
-    classOverlap.overlapThreshold
+    classOverlap.overlapThreshold === undefined
+      ? undefined
+      : String(classOverlap.overlapThreshold)
   );
 
-  React.useEffect(
-    () => setOverlapThreshold(classOverlap.overlapThreshold),
-    [classOverlap.overlapThreshold]
+  const setQuery = React.useCallback(
+    (newClassOverlap: QueryClassOverlapState) =>
+      history.push(
+        `/${jobId}/class_overlap${constructSearchString({
+          ...pipeline,
+          ...classOverlap,
+          ...newClassOverlap,
+        })}`
+      ),
+    [history, jobId, pipeline, classOverlap]
   );
 
-  const setQuery = (newClassOverlap: QueryClassOverlapState) =>
-    history.push(
-      `/${jobId}/class_analysis${constructSearchString({
-        ...pipeline,
-        ...classOverlap,
-        ...newClassOverlap,
-      })}`
-    );
+  const commitOverlapThreshold = useDebounced(
+    React.useCallback(
+      (overlapThreshold: number | undefined) => setQuery({ overlapThreshold }),
+      [setQuery]
+    )
+  );
 
   const checkValid = data?.plot.data[0].node.x.length > 0;
 
   return (
     <Box height="100%" width="100%" minHeight={0} position="relative">
       <Box paddingX={4} paddingTop={1} paddingBottom={3}>
-        <Typography variant="h2">Class Analysis</Typography>
-        {classAnalysisDescription}
+        <Typography variant="h2">Class Overlap</Typography>
+        {
+          <Description
+            text="Assess semantic overlap between class pairs."
+            link="/class-overlap/"
+          />
+        }
       </Box>
       {error && (
         <Box
@@ -92,32 +100,47 @@ const ClassOverlap = () => {
           }}
         >
           <Box padding={2}>
-            <Typography variant="h4">Class Overlap in Training Data</Typography>
-            <Description text="Assess magnitude of overlap. Flows between class nodes indicate whether a class's utterances (source; left) are in neighborhoods typified by other classes or its own class (target; right)." />
+            <Typography variant="h4">
+              Semantic Overlap in Training Data
+            </Typography>
+            <Description
+              text={
+                "Assess magnitude of overlap and select class pairs to explore further. For suggested workflow:"
+              }
+              link="/class-overlap/#suggested_workflow/"
+            />
+            <Typography variant="body2" marginTop={0.25}>
+              Flows between class nodes indicate whether a source class's
+              utterances are in neighborhoods typified by other classes (class
+              overlap) or its own class (self-overlap). For each source class,
+              class overlap and self-overlap flows sum to 1, unless total flow
+              is scaled by class size. Greatest class overlap is towards the
+              top. Colors group flows from the same source class.
+            </Typography>
           </Box>
           <Box display="flex" gap={4} alignSelf="center">
-            <Box width={700}>
+            <Box width={700} display="flex" flexDirection="column">
               {checkValid ? (
-                <PlotWrapper {...data.plot} />
+                <>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="subtitle2">Source class</Typography>
+                    <Typography variant="subtitle2">Target class</Typography>
+                  </Box>
+                  <PlotWrapper {...data.plot} />
+                </>
               ) : (
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignSelf="flex-start"
-                >
+                <>
                   <Typography
                     variant="h4"
                     alignSelf="flex-end"
                     paddingBottom={2}
                   >
-                    No data for the threshold - {classOverlap?.overlapThreshold}
+                    No data for the threshold{" "}
+                    {classOverlap.overlapThreshold ??
+                      data.defaultOverlapThreshold}
                   </Typography>
-                  <img
-                    src={noData}
-                    alt="No data for the threshold"
-                    height="10%"
-                  />
-                </Box>
+                  <img src={noData} alt="No data for the threshold" />
+                </>
               )}
             </Box>
             <Box
@@ -130,7 +153,7 @@ const ClassOverlap = () => {
             >
               <FormGroup>
                 <Tooltip
-                  title="Show flow from a class to itself (not defined as overlap)."
+                  title="Show flows for overlap of a class with itself, to compare to class overlap. Samples can overlap samples in other classes (class overlap) or within the same class (self-overlap)."
                   arrow
                   placement="right"
                 >
@@ -144,11 +167,11 @@ const ClassOverlap = () => {
                         }}
                       />
                     }
-                    label="Self-Overlap"
+                    label="Self-overlap"
                   />
                 </Tooltip>
                 <Tooltip
-                  title="Scale flow by class size. Otherwise, total flow is normalized within classes."
+                  title="Scale flows by class size. Otherwise, total flow is normalized within classes (self-overlap + class overlap = 1)."
                   arrow
                   placement="right"
                 >
@@ -162,16 +185,18 @@ const ClassOverlap = () => {
                         }}
                       />
                     }
-                    label="Scale By Class"
+                    label="Scale by class size"
                   />
                 </Tooltip>
               </FormGroup>
               <Tooltip
-                title="Only flows with values above this threshold will be plotted."
+                title="Only overlap values above this threshold will be plotted. Vary this value to see all dataset overlap or to focus on greatest overlap."
                 arrow
                 placement="right"
               >
-                <Typography variant="h4">Overlap Threshold</Typography>
+                <Typography variant="h4">
+                  Minimum displayed overlap value
+                </Typography>
               </Tooltip>
               <Box
                 display="flex"
@@ -187,15 +212,17 @@ const ClassOverlap = () => {
                     "& .MuiSlider-track": { border: "none" }, // compensate bug with track="inverted"
                   }}
                   {...OVERLAP_THRESHOLD_INPUT_PROPS}
-                  value={overlapThreshold ?? data.defaultOverlapThreshold}
+                  value={Number(
+                    overlapThreshold ?? data.defaultOverlapThreshold
+                  )}
                   onChange={(_, value) => {
-                    if (value !== overlapThreshold) {
-                      setOverlapThreshold(value as number);
+                    if (value !== Number(overlapThreshold)) {
+                      setOverlapThreshold(String(value));
                     }
                   }}
                   onChangeCommitted={(_, value) => {
                     if (value !== classOverlap?.overlapThreshold) {
-                      setQuery({ overlapThreshold: value as number });
+                      commitOverlapThreshold.now(value as number);
                     }
                   }}
                 />
@@ -204,18 +231,20 @@ const ClassOverlap = () => {
                   type="number"
                   value={overlapThreshold ?? data.defaultOverlapThreshold}
                   inputProps={OVERLAP_THRESHOLD_INPUT_PROPS}
-                  onChange={(event) => {
-                    setQuery({ overlapThreshold: Number(event.target.value) });
+                  onChange={({ target: { value } }) => {
+                    setOverlapThreshold(value);
+                    commitOverlapThreshold.debounce(Number(value));
                   }}
                 />
-                <Tooltip title="Reset threshold" arrow>
+                <Tooltip title="Reset threshold (10th highest overlap)" arrow>
                   <span>
                     <IconButton
                       aria-label="delete"
                       color="secondary"
                       disabled={classOverlap.overlapThreshold === undefined}
                       onClick={() => {
-                        setQuery({ overlapThreshold: undefined });
+                        setOverlapThreshold(undefined);
+                        commitOverlapThreshold.now(undefined);
                       }}
                     >
                       <RestartAltIcon fontSize="large" />

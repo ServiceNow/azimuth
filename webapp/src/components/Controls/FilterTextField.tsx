@@ -1,12 +1,12 @@
 import { Clear, Search } from "@mui/icons-material";
 import {
   Box,
-  debounce,
   IconButton,
   Input,
   InputAdornment,
   Typography,
 } from "@mui/material";
+import useDebounced from "hooks/useDebounced";
 import React from "react";
 
 type Props = {
@@ -26,28 +26,16 @@ const FilterTextField: React.FC<Props> = ({
 
   React.useEffect(() => setLiveValue(filterValue), [filterValue]);
 
-  const setFilterValueDebounced = React.useMemo(
-    () => debounce(setFilterValue, 500),
-    [setFilterValue]
-  );
+  const commitFilterValue = useDebounced(setFilterValue);
 
-  // Cancel debounced execution when the component unmounts,
-  // for example when navigating to Dashboard while continuously typing.
-  React.useEffect(
-    () => setFilterValueDebounced.clear,
-    [setFilterValueDebounced]
-  );
-
-  const handleChange = (value?: string) => {
+  const handleChange = (value: string | undefined) => {
     setLiveValue(value);
-    setFilterValueDebounced(value);
+    commitFilterValue.debounce(value);
   };
 
   const handleClear = () => {
     setLiveValue(undefined);
-    // Clear filter value with no delay.
-    setFilterValue(undefined);
-    setFilterValueDebounced.clear();
+    commitFilterValue.now(undefined);
   };
 
   return (
