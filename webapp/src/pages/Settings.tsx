@@ -208,6 +208,8 @@ const Settings: React.FC = () => {
       InputProps={{
         readOnly: true,
         disableUnderline: true,
+      }}
+      inputProps={{
         style: { fontSize: 14 },
       }}
     />
@@ -259,7 +261,12 @@ const Settings: React.FC = () => {
       label={<Typography fontWeight="bold">{field}</Typography>}
       type="number"
       value={value}
-      inputProps={{ min: 0, max: 1, step: 0.1 }}
+      inputProps={{
+        min: 0,
+        max: 1,
+        step: 0.1,
+        style: { fontSize: 14 },
+      }}
       variant="standard"
       onChange={(event) =>
         setPartialConfig({
@@ -422,7 +429,6 @@ const Settings: React.FC = () => {
                     type="number"
                     value={value}
                     disabled={!resultingConfig.uncertainty}
-                    style={{ fontSize: 14 }}
                     inputProps={{
                       ...STEPPER[field],
                       style: { fontSize: 14 },

@@ -23,13 +23,6 @@ import { getClassOverlapPlotEndpoint } from "services/api";
 import { QueryClassOverlapState } from "types/models";
 import { constructSearchString } from "utils/helpers";
 
-export const classAnalysisDescription = (
-  <Description
-    text="Assess overlap between class pairs."
-    link="user-guide/class-analysis/"
-  />
-);
-
 const OVERLAP_THRESHOLD_INPUT_PROPS = { step: 0.01, min: 0, max: 1 };
 
 const ClassOverlap = () => {
@@ -78,7 +71,7 @@ const ClassOverlap = () => {
         {
           <Description
             text="Assess semantic overlap between class pairs."
-            link="/class-overlap/"
+            link="user-guide/class-overlap/"
           />
         }
       </Box>
@@ -114,7 +107,7 @@ const ClassOverlap = () => {
               text={
                 "Assess magnitude of overlap and select class pairs to explore further. For suggested workflow:"
               }
-              link="/class-overlap/#suggested_workflow/"
+              link="user-guide/class-overlap/#suggested_workflow/"
             />
             <Typography variant="body2" marginTop={0.25}>
               Flows between class nodes indicate whether a source class's
