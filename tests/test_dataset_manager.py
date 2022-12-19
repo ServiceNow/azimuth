@@ -396,11 +396,8 @@ def test_custom_persistent_id(simple_text_config, a_text_dataset):
             dataset_split=a_text_dataset,
         )
 
-    # TODO Bug that will be fixed when updating datasets.
-    # 872 should be replaced by len(a_text_dataset).
-    dataset_length = 872
     a_text_dataset_new_col = a_text_dataset.add_column(
-        name="yukongold", column=[1] * dataset_length
+        name="yukongold", column=[1] * len(a_text_dataset)
     )
     with pytest.raises(ValueError, match="need to be unique"):
         DatasetSplitManager(
