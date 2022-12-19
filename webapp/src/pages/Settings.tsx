@@ -458,13 +458,14 @@ const Settings: React.FC = () => {
       {resultingConfig.pipelines &&
         resultingConfig.pipelines.map(
           ({ name, model, postprocessors }, pipelineIndex) => (
-            <Box
+            <Paper
               key={pipelineIndex}
+              variant="outlined"
+              component={Box}
               display="flex"
               flexDirection="column"
-              margin={(theme) => theme.spacing(2, 3)}
+              margin={2}
               padding={1}
-              border="1px solid rgba(0, 0, 0, 0.12)"
             >
               {displaySectionTitle("general")}
               <Box
@@ -505,15 +506,16 @@ const Settings: React.FC = () => {
                 margin={2}
               >
                 {postprocessors?.map((postprocessor, index) => (
-                  <Box
+                  <Paper
                     key={index}
+                    variant="outlined"
+                    component={Box}
                     display="flex"
                     flexDirection="row"
                     justifyContent="flex-start"
                     gap={2}
                     padding={1}
                     marginX={2}
-                    border="1px solid rgba(0, 0, 0, 0.12)"
                   >
                     {displayReadonlyFields(
                       "class_name",
@@ -535,10 +537,10 @@ const Settings: React.FC = () => {
                         index,
                         postprocessor.threshold
                       )}
-                  </Box>
+                  </Paper>
                 ))}
               </Box>
-            </Box>
+            </Paper>
           )
         )}
       <Box display="flex" flexDirection="column" justifyContent="flex-start">
