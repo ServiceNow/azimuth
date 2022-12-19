@@ -621,10 +621,13 @@ const Settings: React.FC = () => {
     ));
 
   return (
-    <Box sx={{ height: "100%" }}>
+    <Box height="100%" display="flex" flexDirection="column">
       <Paper
         variant="outlined"
-        sx={{ height: "90%", padding: 2, overflow: "auto" }}
+        component={Box}
+        flex={1}
+        padding={2}
+        overflow="auto"
       >
         <Typography variant="subtitle1" marginBottom={3}>
           View and edit certain fields from your config file. Once your changes
@@ -652,15 +655,7 @@ const Settings: React.FC = () => {
           {getAnalysesCustomization()}
         </AccordionLayout>
       </Paper>
-      <Box
-        sx={{
-          height: "10%",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingY: 2,
-        }}
-      >
+      <Box display="flex" justifyContent="space-between" paddingY={2}>
         <Button variant="contained" onClick={() => setPartialConfig({})}>
           Discard
         </Button>
@@ -672,19 +667,14 @@ const Settings: React.FC = () => {
           gap={2}
         >
           {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
-            <FormHelperText>
-              <Warning
-                color="warning"
-                sx={{
-                  position: "relative",
-                  top: 3,
-                  right: 0.5,
-                }}
-              />
-              These changes may trigger some time-consuming
-              <br />
-              computations. Azimuth will not be usable until they complete.
-            </FormHelperText>
+            <>
+              <Warning color="warning" />
+              <FormHelperText>
+                These changes may trigger some time-consuming computations.
+                <br />
+                Azimuth will not be usable until they complete.
+              </FormHelperText>
+            </>
           )}
           <Button
             variant="contained"
