@@ -3,7 +3,7 @@
 # in the root directory of this source tree.
 import string
 from dataclasses import dataclass
-from typing import Callable, List
+from typing import Callable, Dict, List
 
 import numpy as np
 import torch
@@ -73,9 +73,13 @@ def load_intent_data(train_path, test_path, python_loader) -> Dataset:
     return load_dataset(python_loader, data_files={"train": train_path, "test": test_path})
 
 
-def load_file_dataset(*args, azimuth_config, **kwargs):
+def load_file_dataset(data_files: Dict[str, str], azimuth_config):
     # Load a file dataset and cast the label column as a ClassLabel.
-    ds_dict = load_dataset(*args, **kwargs)
+    # Train and test need to be loaded separately because they don't always share the same columns.
+    # Train sometimes don't have predictions. HF will complain if we load both together.
+    ds_dict = load_dataset("csv", data_files={"train": data_files["train"]})
+    ds_dict_test = load_dataset("csv", data_files={"test": data_files["test"]})
+    ds_dict.update(ds_dict_test)
     features: Features = [v.features for v in ds_dict.values()][0]
     if not isinstance(features[azimuth_config.columns.label], ClassLabel):
         # Get all classes from both set and apply the same mapping to every dataset.

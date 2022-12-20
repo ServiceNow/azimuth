@@ -436,7 +436,7 @@ test = ["pre-commit", "pytest", "pytest-rerunfailures", "pytest-xdist"]
 
 [[package]]
 name = "datasets"
-version = "1.16.1"
+version = "2.1.0"
 description = "HuggingFace community-driven open-source library of datasets"
 category = "main"
 optional = false
@@ -451,8 +451,9 @@ multiprocess = "*"
 numpy = ">=1.17"
 packaging = "*"
 pandas = "*"
-pyarrow = ">=3.0.0,<4.0.0 || >4.0.0"
+pyarrow = ">=5.0.0"
 requests = ">=2.19.0"
+responses = "<0.19"
 tqdm = ">=4.62.1"
 xxhash = "*"
 
@@ -460,14 +461,15 @@ xxhash = "*"
 apache-beam = ["apache-beam (>=2.26.0)"]
 audio = ["librosa"]
 benchmarks = ["numpy (==1.18.5)", "tensorflow (==2.3.0)", "torch (==1.6.0)", "transformers (==3.0.2)"]
-dev = ["Werkzeug (>=1.0.1)", "absl-py", "aiobotocore", "apache-beam (>=2.26.0)", "bert-score (>=0.3.6)", "black (==21.4b0)", "boto3", "botocore", "bs4", "conllu", "elasticsearch", "fairseq", "faiss-cpu (>=1.6.4)", "fastBPE (==0.1.0)", "flake8 (==3.7.9)", "fsspec[s3]", "importlib-resources", "isort (>=5.0.0)", "jiwer", "langdetect", "lxml", "moto[s3,server] (==2.0.4)", "mwparserfromhell", "nltk", "openpyxl", "py7zr", "pytest", "pytest-datadir", "pytest-xdist", "pytorch-lightning", "pytorch-nlp (==0.5.0)", "pyyaml (>=5.3.1)", "rarfile (>=4.0)", "requests-file (>=1.5.1)", "rouge-score", "s3fs (==2021.08.1)", "sacrebleu", "scikit-learn", "scipy", "sentencepiece", "seqeval", "six (>=1.15.0,<1.16.0)", "tensorflow (>=2.3,!=2.6.0,!=2.6.1)", "texttable (>=1.6.3)", "tldextract", "tldextract (>=3.1.0)", "toml (>=0.10.1)", "torch", "torchaudio", "transformers", "wget (>=3.2)", "zstandard"]
-docs = ["Markdown (!=3.3.5)", "docutils (==0.16.0)", "fsspec (<2021.9.0)", "myst-parser", "recommonmark", "s3fs", "sphinx (==3.1.2)", "sphinx-copybutton", "sphinx-inline-tabs", "sphinx-markdown-tables", "sphinx-panels", "sphinx-rtd-theme (==0.4.3)", "sphinxext-opengraph (==0.4.1)"]
-quality = ["black (==21.4b0)", "flake8 (==3.7.9)", "isort (>=5.0.0)", "pyyaml (>=5.3.1)"]
+dev = ["Pillow (>=6.2.1)", "Werkzeug (>=1.0.1)", "absl-py", "aiobotocore", "apache-beam (>=2.26.0)", "bert-score (>=0.3.6)", "black (>=22.0,<23.0)", "boto3", "botocore", "bs4", "conllu", "elasticsearch (<8.0.0)", "faiss-cpu (>=1.6.4)", "flake8 (>=3.8.3)", "fsspec[s3]", "h5py", "importlib-resources", "isort (>=5.0.0)", "jiwer", "langdetect", "librosa", "lxml", "mauve-text", "moto[s3,server] (==2.0.4)", "mwparserfromhell", "nltk", "openpyxl", "py7zr", "pytest", "pytest-datadir", "pytest-xdist", "pyyaml (>=5.3.1)", "rarfile (>=4.0)", "requests-file (>=1.5.1)", "rouge-score", "s3fs (==2021.08.1)", "sacrebleu", "scikit-learn", "scipy", "sentencepiece", "seqeval", "six (>=1.15.0,<1.16.0)", "soundfile", "tensorflow (>=2.3,!=2.6.0,!=2.6.1)", "texttable (>=1.6.3)", "tldextract", "tldextract (>=3.1.0)", "toml (>=0.10.1)", "torch", "torchaudio", "transformers", "zstandard"]
+docs = ["s3fs"]
+quality = ["black (>=22.0,<23.0)", "flake8 (>=3.8.3)", "isort (>=5.0.0)", "pyyaml (>=5.3.1)"]
 s3 = ["boto3", "botocore", "fsspec", "s3fs"]
 tensorflow = ["tensorflow (>=2.2.0,!=2.6.0,!=2.6.1)"]
 tensorflow_gpu = ["tensorflow-gpu (>=2.2.0,!=2.6.0,!=2.6.1)"]
-tests = ["Werkzeug (>=1.0.1)", "absl-py", "aiobotocore", "apache-beam (>=2.26.0)", "bert-score (>=0.3.6)", "boto3", "botocore", "bs4", "conllu", "elasticsearch", "fairseq", "faiss-cpu (>=1.6.4)", "fastBPE (==0.1.0)", "fsspec[s3]", "importlib-resources", "jiwer", "langdetect", "lxml", "moto[s3,server] (==2.0.4)", "mwparserfromhell", "nltk", "openpyxl", "py7zr", "pytest", "pytest-datadir", "pytest-xdist", "pytorch-lightning", "pytorch-nlp (==0.5.0)", "rarfile (>=4.0)", "requests-file (>=1.5.1)", "rouge-score", "s3fs (==2021.08.1)", "sacrebleu", "scikit-learn", "scipy", "sentencepiece", "seqeval", "six (>=1.15.0,<1.16.0)", "tensorflow (>=2.3,!=2.6.0,!=2.6.1)", "texttable (>=1.6.3)", "tldextract", "tldextract (>=3.1.0)", "toml (>=0.10.1)", "torch", "torchaudio", "transformers", "wget (>=3.2)", "zstandard"]
+tests = ["Pillow (>=6.2.1)", "Werkzeug (>=1.0.1)", "absl-py", "aiobotocore", "apache-beam (>=2.26.0)", "bert-score (>=0.3.6)", "boto3", "botocore", "bs4", "conllu", "elasticsearch (<8.0.0)", "faiss-cpu (>=1.6.4)", "fsspec[s3]", "h5py", "importlib-resources", "jiwer", "langdetect", "librosa", "lxml", "mauve-text", "moto[s3,server] (==2.0.4)", "mwparserfromhell", "nltk", "openpyxl", "py7zr", "pytest", "pytest-datadir", "pytest-xdist", "rarfile (>=4.0)", "requests-file (>=1.5.1)", "rouge-score", "s3fs (==2021.08.1)", "sacrebleu", "scikit-learn", "scipy", "sentencepiece", "seqeval", "six (>=1.15.0,<1.16.0)", "soundfile", "tensorflow (>=2.3,!=2.6.0,!=2.6.1)", "texttable (>=1.6.3)", "tldextract", "tldextract (>=3.1.0)", "toml (>=0.10.1)", "torch", "torchaudio", "transformers", "zstandard"]
 torch = ["torch"]
+vision = ["Pillow (>=6.2.1)"]
 
 [[package]]
 name = "debugpy"
@@ -673,6 +675,7 @@ spacy = ">=3.1.0,<3.2.0"
 [package.source]
 type = "url"
 url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.1.0/fr_core_news_md-3.1.0.tar.gz#egg=fr_core_news_md"
+
 [[package]]
 name = "frozenlist"
 version = "1.3.0"
@@ -1825,9 +1828,9 @@ python-versions = ">=3.8"
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.20.0", markers = "platform_machine == \"arm64\" and python_version < \"3.10\""},
-    {version = ">=1.19.2", markers = "platform_machine == \"aarch64\" and python_version < \"3.10\""},
     {version = ">=1.18.5", markers = "platform_machine != \"aarch64\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
+    {version = ">=1.19.2", markers = "platform_machine == \"aarch64\" and python_version < \"3.10\""},
+    {version = ">=1.20.0", markers = "platform_machine == \"arm64\" and python_version < \"3.10\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -2361,6 +2364,21 @@ requests = ">=2.0.0"
 
 [package.extras]
 rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
+
+[[package]]
+name = "responses"
+version = "0.18.0"
+description = "A utility library for mocking out the `requests` Python library."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+requests = ">=2.0,<3.0"
+urllib3 = ">=1.25.10"
+
+[package.extras]
+tests = ["coverage (>=6.0.0)", "flake8", "mypy", "pytest (>=4.6)", "pytest-cov", "pytest-localserver", "types-mock", "types-requests"]
 
 [[package]]
 name = "retrying"
@@ -3398,7 +3416,7 @@ gpu = ["onnxruntime-gpu"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "631405fb7b957132e46dd2773bda644f194bbca10aaf2f28e5aca6bc6de1355d"
+content-hash = "52defc5f6dd215b9b97ea90d0abb3c275a358731d1cb7101bc6eb46446d0393b"
 
 [metadata.files]
 absl-py = [
@@ -3795,8 +3813,8 @@ dask = [
     {file = "dask-2021.12.0.tar.gz", hash = "sha256:90614c9d162713e4849532c86f2854e8d53468521285413403b6c496344c0109"},
 ]
 datasets = [
-    {file = "datasets-1.16.1-py3-none-any.whl", hash = "sha256:aca948640b184db4f809519599f48bd103b972d7eecbf8d3bc0bd46bf9a596c0"},
-    {file = "datasets-1.16.1.tar.gz", hash = "sha256:eda6c32ae2cbbd076f235c224f49384dc66835e40c196e0d5400259bbfbde342"},
+    {file = "datasets-2.1.0-py3-none-any.whl", hash = "sha256:7c186041abb980066bff4482037f41e302741bad4709885b2417569f2f6bac3a"},
+    {file = "datasets-2.1.0.tar.gz", hash = "sha256:d2bf81085a07ccbf739a92de9da41822f2979d4352dfdcadb3ec35eeef6cd1ef"},
 ]
 debugpy = [
     {file = "debugpy-1.6.0-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:eb1946efac0c0c3d411cea0b5ac772fbde744109fd9520fb0c5a51979faf05ad"},
@@ -5448,6 +5466,10 @@ requests = [
 requests-oauthlib = [
     {file = "requests-oauthlib-1.3.1.tar.gz", hash = "sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"},
     {file = "requests_oauthlib-1.3.1-py2.py3-none-any.whl", hash = "sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5"},
+]
+responses = [
+    {file = "responses-0.18.0-py3-none-any.whl", hash = "sha256:15c63ad16de13ee8e7182d99c9334f64fd81f1ee79f90748d527c28f7ca9dd51"},
+    {file = "responses-0.18.0.tar.gz", hash = "sha256:380cad4c1c1dc942e5e8a8eaae0b4d4edf708f4f010db8b7bcfafad1fcd254ff"},
 ]
 retrying = [
     {file = "retrying-1.3.3.tar.gz", hash = "sha256:08c039560a6da2fe4f2c426d0766e284d3b736e355f8dd24b37367b0bb41973b"},

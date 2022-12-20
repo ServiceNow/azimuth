@@ -7,6 +7,7 @@ from typing import Any, List
 
 import numpy as np
 import pytest
+from datasets import ClassLabel
 
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.dataset_analysis.dataset_warnings import DatasetWarningsModule
@@ -86,17 +87,22 @@ def test_compute_on_dataset_split(
 
 def add_rejection_class(mod, monkeypatch):
     # Adding a rejection class
-    eval_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.eval)
-    train_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.train)
-    eval_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
-    train_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
-    eval_dm._base_dataset_split = eval_dm._base_dataset_split.map(
+    dms = {
+        DatasetSplitName.eval: mod.get_dataset_split_manager(DatasetSplitName.eval),
+        DatasetSplitName.train: mod.get_dataset_split_manager(DatasetSplitName.train),
+    }
+
+    existing_classes = dms[DatasetSplitName.eval].get_class_names(labels_only=True)
+    class_label = ClassLabel(num_classes=3, names=existing_classes + ["NO_INTENT"])
+    for dm in dms.values():
+        dm._base_dataset_split.features["label"] = class_label
+
+    dms[DatasetSplitName.eval]._base_dataset_split = dms[
+        DatasetSplitName.eval
+    ]._base_dataset_split.map(
         lambda u, i: {"label": 2 if i % 10 == 0 else u["label"]}, with_indices=True
     )
-    dms = {
-        DatasetSplitName.eval: eval_dm,
-        DatasetSplitName.train: train_dm,
-    }
+
     # Modifying the config reset the ArtifactManager, which we do not want.
     monkeypatch.setattr(mod, "get_dataset_split_manager", lambda s: dms[s])
     mod.config.rejection_class = "NO_INTENT"

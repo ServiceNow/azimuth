@@ -356,9 +356,8 @@ def get_similar(
     item_scores = dict(
         source_ds.select([index])[f"neighbors_{neighbors_dataset_split_name}"][0][:limit]
     )
-    # NOTE: idx may be float in the HF Dataset.
     items: Dict[int, Dict] = {
-        idx: neighbors_ds_with_class_names[int(idx)] for idx in item_scores.keys()  # type: ignore
+        idx: neighbors_ds_with_class_names[int(idx)] for idx in item_scores.keys()
     }
     # Build utterances from `items`
     similar_utterances = [
