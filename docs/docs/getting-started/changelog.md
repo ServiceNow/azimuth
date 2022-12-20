@@ -1,5 +1,13 @@
 # Releases
 
+## [2.5.2] - 2022-12-20
+
+### Fixed
+- Show long utterances fully on hover in similar and perturbed utterances tables.
+- Fixed webapp crash when there is no pipeline (with `"pipeline": null` configured).
+- Fixed sort utterance table by confidence or prediction without post-processing.
+- Fixed crash on Safari and iOS browsers as they don't support lookbehind in regular expressions.
+
 ## [2.5.1] - 2022-12-05
 
 ### Fixed
