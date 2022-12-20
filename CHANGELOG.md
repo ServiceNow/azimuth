@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Persistent id.
 
 ### Changed
 
@@ -19,9 +20,5 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
-- Showing long utterances fully on hover in similar and perturbed utterances tables.
-- Webapp crash when no pipeline.
-- Sort confidence or prediction without postprocessing.
-- Crash on Safari and iOS browsers as they don't support lookbehind in regular expressions.
 
 ### Security
