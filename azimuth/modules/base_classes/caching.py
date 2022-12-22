@@ -3,8 +3,10 @@
 # in the root directory of this source tree.
 
 import abc
+import json
 import os
 import time
+from os.path import join as pjoin
 from typing import List, Optional
 
 import h5py
@@ -78,6 +80,10 @@ class HDF5CacheMixin(CachingMechanism):
     name: str
     _cache_lock: str  # Lockfile path
     _cache_file: str  # Cachefile path
+    _cache_metadata: str  # Metadata cachefile
+
+    def get_meta_data(self):
+        raise NotImplementedError
 
     def _store_data_in_cache(self, result: List[ModuleResponse], indices: List[int]):
         """Store `results` in `handle` for some `indices`.
@@ -100,6 +106,10 @@ class HDF5CacheMixin(CachingMechanism):
                 ds = handle.require_dataset(f"{self.name}/{idx}", shape=arr.shape, dtype=arr.dtype)
                 ds[()] = arr
             handle.flush()
+
+        # Save all that affects caching so it can be used for identification and debugging.
+        with open(pjoin(self._cache_metadata), "w+") as f:
+            json.dump(self.get_meta_data().no_alias_dict(), f, indent=4)
 
     @retry(stop_max_attempt_number=5, wait_fixed=0.5)
     def _check_cache_internal(self, indices: Optional[List[int]]):

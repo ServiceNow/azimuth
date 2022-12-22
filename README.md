@@ -54,7 +54,7 @@ references to use Azimuth.
   different **contracts** which allow **configuring** Azimuth with different datasets and pipelines.
 * [Development](https://servicenow.github.io/azimuth/development) guides on how to develop and
   **contribute** to the repo.
-  
+
 ### YouTube Playlist
 
 <p align="center">
@@ -62,7 +62,7 @@ references to use Azimuth.
     <img src="docs/docs/_static/images/youtube.png" width="560" height="315" />
   </a>
 </p>
-  
+
 ## Run Our Demo
 
 After installing the requirements, as explained

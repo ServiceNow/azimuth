@@ -11,6 +11,7 @@ from azimuth.config import ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
+from azimuth.types.general.module_options import ModuleMetaData
 from azimuth.utils.conversion import md5_hash
 from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 from azimuth.utils.validation import assert_not_none
@@ -40,20 +41,30 @@ class Module(DaskModule[ConfigScope]):
         self.task_name = self.model_contract_method_name or self.__class__.__name__
         super().__init__(dataset_split_name, config)
 
-    def _get_name(self) -> str:
+    def get_meta_data(self) -> ModuleMetaData:
+        """Retrieve meta-data on the Module such as module options and config attributes.
+
+        Returns:
+            Module's meta-data
+        """
+
         # indices are excluded, since the cache for all indices should be in the same file.
         # model_contract_method_name are excluded too because it's already in the task_name.
-        options_to_consider = self.mod_options.dict(
-            exclude={"indices", "model_contract_method_name"}, include=self.allowed_mod_options
-        )
-        attributes_to_consider = self.config.dict(
-            exclude=exclude_fields_from_cache(self.config),
+        return ModuleMetaData(
+            module_options=self.mod_options.dict(
+                exclude={"indices", "model_contract_method_name"}, include=self.allowed_mod_options
+            ),
+            config_attributes=self.config.dict(
+                exclude=exclude_fields_from_cache(self.config),
+            ),
         )
 
-        return (
-            f"{self.task_name}_{self.dataset_split_name}"
-            f"_{md5_hash(options_to_consider)[:5]}_{md5_hash(attributes_to_consider)[:5]}"
-        )
+    def _get_name(self) -> str:
+        meta_data = self.get_meta_data()
+        hash_options = md5_hash(meta_data.module_options)[:5]
+        hash_attributes = md5_hash(meta_data.config_attributes)[:5]
+
+        return f"{self.task_name}_{self.dataset_split_name}_{hash_options}_{hash_attributes}"
 
     def get_caching_indices(self) -> List[int]:
         return self.mod_options.indices or self.get_indices()

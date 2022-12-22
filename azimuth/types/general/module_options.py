@@ -3,7 +3,7 @@
 # in the root directory of this source tree.
 
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import Field
 
@@ -101,3 +101,8 @@ class ModuleOptions(AliasModel):
     cf_reorder_classes: bool = Field(
         True, title="Reorder classes based on reverse Cuthill-Mckee algorithm."
     )
+
+
+class ModuleMetaData(AliasModel):
+    module_options: Dict[str, Any]
+    config_attributes: Dict[str, Any]

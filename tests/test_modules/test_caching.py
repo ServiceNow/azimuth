@@ -4,11 +4,13 @@
 
 import json
 from copy import deepcopy
+from typing import List
 
 import h5py
+import numpy as np
 import pytest
 
-from azimuth.config import PerturbationTestingConfig
+from azimuth.config import ModelContractConfig, PerturbationTestingConfig
 from azimuth.modules.base_classes import (
     AggregationModule,
     FilterableModule,
@@ -16,12 +18,17 @@ from azimuth.modules.base_classes import (
     Module,
 )
 from azimuth.modules.base_classes.caching import HDF5FileOpenerWithRetry
+from azimuth.modules.model_performance.confusion_matrix import ConfusionMatrixModule
+from azimuth.modules.task_execution import get_task_result
 from azimuth.types import (
     DatasetFilters,
     DatasetSplitName,
     ModuleOptions,
     ModuleResponse,
 )
+from azimuth.types.model_performance import ConfusionMatrixResponse
+from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
+from tests.utils import save_outcomes, save_predictions
 
 
 @pytest.mark.parametrize(
@@ -183,6 +190,40 @@ def test_scoped_caching_common(simple_text_config, dask_client):
     new_perturbation_module = MyPerturbationModule(DatasetSplitName.eval, config=new_config)
     assert new_perturbation_module.name == my_perturbation_module.name
     assert new_perturbation_module.done()
+
+
+def test_meta_data(tiny_text_config):
+    save_predictions(tiny_text_config)
+    save_outcomes(tiny_text_config)
+    mod = ConfusionMatrixModule(
+        config=tiny_text_config,
+        dataset_split_name=DatasetSplitName.eval,
+        mod_options=ModuleOptions(pipeline_index=0, cf_normalize=False),
+    )
+    result = get_task_result(mod, List[ConfusionMatrixResponse])[0]
+
+    with open(mod._cache_metadata, "r") as f:
+        metadata = json.load(f)
+
+    mod_2 = ConfusionMatrixModule(
+        config=tiny_text_config,
+        dataset_split_name=DatasetSplitName.eval,
+        mod_options=ModuleOptions(**metadata["module_options"]),
+    )
+    result_2 = get_task_result(mod_2, List[ConfusionMatrixResponse])[0]
+
+    assert np.array_equal(result.confusion_matrix, result_2.confusion_matrix)
+    assert not result_2.normalize
+
+    # Saved config attributes should match mod_2.config, when excluding fields not affecting cache.
+    loaded_cfg = ModelContractConfig(**metadata["config_attributes"])
+    loaded_cfg_exclude_fields_from_cache = loaded_cfg.dict(
+        exclude=exclude_fields_from_cache(loaded_cfg)
+    )
+    mod_2_exclude_fields_from_cache = mod_2.config.dict(
+        exclude=exclude_fields_from_cache(mod_2.config)
+    )
+    assert mod_2_exclude_fields_from_cache == loaded_cfg_exclude_fields_from_cache
 
 
 if __name__ == "__main__":
