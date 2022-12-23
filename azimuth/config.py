@@ -128,7 +128,7 @@ class ThresholdConfig(BaseSettings, CustomObject):
 
 
 class PipelineDefinition(BaseSettings):
-    name: str
+    name: str = Field(exclude_from_cache=True)
     model: CustomObject
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
@@ -233,7 +233,7 @@ class ColumnConfiguration(BaseModel):
 
 class ProjectConfig(BaseSettings):
     # Name of the current project.
-    name: str = Field("New project", env="NAME")
+    name: str = Field("New project", env="NAME", exclude_from_cache=True)
     # Dataset object definition.
     dataset: CustomObject
     # Which model_contract the application is using.
@@ -261,15 +261,15 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # Where to store artifacts. (HDF5 files,  HF datasets, Dask config)
     artifact_path: str = "/cache"
     # Batch size to use during inference.
-    batch_size: int = 32
+    batch_size: int = Field(32, exclude_from_cache=True)
     # Will use CUDA and will need GPUs if set to True.
     # If "auto" we check if CUDA is available.
-    use_cuda: Union[Literal["auto"], bool] = "auto"
+    use_cuda: Union[Literal["auto"], bool] = Field("auto", exclude_from_cache=True)
     # Memory of the dask cluster. Regular is 6GB, Large is 12GB.
     # For bigger models, large might be needed.
-    large_dask_cluster: bool = False
+    large_dask_cluster: bool = Field(False, exclude_from_cache=True)
     # Disable configuration changes
-    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG")
+    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG", exclude_from_cache=True)
 
     def get_artifact_path(self) -> str:
         """Generate a path for caching.
