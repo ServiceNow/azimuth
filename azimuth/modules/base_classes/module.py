@@ -7,16 +7,12 @@ import numpy as np
 from datasets import Dataset
 from tqdm import tqdm
 
-from azimuth.config import (
-    AzimuthConfig,
-    CommonFieldsConfig,
-    ModelContractConfig,
-    PipelineDefinition,
-)
+from azimuth.config import AzimuthConfig, ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.utils.conversion import md5_hash
+from azimuth.utils.exclude_fields_with_extra import exclude_fields_with_extra
 from azimuth.utils.validation import assert_not_none
 
 
@@ -51,12 +47,7 @@ class Module(DaskModule[ConfigScope]):
             exclude={"indices", "model_contract_method_name"}, include=self.allowed_mod_options
         )
         attributes_to_consider = self.config.dict(
-            include={
-                k: ...
-                for k in set(AzimuthConfig.__fields__.keys()).difference(
-                    CommonFieldsConfig.__fields__.keys()
-                )
-            }
+            exclude=exclude_fields_with_extra(AzimuthConfig.__fields__, "exclude_from_cache"),
         )
 
         return (
