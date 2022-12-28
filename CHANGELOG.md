@@ -13,6 +13,7 @@ Released changes are shown in the
 ### Added
 - Persistent id.
 - New fields in config page.
+- The initial config file and all subsequent changes are saved in the caching folder.
 
 ### Changed
 

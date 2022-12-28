@@ -1,3 +1,4 @@
+import json
 import os
 from glob import glob
 from os.path import join as pjoin
@@ -13,6 +14,7 @@ from azimuth.config import (
     ThresholdConfig,
     config_defaults_per_language,
 )
+from azimuth.utils.project import update_new_config
 
 CURR_PATH = os.path.dirname(os.path.dirname(__file__))
 
@@ -134,3 +136,27 @@ def test_french_defaults_and_override():
         cfg.behavioral_testing.neutral_token.prefix_list
         == config_defaults_per_language[SupportedLanguage.fr].prefix_list
     ), "Config did not take default French value for prefix list (neutral tokens)"
+
+
+def test_update_config(tiny_text_config):
+    change_set = {"similarity": None}
+    # Validation to False so the test is fast.
+    new_config = update_new_config(tiny_text_config, change_set)
+
+    assert not new_config.similarity
+
+    with open(f"{new_config.get_artifact_path()}/configs.jsonl", "r") as f:
+        loaded_config = json.load(f)
+    assert loaded_config == new_config
+
+    change_set_2 = {"dataset_warnings": {"min_num_per_class": 40}}
+    new_config_2 = update_new_config(new_config, change_set_2)
+
+    assert new_config_2.dataset_warnings.min_num_per_class == 40
+
+    with open(f"{new_config_2.get_artifact_path()}/configs.jsonl", "r") as f:
+        lines = f.read().splitlines()
+        assert len(lines) == 2
+        loaded_config_2 = json.loads(lines[-1])
+
+    assert loaded_config_2 == new_config_2

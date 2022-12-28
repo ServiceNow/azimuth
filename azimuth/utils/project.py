@@ -3,6 +3,7 @@
 # in the root directory of this source tree.
 from typing import Dict, Optional
 
+import jsonlines
 import structlog
 from datasets import DatasetDict
 
@@ -50,6 +51,18 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
             f"Found {tuple(dataset_in_config.keys())}."
         )
     return dataset_train_eval
+
+
+def save_config(azimuth_config: AzimuthConfig):
+    """Append config to configs.jsonl to retrieve past configs."""
+    with jsonlines.open(f"{azimuth_config.get_artifact_path()}/configs.jsonl", mode="a") as f:
+        f.write(azimuth_config.dict())
+
+
+def update_new_config(old_config: AzimuthConfig, change_set: Dict) -> AzimuthConfig:
+    new_config = old_config.copy(update=change_set, deep=True)
+    save_config(new_config)
+    return new_config
 
 
 def load_dataset_split_managers_from_config(

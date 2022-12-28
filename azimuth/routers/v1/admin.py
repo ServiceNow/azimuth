@@ -13,9 +13,11 @@ from azimuth.app import (
     get_task_manager,
     initialize_managers,
     require_editable_config,
+    run_start_up_tasks,
 )
 from azimuth.config import AzimuthConfig, AzimuthValidationError
 from azimuth.task_manager import TaskManager
+from azimuth.utils.project import update_new_config
 
 log = structlog.get_logger(__name__)
 router = APIRouter()
@@ -50,8 +52,8 @@ def update_config(
     change_set: Dict = Body(...),
 ) -> AzimuthConfig:
     try:
-        new_config = config.copy(update=change_set, deep=True)
-        initialize_managers(new_config, task_manager.cluster)
+        new_config = update_new_config(old_config=config, change_set=change_set)
+        run_start_up_tasks(new_config, task_manager.cluster)
     except Exception as e:
         log.error("Rollback config update due to error", exc_info=e)
         new_config = config

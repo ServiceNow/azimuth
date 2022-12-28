@@ -6,6 +6,7 @@ from threading import Event
 from typing import Dict, Optional
 
 import structlog
+from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
@@ -13,19 +14,19 @@ from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes import Module
+from azimuth.modules.base_classes import DaskModule
 from azimuth.modules.utilities.validation import ValidationModule
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
 from azimuth.utils.logs import set_logger_config
-from azimuth.utils.project import load_dataset_split_managers_from_config
+from azimuth.utils.project import load_dataset_split_managers_from_config, save_config
 from azimuth.utils.validation import assert_not_none
 
 _dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]] = {}
 _task_manager: Optional[TaskManager] = None
-_startup_tasks: Optional[Dict[str, Module]] = None
+_startup_tasks: Optional[Dict[str, DaskModule]] = None
 _azimuth_config: Optional[AzimuthConfig] = None
 _ready_flag: Optional[Event] = None
 
@@ -56,7 +57,7 @@ def get_task_manager() -> Optional[TaskManager]:
     return _task_manager
 
 
-def get_startup_tasks() -> Optional[Dict[str, Module]]:
+def get_startup_tasks() -> Optional[Dict[str, DaskModule]]:
     return _startup_tasks
 
 
@@ -98,10 +99,11 @@ def start_app(config_path, debug=False) -> FastAPI:
     azimuth_config = load_azimuth_config(config_path)
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
+    save_config(azimuth_config)
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
-    initialize_managers(azimuth_config, local_cluster)
+    run_start_up_tasks(azimuth_config, local_cluster)
     assert_not_none(_task_manager).client.run(set_logger_config, level)
 
     app = create_app()
@@ -227,16 +229,15 @@ def create_app() -> FastAPI:
     return app
 
 
-def initialize_managers(azimuth_config, cluster):
-    """Initialize manager objects.
+def initialize_managers(azimuth_config: AzimuthConfig, cluster: SpecCluster):
+    """Initialize DatasetSplitManagers and TaskManagers.
 
-    Initialize DatasetSplitManagers, TaskManagers, start startup tasks.
 
     Args:
         azimuth_config: Configuration
         cluster: Dask cluster to use.
     """
-    global _task_manager, _dataset_split_managers, _startup_tasks, _azimuth_config, _ready_flag
+    global _task_manager, _dataset_split_managers, _azimuth_config
     _azimuth_config = azimuth_config
     if _task_manager is not None:
         task_history = _task_manager.current_tasks
@@ -248,14 +249,6 @@ def initialize_managers(azimuth_config, cluster):
     _task_manager.current_tasks = task_history
 
     _dataset_split_managers = load_dataset_split_managers_from_config(azimuth_config)
-    # Validate that everything is in order **before** the startup tasks.
-    if _dataset_split_managers.get(DatasetSplitName.train):
-        run_validation(DatasetSplitName.train, _task_manager, azimuth_config)
-    if _dataset_split_managers.get(DatasetSplitName.eval):
-        run_validation(DatasetSplitName.eval, _task_manager, azimuth_config)
-
-    _startup_tasks = startup.startup_tasks(_dataset_split_managers, _task_manager)
-    _ready_flag = Event()
 
 
 def run_validation(
@@ -289,3 +282,25 @@ def run_validation(
             run_validation_module(pipeline_index)
     task_manager.clear_worker_cache()
     task_manager.restart()
+
+
+def run_start_up_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
+    """Initialize managers, run validation and startup tasks.
+
+    Args:
+        azimuth_config: Config
+        cluster: Cluster
+
+    """
+    initialize_managers(azimuth_config, cluster)
+
+    task_manager = assert_not_none(get_task_manager())
+    # Validate that everything is in order **before** the startup tasks.
+    if _dataset_split_managers.get(DatasetSplitName.train):
+        run_validation(DatasetSplitName.train, _task_manager, azimuth_config)
+    if _dataset_split_managers.get(DatasetSplitName.eval):
+        run_validation(DatasetSplitName.eval, _task_manager, azimuth_config)
+
+    global _startup_tasks, _ready_flag
+    _startup_tasks = startup.startup_tasks(_dataset_split_managers, task_manager)
+    _ready_flag = Event()
