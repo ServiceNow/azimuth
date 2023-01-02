@@ -7,7 +7,7 @@ import numpy as np
 from datasets import Dataset
 from tqdm import tqdm
 
-from azimuth.config import AzimuthConfig, ModelContractConfig, PipelineDefinition
+from azimuth.config import ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
@@ -47,7 +47,7 @@ class Module(DaskModule[ConfigScope]):
             exclude={"indices", "model_contract_method_name"}, include=self.allowed_mod_options
         )
         attributes_to_consider = self.config.dict(
-            exclude=exclude_fields_with_extra(AzimuthConfig.__fields__, "exclude_from_cache"),
+            exclude=exclude_fields_with_extra(self.config, "exclude_from_cache"),
         )
 
         return (
