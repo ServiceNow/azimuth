@@ -13,6 +13,7 @@ from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, vali
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
+from azimuth.utils.exclude_fields_with_extra import exclude_fields_with_extra
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
@@ -252,7 +253,13 @@ class ProjectConfig(BaseSettings):
         return copy
 
     def to_hash(self):
-        return md5_hash(self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True))
+        return md5_hash(
+            self.dict(
+                include=ProjectConfig.__fields__.keys(),
+                exclude=exclude_fields_with_extra(self, "exclude_from_cache"),
+                by_alias=True,
+            )
+        )
 
 
 class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
@@ -280,12 +287,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         Returns:
             Path to a folder where it is safe to store data.
         """
-        md5 = md5_hash(
-            ProjectConfig(
-                **self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True)
-            ).dict()
-        )
-        path = pjoin(self.artifact_path, f"{self.name}_{self.model_contract}_{md5[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{self.model_contract}_{self.to_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
 
