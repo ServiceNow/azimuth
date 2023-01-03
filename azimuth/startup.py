@@ -183,7 +183,11 @@ def make_startup_tasks(
     dms = {k: v for k, v in dataset_split_managers.items() if v is not None}
     tasks: Dict[DatasetSplitName, DaskModule] = {}
 
-    available_datasets_splits = list(set(dataset_split_names) & set(dms))
+    if DatasetSplitName.all not in dataset_split_names:
+        available_datasets_splits = list(set(dataset_split_names) & set(dms))
+    else:
+        available_datasets_splits = [DatasetSplitName.all]
+
     for dataset_split_name in available_datasets_splits:
         _, maybe_task = task_manager.get_task(
             task_name=supported_module,
