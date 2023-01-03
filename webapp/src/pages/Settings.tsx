@@ -172,7 +172,6 @@ const Settings: React.FC = () => {
           <Typography
             variant="body2"
             sx={{
-              s: 1,
               width: "100%",
             }}
           >
@@ -254,7 +253,6 @@ const Settings: React.FC = () => {
     <TextField
       key={postprocessorIdx}
       sx={{
-        m: 1,
         width: "15ch",
       }}
       size="small"
@@ -337,7 +335,6 @@ const Settings: React.FC = () => {
           <Box display="flex" flexDirection="row">
             <Typography
               sx={{
-                s: 1,
                 width: "100px",
               }}
               variant="body2"
@@ -351,7 +348,6 @@ const Settings: React.FC = () => {
           <Box display="flex" flexDirection="row">
             <Typography
               sx={{
-                s: 1,
                 width: "100px",
               }}
               variant="body2"
@@ -414,7 +410,6 @@ const Settings: React.FC = () => {
                 <Box key={index} display="flex" flexDirection="row">
                   <Typography
                     sx={{
-                      s: 1,
                       width: "20ch",
                       whiteSpace: "normal",
                     }}
@@ -424,7 +419,7 @@ const Settings: React.FC = () => {
                   </Typography>
                   <TextField
                     id={field}
-                    sx={{ s: 1, width: "5ch" }}
+                    sx={{ width: "5ch" }}
                     size="small"
                     type="number"
                     value={value}
