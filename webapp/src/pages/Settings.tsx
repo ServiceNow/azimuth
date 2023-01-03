@@ -36,13 +36,6 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object>;
 
-const ANALYSES_CUSTOMIZATION: SubConfigKeys[] = [
-  "dataset_warnings",
-  "syntax",
-  "similarity",
-  "behavioral_testing",
-];
-
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
   dataset_warnings: {
     max_delta_class_imbalance: 0,
@@ -93,10 +86,8 @@ const Settings: React.FC = () => {
   const divider = <Divider sx={{ marginY: 1 }} />;
 
   const displaySectionTitle = (section: string) => (
-    <Box sx={{ m: 1, width: "100px" }}>
-      <Typography textTransform="capitalize" variant="subtitle2">
-        {section}
-      </Typography>
+    <Box sx={{ padding: 1 }}>
+      <Typography variant="subtitle2">{section}</Typography>
     </Box>
   );
 
@@ -104,10 +95,8 @@ const Settings: React.FC = () => {
     field: keyof AzimuthConfig,
     section: string = field
   ) => (
-    <Box display="flex" flexDirection="row" marginLeft={1.5}>
-      <Typography textTransform="capitalize" variant="subtitle2">
-        {section}
-      </Typography>
+    <Box display="flex" flexDirection="row" padding={1}>
+      <Typography variant="subtitle2">{section}</Typography>
       <Checkbox
         sx={{ paddingTop: 0.5 }}
         size="small"
@@ -317,7 +306,7 @@ const Settings: React.FC = () => {
 
   const getProjectConfigSection = () => (
     <Box display="flex" flexDirection="column" justifyContent="flex-start">
-      {displaySectionTitle("general")}
+      {displaySectionTitle("General")}
       <Box
         display="flex"
         flexDirection="row"
@@ -361,7 +350,7 @@ const Settings: React.FC = () => {
         </Box>
       </Box>
       {divider}
-      {displaySectionTitle("dataset")}
+      {displaySectionTitle("Dataset")}
       <Box
         display="flex"
         flexDirection="row"
@@ -386,7 +375,7 @@ const Settings: React.FC = () => {
   );
   const getModelContractConfigSection = () => (
     <Box display="flex" flexDirection="column" justifyContent="flex-start">
-      {displaySectionTitle("general")}
+      {displaySectionTitle("General")}
       <Box
         display="flex"
         flexDirection="row"
@@ -458,7 +447,7 @@ const Settings: React.FC = () => {
               margin={2}
               padding={1}
             >
-              {displaySectionTitle("general")}
+              {displaySectionTitle("General")}
               <Box
                 display="flex"
                 flexDirection="row"
@@ -467,7 +456,7 @@ const Settings: React.FC = () => {
               >
                 {displayReadonlyFields("name", name)}
               </Box>
-              {displaySectionTitle("model")}
+              {displaySectionTitle("Model")}
               <Box
                 display="flex"
                 flexDirection="row"
@@ -535,7 +524,7 @@ const Settings: React.FC = () => {
           )
         )}
       <Box display="flex" flexDirection="column" justifyContent="flex-start">
-        {displaySectionTitle("metrics")}
+        {displaySectionTitle("Metrics")}
         {CUSTOM_METRICS.map((metricName, index) => (
           <FormControlLabel
             key={index}
@@ -557,61 +546,49 @@ const Settings: React.FC = () => {
     </Box>
   );
 
-  const getAnalysesCustomization = () =>
-    ANALYSES_CUSTOMIZATION.map((customizationConfig, index) => (
-      <Box
-        key={index}
-        display="flex"
-        flexDirection="column"
-        justifyContent="flex-start"
-        gap={5}
-      >
-        {customizationConfig === "behavioral_testing" ? (
-          displayToggleSectionTitle(
-            "behavioral_testing",
-            "Perturbation Testing"
-          )
-        ) : (
-          <Box key={index} display="flex" flexDirection="column">
-            {customizationConfig === "similarity"
-              ? displayToggleSectionTitle(
-                  customizationConfig,
-                  customizationConfig
-                )
-              : displaySectionTitle(customizationConfig)}
+  const getAnalysesCustomization = (config: SubConfigKeys) => (
+    <Box
+      display="flex"
+      flexDirection="row"
+      gap={5}
+      sx={{
+        "& .MuiTextField-root": { m: 1, width: "18ch" },
+      }}
+    >
+      {Object.entries(
+        resultingConfig[config] ?? CONFIG_SUB_FIELDS[config] ?? {}
+      ).map(
+        ([field, value], index) =>
+          !ANALYSES_CUSTOMIZATION_IGNORE_FIELDS.includes(field) && (
             <Box
+              key={index}
               display="flex"
               flexDirection="row"
+              justifyContent="flex-start"
+              marginLeft={2}
               gap={5}
-              sx={{
-                "& .MuiTextField-root": { m: 1, width: "18ch" },
-              }}
             >
-              {Object.entries(
-                resultingConfig[customizationConfig] ??
-                  CONFIG_SUB_FIELDS[customizationConfig] ??
-                  {}
-              ).map(
-                ([field, value], index) =>
-                  !ANALYSES_CUSTOMIZATION_IGNORE_FIELDS.includes(field) && (
-                    <Box
-                      key={index}
-                      display="flex"
-                      flexDirection="row"
-                      justifyContent="flex-start"
-                      marginLeft={2}
-                      gap={5}
-                    >
-                      {displayNumberField(customizationConfig, field, value)}
-                    </Box>
-                  )
-              )}
+              {displayNumberField(config, field, value)}
             </Box>
-            {divider}
-          </Box>
-        )}
-      </Box>
-    ));
+          )
+      )}
+    </Box>
+  );
+
+  const getAnalysesCustomizationSection = () => (
+    <>
+      {displaySectionTitle("Dataset Warnings")}
+      {getAnalysesCustomization("dataset_warnings")}
+      {divider}
+      {displaySectionTitle("Syntax")}
+      {getAnalysesCustomization("syntax")}
+      {divider}
+      {displayToggleSectionTitle("similarity", "Similarity")}
+      {getAnalysesCustomization("similarity")}
+      {divider}
+      {displayToggleSectionTitle("behavioral_testing", "Perturbation Testing")}
+    </>
+  );
 
   return (
     <Box height="100%" display="flex" flexDirection="column">
@@ -645,7 +622,7 @@ const Settings: React.FC = () => {
           description="Enable or disable some analyses and edit corresponding thresholds."
           link="reference/configuration/analyses/"
         >
-          {getAnalysesCustomization()}
+          {getAnalysesCustomizationSection()}
         </AccordionLayout>
       </Paper>
       <Box display="flex" justifyContent="space-between" paddingY={2}>
