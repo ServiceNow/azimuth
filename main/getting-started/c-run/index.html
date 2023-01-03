@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../b-basics/">
+      
+      
+        <link rel="next" href="../changelog/">
+      
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.1">
     
     
       
@@ -17,11 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.3bd4f189.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -115,8 +120,6 @@
       <form class="md-header__option" data-md-component="palette">
         
           
-          
-          
           <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
           
             <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
@@ -124,8 +127,6 @@
             </label>
           
         
-          
-          
           
           <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
           
@@ -1753,10 +1754,9 @@
                 
                   
 
-  <a href="https://github.com/ServiceNow/azimuth/edit/main/docs/docs/getting-started/c-run.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
 <h1 id="c-run-on-your-use-case">C. Run on Your Use Case</h1>
@@ -1813,35 +1813,35 @@ dataset and model are available in <code>config/examples</code> (<code>CLINC</co
 </div>
 </li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p p-Indicator">{</span><span class="w"></span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s">&quot;name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;CLINC150&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (1)</span><span class="w"></span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="s">&quot;dataset&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"></span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;datasets.load_dataset&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (2)</span><span class="w"></span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="s">&quot;args&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (3)</span><span class="w"></span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="s">&quot;clinc_oos&quot;</span><span class="p p-Indicator">,</span><span class="w"></span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="s">&quot;imbalanced&quot;</span><span class="w"></span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p p-Indicator">]</span><span class="w"></span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p p-Indicator">},</span><span class="w"></span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="s">&quot;columns&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (4)</span><span class="w"></span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="s">&quot;text_input&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;text&quot;</span><span class="p p-Indicator">,</span><span class="w"></span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="s">&quot;label&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;intent&quot;</span><span class="w"></span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p p-Indicator">},</span><span class="w"></span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="s">&quot;rejection_class&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;oos&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (5)</span><span class="w"></span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="s">&quot;model_contract&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;hf_text_classification&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (6)</span><span class="w"></span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="s">&quot;pipelines&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (7)</span><span class="w"></span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p p-Indicator">{</span><span class="w"></span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">      </span><span class="s">&quot;model&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"></span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">        </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;loading_resources.load_hf_text_classif_pipeline&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (8)</span><span class="w"></span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">        </span><span class="s">&quot;remote&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;/azimuth_shr&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (9)</span><span class="w"></span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="s">&quot;kwargs&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (10)</span><span class="w"></span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">          </span><span class="s">&quot;checkpoint_path&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;transformersbook/</span><span class="w"></span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">                              </span><span class="s">distilbert-base-uncased-distilled-clinc&quot;</span><span class="w"></span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span><span class="p p-Indicator">}</span><span class="w"></span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">      </span><span class="p p-Indicator">}</span><span class="w"></span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="p p-Indicator">}</span><span class="w"></span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">  </span><span class="p p-Indicator">],</span><span class="w"></span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">  </span><span class="s">&quot;saliency_layer&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;distilbert.embeddings.word_embeddings&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (11)</span><span class="w"></span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="p p-Indicator">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p p-Indicator">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s">&quot;name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;CLINC150&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (1)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="s">&quot;dataset&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;datasets.load_dataset&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (2)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="s">&quot;args&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (3)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="s">&quot;clinc_oos&quot;</span><span class="p p-Indicator">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="s">&quot;imbalanced&quot;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p p-Indicator">]</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p p-Indicator">},</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="s">&quot;columns&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (4)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="s">&quot;text_input&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;text&quot;</span><span class="p p-Indicator">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="s">&quot;label&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;intent&quot;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p p-Indicator">},</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="s">&quot;rejection_class&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;oos&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (5)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="s">&quot;model_contract&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;hf_text_classification&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (6)</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="s">&quot;pipelines&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (7)</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p p-Indicator">{</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">      </span><span class="s">&quot;model&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">        </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;loading_resources.load_hf_text_classif_pipeline&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (8)</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">        </span><span class="s">&quot;remote&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;/azimuth_shr&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (9)</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="s">&quot;kwargs&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (10)</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">          </span><span class="s">&quot;checkpoint_path&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;transformersbook/</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">                              </span><span class="s">distilbert-base-uncased-distilled-clinc&quot;</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span><span class="p p-Indicator">}</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">      </span><span class="p p-Indicator">}</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="p p-Indicator">}</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">  </span><span class="p p-Indicator">],</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">  </span><span class="s">&quot;saliency_layer&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;distilbert.embeddings.word_embeddings&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (11)</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="p p-Indicator">}</span>
 </code></pre></div>
 <ol>
 <li>Name for your project. Shown in the application to identify your config.</li>
@@ -1912,42 +1912,6 @@ values from the config file will prevail.</p>
       
         <footer class="md-footer">
   
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="../b-basics/" class="md-footer__link md-footer__link--prev" aria-label="Previous: B. Learn Basics" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              B. Learn Basics
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../changelog/" class="md-footer__link md-footer__link--next" aria-label="Next: Releases" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Releases
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
-  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -1969,12 +1933,11 @@ values from the config file will prevail.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "search.suggest", "navigation.indexes", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"default": "main", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "search.suggest", "navigation.indexes", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.12658920.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "main", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../../assets/javascripts/bundle.5cf534bf.min.js"></script>
       
-    
     
   </body>
 </html>
