@@ -13,6 +13,7 @@ from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, vali
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
+from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
@@ -128,7 +129,7 @@ class ThresholdConfig(BaseSettings, CustomObject):
 
 
 class PipelineDefinition(BaseSettings):
-    name: str
+    name: str = Field(exclude_from_cache=True)
     model: CustomObject
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
@@ -233,7 +234,7 @@ class ColumnConfiguration(BaseModel):
 
 class ProjectConfig(BaseSettings):
     # Name of the current project.
-    name: str = Field("New project", env="NAME")
+    name: str = Field("New project", env="NAME", exclude_from_cache=True)
     # Dataset object definition.
     dataset: CustomObject
     # Which model_contract the application is using.
@@ -252,7 +253,13 @@ class ProjectConfig(BaseSettings):
         return copy
 
     def to_hash(self):
-        return md5_hash(self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True))
+        return md5_hash(
+            self.dict(
+                include=ProjectConfig.__fields__.keys(),
+                exclude=exclude_fields_from_cache(self),
+                by_alias=True,
+            )
+        )
 
 
 class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
@@ -261,15 +268,15 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # Where to store artifacts. (HDF5 files,  HF datasets, Dask config)
     artifact_path: str = "/cache"
     # Batch size to use during inference.
-    batch_size: int = 32
+    batch_size: int = Field(32, exclude_from_cache=True)
     # Will use CUDA and will need GPUs if set to True.
     # If "auto" we check if CUDA is available.
-    use_cuda: Union[Literal["auto"], bool] = "auto"
+    use_cuda: Union[Literal["auto"], bool] = Field("auto", exclude_from_cache=True)
     # Memory of the dask cluster. Regular is 6GB, Large is 12GB.
     # For bigger models, large might be needed.
-    large_dask_cluster: bool = False
+    large_dask_cluster: bool = Field(False, exclude_from_cache=True)
     # Disable configuration changes
-    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG")
+    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG", exclude_from_cache=True)
 
     def get_artifact_path(self) -> str:
         """Generate a path for caching.
@@ -280,12 +287,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         Returns:
             Path to a folder where it is safe to store data.
         """
-        md5 = md5_hash(
-            ProjectConfig(
-                **self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True)
-            ).dict()
-        )
-        path = pjoin(self.artifact_path, f"{self.name}_{self.model_contract}_{md5[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{self.model_contract}_{self.to_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
 

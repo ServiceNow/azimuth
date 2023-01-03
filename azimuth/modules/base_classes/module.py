@@ -7,16 +7,12 @@ import numpy as np
 from datasets import Dataset
 from tqdm import tqdm
 
-from azimuth.config import (
-    AzimuthConfig,
-    CommonFieldsConfig,
-    ModelContractConfig,
-    PipelineDefinition,
-)
+from azimuth.config import ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.utils.conversion import md5_hash
+from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 from azimuth.utils.validation import assert_not_none
 
 
@@ -45,16 +41,13 @@ class Module(DaskModule[ConfigScope]):
         super().__init__(dataset_split_name, config)
 
     def _get_name(self) -> str:
-        options_to_consider = self.mod_options.dict()
-        # Indices are excluded, since the cache for all indices should be in the same folder.
-        options_to_consider = self.mod_options.dict(exclude={"indices"})
+        # indices are excluded, since the cache for all indices should be in the same file.
+        # model_contract_method_name are excluded too because it's already in the task_name.
+        options_to_consider = self.mod_options.dict(
+            exclude={"indices", "model_contract_method_name"}, include=self.allowed_mod_options
+        )
         attributes_to_consider = self.config.dict(
-            include={
-                k: ...
-                for k in set(AzimuthConfig.__fields__.keys()).difference(
-                    CommonFieldsConfig.__fields__.keys()
-                )
-            }
+            exclude=exclude_fields_from_cache(self.config),
         )
 
         return (

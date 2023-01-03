@@ -161,7 +161,7 @@ def get_confidences_from_ds(ds: Dataset, without_postprocessing: bool = False) -
 def get_outcomes_from_ds(ds: Dataset, without_postprocessing: bool = False) -> List[OutcomeName]:
     """Get outcomes, with or without postprocessing.
 
-        Args:
+    Args:
         ds: Dataset Split for which to get outcomes.
         without_postprocessing: Determine which column to use.
 
