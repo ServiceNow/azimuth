@@ -445,11 +445,7 @@ const Settings: React.FC = () => {
         </Box>
       </Box>
       {divider}
-      <Box sx={{ m: 1, width: "100px", marginTop: 1 }}>
-        <Typography variant="body1" fontWeight="bold">
-          Pipelines
-        </Typography>
-      </Box>
+      {displaySectionTitle("Pipelines")}
       {resultingConfig.pipelines &&
         resultingConfig.pipelines.map(
           ({ name, model, postprocessors }, pipelineIndex) => (
