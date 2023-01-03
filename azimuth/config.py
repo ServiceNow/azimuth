@@ -13,7 +13,7 @@ from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, vali
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
-from azimuth.utils.exclude_fields_with_extra import exclude_fields_with_extra
+from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
@@ -256,7 +256,7 @@ class ProjectConfig(BaseSettings):
         return md5_hash(
             self.dict(
                 include=ProjectConfig.__fields__.keys(),
-                exclude=exclude_fields_with_extra(self, "exclude_from_cache"),
+                exclude=exclude_fields_from_cache(self),
                 by_alias=True,
             )
         )

@@ -9,28 +9,27 @@ from pydantic import BaseModel
 Model = TypeVar("Model", bound=BaseModel)
 
 
-def exclude_fields_with_extra(model: Model, extra: str):
-    """Exclude pydantic fields with given extra keyword argument.
+def exclude_fields_from_cache(model: Model):
+    """Exclude pydantic fields with exclude_from_cache=True.
 
     Args:
         model: Model, inheriting from pydantic.BaseModel.
-        extra: The extra keyword argument to look for in each field.
 
     Returns: The format expected by pydantic.BaseModel.dict(exclude=...), json() and _iter()
     """
     exclude = dict()
     for key, field in model.__fields__.items():
-        if field.field_info.extra.get(extra):
+        if field.field_info.extra.get("exclude_from_cache"):
             exclude[key] = ...  # TODO update pydantic to >=1.9 and change `...` to `True`
         else:
             val = getattr(model, key)
             if isinstance(val, BaseModel):
-                set_if(exclude, key, exclude_fields_with_extra(val, extra))
+                set_if(exclude, key, exclude_fields_from_cache(val))
             elif isinstance(val, Collection):
                 sub: Dict = dict()
                 for sub_key, sub_val in val.items() if isinstance(val, Mapping) else enumerate(val):
                     if isinstance(sub_val, BaseModel):
-                        set_if(sub, sub_key, exclude_fields_with_extra(sub_val, extra))
+                        set_if(sub, sub_key, exclude_fields_from_cache(sub_val))
                 set_if(exclude, key, sub)
     return exclude
 

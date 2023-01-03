@@ -6,7 +6,7 @@ from typing import Dict, List, Union
 
 from pydantic import BaseModel, Field
 
-from azimuth.utils.exclude_fields_with_extra import exclude_fields_with_extra
+from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 
 
 class Sub(BaseModel):
@@ -40,7 +40,7 @@ def test_exclude_from_cache():
             "c": 11,
         },
     )
-    exclude = exclude_fields_with_extra(model, "exclude_from_cache")
+    exclude = exclude_fields_from_cache(model)
     assert exclude == {
         "excluded_sub_with_excluded_field": ...,
         "sub_with_excluded_field": {"excluded_field": ...},
