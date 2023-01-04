@@ -82,11 +82,7 @@ def test_neighbors_no_train(tiny_text_config_no_train, dask_client, monkeypatch)
     mod = NeighborsTaggingModule(DatasetSplitName.eval, tiny_text_config_no_train)
     res = mod.compute_on_dataset_split()
 
-    assert not any(
-        [
-            [r.tags["conflicting_neighbors_train"] for r in res],
-            [r.tags["no_close_train"] for r in res],
-            [r.adds["neighbors_train"] for r in res],
-        ]
-    )
+    assert not any([r.tags["conflicting_neighbors_train"] for r in res])
+    assert not any([r.tags["no_close_train"] for r in res])
+    assert not any([r.adds["neighbors_train"] for r in res])
     assert any([r.adds["neighbors_eval"] for r in res])
