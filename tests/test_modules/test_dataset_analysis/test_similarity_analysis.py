@@ -69,3 +69,24 @@ def test_neighbors(simple_text_config, dask_client, monkeypatch):
         indices_subset
     ), f"Length of result ({len(res)}) does not match length of indices ({len(indices_subset)})"
     # Would currently fail on mod.save_result() because of indices (length) mismatch
+
+
+def test_neighbors_no_train(tiny_text_config_no_train, dask_client, monkeypatch):
+    monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    # Mock SentenceTransformer on all workers.
+    dask_client.run(
+        lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    )
+    tiny_text_config_no_train.similarity.conflicting_neighbors_threshold = 0.1
+
+    mod = NeighborsTaggingModule(DatasetSplitName.eval, tiny_text_config_no_train)
+    res = mod.compute_on_dataset_split()
+
+    assert not any(
+        [
+            [r.tags["conflicting_neighbors_train"] for r in res],
+            [r.tags["no_close_train"] for r in res],
+            [r.adds["neighbors_train"] for r in res],
+        ]
+    )
+    assert any([r.adds["neighbors_eval"] for r in res])
