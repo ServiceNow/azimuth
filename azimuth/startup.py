@@ -48,16 +48,16 @@ class Startup:
 
 START_UP_THREAD_NAME = "Azimuth_Startup"
 
-SIMILARITY_TASKS = [Startup("neighbors_tags", SupportedModule.NeighborsTagging)]
-
-SIMILARITY_TRAIN_TASKS = [
+SIMILARITY_TASKS = [
+    Startup("neighbors_tags", SupportedModule.NeighborsTagging),
     Startup(
         "class_overlap",
         SupportedModule.ClassOverlap,
         dependency_names=["neighbors_tags"],
         dataset_split_names=[DatasetSplitName.train],
-    )
+    ),
 ]
+
 
 BMA_PREDICTION_TASKS = [
     Startup(
@@ -89,11 +89,10 @@ PIPELINE_COMPARISON_TASKS = [
         "prediction_comparison",
         SupportedModule.PredictionComparison,
         dependency_names=["prediction"],
-        run_on_all_pipelines=False,
     )
 ]
 
-POSTPROCESSING_EVAL_TASKS = [
+POSTPROCESSING_TASKS = [
     Startup(
         "outcome_count_per_threshold",
         SupportedModule.OutcomeCountPerThreshold,
@@ -180,15 +179,16 @@ def make_startup_tasks(
 
     """
 
-    dms = {k: v for k, v in dataset_split_managers.items() if v is not None}
+    available_dms = {k: v for k, v in dataset_split_managers.items() if v is not None}
+    available_dms_with_all: Dict[DatasetSplitName, Optional[DatasetSplitManager]] = {
+        **available_dms,
+        DatasetSplitName.all: None,
+    }
     tasks: Dict[DatasetSplitName, DaskModule] = {}
 
-    if DatasetSplitName.all not in dataset_split_names:
-        available_datasets_splits = list(set(dataset_split_names) & set(dms))
-    else:
-        available_datasets_splits = [DatasetSplitName.all]
-
-    for dataset_split_name in available_datasets_splits:
+    for dataset_split_name, dm in available_dms_with_all.items():
+        if dataset_split_name not in dataset_split_names:
+            continue
         _, maybe_task = task_manager.get_task(
             task_name=supported_module,
             dataset_split_name=dataset_split_name,
@@ -198,7 +198,6 @@ def make_startup_tasks(
         task = assert_not_none(maybe_task)
         task_launched = task.future is not None
         if task_launched:
-            dm = dms[dataset_split_name] if dataset_split_name != DatasetSplitName.all else dms
             task.add_done_callback(on_end, dm=dm, task_manager=task_manager)
         tasks[dataset_split_name] = task
     return tasks
@@ -237,11 +236,9 @@ def startup_tasks(
             start_up_tasks += PIPELINE_COMPARISON_TASKS
         # TODO We only check pipeline_index=0, but we should check all pipelines.
         if postprocessing_editable(task_manager.config, 0):
-            start_up_tasks += POSTPROCESSING_EVAL_TASKS
+            start_up_tasks += POSTPROCESSING_TASKS
     if similarity_available(task_manager.config):
         start_up_tasks += SIMILARITY_TASKS
-        if DatasetSplitName.train in dataset_split_managers:
-            start_up_tasks += SIMILARITY_TRAIN_TASKS
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
