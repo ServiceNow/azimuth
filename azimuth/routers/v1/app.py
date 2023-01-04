@@ -8,7 +8,6 @@ from datasets import Metric, MetricInfo
 from fastapi import APIRouter, Depends, HTTPException
 
 from azimuth.app import (
-    get_all_dataset_split_managers,
     get_config,
     get_dataset_split_manager_mapping,
     get_ready_flag,
@@ -129,7 +128,7 @@ def get_dataset_info(
     response_model=Dict[str, MetricInfo],
 )
 def custom_metrics_info(
-    dataset_split_managers=Depends(get_all_dataset_split_managers),
+    dataset_split_managers=Depends(get_dataset_split_manager_mapping),
     config: AzimuthConfig = Depends(get_config),
 ) -> Dict[str, MetricInfo]:
     result = {}
