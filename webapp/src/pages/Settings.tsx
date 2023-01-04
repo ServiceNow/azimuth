@@ -435,94 +435,85 @@ const Settings: React.FC = () => {
       </Box>
       {divider}
       {displaySectionTitle("Pipelines")}
-      {resultingConfig.pipelines &&
-        resultingConfig.pipelines.map(
-          ({ name, model, postprocessors }, pipelineIndex) => (
-            <Paper
-              key={pipelineIndex}
-              variant="outlined"
-              component={Box}
-              display="flex"
-              flexDirection="column"
-              margin={2}
-              padding={1}
-            >
-              {displaySectionTitle("General")}
-              <Box
+      {resultingConfig.pipelines?.map((pipeline, pipelineIndex) => (
+        <Paper
+          key={pipelineIndex}
+          variant="outlined"
+          component={Box}
+          display="flex"
+          flexDirection="column"
+          margin={2}
+          padding={1}
+        >
+          {displaySectionTitle("General")}
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="flex-start"
+            marginLeft={2}
+          >
+            {displayReadonlyFields("name", pipeline.name)}
+          </Box>
+          {displaySectionTitle("Model")}
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="flex-start"
+            alignContent="center"
+            flexWrap="wrap"
+            gap={(theme) => theme.spacing(1, 5)}
+            marginLeft={2}
+          >
+            {displayReadonlyFields("class_name", pipeline.model.class_name)}
+            {displayReadonlyFields("remote", pipeline.model.remote)}
+            {pipeline.model.kwargs &&
+              displayArgumentsList("kwargs", pipeline.model.kwargs)}
+            {pipeline.model.args &&
+              pipeline.model.args.length > 0 &&
+              displayArgumentsList("args", pipeline.model.args)}
+          </Box>
+          {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
+          <Box
+            key={pipelineIndex}
+            display="flex"
+            flexDirection="column"
+            gap={1}
+            margin={2}
+          >
+            {pipeline.postprocessors?.map((postprocessor, index) => (
+              <Paper
+                key={index}
+                variant="outlined"
+                component={Box}
                 display="flex"
                 flexDirection="row"
                 justifyContent="flex-start"
-                marginLeft={2}
+                gap={2}
+                padding={1}
+                marginX={2}
               >
-                {displayReadonlyFields("name", name)}
-              </Box>
-              {displaySectionTitle("Model")}
-              <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="flex-start"
-                alignContent="center"
-                flexWrap="wrap"
-                gap={(theme) => theme.spacing(1, 5)}
-                marginLeft={2}
-              >
-                {displayReadonlyFields("class_name", model.class_name)}
-                {displayReadonlyFields("remote", model.remote)}
-                {model.kwargs && displayArgumentsList("kwargs", model.kwargs)}
-                {model.args &&
-                  model.args.length > 0 &&
-                  displayArgumentsList("args", model.args)}
-              </Box>
-              {displayPostprocessorToggleSection(pipelineIndex, {
-                name,
-                model,
-                postprocessors,
-              })}
-              <Box
-                key={pipelineIndex}
-                display="flex"
-                flexDirection="column"
-                gap={1}
-                margin={2}
-              >
-                {postprocessors?.map((postprocessor, index) => (
-                  <Paper
-                    key={index}
-                    variant="outlined"
-                    component={Box}
-                    display="flex"
-                    flexDirection="row"
-                    justifyContent="flex-start"
-                    gap={2}
-                    padding={1}
-                    marginX={2}
-                  >
-                    {displayReadonlyFields(
-                      "class_name",
-                      postprocessor.class_name
-                    )}
-                    {postprocessor.temperature !== undefined &&
-                      displayPostprocessorNumberField(
-                        pipelineIndex,
-                        { name, model, postprocessors },
-                        "temperature",
-                        index,
-                        postprocessor.temperature
-                      )}
-                    {postprocessor.threshold !== undefined &&
-                      displayPostprocessorNumberField(
-                        pipelineIndex,
-                        { name, model, postprocessors },
-                        "threshold",
-                        index,
-                        postprocessor.threshold
-                      )}
-                  </Paper>
-                ))}
-              </Box>
-            </Paper>
-          )
-        )}
+                {displayReadonlyFields("class_name", postprocessor.class_name)}
+                {postprocessor.temperature !== undefined &&
+                  displayPostprocessorNumberField(
+                    pipelineIndex,
+                    pipeline,
+                    "temperature",
+                    index,
+                    postprocessor.temperature
+                  )}
+                {postprocessor.threshold !== undefined &&
+                  displayPostprocessorNumberField(
+                    pipelineIndex,
+                    pipeline,
+                    "threshold",
+                    index,
+                    postprocessor.threshold
+                  )}
+              </Paper>
+            ))}
+          </Box>
+        </Paper>
+      ))}
       <Box display="flex" flexDirection="column" justifyContent="flex-start">
         {displaySectionTitle("Metrics")}
         {CUSTOM_METRICS.map((metricName, index) => (
