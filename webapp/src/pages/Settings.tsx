@@ -21,17 +21,17 @@ import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 
 const STEPPER: Record<string, InputBaseComponentProps> = {
-  iterations: { min: 0, max: 100, step: 1 },
+  iterations: { min: 0 },
   high_epistemic_threshold: { min: 0, max: 1, step: 0.1 },
   conflicting_neighbors_threshold: { min: 0, max: 1, step: 0.1 },
   no_close_threshold: { min: 0, max: 1, step: 0.1 },
-  min_num_per_class: { min: 0, max: 100, step: 10 },
+  min_num_per_class: { min: 0 },
   max_delta_class_imbalance: { min: 0, max: 1, step: 0.1 },
-  max_delta_representation: { min: 0, max: 0.1, step: 0.01 },
-  max_delta_mean_tokens: { min: 0.0, max: 10.0, step: 1.0 },
-  max_delta_std_tokens: { min: 0.0, max: 10.0, step: 1.0 },
-  short_sentence_max_token: { min: 0, max: 100, step: 1 },
-  long_sentence_min_token: { min: 0, max: 100, step: 1 },
+  max_delta_representation: { min: 0, max: 1, step: 0.01 },
+  max_delta_mean_tokens: { min: 0, step: 0.1 },
+  max_delta_std_tokens: { min: 0, step: 0.1 },
+  short_sentence_max_token: { min: 0 },
+  long_sentence_min_token: { min: 0 },
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object>;
