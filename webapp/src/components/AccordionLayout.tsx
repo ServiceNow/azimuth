@@ -25,24 +25,19 @@ const AccordionLayout: React.FC<Props> = ({
 }) => (
   <Accordion>
     <AccordionSummary expandIcon={<ExpandMoreIcon />} id={name}>
-      <Typography
-        variant="body1"
-        fontWeight="bold"
-        sx={{
-          width: "20%",
-          flexShrink: 0,
-        }}
-      >
+      <Typography fontWeight="bold" width="20%" flexShrink={0}>
         {name}
       </Typography>
-      <Divider orientation="vertical" flexItem sx={{ marginX: 2 }} />
       <Box display="flex" gap={2}>
-        <Typography variant="body1">{description}</Typography>
+        <Divider orientation="vertical" />
+        <Typography>{description}</Typography>
         <Description link={link} />
       </Box>
     </AccordionSummary>
-    <AccordionDetails>
-      <Divider sx={{ marginBottom: 1 }} />
+    <AccordionDetails
+      sx={{ display: "flex", flexDirection: "column", paddingY: 0 }}
+    >
+      <Divider />
       {children}
     </AccordionDetails>
   </Accordion>
