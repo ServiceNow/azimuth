@@ -88,20 +88,21 @@ const Dashboard = () => {
           </Box>
         </PreviewCard>
       )}
-      {datasetInfo?.similarityAvailable && (
-        <PreviewCard
-          title="Class Overlap"
-          to={`/${jobId}/class_overlap${searchString}`}
-          description={
-            <Description
-              text="Assess semantic overlap between class pairs and compare to pipeline confusion."
-              link="user-guide/class-overlap/"
-            />
-          }
-        >
-          <ClassOverlapTable jobId={jobId} pipeline={pipeline} />
-        </PreviewCard>
-      )}
+      {datasetInfo?.availableDatasetSplits.train &&
+        datasetInfo?.similarityAvailable && (
+          <PreviewCard
+            title="Class Overlap"
+            to={`/${jobId}/class_overlap${searchString}`}
+            description={
+              <Description
+                text="Assess semantic overlap between class pairs and compare to pipeline confusion."
+                link="user-guide/class-overlap/"
+              />
+            }
+          >
+            <ClassOverlapTable jobId={jobId} pipeline={pipeline} />
+          </PreviewCard>
+        )}
       {isPipelineSelected(pipeline) && (
         <PreviewCard
           title="Pipeline Metrics by Data Subpopulation"

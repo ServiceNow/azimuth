@@ -98,8 +98,8 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
             eval_dm if self.dataset_split_name == DatasetSplitName.eval else train_dm
         )
 
-        conflicting_neighbors_tags = {}
-        no_close_tags = {}
+        conflicting_neighbors_tags = defaultdict(list)
+        no_close_tags = defaultdict(list)
         for split_name, tagname_conflicting_neighbors, tagname_no_close in zip(
             [DatasetSplitName.train, DatasetSplitName.eval],
             [SmartTag.conflicting_neighbors_train, SmartTag.conflicting_neighbors_eval],
@@ -128,10 +128,10 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
             conflicting_neighbors_eval,
             no_close_train,
             no_close_eval,
-        ) in zip(
+        ) in itertools.zip_longest(
             neighbors[DatasetSplitName.train],
             neighbors[DatasetSplitName.eval],
-            conflicting_neighbors_tags.get(DatasetSplitName.train, []),
+            conflicting_neighbors_tags[DatasetSplitName.train],
             conflicting_neighbors_tags[DatasetSplitName.eval],
             no_close_tags[DatasetSplitName.train],
             no_close_tags[DatasetSplitName.eval],
@@ -145,7 +145,9 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
                         SmartTag.conflicting_neighbors_eval: conflicting_neighbors_eval[
                             SmartTag.conflicting_neighbors_eval
                         ],
-                        SmartTag.no_close_train: no_close_train[SmartTag.no_close_train],
+                        SmartTag.no_close_train: False
+                        if no_close_train is None
+                        else no_close_train[SmartTag.no_close_train],
                         SmartTag.no_close_eval: no_close_eval[SmartTag.no_close_eval],
                     },
                     adds={
