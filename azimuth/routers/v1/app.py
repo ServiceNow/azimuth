@@ -43,6 +43,7 @@ from azimuth.utils.routers import (
     require_available_model,
     require_pipeline_index,
 )
+from azimuth.utils.validation import assert_not_none
 
 router = APIRouter()
 
@@ -89,17 +90,20 @@ def get_dataset_info(
     task_manager: TaskManager = Depends(get_task_manager),
     config: AzimuthConfig = Depends(get_config),
 ):
-    eval_dm = dataset_split_managers[DatasetSplitName.eval]
+    eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
     training_dm = dataset_split_managers.get(DatasetSplitName.train)
+    dm = assert_not_none(eval_dm if eval_dm is not None else training_dm)
 
     model_contract = task_manager.config.model_contract
 
     return DatasetInfoResponse(
         project_name=config.name,
-        class_names=eval_dm.get_class_names(),
+        class_names=dm.get_class_names(),
         data_actions=ALL_DATA_ACTION_FILTERS,
         smart_tags=ALL_SMART_TAG_FILTERS,
-        eval_class_distribution=eval_dm.class_distribution().tolist(),
+        eval_class_distribution=eval_dm.class_distribution().tolist()
+        if eval_dm is not None
+        else [],
         train_class_distribution=training_dm.class_distribution().tolist()
         if training_dm is not None
         else [],
@@ -132,7 +136,9 @@ def custom_metrics_info(
     config: AzimuthConfig = Depends(get_config),
 ) -> Dict[str, MetricInfo]:
     result = {}
-    dm = dataset_split_managers[DatasetSplitName.eval]
+    dm = dataset_split_managers.get(DatasetSplitName.eval) or dataset_split_managers.get(
+        DatasetSplitName.train
+    )
     for metric_name, metric_obj_def in config.metrics.items():
         met: Metric = load_custom_object(
             metric_obj_def,
@@ -160,13 +166,12 @@ def get_perturbation_testing_summary(
     config: AzimuthConfig = Depends(get_config),
     pipeline_index: int = Depends(require_pipeline_index),
 ):
-    eval_dm = dataset_split_managers[DatasetSplitName.eval]
+    eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
     training_dm = dataset_split_managers.get(DatasetSplitName.train)
-    last_update = (
-        eval_dm.last_update
-        if training_dm is None
-        else max(eval_dm.last_update, training_dm.last_update)
-    )
+
+    last_update_eval = eval_dm.last_update if eval_dm else 0
+    last_update_train = training_dm.last_update if training_dm else 0
+    last_update = max(last_update_eval, last_update_train)
 
     if perturbation_testing_available(config) and pipeline_index is not None:
         perturbation_testing_result: PerturbationTestingMergedResponse = get_standard_task_result(
