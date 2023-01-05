@@ -156,7 +156,8 @@ const Dashboard = () => {
             </Box>
           </PreviewCard>
         )}
-      {isPipelineSelected(pipeline) &&
+      {datasetInfo?.availableDatasetSplits.eval &&
+        isPipelineSelected(pipeline) &&
         datasetInfo?.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
