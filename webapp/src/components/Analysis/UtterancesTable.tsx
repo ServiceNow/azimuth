@@ -377,7 +377,7 @@ const UtterancesTable: React.FC<Props> = ({
       <div className={classes.gridHeaderActions}>
         <Description
           text="Explore utterances and propose actions. Click on a row to inspect the utterance details."
-          link="/exploration-space/utterance-table/"
+          link="user-guide/exploration-space/utterance-table/"
         />
         <Button
           className={classes.exportButton}

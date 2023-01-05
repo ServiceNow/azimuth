@@ -66,6 +66,7 @@ export type PerturbedUtteranceExample =
 export type PerturbedUtterance =
   components["schemas"]["PerturbedUtteranceWithClassNames"];
 export type PerturbationType = components["schemas"]["PerturbationType"];
+export type PipelineDefinition = components["schemas"]["PipelineDefinition"];
 export type PlotSpecification = components["schemas"]["PlotSpecification"];
 export type PostDataActionRequest =
   components["schemas"]["PostDataActionRequest"];

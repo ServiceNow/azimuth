@@ -10,13 +10,13 @@ const DESCRIPTION = {
   "General Warnings": (
     <Description
       text="Investigate issues with class size, class imbalance, and dataset shift."
-      link="/dataset-warnings/#general-warnings"
+      link="user-guide/dataset-warnings/"
     />
   ),
   "Syntactic Warnings": (
     <Description
       text="Compare utterance lengths for your training and evaluation data."
-      link="/dataset-warnings/#syntactic-warnings"
+      link="user-guide/dataset-warnings/"
     />
   ),
 };

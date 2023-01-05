@@ -12,6 +12,7 @@ Released changes are shown in the
 
 ### Added
 - Persistent id.
+- New fields in config page.
 
 ### Changed
 
