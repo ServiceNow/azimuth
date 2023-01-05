@@ -58,7 +58,6 @@ SIMILARITY_TASKS = [
     ),
 ]
 
-
 BMA_PREDICTION_TASKS = [
     Startup(
         "prediction_bma",
