@@ -60,10 +60,13 @@ def load_sst2_dataset() -> DatasetDict:
     )
 
 
-def load_CLINC150_data(full_path, python_loader, train=True) -> Dataset:
+def load_CLINC150_data(full_path, python_loader, train=True, eval=True) -> Dataset:
     """This dataset contains train, validation and test in one file."""
     log.debug("Loading dataset for CLINC150 intent classification")
     dst = load_dataset(python_loader, data_files={"full": full_path})
     if not train:
         dst.pop("train")
+    if not eval:
+        dst.pop("validation")
+        dst.pop("test")
     return dst
