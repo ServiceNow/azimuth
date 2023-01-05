@@ -10,7 +10,7 @@ import { isPipelineSelected } from "utils/helpers";
 export const postprocessingDescription = (
   <Description
     text="View prediction distribution for multiple thresholds to find the optimal one. You can change the confidence threshold in the config file."
-    link="/post-processing-analysis/"
+    link="user-guide/post-processing-analysis/"
   />
 );
 

@@ -58,7 +58,7 @@ const Dashboard = () => {
           <Typography variant="h2">Dashboard</Typography>
           <Description
             text="Explore the analyses of your datasets and pipelines."
-            link="/"
+            link="user-guide/"
           />
         </Box>
         <Button
@@ -79,7 +79,7 @@ const Dashboard = () => {
           description={
             <Description
               text="Investigate issues related to class size, class imbalance, or dataset shift between your training and evaluation sets."
-              link="/dataset-warnings/"
+              link="user-guide/dataset-warnings/"
             />
           }
         >
@@ -95,7 +95,7 @@ const Dashboard = () => {
           description={
             <Description
               text="Assess semantic overlap between class pairs and compare to pipeline confusion."
-              link="/class-overlap/"
+              link="user-guide/class-overlap/"
             />
           }
         >

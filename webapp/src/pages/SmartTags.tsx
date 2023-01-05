@@ -11,7 +11,7 @@ import { isPipelineSelected } from "utils/helpers";
 export const smartTagsDescription = (
   <Description
     text="Identify patterns between smart tags and classes."
-    link="/#smart-tag-analysis"
+    link="user-guide/smart-tag-analysis/"
   />
 );
 
