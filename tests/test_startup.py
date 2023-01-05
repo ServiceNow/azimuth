@@ -27,10 +27,11 @@ def test_startup_task(tiny_text_config, tiny_text_task_manager):
     # We lock the task manager
     assert tiny_text_task_manager.is_locked
     assert not one_mod.done()
-    assert all("train" in k or "eval" in k for k in mods.keys())
+    assert all("train" in k or "eval" in k or "all" in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
     ), "Some modules don't have callbacks!"
+    assert len(mods) == 19
 
 
 def test_startup_task_fast(tiny_text_config, tiny_text_task_manager):
