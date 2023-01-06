@@ -98,9 +98,8 @@ Because the user can make changes to the dataset, we needed to add a Mixin that 
 - Expirable Mixin
     - This module needs to be recomputed every time the user makes a change to the dataset. This
       usually happens because of the use of data action tags in the filter in module options, which
-      can lead to a different set of data points once the user starts to annotate.
-    - Since it is a Mixin, it is added as a second inheritance to Modules that need it. You will
-      need to set up the `self._time` value in the constructor of your Module.
+      can lead to a different set of data points once the user starts to annotate. This also happens when thresholds are edited in the config, which recompute some smart tags.
+    - Since it is a Mixin, it is added as a second inheritance to Modules that need it.
 
 ## ConfigScope
 
