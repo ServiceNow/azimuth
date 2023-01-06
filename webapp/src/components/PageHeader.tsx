@@ -104,6 +104,10 @@ const PageHeader = () => {
           name: "Pipeline Metrics by Data Subpopulation",
         },
         {
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/smart_tags`,
+          name: "Smart Tag Analysis",
+        },
+        {
           pathname: `/${jobId}/settings`,
           name: "Settings",
         },

@@ -2,13 +2,13 @@ import { Box, Button, Typography } from "@mui/material";
 import noData from "assets/void.svg";
 import PerturbationTestingPreview from "components/Analysis/PerturbationTestingPreview";
 import PreviewCard from "components/Analysis/PreviewCard";
+import SmartTagsPreviewCard from "components/Analysis/SmartTagsPreviewCard";
 import WarningsPreview from "components/Analysis/WarningsPreview";
 import ClassOverlapTable from "components/ClassOverlapTable";
 import Description from "components/Description";
 import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
 import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
-import SmartTagsTable from "components/SmartTagsTable";
 import ThresholdPlot from "components/ThresholdPlot";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -18,7 +18,6 @@ import { DATASET_SPLIT_NAMES, UNKNOWN_ERROR } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
 import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
-import { smartTagsDescription } from "./SmartTags";
 import { postprocessingDescription } from "./Threshold";
 
 const Dashboard = () => {
@@ -129,19 +128,13 @@ const Dashboard = () => {
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) && (
-        <PreviewCard
-          title="Smart Tag Analysis"
-          to={`/${jobId}/smart_tags${searchString}`}
-          description={smartTagsDescription}
-        >
-          <Box display="flex" flexDirection="column">
-            <SmartTagsTable
-              jobId={jobId}
-              pipeline={pipeline}
-              availableDatasetSplits={datasetInfo.availableDatasetSplits}
-            />
-          </Box>
-        </PreviewCard>
+        <SmartTagsPreviewCard
+          jobId={jobId}
+          pipeline={pipeline}
+          searchString={searchString}
+          availableDatasetSplits={datasetInfo.availableDatasetSplits}
+          defaultDatasetSplitName={firstAvailableDatasetSplit}
+        />
       )}
       {isPipelineSelected(pipeline) &&
         datasetInfo.perturbationTestingAvailable && (

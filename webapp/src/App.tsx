@@ -94,7 +94,10 @@ export default class App extends React.Component<Props> {
                                 <ClassOverlap />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/smart_tags" exact>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/smart_tags"
+                              exact
+                            >
                               <BasicLayout>
                                 <SmartTags />
                               </BasicLayout>

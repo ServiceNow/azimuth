@@ -51,9 +51,15 @@ const SmartTagsTable: React.FC<{
   jobId: string;
   pipeline: Required<QueryPipelineState>;
   availableDatasetSplits: AvailableDatasetSplits | undefined;
-}> = ({ jobId, pipeline, availableDatasetSplits }) => {
-  const [datasetSplitName, setDatasetSplitName] =
-    React.useState<DatasetSplitName>("eval");
+  datasetSplitName: DatasetSplitName;
+  setDatasetSplitName: (name: DatasetSplitName) => void;
+}> = ({
+  jobId,
+  pipeline,
+  availableDatasetSplits,
+  datasetSplitName,
+  setDatasetSplitName,
+}) => {
   const [transpose, setTranspose] = React.useState(false);
 
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =

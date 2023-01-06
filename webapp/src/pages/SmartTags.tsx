@@ -3,8 +3,9 @@ import Description from "components/Description";
 import SmartTagsTable from "components/SmartTagsTable";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
+import { DatasetSplitName } from "types/api";
 import { PIPELINE_REQUIRED_TIP } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
 
@@ -16,10 +17,17 @@ export const smartTagsDescription = (
 );
 
 const SmartTags = () => {
-  const { jobId } = useParams<{ jobId: string }>();
-  const { pipeline } = useQueryState();
+  const history = useHistory();
+  const { jobId, datasetSplitName } = useParams<{
+    jobId: string;
+    datasetSplitName: DatasetSplitName;
+  }>();
+  const { pipeline, searchString } = useQueryState();
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
+
+  const setDatasetSplitName = (name: DatasetSplitName) =>
+    history.push(`/${jobId}/dataset_splits/${name}/smart_tags${searchString}`);
 
   return (
     <Box display="flex" flexDirection="column" height="100%">
@@ -34,6 +42,8 @@ const SmartTags = () => {
             jobId={jobId}
             pipeline={pipeline}
             availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+            datasetSplitName={datasetSplitName}
+            setDatasetSplitName={setDatasetSplitName}
           />
         </Paper>
       ) : (
