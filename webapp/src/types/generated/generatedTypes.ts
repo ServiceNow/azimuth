@@ -378,17 +378,15 @@ export interface components {
      * that all fields are represented correctly.
      */
     MetricsPerFilter: {
+      extremeLength: components["schemas"]["MetricsPerFilterValue"][];
+      partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
+      dissimilar: components["schemas"]["MetricsPerFilterValue"][];
       almostCorrect: components["schemas"]["MetricsPerFilterValue"][];
       behavioralTesting: components["schemas"]["MetricsPerFilterValue"][];
       pipelineComparison: components["schemas"]["MetricsPerFilterValue"][];
       uncertain: components["schemas"]["MetricsPerFilterValue"][];
-      prediction: components["schemas"]["MetricsPerFilterValue"][];
-      outcome: components["schemas"]["MetricsPerFilterValue"][];
-      extremeLength: components["schemas"]["MetricsPerFilterValue"][];
-      partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
-      dissimilar: components["schemas"]["MetricsPerFilterValue"][];
       label: components["schemas"]["MetricsPerFilterValue"][];
-      dataAction: components["schemas"]["MetricsPerFilterValue"][];
+      prediction: components["schemas"]["MetricsPerFilterValue"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure

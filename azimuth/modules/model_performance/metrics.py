@@ -27,12 +27,7 @@ from azimuth.types.model_performance import (
     MetricsPerFilterValue,
 )
 from azimuth.types.outcomes import ALL_OUTCOMES
-from azimuth.types.tag import (
-    ALL_DATA_ACTION_FILTERS,
-    SMART_TAGS_FAMILY_MAPPING,
-    SmartTag,
-    SmartTagFamily,
-)
+from azimuth.types.tag import SMART_TAGS_FAMILY_MAPPING, SmartTag, SmartTagFamily
 from azimuth.utils.dataset_operations import (
     filter_dataset_split,
     get_confidences_from_ds,
@@ -184,7 +179,12 @@ class MetricsModule(FilterableModule[MetricConfig]):
 
 
 class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
-    """Computes the metrics for each filter."""
+    """Computes the metrics for each filter.
+
+    Note: This module has AzimuthConfig as a scope given that it should be recomputed if smart tags
+    are changed when the config is modified. It is not an expirable module because it is too long
+    to compute. As such, it cannot be affected by data actions.
+    """
 
     def get_metrics_for_filter(
         self, filters_dict: Dict[str, DatasetFilters]
@@ -196,7 +196,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
                 and the corresponding dataset filters as values.
 
         Returns:
-            Metrics for all provided filters.
+            Metrics for labels, predictions and smart tags.
         """
         ds = self.get_dataset_split()
         accumulator = []
@@ -221,7 +221,7 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
         dm = self.get_dataset_split_manager()
         ds = self.get_dataset_split()
 
-        with tqdm(total=5) as pbar:
+        with tqdm(total=3) as pbar:
             pbar.set_description(
                 f"MetricsPerFilter on {self.dataset_split_name} "
                 f"set for pipeline {self.mod_options.pipeline_index}"
@@ -246,16 +246,6 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
             )
             pbar.update()
 
-            data_action_filters = {
-                data_action: self.edit_filter(self.mod_options.filters, data_action=data_action)
-                for data_action in ALL_DATA_ACTION_FILTERS
-            }
-            metrics_per_data_action = sorted_by_utterance_count_with_last(
-                self.get_metrics_for_filter(data_action_filters),
-                -1,
-            )
-            pbar.update()
-
             smart_tag_filters: Dict[SmartTagFamily, Dict[str, DatasetFilters]] = {
                 tag_family: {
                     smart_tag: self.edit_filter(
@@ -273,21 +263,12 @@ class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
             }
             pbar.update()
 
-            outcomes_filters: Dict[str, DatasetFilters] = {
-                outcome: self.edit_filter(self.mod_options.filters, outcome=outcome)
-                for outcome in ALL_OUTCOMES
-            }
-            metrics_per_outcome = self.get_metrics_for_filter(outcomes_filters)
-            pbar.update()
-
         return [
             MetricsPerFilterModuleResponse(
                 metrics_per_filter=MetricsPerFilter(
                     label=metrics_per_label,
                     prediction=metrics_per_prediction,
-                    data_action=metrics_per_data_action,
                     **metrics_per_smart_tag,
-                    outcome=metrics_per_outcome,
                 ),
                 utterance_count=len(ds),
             )

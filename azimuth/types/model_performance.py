@@ -67,6 +67,13 @@ class ValuePerPipelineFilter(ValuePerPipelineSmartTag[T], GenericModel, Generic[
     outcome: List[T] = Field(..., title="Outcome")
 
 
+class ValuePerClassFilter(
+    ValuePerPipelineSmartTag[T], ValuePerDatasetSmartTag[T], GenericModel, Generic[T]
+):
+    label: List[T] = Field(..., title="Label")
+    prediction: List[T] = Field(..., title="Prediction")
+
+
 class UtteranceCountPerFilter(ValuePerDatasetFilter[UtteranceCountPerFilterValue]):
     pass
 
@@ -96,9 +103,7 @@ class MetricsPerFilterValue(MetricsResponseCommonFields, UtteranceCountPerFilter
     pass
 
 
-class MetricsPerFilter(
-    ValuePerDatasetFilter[MetricsPerFilterValue], ValuePerPipelineFilter[MetricsPerFilterValue]
-):
+class MetricsPerFilter(ValuePerClassFilter[MetricsPerFilterValue]):
     pass
 
 
