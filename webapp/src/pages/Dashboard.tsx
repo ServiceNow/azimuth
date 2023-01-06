@@ -100,7 +100,11 @@ const Dashboard = () => {
               />
             }
           >
-            <ClassOverlapTable jobId={jobId} pipeline={pipeline} />
+            <ClassOverlapTable
+              jobId={jobId}
+              pipeline={pipeline}
+              availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+            />
           </PreviewCard>
         )}
       {isPipelineSelected(pipeline) && (

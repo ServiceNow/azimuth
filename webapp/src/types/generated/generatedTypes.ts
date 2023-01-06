@@ -26,13 +26,13 @@ export interface paths {
     /** Update the config using a changeset. */
     patch: operations["update_config_admin_config_patch"];
   };
-  "/class_overlap/plot": {
+  "/dataset_splits/{dataset_split_name}/class_overlap/plot": {
     /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
-    get: operations["get_class_overlap_plot_class_overlap_plot_get"];
+    get: operations["get_class_overlap_plot_dataset_splits__dataset_split_name__class_overlap_plot_get"];
   };
-  "/class_overlap": {
+  "/dataset_splits/{dataset_split_name}/class_overlap": {
     /** Get data for class overlap, confusion, and related utterance counts. */
-    get: operations["get_class_overlap_class_overlap_get"];
+    get: operations["get_class_overlap_dataset_splits__dataset_split_name__class_overlap_get"];
   };
   "/tags": {
     /** Post new data_action tags */
@@ -909,8 +909,11 @@ export interface operations {
     };
   };
   /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
-  get_class_overlap_plot_class_overlap_plot_get: {
+  get_class_overlap_plot_dataset_splits__dataset_split_name__class_overlap_plot_get: {
     parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
+      };
       query: {
         /** Whether to include overlap of a class with itself. */
         self_overlap?: boolean;
@@ -936,8 +939,11 @@ export interface operations {
     };
   };
   /** Get data for class overlap, confusion, and related utterance counts. */
-  get_class_overlap_class_overlap_get: {
+  get_class_overlap_dataset_splits__dataset_split_name__class_overlap_get: {
     parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
+      };
       query: {
         pipeline_index?: number;
       };

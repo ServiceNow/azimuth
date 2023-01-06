@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { GridValueFormatterParams, GridCellParams } from "@mui/x-data-grid";
+import { GridCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
 import { QueryPipelineState } from "types/models";
 import { getClassOverlapEndpoint } from "services/api";
 import { formatRatioAsPercentageString } from "utils/format";
@@ -9,7 +9,7 @@ import SeeMoreLess, {
   useMoreLess,
 } from "components/SeeMoreLess";
 import { Table } from "./Table";
-import { ClassOverlapTableClassPair } from "types/api";
+import { AvailableDatasetSplits, ClassOverlapTableClassPair } from "types/api";
 import { isPipelineSelected } from "utils/helpers";
 
 const ROW_HEIGHT = 35;
@@ -19,11 +19,16 @@ type Row = ClassOverlapTableClassPair & { id: number };
 type Props = {
   jobId: string;
   pipeline: QueryPipelineState;
+  availableDatasetSplits: AvailableDatasetSplits | undefined;
 };
 const twoDigitFormatter = ({ value }: GridValueFormatterParams) =>
   isNaN(value as number) ? "--" : (value as number).toFixed(2);
 
-const ClassOverlapTable: React.FC<Props> = ({ jobId, pipeline }) => {
+const ClassOverlapTable: React.FC<Props> = ({
+  jobId,
+  pipeline,
+  availableDatasetSplits,
+}) => {
   const { data, isFetching, error } = getClassOverlapEndpoint.useQuery({
     jobId,
     ...pipeline,
@@ -120,7 +125,9 @@ const ClassOverlapTable: React.FC<Props> = ({ jobId, pipeline }) => {
         },
       ]}
       columnVisibilityModel={
-        isPipelineSelected(pipeline) ? {} : { pipelineConfusionEval: false }
+        isPipelineSelected(pipeline) && availableDatasetSplits?.eval
+          ? {}
+          : { pipelineConfusionEval: false }
       }
       rows={rows}
       sortingOrder={["desc", "asc"]}

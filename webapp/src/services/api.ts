@@ -2,7 +2,7 @@ import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { AzimuthConfig, DataAction, DataActionResponse } from "types/api";
 import { Tags } from "types/models";
-import { GetUtterancesQueryState, fetchApi, TypedResponse } from "utils/api";
+import { fetchApi, GetUtterancesQueryState, TypedResponse } from "utils/api";
 import { DATA_ACTION_NONE_VALUE } from "utils/const";
 import { raiseSuccessToast } from "utils/helpers";
 
@@ -203,7 +203,7 @@ export const api = createApi({
       providesTags: () => [{ type: "ClassOverlap" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_overlap",
+          path: "/dataset_splits/{dataset_split_name}/class_overlap",
           method: "get",
         }),
         "Something went wrong fetching class overlap"
@@ -213,7 +213,7 @@ export const api = createApi({
       providesTags: () => [{ type: "ClassOverlapPlot" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_overlap/plot",
+          path: "/dataset_splits/{dataset_split_name}/class_overlap/plot",
           method: "get",
         }),
         "Something went wrong fetching spectral clustering class overlap data"

@@ -32,6 +32,7 @@ const ClassOverlap = () => {
 
   const { data, error, isFetching } = getClassOverlapPlotEndpoint.useQuery({
     jobId,
+    datasetSplitName: "train",
     ...classOverlap,
   });
 

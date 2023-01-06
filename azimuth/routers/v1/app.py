@@ -38,6 +38,7 @@ from azimuth.utils.project import (
     similarity_available,
 )
 from azimuth.utils.routers import (
+    get_last_update,
     get_standard_task_result,
     require_application_ready,
     require_available_model,
@@ -169,9 +170,7 @@ def get_perturbation_testing_summary(
     eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
     training_dm = dataset_split_managers.get(DatasetSplitName.train)
 
-    last_update_eval = eval_dm.last_update if eval_dm else 0
-    last_update_train = training_dm.last_update if training_dm else 0
-    last_update = max(last_update_eval, last_update_train)
+    last_update = get_last_update([training_dm, eval_dm])
 
     if perturbation_testing_available(config) and pipeline_index is not None:
         perturbation_testing_result: PerturbationTestingMergedResponse = get_standard_task_result(
