@@ -14,7 +14,7 @@ import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
-import { UNKNOWN_ERROR } from "utils/const";
+import { DATASET_SPLIT_NAMES, UNKNOWN_ERROR } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
 import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
@@ -46,6 +46,10 @@ const Dashboard = () => {
     );
   }
 
+  const firstAvailableDatasetSplit = DATASET_SPLIT_NAMES.find(
+    (datasetSplitName) => datasetInfo.availableDatasetSplits[datasetSplitName]
+  )!;
+
   return (
     <Box display="flex" flexDirection="column" gap={2}>
       <Box
@@ -66,7 +70,7 @@ const Dashboard = () => {
           color="secondary"
           variant="contained"
           component={Link}
-          to={`/${jobId}/dataset_splits/eval/prediction_overview${searchString}`}
+          to={`/${jobId}/dataset_splits/${firstAvailableDatasetSplit}/prediction_overview${searchString}`}
           sx={{ gap: 1 }}
         >
           <Telescope fontSize="large" />
