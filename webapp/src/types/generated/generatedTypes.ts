@@ -137,8 +137,8 @@ export interface components {
       pipelines?: components["schemas"]["PipelineDefinition"][];
       uncertainty?: components["schemas"]["UncertaintyOptions"];
       saliency_layer?: string;
-      metrics?: { [key: string]: components["schemas"]["MetricDefinition"] };
       behavioral_testing?: components["schemas"]["BehavioralTestingOptions"];
+      metrics?: { [key: string]: components["schemas"]["MetricDefinition"] };
     };
     BehavioralTestingOptions: {
       neutral_token?: components["schemas"]["NeutralTokenOptions"];

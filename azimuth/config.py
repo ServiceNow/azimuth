@@ -299,6 +299,26 @@ class ModelContractConfig(CommonFieldsConfig):
     uncertainty: UncertaintyOptions = UncertaintyOptions()
     # Layer name where to calculate the gradients, normally the word embeddings layer.
     saliency_layer: Optional[str] = None
+
+    @validator("pipelines", pre=True)
+    def check_pipeline_names(cls, pipeline_definitions):
+        if pipeline_definitions is None:
+            return pipeline_definitions
+        pipeline_definitions = [
+            pipeline_def.dict() if isinstance(pipeline_def, PipelineDefinition) else pipeline_def
+            for pipeline_def in pipeline_definitions
+        ]
+        for pipeline_idx, pipeline_def in enumerate(pipeline_definitions):
+            if "name" not in pipeline_def or pipeline_def["name"] == "":
+                # Default value is the project name + idx.
+                pipeline_def["name"] = f"Pipeline_{pipeline_idx}"
+        pipeline_names = set(pipeline_def["name"] for pipeline_def in pipeline_definitions)
+        if len(pipeline_definitions) != len(pipeline_names):
+            raise ValueError(f"Duplicated pipeline names {pipeline_names}.")
+        return pipeline_definitions
+
+
+class MetricConfig(ModelContractConfig):
     # Custom HuggingFace metrics
     metrics: Dict[str, MetricDefinition] = {
         "Accuracy": MetricDefinition(
@@ -320,23 +340,6 @@ class ModelContractConfig(CommonFieldsConfig):
             additional_kwargs={"average": "weighted"},
         ),
     }
-
-    @validator("pipelines", pre=True)
-    def check_pipeline_names(cls, pipeline_definitions):
-        if pipeline_definitions is None:
-            return pipeline_definitions
-        pipeline_definitions = [
-            pipeline_def.dict() if isinstance(pipeline_def, PipelineDefinition) else pipeline_def
-            for pipeline_def in pipeline_definitions
-        ]
-        for pipeline_idx, pipeline_def in enumerate(pipeline_definitions):
-            if "name" not in pipeline_def or pipeline_def["name"] == "":
-                # Default value is the project name + idx.
-                pipeline_def["name"] = f"Pipeline_{pipeline_idx}"
-        pipeline_names = set(pipeline_def["name"] for pipeline_def in pipeline_definitions)
-        if len(pipeline_definitions) != len(pipeline_names):
-            raise ValueError(f"Duplicated pipeline names {pipeline_names}.")
-        return pipeline_definitions
 
 
 class LanguageConfig(CommonFieldsConfig):
@@ -369,6 +372,7 @@ class SyntaxConfig(CommonFieldsConfig):
 
 
 class AzimuthConfig(
+    MetricConfig,
     PerturbationTestingConfig,
     SimilarityConfig,
     DatasetWarningConfig,
@@ -436,7 +440,9 @@ def load_azimuth_config(config_path: str) -> AzimuthConfig:
             )
 
     not_default_config_values = cfg.dict(
-        exclude_defaults=True, exclude={"name", "model_contract", "dataset", "pipelines"}
+        exclude_defaults=True,
+        exclude={"name", "model_contract", "dataset", "pipelines"},
+        exclude_unset=True,
     )
     log.info(f"The following additional fields were set: {not_default_config_values}")
     log.info("-------------Config loaded--------------")
