@@ -10,7 +10,7 @@ from starlette.testclient import TestClient
 def test_class_overlap_plot_route(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp = client.get("/class_overlap/plot")
+    resp = client.get("dataset_splits/train/class_overlap/plot")
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
 
@@ -21,7 +21,7 @@ def test_class_overlap_plot_route(app: FastAPI) -> None:
 def test_class_overlap_route(app: FastAPI) -> None:
     client = TestClient(app)
 
-    resp_no_pipeline = client.get("/class_overlap")  # Dataset only, no pipeline
+    resp_no_pipeline = client.get("dataset_splits/train/class_overlap")  # No pipeline
     assert resp_no_pipeline.status_code == HTTP_200_OK, resp_no_pipeline.text
     data_no_pipeline = resp_no_pipeline.json()
 
@@ -48,7 +48,7 @@ def test_class_overlap_route(app: FastAPI) -> None:
         ]
     }
 
-    resp_pipeline_0 = client.get("/class_overlap?pipeline_index=0")
+    resp_pipeline_0 = client.get("dataset_splits/train/class_overlap?pipeline_index=0")
     assert resp_pipeline_0.status_code == HTTP_200_OK, resp_pipeline_0.text
     data_pipeline_0 = resp_pipeline_0.json()
 
