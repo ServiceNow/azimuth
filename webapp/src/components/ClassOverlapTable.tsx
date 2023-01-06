@@ -31,6 +31,7 @@ const ClassOverlapTable: React.FC<Props> = ({
 }) => {
   const { data, isFetching, error } = getClassOverlapEndpoint.useQuery({
     jobId,
+    datasetSplitName: "train",
     ...pipeline,
   });
 
