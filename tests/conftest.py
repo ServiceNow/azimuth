@@ -116,6 +116,13 @@ def tiny_text_config_no_train(tiny_text_config) -> AzimuthConfig:
     return tiny_text_config_no_train
 
 
+@pytest.fixture(params=["train", "eval"])
+def tiny_text_config_one_ds(tiny_text_config, request) -> AzimuthConfig:
+    tiny_text_config_one_ds = tiny_text_config.copy(deep=True)
+    tiny_text_config_one_ds.dataset.kwargs[request.param] = False
+    return tiny_text_config_one_ds
+
+
 @pytest.fixture
 def tiny_text_config_no_pipeline(tiny_text_config) -> AzimuthConfig:
     tiny_text_config_no_pipeline = tiny_text_config.copy(deep=True)

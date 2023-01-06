@@ -58,11 +58,15 @@ def load_hf_text_classif_pipeline(checkpoint_path: str, azimuth_config: AzimuthC
     )
 
 
-def load_sst2_dataset(train: bool = True, max_dataset_len: int = _MAX_DATASET_LEN) -> DatasetDict:
+def load_sst2_dataset(
+    train: bool = True, eval: bool = True, max_dataset_len: int = _MAX_DATASET_LEN
+) -> DatasetDict:
     datasets = load_dataset("glue", "sst2")
-    datasets["validation"] = datasets["validation"].rename_column("sentence", "utterance")
-    # Test has no label
-    ds = {"validation": datasets["validation"].select(np.arange(max_dataset_len))}
+    ds = {}
+    if eval:
+        # Test set has no label
+        datasets["validation"] = datasets["validation"].rename_column("sentence", "utterance")
+        ds.update({"validation": datasets["validation"].select(np.arange(max_dataset_len))})
     if train:
         datasets["train"] = datasets["train"].rename_column("sentence", "utterance")
         ds.update({"train": datasets["train"].select(np.arange(max_dataset_len))})

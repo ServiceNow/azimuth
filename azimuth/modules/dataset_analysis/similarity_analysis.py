@@ -73,30 +73,28 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
     """Compute neighbors for each utterance in a dataset split."""
 
     def compute_on_dataset_split(self) -> List[TaggingResponse]:  # type: ignore
-        if DatasetSplitName.train in self.available_dataset_splits:
-            train_dm: Optional[DatasetSplitManager] = self.get_dataset_split_manager(
-                DatasetSplitName.train
-            )
-            # NOTE: Doing this ensure that the FAISS index exists somewhere.
-            # If FAISSModule fails this module will fail instead of blocking.
-            train_features: Optional[List[Array]] = self._get_features(DatasetSplitName.train)
-        else:
-            train_dm = None
-            train_features = None
+        def get_dm_and_features(ds_name):
+            if ds_name in self.available_dataset_splits:
+                dm: Optional[DatasetSplitManager] = self.get_dataset_split_manager(ds_name)
+                features: Optional[List[Array]] = self._get_features(ds_name)
+                return dm, features
+            else:
+                return None, None
 
-        eval_dm = self.get_dataset_split_manager(DatasetSplitName.eval)
-        eval_features = self._get_features(DatasetSplitName.eval)
-        ds_features = assert_not_none(
+        train_dm, train_features = get_dm_and_features(DatasetSplitName.train)
+        eval_dm, eval_features = get_dm_and_features(DatasetSplitName.eval)
+
+        ds_features: List[Array] = assert_not_none(
             eval_features if self.dataset_split_name == DatasetSplitName.eval else train_features
+        )
+        ds_dm: DatasetSplitManager = assert_not_none(
+            eval_dm if self.dataset_split_name == DatasetSplitName.eval else train_dm
         )
 
         indices = self.get_indices()
         neighbors = self.get_neighbors([ds_features[i] for i in indices])
 
         similarity_config: SimilarityOptions = assert_not_none(self.config.similarity)
-        dm = assert_not_none(
-            eval_dm if self.dataset_split_name == DatasetSplitName.eval else train_dm
-        )
 
         conflicting_neighbors_tags = defaultdict(list)
         no_close_tags = defaultdict(list)
@@ -108,7 +106,7 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
             if split_name not in self.available_dataset_splits:
                 continue
             conflicting_neighbors_tags[split_name] = self.get_conflicting_neighbors_tag(
-                labels=dm.get_dataset_split().select(indices)[self.config.columns.label],
+                labels=ds_dm.get_dataset_split().select(indices)[self.config.columns.label],
                 neighbors=neighbors[split_name],
                 dm=self.get_dataset_split_manager(split_name),
                 threshold=similarity_config.conflicting_neighbors_threshold,
@@ -142,17 +140,19 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
                         SmartTag.conflicting_neighbors_train: False
                         if conflicting_neighbors_train is None
                         else conflicting_neighbors_train[SmartTag.conflicting_neighbors_train],
-                        SmartTag.conflicting_neighbors_eval: conflicting_neighbors_eval[
-                            SmartTag.conflicting_neighbors_eval
-                        ],
+                        SmartTag.conflicting_neighbors_eval: False
+                        if conflicting_neighbors_eval is None
+                        else conflicting_neighbors_eval[SmartTag.conflicting_neighbors_eval],
                         SmartTag.no_close_train: False
                         if no_close_train is None
                         else no_close_train[SmartTag.no_close_train],
-                        SmartTag.no_close_eval: no_close_eval[SmartTag.no_close_eval],
+                        SmartTag.no_close_eval: False
+                        if no_close_eval is None
+                        else no_close_eval[SmartTag.no_close_eval],
                     },
                     adds={
                         DatasetColumn.neighbors_train: train_neighbors or [],
-                        DatasetColumn.neighbors_eval: eval_neighbors,
+                        DatasetColumn.neighbors_eval: eval_neighbors or [],
                     },
                 )
             )
