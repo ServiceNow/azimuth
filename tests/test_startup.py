@@ -17,7 +17,7 @@ from azimuth.types import (
     SupportedModule,
 )
 from azimuth.utils.project import load_dataset_split_managers_from_config
-from tests.utils import get_table_key
+from tests.utils import get_table_key, get_tiny_text_config_one_ds_name
 
 
 def test_startup_task(tiny_text_config, tiny_text_task_manager):
@@ -69,12 +69,13 @@ def test_on_end(tiny_text_config):
     task_manager.clear_worker_cache.assert_called_once()
 
 
-def test_startup_task_no_train(tiny_text_config_no_train, tiny_text_task_manager):
-    dms = load_dataset_split_managers_from_config(tiny_text_config_no_train)
+def test_startup_task_one_ds(tiny_text_config_one_ds, tiny_text_task_manager):
+    dms = load_dataset_split_managers_from_config(tiny_text_config_one_ds)
     assert DatasetSplitName.eval in dms and DatasetSplitName.train in dms
 
     mods = startup_tasks(dms, tiny_text_task_manager)
-    assert all("train" not in k or "eval" in k for k in mods.keys())
+    ds_name, other_ds_name = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
+    assert all(other_ds_name not in k or ds_name in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
     ), "Some modules don't have callbacks!"
