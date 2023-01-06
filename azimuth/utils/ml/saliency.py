@@ -6,7 +6,7 @@ from typing import Any, List
 import numpy as np
 import structlog
 
-from azimuth.types.general.module_options import GradientCalculation
+from azimuth.types.general.module_arguments import GradientCalculation
 
 log = structlog.get_logger()
 
