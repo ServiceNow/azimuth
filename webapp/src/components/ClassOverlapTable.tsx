@@ -19,7 +19,7 @@ type Row = ClassOverlapTableClassPair & { id: number };
 type Props = {
   jobId: string;
   pipeline: QueryPipelineState;
-  availableDatasetSplits: AvailableDatasetSplits | undefined;
+  availableDatasetSplits: AvailableDatasetSplits;
 };
 const twoDigitFormatter = ({ value }: GridValueFormatterParams) =>
   isNaN(value as number) ? "--" : (value as number).toFixed(2);
@@ -126,7 +126,7 @@ const ClassOverlapTable: React.FC<Props> = ({
         },
       ]}
       columnVisibilityModel={
-        isPipelineSelected(pipeline) && availableDatasetSplits?.eval
+        isPipelineSelected(pipeline) && availableDatasetSplits.eval
           ? {}
           : { pipelineConfusionEval: false }
       }

@@ -14,6 +14,7 @@ import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
+import { UNKNOWN_ERROR } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
 import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
@@ -36,11 +37,11 @@ const Dashboard = () => {
 
   if (isFetching) {
     return <Loading />;
-  } else if (error) {
+  } else if (error || datasetInfo === undefined) {
     return (
       <Box alignItems="center" display="grid" justifyItems="center">
         <img src={noData} width="50%" alt="no dataset info" />
-        <Typography>{error.message}</Typography>
+        <Typography>{error?.message || UNKNOWN_ERROR}</Typography>
       </Box>
     );
   }
@@ -72,7 +73,7 @@ const Dashboard = () => {
           Go to exploration space
         </Button>
       </Box>
-      {datasetInfo?.availableDatasetSplits.train && (
+      {datasetInfo.availableDatasetSplits.train && (
         <PreviewCard
           title="Dataset Warnings"
           to={`/${jobId}/dataset_warnings${searchString}`}
@@ -88,8 +89,8 @@ const Dashboard = () => {
           </Box>
         </PreviewCard>
       )}
-      {datasetInfo?.availableDatasetSplits.train &&
-        datasetInfo?.similarityAvailable && (
+      {datasetInfo.availableDatasetSplits.train &&
+        datasetInfo.similarityAvailable && (
           <PreviewCard
             title="Class Overlap"
             to={`/${jobId}/class_overlap${searchString}`}
@@ -103,7 +104,7 @@ const Dashboard = () => {
             <ClassOverlapTable
               jobId={jobId}
               pipeline={pipeline}
-              availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+              availableDatasetSplits={datasetInfo.availableDatasetSplits}
             />
           </PreviewCard>
         )}
@@ -121,7 +122,7 @@ const Dashboard = () => {
           <PerformanceAnalysis
             jobId={jobId}
             pipeline={pipeline}
-            availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+            availableDatasetSplits={datasetInfo.availableDatasetSplits}
           />
         </PreviewCard>
       )}
@@ -139,13 +140,13 @@ const Dashboard = () => {
             <SmartTagsTable
               jobId={jobId}
               pipeline={pipeline}
-              availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+              availableDatasetSplits={datasetInfo.availableDatasetSplits}
             />
           </Box>
         </PreviewCard>
       )}
       {isPipelineSelected(pipeline) &&
-        datasetInfo?.perturbationTestingAvailable && (
+        datasetInfo.perturbationTestingAvailable && (
           <PreviewCard
             title="Behavioral Testing"
             to={`/${jobId}/behavioral_testing_summary${searchString}`}
@@ -160,9 +161,9 @@ const Dashboard = () => {
             </Box>
           </PreviewCard>
         )}
-      {datasetInfo?.availableDatasetSplits.eval &&
-        isPipelineSelected(pipeline) &&
-        datasetInfo?.postprocessingEditable?.[pipeline.pipelineIndex] && (
+      {isPipelineSelected(pipeline) &&
+        datasetInfo.availableDatasetSplits.eval &&
+        datasetInfo.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
             to={`/${jobId}/thresholds${searchString}`}
