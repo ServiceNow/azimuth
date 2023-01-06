@@ -192,7 +192,7 @@ def test_scoped_caching_common(simple_text_config, dask_client):
     assert new_perturbation_module.done()
 
 
-def test_meta_data(tiny_text_config):
+def test_effective_arguments(tiny_text_config):
     save_predictions(tiny_text_config)
     save_outcomes(tiny_text_config)
     mod = ConfusionMatrixModule(
@@ -202,13 +202,13 @@ def test_meta_data(tiny_text_config):
     )
     result = get_task_result(mod, List[ConfusionMatrixResponse])[0]
 
-    with open(mod._cache_metadata, "r") as f:
-        metadata = json.load(f)
+    with open(mod._cache_effective_arguments, "r") as f:
+        effective_arguments = json.load(f)
 
     mod_2 = ConfusionMatrixModule(
         config=tiny_text_config,
         dataset_split_name=DatasetSplitName.eval,
-        mod_options=ModuleOptions(**metadata["module_options"]),
+        mod_options=ModuleOptions(**effective_arguments["mod_options"]),
     )
     result_2 = get_task_result(mod_2, List[ConfusionMatrixResponse])[0]
 
@@ -216,7 +216,7 @@ def test_meta_data(tiny_text_config):
     assert not result_2.normalize
 
     # Saved config attributes should match mod_2.config, when excluding fields not affecting cache.
-    loaded_cfg = ModelContractConfig(**metadata["config_attributes"])
+    loaded_cfg = ModelContractConfig(**effective_arguments["config_scope"])
     loaded_cfg_exclude_fields_from_cache = loaded_cfg.dict(
         exclude=exclude_fields_from_cache(loaded_cfg)
     )

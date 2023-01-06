@@ -10,7 +10,7 @@ from datasets import Dataset
 
 from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
-from azimuth.types.general.module_options import GradientCalculation
+from azimuth.types.general.module_arguments import GradientCalculation
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.saliency import find_word_embeddings_layer
 

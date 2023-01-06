@@ -6,7 +6,6 @@ import abc
 import json
 import os
 import time
-from os.path import join as pjoin
 from typing import List, Optional
 
 import h5py
@@ -79,10 +78,10 @@ class HDF5CacheMixin(CachingMechanism):
 
     name: str
     _cache_lock: str  # Lockfile path
-    _cache_file: str  # Cachefile path
-    _cache_metadata: str  # Metadata cachefile
+    _cache_file: str  # Cache file path
+    _cache_effective_arguments: str  # Effective arguments cache file
 
-    def get_meta_data(self):
+    def get_effective_arguments(self):
         raise NotImplementedError
 
     def _store_data_in_cache(self, result: List[ModuleResponse], indices: List[int]):
@@ -108,8 +107,8 @@ class HDF5CacheMixin(CachingMechanism):
             handle.flush()
 
         # Save all that affects caching so it can be used for identification and debugging.
-        with open(pjoin(self._cache_metadata), "w+") as f:
-            json.dump(self.get_meta_data().no_alias_dict(), f, indent=4)
+        with open(os.path.join(self._cache_effective_arguments), "w") as f:
+            json.dump(self.get_effective_arguments().no_alias_dict(), f, indent=2)
 
     @retry(stop_max_attempt_number=5, wait_fixed=0.5)
     def _check_cache_internal(self, indices: Optional[List[int]]):

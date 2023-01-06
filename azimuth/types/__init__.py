@@ -14,7 +14,7 @@ from azimuth.types.general.modules import (
     SupportedModule,
     SupportedTask,
 )
-from azimuth.types.general.module_options import (
+from azimuth.types.general.module_arguments import (
     DatasetFilters,
     ModuleOptions,
     NamedDatasetFilters,

@@ -103,6 +103,8 @@ class ModuleOptions(AliasModel):
     )
 
 
-class ModuleMetaData(AliasModel):
-    module_options: Dict[str, Any]
-    config_attributes: Dict[str, Any]
+class ModuleEffectiveArguments(AliasModel):
+    """Config scope and module options affecting a module's computation."""
+
+    mod_options: Dict[str, Any]
+    config_scope: Dict[str, Any]

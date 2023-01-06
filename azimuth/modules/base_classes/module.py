@@ -11,7 +11,7 @@ from azimuth.config import ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
-from azimuth.types.general.module_options import ModuleMetaData
+from azimuth.types.general.module_arguments import ModuleEffectiveArguments
 from azimuth.utils.conversion import md5_hash
 from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 from azimuth.utils.validation import assert_not_none
@@ -41,28 +41,28 @@ class Module(DaskModule[ConfigScope]):
         self.task_name = self.model_contract_method_name or self.__class__.__name__
         super().__init__(dataset_split_name, config)
 
-    def get_meta_data(self) -> ModuleMetaData:
-        """Retrieve meta-data on the Module such as module options and config attributes.
+    def get_effective_arguments(self) -> ModuleEffectiveArguments:
+        """Retrieve arguments affecting the Module, i.e. module options and config scope.
 
         Returns:
-            Module's meta-data
+            Module's Effective Arguments
         """
 
         # indices are excluded, since the cache for all indices should be in the same file.
         # model_contract_method_name are excluded too because it's already in the task_name.
-        return ModuleMetaData(
-            module_options=self.mod_options.dict(
+        return ModuleEffectiveArguments(
+            mod_options=self.mod_options.dict(
                 exclude={"indices", "model_contract_method_name"}, include=self.allowed_mod_options
             ),
-            config_attributes=self.config.dict(
+            config_scope=self.config.dict(
                 exclude=exclude_fields_from_cache(self.config),
             ),
         )
 
     def _get_name(self) -> str:
-        meta_data = self.get_meta_data()
-        hash_options = md5_hash(meta_data.module_options)[:5]
-        hash_attributes = md5_hash(meta_data.config_attributes)[:5]
+        effective_arguments = self.get_effective_arguments()
+        hash_options = md5_hash(effective_arguments.mod_options)[:5]
+        hash_attributes = md5_hash(effective_arguments.config_scope)[:5]
 
         return f"{self.task_name}_{self.dataset_split_name}_{hash_options}_{hash_attributes}"
 
