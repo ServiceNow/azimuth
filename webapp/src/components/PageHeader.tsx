@@ -100,7 +100,7 @@ const PageHeader = () => {
           name: "Class Overlap",
         },
         {
-          pathname: `/${jobId}/pipeline_metrics`,
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/pipeline_metrics`,
           name: "Pipeline Metrics by Data Subpopulation",
         },
         {

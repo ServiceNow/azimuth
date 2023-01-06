@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import noData from "assets/void.svg";
+import PerformanceAnalysisPreviewCard from "components/Analysis/PerformanceAnalysisPreviewCard";
 import PerturbationTestingPreview from "components/Analysis/PerturbationTestingPreview";
 import PreviewCard from "components/Analysis/PreviewCard";
 import SmartTagsPreviewCard from "components/Analysis/SmartTagsPreviewCard";
@@ -8,7 +9,6 @@ import ClassOverlapTable from "components/ClassOverlapTable";
 import Description from "components/Description";
 import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
-import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
 import ThresholdPlot from "components/ThresholdPlot";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -16,7 +16,6 @@ import { Link, useParams } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
 import { DATASET_SPLIT_NAMES, UNKNOWN_ERROR } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
-import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
 import { postprocessingDescription } from "./Threshold";
 
@@ -109,23 +108,18 @@ const Dashboard = () => {
           </PreviewCard>
         )}
       {isPipelineSelected(pipeline) && (
-        <PreviewCard
-          title="Pipeline Metrics by Data Subpopulation"
-          to={`/${jobId}/pipeline_metrics${searchString}`}
+        <PerformanceAnalysisPreviewCard
+          jobId={jobId}
+          pipeline={pipeline}
+          searchString={searchString}
+          availableDatasetSplits={datasetInfo.availableDatasetSplits}
+          defaultDatasetSplitName={firstAvailableDatasetSplit}
           linkButtonText={
             config?.pipelines && config.pipelines.length > 1
               ? "Compare pipelines"
               : undefined
           }
-          description={performanceAnalysisDescription}
-          autoHeight
-        >
-          <PerformanceAnalysis
-            jobId={jobId}
-            pipeline={pipeline}
-            availableDatasetSplits={datasetInfo.availableDatasetSplits}
-          />
-        </PreviewCard>
+        />
       )}
       {isPipelineSelected(pipeline) && (
         <SmartTagsPreviewCard

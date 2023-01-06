@@ -89,6 +89,8 @@ type Props = {
   pipeline: Required<QueryPipelineState>;
   availableDatasetSplits: AvailableDatasetSplits | undefined;
   isLoading: boolean;
+  datasetSplitName: DatasetSplitName;
+  setDatasetSplitName: (name: DatasetSplitName) => void;
 };
 
 type Row = {
@@ -102,10 +104,9 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   pipeline,
   availableDatasetSplits,
   isLoading,
+  datasetSplitName,
+  setDatasetSplitName,
 }) => {
-  const [selectedDatasetSplit, setSelectedDatasetSplit] =
-    React.useState<DatasetSplitName>("eval");
-
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
@@ -127,7 +128,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
     error: errorFetchingBasePipelineData,
   } = getMetricsPerFilterEndpoint.useQuery({
     jobId,
-    datasetSplitName: selectedDatasetSplit,
+    datasetSplitName,
     ...pipeline,
   });
 
@@ -138,7 +139,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   } = getMetricsPerFilterEndpoint.useQuery(
     {
       jobId,
-      datasetSplitName: selectedDatasetSplit,
+      datasetSplitName,
       pipelineIndex: comparedPipeline!,
     },
     { skip: comparedPipeline === undefined }
@@ -462,7 +463,7 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/prediction_overview${constructSearchString(
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview${constructSearchString(
         {
           ...(props.row.id !== OVERALL_ROW_ID && {
             [selectedMetricPerFilterOption]: [
@@ -547,8 +548,8 @@ const PerformanceAnalysisTable: React.FC<Props> = ({
         <Box width={340}>
           <DatasetSplitToggler
             availableDatasetSplits={availableDatasetSplits}
-            value={selectedDatasetSplit}
-            onChange={setSelectedDatasetSplit}
+            value={datasetSplitName}
+            onChange={setDatasetSplitName}
           />
         </Box>
         {config?.pipelines && config.pipelines.length > 1 && (

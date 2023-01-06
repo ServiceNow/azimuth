@@ -95,6 +95,14 @@ export default class App extends React.Component<Props> {
                               </BasicLayout>
                             </Route>
                             <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/pipeline_metrics"
+                              exact
+                            >
+                              <BasicLayout>
+                                <PerformanceAnalysis />
+                              </BasicLayout>
+                            </Route>
+                            <Route
                               path="/:jobId/dataset_splits/:datasetSplitName/smart_tags"
                               exact
                             >
@@ -138,11 +146,6 @@ export default class App extends React.Component<Props> {
                             >
                               <BasicLayout>
                                 <UtteranceDetail />
-                              </BasicLayout>
-                            </Route>
-                            <Route path="/:jobId/pipeline_metrics" exact>
-                              <BasicLayout>
-                                <PerformanceAnalysis />
                               </BasicLayout>
                             </Route>
                             <Route>
