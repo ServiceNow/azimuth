@@ -304,24 +304,36 @@ const Settings: React.FC = () => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields("name", resultingConfig.name)}
-          {displayReadonlyFields(
-            "rejection_class",
-            resultingConfig.rejection_class
+          {resultingConfig.name &&
+            displayReadonlyFields("name", resultingConfig.name)}
+          {resultingConfig.rejection_class &&
+            displayReadonlyFields(
+              "rejection_class",
+              resultingConfig.rejection_class
+            )}
+          {resultingConfig.columns && (
+            <Box display="flex" flexDirection="column">
+              <Typography variant="caption">columns</Typography>
+              <KeyValuePairs>
+                {resultingConfig.columns.text_input && (
+                  <>
+                    <Typography variant="body2">text_input:</Typography>
+                    <Typography variant="body2">
+                      {resultingConfig.columns.text_input}
+                    </Typography>
+                  </>
+                )}
+                {resultingConfig.columns.label && (
+                  <>
+                    <Typography variant="body2">label:</Typography>
+                    <Typography variant="body2">
+                      {resultingConfig.columns.label}
+                    </Typography>
+                  </>
+                )}
+              </KeyValuePairs>
+            </Box>
           )}
-          <Box display="flex" flexDirection="column">
-            <Typography variant="caption">columns</Typography>
-            <KeyValuePairs>
-              <Typography variant="body2">text_input:</Typography>
-              <Typography variant="body2">
-                {resultingConfig.columns?.text_input}
-              </Typography>
-              <Typography variant="body2">label:</Typography>
-              <Typography variant="body2">
-                {resultingConfig.columns?.label}
-              </Typography>
-            </KeyValuePairs>
-          </Box>
         </Columns>
       </FormGroup>
       {displaySectionTitle("Dataset")}
@@ -331,8 +343,10 @@ const Settings: React.FC = () => {
             "class_name",
             resultingConfig.dataset?.class_name
           )}
-          {displayReadonlyFields("remote", resultingConfig.dataset?.remote)}
+          {resultingConfig.dataset?.remote &&
+            displayReadonlyFields("remote", resultingConfig.dataset.remote)}
           {resultingConfig.dataset?.kwargs &&
+            Object.keys(resultingConfig.dataset?.kwargs).length > 0 &&
             displayArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
           {resultingConfig.dataset?.args &&
             resultingConfig.dataset.args.length > 0 &&
@@ -346,14 +360,16 @@ const Settings: React.FC = () => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields(
-            "model_contract",
-            resultingConfig.model_contract
-          )}
-          {displayReadonlyFields(
-            "saliency_layer",
-            resultingConfig.saliency_layer
-          )}
+          {resultingConfig.model_contract &&
+            displayReadonlyFields(
+              "model_contract",
+              resultingConfig.model_contract
+            )}
+          {resultingConfig.saliency_layer &&
+            displayReadonlyFields(
+              "saliency_layer",
+              resultingConfig.saliency_layer
+            )}
           {resultingConfig.uncertainty && (
             <Box display="flex" flexDirection="column">
               <Typography variant="caption">uncertainty</Typography>
@@ -388,7 +404,7 @@ const Settings: React.FC = () => {
           )}
         </Columns>
       </FormGroup>
-      {displaySectionTitle("Pipelines")}
+      {resultingConfig.pipelines && displaySectionTitle("Pipelines")}
       <FormGroup sx={{ gap: 2 }}>
         {resultingConfig.pipelines?.map((pipeline, pipelineIndex) => (
           <Paper
@@ -412,8 +428,10 @@ const Settings: React.FC = () => {
                     "class_name",
                     pipeline.model.class_name
                   )}
-                  {displayReadonlyFields("remote", pipeline.model.remote)}
+                  {pipeline.model.remote &&
+                    displayReadonlyFields("remote", pipeline.model.remote)}
                   {pipeline.model.kwargs &&
+                    Object.keys(pipeline.model.kwargs).length > 0 &&
                     displayArgumentsList("kwargs", pipeline.model.kwargs)}
                   {pipeline.model.args &&
                     pipeline.model.args.length > 0 &&
@@ -422,15 +440,17 @@ const Settings: React.FC = () => {
               </FormGroup>
             </FormControl>
             <FormControl>
-              {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
+              {pipeline.postprocessors &&
+                displayPostprocessorToggleSection(pipelineIndex, pipeline)}
               <FormGroup sx={{ gap: 2 }}>
                 {pipeline.postprocessors?.map((postprocessor, index) => (
                   <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
                     <Columns columns={3}>
-                      {displayReadonlyFields(
-                        "class_name",
-                        postprocessor.class_name
-                      )}
+                      {postprocessor.class_name &&
+                        displayReadonlyFields(
+                          "class_name",
+                          postprocessor.class_name
+                        )}
                       {postprocessor.temperature !== undefined &&
                         displayPostprocessorNumberField(
                           pipelineIndex,
