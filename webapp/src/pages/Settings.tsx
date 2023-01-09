@@ -164,7 +164,7 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displayArgumentsList = (
+  const displayKeyArgumentsList = (
     name: string,
     argEntries: Record<string, any> | any[]
   ) => (
@@ -187,6 +187,24 @@ const Settings: React.FC = () => {
           </React.Fragment>
         ))}
       </KeyValuePairs>
+    </Box>
+  );
+
+  const displayArgumentsList = (name: string, argEntries: string[] | any[]) => (
+    <Box display="flex" flexDirection={"column"}>
+      <Typography variant="caption">{name}</Typography>
+      {argEntries.map((value, index) => (
+        <React.Fragment key={index}>
+          <Typography
+            variant="body2"
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+          >
+            {value}
+          </Typography>
+        </React.Fragment>
+      ))}
     </Box>
   );
 
@@ -333,7 +351,7 @@ const Settings: React.FC = () => {
           )}
           {displayReadonlyFields("remote", resultingConfig.dataset?.remote)}
           {resultingConfig.dataset?.kwargs &&
-            displayArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
+            displayKeyArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
           {resultingConfig.dataset?.args &&
             resultingConfig.dataset.args.length > 0 &&
             displayArgumentsList("args", resultingConfig.dataset.args)}
@@ -414,7 +432,7 @@ const Settings: React.FC = () => {
                   )}
                   {displayReadonlyFields("remote", pipeline.model.remote)}
                   {pipeline.model.kwargs &&
-                    displayArgumentsList("kwargs", pipeline.model.kwargs)}
+                    displayKeyArgumentsList("kwargs", pipeline.model.kwargs)}
                   {pipeline.model.args &&
                     pipeline.model.args.length > 0 &&
                     displayArgumentsList("args", pipeline.model.args)}
