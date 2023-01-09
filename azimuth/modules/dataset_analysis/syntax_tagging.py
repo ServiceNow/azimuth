@@ -48,7 +48,8 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
 
         # Always use the BERT tokenizer to ensure this feature works regardless of model
         tokenizer = self.artifact_manager.get_tokenizer()
-        inputs = tokenizer(utterances)
+        # truncate to max model size so it doesn't crash if the utterances are too long.
+        inputs = tokenizer(utterances, truncation=True)
         batch_tokens = [tokenizer.convert_ids_to_tokens(tokens) for tokens in inputs["input_ids"]]
         batch_tokens = [
             [tok for tok in batch_token if tok not in [tokenizer.cls_token, tokenizer.sep_token]]

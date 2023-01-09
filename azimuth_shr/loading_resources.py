@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import structlog
 import torch
-from datasets import Dataset, DatasetDict, load_dataset
+from datasets import ClassLabel, Dataset, DatasetDict, Features, load_dataset
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -67,3 +67,32 @@ def load_CLINC150_data(full_path, python_loader, train=True) -> Dataset:
     if not train:
         dst.pop("train")
     return dst
+
+
+def align_labels(ds_dict: DatasetDict, azimuth_config: AzimuthConfig) -> DatasetDict:
+    features: Features = [v.features for v in ds_dict.values()][0]
+    if not isinstance(features[azimuth_config.columns.label], ClassLabel):
+        # Get all classes from both set and apply the same mapping to every dataset.
+        classes = sorted(
+            list(set(sum([ds[azimuth_config.columns.label] for ds in ds_dict.values()], [])))
+        )
+        ds_dict = ds_dict.class_encode_column(azimuth_config.columns.label)
+        return ds_dict.align_labels_with_mapping(
+            {class_name: i for i, class_name in enumerate(classes)}, azimuth_config.columns.label
+        )
+
+
+def load_csv(azimuth_config, train_path=None, validation_path=None) -> DatasetDict:
+    data_files = dict()
+    if train_path:
+        data_files["train"] = train_path
+    if validation_path:
+        data_files["validation"] = validation_path
+    ds_dict = load_dataset(path="csv", data_files=data_files)
+    ds_dict = align_labels(ds_dict, azimuth_config)
+    # Remove empty utterances that can exist
+    for ds_name, ds in ds_dict.items():
+        ds_dict[ds_name] = ds_dict[ds_name].filter(
+            lambda x: x[azimuth_config.columns.text_input] is not None
+        )
+    return ds_dict
