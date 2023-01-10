@@ -91,7 +91,7 @@ const Dashboard = () => {
         datasetInfo.similarityAvailable && (
           <PreviewCard
             title="Class Overlap"
-            to={`/${jobId}/class_overlap${searchString}`}
+            to={`/${jobId}/dataset_splits/train/class_overlap${searchString}`}
             description={
               <Description
                 text="Assess semantic overlap between class pairs and compare to pipeline confusion."

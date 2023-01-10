@@ -96,7 +96,7 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/class_overlap`,
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/class_overlap`,
           name: "Class Overlap",
         },
         {

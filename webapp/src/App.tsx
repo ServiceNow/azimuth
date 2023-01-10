@@ -89,7 +89,10 @@ export default class App extends React.Component<Props> {
                                 <Settings />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/class_overlap" exact>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/class_overlap"
+                              exact
+                            >
                               <BasicLayout maxWidth="md">
                                 <ClassOverlap />
                               </BasicLayout>
