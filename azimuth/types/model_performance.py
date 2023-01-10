@@ -36,10 +36,10 @@ class UtteranceCountPerFilterValue(AliasModel):
 
 if typing.TYPE_CHECKING:
 
-    class ValuePerDatasetSmartTag(AliasModel, Generic[T]):
+    class ValuePerDatasetSmartTag(GenericModel, Generic[T]):
         pass
 
-    class ValuePerPipelineSmartTag(AliasModel, Generic[T]):
+    class ValuePerPipelineSmartTag(GenericModel, Generic[T]):
         pass
 
 else:
