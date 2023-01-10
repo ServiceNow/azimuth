@@ -1,22 +1,25 @@
 import { Box, Button, Typography } from "@mui/material";
 import noData from "assets/void.svg";
-import PerformanceAnalysisPreviewCard from "components/Analysis/PerformanceAnalysisPreviewCard";
 import PerturbationTestingPreview from "components/Analysis/PerturbationTestingPreview";
 import PreviewCard from "components/Analysis/PreviewCard";
-import SmartTagsPreviewCard from "components/Analysis/SmartTagsPreviewCard";
 import WarningsPreview from "components/Analysis/WarningsPreview";
 import ClassOverlapTable from "components/ClassOverlapTable";
 import Description from "components/Description";
 import Telescope from "components/Icons/Telescope";
 import Loading from "components/Loading";
+import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
+import SmartTagsTable from "components/SmartTagsTable";
 import ThresholdPlot from "components/ThresholdPlot";
+import WithDatasetSplitNameState from "components/WithDatasetSplitNameState";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
 import { DATASET_SPLIT_NAMES, UNKNOWN_ERROR } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
+import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
+import { smartTagsDescription } from "./SmartTags";
 import { postprocessingDescription } from "./Threshold";
 
 const Dashboard = () => {
@@ -108,26 +111,51 @@ const Dashboard = () => {
           </PreviewCard>
         )}
       {isPipelineSelected(pipeline) && (
-        <PerformanceAnalysisPreviewCard
-          jobId={jobId}
-          pipeline={pipeline}
-          searchString={searchString}
-          availableDatasetSplits={datasetInfo.availableDatasetSplits}
+        <WithDatasetSplitNameState
           defaultDatasetSplitName={firstAvailableDatasetSplit}
-          linkButtonText={
-            config?.pipelines && config.pipelines.length > 1
-              ? "Compare pipelines"
-              : undefined
-          }
+          render={(datasetSplitName, setDatasetSplitName) => (
+            <PreviewCard
+              title="Pipeline Metrics by Data Subpopulation"
+              to={`/${jobId}/dataset_splits/${datasetSplitName}/pipeline_metrics${searchString}`}
+              linkButtonText={
+                config?.pipelines && config.pipelines.length > 1
+                  ? "Compare pipelines"
+                  : undefined
+              }
+              description={performanceAnalysisDescription}
+              autoHeight
+            >
+              <PerformanceAnalysis
+                jobId={jobId}
+                pipeline={pipeline}
+                availableDatasetSplits={datasetInfo.availableDatasetSplits}
+                datasetSplitName={datasetSplitName}
+                setDatasetSplitName={setDatasetSplitName}
+              />
+            </PreviewCard>
+          )}
         />
       )}
       {isPipelineSelected(pipeline) && (
-        <SmartTagsPreviewCard
-          jobId={jobId}
-          pipeline={pipeline}
-          searchString={searchString}
-          availableDatasetSplits={datasetInfo.availableDatasetSplits}
+        <WithDatasetSplitNameState
           defaultDatasetSplitName={firstAvailableDatasetSplit}
+          render={(datasetSplitName, setDatasetSplitName) => (
+            <PreviewCard
+              title="Smart Tag Analysis"
+              to={`/${jobId}/dataset_splits/${datasetSplitName}/smart_tags${searchString}`}
+              description={smartTagsDescription}
+            >
+              <Box display="flex" flexDirection="column">
+                <SmartTagsTable
+                  jobId={jobId}
+                  pipeline={pipeline}
+                  availableDatasetSplits={datasetInfo.availableDatasetSplits}
+                  datasetSplitName={datasetSplitName}
+                  setDatasetSplitName={setDatasetSplitName}
+                />
+              </Box>
+            </PreviewCard>
+          )}
         />
       )}
       {isPipelineSelected(pipeline) &&
