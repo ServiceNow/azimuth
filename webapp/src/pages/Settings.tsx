@@ -9,6 +9,7 @@ import {
   FormGroup,
   formGroupClasses,
   FormHelperText,
+  InputAdornment,
   InputBaseComponentProps,
   inputClasses,
   inputLabelClasses,
@@ -40,6 +41,18 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
+
+const UNITS: Record<string, string> = {
+  max_delta_class_imbalance: "ms",
+  max_delta_mean_tokens: "ms",
+  max_delta_representation: "ms",
+  max_delta_std_tokens: "ms",
+  min_num_per_class: "ms",
+  short_sentence_max_token: "ms",
+  long_sentence_min_token: "ms",
+  conflicting_neighbors_threshold: "ms",
+  no_close_threshold: "ms",
+};
 
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
   similarity: {
@@ -239,6 +252,11 @@ const Settings: React.FC = () => {
       className="number"
       value={value}
       inputProps={STEPPER[field]}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">{UNITS[field]}</InputAdornment>
+        ),
+      }}
       disabled={!resultingConfig[config]}
       variant="standard"
       onChange={(event) =>
@@ -270,6 +288,9 @@ const Settings: React.FC = () => {
         min: 0,
         max: 1,
         step: 0.1,
+      }}
+      InputProps={{
+        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
       }}
       variant="standard"
       onChange={(event) =>
