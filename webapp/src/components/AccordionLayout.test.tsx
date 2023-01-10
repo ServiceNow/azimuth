@@ -20,7 +20,8 @@ describe("AccordionLayout", () => {
       )
     ).toBeVisible();
     const link: HTMLAnchorElement = screen.getByRole("link");
-    expect(link.href).toContain(
+    expect(link).toHaveAttribute(
+      "href",
       "https://servicenow.github.io/azimuth/main/reference/configuration/project/"
     );
     screen.getByText("Learn more");
