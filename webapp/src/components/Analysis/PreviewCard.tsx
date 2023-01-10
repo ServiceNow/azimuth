@@ -8,10 +8,7 @@ type Props = {
   to?: string;
   linkButtonText?: string;
   description: React.ReactElement<typeof Description>;
-  autoHeight?: boolean;
 };
-
-const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
 
 const PreviewCard: React.FC<Props> = ({
   title,
@@ -19,7 +16,6 @@ const PreviewCard: React.FC<Props> = ({
   linkButtonText = "View details",
   children,
   description,
-  autoHeight,
 }) => (
   <Paper
     variant="outlined"
@@ -36,9 +32,7 @@ const PreviewCard: React.FC<Props> = ({
         </Button>
       )}
     </Box>
-    <Box height={autoHeight ? "auto" : DEFAULT_PREVIEW_CONTENT_HEIGHT}>
-      {children}
-    </Box>
+    {children}
   </Paper>
 );
 

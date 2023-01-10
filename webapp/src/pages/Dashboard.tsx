@@ -22,6 +22,8 @@ import { behavioralTestingDescription } from "./PerturbationTestingSummary";
 import { smartTagsDescription } from "./SmartTags";
 import { postprocessingDescription } from "./Threshold";
 
+const DEFAULT_PREVIEW_CONTENT_HEIGHT = 502;
+
 const Dashboard = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { pipeline, searchString } = useQueryState();
@@ -87,7 +89,9 @@ const Dashboard = () => {
             />
           }
         >
-          <WarningsPreview jobId={jobId} />
+          <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
+            <WarningsPreview jobId={jobId} />
+          </Box>
         </PreviewCard>
       )}
       {datasetInfo.availableDatasetSplits.train &&
@@ -101,7 +105,6 @@ const Dashboard = () => {
                 link="user-guide/class-overlap/"
               />
             }
-            autoHeight
           >
             <ClassOverlapTable
               jobId={jobId}
@@ -123,7 +126,6 @@ const Dashboard = () => {
                   : undefined
               }
               description={performanceAnalysisDescription}
-              autoHeight
             >
               <PerformanceAnalysis
                 jobId={jobId}
@@ -145,7 +147,7 @@ const Dashboard = () => {
               to={`/${jobId}/dataset_splits/${datasetSplitName}/smart_tags${searchString}`}
               description={smartTagsDescription}
             >
-              <Box display="flex" flexDirection="column">
+              <Box maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
                 <SmartTagsTable
                   jobId={jobId}
                   pipeline={pipeline}
@@ -165,11 +167,13 @@ const Dashboard = () => {
             to={`/${jobId}/behavioral_testing_summary${searchString}`}
             description={behavioralTestingDescription}
           >
-            <PerturbationTestingPreview
-              jobId={jobId}
-              pipeline={pipeline}
-              availableDatasetSplits={datasetInfo.availableDatasetSplits}
-            />
+            <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
+              <PerturbationTestingPreview
+                jobId={jobId}
+                pipeline={pipeline}
+                availableDatasetSplits={datasetInfo.availableDatasetSplits}
+              />
+            </Box>
           </PreviewCard>
         )}
       {isPipelineSelected(pipeline) &&
@@ -180,7 +184,9 @@ const Dashboard = () => {
             to={`/${jobId}/thresholds${searchString}`}
             description={postprocessingDescription}
           >
-            <ThresholdPlot jobId={jobId} pipeline={pipeline} />
+            <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
+              <ThresholdPlot jobId={jobId} pipeline={pipeline} />
+            </Box>
           </PreviewCard>
         )}
     </Box>
