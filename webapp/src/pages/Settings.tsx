@@ -164,9 +164,9 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displayKeyArgumentsList = (
+  const displayKeywordArguments = (
     name: string,
-    argEntries: Record<string, any> | any[]
+    argEntries: Record<string, any>
   ) => (
     <Box display="grid">
       <Typography variant="caption">{name}</Typography>
@@ -190,20 +190,18 @@ const Settings: React.FC = () => {
     </Box>
   );
 
-  const displayArgumentsList = (name: string, argEntries: string[] | any[]) => (
+  const displayArgumentsList = (name: string, argEntries: any[]) => (
     <Box display="flex" flexDirection={"column"}>
       <Typography variant="caption">{name}</Typography>
       {argEntries.map((value, index) => (
-        <React.Fragment key={index}>
-          <Typography
-            variant="body2"
-            whiteSpace="nowrap"
-            overflow="hidden"
-            textOverflow="ellipsis"
-          >
-            {value}
-          </Typography>
-        </React.Fragment>
+        <Typography
+          variant="body2"
+          whiteSpace="nowrap"
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
+          {value}
+        </Typography>
       ))}
     </Box>
   );
@@ -351,7 +349,7 @@ const Settings: React.FC = () => {
           )}
           {displayReadonlyFields("remote", resultingConfig.dataset?.remote)}
           {resultingConfig.dataset?.kwargs &&
-            displayKeyArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
+            displayKeywordArguments("kwargs", resultingConfig.dataset.kwargs)}
           {resultingConfig.dataset?.args &&
             resultingConfig.dataset.args.length > 0 &&
             displayArgumentsList("args", resultingConfig.dataset.args)}
@@ -432,7 +430,7 @@ const Settings: React.FC = () => {
                   )}
                   {displayReadonlyFields("remote", pipeline.model.remote)}
                   {pipeline.model.kwargs &&
-                    displayKeyArgumentsList("kwargs", pipeline.model.kwargs)}
+                    displayKeywordArguments("kwargs", pipeline.model.kwargs)}
                   {pipeline.model.args &&
                     pipeline.model.args.length > 0 &&
                     displayArgumentsList("args", pipeline.model.args)}
