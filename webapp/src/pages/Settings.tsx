@@ -346,7 +346,7 @@ const Settings: React.FC = () => {
           {resultingConfig.dataset?.remote &&
             displayReadonlyFields("remote", resultingConfig.dataset.remote)}
           {resultingConfig.dataset?.kwargs &&
-            Object.keys(resultingConfig.dataset?.kwargs).length > 0 &&
+            Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
             displayArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
           {resultingConfig.dataset?.args &&
             resultingConfig.dataset.args.length > 0 &&
@@ -404,77 +404,79 @@ const Settings: React.FC = () => {
           )}
         </Columns>
       </FormGroup>
-      {resultingConfig.pipelines && displaySectionTitle("Pipelines")}
-      <FormGroup sx={{ gap: 2 }}>
-        {resultingConfig.pipelines?.map((pipeline, pipelineIndex) => (
-          <Paper
-            key={pipelineIndex}
-            variant="outlined"
-            sx={{ display: "flex", flexDirection: "column", paddingX: 2 }}
-          >
-            <FormControl>
-              {displaySectionTitle("General")}
-              <FormGroup>
-                <Columns columns={3}>
-                  {displayReadonlyFields("name", pipeline.name)}
-                </Columns>
-              </FormGroup>
-            </FormControl>
-            <FormControl>
-              {displaySectionTitle("Model")}
-              <FormGroup>
-                <Columns columns={3}>
-                  {displayReadonlyFields(
-                    "class_name",
-                    pipeline.model.class_name
-                  )}
-                  {pipeline.model.remote &&
-                    displayReadonlyFields("remote", pipeline.model.remote)}
-                  {pipeline.model.kwargs &&
-                    Object.keys(pipeline.model.kwargs).length > 0 &&
-                    displayArgumentsList("kwargs", pipeline.model.kwargs)}
-                  {pipeline.model.args &&
-                    pipeline.model.args.length > 0 &&
-                    displayArgumentsList("args", pipeline.model.args)}
-                </Columns>
-              </FormGroup>
-            </FormControl>
-            <FormControl>
-              {pipeline.postprocessors &&
-                displayPostprocessorToggleSection(pipelineIndex, pipeline)}
-              <FormGroup sx={{ gap: 2 }}>
-                {pipeline.postprocessors?.map((postprocessor, index) => (
-                  <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
+      {resultingConfig.pipelines && (
+        <>
+          {displaySectionTitle("Pipelines")}
+          <FormGroup sx={{ gap: 2 }}>
+            {resultingConfig.pipelines?.map((pipeline, pipelineIndex) => (
+              <Paper
+                key={pipelineIndex}
+                variant="outlined"
+                sx={{ display: "flex", flexDirection: "column", paddingX: 2 }}
+              >
+                <FormControl>
+                  {displaySectionTitle("General")}
+                  <FormGroup>
                     <Columns columns={3}>
-                      {postprocessor.class_name &&
-                        displayReadonlyFields(
-                          "class_name",
-                          postprocessor.class_name
-                        )}
-                      {postprocessor.temperature !== undefined &&
-                        displayPostprocessorNumberField(
-                          pipelineIndex,
-                          pipeline,
-                          "temperature",
-                          index,
-                          postprocessor.temperature
-                        )}
-                      {postprocessor.threshold !== undefined &&
-                        displayPostprocessorNumberField(
-                          pipelineIndex,
-                          pipeline,
-                          "threshold",
-                          index,
-                          postprocessor.threshold
-                        )}
+                      {displayReadonlyFields("name", pipeline.name)}
                     </Columns>
-                  </Paper>
-                ))}
-              </FormGroup>
-            </FormControl>
-          </Paper>
-        ))}
-      </FormGroup>
+                  </FormGroup>
+                </FormControl>
+                <FormControl>
+                  {displaySectionTitle("Model")}
+                  <FormGroup>
+                    <Columns columns={3}>
+                      {displayReadonlyFields(
+                        "class_name",
+                        pipeline.model.class_name
+                      )}
+                      {pipeline.model.remote &&
+                        displayReadonlyFields("remote", pipeline.model.remote)}
+                      {pipeline.model.kwargs &&
+                        Object.keys(pipeline.model.kwargs).length > 0 &&
+                        displayArgumentsList("kwargs", pipeline.model.kwargs)}
+                      {pipeline.model.args &&
+                        pipeline.model.args.length > 0 &&
+                        displayArgumentsList("args", pipeline.model.args)}
+                    </Columns>
+                  </FormGroup>
+                </FormControl>
+                <FormControl>
+                  {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
+                  <FormGroup sx={{ gap: 2 }}>
+                    {pipeline.postprocessors?.map((postprocessor, index) => (
+                      <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
+                        <Columns columns={3}>
+                          {displayReadonlyFields(
+                            "class_name",
+                            postprocessor.class_name
+                          )}
+                          {postprocessor.temperature !== undefined &&
+                            displayPostprocessorNumberField(
+                              pipelineIndex,
+                              pipeline,
+                              "temperature",
+                              index,
+                              postprocessor.temperature
+                            )}
+                          {postprocessor.threshold !== undefined &&
+                            displayPostprocessorNumberField(
+                              pipelineIndex,
+                              pipeline,
+                              "threshold",
+                              index,
+                              postprocessor.threshold
+                            )}
+                        </Columns>
+                      </Paper>
+                    ))}
+                  </FormGroup>
+                </FormControl>
+              </Paper>
+            ))}
+          </FormGroup>
+        </>
+      )}
       {displaySectionTitle("Metrics")}
       <FormGroup>
         {CUSTOM_METRICS.map((metricName, index) => (
