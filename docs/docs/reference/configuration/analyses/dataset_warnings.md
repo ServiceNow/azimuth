@@ -1,9 +1,9 @@
-# Dataset Class Distribution Analysis Config
+# Dataset Warnings Config
 
 :blue_circle: **Default value:** `DatasetWarningsOptions()`
 
 Some thresholds can be set to modify the number of warnings in the
-[:material-link: Dataset Class Distribution Analysis](../../../user-guide/dataset-warnings.md).
+[:material-link: Dataset Warnings](../../../user-guide/dataset-warnings.md).
 
 === "Class Definition"
 
