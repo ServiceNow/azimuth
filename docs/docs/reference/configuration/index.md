@@ -32,8 +32,10 @@ the reference.
         * Defines how the behavioral tests are generated.
     2. [:material-link: Similarity Analysis Config](analyses/similarity.md) :blue_circle:
         * Modifies the similarity analysis.
-    3. [:material-link: Dataset Class Distribution Analysis Config](analyses/dataset_warnings.md)
+    3. [:material-link: Dataset Warnings Config](analyses/dataset_warnings.md)
        :blue_circle:
-        * Configure Dataset Class Distribution Analysis.
+        * Configure the dataset warnings.
+    4. [:material-link: Syntax Analysis Config](analyses/syntax.md) :blue_circle:
+        * Modify the defaults for the syntax analysis.
 
 --8<-- "includes/abbreviations.md"
