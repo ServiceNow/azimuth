@@ -36,10 +36,10 @@ class UtteranceCountPerFilterValue(AliasModel):
 
 if typing.TYPE_CHECKING:
 
-    class ValuePerDatasetSmartTag(AliasModel, Generic[T]):
+    class ValuePerDatasetSmartTag(GenericModel, Generic[T]):
         pass
 
-    class ValuePerPipelineSmartTag(AliasModel, Generic[T]):
+    class ValuePerPipelineSmartTag(GenericModel, Generic[T]):
         pass
 
 else:
@@ -97,9 +97,11 @@ class MetricsPerFilterValue(MetricsResponseCommonFields, UtteranceCountPerFilter
 
 
 class MetricsPerFilter(
-    ValuePerDatasetFilter[MetricsPerFilterValue], ValuePerPipelineFilter[MetricsPerFilterValue]
+    ValuePerDatasetSmartTag[MetricsPerFilterValue],
+    ValuePerPipelineSmartTag[MetricsPerFilterValue],
 ):
-    pass
+    label: List[MetricsPerFilterValue] = Field(..., title="Label")
+    prediction: List[MetricsPerFilterValue] = Field(..., title="Prediction")
 
 
 class MetricsPerFilterModuleResponse(ModuleResponse):

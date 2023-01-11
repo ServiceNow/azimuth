@@ -8,7 +8,7 @@ import numpy as np
 from datasets import Dataset
 from tqdm import tqdm
 
-from azimuth.config import AzimuthConfig, ModelContractConfig
+from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import AggregationModule, FilterableModule
 from azimuth.modules.model_performance.outcomes import OutcomesModule
@@ -35,7 +35,7 @@ from azimuth.utils.project import postprocessing_editable
 from azimuth.utils.validation import assert_is_list
 
 
-class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
+class OutcomeCountPerFilterModule(FilterableModule[ModelContractConfig]):
     """Computes the outcome count for each filter."""
 
     def get_outcome_count_per_class(

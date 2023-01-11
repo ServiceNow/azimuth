@@ -1,14 +1,13 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-import time
 from abc import ABC
-from typing import List, Optional
+from typing import List
 
 from datasets import Dataset
 
 from azimuth.modules.base_classes import ConfigScope, ExpirableMixin, Module
-from azimuth.types import DatasetSplitName, ModuleOptions, ModuleResponse
+from azimuth.types import DatasetSplitName, ModuleResponse
 from azimuth.utils.dataset_operations import filter_dataset_split
 
 
@@ -34,15 +33,6 @@ class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
     """Filterable Module are affected by filters in mod options."""
 
     allowed_mod_options = {"filters", "pipeline_index", "without_postprocessing"}
-
-    def __init__(
-        self,
-        dataset_split_name: DatasetSplitName,
-        config: ConfigScope,
-        mod_options: Optional[ModuleOptions] = None,
-    ):
-        super().__init__(dataset_split_name, config, mod_options=mod_options)
-        self._time = time.time()
 
     def get_dataset_split(self, name: DatasetSplitName = None) -> Dataset:
         """Get the specified dataset_split, filtered according to mod_options.
