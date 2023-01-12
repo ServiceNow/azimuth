@@ -76,7 +76,7 @@ def test_startup_task_one_ds(tiny_text_config_one_ds, tiny_text_task_manager):
     mods = startup_tasks(dms, tiny_text_task_manager)
     ds_name, other_ds_name = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
     assert all(
-        (DatasetSplitName.all or ds_name in k) and other_ds_name not in k for k in mods.keys()
+        (DatasetSplitName.all in k or ds_name in k) and other_ds_name not in k for k in mods.keys()
     )
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
