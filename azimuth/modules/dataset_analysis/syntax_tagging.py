@@ -58,7 +58,7 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
             tokens = [token.text for token in doc if not token.is_punct]
 
             # Some issues occur with other languages such as french if using doc.sents directly.
-            # Hence, we use an english sentencizer that seems to work better for similar languages.
+            # Hence, we use an English sentencizer that seems to work better for similar languages.
             doc_sentencizer_en = self.spacy_sentencizer_en(clean_utterance(utterance))
             sentence_count = len(list(doc_sentencizer_en.sents))
 

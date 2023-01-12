@@ -575,8 +575,8 @@ def word_count_plot(
     """Create the plot with the dropdown for all labels.
 
     Args:
-        train_per_class_count: Training set word count.
-        eval_per_class_count: Evaluation set word count.
+        train_per_class_count: Training set word count per class.
+        eval_per_class_count: Evaluation set word count per class.
         threshold_mean: threshold above which there is an alert for the mean.
         threshold_std: threshold above which there is an alert for the std dev.
         train_per_class_stats: Mean and std dev per class on the train.
