@@ -77,7 +77,7 @@ def load_intent_data(train_path, test_path, python_loader) -> Dataset:
 def load_file_dataset(data_files: Dict[str, str], azimuth_config) -> DatasetDict:
     # Load a file dataset and cast the label column as a ClassLabel.
     # Train and test need to be loaded separately because they don't always share the same columns.
-    # Train sometimes don't have predictions. HF will complain if we load both together.
+    # Train sometimes doesn't have predictions. HF will complain if we load both together.
     ds_dict = load_dataset("csv", data_files={"train": data_files["train"]})
     ds_dict_test = load_dataset("csv", data_files={"test": data_files["test"]})
     ds_dict.update(ds_dict_test)

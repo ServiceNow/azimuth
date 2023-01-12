@@ -279,7 +279,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         return [
             DatasetWarning(
                 name=f"Length mismatch " f"(>{max_delta_mean_words}±{max_delta_std_words} words)",
-                description=f"Delta between the number of words of a "
+                description=f"Delta between the number of words per utterance for a "
                 f"given class in the evaluation set vs the train set is "
                 f"above {max_delta_mean_words}±{max_delta_std_words}.",
                 columns=["mean", "std"],
