@@ -200,7 +200,7 @@ const Settings: React.FC = () => {
           overflow="hidden"
           textOverflow="ellipsis"
         >
-          {value}
+          {index + 1}. {value}
         </Typography>
       ))}
     </Box>
