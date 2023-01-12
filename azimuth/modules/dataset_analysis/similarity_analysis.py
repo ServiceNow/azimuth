@@ -73,7 +73,8 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
     """Compute neighbors for each utterance in a dataset split."""
 
     def compute_on_dataset_split(self) -> List[TaggingResponse]:  # type: ignore
-        # FAISS is computed for all available splits so neighbors can be computed for all splits.
+        # Get the features from FAISS for all available splits to make sure they are all computed
+        # and that we can compute neighbors for all splits.
         eval_features = (
             self._get_features_from_faiss(DatasetSplitName.eval)
             if DatasetSplitName.eval in self.available_dataset_splits
