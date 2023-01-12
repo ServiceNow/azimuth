@@ -67,7 +67,7 @@ explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
     from pydantic import BaseModel, Field
 
     class CustomObject(BaseModel):
-        class_name: str
+        class_name: str # (1)
         args: List[Union["CustomObject", Any]] = []
         kwargs: Dict[str, Union["CustomObject", Any]] = {}
         remote: Optional[str] = None # (2)
