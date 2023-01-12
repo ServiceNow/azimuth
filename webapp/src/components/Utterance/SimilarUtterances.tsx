@@ -2,7 +2,10 @@ import { Warning } from "@mui/icons-material";
 import { Tooltip, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import { GridCellParams, GridRow } from "@mui/x-data-grid";
-import HoverableDataCell from "components/Analysis/HoverableDataCell";
+import HoverableDataCell, {
+  hoverableDataCellClasses,
+  sxTableWithHoverableDataCell,
+} from "components/Analysis/HoverableDataCell";
 import CopyButton from "components/CopyButton";
 import { Column, RowProps, Table } from "components/Table";
 import VisualBar from "components/VisualBar";
@@ -19,10 +22,6 @@ const useStyles = makeStyles(() => ({
     "& > .MuiDataGrid-columnSeparator": {
       visibility: "hidden",
     },
-  },
-  hoverableDataCell: {
-    overflow: "visible !important",
-    position: "relative",
   },
 }));
 
@@ -64,7 +63,7 @@ const SimilarUtterances: React.FC<Props> = ({
       headerName: "Similar Utterance",
       flex: 1,
       sortable: false,
-      cellClassName: classes.hoverableDataCell,
+      cellClassName: hoverableDataCellClasses.root,
       renderCell: ({ value }: GridCellParams<string>) => (
         <HoverableDataCell>
           <Typography variant="inherit" whiteSpace="pre-wrap">
@@ -160,6 +159,7 @@ const SimilarUtterances: React.FC<Props> = ({
           : { postprocessedPrediction: false, postprocessedConfidence: false }
       }
       components={{ Row: RowLink }}
+      sx={sxTableWithHoverableDataCell}
     />
   );
 };

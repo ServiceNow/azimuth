@@ -1,6 +1,18 @@
-import React from "react";
 import { Box, Paper, Popper } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import { gridClasses } from "@mui/x-data-grid";
+import React from "react";
+
+export const hoverableDataCellClasses = {
+  root: "HoverableDataCell-root",
+};
+
+export const sxTableWithHoverableDataCell = {
+  [`& .${hoverableDataCellClasses.root}`]: {
+    overflow: "visible !important",
+    position: "relative",
+  },
+};
 
 const isOverflown = (element: Element) =>
   element.scrollWidth > element.clientWidth ||
@@ -105,4 +117,4 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
   );
 };
 
-export default HoverableDataCell;
+export default React.memo(HoverableDataCell);
