@@ -2,6 +2,7 @@ import {
   DataGrid,
   DataGridProps,
   GridCellValue,
+  gridClasses,
   GridColDef,
   GridRenderCellParams,
   GridRowId,
@@ -101,6 +102,9 @@ export const Table = <Row extends { id: GridRowId }>({
           },
         "& .MuiDataGrid-columnHeaderTitle, & .MuiDataGrid-columnHeader": {
           fontWeight: "bold",
+        },
+        [`& .${gridClasses.virtualScrollerRenderZone}`]: {
+          overflow: "hidden",
         },
       },
       ...(Array.isArray(sx) ? sx : [sx]),

@@ -21,6 +21,7 @@ const useStyles = makeStyles(() => ({
     },
   },
   hoverableDataCell: {
+    overflow: "visible !important",
     position: "relative",
   },
 }));

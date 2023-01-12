@@ -72,7 +72,9 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
           open={showFullCell && anchorEl !== null}
           placement="bottom-start"
           anchorEl={anchorEl}
+          disablePortal
           style={{
+            zIndex: 1,
             ...(!autoWidth && { width: wrapper.current!.offsetWidth }),
             pointerEvents: "none", // Because of that, avoid nesting anything
             // that relies on pointer events like click, hover or scroll.

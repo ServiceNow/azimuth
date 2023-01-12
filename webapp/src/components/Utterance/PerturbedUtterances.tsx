@@ -182,6 +182,7 @@ const PerturbedUtterances: React.FC<Props> = (props) => {
       rows={rows}
       sx={{
         "& .hoverableDataCell": {
+          overflow: "visible !important",
           position: "relative",
         },
       }}

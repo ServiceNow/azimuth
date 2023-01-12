@@ -203,7 +203,7 @@ export const UtteranceDetail = () => {
             />
           )}
         </Box>
-        <Box display="flex" alignItems="center">
+        <Box maxHeight="13vh" overflow="auto">
           <UtteranceSaliency
             variant="subtitle1"
             tooltip

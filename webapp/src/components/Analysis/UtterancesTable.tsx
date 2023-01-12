@@ -50,6 +50,7 @@ const SMART_TAG_WIDTH = 30;
 
 const useStyles = makeStyles((theme) => ({
   hoverableDataCell: {
+    overflow: "visible !important",
     position: "relative",
   },
   gridContainer: {
