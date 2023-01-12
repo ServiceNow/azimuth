@@ -64,7 +64,7 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
 
 ## Model Contract
 
-:orange_circle: **Mandatory field** with an ML pipeline.
+🟠 **Mandatory field** with an ML pipeline.
 
 **Default value**: `hf_text_classification`
 
@@ -81,7 +81,7 @@ in [:material-link: Define a Model](../custom-objects/model.md).
 
 ## Pipelines
 
-:orange_circle: **Mandatory field** with an ML pipeline.
+🟠 **Mandatory field** with an ML pipeline.
 
 **Default value**: `None`
 
@@ -171,7 +171,7 @@ Objects**](index.md).
 
 ## Uncertainty
 
-:blue_circle: **Default value**: `UncertaintyOptions()`
+🔵 **Default value**: `UncertaintyOptions()`
 
 Azimuth has some simple uncertainty estimation capabilities. By default, they are disabled given
 that it can be computationally expensive.
@@ -208,7 +208,7 @@ in [:material-link: Uncertainty Estimation](../../key-concepts/uncertainty.md).
 
 ## Saliency Layer
 
-:yellow_circle: **Default value**: `None`
+🟡 **Default value**: `None`
 
 If using a Pytorch model, [:material-link: Saliency Maps](../../key-concepts/saliency.md) can be
 available. Specify the name of the embedding layer on which to compute them.
@@ -217,7 +217,7 @@ Example: `distilbert.embeddings.word_embeddings`.
 
 ## Metrics
 
-:blue_circle: **Default value**: Accuracy, Precision, Recall and F1. See in the config example below.
+🔵 **Default value**: Accuracy, Precision, Recall and F1. See in the config example below.
 
 By default, Azimuth will compute the metrics listed above. `metrics` leverages custom
 objects, with an additional field which allow defining `kwargs`

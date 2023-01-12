@@ -38,7 +38,7 @@ see [:material-link: Similarity Analysis](../../key-concepts/similarity.md).
 * The toggle buttons control whether to search for similar utterances in the evaluation set or the
   training set.
 * Utterances that are similar but have different labels or predictions can indicate possible
-  problems with the dataset or the model. An :warning: icon indicates utterances that are **from a
+  problems with the dataset or the model. An ⚠ icon indicates utterances that are **from a
   different class** than the base utterance.
 * Clicking on the row of an utterance in the table will open the details page for that utterance.
 

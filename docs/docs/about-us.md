@@ -5,7 +5,7 @@ ServiceNow. We are open source since April 2022. Our motivation in developing th
 beyond the traditional model quality assessment based solely on high-level metrics. We strongly
 believe that much more can be discovered and understood from our dataset and models if we have the
 right tools, visualizations, and interfaces. We hope this can be helpful to you, and that you enjoy
-Azimuth! :smiley:
+Azimuth! 😃
 
 ## The Team
 
