@@ -559,7 +559,7 @@ def create_histogram_mean_std(
     return cast(PlotSpecification, json.loads(fig.to_json()))
 
 
-def nb_tokens_plot(
+def word_count_plot(
     train_per_class_count: np.ndarray,
     eval_per_class_count: np.ndarray,
     threshold_mean: float,
@@ -575,8 +575,8 @@ def nb_tokens_plot(
     """Create the plot with the dropdown for all labels.
 
     Args:
-        train_per_class_count: Training set count of nb of tokens.
-        eval_per_class_count: Evaluation set count of nb of tokens.
+        train_per_class_count: Training set word count.
+        eval_per_class_count: Evaluation set word count.
         threshold_mean: threshold above which there is an alert for the mean.
         threshold_std: threshold above which there is an alert for the std dev.
         train_per_class_stats: Mean and std dev per class on the train.

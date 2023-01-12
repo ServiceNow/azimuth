@@ -75,14 +75,14 @@ def test_compute_on_dataset_split(
     assert len(class_repr.plots.overall.data) > 0
     assert class_repr.plots.overall.layout
 
-    # Token length portion
-    tokens = syntactic_warnings.warnings[0]
-    assert len(tokens.comparisons) == num_classes
-    assert tokens.columns == ["mean", "std"]
-    assert len(tokens.plots.overall.data) > 0
-    assert tokens.plots.overall.layout
-    assert all([len(p.data) > 0 for cls_name, p in tokens.plots.per_class.items()])
-    assert all([p.layout for p in tokens.plots.per_class.values()])
+    # Word Count warnings
+    word_count_warnings = syntactic_warnings.warnings[0]
+    assert len(word_count_warnings.comparisons) == num_classes
+    assert word_count_warnings.columns == ["mean", "std"]
+    assert len(word_count_warnings.plots.overall.data) > 0
+    assert word_count_warnings.plots.overall.layout
+    assert all([len(p.data) > 0 for cls_name, p in word_count_warnings.plots.per_class.items()])
+    assert all([p.layout for p in word_count_warnings.plots.per_class.values()])
 
 
 def add_rejection_class(mod, monkeypatch):

@@ -14,7 +14,7 @@ from azimuth.plots.dataset_warnings import (
     class_imbalance_plot,
     class_representation,
     min_nb_samples_plot,
-    nb_tokens_plot,
+    word_count_plot,
 )
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.dataset_warnings import (
@@ -214,47 +214,47 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         # Get token length and other (see screen 3b)
         train_df = pd.DataFrame(
             {
-                DatasetColumn.token_count: train_ds[DatasetColumn.token_count],
+                DatasetColumn.word_count: train_ds[DatasetColumn.word_count],
                 "label": train_ds[self.config.columns.label],
             }
         )
         eval_df = pd.DataFrame(
             {
-                DatasetColumn.token_count: eval_ds[DatasetColumn.token_count],
+                DatasetColumn.word_count: eval_ds[DatasetColumn.word_count],
                 "label": eval_ds[self.config.columns.label],
             }
         )
 
         # overall stats
-        train_overall = np.mean(cast(List[int], train_ds[DatasetColumn.token_count])), np.std(
-            cast(List[int], train_ds[DatasetColumn.token_count])
+        train_overall = np.mean(cast(List[int], train_ds[DatasetColumn.word_count])), np.std(
+            cast(List[int], train_ds[DatasetColumn.word_count])
         )
-        eval_overall = np.mean(cast(List[int], eval_ds[DatasetColumn.token_count])), np.std(
-            cast(List[int], eval_ds[DatasetColumn.token_count])
+        eval_overall = np.mean(cast(List[int], eval_ds[DatasetColumn.word_count])), np.std(
+            cast(List[int], eval_ds[DatasetColumn.word_count])
         )
 
         # Get mean and std token lengths
         train_desc = train_df.groupby("label").agg(["mean", "std"])
         eval_desc = eval_df.groupby("label").agg(["mean", "std"])
         # Compute divergence
-        divergence = (train_desc - eval_desc)[DatasetColumn.token_count].apply(np.abs)
+        divergence = (train_desc - eval_desc)[DatasetColumn.word_count].apply(np.abs)
         divergence = fill_at_missing_indices(divergence, find_missing_rows(divergence, cls_index))
         divergence_mean = divergence["mean"].to_numpy()
         divergence_std = divergence["std"].to_numpy()
 
         # Make alerts from values.
-        max_delta_mean_tokens = int(self.config.dataset_warnings.max_delta_mean_tokens)
-        max_delta_std_tokens = int(self.config.dataset_warnings.max_delta_std_tokens)
-        alert_norm_mean = divergence_mean > max_delta_mean_tokens
-        alert_norm_std = divergence_std > max_delta_std_tokens
+        max_delta_mean_words = int(self.config.dataset_warnings.max_delta_mean_words)
+        max_delta_std_words = int(self.config.dataset_warnings.max_delta_std_words)
+        alert_norm_mean = divergence_mean > max_delta_mean_words
+        alert_norm_std = divergence_std > max_delta_std_words
         alert_norm = np.any([alert_norm_mean, alert_norm_std], axis=0)
 
         # Get counts, this will have N columns with count and LABEL rows.
         train_count = (
-            train_df.groupby(["label", DatasetColumn.token_count]).size().unstack(fill_value=0)
+            train_df.groupby(["label", DatasetColumn.word_count]).size().unstack(fill_value=0)
         )
         eval_count = (
-            eval_df.groupby(["label", DatasetColumn.token_count]).size().unstack(fill_value=0)
+            eval_df.groupby(["label", DatasetColumn.word_count]).size().unstack(fill_value=0)
         )
 
         train_missing_cols = find_missing_rows(train_count, cls_index)
@@ -278,11 +278,10 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
 
         return [
             DatasetWarning(
-                name=f"Length mismatch "
-                f"(>{max_delta_mean_tokens}±{max_delta_std_tokens} tokens)",
-                description=f"Delta between the number of tokens of a "
+                name=f"Length mismatch " f"(>{max_delta_mean_words}±{max_delta_std_words} words)",
+                description=f"Delta between the number of words of a "
                 f"given class in the evaluation set vs the train set is "
-                f"above {max_delta_mean_tokens}±{max_delta_std_tokens}.",
+                f"above {max_delta_mean_words}±{max_delta_std_words}.",
                 columns=["mean", "std"],
                 format=FormatType.Decimal,
                 comparisons=[
@@ -300,11 +299,11 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                     )
                     for i, _ in enumerate(train_dist)
                 ],
-                plots=nb_tokens_plot(
+                plots=word_count_plot(
                     train_count_filled,
                     test_count_filled,
-                    max_delta_mean_tokens,
-                    max_delta_std_tokens,
+                    max_delta_mean_words,
+                    max_delta_std_words,
                     train_desc,
                     eval_desc,
                     train_overall,

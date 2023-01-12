@@ -163,13 +163,13 @@ class DatasetWarningsOptions(BaseModel):
     min_num_per_class: int = 20
     max_delta_class_imbalance: float = 0.5
     max_delta_representation: float = 0.05
-    max_delta_mean_tokens: float = 3.0
-    max_delta_std_tokens: float = 3.0
+    max_delta_mean_words: float = 3.0
+    max_delta_std_words: float = 3.0
 
 
 class SyntaxOptions(BaseModel):
-    short_sentence_max_token: int = 3
-    long_sentence_min_token: int = 16
+    short_sentence_max_word: int = 3
+    long_sentence_min_word: int = 12
     spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
     subj_tags: List[str] = []  # Language-based dynamic default value
     obj_tags: List[str] = []  # Language-based dynamic default value

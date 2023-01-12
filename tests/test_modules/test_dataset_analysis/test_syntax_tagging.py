@@ -6,13 +6,12 @@ from azimuth.types import DatasetSplitName
 from azimuth.types.tag import SmartTag
 
 
-def test_syntax_tagging(simple_text_config):
+def test_syntax_tagging(tiny_text_config):
     mod = SyntaxTaggingModule(
         DatasetSplitName.eval,
-        simple_text_config,
+        tiny_text_config,
     )
 
-    assert mod is not None
     batch = {
         "utterance": [
             "detect files.",
@@ -38,23 +37,25 @@ def test_syntax_tagging(simple_text_config):
     assert json_output[3].tags[SmartTag.no_verb]
     assert not all(v for k, v in json_output[3].tags.items() if k is not SmartTag.no_verb)
 
-    json_output = mod.compute_on_dataset_split()
-    ds = mod.get_dataset_split()
-    assert len(json_output) == len(ds)
-
     # Edit config values
-    simple_text_config.syntax.short_sentence_max_token = 2
-    simple_text_config.syntax.long_sentence_min_token = 3
+    tiny_text_config_2 = tiny_text_config.copy(deep=True)
+    tiny_text_config_2.syntax.short_sentence_max_word = 2
+    tiny_text_config_2.syntax.long_sentence_min_word = 3
 
     mod_2 = SyntaxTaggingModule(
         DatasetSplitName.eval,
-        simple_text_config,
+        tiny_text_config_2,
     )
 
     json_output_2 = mod_2.compute(batch)
-    # Tags should changed for utterances below, based on new config values
-    assert not json_output_2[2].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
-    assert not json_output_2[3].tags[SmartTag.short] and json_output_2[0].tags[SmartTag.long]
+    # Tags should change for utterances below, based on the new config values
+    assert json_output_2[0].tags[SmartTag.short] and not json_output_2[0].tags[SmartTag.long]
+    assert json_output_2[2].tags[SmartTag.long]
+    assert json_output_2[3].tags[SmartTag.long]
+
+    json_output_all = mod.compute_on_dataset_split()
+    ds = mod.get_dataset_split()
+    assert len(json_output_all) == len(ds)
 
 
 def test_syntax_tagging_french(simple_text_config_french):

@@ -97,25 +97,25 @@ def test_dataset_warnings(app: FastAPI) -> None:
                         {
                             "alert": True,
                             "data": [
-                                {"alert": True, "value": 12.071146245059289},
-                                {"alert": True, "value": 4.469294371655238},
+                                {"alert": True, "value": 8.015810276679842},
+                                {"alert": True, "value": 3.5906416471375184},
                             ],
                             "name": "negative",
                         },
                         {
                             "alert": True,
                             "data": [
-                                {"alert": True, "value": 11.15263157894737},
-                                {"alert": True, "value": 3.219210813495705},
+                                {"alert": True, "value": 7.389473684210527},
+                                {"alert": True, "value": 3.5437914479857975},
                             ],
                             "name": "positive",
                         },
                     ],
-                    "description": "Delta between the number of tokens of a given "
+                    "description": "Delta between the number of words of a given "
                     "class in the evaluation set vs the train set "
                     "is above 3±3.",
                     "format": "Decimal",
-                    "name": "Length mismatch (>3±3 tokens)",
+                    "name": "Length mismatch (>3±3 words)",
                 }
             ],
         },

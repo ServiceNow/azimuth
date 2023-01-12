@@ -33,10 +33,10 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
   min_num_per_class: { min: 0 },
   max_delta_class_imbalance: { min: 0, max: 1, step: 0.1 },
   max_delta_representation: { min: 0, max: 1, step: 0.01 },
-  max_delta_mean_tokens: { min: 0, step: 0.1 },
-  max_delta_std_tokens: { min: 0, step: 0.1 },
-  short_sentence_max_token: { min: 0 },
-  long_sentence_min_token: { min: 0 },
+  max_delta_mean_words: { min: 0, step: 0.1 },
+  max_delta_std_words: { min: 0, step: 0.1 },
+  short_sentence_max_word: { min: 0 },
+  long_sentence_min_word: { min: 0 },
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object>;
@@ -44,9 +44,9 @@ type SubConfigKeys = keyof PickByValue<AzimuthConfig, object>;
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
   dataset_warnings: {
     max_delta_class_imbalance: 0,
-    max_delta_mean_tokens: 0,
+    max_delta_mean_words: 0,
     max_delta_representation: 0,
-    max_delta_std_tokens: 0,
+    max_delta_std_words: 0,
     min_num_per_class: 0,
   },
   similarity: { conflicting_neighbors_threshold: 0, no_close_threshold: 0 },
