@@ -93,7 +93,7 @@ def get_dataset_info(
 ):
     eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
     training_dm = dataset_split_managers.get(DatasetSplitName.train)
-    dm = assert_not_none(eval_dm if eval_dm is not None else training_dm)
+    dm = assert_not_none(eval_dm or training_dm)
 
     model_contract = task_manager.config.model_contract
 

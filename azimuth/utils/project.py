@@ -37,7 +37,7 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
         azimuth_config.dataset, azimuth_config=azimuth_config
     )
     dataset_train_eval: DatasetDict = DatasetDict()
-    if "train" in dataset_in_config:
+    if "train" in dataset_in_config and len(dataset_in_config["train"]) > 0:
         dataset_train_eval[DatasetSplitName.train] = dataset_in_config["train"]
     if "validation" in dataset_in_config and len(dataset_in_config["validation"]) > 0:
         dataset_train_eval[DatasetSplitName.eval] = dataset_in_config["validation"]

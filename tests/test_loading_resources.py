@@ -66,10 +66,10 @@ def load_sst2_dataset(
     if eval:
         # Test set has no label
         datasets["validation"] = datasets["validation"].rename_column("sentence", "utterance")
-        ds.update({"validation": datasets["validation"].select(np.arange(max_dataset_len))})
+        ds["validation"] = datasets["validation"].select(np.arange(max_dataset_len))
     if train:
         datasets["train"] = datasets["train"].rename_column("sentence", "utterance")
-        ds.update({"train": datasets["train"].select(np.arange(max_dataset_len))})
+        ds["train"] = datasets["train"].select(np.arange(max_dataset_len))
     return DatasetDict(ds)
 
 

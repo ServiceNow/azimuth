@@ -47,11 +47,11 @@ def test_perturbation_testing_summary_one_ds(tiny_text_config_one_ds):
         config=tiny_text_config_one_ds,
         mod_options=ModuleOptions(pipeline_index=0),
     )
-    res_dict = mod.compute_on_dataset_split()[0].no_alias_dict()
+    [res] = mod.compute_on_dataset_split()
     ds_name, other_ds_name = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
     assert (
-        res_dict[f"{ds_name}_failure_rate"] >= 0.0
-        and res_dict[f"{other_ds_name}_failure_rate"] == 0.0
+        getattr(res, f"{ds_name}_failure_rate") >= 0.0
+        and getattr(res, f"{other_ds_name}_failure_rate") == 0.0
     )
 
     mod_sum = PerturbationTestingSummaryModule(
@@ -61,4 +61,4 @@ def test_perturbation_testing_summary_one_ds(tiny_text_config_one_ds):
     )
 
     res = mod_sum.compute_on_dataset_split()[0]
-    assert all(t.no_alias_dict()[f"{other_ds_name}_count"] == 0 for t in res.all_tests_summary)
+    assert all(getattr(t, f"{other_ds_name}_count") == 0 for t in res.all_tests_summary)
