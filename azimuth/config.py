@@ -83,6 +83,7 @@ class CustomObject(BaseModel):  # type: ignore
     remote: Optional[str] = Field(
         None,
         description="Relative path to class. `class_name` needs to be accessible from this path.",
+        nullable=True,
     )
 
 
@@ -242,7 +243,7 @@ class ProjectConfig(BaseSettings):
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
-    rejection_class: Optional[str] = "REJECTION_CLASS"
+    rejection_class: Optional[str] = Field("REJECTION_CLASS", nullable=True)
 
     def copy(self: T, *, validate: bool = True, **kwargs: Any) -> T:
         copy: T = super().copy(**kwargs)
@@ -358,7 +359,7 @@ class PerturbationTestingConfig(ModelContractConfig):
 
 class SimilarityConfig(CommonFieldsConfig):
     # Similarity configuration to define the encoder and the similarity threshold.
-    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
+    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), nullable=True)
 
 
 class DatasetWarningConfig(CommonFieldsConfig):

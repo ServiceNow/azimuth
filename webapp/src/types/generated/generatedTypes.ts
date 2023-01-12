@@ -124,7 +124,7 @@ export interface components {
       dataset: components["schemas"]["CustomObject"];
       model_contract?: components["schemas"]["SupportedModelContract"];
       columns?: components["schemas"]["ColumnConfiguration"];
-      rejection_class?: string;
+      rejection_class?: string | null;
       artifact_path?: string;
       batch_size?: number;
       use_cuda?: Partial<"auto"> & Partial<boolean>;
@@ -133,7 +133,7 @@ export interface components {
       language?: components["schemas"]["SupportedLanguage"];
       syntax?: components["schemas"]["SyntaxOptions"];
       dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
-      similarity?: components["schemas"]["SimilarityOptions"];
+      similarity?: components["schemas"]["SimilarityOptions"] | null;
       pipelines?: components["schemas"]["PipelineDefinition"][];
       uncertainty?: components["schemas"]["UncertaintyOptions"];
       saliency_layer?: string;
@@ -216,7 +216,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
     };
     /** An enumeration. */
     DataAction:
@@ -343,7 +343,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
       /** Keyword arguments supplied to `compute`. */
       additional_kwargs?: { [key: string]: any };
     };
@@ -708,7 +708,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
       temperature?: number;
     };
     /**
@@ -722,7 +722,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
       threshold?: number;
     };
     /** An enumeration. */
