@@ -73,26 +73,24 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
     """Compute neighbors for each utterance in a dataset split."""
 
     def compute_on_dataset_split(self) -> List[TaggingResponse]:  # type: ignore
-        def get_dm_and_features(ds_name):
-            if ds_name in self.available_dataset_splits:
-                dm: Optional[DatasetSplitManager] = self.get_dataset_split_manager(ds_name)
-                features: Optional[List[Array]] = self._get_features(ds_name)
-                return dm, features
-            else:
-                return None, None
+        # FAISS is computed for all available splits so neighbors can be computed for all splits.
+        eval_features = (
+            self._get_features_from_faiss(DatasetSplitName.eval)
+            if DatasetSplitName.eval in self.available_dataset_splits
+            else None
+        )
+        train_features = (
+            self._get_features_from_faiss(DatasetSplitName.train)
+            if DatasetSplitName.train in self.available_dataset_splits
+            else None
+        )
 
-        train_dm, train_features = get_dm_and_features(DatasetSplitName.train)
-        eval_dm, eval_features = get_dm_and_features(DatasetSplitName.eval)
-
-        ds_features: List[Array] = assert_not_none(
+        dm = self.get_dataset_split_manager()
+        indices = self.get_indices()
+        features = assert_not_none(
             eval_features if self.dataset_split_name == DatasetSplitName.eval else train_features
         )
-        ds_dm: DatasetSplitManager = assert_not_none(
-            eval_dm if self.dataset_split_name == DatasetSplitName.eval else train_dm
-        )
-
-        indices = self.get_indices()
-        neighbors = self.get_neighbors([ds_features[i] for i in indices])
+        neighbors = self.get_neighbors([features[i] for i in indices])
 
         similarity_config: SimilarityOptions = assert_not_none(self.config.similarity)
 
@@ -106,7 +104,7 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
             if split_name not in self.available_dataset_splits:
                 continue
             conflicting_neighbors_tags[split_name] = self.get_conflicting_neighbors_tag(
-                labels=ds_dm.get_dataset_split().select(indices)[self.config.columns.label],
+                labels=dm.get_dataset_split().select(indices)[self.config.columns.label],
                 neighbors=neighbors[split_name],
                 dm=self.get_dataset_split_manager(split_name),
                 threshold=similarity_config.conflicting_neighbors_threshold,
@@ -159,8 +157,8 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
 
         return results
 
-    def _get_features(self, ds_split_name: DatasetSplitName) -> List[Array]:
-        """Get Sentence embedding features
+    def _get_features_from_faiss(self, ds_split_name: DatasetSplitName) -> List[Array]:
+        """Get Sentence embedding features from FAISS module.
 
         Args:
             ds_split_name: Name of the dataset_split to get
@@ -187,8 +185,8 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
         for col_name in res[0].adds.keys():
             dm.add_column(key=col_name, features=[r.adds[col_name] for r in res])
 
+    @staticmethod
     def get_conflicting_neighbors_tag(
-        self,
         labels: List[int],
         neighbors: List[List[Tuple[int, float]]],
         dm: DatasetSplitManager,
