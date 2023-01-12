@@ -28,16 +28,16 @@ import { PickByValue } from "types/models";
 
 const STEPPER: Record<string, InputBaseComponentProps> = {
   iterations: { min: 0 },
-  high_epistemic_threshold: { min: 0, max: 1, step: 0.1 },
-  conflicting_neighbors_threshold: { min: 0, max: 1, step: 0.1 },
-  no_close_threshold: { min: 0, max: 1, step: 0.1 },
+  high_epistemic_threshold: { min: 0, max: 100, step: 10 },
+  conflicting_neighbors_threshold: { min: 0, max: 100, step: 10 },
+  no_close_threshold: { min: 0, max: 100, step: 10 },
   min_num_per_class: { min: 0 },
-  max_delta_class_imbalance: { min: 0, max: 1, step: 0.1 },
-  max_delta_representation: { min: 0, max: 1, step: 0.01 },
-  max_delta_mean_words: { min: 0, step: 0.1 },
-  max_delta_std_words: { min: 0, step: 0.1 },
-  short_sentence_max_word: { min: 0 },
-  long_sentence_min_word: { min: 0 },
+  max_delta_class_imbalance: { min: 0, max: 100, step: 10 },
+  max_delta_representation: { min: 0, max: 100, step: 1 },
+  max_delta_mean_tokens: { min: 0, step: 0.1 },
+  max_delta_std_tokens: { min: 0, step: 0.1 },
+  short_sentence_max_token: { min: 0 },
+  long_sentence_min_token: { min: 0 },
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
@@ -69,7 +69,13 @@ const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
-
+const CONFIG_RATIO_FIELDS = [
+  "high_epistemic_threshold",
+  "conflicting_neighbors_threshold",
+  "no_close_threshold",
+  "max_delta_class_imbalance",
+  "max_delta_representation",
+];
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -254,7 +260,9 @@ const Settings: React.FC = () => {
       label={field}
       type="number"
       className="number"
-      value={value}
+      value={
+        value ? (CONFIG_RATIO_FIELDS.includes(field) ? value * 100 : value) : 0
+      }
       inputProps={STEPPER[field]}
       InputProps={{
         endAdornment: (
@@ -268,7 +276,9 @@ const Settings: React.FC = () => {
           ...partialConfig,
           [config]: {
             ...resultingConfig[config],
-            [field]: Number(event.target.value),
+            [field]: CONFIG_RATIO_FIELDS.includes(field)
+              ? Number(event.target.value) / 100
+              : Number(event.target.value),
           },
         })
       }
@@ -287,7 +297,7 @@ const Settings: React.FC = () => {
       label={field}
       type="number"
       className="number"
-      value={value}
+      value={value ? value * 100 : 0}
       inputProps={{
         min: 0,
         max: 1,
@@ -310,8 +320,8 @@ const Settings: React.FC = () => {
                 ...pipeline.postprocessors!.slice(0, postprocessorIdx),
                 {
                   ...pipeline.postprocessors![postprocessorIdx],
-                  [field]: Number(event.target.value),
-                  kwargs: { [field]: Number(event.target.value) },
+                  [field]: Number(event.target.value) / 100,
+                  kwargs: { [field]: Number(event.target.value) / 100 },
                 },
                 ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
               ],
@@ -415,7 +425,11 @@ const Settings: React.FC = () => {
                       size="small"
                       type="number"
                       className="number"
-                      value={value}
+                      value={
+                        CONFIG_RATIO_FIELDS.includes(field)
+                          ? value * 100
+                          : value
+                      }
                       disabled={!resultingConfig.uncertainty}
                       inputProps={STEPPER[field]}
                       InputProps={{
@@ -431,7 +445,9 @@ const Settings: React.FC = () => {
                           ...partialConfig,
                           uncertainty: {
                             ...resultingConfig.uncertainty,
-                            [field]: Number(event.target.value),
+                            [field]: CONFIG_RATIO_FIELDS.includes(field)
+                              ? Number(event.target.value) / 100
+                              : Number(event.target.value),
                           },
                         })
                       }
