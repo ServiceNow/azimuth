@@ -195,7 +195,7 @@ const Settings: React.FC = () => {
       size="small"
       variant="standard"
       label={label}
-      value={value}
+      value={value ?? "null"}
       disabled={isError || isFetching}
       InputProps={{
         readOnly: true,
@@ -304,18 +304,18 @@ const Settings: React.FC = () => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {resultingConfig.name &&
+          {resultingConfig.name !== undefined &&
             displayReadonlyFields("name", resultingConfig.name)}
-          {resultingConfig.rejection_class &&
+          {resultingConfig.rejection_class !== undefined &&
             displayReadonlyFields(
               "rejection_class",
               resultingConfig.rejection_class
             )}
-          {resultingConfig.columns && (
+          {resultingConfig.columns !== undefined && (
             <Box display="flex" flexDirection="column">
               <Typography variant="caption">columns</Typography>
               <KeyValuePairs>
-                {resultingConfig.columns.text_input && (
+                {resultingConfig.columns.text_input !== undefined && (
                   <>
                     <Typography variant="body2">text_input:</Typography>
                     <Typography variant="body2">
@@ -323,7 +323,7 @@ const Settings: React.FC = () => {
                     </Typography>
                   </>
                 )}
-                {resultingConfig.columns.label && (
+                {resultingConfig.columns.label !== undefined && (
                   <>
                     <Typography variant="body2">label:</Typography>
                     <Typography variant="body2">
@@ -343,7 +343,7 @@ const Settings: React.FC = () => {
             "class_name",
             resultingConfig.dataset?.class_name
           )}
-          {resultingConfig.dataset?.remote &&
+          {resultingConfig.dataset?.remote !== undefined &&
             displayReadonlyFields("remote", resultingConfig.dataset.remote)}
           {resultingConfig.dataset?.kwargs &&
             Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
@@ -360,12 +360,12 @@ const Settings: React.FC = () => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {resultingConfig.model_contract &&
+          {resultingConfig.model_contract !== undefined &&
             displayReadonlyFields(
               "model_contract",
               resultingConfig.model_contract
             )}
-          {resultingConfig.saliency_layer &&
+          {resultingConfig.saliency_layer !== undefined &&
             displayReadonlyFields(
               "saliency_layer",
               resultingConfig.saliency_layer
