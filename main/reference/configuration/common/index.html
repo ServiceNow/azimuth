@@ -15,7 +15,7 @@
         <link rel="next" href="../analyses/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.3">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.4">
     
     
       
@@ -23,7 +23,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.6b71719e.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.9c788c91.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.2505c338.min.css">
@@ -1786,7 +1786,7 @@
 </div>
 </div>
 <h2 id="artifact-path">Artifact Path</h2>
-<p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value</strong>: <code>/cache</code></p>
+<p>🔵 <strong>Default value</strong>: <code>/cache</code></p>
 <p>Where to store the caching artifacts (<code>HDF5</code> files and <abbr title="HuggingFace">HF</abbr> datasets). The value needs to be available
 inside Docker (see <code>docker-compose.yml</code>). <code>/cache</code> is available by default on the docker image.</p>
 <div class="admonition tip">
@@ -1795,18 +1795,18 @@ inside Docker (see <code>docker-compose.yml</code>). <code>/cache</code> is avai
 work).</p>
 </div>
 <h2 id="batch-size">Batch Size</h2>
-<p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value</strong>: 32</p>
+<p>🔵 <strong>Default value</strong>: 32</p>
 <p>Batch size to use during inference. A higher batch size will make computation faster, depending on
 the memory available on your machine.</p>
 <h2 id="use-cuda">Use Cuda</h2>
-<p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value</strong>: <code>auto</code></p>
+<p>🔵 <strong>Default value</strong>: <code>auto</code></p>
 <p>If cuda is available on your machine, set to <code>true</code>, otherwise <code>false</code>. Can also be set to "auto"
 and let the user-code take care of it.</p>
 <h2 id="large-dask-cluster">Large Dask Cluster</h2>
-<p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value</strong>: False</p>
+<p>🔵 <strong>Default value</strong>: False</p>
 <p>The memory of the dask cluster is usually 6GB. If your models are big or if you encounter garbage collection errors,  you can set the memory to 12GB by setting <code>large_dask_cluster</code> to <code>True</code>.</p>
 <h2 id="read-only-config">Read-Only Config</h2>
-<p><img alt="🔵" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f535.svg" title=":blue_circle:" /> <strong>Default value</strong>: False</p>
+<p>🔵 <strong>Default value</strong>: False</p>
 <p>This field allows to block the changes to the config when set to <code>True</code>. This can be useful in certain context, such as when hosting a demo.</p>
 
 
