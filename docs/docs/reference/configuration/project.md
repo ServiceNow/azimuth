@@ -40,7 +40,7 @@ Azimuth and details about the way it is handled by the app.
 
 ## Name
 
-:yellow_circle: **Default value**: `New project`
+🟡 **Default value**: `New project`
 
 **Environment Variable**: `NAME`
 
@@ -49,7 +49,7 @@ model. Ex: `Banking77 Model v4`.
 
 ## Dataset
 
-:red_circle: **Mandatory field**
+🔴 **Mandatory field**
 
 To define which dataset to load in the application, Azimuth
 uses [:material-link: Custom Objects](../custom-objects/index.md).
@@ -92,7 +92,7 @@ explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
 
 ## Columns
 
-:yellow_circle: **Default value**: `ColumnConfiguration()`
+🟡 **Default value**: `ColumnConfiguration()`
 
 All dataset column names are configurable. The mandatory columns and their descriptions are as
 follows:
@@ -137,7 +137,7 @@ follows:
 
 ## Rejection class
 
-:yellow_circle: **Default value**: `REJECTION_CLASS`
+🟡 **Default value**: `REJECTION_CLASS`
 
 The field `rejection_class` requires the class to be present in the dataset. If your dataset doesn't
 have a rejection class, set the value to `null`. More details on the rejection class are available

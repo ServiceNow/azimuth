@@ -1,6 +1,6 @@
 # Syntax Analysis Config
 
-:blue_circle: **Default value:** `SyntaxOptions()`
+🔵 **Default value:** `SyntaxOptions()`
 
 In the Syntax config, users can modify thresholds to determine what is considered a short
 or a long sentence, as well as select the spaCy model and the dependency tags used for certain

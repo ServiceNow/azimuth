@@ -1,6 +1,6 @@
 # Dataset Warnings Config
 
-:blue_circle: **Default value:** `DatasetWarningsOptions()`
+🔵 **Default value:** `DatasetWarningsOptions()`
 
 Some thresholds can be set to modify the number of warnings in the
 [:material-link: Dataset Warnings](../../../user-guide/dataset-warnings.md).

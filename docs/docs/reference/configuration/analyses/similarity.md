@@ -1,6 +1,6 @@
 # Similarity Analysis Config
 
-:blue_circle: **Default value:** `SimilarityOptions()`
+🔵 **Default value:** `SimilarityOptions()`
 
 **Environment Variable**: `SIMILARITY`
 
