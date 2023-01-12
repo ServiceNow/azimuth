@@ -235,7 +235,7 @@ class ColumnConfiguration(BaseModel):
 
 class ProjectConfig(BaseSettings):
     # Name of the current project.
-    name: str = Field("New project", env="NAME", exclude_from_cache=True)
+    name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
     dataset: CustomObject
     # Which model_contract the application is using.
@@ -277,7 +277,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # For bigger models, large might be needed.
     large_dask_cluster: bool = Field(False, exclude_from_cache=True)
     # Disable configuration changes
-    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG", exclude_from_cache=True)
+    read_only_config: bool = Field(False, exclude_from_cache=True)
 
     def get_artifact_path(self) -> str:
         """Generate a path for caching.
@@ -352,9 +352,7 @@ class LanguageConfig(CommonFieldsConfig):
 
 class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
-    behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
-    )
+    behavioral_testing: Optional[BehavioralTestingOptions] = Field(BehavioralTestingOptions())
 
 
 class SimilarityConfig(CommonFieldsConfig):
