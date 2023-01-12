@@ -156,7 +156,7 @@ export const api = createApi({
       providesTags: () => [{ type: "DatasetWarnings" }],
       queryFn: responseToData(
         fetchApi({ path: "/dataset_warnings", method: "get" }),
-        "Something went wrong fetching dataset class distribution analysis"
+        "Something went wrong fetching dataset warnings"
       ),
     }),
     getUtterances: build.query({
@@ -216,7 +216,7 @@ export const api = createApi({
           path: "/dataset_splits/{dataset_split_name}/class_overlap/plot",
           method: "get",
         }),
-        "Something went wrong fetching spectral clustering class overlap data"
+        "Something went wrong fetching class overlap plot"
       ),
     }),
     updateDataActions: build.mutation<
@@ -236,7 +236,7 @@ export const api = createApi({
       }) =>
         responseToData(
           fetchApi({ path: "/tags", method: "post" }),
-          "Something went wrong updating the resolution"
+          "Something went wrong updating proposed actions"
         )({
           jobId,
           body: {
@@ -362,7 +362,7 @@ export const api = createApi({
       providesTags: () => [{ type: "Status" }],
       queryFn: responseToData(
         fetchApi({ path: "/status", method: "get" }),
-        "Something went wrong fetching the status"
+        "Something went wrong fetching status"
       ),
     }),
   }),

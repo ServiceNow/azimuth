@@ -3,8 +3,9 @@ import Description from "components/Description";
 import PerformanceAnalysisTable from "components/Metrics/PerformanceAnalysisTable";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
+import { DatasetSplitName } from "types/api";
 import { PIPELINE_REQUIRED_TIP } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
 
@@ -15,12 +16,21 @@ export const performanceAnalysisDescription = (
   />
 );
 
-const PerformanceAnalysisComparison = () => {
-  const { jobId } = useParams<{ jobId: string }>();
-  const { pipeline } = useQueryState();
+const PerformanceAnalysis = () => {
+  const history = useHistory();
+  const { jobId, datasetSplitName } = useParams<{
+    jobId: string;
+    datasetSplitName: DatasetSplitName;
+  }>();
+  const { pipeline, searchString } = useQueryState();
 
   const { data: datasetInfo, isFetching: isFetchingDatasetInfo } =
     getDatasetInfoEndpoint.useQuery({ jobId });
+
+  const setDatasetSplitName = (name: DatasetSplitName) =>
+    history.push(
+      `/${jobId}/dataset_splits/${name}/pipeline_metrics${searchString}`
+    );
 
   return (
     <Box display="flex" flexDirection="column" height="100%">
@@ -34,6 +44,8 @@ const PerformanceAnalysisComparison = () => {
           pipeline={pipeline}
           availableDatasetSplits={datasetInfo?.availableDatasetSplits}
           isLoading={isFetchingDatasetInfo}
+          datasetSplitName={datasetSplitName}
+          setDatasetSplitName={setDatasetSplitName}
         />
       ) : (
         <Typography>{PIPELINE_REQUIRED_TIP}</Typography>
@@ -42,4 +54,4 @@ const PerformanceAnalysisComparison = () => {
   );
 };
 
-export default React.memo(PerformanceAnalysisComparison);
+export default React.memo(PerformanceAnalysis);
