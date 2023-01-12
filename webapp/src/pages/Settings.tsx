@@ -297,7 +297,7 @@ const Settings: React.FC = () => {
       label={field}
       type="number"
       className="number"
-      value={value}
+      value={value ? value * 100 : 0}
       inputProps={{
         min: 0,
         max: 1,
@@ -320,8 +320,8 @@ const Settings: React.FC = () => {
                 ...pipeline.postprocessors!.slice(0, postprocessorIdx),
                 {
                   ...pipeline.postprocessors![postprocessorIdx],
-                  [field]: Number(event.target.value),
-                  kwargs: { [field]: Number(event.target.value) },
+                  [field]: Number(event.target.value) / 100,
+                  kwargs: { [field]: Number(event.target.value) / 100 },
                 },
                 ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
               ],
