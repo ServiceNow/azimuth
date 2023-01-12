@@ -25,16 +25,15 @@ from pydantic import BaseModel, Field
 
 
 class CustomObject(BaseModel):
-    class_name: str = Field(..., title="Class name to load")
+    class_name: str # (1)
     args: List[Union["CustomObject", Any]] = []
     kwargs: Dict[str, Union["CustomObject", Any]] = {}
-    remote: Optional[str] = None  # (1)
+    remote: Optional[str] = None # (2)
 ```
 
-1. Absolute path to `class_name`.
-
-`class_name` is the name of the function or class that is located in `remote`. `args` and `kwargs`
+1. Name of the function or class that is located in `remote`. `args` and `kwargs`
 will be sent to the function/class.
+2. Relative path to class. `class_name` needs to be accessible from this path.
 
 ### Example
 
