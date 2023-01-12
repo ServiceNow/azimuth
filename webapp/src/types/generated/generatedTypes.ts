@@ -124,7 +124,7 @@ export interface components {
       dataset: components["schemas"]["CustomObject"];
       model_contract?: components["schemas"]["SupportedModelContract"];
       columns?: components["schemas"]["ColumnConfiguration"];
-      rejection_class?: string;
+      rejection_class?: string | null;
       artifact_path?: string;
       batch_size?: number;
       use_cuda?: Partial<"auto"> & Partial<boolean>;
@@ -133,11 +133,13 @@ export interface components {
       language?: components["schemas"]["SupportedLanguage"];
       syntax?: components["schemas"]["SyntaxOptions"];
       dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
-      similarity?: components["schemas"]["SimilarityOptions"];
-      pipelines?: components["schemas"]["PipelineDefinition"][];
+      similarity?: components["schemas"]["SimilarityOptions"] | null;
+      pipelines?: components["schemas"]["PipelineDefinition"][] | null;
       uncertainty?: components["schemas"]["UncertaintyOptions"];
-      saliency_layer?: string;
-      behavioral_testing?: components["schemas"]["BehavioralTestingOptions"];
+      saliency_layer?: string | null;
+      behavioral_testing?:
+        | components["schemas"]["BehavioralTestingOptions"]
+        | null;
       metrics?: { [key: string]: components["schemas"]["MetricDefinition"] };
     };
     BehavioralTestingOptions: {
@@ -216,7 +218,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
     };
     /** An enumeration. */
     DataAction:
@@ -343,7 +345,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
       /** Keyword arguments supplied to `compute`. */
       additional_kwargs?: { [key: string]: any };
     };
@@ -708,7 +710,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
       temperature?: number;
     };
     /**
@@ -722,7 +724,7 @@ export interface components {
       args?: { [key: string]: any }[];
       kwargs?: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      remote?: string | null;
       threshold?: number;
     };
     /** An enumeration. */

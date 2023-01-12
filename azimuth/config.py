@@ -83,6 +83,7 @@ class CustomObject(BaseModel):  # type: ignore
     remote: Optional[str] = Field(
         None,
         description="Relative path to class. `class_name` needs to be accessible from this path.",
+        nullable=True,
     )
 
 
@@ -242,7 +243,7 @@ class ProjectConfig(BaseSettings):
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
-    rejection_class: Optional[str] = "REJECTION_CLASS"
+    rejection_class: Optional[str] = Field("REJECTION_CLASS", nullable=True)
 
     def copy(self: T, *, validate: bool = True, **kwargs: Any) -> T:
         copy: T = super().copy(**kwargs)
@@ -294,11 +295,11 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
 
 class ModelContractConfig(CommonFieldsConfig):
     # Model object definition.
-    pipelines: Optional[List[PipelineDefinition]] = None
+    pipelines: Optional[List[PipelineDefinition]] = Field(None, nullable=True)
     # Uncertainty configuration
     uncertainty: UncertaintyOptions = UncertaintyOptions()
     # Layer name where to calculate the gradients, normally the word embeddings layer.
-    saliency_layer: Optional[str] = None
+    saliency_layer: Optional[str] = Field(None, nullable=True)
 
     @validator("pipelines", pre=True)
     def check_pipeline_names(cls, pipeline_definitions):
@@ -352,13 +353,13 @@ class LanguageConfig(CommonFieldsConfig):
 class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
     behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
+        BehavioralTestingOptions(), nullable=True
     )
 
 
 class SimilarityConfig(CommonFieldsConfig):
     # Similarity configuration to define the encoder and the similarity threshold.
-    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
+    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), nullable=True)
 
 
 class DatasetWarningConfig(CommonFieldsConfig):

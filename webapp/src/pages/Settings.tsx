@@ -39,7 +39,7 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
   long_sentence_min_word: { min: 0 },
 };
 
-type SubConfigKeys = keyof PickByValue<AzimuthConfig, object>;
+type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
   dataset_warnings: {
