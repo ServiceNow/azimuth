@@ -43,15 +43,19 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
 const UNITS: Record<string, string> = {
-  max_delta_class_imbalance: "ms",
-  max_delta_mean_tokens: "ms",
-  max_delta_representation: "ms",
-  max_delta_std_tokens: "ms",
-  min_num_per_class: "ms",
-  short_sentence_max_token: "ms",
-  long_sentence_min_token: "ms",
-  conflicting_neighbors_threshold: "ms",
-  no_close_threshold: "ms",
+  max_delta_class_imbalance: "%",
+  max_delta_mean_tokens: "tokens",
+  max_delta_representation: "%",
+  max_delta_std_tokens: "tokens",
+  min_num_per_class: "samples",
+  short_sentence_max_token: "tokens",
+  long_sentence_min_token: "tokens",
+  conflicting_neighbors_threshold: "%",
+  no_close_threshold: "%",
+  iterations: "tokens",
+  high_epistemic_threshold: "%",
+  temperature: "%",
+  threshold: "%",
 };
 
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
@@ -290,7 +294,9 @@ const Settings: React.FC = () => {
         step: 0.1,
       }}
       InputProps={{
-        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+        endAdornment: (
+          <InputAdornment position="end">{UNITS[field]}</InputAdornment>
+        ),
       }}
       variant="standard"
       onChange={(event) =>
@@ -412,6 +418,13 @@ const Settings: React.FC = () => {
                       value={value}
                       disabled={!resultingConfig.uncertainty}
                       inputProps={STEPPER[field]}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            {UNITS[field]}
+                          </InputAdornment>
+                        ),
+                      }}
                       variant="standard"
                       onChange={(event) =>
                         setPartialConfig({
@@ -566,7 +579,7 @@ const Settings: React.FC = () => {
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .number .${inputClasses.root}`]: { width: "8ch" },
+          [`& .number .${inputClasses.root}`]: { width: "12ch" },
           [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
