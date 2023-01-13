@@ -635,7 +635,7 @@ export interface components {
      * that all fields are represented correctly.
      */
     PostDataActionRequest: {
-      datasetSplitName?: components["schemas"]["DatasetSplitName"];
+      datasetSplitName: components["schemas"]["DatasetSplitName"];
       dataActions: { [key: string]: { [key: string]: boolean } };
     };
     /** Class for saving the results in the dataset and the routes. */
