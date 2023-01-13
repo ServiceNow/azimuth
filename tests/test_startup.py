@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from datasets import Dataset, DatasetDict
 
-from azimuth.app import get_ready_flag, run_start_up_tasks
+from azimuth.app import get_ready_flag, run_startup_tasks
 from azimuth.config import CustomObject
 from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.startup import on_end, startup_tasks
@@ -107,7 +107,7 @@ def test_initialize_backbone(tiny_text_config, dask_client):
     event = get_ready_flag()
     assert event is None
     assert get_startup_tasks() is None
-    run_start_up_tasks(tiny_text_config, cluster=dask_client.cluster)
+    run_startup_tasks(tiny_text_config, cluster=dask_client.cluster)
     assert get_task_manager().cluster is dask_client.cluster
     assert get_config() is tiny_text_config
     assert get_dataset_split_manager(DatasetSplitName.train).config is tiny_text_config

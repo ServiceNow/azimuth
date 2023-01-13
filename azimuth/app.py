@@ -103,7 +103,7 @@ def start_app(config_path, debug=False) -> FastAPI:
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
-    run_start_up_tasks(azimuth_config, local_cluster)
+    run_startup_tasks(azimuth_config, local_cluster)
     assert_not_none(_task_manager).client.run(set_logger_config, level)
 
     app = create_app()
@@ -284,7 +284,7 @@ def run_validation(
     task_manager.restart()
 
 
-def run_start_up_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
+def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
     """Initialize managers, run validation and startup tasks.
 
     Args:

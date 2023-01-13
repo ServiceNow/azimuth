@@ -59,8 +59,8 @@ def save_config(azimuth_config: AzimuthConfig):
         f.write(azimuth_config.dict())
 
 
-def update_new_config(old_config: AzimuthConfig, change_set: Dict) -> AzimuthConfig:
-    new_config = old_config.copy(update=change_set, deep=True)
+def update_config(old_config: AzimuthConfig, partial_config: Dict) -> AzimuthConfig:
+    new_config = old_config.copy(update=partial_config, deep=True)
     save_config(new_config)
     return new_config
 
