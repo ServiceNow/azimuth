@@ -120,28 +120,34 @@ export interface components {
     };
     /** Fields that can be modified without affecting caching. */
     AzimuthConfig: {
-      name?: string;
+      name: string;
       dataset: components["schemas"]["CustomObject"];
-      model_contract?: components["schemas"]["SupportedModelContract"];
-      columns?: components["schemas"]["ColumnConfiguration"];
-      rejection_class?: string | null;
-      artifact_path?: string;
-      batch_size?: number;
-      use_cuda?: Partial<"auto"> & Partial<boolean>;
-      large_dask_cluster?: boolean;
-      read_only_config?: boolean;
-      language?: components["schemas"]["SupportedLanguage"];
-      syntax?: components["schemas"]["SyntaxOptions"];
-      dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
-      similarity?: components["schemas"]["SimilarityOptions"] | null;
-      pipelines?: components["schemas"]["PipelineDefinition"][] | null;
-      uncertainty?: components["schemas"]["UncertaintyOptions"];
-      saliency_layer?: string | null;
-      behavioral_testing?:
+      model_contract: components["schemas"]["SupportedModelContract"];
+      columns: components["schemas"]["ColumnConfiguration"];
+      rejection_class: string | null;
+      artifact_path: string;
+      batch_size: number;
+      use_cuda: "auto" | boolean;
+      large_dask_cluster: boolean;
+      read_only_config: boolean;
+      language: components["schemas"]["SupportedLanguage"];
+      syntax: components["schemas"]["SyntaxOptions"];
+      dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
+      similarity: components["schemas"]["SimilarityOptions"] | null;
+      pipelines: components["schemas"]["PipelineDefinition"][] | null;
+      uncertainty: components["schemas"]["UncertaintyOptions"];
+      saliency_layer: string | null;
+      behavioral_testing:
         | components["schemas"]["BehavioralTestingOptions"]
         | null;
-      metrics?: { [key: string]: components["schemas"]["MetricDefinition"] };
+      metrics: { [key: string]: components["schemas"]["MetricDefinition"] };
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     BehavioralTestingOptions: {
       neutral_token?: components["schemas"]["NeutralTokenOptions"];
       punctuation?: components["schemas"]["PunctuationTestOptions"];
@@ -177,12 +183,18 @@ export interface components {
     ClassOverlapTableResponse: {
       classPairs: components["schemas"]["ClassOverlapTableClassPair"][];
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     ColumnConfiguration: {
-      text_input?: string;
-      raw_text_input?: string;
-      label?: string;
-      failed_parsing_reason?: string;
-      persistent_id?: string;
+      text_input: string;
+      raw_text_input: string;
+      label: string;
+      failed_parsing_reason: string;
+      persistent_id: string;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -213,12 +225,18 @@ export interface components {
       reorderClasses: boolean;
       rejectionClass: string;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     CustomObject: {
       class_name: string;
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string | null;
+      remote: string | null;
     };
     /** An enumeration. */
     DataAction:
@@ -316,17 +334,29 @@ export interface components {
         [key: string]: components["schemas"]["PlotSpecification"];
       } | null;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     DatasetWarningsOptions: {
-      min_num_per_class?: number;
-      max_delta_class_imbalance?: number;
-      max_delta_representation?: number;
-      max_delta_mean_words?: number;
-      max_delta_std_words?: number;
+      min_num_per_class: number;
+      max_delta_class_imbalance: number;
+      max_delta_representation: number;
+      max_delta_mean_words: number;
+      max_delta_std_words: number;
     };
     /** An enumeration. */
     FormatType: "Integer" | "Percentage" | "Decimal";
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     FuzzyMatchingTestOptions: {
-      threshold?: number;
+      threshold: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -340,14 +370,20 @@ export interface components {
     HTTPValidationError: {
       detail?: components["schemas"]["ValidationError"][];
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     MetricDefinition: {
       class_name: string;
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string | null;
+      remote: string | null;
       /** Keyword arguments supplied to `compute`. */
-      additional_kwargs?: { [key: string]: any };
+      additional_kwargs: { [key: string]: any };
     };
     MetricInfo: {
       description: string;
@@ -432,10 +468,16 @@ export interface components {
       tokens: string[];
       saliencies: number[];
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     NeutralTokenOptions: {
-      threshold?: number;
-      suffix_list?: string[];
-      prefix_list?: string[];
+      threshold: number;
+      suffix_list: string[];
+      prefix_list: string[];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -572,10 +614,12 @@ export interface components {
     PipelineDefinition: {
       name: string;
       model: components["schemas"]["CustomObject"];
-      postprocessors?:
-        | (Partial<components["schemas"]["TemperatureScaling"]> &
-            Partial<components["schemas"]["ThresholdConfig"]> &
-            Partial<components["schemas"]["CustomObject"]>)[]
+      postprocessors:
+        | (
+            | components["schemas"]["TemperatureScaling"]
+            | components["schemas"]["ThresholdConfig"]
+            | components["schemas"]["CustomObject"]
+          )[]
         | null;
     };
     /**
@@ -620,8 +664,14 @@ export interface components {
       text: string;
       className: string;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     PunctuationTestOptions: {
-      threshold?: number;
+      threshold: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -650,10 +700,16 @@ export interface components {
     SimilarUtterancesResponse: {
       utterances: components["schemas"]["SimilarUtterance"][];
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     SimilarityOptions: {
-      faiss_encoder?: string;
-      conflicting_neighbors_threshold?: number;
-      no_close_threshold?: number;
+      faiss_encoder: string;
+      conflicting_neighbors_threshold: number;
+      no_close_threshold: number;
     };
     /** An enumeration. */
     SmartTag:
@@ -692,12 +748,18 @@ export interface components {
       | "custom_text_classification";
     /** An enumeration. */
     SupportedSpacyModels: "" | "en_core_web_sm" | "fr_core_news_md";
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     SyntaxOptions: {
-      short_sentence_max_word?: number;
-      long_sentence_min_word?: number;
-      spacy_model?: components["schemas"]["SupportedSpacyModels"];
-      subj_tags?: string[];
-      obj_tags?: string[];
+      short_sentence_max_word: number;
+      long_sentence_min_word: number;
+      spacy_model: components["schemas"]["SupportedSpacyModels"];
+      subj_tags: string[];
+      obj_tags: string[];
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -706,12 +768,12 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     TemperatureScaling: {
-      class_name?: "azimuth.utils.ml.postprocessing.TemperatureScaling";
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
+      class_name: "azimuth.utils.ml.postprocessing.TemperatureScaling";
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string | null;
-      temperature?: number;
+      remote: string | null;
+      temperature: number;
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -720,12 +782,12 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     ThresholdConfig: {
-      class_name?: "azimuth.utils.ml.postprocessing.Thresholding";
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
+      class_name: "azimuth.utils.ml.postprocessing.Thresholding";
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
       /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string | null;
-      threshold?: number;
+      remote: string | null;
+      threshold: number;
     };
     /** An enumeration. */
     TopWordsImportanceCriteria: "salient" | "frequent";
@@ -747,13 +809,25 @@ export interface components {
       word: string;
       count: number;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     TypoTestOptions: {
-      threshold?: number;
-      nb_typos_per_utterance?: number;
+      threshold: number;
+      nb_typos_per_utterance: number;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     UncertaintyOptions: {
-      iterations?: number;
-      high_epistemic_threshold?: number;
+      iterations: number;
+      high_epistemic_threshold: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
