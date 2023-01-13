@@ -73,8 +73,8 @@ explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
         remote: Optional[str] = None # (2)
     ```
 
-    1. Class name to load
-    2. Relative path to class. `class_name` needs to be accessible from this path.
+    1. Name of the function or class that is located in `remote`. `args` and `kwargs` will be sent to the function/class.
+    2. Absolute path to class. `class_name` needs to be accessible from this path.
 
 === "Config Example with HF"
 

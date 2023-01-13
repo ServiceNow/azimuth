@@ -232,10 +232,11 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     CustomObject: {
+      /** Name of the function or class that is located in `remote`.`args` and `kwargs` will be sent to the function/class. */
       class_name: string;
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
       remote: string | null;
     };
     /** An enumeration. */
@@ -377,10 +378,11 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     MetricDefinition: {
+      /** Name of the function or class that is located in `remote`.`args` and `kwargs` will be sent to the function/class. */
       class_name: string;
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
       remote: string | null;
       /** Keyword arguments supplied to `compute`. */
       additional_kwargs: { [key: string]: any };
@@ -771,7 +773,7 @@ export interface components {
       class_name: "azimuth.utils.ml.postprocessing.TemperatureScaling";
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
       remote: string | null;
       temperature: number;
     };
@@ -785,7 +787,7 @@ export interface components {
       class_name: "azimuth.utils.ml.postprocessing.Thresholding";
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
       remote: string | null;
       threshold: number;
     };

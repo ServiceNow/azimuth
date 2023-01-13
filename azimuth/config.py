@@ -92,12 +92,17 @@ class AzimuthBaseSettings(BaseSettings):
 
 
 class CustomObject(AzimuthBaseSettings):
-    class_name: str = Field(..., title="Class name to load.")
+    class_name: str = Field(
+        ...,
+        title="Class name to load.",
+        description="Name of the function or class that is located in `remote`."
+        "`args` and `kwargs` will be sent to the function/class.",
+    )
     args: List[Any] = []
     kwargs: Dict[str, Any] = {}
     remote: Optional[str] = Field(
         None,
-        description="Relative path to class. `class_name` needs to be accessible from this path.",
+        description="Absolute path to class. `class_name` needs to be accessible from this path.",
         nullable=True,
     )
 
