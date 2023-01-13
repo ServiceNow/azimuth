@@ -42,13 +42,6 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
-  dataset_warnings: {
-    max_delta_class_imbalance: 0,
-    max_delta_mean_words: 0,
-    max_delta_representation: 0,
-    max_delta_std_words: 0,
-    min_num_per_class: 0,
-  },
   similarity: {
     faiss_encoder: "",
     conflicting_neighbors_threshold: 0.9,
