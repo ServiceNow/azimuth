@@ -37,15 +37,16 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
         azimuth_config.dataset, azimuth_config=azimuth_config
     )
     dataset_train_eval: DatasetDict = DatasetDict()
-    if "train" in dataset_in_config:
+    if "train" in dataset_in_config and len(dataset_in_config["train"]) > 0:
         dataset_train_eval[DatasetSplitName.train] = dataset_in_config["train"]
     if "validation" in dataset_in_config and len(dataset_in_config["validation"]) > 0:
         dataset_train_eval[DatasetSplitName.eval] = dataset_in_config["validation"]
     elif "test" in dataset_in_config and len(dataset_in_config["test"]) > 0:
         dataset_train_eval[DatasetSplitName.eval] = dataset_in_config["test"]
-    else:
+
+    if not dataset_train_eval:
         raise ValueError(
-            "Unable to find a validation set or a test set. "
+            "Unable to find a dataset split named train, validation or test"
             f"Found {tuple(dataset_in_config.keys())}."
         )
     return dataset_train_eval

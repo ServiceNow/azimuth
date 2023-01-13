@@ -193,3 +193,11 @@ def add_tags(dm):
     table_key = get_table_key(dm.config)
     add_all_tags_once(ALL_DATA_ACTIONS)
     add_all_tags_once(ALL_SMART_TAGS)
+
+
+def get_tiny_text_config_one_ds_name(config):
+    ds_name = DatasetSplitName.eval if "train" in config.dataset.kwargs else DatasetSplitName.train
+    other_ds_name = (
+        DatasetSplitName.train if ds_name == DatasetSplitName.eval else DatasetSplitName.eval
+    )
+    return ds_name, other_ds_name

@@ -10,10 +10,12 @@ import Loading from "components/Loading";
 import PerformanceAnalysis from "components/Metrics/PerformanceAnalysis";
 import SmartTagsTable from "components/SmartTagsTable";
 import ThresholdPlot from "components/ThresholdPlot";
+import WithDatasetSplitNameState from "components/WithDatasetSplitNameState";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
+import { DATASET_SPLIT_NAMES, UNKNOWN_ERROR } from "utils/const";
 import { isPipelineSelected } from "utils/helpers";
 import { performanceAnalysisDescription } from "./PerformanceAnalysis";
 import { behavioralTestingDescription } from "./PerturbationTestingSummary";
@@ -36,14 +38,18 @@ const Dashboard = () => {
 
   if (isFetching) {
     return <Loading />;
-  } else if (error) {
+  } else if (error || datasetInfo === undefined) {
     return (
       <Box alignItems="center" display="grid" justifyItems="center">
         <img src={noData} width="50%" alt="no dataset info" />
-        <Typography>{error.message}</Typography>
+        <Typography>{error?.message || UNKNOWN_ERROR}</Typography>
       </Box>
     );
   }
+
+  const firstAvailableDatasetSplit = DATASET_SPLIT_NAMES.find(
+    (datasetSplitName) => datasetInfo.availableDatasetSplits[datasetSplitName]
+  )!;
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>
@@ -65,14 +71,14 @@ const Dashboard = () => {
           color="secondary"
           variant="contained"
           component={Link}
-          to={`/${jobId}/dataset_splits/eval/prediction_overview${searchString}`}
+          to={`/${jobId}/dataset_splits/${firstAvailableDatasetSplit}/prediction_overview${searchString}`}
           sx={{ gap: 1 }}
         >
           <Telescope fontSize="large" />
           Go to exploration space
         </Button>
       </Box>
-      {datasetInfo?.availableDatasetSplits.train && (
+      {datasetInfo.availableDatasetSplits.train && (
         <PreviewCard
           title="Dataset Warnings"
           to={`/${jobId}/dataset_warnings${searchString}`}
@@ -88,11 +94,11 @@ const Dashboard = () => {
           </Box>
         </PreviewCard>
       )}
-      {datasetInfo?.availableDatasetSplits.train &&
-        datasetInfo?.similarityAvailable && (
+      {datasetInfo.availableDatasetSplits.train &&
+        datasetInfo.similarityAvailable && (
           <PreviewCard
             title="Class Overlap"
-            to={`/${jobId}/class_overlap${searchString}`}
+            to={`/${jobId}/dataset_splits/train/class_overlap${searchString}`}
             description={
               <Description
                 text="Assess semantic overlap between class pairs and compare to pipeline confusion."
@@ -100,48 +106,62 @@ const Dashboard = () => {
               />
             }
           >
-            <ClassOverlapTable jobId={jobId} pipeline={pipeline} />
+            <ClassOverlapTable
+              jobId={jobId}
+              pipeline={pipeline}
+              availableDatasetSplits={datasetInfo.availableDatasetSplits}
+            />
           </PreviewCard>
         )}
       {isPipelineSelected(pipeline) && (
-        <PreviewCard
-          title="Pipeline Metrics by Data Subpopulation"
-          to={`/${jobId}/pipeline_metrics${searchString}`}
-          linkButtonText={
-            config?.pipelines && config.pipelines.length > 1
-              ? "Compare pipelines"
-              : undefined
-          }
-          description={performanceAnalysisDescription}
-        >
-          <PerformanceAnalysis
-            jobId={jobId}
-            pipeline={pipeline}
-            availableDatasetSplits={datasetInfo?.availableDatasetSplits}
-          />
-        </PreviewCard>
+        <WithDatasetSplitNameState
+          defaultDatasetSplitName={firstAvailableDatasetSplit}
+          render={(datasetSplitName, setDatasetSplitName) => (
+            <PreviewCard
+              title="Pipeline Metrics by Data Subpopulation"
+              to={`/${jobId}/dataset_splits/${datasetSplitName}/pipeline_metrics${searchString}`}
+              linkButtonText={
+                config?.pipelines && config.pipelines.length > 1
+                  ? "Compare pipelines"
+                  : undefined
+              }
+              description={performanceAnalysisDescription}
+            >
+              <PerformanceAnalysis
+                jobId={jobId}
+                pipeline={pipeline}
+                availableDatasetSplits={datasetInfo.availableDatasetSplits}
+                datasetSplitName={datasetSplitName}
+                setDatasetSplitName={setDatasetSplitName}
+              />
+            </PreviewCard>
+          )}
+        />
       )}
       {isPipelineSelected(pipeline) && (
-        <PreviewCard
-          title="Smart Tag Analysis"
-          to={`/${jobId}/smart_tags${searchString}`}
-          description={smartTagsDescription}
-        >
-          <Box
-            display="flex"
-            flexDirection="column"
-            maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}
-          >
-            <SmartTagsTable
-              jobId={jobId}
-              pipeline={pipeline}
-              availableDatasetSplits={datasetInfo?.availableDatasetSplits}
-            />
-          </Box>
-        </PreviewCard>
+        <WithDatasetSplitNameState
+          defaultDatasetSplitName={firstAvailableDatasetSplit}
+          render={(datasetSplitName, setDatasetSplitName) => (
+            <PreviewCard
+              title="Smart Tag Analysis"
+              to={`/${jobId}/dataset_splits/${datasetSplitName}/smart_tags${searchString}`}
+              description={smartTagsDescription}
+            >
+              <Box maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
+                <SmartTagsTable
+                  jobId={jobId}
+                  pipeline={pipeline}
+                  availableDatasetSplits={datasetInfo.availableDatasetSplits}
+                  datasetSplitName={datasetSplitName}
+                  setDatasetSplitName={setDatasetSplitName}
+                />
+              </Box>
+            </PreviewCard>
+          )}
+        />
       )}
       {isPipelineSelected(pipeline) &&
-        datasetInfo?.perturbationTestingAvailable && (
+        datasetInfo.perturbationTestingAvailable && (
           <PreviewCard
             title="Behavioral Testing"
             to={`/${jobId}/behavioral_testing_summary${searchString}`}
@@ -157,7 +177,8 @@ const Dashboard = () => {
           </PreviewCard>
         )}
       {isPipelineSelected(pipeline) &&
-        datasetInfo?.postprocessingEditable?.[pipeline.pipelineIndex] && (
+        datasetInfo.availableDatasetSplits.eval &&
+        datasetInfo.postprocessingEditable?.[pipeline.pipelineIndex] && (
           <PreviewCard
             title="Post-processing Analysis"
             to={`/${jobId}/thresholds${searchString}`}

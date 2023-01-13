@@ -22,8 +22,13 @@ const PerturbationTestingPreview: React.FC<{
   const { data, error, isError, isFetching } =
     getPerturbationTestingSummaryEndpoint.useQuery({ jobId, ...pipeline });
 
+  const defaultOption = DATASET_SPLIT_NAMES.findIndex(
+    (datasetSplitName) => availableDatasetSplits[datasetSplitName]
+  );
+
   return (
     <PreviewToggle
+      defaultOption={defaultOption}
       options={DATASET_SPLIT_NAMES.map((name, i) => ({
         button: (
           <PreviewToggleButton

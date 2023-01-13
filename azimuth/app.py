@@ -164,7 +164,7 @@ def create_app() -> FastAPI:
     api_router.include_router(admin_router, prefix="/admin")
     api_router.include_router(
         class_overlap_router,
-        prefix="/class_overlap",
+        prefix="/dataset_splits/{dataset_split_name}/class_overlap",
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(tags_router, prefix="/tags", dependencies=[])
@@ -251,7 +251,8 @@ def initialize_managers(azimuth_config, cluster):
     # Validate that everything is in order **before** the startup tasks.
     if _dataset_split_managers.get(DatasetSplitName.train):
         run_validation(DatasetSplitName.train, _task_manager, azimuth_config)
-    run_validation(DatasetSplitName.eval, _task_manager, azimuth_config)
+    if _dataset_split_managers.get(DatasetSplitName.eval):
+        run_validation(DatasetSplitName.eval, _task_manager, azimuth_config)
 
     _startup_tasks = startup.startup_tasks(_dataset_split_managers, _task_manager)
     _ready_flag = Event()

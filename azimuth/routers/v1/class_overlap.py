@@ -7,7 +7,12 @@ from typing import Dict, Optional
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from azimuth.app import get_all_dataset_split_managers, get_config, get_task_manager
+from azimuth.app import (
+    get_config,
+    get_dataset_split_manager,
+    get_dataset_split_manager_mapping,
+    get_task_manager,
+)
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.plots.sankey_plot import make_sankey_plot
@@ -39,10 +44,9 @@ EPSILON = 1e-4
     response_model=ClassOverlapPlotResponse,
 )
 def get_class_overlap_plot(
+    dataset_split_name: DatasetSplitName,
     task_manager: TaskManager = Depends(get_task_manager),
-    dataset_split_managers: Dict[DatasetSplitName, DatasetSplitManager] = Depends(
-        get_all_dataset_split_managers
-    ),
+    dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     config: AzimuthConfig = Depends(get_config),
     self_overlap: bool = Query(
         False,
@@ -66,17 +70,15 @@ def get_class_overlap_plot(
             400, detail="Please enable similarity in the configuration to enable this route."
         )
 
-    dm = dataset_split_managers[DatasetSplitName.train]
-
     task_result: ClassOverlapResponse = get_standard_task_result(
         SupportedModule.ClassOverlap,
-        dataset_split_name=DatasetSplitName.train,
+        dataset_split_name=dataset_split_name,
         task_manager=task_manager,
         last_update=-1,
     )[0]
     class_overlap_plot_response: ClassOverlapPlotResponse = make_sankey_plot(
         task_result,
-        dm,
+        dataset_split_manager,
         self_overlap=self_overlap,
         scale_by_class=scale_by_class,
         overlap_threshold=overlap_threshold,
@@ -93,20 +95,19 @@ def get_class_overlap_plot(
     response_model=ClassOverlapTableResponse,
 )
 def get_class_overlap(
+    dataset_split_name: DatasetSplitName,
     task_manager: TaskManager = Depends(get_task_manager),
+    dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     dataset_split_managers: Dict[DatasetSplitName, DatasetSplitManager] = Depends(
-        get_all_dataset_split_managers
+        get_dataset_split_manager_mapping
     ),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
 ) -> ClassOverlapTableResponse:
-    dm = dataset_split_managers[DatasetSplitName.train]
-    class_counts_train = dm.class_distribution()
-    class_counts_eval = dataset_split_managers[DatasetSplitName.eval].class_distribution()
-    class_names = dm.get_class_names(labels_only=True)
+    eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
 
     class_overlap_result: ClassOverlapResponse = get_standard_task_result(
         SupportedModule.ClassOverlap,
-        dataset_split_name=DatasetSplitName.train,
+        dataset_split_name=dataset_split_name,
         task_manager=task_manager,
         last_update=-1,
     )[0]
@@ -126,11 +127,19 @@ def get_class_overlap(
             mod_options=ModuleOptions(
                 pipeline_index=pipeline_index, cf_normalize=False, cf_reorder_classes=False
             ),
-            last_update=dataset_split_managers[DatasetSplitName.eval].last_update,
+            last_update=eval_dm.last_update,
         )[0]
-        if pipeline_index is not None
+        if pipeline_index is not None and eval_dm
         else None
     )
+
+    class_counts_train = dataset_split_manager.class_distribution()
+    class_counts_eval = (
+        eval_dm.class_distribution()
+        if eval_dm
+        else np.zeros(dataset_split_manager.get_num_classes())
+    )
+    class_names = dataset_split_manager.get_class_names(labels_only=True)
 
     class_pairs_list = [
         ClassOverlapTableClassPair(
