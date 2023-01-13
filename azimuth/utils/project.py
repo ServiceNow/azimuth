@@ -55,7 +55,7 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
 
 def save_config(azimuth_config: AzimuthConfig):
     """Append config to configs.jsonl to retrieve past configs."""
-    with jsonlines.open(f"{azimuth_config.get_artifact_path()}/configs.jsonl", mode="a") as f:
+    with jsonlines.open(f"{azimuth_config.artifact_path}/configs.jsonl", mode="a") as f:
         f.write(azimuth_config.dict())
 
 

@@ -146,7 +146,7 @@ def test_update_config(tiny_text_config):
 
     assert not new_config.similarity
 
-    with open(f"{new_config.get_artifact_path()}/configs.jsonl", "r") as f:
+    with open(f"{new_config.artifact_path}/configs.jsonl", "r") as f:
         loaded_config = json.load(f)
     assert loaded_config == new_config
 
@@ -155,7 +155,7 @@ def test_update_config(tiny_text_config):
 
     assert new_config_2.dataset_warnings.min_num_per_class == 40
 
-    with jsonlines.open(f"{new_config_2.get_artifact_path()}/configs.jsonl", "r") as reader:
+    with jsonlines.open(f"{new_config_2.artifact_path}/configs.jsonl", "r") as reader:
         all_configs = [config for config in reader]
 
     assert len(all_configs) == 2
