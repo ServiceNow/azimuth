@@ -191,16 +191,17 @@ const Settings: React.FC = () => {
   );
 
   const displayArgumentsList = (name: string, argEntries: any[]) => (
-    <Box display="flex" flexDirection={"column"}>
+    <Box display="grid">
       <Typography variant="caption">{name}</Typography>
       {argEntries.map((value, index) => (
         <Typography
+          key={index}
           variant="body2"
           whiteSpace="nowrap"
           overflow="hidden"
           textOverflow="ellipsis"
         >
-          {index + 1}. {value}
+          {value}
         </Typography>
       ))}
     </Box>
