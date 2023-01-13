@@ -166,12 +166,12 @@ const Settings: React.FC = () => {
 
   const displayKeywordArguments = (
     name: string,
-    argEntries: Record<string, any>
+    kwargs: Record<string, any>
   ) => (
     <Box display="grid">
       <Typography variant="caption">{name}</Typography>
       <KeyValuePairs>
-        {Object.entries(argEntries).map(([field, value], index) => (
+        {Object.entries(kwargs).map(([field, value], index) => (
           <React.Fragment key={index}>
             <Typography variant="body2">{field}:</Typography>
             <Tooltip title={value}>
@@ -190,10 +190,10 @@ const Settings: React.FC = () => {
     </Box>
   );
 
-  const displayArgumentsList = (name: string, argEntries: any[]) => (
+  const displayArgumentsList = (name: string, args: any[]) => (
     <Box display="grid">
       <Typography variant="caption">{name}</Typography>
-      {argEntries.map((value, index) => (
+      {args.map((value, index) => (
         <Typography
           key={index}
           variant="body2"
