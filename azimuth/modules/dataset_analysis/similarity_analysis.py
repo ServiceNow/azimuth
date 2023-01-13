@@ -75,22 +75,13 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
     def compute_on_dataset_split(self) -> List[TaggingResponse]:  # type: ignore
         # Get the features from FAISS for all available splits to make sure they are all computed
         # and that we can compute neighbors for all splits.
-        eval_features = (
-            self._get_features_from_faiss(DatasetSplitName.eval)
-            if DatasetSplitName.eval in self.available_dataset_splits
-            else None
-        )
-        train_features = (
-            self._get_features_from_faiss(DatasetSplitName.train)
-            if DatasetSplitName.train in self.available_dataset_splits
-            else None
-        )
+        features_dict = {
+            split: self._get_features_from_faiss(split) for split in self.available_dataset_splits
+        }
 
         dm = self.get_dataset_split_manager()
         indices = self.get_indices()
-        features = assert_not_none(
-            eval_features if self.dataset_split_name == DatasetSplitName.eval else train_features
-        )
+        features = features_dict[self.dataset_split_name]
         neighbors = self.get_neighbors([features[i] for i in indices])
 
         similarity_config: SimilarityOptions = assert_not_none(self.config.similarity)
