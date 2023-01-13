@@ -5,11 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from azimuth.config import (
-    BehavioralTestingOptions,
-    NeutralTokenOptions,
-    TypoTestOptions,
-)
+from azimuth.config import BehavioralTestingOptions, TypoTestOptions
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.modules.model_performance.outcomes import OutcomesModule
@@ -34,7 +30,6 @@ _SAMPLE_DATA_DIR = _CURRENT_DIR / "fixtures"
 _SAMPLE_VOCAB_DIR = _SAMPLE_DATA_DIR / "distilbert-tokenizer-files"
 _CHECKPOINT_PATH = str(_SAMPLE_VOCAB_DIR)
 SIMPLE_PERTURBATION_TESTING_CONFIG = BehavioralTestingOptions(
-    neutral_suffix=NeutralTokenOptions(suffix_list=["pls", "thanks"], prefix_list=["pls", "hello"]),
     typo=TypoTestOptions(threshold=0.005),
 )
 
