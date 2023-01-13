@@ -51,8 +51,8 @@ const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
   },
   similarity: {
     faiss_encoder: "",
-    conflicting_neighbors_threshold: 0,
-    no_close_threshold: 0,
+    conflicting_neighbors_threshold: 0.9,
+    no_close_threshold: 0.5,
   },
   behavioral_testing: {},
 };
