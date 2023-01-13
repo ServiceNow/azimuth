@@ -20,6 +20,6 @@ class DatasetColumn(str, Enum):
     confidence_bin_idx = "confidence_bin_idx"
     model_outcome = "model_outcome"
     postprocessed_outcome = "postprocessed_outcome"
-    token_count = "token_count"
+    word_count = "word_count"
     neighbors_train = f"neighbors_{DatasetSplitName.train}"
     neighbors_eval = f"neighbors_{DatasetSplitName.eval}"

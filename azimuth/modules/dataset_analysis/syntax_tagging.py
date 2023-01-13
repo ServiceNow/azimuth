@@ -25,10 +25,8 @@ from azimuth.utils.validation import assert_not_none
 class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
     """Calculate smart tags related to syntax."""
 
-    # Sentencizer; English() should work for other languages that have similar sentence conventions.
-    spacy_pipeline = English()
-    spacy_pipeline.add_pipe("sentencizer")
-
+    spacy_sentencizer_en = English()
+    spacy_sentencizer_en.add_pipe("sentencizer")
     # we use pos_ for verb since it is simpler and more reliable than dep_
     verb_tags = ["VERB", "AUX"]
 
@@ -42,55 +40,50 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
             tags: Newly calculated tags.
 
         """
-        spacy_pos = spacy.load(self.config.syntax.spacy_model)
+        syntax_options: SyntaxOptions = assert_not_none(self.config.syntax)
+        spacy_model = spacy.load(syntax_options.spacy_model)
 
         utterances = batch[self.config.columns.text_input]
-
-        # Always use the BERT tokenizer to ensure this feature works regardless of model
-        tokenizer = self.artifact_manager.get_tokenizer()
-        inputs = tokenizer(utterances)
-        batch_tokens = [tokenizer.convert_ids_to_tokens(tokens) for tokens in inputs["input_ids"]]
-        batch_tokens = [
-            [tok for tok in batch_token if tok not in [tokenizer.cls_token, tokenizer.sep_token]]
-            for batch_token in batch_tokens
-        ]
-
         records: List[TaggingResponse] = []
 
-        for tokens, utterance in zip(batch_tokens, utterances):
+        for utterance in utterances:
             tag: Dict[SmartTag, bool] = {
                 smart_tag: False
                 for family in [SmartTagFamily.extreme_length, SmartTagFamily.partial_syntax]
                 for smart_tag in SMART_TAGS_FAMILY_MAPPING[family]
             }
-            adds = {}
-            syntax_options: SyntaxOptions = assert_not_none(self.config.syntax)
 
-            do = self.spacy_pipeline(utterance)
-            adds[DatasetColumn.token_count] = len(tokens)
+            doc = spacy_model(clean_utterance(utterance))
+            # Remove punctuation for word count and smart tags
+            tokens = [token.text for token in doc if not token.is_punct]
 
-            if len(list(do.sents)) > 1:
-                tag[SmartTag.multi_sent] = True
+            # Some issues occur with other languages such as french if using doc.sents directly.
+            # Hence, we use an English sentencizer that seems to work better for similar languages.
+            doc_sentencizer_en = self.spacy_sentencizer_en(clean_utterance(utterance))
+            sentence_count = len(list(doc_sentencizer_en.sents))
+
+            if sentence_count > 1:
                 # if an utterance has more than one sentence, no other tags are added.
+                tag[SmartTag.multi_sent] = True
             else:
-                if len(tokens) >= syntax_options.long_sentence_min_token:
+                if len(tokens) >= syntax_options.long_sentence_min_word:
                     tag[SmartTag.long] = True
-                if len(tokens) <= syntax_options.short_sentence_max_token:
+                if len(tokens) <= syntax_options.short_sentence_max_word:
                     tag[SmartTag.short] = True
 
-                tokens_doc = spacy_pos(clean_utterance(utterance))
-                sub_toks = [tok for tok in tokens_doc if (tok.dep_ in self.config.syntax.subj_tags)]
-                obj_toks = [tok for tok in tokens_doc if (tok.dep_ in self.config.syntax.obj_tags)]
-                vrb_toks = [tok for tok in tokens_doc if (tok.pos_ in self.verb_tags)]
-
-                if len(sub_toks) == 0:
+                sub_toks = [tok for tok in doc if (tok.dep_ in syntax_options.subj_tags)]
+                obj_toks = [tok for tok in doc if (tok.dep_ in syntax_options.obj_tags)]
+                vrb_toks = [tok for tok in doc if (tok.pos_ in self.verb_tags)]
+                if not sub_toks:
                     tag[SmartTag.no_subj] = True
-                if len(obj_toks) == 0:
+                if not obj_toks:
                     tag[SmartTag.no_obj] = True
-                if len(vrb_toks) == 0:
+                if not vrb_toks:
                     tag[SmartTag.no_verb] = True
 
+            adds = {DatasetColumn.word_count: len(tokens)}
             records.append(TaggingResponse(tags=tag, adds=adds))
+
         return records
 
     def _save_result(self, res: List[ModuleResponse], dm: DatasetSplitManager):
@@ -104,6 +97,6 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
         res_cast = cast(List[TaggingResponse], res)
         dm.add_tags(dict(zip(itertools.count(), (r.tags for r in res_cast))))
         dm.add_column(
-            key=DatasetColumn.token_count,
-            features=[r.adds[DatasetColumn.token_count] for r in res_cast],
+            key=DatasetColumn.word_count,
+            features=[r.adds[DatasetColumn.word_count] for r in res_cast],
         )

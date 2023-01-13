@@ -17,8 +17,8 @@ dependency tag lists will generally not need to be modified.
     from pydantic import BaseModel
 
     class SyntaxOptions(BaseModel):
-        short_sentence_max_token: int = 3 # (1)
-        long_sentence_min_token: int = 16 # (2)
+        short_sentence_max_word int = 3 # (1)
+        long_sentence_min_word: int = 12 # (2)
         spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default (3)
         subj_tags: List[str] = []  # Language-based default value (4)
         obj_tags: List[str] = []  # Language-based default value (5)
@@ -35,7 +35,7 @@ dependency tag lists will generally not need to be modified.
     ```json
     {
       "syntax": {
-        "short_sentence_max_token": 5
+        "short_sentence_max_word": 5
       }
     }
     ```

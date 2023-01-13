@@ -34,9 +34,9 @@ def test_get_config(app: FastAPI):
             "remote": None,
         },
         "dataset_warnings": {
-            "max_delta_mean_tokens": 3.0,
+            "max_delta_mean_words": 3.0,
             "max_delta_representation": 0.05,
-            "max_delta_std_tokens": 3.0,
+            "max_delta_std_words": 3.0,
             "min_num_per_class": 20,
             "max_delta_class_imbalance": 0.5,
         },
@@ -94,8 +94,8 @@ def test_get_config(app: FastAPI):
             "no_close_threshold": 0.5,
         },
         "syntax": {
-            "long_sentence_min_token": 16,
-            "short_sentence_max_token": 3,
+            "long_sentence_min_word": 12,
+            "short_sentence_max_word": 3,
             "spacy_model": "en_core_web_sm",
             "subj_tags": ["nsubj", "nsubjpass"],
             "obj_tags": ["dobj", "pobj", "obj"],

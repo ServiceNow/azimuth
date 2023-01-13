@@ -231,7 +231,7 @@ class DatasetSplitManager:
             DatasetColumn.postprocessed_outcome,
             DatasetColumn.pipeline_steps,
             DatasetColumn.confidence_bin_idx,
-            DatasetColumn.token_count,
+            DatasetColumn.word_count,
             DatasetColumn.neighbors_train,
             DatasetColumn.neighbors_eval,
             *self._tags,

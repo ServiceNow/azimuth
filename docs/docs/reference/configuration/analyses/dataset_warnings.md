@@ -14,8 +14,8 @@ Some thresholds can be set to modify the number of warnings in the
         min_num_per_class: int = 20 # (1)
         max_delta_class_imbalance: float = 0.5 # (2)
         max_delta_representation: float = 0.05 # (3)
-        max_delta_mean_tokens: float = 3.0 # (4)
-        max_delta_std_tokens: float = 3.0 # (5)
+        max_delta_mean_words: float = 3.0 # (4)
+        max_delta_std_words: float = 3.0 # (5)
 
     ```
 

@@ -7,7 +7,7 @@ from typing import Callable, Dict, List
 
 import numpy as np
 import torch
-from datasets import ClassLabel, Dataset, DatasetDict, Features, load_dataset
+from datasets import Dataset, DatasetDict, load_dataset
 from scipy.special import softmax
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -22,6 +22,7 @@ from transformers import (
 
 from azimuth.config import AzimuthConfig
 from azimuth.utils.ml.seeding import RandomContext
+from azimuth_shr.loading_resources import align_labels
 
 _CURRENT_DIR = "/tmp"
 _MAX_DATASET_LEN = 42
@@ -77,24 +78,14 @@ def load_intent_data(train_path, test_path, python_loader) -> Dataset:
     return load_dataset(python_loader, data_files={"train": train_path, "test": test_path})
 
 
-def load_file_dataset(data_files: Dict[str, str], azimuth_config):
+def load_file_dataset(data_files: Dict[str, str], azimuth_config) -> DatasetDict:
     # Load a file dataset and cast the label column as a ClassLabel.
     # Train and test need to be loaded separately because they don't always share the same columns.
-    # Train sometimes don't have predictions. HF will complain if we load both together.
+    # Train sometimes doesn't have predictions. HF will complain if we load both together.
     ds_dict = load_dataset("csv", data_files={"train": data_files["train"]})
     ds_dict_test = load_dataset("csv", data_files={"test": data_files["test"]})
     ds_dict.update(ds_dict_test)
-    features: Features = [v.features for v in ds_dict.values()][0]
-    if not isinstance(features[azimuth_config.columns.label], ClassLabel):
-        # Get all classes from both set and apply the same mapping to every dataset.
-        classes = sorted(
-            list(set(sum([ds[azimuth_config.columns.label] for ds in ds_dict.values()], [])))
-        )
-        ds_dict = ds_dict.class_encode_column(azimuth_config.columns.label)
-        ds_dict = ds_dict.align_labels_with_mapping(
-            {class_name: i for i, class_name in enumerate(classes)}, azimuth_config.columns.label
-        )
-    return ds_dict
+    return align_labels(ds_dict, azimuth_config)
 
 
 def load_CLINC150_data(full_path, python_loader) -> Dataset:

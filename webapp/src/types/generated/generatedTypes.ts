@@ -318,8 +318,8 @@ export interface components {
       min_num_per_class?: number;
       max_delta_class_imbalance?: number;
       max_delta_representation?: number;
-      max_delta_mean_tokens?: number;
-      max_delta_std_tokens?: number;
+      max_delta_mean_words?: number;
+      max_delta_std_words?: number;
     };
     /** An enumeration. */
     FormatType: "Integer" | "Percentage" | "Decimal";
@@ -691,8 +691,8 @@ export interface components {
     /** An enumeration. */
     SupportedSpacyModels: "" | "en_core_web_sm" | "fr_core_news_md";
     SyntaxOptions: {
-      short_sentence_max_token?: number;
-      long_sentence_min_token?: number;
+      short_sentence_max_word?: number;
+      long_sentence_min_word?: number;
       spacy_model?: components["schemas"]["SupportedSpacyModels"];
       subj_tags?: string[];
       obj_tags?: string[];
