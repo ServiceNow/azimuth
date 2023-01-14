@@ -190,18 +190,23 @@ const Settings: React.FC = () => {
     </Box>
   );
 
-  const displayReadonlyFields = (label: string, value: string) => (
+  const displayReadonlyFields = (label: string, value: string | null) => (
     <TextField
       size="small"
       variant="standard"
       label={label}
-      value={value ?? "null"}
+      value={String(value)}
       disabled={isError || isFetching}
       InputProps={{
         readOnly: true,
         disableUnderline: true,
       }}
-      inputProps={{ sx: { textOverflow: "ellipsis" } }}
+      inputProps={{
+        sx: {
+          textOverflow: "ellipsis",
+          ...(value === null && { fontStyle: "italic" }),
+        },
+      }}
     />
   );
 
@@ -307,11 +312,10 @@ const Settings: React.FC = () => {
       <FormGroup>
         <Columns columns={3}>
           {displayReadonlyFields("name", resultingConfig.name)}
-          {resultingConfig.rejection_class !== null &&
-            displayReadonlyFields(
-              "rejection_class",
-              resultingConfig.rejection_class
-            )}
+          {displayReadonlyFields(
+            "rejection_class",
+            resultingConfig.rejection_class
+          )}
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
@@ -334,8 +338,7 @@ const Settings: React.FC = () => {
             "class_name",
             resultingConfig.dataset.class_name
           )}
-          {resultingConfig.dataset.remote !== null &&
-            displayReadonlyFields("remote", resultingConfig.dataset.remote)}
+          {displayReadonlyFields("remote", resultingConfig.dataset.remote)}
           {resultingConfig.dataset.args.length > 0 &&
             displayArgumentsList("args", resultingConfig.dataset.args)}
           {Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
@@ -353,11 +356,10 @@ const Settings: React.FC = () => {
             "model_contract",
             resultingConfig.model_contract
           )}
-          {resultingConfig.saliency_layer !== null &&
-            displayReadonlyFields(
-              "saliency_layer",
-              resultingConfig.saliency_layer
-            )}
+          {displayReadonlyFields(
+            "saliency_layer",
+            resultingConfig.saliency_layer
+          )}
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">uncertainty</Typography>
             <KeyValuePairs>
@@ -416,8 +418,7 @@ const Settings: React.FC = () => {
                         "class_name",
                         pipeline.model.class_name
                       )}
-                      {pipeline.model.remote !== null &&
-                        displayReadonlyFields("remote", pipeline.model.remote)}
+                      {displayReadonlyFields("remote", pipeline.model.remote)}
                       {pipeline.model.args.length > 0 &&
                         displayArgumentsList("args", pipeline.model.args)}
                       {Object.keys(pipeline.model.kwargs).length > 0 &&
