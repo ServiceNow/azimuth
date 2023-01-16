@@ -164,14 +164,14 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displayArgumentsList = (
+  const displayKeywordArguments = (
     name: string,
-    argEntries: Record<string, any> | any[]
+    kwargs: Record<string, any>
   ) => (
     <Box display="grid">
       <Typography variant="caption">{name}</Typography>
       <KeyValuePairs>
-        {Object.entries(argEntries).map(([field, value], index) => (
+        {Object.entries(kwargs).map(([field, value], index) => (
           <React.Fragment key={index}>
             <Typography variant="body2">{field}:</Typography>
             <Tooltip title={value}>
@@ -187,6 +187,23 @@ const Settings: React.FC = () => {
           </React.Fragment>
         ))}
       </KeyValuePairs>
+    </Box>
+  );
+
+  const displayArgumentsList = (name: string, args: any[]) => (
+    <Box display="grid">
+      <Typography variant="caption">{name}</Typography>
+      {args.map((value, index) => (
+        <Typography
+          key={index}
+          variant="body2"
+          whiteSpace="nowrap"
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
+          {value}
+        </Typography>
+      ))}
     </Box>
   );
 
@@ -342,7 +359,7 @@ const Settings: React.FC = () => {
           {resultingConfig.dataset.args.length > 0 &&
             displayArgumentsList("args", resultingConfig.dataset.args)}
           {Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
-            displayArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
+            displayKeywordArguments("kwargs", resultingConfig.dataset.kwargs)}
         </Columns>
       </FormGroup>
     </>
@@ -422,7 +439,10 @@ const Settings: React.FC = () => {
                       {pipeline.model.args.length > 0 &&
                         displayArgumentsList("args", pipeline.model.args)}
                       {Object.keys(pipeline.model.kwargs).length > 0 &&
-                        displayArgumentsList("kwargs", pipeline.model.kwargs)}
+                        displayKeywordArguments(
+                          "kwargs",
+                          pipeline.model.kwargs
+                        )}
                     </Columns>
                   </FormGroup>
                 </FormControl>
