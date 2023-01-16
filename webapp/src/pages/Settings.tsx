@@ -80,19 +80,104 @@ const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
   </Box>
 );
 
+const displaySectionTitle = (section: string) => (
+  <Typography variant="subtitle2" marginY={1.5}>
+    {section}
+  </Typography>
+);
+
 const KeyValuePairs: React.FC = ({ children }) => (
   <Box display="grid" gridTemplateColumns="max-content auto" columnGap={1}>
     {children}
   </Box>
 );
 
+const displayKeywordArguments = (name: string, kwargs: Record<string, any>) => (
+  <Box display="grid">
+    <Typography variant="caption">{name}</Typography>
+    <KeyValuePairs>
+      {Object.entries(kwargs).map(([field, value], index) => (
+        <React.Fragment key={index}>
+          <Typography variant="body2">{field}:</Typography>
+          <Tooltip title={value}>
+            <Typography
+              variant="body2"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
+              {value}
+            </Typography>
+          </Tooltip>
+        </React.Fragment>
+      ))}
+    </KeyValuePairs>
+  </Box>
+);
+
+const displayArgumentsList = (name: string, args: any[]) => (
+  <Box display="grid">
+    <Typography variant="caption">{name}</Typography>
+    {args.map((value, index) => (
+      <Typography
+        key={index}
+        variant="body2"
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+      >
+        {value}
+      </Typography>
+    ))}
+  </Box>
+);
+
+const displayReadonlyFields = (label: string, value: string | null) => (
+  <TextField
+    size="small"
+    variant="standard"
+    label={label}
+    value={String(value)}
+    InputProps={{
+      readOnly: true,
+      disableUnderline: true,
+    }}
+    inputProps={{
+      sx: {
+        textOverflow: "ellipsis",
+        ...(value === null && { fontStyle: "italic" }),
+      },
+    }}
+  />
+);
+
+const NumberField: React.FC<
+  Omit<TextFieldProps, "onChange"> & {
+    value: number;
+    scale?: number;
+    units?: string;
+    onChange: (newValue: number) => void;
+  }
+> = ({ value, scale = 1, units, onChange, ...props }) => (
+  <TextField
+    variant="standard"
+    size="small"
+    type="number"
+    className="number"
+    value={value * scale}
+    {...(units && {
+      InputProps: {
+        endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
+      },
+    })}
+    onChange={(event) => onChange(Number(event.target.value) / scale)}
+    {...props}
+  />
+);
+
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
-  const {
-    data: config,
-    isError,
-    isFetching,
-  } = getConfigEndpoint.useQuery({ jobId });
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig] = updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
@@ -104,12 +189,6 @@ const Settings: React.FC = () => {
 
   const resultingConfig = Object.assign({}, config, partialConfig);
 
-  const displaySectionTitle = (section: string) => (
-    <Typography variant="subtitle2" marginY={1.5}>
-      {section}
-    </Typography>
-  );
-
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
     section: string = field
@@ -119,7 +198,6 @@ const Settings: React.FC = () => {
         <Checkbox
           size="small"
           checked={Boolean(resultingConfig[field])}
-          disabled={isError || isFetching}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -144,7 +222,6 @@ const Settings: React.FC = () => {
         <Checkbox
           size="small"
           checked={Boolean(pipeline.postprocessors)}
-          disabled={isError || isFetching}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -165,93 +242,6 @@ const Settings: React.FC = () => {
       }
       label={displaySectionTitle("Postprocessors")}
       labelPlacement="start"
-    />
-  );
-
-  const displayKeywordArguments = (
-    name: string,
-    kwargs: Record<string, any>
-  ) => (
-    <Box display="grid">
-      <Typography variant="caption">{name}</Typography>
-      <KeyValuePairs>
-        {Object.entries(kwargs).map(([field, value], index) => (
-          <React.Fragment key={index}>
-            <Typography variant="body2">{field}:</Typography>
-            <Tooltip title={value}>
-              <Typography
-                variant="body2"
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                {value}
-              </Typography>
-            </Tooltip>
-          </React.Fragment>
-        ))}
-      </KeyValuePairs>
-    </Box>
-  );
-
-  const displayArgumentsList = (name: string, args: any[]) => (
-    <Box display="grid">
-      <Typography variant="caption">{name}</Typography>
-      {args.map((value, index) => (
-        <Typography
-          key={index}
-          variant="body2"
-          whiteSpace="nowrap"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {value}
-        </Typography>
-      ))}
-    </Box>
-  );
-
-  const displayReadonlyFields = (label: string, value: string | null) => (
-    <TextField
-      size="small"
-      variant="standard"
-      label={label}
-      value={String(value)}
-      disabled={isError || isFetching}
-      InputProps={{
-        readOnly: true,
-        disableUnderline: true,
-      }}
-      inputProps={{
-        sx: {
-          textOverflow: "ellipsis",
-          ...(value === null && { fontStyle: "italic" }),
-        },
-      }}
-    />
-  );
-
-  const NumberField: React.FC<
-    Omit<TextFieldProps, "onChange"> & {
-      value: number;
-      scale?: number;
-      units?: string;
-      onChange: (newValue: number) => void;
-    }
-  > = ({ value, scale = 1, units, onChange, ...props }) => (
-    <TextField
-      variant="standard"
-      size="small"
-      type="number"
-      className="number"
-      value={value * scale}
-      {...(units && {
-        InputProps: {
-          endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
-        },
-      })}
-      onChange={(event) => onChange(Number(event.target.value) / scale)}
-      {...props}
     />
   );
 
