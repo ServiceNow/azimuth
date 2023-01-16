@@ -60,9 +60,7 @@ def save_config(azimuth_config: AzimuthConfig):
 
 
 def update_config(old_config: AzimuthConfig, partial_config: Dict) -> AzimuthConfig:
-    new_config = old_config.copy(update=partial_config, deep=True)
-    save_config(new_config)
-    return new_config
+    return old_config.copy(update=partial_config, deep=True)
 
 
 def load_dataset_split_managers_from_config(

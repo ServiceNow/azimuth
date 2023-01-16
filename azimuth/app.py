@@ -11,11 +11,11 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
-from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DaskModule
 from azimuth.modules.utilities.validation import ValidationModule
+from azimuth.startup import startup_tasks
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.utils.cluster import default_cluster
@@ -99,7 +99,6 @@ def start_app(config_path, debug=False) -> FastAPI:
     azimuth_config = load_azimuth_config(config_path)
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
-    save_config(azimuth_config)
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
@@ -297,10 +296,12 @@ def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
     task_manager = assert_not_none(get_task_manager())
     # Validate that everything is in order **before** the startup tasks.
     if _dataset_split_managers.get(DatasetSplitName.train):
-        run_validation(DatasetSplitName.train, _task_manager, azimuth_config)
+        run_validation(DatasetSplitName.train, task_manager, azimuth_config)
     if _dataset_split_managers.get(DatasetSplitName.eval):
-        run_validation(DatasetSplitName.eval, _task_manager, azimuth_config)
+        run_validation(DatasetSplitName.eval, task_manager, azimuth_config)
+
+    save_config(azimuth_config)  # Save only after the validation modules ran successfully
 
     global _startup_tasks, _ready_flag
-    _startup_tasks = startup.startup_tasks(_dataset_split_managers, task_manager)
+    _startup_tasks = startup_tasks(_dataset_split_managers, task_manager)
     _ready_flag = Event()
