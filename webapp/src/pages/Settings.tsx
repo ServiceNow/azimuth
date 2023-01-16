@@ -39,17 +39,14 @@ const STEPPER: Record<string, InputBaseComponentProps> = {
   long_sentence_min_word: { min: 0 },
 };
 
-type SubConfigKeys = keyof PickByValue<AzimuthConfig, object>;
+type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
-  dataset_warnings: {
-    max_delta_class_imbalance: 0,
-    max_delta_mean_words: 0,
-    max_delta_representation: 0,
-    max_delta_std_words: 0,
-    min_num_per_class: 0,
+  similarity: {
+    faiss_encoder: "",
+    conflicting_neighbors_threshold: 0.9,
+    no_close_threshold: 0.5,
   },
-  similarity: { conflicting_neighbors_threshold: 0, no_close_threshold: 0 },
   behavioral_testing: {},
 };
 
@@ -98,7 +95,10 @@ const Settings: React.FC = () => {
     Partial<AzimuthConfig>
   >({});
 
-  const resultingConfig = { ...config, ...partialConfig };
+  // If config was undefined, PipelineCheck would not even render the page.
+  if (config === undefined) return null;
+
+  const resultingConfig = Object.assign({}, config, partialConfig);
 
   const displaySectionTitle = (section: string) => (
     <Typography variant="subtitle2" marginY={1.5}>
@@ -120,7 +120,7 @@ const Settings: React.FC = () => {
             setPartialConfig({
               ...partialConfig,
               [field]: checked
-                ? config![field] ?? CONFIG_SUB_FIELDS[field]
+                ? config[field] ?? CONFIG_SUB_FIELDS[field]
                 : null,
             })
           }
@@ -150,7 +150,7 @@ const Settings: React.FC = () => {
                 {
                   ...pipeline,
                   postprocessors: checked
-                    ? config!.pipelines![pipelineIndex].postprocessors ?? []
+                    ? config.pipelines![pipelineIndex].postprocessors ?? []
                     : null,
                 },
                 ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
@@ -190,25 +190,30 @@ const Settings: React.FC = () => {
     </Box>
   );
 
-  const displayReadonlyFields = (label: string, value: string | undefined) => (
+  const displayReadonlyFields = (label: string, value: string | null) => (
     <TextField
       size="small"
       variant="standard"
       label={label}
-      value={value ?? "null"}
+      value={String(value)}
       disabled={isError || isFetching}
       InputProps={{
         readOnly: true,
         disableUnderline: true,
       }}
-      inputProps={{ sx: { textOverflow: "ellipsis" } }}
+      inputProps={{
+        sx: {
+          textOverflow: "ellipsis",
+          ...(value === null && { fontStyle: "italic" }),
+        },
+      }}
     />
   );
 
   const displayNumberField = (
     config: SubConfigKeys,
     field: string,
-    value: number | undefined
+    value: number
   ) => (
     <TextField
       size="small"
@@ -236,7 +241,7 @@ const Settings: React.FC = () => {
     pipeline: PipelineDefinition,
     field: string,
     postprocessorIdx: number,
-    value: number | undefined
+    value: number
   ) => (
     <TextField
       size="small"
@@ -282,9 +287,11 @@ const Settings: React.FC = () => {
             ...resultingConfig.metrics,
             [metricName]: {
               class_name: "datasets.load_metric",
+              args: [],
               kwargs: {
                 path: metricName.toLowerCase(),
               },
+              remote: null,
               additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
                 metricName
               )
@@ -304,36 +311,24 @@ const Settings: React.FC = () => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {resultingConfig.name !== undefined &&
-            displayReadonlyFields("name", resultingConfig.name)}
-          {resultingConfig.rejection_class !== undefined &&
-            displayReadonlyFields(
-              "rejection_class",
-              resultingConfig.rejection_class
-            )}
-          {resultingConfig.columns !== undefined && (
-            <Box display="flex" flexDirection="column">
-              <Typography variant="caption">columns</Typography>
-              <KeyValuePairs>
-                {resultingConfig.columns.text_input !== undefined && (
-                  <>
-                    <Typography variant="body2">text_input:</Typography>
-                    <Typography variant="body2">
-                      {resultingConfig.columns.text_input}
-                    </Typography>
-                  </>
-                )}
-                {resultingConfig.columns.label !== undefined && (
-                  <>
-                    <Typography variant="body2">label:</Typography>
-                    <Typography variant="body2">
-                      {resultingConfig.columns.label}
-                    </Typography>
-                  </>
-                )}
-              </KeyValuePairs>
-            </Box>
+          {displayReadonlyFields("name", resultingConfig.name)}
+          {displayReadonlyFields(
+            "rejection_class",
+            resultingConfig.rejection_class
           )}
+          <Box display="flex" flexDirection="column">
+            <Typography variant="caption">columns</Typography>
+            <KeyValuePairs>
+              <Typography variant="body2">text_input:</Typography>
+              <Typography variant="body2">
+                {resultingConfig.columns.text_input}
+              </Typography>
+              <Typography variant="body2">label:</Typography>
+              <Typography variant="body2">
+                {resultingConfig.columns.label}
+              </Typography>
+            </KeyValuePairs>
+          </Box>
         </Columns>
       </FormGroup>
       {displaySectionTitle("Dataset")}
@@ -341,16 +336,13 @@ const Settings: React.FC = () => {
         <Columns columns={3}>
           {displayReadonlyFields(
             "class_name",
-            resultingConfig.dataset?.class_name
+            resultingConfig.dataset.class_name
           )}
-          {resultingConfig.dataset?.remote !== undefined &&
-            displayReadonlyFields("remote", resultingConfig.dataset.remote)}
-          {resultingConfig.dataset?.kwargs &&
-            Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
-            displayArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
-          {resultingConfig.dataset?.args &&
-            resultingConfig.dataset.args.length > 0 &&
+          {displayReadonlyFields("remote", resultingConfig.dataset.remote)}
+          {resultingConfig.dataset.args.length > 0 &&
             displayArgumentsList("args", resultingConfig.dataset.args)}
+          {Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
+            displayArgumentsList("kwargs", resultingConfig.dataset.kwargs)}
         </Columns>
       </FormGroup>
     </>
@@ -360,55 +352,51 @@ const Settings: React.FC = () => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {resultingConfig.model_contract !== undefined &&
-            displayReadonlyFields(
-              "model_contract",
-              resultingConfig.model_contract
-            )}
-          {resultingConfig.saliency_layer !== undefined &&
-            displayReadonlyFields(
-              "saliency_layer",
-              resultingConfig.saliency_layer
-            )}
-          {resultingConfig.uncertainty && (
-            <Box display="flex" flexDirection="column">
-              <Typography variant="caption">uncertainty</Typography>
-              <KeyValuePairs>
-                {Object.entries(resultingConfig.uncertainty).map(
-                  ([field, value], index) => (
-                    <React.Fragment key={index}>
-                      <Typography variant="body2">{field}:</Typography>
-                      <TextField
-                        size="small"
-                        type="number"
-                        className="number"
-                        value={value}
-                        disabled={!resultingConfig.uncertainty}
-                        inputProps={STEPPER[field]}
-                        variant="standard"
-                        onChange={(event) =>
-                          setPartialConfig({
-                            ...partialConfig,
-                            uncertainty: {
-                              ...resultingConfig.uncertainty,
-                              [field]: Number(event.target.value),
-                            },
-                          })
-                        }
-                      />
-                    </React.Fragment>
-                  )
-                )}
-              </KeyValuePairs>
-            </Box>
+          {displayReadonlyFields(
+            "model_contract",
+            resultingConfig.model_contract
           )}
+          {displayReadonlyFields(
+            "saliency_layer",
+            resultingConfig.saliency_layer
+          )}
+          <Box display="flex" flexDirection="column">
+            <Typography variant="caption">uncertainty</Typography>
+            <KeyValuePairs>
+              {Object.entries(resultingConfig.uncertainty).map(
+                ([field, value], index) => (
+                  <React.Fragment key={index}>
+                    <Typography variant="body2">{field}:</Typography>
+                    <TextField
+                      size="small"
+                      type="number"
+                      className="number"
+                      value={value}
+                      disabled={!resultingConfig.uncertainty}
+                      inputProps={STEPPER[field]}
+                      variant="standard"
+                      onChange={(event) =>
+                        setPartialConfig({
+                          ...partialConfig,
+                          uncertainty: {
+                            ...resultingConfig.uncertainty,
+                            [field]: Number(event.target.value),
+                          },
+                        })
+                      }
+                    />
+                  </React.Fragment>
+                )
+              )}
+            </KeyValuePairs>
+          </Box>
         </Columns>
       </FormGroup>
       {resultingConfig.pipelines && (
         <>
           {displaySectionTitle("Pipelines")}
           <FormGroup sx={{ gap: 2 }}>
-            {resultingConfig.pipelines?.map((pipeline, pipelineIndex) => (
+            {resultingConfig.pipelines.map((pipeline, pipelineIndex) => (
               <Paper
                 key={pipelineIndex}
                 variant="outlined"
@@ -430,14 +418,11 @@ const Settings: React.FC = () => {
                         "class_name",
                         pipeline.model.class_name
                       )}
-                      {pipeline.model.remote &&
-                        displayReadonlyFields("remote", pipeline.model.remote)}
-                      {pipeline.model.kwargs &&
-                        Object.keys(pipeline.model.kwargs).length > 0 &&
-                        displayArgumentsList("kwargs", pipeline.model.kwargs)}
-                      {pipeline.model.args &&
-                        pipeline.model.args.length > 0 &&
+                      {displayReadonlyFields("remote", pipeline.model.remote)}
+                      {pipeline.model.args.length > 0 &&
                         displayArgumentsList("args", pipeline.model.args)}
+                      {Object.keys(pipeline.model.kwargs).length > 0 &&
+                        displayArgumentsList("kwargs", pipeline.model.kwargs)}
                     </Columns>
                   </FormGroup>
                 </FormControl>
@@ -451,7 +436,7 @@ const Settings: React.FC = () => {
                             "class_name",
                             postprocessor.class_name
                           )}
-                          {postprocessor.temperature !== undefined &&
+                          {"temperature" in postprocessor &&
                             displayPostprocessorNumberField(
                               pipelineIndex,
                               pipeline,
@@ -459,7 +444,7 @@ const Settings: React.FC = () => {
                               index,
                               postprocessor.temperature
                             )}
-                          {postprocessor.threshold !== undefined &&
+                          {"threshold" in postprocessor &&
                             displayPostprocessorNumberField(
                               pipelineIndex,
                               pipeline,
@@ -485,7 +470,7 @@ const Settings: React.FC = () => {
             control={
               <Checkbox
                 size="small"
-                checked={Boolean(resultingConfig.metrics?.[metricName])}
+                checked={Boolean(resultingConfig.metrics[metricName])}
                 onChange={(e) =>
                   handleCustomMetricUpdate(e.target.checked, metricName)
                 }

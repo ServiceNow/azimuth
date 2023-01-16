@@ -9,7 +9,7 @@ from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
-from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, validator
+from pydantic import BaseSettings, Extra, Field, root_validator, validator
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
@@ -75,21 +75,42 @@ class AzimuthValidationError(Exception):
     pass
 
 
-# Mypy does not like a variable named kwargs.
-class CustomObject(BaseModel):  # type: ignore
-    class_name: str = Field(..., title="Class name to load.")
+class AzimuthBaseSettings(BaseSettings):
+    class Config:
+        @staticmethod
+        def schema_extra(schema):
+            # For Union types, openapi-typescript understands oneOf better than anyOf.
+            for field in schema["properties"].values():
+                if field.get("type") == "array":
+                    field = field["items"]
+                if "anyOf" in field:
+                    field["oneOf"] = field.pop("anyOf")
+
+            # pydantic considers fields with default values to be optional, but when the API returns
+            # an object, all the default values are set, so the fields are always present.
+            schema["required"] = list(schema["properties"].keys())
+
+
+class CustomObject(AzimuthBaseSettings):
+    class_name: str = Field(
+        ...,
+        title="Class name to load.",
+        description="Name of the function or class that is located in `remote`."
+        "`args` and `kwargs` will be sent to the function/class.",
+    )
     args: List[Any] = []
     kwargs: Dict[str, Any] = {}
     remote: Optional[str] = Field(
         None,
-        description="Relative path to class. `class_name` needs to be accessible from this path.",
+        description="Absolute path to class. `class_name` needs to be accessible from this path.",
+        nullable=True,
     )
 
 
 CustomObject.update_forward_refs()
 
 
-class MetricDefinition(CustomObject):  # type: ignore
+class MetricDefinition(CustomObject):
     additional_kwargs: Dict = Field(
         default_factory=dict,
         title="Additional kwargs",
@@ -97,7 +118,7 @@ class MetricDefinition(CustomObject):  # type: ignore
     )
 
 
-class TemperatureScaling(CustomObject, BaseSettings):
+class TemperatureScaling(CustomObject):
     class_name: Literal[
         "azimuth.utils.ml.postprocessing.TemperatureScaling"
     ] = "azimuth.utils.ml.postprocessing.TemperatureScaling"
@@ -113,7 +134,7 @@ class TemperatureScaling(CustomObject, BaseSettings):
         return values
 
 
-class ThresholdConfig(BaseSettings, CustomObject):
+class ThresholdConfig(CustomObject):
     class_name: Literal[
         "azimuth.utils.ml.postprocessing.Thresholding"
     ] = "azimuth.utils.ml.postprocessing.Thresholding"
@@ -128,8 +149,8 @@ class ThresholdConfig(BaseSettings, CustomObject):
         return values
 
 
-class PipelineDefinition(BaseSettings):
-    name: str = Field(exclude_from_cache=True)
+class PipelineDefinition(AzimuthBaseSettings):
+    name: str = Field(..., exclude_from_cache=True)
     model: CustomObject
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
@@ -159,7 +180,7 @@ class PipelineDefinition(BaseSettings):
         return None
 
 
-class DatasetWarningsOptions(BaseModel):
+class DatasetWarningsOptions(AzimuthBaseSettings):
     min_num_per_class: int = 20
     max_delta_class_imbalance: float = 0.5
     max_delta_representation: float = 0.05
@@ -167,7 +188,7 @@ class DatasetWarningsOptions(BaseModel):
     max_delta_std_words: float = 3.0
 
 
-class SyntaxOptions(BaseModel):
+class SyntaxOptions(AzimuthBaseSettings):
     short_sentence_max_word: int = 3
     long_sentence_min_word: int = 12
     spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
@@ -175,28 +196,29 @@ class SyntaxOptions(BaseModel):
     obj_tags: List[str] = []  # Language-based dynamic default value
 
 
-class NeutralTokenOptions(BaseModel):
+class NeutralTokenOptions(AzimuthBaseSettings):
     threshold: float = 1
     suffix_list: List[str] = []  # Language-based default value
     prefix_list: List[str] = []  # Language-based default value
 
 
-class PunctuationTestOptions(BaseModel):
+class PunctuationTestOptions(AzimuthBaseSettings):
     threshold: float = 1
 
 
-class FuzzyMatchingTestOptions(BaseModel):
+class FuzzyMatchingTestOptions(AzimuthBaseSettings):
     threshold: float = 1
 
 
-class TypoTestOptions(BaseModel):
+class TypoTestOptions(AzimuthBaseSettings):
     threshold: float = 1
     # Ex: if nb_typos_per_utterance = 2, this will create both tests with 1 typo and 2 typos per
     # utterance.
     nb_typos_per_utterance: int = 1
 
 
-class BehavioralTestingOptions(BaseModel):
+# TODO Change to AzimuthBaseSettings once the front end knows the default values.
+class BehavioralTestingOptions(BaseSettings):
     neutral_token: NeutralTokenOptions = NeutralTokenOptions()
     punctuation: PunctuationTestOptions = PunctuationTestOptions()
     fuzzy_matching: FuzzyMatchingTestOptions = FuzzyMatchingTestOptions()
@@ -206,7 +228,7 @@ class BehavioralTestingOptions(BaseModel):
     seed: int = 300
 
 
-class SimilarityOptions(BaseModel):
+class SimilarityOptions(AzimuthBaseSettings):
     faiss_encoder: str = ""  # Language-based dynamic default value
     # Threshold to use when finding conflicting neighbors.
     conflicting_neighbors_threshold: float = 0.9
@@ -214,12 +236,12 @@ class SimilarityOptions(BaseModel):
     no_close_threshold: float = 0.5
 
 
-class UncertaintyOptions(BaseModel):
+class UncertaintyOptions(AzimuthBaseSettings):
     iterations: int = 1  # Number of MC sampling to do. 1 disables BMA.
     high_epistemic_threshold: float = 0.1  # Threshold to determine high epistemic items.
 
 
-class ColumnConfiguration(BaseModel):
+class ColumnConfiguration(AzimuthBaseSettings):
     # Column for the preprocessed text input
     text_input: str = "utterance"
     # Column for the raw text input
@@ -232,9 +254,9 @@ class ColumnConfiguration(BaseModel):
     persistent_id: str = DatasetColumn.row_idx
 
 
-class ProjectConfig(BaseSettings):
+class ProjectConfig(AzimuthBaseSettings):
     # Name of the current project.
-    name: str = Field("New project", env="NAME", exclude_from_cache=True)
+    name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
     dataset: CustomObject
     # Which model_contract the application is using.
@@ -242,7 +264,7 @@ class ProjectConfig(BaseSettings):
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
-    rejection_class: Optional[str] = "REJECTION_CLASS"
+    rejection_class: Optional[str] = Field("REJECTION_CLASS", nullable=True)
 
     def copy(self: T, *, validate: bool = True, **kwargs: Any) -> T:
         copy: T = super().copy(**kwargs)
@@ -276,7 +298,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # For bigger models, large might be needed.
     large_dask_cluster: bool = Field(False, exclude_from_cache=True)
     # Disable configuration changes
-    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG", exclude_from_cache=True)
+    read_only_config: bool = Field(False, exclude_from_cache=True)
 
     def get_artifact_path(self) -> str:
         """Generate a path for caching.
@@ -294,11 +316,11 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
 
 class ModelContractConfig(CommonFieldsConfig):
     # Model object definition.
-    pipelines: Optional[List[PipelineDefinition]] = None
+    pipelines: Optional[List[PipelineDefinition]] = Field(None, nullable=True)
     # Uncertainty configuration
     uncertainty: UncertaintyOptions = UncertaintyOptions()
     # Layer name where to calculate the gradients, normally the word embeddings layer.
-    saliency_layer: Optional[str] = None
+    saliency_layer: Optional[str] = Field(None, nullable=True)
 
     @validator("pipelines", pre=True)
     def check_pipeline_names(cls, pipeline_definitions):
@@ -352,13 +374,13 @@ class LanguageConfig(CommonFieldsConfig):
 class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
     behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
+        BehavioralTestingOptions(), nullable=True
     )
 
 
 class SimilarityConfig(CommonFieldsConfig):
     # Similarity configuration to define the encoder and the similarity threshold.
-    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
+    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), nullable=True)
 
 
 class DatasetWarningConfig(CommonFieldsConfig):

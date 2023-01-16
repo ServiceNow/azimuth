@@ -156,5 +156,5 @@ def test_perturbed_utterances(app: FastAPI, monkeypatch):
     resp = client.get(
         "/dataset_splits/eval/utterances/1/perturbed_utterances?pipeline_index=0"
     ).json()
-    # Utterance 1 has 15 perturbation tests
-    assert len(resp) == 15
+    # Utterance 1 has 11 perturbation tests
+    assert len(resp) == 11

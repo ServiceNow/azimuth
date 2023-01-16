@@ -12,8 +12,8 @@ def test_get_config(app: FastAPI):
         "behavioral_testing": {
             "fuzzy_matching": {"threshold": 1.0},
             "neutral_token": {
-                "prefix_list": ["pls", "please", "hello", "greetings"],
-                "suffix_list": ["pls", "please", "thank you", "appreciated"],
+                "prefix_list": ["pls", "hello"],
+                "suffix_list": ["pls", "thanks"],
                 "threshold": 1.0,
             },
             "punctuation": {"threshold": 1.0},

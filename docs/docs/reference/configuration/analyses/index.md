@@ -7,14 +7,11 @@ different attributes that can be defined.
 
     ```python
     class PerturbationTestingConfig(ModelContractConfig):
-        behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-            BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
-        )
+        behavioral_testing: Optional[BehavioralTestingOptions] = BehavioralTestingOptions()
 
 
     class SimilarityConfig(CommonFieldsConfig):
-        similarity: Optional[SimilarityOptions] = Field(
-            SimilarityOptions(), env="SIMILARITY")
+        similarity: Optional[SimilarityOptions] = SimilarityOptions()
 
 
     class DatasetWarningConfig(CommonFieldsConfig):

@@ -104,7 +104,7 @@ launched without any pipeline.
         model: CustomObject # (2)
         postprocessors: Optional[ # (3)
             List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
-        ] = Field([ThresholdConfig(threshold=0.5)], nullable=True)
+        ] = [ThresholdConfig(threshold=0.5)]
     ```
 
     1. Add a name to the pipeline to easily recognize it from the webapp.
