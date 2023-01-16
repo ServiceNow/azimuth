@@ -26,37 +26,30 @@ import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 
-const STEPPER: Record<string, InputBaseComponentProps> = {
-  iterations: { min: 0 },
-  high_epistemic_threshold: { min: 0, max: 100, step: 10 },
-  conflicting_neighbors_threshold: { min: 0, max: 100, step: 10 },
-  no_close_threshold: { min: 0, max: 100, step: 10 },
-  min_num_per_class: { min: 0 },
-  max_delta_class_imbalance: { min: 0, max: 100, step: 10 },
-  max_delta_representation: { min: 0, max: 100, step: 1 },
-  max_delta_mean_tokens: { min: 0, step: 0.1 },
-  max_delta_std_tokens: { min: 0, step: 0.1 },
-  short_sentence_max_token: { min: 0 },
-  long_sentence_min_token: { min: 0 },
+const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
+const INT = { scale: 1, units: "", inputProps: { min: 0 } };
+const FLOAT = { scale: 1, units: "", inputProps: { min: 0, step: 0.1 } };
+
+const FIELDS: Record<
+  string,
+  { scale: number; units: string; inputProps: InputBaseComponentProps }
+> = {
+  iterations: INT,
+  high_epistemic_threshold: PERCENTAGE,
+  conflicting_neighbors_threshold: PERCENTAGE,
+  no_close_threshold: PERCENTAGE,
+  min_num_per_class: { ...INT, units: "samples" },
+  max_delta_class_imbalance: PERCENTAGE,
+  max_delta_representation: PERCENTAGE,
+  max_delta_mean_words: { ...FLOAT, units: "words" },
+  max_delta_std_words: { ...FLOAT, units: "words" },
+  short_sentence_max_word: { ...INT, units: "words" },
+  long_sentence_min_word: { ...INT, units: "words" },
+  temperature: FLOAT,
+  threshold: PERCENTAGE,
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
-
-const UNITS: Record<string, string> = {
-  max_delta_class_imbalance: "%",
-  max_delta_mean_tokens: "tokens",
-  max_delta_representation: "%",
-  max_delta_std_tokens: "tokens",
-  min_num_per_class: "samples",
-  short_sentence_max_token: "tokens",
-  long_sentence_min_token: "tokens",
-  conflicting_neighbors_threshold: "%",
-  no_close_threshold: "%",
-  iterations: "tokens",
-  high_epistemic_threshold: "%",
-  temperature: "%",
-  threshold: "%",
-};
 
 const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
   similarity: {
@@ -69,13 +62,7 @@ const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
-const CONFIG_RATIO_FIELDS = [
-  "high_epistemic_threshold",
-  "conflicting_neighbors_threshold",
-  "no_close_threshold",
-  "max_delta_class_imbalance",
-  "max_delta_representation",
-];
+
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -84,13 +71,6 @@ const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "pipelines",
   "uncertainty",
   "metrics",
-];
-
-const ANALYSES_CUSTOMIZATION_IGNORE_FIELDS: string[] = [
-  "spacy_model",
-  "subj_tags",
-  "obj_tags",
-  "faiss_encoder",
 ];
 
 const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
@@ -260,11 +240,11 @@ const Settings: React.FC = () => {
       label={field}
       type="number"
       className="number"
-      value={CONFIG_RATIO_FIELDS.includes(field) ? value * 100 : value}
-      inputProps={STEPPER[field]}
+      value={value * FIELDS[field].scale}
+      inputProps={FIELDS[field].inputProps}
       InputProps={{
         endAdornment: (
-          <InputAdornment position="end">{UNITS[field]}</InputAdornment>
+          <InputAdornment position="end">{FIELDS[field].units}</InputAdornment>
         ),
       }}
       disabled={!resultingConfig[config]}
@@ -274,9 +254,7 @@ const Settings: React.FC = () => {
           ...partialConfig,
           [config]: {
             ...resultingConfig[config],
-            [field]: CONFIG_RATIO_FIELDS.includes(field)
-              ? Number(event.target.value) / 100
-              : Number(event.target.value),
+            [field]: Number(event.target.value) / FIELDS[field].scale,
           },
         })
       }
@@ -295,15 +273,11 @@ const Settings: React.FC = () => {
       label={field}
       type="number"
       className="number"
-      value={value * 100}
-      inputProps={{
-        min: 0,
-        max: 1,
-        step: 0.1,
-      }}
+      value={value * FIELDS[field].scale}
+      inputProps={FIELDS[field].inputProps}
       InputProps={{
         endAdornment: (
-          <InputAdornment position="end">{UNITS[field]}</InputAdornment>
+          <InputAdornment position="end">{FIELDS[field].units}</InputAdornment>
         ),
       }}
       variant="standard"
@@ -318,8 +292,10 @@ const Settings: React.FC = () => {
                 ...pipeline.postprocessors!.slice(0, postprocessorIdx),
                 {
                   ...pipeline.postprocessors![postprocessorIdx],
-                  [field]: Number(event.target.value) / 100,
-                  kwargs: { [field]: Number(event.target.value) / 100 },
+                  [field]: Number(event.target.value) / FIELDS[field].scale,
+                  kwargs: {
+                    [field]: Number(event.target.value) / FIELDS[field].scale,
+                  },
                 },
                 ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
               ],
@@ -423,17 +399,13 @@ const Settings: React.FC = () => {
                       size="small"
                       type="number"
                       className="number"
-                      value={
-                        CONFIG_RATIO_FIELDS.includes(field)
-                          ? value * 100
-                          : value
-                      }
+                      value={value * FIELDS[field].scale}
                       disabled={!resultingConfig.uncertainty}
-                      inputProps={STEPPER[field]}
+                      inputProps={FIELDS[field].inputProps}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            {UNITS[field]}
+                            {FIELDS[field].units}
                           </InputAdornment>
                         ),
                       }}
@@ -443,9 +415,8 @@ const Settings: React.FC = () => {
                           ...partialConfig,
                           uncertainty: {
                             ...resultingConfig.uncertainty,
-                            [field]: CONFIG_RATIO_FIELDS.includes(field)
-                              ? Number(event.target.value) / 100
-                              : Number(event.target.value),
+                            [field]:
+                              Number(event.target.value) / FIELDS[field].scale,
                           },
                         })
                       }
@@ -558,7 +529,7 @@ const Settings: React.FC = () => {
           resultingConfig[config] ?? CONFIG_SUB_FIELDS[config] ?? {}
         ).map(
           ([field, value]) =>
-            !ANALYSES_CUSTOMIZATION_IGNORE_FIELDS.includes(field) && (
+            field in FIELDS && (
               <React.Fragment key={field}>
                 {displayNumberField(config, field, value)}
               </React.Fragment>
