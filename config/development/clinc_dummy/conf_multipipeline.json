@@ -22,7 +22,10 @@
       },
       "postprocessors": [
         {
-          "threshold": 0.7
+          "threshold": 0.3
+        },
+        {
+          "temperature": 0.8
         }
       ]
     }
