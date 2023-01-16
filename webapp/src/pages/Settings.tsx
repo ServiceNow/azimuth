@@ -260,9 +260,7 @@ const Settings: React.FC = () => {
       label={field}
       type="number"
       className="number"
-      value={
-        value ? (CONFIG_RATIO_FIELDS.includes(field) ? value * 100 : value) : 0
-      }
+      value={CONFIG_RATIO_FIELDS.includes(field) ? value * 100 : value}
       inputProps={STEPPER[field]}
       InputProps={{
         endAdornment: (
@@ -297,7 +295,7 @@ const Settings: React.FC = () => {
       label={field}
       type="number"
       className="number"
-      value={value ? value * 100 : 0}
+      value={value * 100}
       inputProps={{
         min: 0,
         max: 1,
