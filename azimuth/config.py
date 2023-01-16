@@ -150,7 +150,7 @@ class ThresholdConfig(CustomObject):
 
 
 class PipelineDefinition(AzimuthBaseSettings):
-    name: str = Field(exclude_from_cache=True)
+    name: str = Field(..., exclude_from_cache=True)
     model: CustomObject
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
