@@ -10,7 +10,10 @@ from starlette.testclient import TestClient
 def test_post_tags(app: FastAPI) -> None:
     client = TestClient(app)
 
-    request = {"data_actions": {0: {"remove": True, "NO_ACTION": False}}}
+    request = {
+        "datasetSplitName": "eval",
+        "data_actions": {0: {"remove": True, "NO_ACTION": False}},
+    }
     resp = client.post("/tags", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()
@@ -28,7 +31,10 @@ def test_post_tags(app: FastAPI) -> None:
     }
 
     # Reset tag to NO_ACTION
-    request = {"data_actions": {0: {"remove": False, "NO_ACTION": True}}}
+    request = {
+        "datasetSplitName": "eval",
+        "data_actions": {0: {"remove": False, "NO_ACTION": True}},
+    }
     resp = client.post("/tags", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
     data = resp.json()

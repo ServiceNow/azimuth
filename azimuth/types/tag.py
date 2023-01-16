@@ -139,7 +139,7 @@ class DataActionResponse(AliasModel):
 
 
 class PostDataActionRequest(AliasModel):
-    dataset_split_name: DatasetSplitName = Field(DatasetSplitName.eval, title="Dataset Split Name")
+    dataset_split_name: DatasetSplitName = Field(..., title="Dataset Split Name")
     data_actions: Dict[int, Dict[str, bool]] = Field(..., title="Data action tags")
 
     class Config:

@@ -34,7 +34,7 @@ _SAMPLE_DATA_DIR = _CURRENT_DIR / "fixtures"
 _SAMPLE_VOCAB_DIR = _SAMPLE_DATA_DIR / "distilbert-tokenizer-files"
 _CHECKPOINT_PATH = str(_SAMPLE_VOCAB_DIR)
 SIMPLE_PERTURBATION_TESTING_CONFIG = BehavioralTestingOptions(
-    neutral_suffix=NeutralTokenOptions(suffix_list=["pls", "thanks"], prefix_list=["pls", "hello"]),
+    neutral_token=NeutralTokenOptions(suffix_list=["pls", "thanks"], prefix_list=["pls", "hello"]),
     typo=TypoTestOptions(threshold=0.005),
 )
 

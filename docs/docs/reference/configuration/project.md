@@ -13,7 +13,7 @@ Azimuth and details about the way it is handled by the app.
     from azimuth.config import ColumnConfiguration, CustomObject
 
     class ProjectConfig(BaseSettings):
-        name: str = Field("New project", env="NAME")
+        name: str = "New project"
         dataset: CustomObject
         columns: ColumnConfiguration = ColumnConfiguration()
         rejection_class: Optional[str] = "REJECTION_CLASS"
@@ -67,13 +67,14 @@ explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
     from pydantic import BaseModel, Field
 
     class CustomObject(BaseModel):
-        class_name: str = Field(..., title="Class name to load")
+        class_name: str # (1)
         args: List[Union["CustomObject", Any]] = []
         kwargs: Dict[str, Union["CustomObject", Any]] = {}
-        remote: Optional[str] = None # (1)
+        remote: Optional[str] = None # (2)
     ```
 
-    1. Absolute path to `class_name`.
+    1. Name of the function or class that is located in `remote`. `args` and `kwargs` will be sent to the function/class.
+    2. Absolute path to class. `class_name` needs to be accessible from this path.
 
 === "Config Example with HF"
 
