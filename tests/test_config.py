@@ -146,20 +146,18 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
     save_config(new_config)
 
     with jsonlines.open(f"{new_config.artifact_path}/configs.jsonl", "r") as reader:
-        all_configs = [config for config in reader]
+        all_configs = list(reader)
     assert len(all_configs) == 1
-    loaded_config = all_configs[0]
-    assert loaded_config == new_config
+    assert all_configs[0] == new_config
 
     # Changing config for a second time
-    partial_config_2 = {"dataset_warnings": {"min_num_per_class": 40}}
-    new_config_2 = update_config(new_config, partial_config_2)
-    assert new_config_2.dataset_warnings.min_num_per_class == 40
-    save_config(new_config_2)
+    partial_config = {"dataset_warnings": {"min_num_per_class": 40}}
+    new_config = update_config(new_config, partial_config)
+    assert new_config.dataset_warnings.min_num_per_class == 40
+    save_config(new_config)
 
-    with jsonlines.open(f"{new_config_2.artifact_path}/configs.jsonl", "r") as reader:
-        all_configs_2 = [config for config in reader]
+    with jsonlines.open(f"{new_config.artifact_path}/configs.jsonl", "r") as reader:
+        all_configs = list(reader)
 
-    assert len(all_configs_2) == 2
-    loaded_config_2 = all_configs_2[-1]
-    assert loaded_config_2 == new_config_2
+    assert len(all_configs) == 2
+    assert all_configs[-1] == new_config
