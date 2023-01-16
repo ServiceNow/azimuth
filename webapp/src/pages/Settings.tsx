@@ -15,6 +15,7 @@ import {
   inputLabelClasses,
   Paper,
   TextField,
+  TextFieldProps,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -27,12 +28,12 @@ import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
-const INT = { scale: 1, units: "", inputProps: { min: 0 } };
-const FLOAT = { scale: 1, units: "", inputProps: { min: 0, step: 0.1 } };
+const INT = { inputProps: { min: 0 } };
+const FLOAT = { inputProps: { min: 0, step: 0.1 } };
 
 const FIELDS: Record<
   string,
-  { scale: number; units: string; inputProps: InputBaseComponentProps }
+  { scale?: number; units?: string; inputProps: InputBaseComponentProps }
 > = {
   iterations: INT,
   high_epistemic_threshold: PERCENTAGE,
@@ -230,34 +231,27 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displayNumberField = (
-    config: SubConfigKeys,
-    field: string,
-    value: number
-  ) => (
+  const NumberField: React.FC<
+    Omit<TextFieldProps, "onChange"> & {
+      value: number;
+      scale?: number;
+      units?: string;
+      onChange: (newValue: number) => void;
+    }
+  > = ({ value, scale = 1, units, onChange, ...props }) => (
     <TextField
+      variant="standard"
       size="small"
-      label={field}
       type="number"
       className="number"
-      value={value * FIELDS[field].scale}
-      inputProps={FIELDS[field].inputProps}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">{FIELDS[field].units}</InputAdornment>
-        ),
-      }}
-      disabled={!resultingConfig[config]}
-      variant="standard"
-      onChange={(event) =>
-        setPartialConfig({
-          ...partialConfig,
-          [config]: {
-            ...resultingConfig[config],
-            [field]: Number(event.target.value) / FIELDS[field].scale,
-          },
-        })
-      }
+      value={value * scale}
+      {...(units && {
+        InputProps: {
+          endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
+        },
+      })}
+      onChange={(event) => onChange(Number(event.target.value) / scale)}
+      {...props}
     />
   );
 
@@ -268,20 +262,10 @@ const Settings: React.FC = () => {
     postprocessorIdx: number,
     value: number
   ) => (
-    <TextField
-      size="small"
+    <NumberField
       label={field}
-      type="number"
-      className="number"
-      value={value * FIELDS[field].scale}
-      inputProps={FIELDS[field].inputProps}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">{FIELDS[field].units}</InputAdornment>
-        ),
-      }}
-      variant="standard"
-      onChange={(event) =>
+      value={value}
+      onChange={(newValue) =>
         setPartialConfig({
           ...partialConfig,
           pipelines: [
@@ -292,10 +276,8 @@ const Settings: React.FC = () => {
                 ...pipeline.postprocessors!.slice(0, postprocessorIdx),
                 {
                   ...pipeline.postprocessors![postprocessorIdx],
-                  [field]: Number(event.target.value) / FIELDS[field].scale,
-                  kwargs: {
-                    [field]: Number(event.target.value) / FIELDS[field].scale,
-                  },
+                  [field]: newValue,
+                  kwargs: { [field]: newValue },
                 },
                 ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
               ],
@@ -304,14 +286,15 @@ const Settings: React.FC = () => {
           ],
         })
       }
+      {...FIELDS[field]}
     />
   );
 
   const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
-    checked
-      ? setPartialConfig({
-          ...partialConfig,
-          metrics: {
+    setPartialConfig({
+      ...partialConfig,
+      metrics: checked
+        ? {
             ...resultingConfig.metrics,
             [metricName]: {
               class_name: "datasets.load_metric",
@@ -326,12 +309,9 @@ const Settings: React.FC = () => {
                 ? { average: "weighted" }
                 : {},
             },
-          },
-        })
-      : setPartialConfig({
-          ...partialConfig,
-          metrics: _.omit(resultingConfig.metrics, metricName),
-        });
+          }
+        : _.omit(resultingConfig.metrics, metricName),
+    });
   };
 
   const getProjectConfigSection = () => (
@@ -395,31 +375,19 @@ const Settings: React.FC = () => {
                 ([field, value], index) => (
                   <React.Fragment key={index}>
                     <Typography variant="body2">{field}:</Typography>
-                    <TextField
-                      size="small"
-                      type="number"
-                      className="number"
-                      value={value * FIELDS[field].scale}
+                    <NumberField
+                      value={value}
                       disabled={!resultingConfig.uncertainty}
-                      inputProps={FIELDS[field].inputProps}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {FIELDS[field].units}
-                          </InputAdornment>
-                        ),
-                      }}
-                      variant="standard"
-                      onChange={(event) =>
+                      onChange={(newValue) =>
                         setPartialConfig({
                           ...partialConfig,
                           uncertainty: {
                             ...resultingConfig.uncertainty,
-                            [field]:
-                              Number(event.target.value) / FIELDS[field].scale,
+                            [field]: newValue,
                           },
                         })
                       }
+                      {...FIELDS[field]}
                     />
                   </React.Fragment>
                 )
@@ -530,9 +498,19 @@ const Settings: React.FC = () => {
         ).map(
           ([field, value]) =>
             field in FIELDS && (
-              <React.Fragment key={field}>
-                {displayNumberField(config, field, value)}
-              </React.Fragment>
+              <NumberField
+                key={field}
+                label={field}
+                value={value}
+                disabled={!resultingConfig[config]}
+                onChange={(newValue) =>
+                  setPartialConfig({
+                    ...partialConfig,
+                    [config]: { ...resultingConfig[config], [field]: newValue },
+                  })
+                }
+                {...FIELDS[field]}
+              />
             )
         )}
       </Columns>
