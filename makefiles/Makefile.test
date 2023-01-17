@@ -29,6 +29,7 @@ mypy:
 
 
 unit-test:
+	rm -rf /tmp/azimuth_test_cache
 	poetry run pytest tests --durations 5 --cov azimuth --cov-config=tests/.coveragerc
 
 test-doc:

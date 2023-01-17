@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from jsonlines import jsonlines
 from starlette.testclient import TestClient
 
 
@@ -111,14 +112,25 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     initial_config = client.get("/admin/config").json()
     initial_contract = initial_config["model_contract"]
     initial_pipelines = initial_config["pipelines"]
+    jsonl_file_path = f"{initial_config['artifact_path']}/config_history.jsonl"
+
     res = client.patch(
         "/admin/config",
         json={"model_contract": "file_based_text_classification", "pipelines": None},
     )
     assert res.json()["model_contract"] == "file_based_text_classification"
+    with jsonlines.open(jsonl_file_path, "r") as reader:
+        loaded_configs = list(reader)
+    assert len(loaded_configs) == 2, "Config have been modified once."
+    assert loaded_configs[-1]["model_contract"] == "file_based_text_classification"
+    assert not loaded_configs[-1]["pipelines"]
 
     res = client.patch("/admin/config", json={"model_contract": "potato"})
     assert res.status_code == 400
+    with jsonlines.open(jsonl_file_path, "r") as reader:
+        loaded_configs = list(reader)
+    assert len(loaded_configs) == 2, "The invalid config should not be saved."
+    assert loaded_configs[-1]["model_contract"] == "file_based_text_classification"
 
     # Revert config change
     _ = client.patch(
