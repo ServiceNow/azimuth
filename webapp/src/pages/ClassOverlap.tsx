@@ -241,6 +241,7 @@ const ClassOverlap = () => {
                 <TextField
                   size="small"
                   type="number"
+                  title="" // Overwrite any default input validation tooltip
                   value={overlapThreshold ?? data.defaultOverlapThreshold}
                   inputProps={OVERLAP_THRESHOLD_INPUT_PROPS}
                   onChange={({ target: { value } }) => {

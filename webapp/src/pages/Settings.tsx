@@ -164,6 +164,7 @@ const NumberField: React.FC<
     size="small"
     type="number"
     className="number"
+    title="" // Overwrite any default input validation tooltip
     value={value * scale}
     {...(units && {
       InputProps: {
