@@ -9,11 +9,13 @@ import {
   FormGroup,
   formGroupClasses,
   FormHelperText,
+  InputAdornment,
   InputBaseComponentProps,
   inputClasses,
   inputLabelClasses,
   Paper,
   TextField,
+  TextFieldProps,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -25,18 +27,28 @@ import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 
-const STEPPER: Record<string, InputBaseComponentProps> = {
-  iterations: { min: 0 },
-  high_epistemic_threshold: { min: 0, max: 1, step: 0.1 },
-  conflicting_neighbors_threshold: { min: 0, max: 1, step: 0.1 },
-  no_close_threshold: { min: 0, max: 1, step: 0.1 },
-  min_num_per_class: { min: 0 },
-  max_delta_class_imbalance: { min: 0, max: 1, step: 0.1 },
-  max_delta_representation: { min: 0, max: 1, step: 0.01 },
-  max_delta_mean_words: { min: 0, step: 0.1 },
-  max_delta_std_words: { min: 0, step: 0.1 },
-  short_sentence_max_word: { min: 0 },
-  long_sentence_min_word: { min: 0 },
+const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
+const INT = { inputProps: { min: 0 } };
+const FLOAT = { inputProps: { min: 0, step: 0.1 } };
+const COSINE_SIMILARITY = { inputProps: { min: -1, max: 1, step: 0.1 } };
+
+const FIELDS: Record<
+  string,
+  { scale?: number; units?: string; inputProps: InputBaseComponentProps }
+> = {
+  iterations: INT,
+  high_epistemic_threshold: FLOAT,
+  conflicting_neighbors_threshold: PERCENTAGE,
+  no_close_threshold: COSINE_SIMILARITY,
+  min_num_per_class: { ...INT, units: "samples" },
+  max_delta_class_imbalance: PERCENTAGE,
+  max_delta_representation: PERCENTAGE,
+  max_delta_mean_words: { ...FLOAT, units: "words" },
+  max_delta_std_words: { ...FLOAT, units: "words" },
+  short_sentence_max_word: { ...INT, units: "words" },
+  long_sentence_min_word: { ...INT, units: "words" },
+  temperature: FLOAT,
+  threshold: PERCENTAGE,
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
@@ -63,17 +75,16 @@ const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "metrics",
 ];
 
-const ANALYSES_CUSTOMIZATION_IGNORE_FIELDS: string[] = [
-  "spacy_model",
-  "subj_tags",
-  "obj_tags",
-  "faiss_encoder",
-];
-
 const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
   <Box display="grid" gap={2} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
     {children}
   </Box>
+);
+
+const displaySectionTitle = (section: string) => (
+  <Typography variant="subtitle2" marginY={1.5}>
+    {section}
+  </Typography>
 );
 
 const KeyValuePairs: React.FC = ({ children }) => (
@@ -82,13 +93,93 @@ const KeyValuePairs: React.FC = ({ children }) => (
   </Box>
 );
 
+const displayKeywordArguments = (name: string, kwargs: Record<string, any>) => (
+  <Box display="grid">
+    <Typography variant="caption">{name}</Typography>
+    <KeyValuePairs>
+      {Object.entries(kwargs).map(([field, value], index) => (
+        <React.Fragment key={index}>
+          <Typography variant="body2">{field}:</Typography>
+          <Tooltip title={value}>
+            <Typography
+              variant="body2"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
+              {value}
+            </Typography>
+          </Tooltip>
+        </React.Fragment>
+      ))}
+    </KeyValuePairs>
+  </Box>
+);
+
+const displayArgumentsList = (name: string, args: any[]) => (
+  <Box display="grid">
+    <Typography variant="caption">{name}</Typography>
+    {args.map((value, index) => (
+      <Typography
+        key={index}
+        variant="body2"
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+      >
+        {value}
+      </Typography>
+    ))}
+  </Box>
+);
+
+const displayReadonlyFields = (label: string, value: string | null) => (
+  <TextField
+    size="small"
+    variant="standard"
+    label={label}
+    value={String(value)}
+    InputProps={{
+      readOnly: true,
+      disableUnderline: true,
+    }}
+    inputProps={{
+      sx: {
+        textOverflow: "ellipsis",
+        ...(value === null && { fontStyle: "italic" }),
+      },
+    }}
+  />
+);
+
+const NumberField: React.FC<
+  Omit<TextFieldProps, "onChange"> & {
+    value: number;
+    scale?: number;
+    units?: string;
+    onChange: (newValue: number) => void;
+  }
+> = ({ value, scale = 1, units, onChange, ...props }) => (
+  <TextField
+    variant="standard"
+    size="small"
+    type="number"
+    className="number"
+    title="" // Overwrite any default input validation tooltip
+    value={value * scale}
+    {...(units && {
+      InputProps: {
+        endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
+      },
+    })}
+    onChange={(event) => onChange(Number(event.target.value) / scale)}
+    {...props}
+  />
+);
+
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
-  const {
-    data: config,
-    isError,
-    isFetching,
-  } = getConfigEndpoint.useQuery({ jobId });
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig] = updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
@@ -100,12 +191,6 @@ const Settings: React.FC = () => {
 
   const resultingConfig = Object.assign({}, config, partialConfig);
 
-  const displaySectionTitle = (section: string) => (
-    <Typography variant="subtitle2" marginY={1.5}>
-      {section}
-    </Typography>
-  );
-
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
     section: string = field
@@ -115,7 +200,6 @@ const Settings: React.FC = () => {
         <Checkbox
           size="small"
           checked={Boolean(resultingConfig[field])}
-          disabled={isError || isFetching}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -140,7 +224,6 @@ const Settings: React.FC = () => {
         <Checkbox
           size="small"
           checked={Boolean(pipeline.postprocessors)}
-          disabled={isError || isFetching}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -164,95 +247,6 @@ const Settings: React.FC = () => {
     />
   );
 
-  const displayKeywordArguments = (
-    name: string,
-    kwargs: Record<string, any>
-  ) => (
-    <Box display="grid">
-      <Typography variant="caption">{name}</Typography>
-      <KeyValuePairs>
-        {Object.entries(kwargs).map(([field, value], index) => (
-          <React.Fragment key={index}>
-            <Typography variant="body2">{field}:</Typography>
-            <Tooltip title={value}>
-              <Typography
-                variant="body2"
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                {value}
-              </Typography>
-            </Tooltip>
-          </React.Fragment>
-        ))}
-      </KeyValuePairs>
-    </Box>
-  );
-
-  const displayArgumentsList = (name: string, args: any[]) => (
-    <Box display="grid">
-      <Typography variant="caption">{name}</Typography>
-      {args.map((value, index) => (
-        <Typography
-          key={index}
-          variant="body2"
-          whiteSpace="nowrap"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {value}
-        </Typography>
-      ))}
-    </Box>
-  );
-
-  const displayReadonlyFields = (label: string, value: string | null) => (
-    <TextField
-      size="small"
-      variant="standard"
-      label={label}
-      value={String(value)}
-      disabled={isError || isFetching}
-      InputProps={{
-        readOnly: true,
-        disableUnderline: true,
-      }}
-      inputProps={{
-        sx: {
-          textOverflow: "ellipsis",
-          ...(value === null && { fontStyle: "italic" }),
-        },
-      }}
-    />
-  );
-
-  const displayNumberField = (
-    config: SubConfigKeys,
-    field: string,
-    value: number
-  ) => (
-    <TextField
-      size="small"
-      label={field}
-      type="number"
-      className="number"
-      value={value}
-      inputProps={STEPPER[field]}
-      disabled={!resultingConfig[config]}
-      variant="standard"
-      onChange={(event) =>
-        setPartialConfig({
-          ...partialConfig,
-          [config]: {
-            ...resultingConfig[config],
-            [field]: Number(event.target.value),
-          },
-        })
-      }
-    />
-  );
-
   const displayPostprocessorNumberField = (
     pipelineIndex: number,
     pipeline: PipelineDefinition,
@@ -260,19 +254,10 @@ const Settings: React.FC = () => {
     postprocessorIdx: number,
     value: number
   ) => (
-    <TextField
-      size="small"
+    <NumberField
       label={field}
-      type="number"
-      className="number"
       value={value}
-      inputProps={{
-        min: 0,
-        max: 1,
-        step: 0.1,
-      }}
-      variant="standard"
-      onChange={(event) =>
+      onChange={(newValue) =>
         setPartialConfig({
           ...partialConfig,
           pipelines: [
@@ -283,8 +268,8 @@ const Settings: React.FC = () => {
                 ...pipeline.postprocessors!.slice(0, postprocessorIdx),
                 {
                   ...pipeline.postprocessors![postprocessorIdx],
-                  [field]: Number(event.target.value),
-                  kwargs: { [field]: Number(event.target.value) },
+                  [field]: newValue,
+                  kwargs: { [field]: newValue },
                 },
                 ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
               ],
@@ -293,14 +278,15 @@ const Settings: React.FC = () => {
           ],
         })
       }
+      {...FIELDS[field]}
     />
   );
 
   const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
-    checked
-      ? setPartialConfig({
-          ...partialConfig,
-          metrics: {
+    setPartialConfig({
+      ...partialConfig,
+      metrics: checked
+        ? {
             ...resultingConfig.metrics,
             [metricName]: {
               class_name: "datasets.load_metric",
@@ -315,12 +301,9 @@ const Settings: React.FC = () => {
                 ? { average: "weighted" }
                 : {},
             },
-          },
-        })
-      : setPartialConfig({
-          ...partialConfig,
-          metrics: _.omit(resultingConfig.metrics, metricName),
-        });
+          }
+        : _.omit(resultingConfig.metrics, metricName),
+    });
   };
 
   const getProjectConfigSection = () => (
@@ -384,23 +367,19 @@ const Settings: React.FC = () => {
                 ([field, value], index) => (
                   <React.Fragment key={index}>
                     <Typography variant="body2">{field}:</Typography>
-                    <TextField
-                      size="small"
-                      type="number"
-                      className="number"
+                    <NumberField
                       value={value}
                       disabled={!resultingConfig.uncertainty}
-                      inputProps={STEPPER[field]}
-                      variant="standard"
-                      onChange={(event) =>
+                      onChange={(newValue) =>
                         setPartialConfig({
                           ...partialConfig,
                           uncertainty: {
                             ...resultingConfig.uncertainty,
-                            [field]: Number(event.target.value),
+                            [field]: newValue,
                           },
                         })
                       }
+                      {...FIELDS[field]}
                     />
                   </React.Fragment>
                 )
@@ -510,10 +489,20 @@ const Settings: React.FC = () => {
           resultingConfig[config] ?? CONFIG_SUB_FIELDS[config] ?? {}
         ).map(
           ([field, value]) =>
-            !ANALYSES_CUSTOMIZATION_IGNORE_FIELDS.includes(field) && (
-              <React.Fragment key={field}>
-                {displayNumberField(config, field, value)}
-              </React.Fragment>
+            field in FIELDS && (
+              <NumberField
+                key={field}
+                label={field}
+                value={value}
+                disabled={!resultingConfig[config]}
+                onChange={(newValue) =>
+                  setPartialConfig({
+                    ...partialConfig,
+                    [config]: { ...resultingConfig[config], [field]: newValue },
+                  })
+                }
+                {...FIELDS[field]}
+              />
             )
         )}
       </Columns>
@@ -545,7 +534,7 @@ const Settings: React.FC = () => {
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .number .${inputClasses.root}`]: { width: "8ch" },
+          [`& .number .${inputClasses.root}`]: { width: "12ch" },
           [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
