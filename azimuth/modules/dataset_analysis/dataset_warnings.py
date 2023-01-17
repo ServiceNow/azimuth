@@ -1,11 +1,9 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
-from typing import List, Set, cast
+from typing import Dict, List, Set
 
 import numpy as np
-import pandas as pd
 
 from azimuth.config import DatasetWarningConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -18,6 +16,7 @@ from azimuth.plots.dataset_warnings import (
 )
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.dataset_warnings import (
+    Agg,
     DatasetDistributionComparison,
     DatasetDistributionComparisonValue,
     DatasetWarning,
@@ -44,6 +43,8 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         train_mng = self.get_dataset_split_manager(DatasetSplitName.train)
         eval_mng = self.get_dataset_split_manager(DatasetSplitName.eval)
 
+        dm = train_mng or eval_mng
+
         return [
             DatasetWarningsResponse(
                 warning_groups=[
@@ -53,7 +54,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                     ),
                     DatasetWarningGroup(
                         name="Syntactic Warnings",
-                        warnings=self.get_syntactic_warnings(train_mng, eval_mng),
+                        warnings=self.get_syntactic_warnings(dm),
                     ),
                 ]
             )
@@ -193,135 +194,121 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             ),
         ]
 
-    def get_syntactic_warnings(
-        self, train_mng: DatasetSplitManager, eval_mng: DatasetSplitManager
-    ) -> List[DatasetWarning]:
+    def get_syntactic_warnings(self, dm: DatasetSplitManager) -> List[DatasetWarning]:
         """Generate warnings related to the syntax of the utterances.
 
         Args:
-            train_mng: Dataset manager for the training set.
-            eval_mng: Dataset manager for the evaluation set.
+            dm: DatasetSplitManager for either split.
 
         Returns:
             List of syntactic warnings.
 
         """
-        train_ds, eval_ds = train_mng.get_dataset_split(), eval_mng.get_dataset_split()
-        train_dist = train_mng.class_distribution(labels_only=True)
-        class_names = train_mng.get_class_names(labels_only=True)
-        cls_index = np.arange(train_mng.get_num_classes(labels_only=True))
+        class_index = np.arange(dm.get_num_classes(labels_only=True))
+        agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]] = {
+            split: {} for split in self.available_dataset_splits
+        }
+        agg_per_label_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]] = {
+            split: {} for split in self.available_dataset_splits
+        }
+        hist_per_label_per_split = {}
 
-        # Get token length and other (see screen 3b)
-        train_df = pd.DataFrame(
-            {
-                DatasetColumn.word_count: train_ds[DatasetColumn.word_count],
-                "label": train_ds[self.config.columns.label],
-            }
+        for split in self.available_dataset_splits:
+            ds = self.get_dataset_split(split).remove_columns([])
+            df = ds.remove_columns(
+                [
+                    column
+                    for column in ds.column_names
+                    if column not in [DatasetColumn.word_count, self.config.columns.label]
+                ]
+            ).to_pandas()
+
+            agg_per_split[split][Agg.mean] = df["word_count"].mean()
+            agg_per_split[split][Agg.std] = df["word_count"].std()
+
+            # Get mean and std word count per label
+            stats_per_label = df.groupby("label").agg(["mean", "std"]).reindex(class_index)
+            for agg in [Agg.mean, Agg.std]:
+                agg_per_label_per_split[split][agg] = stats_per_label["word_count"][agg].to_numpy()
+
+            # Get word count histogram per label. Columns are word counts and rows are labels.
+            hist_per_label_per_split[split] = (
+                df.groupby(["label", "word_count"])
+                .size()
+                .unstack(fill_value=0)
+                .reindex(class_index, fill_value=0)
+            )
+
+        # Compute divergence and alerts
+        divergence_per_label_per_agg = dict()
+        alert_per_label_per_agg = dict()
+        thresholds_per_agg = {
+            Agg.mean: self.config.dataset_warnings.max_delta_mean_words,
+            Agg.std: self.config.dataset_warnings.max_delta_std_words,
+        }
+        for agg in thresholds_per_agg.keys():
+            divergence_per_label_per_agg[agg] = np.abs(
+                (
+                    agg_per_label_per_split[DatasetSplitName.train][agg]
+                    - agg_per_label_per_split[DatasetSplitName.eval][agg]
+                )
+            )
+            alert_per_label_per_agg[agg] = (
+                divergence_per_label_per_agg[agg] > thresholds_per_agg[agg]
+            )
+        alert_per_label = np.any(
+            [alert_per_label_per_agg[Agg.mean], alert_per_label_per_agg[Agg.std]], axis=0
         )
-        eval_df = pd.DataFrame(
-            {
-                DatasetColumn.word_count: eval_ds[DatasetColumn.word_count],
-                "label": eval_ds[self.config.columns.label],
-            }
+
+        # Fill columns so both splits have the same values from 1 to N.
+        N = max(
+            [
+                max(hist_per_label_per_split[split].columns)
+                for split in self.available_dataset_splits
+            ]
         )
+        hist_filled_per_split_per_label = dict()
+        for split in self.available_dataset_splits:
+            hist_per_label = hist_per_label_per_split[split]
+            hist_filled_per_split_per_label[split] = np.zeros([len(hist_per_label), N], dtype=int)
+            # Fill with token count (-1 because columns start at 1)
+            hist_filled_per_split_per_label[split][
+                :, np.array(hist_per_label.columns) - 1
+            ] = hist_per_label.to_numpy()
 
-        # overall stats
-        train_overall = np.mean(cast(List[int], train_ds[DatasetColumn.word_count])), np.std(
-            cast(List[int], train_ds[DatasetColumn.word_count])
-        )
-        eval_overall = np.mean(cast(List[int], eval_ds[DatasetColumn.word_count])), np.std(
-            cast(List[int], eval_ds[DatasetColumn.word_count])
-        )
-
-        # Get mean and std token lengths
-        train_desc = train_df.groupby("label").agg(["mean", "std"])
-        eval_desc = eval_df.groupby("label").agg(["mean", "std"])
-        # Compute divergence
-        divergence = (train_desc - eval_desc)[DatasetColumn.word_count].apply(np.abs)
-        divergence = fill_at_missing_indices(divergence, find_missing_rows(divergence, cls_index))
-        divergence_mean = divergence["mean"].to_numpy()
-        divergence_std = divergence["std"].to_numpy()
-
-        # Make alerts from values.
-        max_delta_mean_words = int(self.config.dataset_warnings.max_delta_mean_words)
-        max_delta_std_words = int(self.config.dataset_warnings.max_delta_std_words)
-        alert_norm_mean = divergence_mean > max_delta_mean_words
-        alert_norm_std = divergence_std > max_delta_std_words
-        alert_norm = np.any([alert_norm_mean, alert_norm_std], axis=0)
-
-        # Get counts, this will have N columns with count and LABEL rows.
-        train_count = (
-            train_df.groupby(["label", DatasetColumn.word_count]).size().unstack(fill_value=0)
-        )
-        eval_count = (
-            eval_df.groupby(["label", DatasetColumn.word_count]).size().unstack(fill_value=0)
-        )
-
-        train_missing_cols = find_missing_rows(train_count, cls_index)
-        eval_missing_cols = find_missing_rows(eval_count, cls_index)
-        train_count = fill_at_missing_indices(train_count, train_missing_cols)
-        eval_count = fill_at_missing_indices(eval_count, eval_missing_cols)
-        # Add to mean too.
-        train_desc = fill_at_missing_indices(
-            train_desc, train_missing_cols, fill_value=float("nan")
-        )
-        eval_desc = fill_at_missing_indices(eval_desc, eval_missing_cols, fill_value=float("nan"))
-
-        # Get the same x-axis for everyone.
-        N = max(max(train_count.columns), max(eval_count.columns))
-        train_count_filled = np.zeros([len(train_count), N], dtype=int)
-        test_count_filled = np.zeros([len(eval_count), N], dtype=int)
-
-        # Fill with token count (-1 because columns start at 1)
-        train_count_filled[:, np.array(train_count.columns) - 1] = train_count.to_numpy()
-        test_count_filled[:, np.array(eval_count.columns) - 1] = eval_count.to_numpy()
-
+        class_names = dm.get_class_names(labels_only=True)
         return [
             DatasetWarning(
-                name=f"Length mismatch " f"(>{max_delta_mean_words}±{max_delta_std_words} words)",
+                name=f"Length mismatch "
+                f"(>{thresholds_per_agg[Agg.mean]}±{thresholds_per_agg[Agg.std]} words)",
                 description=f"Delta between the number of words per utterance for a "
                 f"given class in the evaluation set vs the train set is "
-                f"above {max_delta_mean_words}±{max_delta_std_words}.",
+                f"above {thresholds_per_agg[Agg.mean]}±{thresholds_per_agg[Agg.std]}.",
                 columns=["mean", "std"],
                 format=FormatType.Decimal,
                 comparisons=[
                     DatasetDistributionComparison(
                         name=class_names[i],
-                        alert=alert_norm[i],
+                        alert=alert_per_label[i],
                         data=[
                             DatasetDistributionComparisonValue(
-                                value=divergence_mean[i], alert=alert_norm_mean[i]
+                                value=divergence_per_label_per_agg[Agg.mean][i],
+                                alert=alert_per_label_per_agg[Agg.mean][i],
                             ),
                             DatasetDistributionComparisonValue(
-                                value=divergence_std[i], alert=alert_norm_std[i]
+                                value=divergence_per_label_per_agg[Agg.std][i],
+                                alert=alert_per_label_per_agg[Agg.std][i],
                             ),
                         ],
                     )
-                    for i, _ in enumerate(train_dist)
+                    for i in class_index
                 ],
                 plots=word_count_plot(
-                    train_count_filled,
-                    test_count_filled,
-                    max_delta_mean_words,
-                    max_delta_std_words,
-                    train_desc,
-                    eval_desc,
-                    train_overall,
-                    eval_overall,
-                    divergence_mean,
-                    divergence_std,
+                    hist_filled_per_split_per_label,
+                    agg_per_split,
+                    agg_per_label_per_split,
+                    divergence_per_label_per_agg,
                     class_names,
                 ),
             )
         ]
-
-
-def find_missing_rows(df1, ref: np.ndarray):
-    # Get rows missing from df1 according to a reference.
-    return set(ref).difference(set(df1.index))
-
-
-def fill_at_missing_indices(df, indices, fill_value=0.0):
-    for i in indices:
-        df.loc[i] = [fill_value] * len(df.columns)
-    return df.sort_index()

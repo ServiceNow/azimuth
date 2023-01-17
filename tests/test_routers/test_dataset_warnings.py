@@ -113,9 +113,9 @@ def test_dataset_warnings(app: FastAPI) -> None:
                     ],
                     "description": "Delta between the number of words per utterance for a given "
                     "class in the evaluation set vs the train set "
-                    "is above 3±3.",
+                    "is above 3.0±3.0.",
                     "format": "Decimal",
-                    "name": "Length mismatch (>3±3 words)",
+                    "name": "Length mismatch (>3.0±3.0 words)",
                 }
             ],
         },

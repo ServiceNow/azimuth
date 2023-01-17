@@ -2,17 +2,19 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 import json
-from typing import List, Optional, Tuple, cast
+from typing import Dict, List, Optional, cast
 
 import numpy as np
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-from azimuth.types import PlotSpecification
-from azimuth.types.dataset_warnings import DatasetWarningPlots
+from azimuth.types import DatasetSplitName, PlotSpecification
+from azimuth.types.dataset_warnings import Agg, DatasetWarningPlots
 from azimuth.utils.plots import (
     AXIS_FONT_SIZE,
+    COLORS_PER_SPLIT,
     PAPER_MARGINS,
+    SPLIT_PRETTY_NAMES,
     X_LEFT_LEGEND,
     X_RIGHT_LEGEND,
     Y_LEGEND_LINE_1,
@@ -432,28 +434,17 @@ def class_representation(
 
 
 def create_histogram_mean_std(
-    train_count: np.ndarray,
-    eval_count: np.ndarray,
-    threshold_mean: float,
-    threshold_std: float,
-    train_stats: Tuple[np.ndarray, np.ndarray],
-    eval_stats: Tuple[np.ndarray, np.ndarray],
-    divergence_mean: Optional[float],
-    divergence_std: Optional[float],
-    label_name: Optional[str] = None,
+    hist_per_split: Dict[DatasetSplitName, np.ndarray],
+    agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]],
+    divergence_per_agg: Optional[Dict[Agg, float]] = None,
 ) -> PlotSpecification:
     """Create the histogram traces and annotations for each label (and "all").
 
     Args:
-        train_count: Histogram values for the selected label in the train set.
-        eval_count: Histogram values for the selected label in the evaluation set.
-        threshold_mean: Alert value.
-        threshold_std: Alert value.
-        train_stats: Mean and std dev of the train.
-        eval_stats: Mean and std dev of the evaluation set.
-        divergence_mean: Difference in the mean. None means one distribution is empty.
-        divergence_std: Difference in the std dev. None means one distribution is empty.
-        label_name: Name of the label, when sending 'None', the traces are generated for 'all'.
+        hist_per_split: Histogram values for the selected label per split.
+        agg_per_split: Mean and std dev for the selected label per split.
+        divergence_per_agg: Difference in the mean and std dev. None means one distribution is
+            empty or we are generating the plot for 'all' labels.
 
     Returns:
         Plot for one label.
@@ -461,60 +452,43 @@ def create_histogram_mean_std(
     """
     fig = go.Figure()
 
-    train_count_norm = train_count / max(sum(train_count), 1)
-    eval_count_norm = eval_count / max(sum(eval_count), 1)
+    hist_normalized = dict()
+    for split in hist_per_split.keys():
+        hist_normalized[split] = hist_per_split[split] / max(sum(hist_per_split[split]), 1)
 
     # Helps position the error bars.
-    max_y = max(train_count_norm.max(), eval_count_norm.max())
+    max_y = max([value.max() for value in hist_normalized.values()])
 
-    train_mean = train_stats[0]
-    train_std = train_stats[1]
+    y_per_split = {DatasetSplitName.eval: 1.14, DatasetSplitName.train: 1.07}
+    opacity_per_split = {DatasetSplitName.eval: 1, DatasetSplitName.train: 0.5}
+    # reversed because the color overlay looks better when train is first
+    for split in reversed(hist_normalized.keys()):
+        if hist_normalized[split].max() != 0:
+            fig.add_bar(
+                x=list(range(1, len(hist_normalized[split]) + 1)),
+                y=hist_normalized[split],
+                name=SPLIT_PRETTY_NAMES[split],
+                marker=dict(color=COLORS_PER_SPLIT[split], opacity=opacity_per_split[split]),
+            )
 
-    eval_mean = eval_stats[0]
-    eval_std = eval_stats[1]
+            fig.add_scatter(
+                x=[np.round(agg_per_split[split][Agg.mean], 2)],
+                y=[max_y * y_per_split[split]],
+                name=f"{split}_mean_std",
+                error_x=dict(type="constant", value=np.round(agg_per_split[split][Agg.std], 2)),
+                hoverinfo="x",
+                marker=dict(color=COLORS_PER_SPLIT[split]),
+            )
 
-    if eval_count_norm.max() != 0:
-        fig.add_bar(
-            x=list(range(1, len(eval_count_norm) + 1)),
-            y=eval_count_norm,
-            name="evaluation set",
-            marker=dict(color=Colors.DataViz1),
-        )
+    at_least_one_distribution = min([value.max() for value in hist_normalized.values()]) > 0
 
-        fig.add_scatter(
-            x=[np.round(eval_mean, 2)],
-            y=[max_y * 1.14],
-            name="eval_mean_std",
-            error_x=dict(type="constant", value=np.round(eval_std, 2)),
-            hoverinfo="x",
-            marker=dict(color=Colors.DataViz1),
-        )
-
-    if train_count_norm.max() != 0:
-        fig.add_bar(
-            x=list(range(1, len(train_count_norm) + 1)),
-            y=train_count_norm,
-            name="training set",
-            marker=dict(color=Colors.DataViz2, opacity=0.5),
-        )
-
-        fig.add_scatter(
-            x=[np.round(train_mean, 2)],
-            y=[max_y * 1.07],
-            name="train_mean_std",
-            error_x=dict(type="constant", value=np.round(train_std, 2)),
-            hoverinfo="x",
-            marker=dict(color=Colors.DataViz2),
-        )
-
-    at_least_one_distribution = min(train_count_norm.max(), eval_count_norm.max()) > 0
-
-    if divergence_mean and divergence_std and at_least_one_distribution:
+    if divergence_per_agg and at_least_one_distribution:
         fig.add_annotation(
             dict(
                 x=0,
                 y=max_y * 1.2,
-                text=f"Delta of {divergence_mean:.2f}±{divergence_std:.2f} tokens",
+                text=f"Delta of {divergence_per_agg[Agg.mean]:.2f}±"
+                f"{divergence_per_agg[Agg.std]:.2f} tokens",
                 font=dict(color=Colors.Text),
                 xref="paper",
                 xanchor="left",
@@ -522,23 +496,7 @@ def create_histogram_mean_std(
             )
         )
 
-    fig.update_layout(
-        barmode="overlay",
-        title="Histogram of utterances per token count",
-        height=500,
-    )
-    fig.update_yaxes(
-        tickformat=",.0%",
-        zerolinecolor=Colors.Axis,
-        zerolinewidth=1,
-        showgrid=True,
-        gridcolor=Colors.Gray_transparent,
-        tickmode="array",
-        tickvals=np.arange(0, max_y, 0.05),
-    )
-    fig.update_xaxes(zeroline=True, zerolinecolor=Colors.Axis, zerolinewidth=1)
-
-    empty_distribution = max(train_count_norm.max(), eval_count_norm.max()) == 0
+    empty_distribution = max([value.max() for value in hist_normalized.values()]) == 0
     if empty_distribution:
         fig.add_annotation(
             dict(
@@ -554,82 +512,72 @@ def create_histogram_mean_std(
             )
         )
 
+    fig.update_layout(
+        barmode="overlay",
+        title="Histogram of utterances per word count",
+        height=500,
+    )
+    fig.update_yaxes(
+        tickformat=",.0%",
+        zerolinecolor=Colors.Axis,
+        zerolinewidth=1,
+        showgrid=True,
+        gridcolor=Colors.Gray_transparent,
+        tickmode="array",
+        tickvals=np.arange(0, max_y, 0.05),
+    )
+    fig.update_xaxes(zeroline=True, zerolinecolor=Colors.Axis, zerolinewidth=1)
     fig = fig_default(fig)
-    fig.update_layout(margin=dict(l=60))  # The tick labels are smaller for this plot
+    fig.update_layout(margin=dict(l=60))  # Overwriting default for this plot
+
     return cast(PlotSpecification, json.loads(fig.to_json()))
 
 
 def word_count_plot(
-    train_per_class_count: np.ndarray,
-    eval_per_class_count: np.ndarray,
-    threshold_mean: float,
-    threshold_std: float,
-    train_per_class_stats: np.ndarray,
-    eval_per_class_stats: np.ndarray,
-    train_overall_stats: Tuple[np.ndarray, np.ndarray],
-    eval_overall_stats: Tuple[np.ndarray, np.ndarray],
-    divergence_mean: np.ndarray,
-    divergence_std: np.ndarray,
+    hist_per_label_per_split: Dict[DatasetSplitName, np.ndarray],
+    agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]],
+    agg_per_label_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]],
+    divergence_per_label_per_agg: Dict[Agg, np.ndarray],
     class_names: List[str],
 ) -> DatasetWarningPlots:
     """Create the plot with the dropdown for all labels.
 
     Args:
-        train_per_class_count: Training set word count per class.
-        eval_per_class_count: Evaluation set word count per class.
-        threshold_mean: threshold above which there is an alert for the mean.
-        threshold_std: threshold above which there is an alert for the std dev.
-        train_per_class_stats: Mean and std dev per class on the train.
-        eval_per_class_stats: Mean and std dev per class on the evaluation set.
-        train_overall_stats: Mean and std dev overall on the train.
-        eval_overall_stats: Mean and std dev overall on the evaluation set.
-        divergence_mean: Alert value for the mean.
-        divergence_std: Alert value for the std dev.
+        hist_per_label_per_split: Histogram of word count per label per split.
+        agg_per_split: Mean and std dev per split.
+        agg_per_label_per_split: Mean and std dev per label per split.
+        divergence_per_label_per_agg: Alert value for the mean and std dev per label.
         class_names: List of class names.
 
     Returns:
         Plot for all classes combined, and plot per class.
 
     """
-    # Sanitize values
-    train_per_class_count, eval_per_class_count = map(
-        lambda data: np.nan_to_num(np.array(data, dtype=float)),
-        (train_per_class_count, eval_per_class_count),
-    )
-    train_per_class_stats, eval_per_class_stats = map(
-        lambda data: np.nan_to_num(np.array(data, dtype=float)),
-        (train_per_class_stats, eval_per_class_stats),
-    )
+    hist_per_split = dict()
+    for split in hist_per_label_per_split.keys():
+        # Sanitize values
+        agg_per_label = agg_per_label_per_split[split]
+        for agg in agg_per_label.keys():
+            agg_per_label[agg] = np.nan_to_num(agg_per_label[agg])
 
-    # Traces and Annotations for 'all'
-    train_count_sum = train_per_class_count.sum(axis=0)
-    eval_count_sum = eval_per_class_count.sum(axis=0)
+        hist_per_split[split] = hist_per_label_per_split[split].sum(axis=0)
+
+    # Traces and Annotations across all labels
     fig_all = create_histogram_mean_std(
-        np.array(train_count_sum),
-        np.array(eval_count_sum),
-        threshold_mean,
-        threshold_std,
-        train_overall_stats,
-        eval_overall_stats,
-        divergence_mean=None,
-        divergence_std=None,
+        hist_per_split,
+        agg_per_split,
     )
 
     # Traces and Annotations for each label
     figs_dict = {}
-    for label_id, (train_data, test_data) in enumerate(
-        zip(train_per_class_count, eval_per_class_count)
-    ):
+    for label_id in np.arange(len(class_names)):
         figs_dict[class_names[label_id]] = create_histogram_mean_std(
-            train_data,
-            test_data,
-            threshold_mean,
-            threshold_std,
-            train_per_class_stats[label_id],
-            eval_per_class_stats[label_id],
-            divergence_mean[label_id],
-            divergence_std[label_id],
-            class_names[label_id],
+            {split: value[label_id] for split, value in hist_per_label_per_split.items()},
+            {
+                split: {agg: value[label_id] for agg, value in per_split_value.items()}
+                for split, per_split_value in agg_per_label_per_split.items()
+            },
+            {agg: value[label_id] for agg, value in divergence_per_label_per_agg.items()},
         )
 
     return DatasetWarningPlots(overall=fig_all, per_class=figs_dict)
