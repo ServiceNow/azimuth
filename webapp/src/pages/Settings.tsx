@@ -30,15 +30,16 @@ import { PickByValue } from "types/models";
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
 const INT = { inputProps: { min: 0 } };
 const FLOAT = { inputProps: { min: 0, step: 0.1 } };
+const COSINE_SIMILARITY = { inputProps: { min: -1, max: 1, step: 0.1 } };
 
 const FIELDS: Record<
   string,
   { scale?: number; units?: string; inputProps: InputBaseComponentProps }
 > = {
   iterations: INT,
-  high_epistemic_threshold: PERCENTAGE,
+  high_epistemic_threshold: FLOAT,
   conflicting_neighbors_threshold: PERCENTAGE,
-  no_close_threshold: PERCENTAGE,
+  no_close_threshold: COSINE_SIMILARITY,
   min_num_per_class: { ...INT, units: "samples" },
   max_delta_class_imbalance: PERCENTAGE,
   max_delta_representation: PERCENTAGE,
