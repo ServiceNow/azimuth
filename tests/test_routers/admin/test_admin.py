@@ -112,7 +112,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     initial_config = client.get("/admin/config").json()
     initial_contract = initial_config["model_contract"]
     initial_pipelines = initial_config["pipelines"]
-    jsonl_file_path = f"{initial_config['artifact_path']}/configs.jsonl"
+    jsonl_file_path = f"{initial_config['artifact_path']}/config_history.jsonl"
 
     res = client.patch(
         "/admin/config",

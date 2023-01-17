@@ -145,7 +145,7 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
     assert not new_config.similarity
     save_config(new_config)
 
-    with jsonlines.open(f"{new_config.artifact_path}/configs.jsonl", "r") as reader:
+    with jsonlines.open(f"{new_config.artifact_path}/config_history.jsonl", "r") as reader:
         all_configs = list(reader)
     assert len(all_configs) == 1
     assert all_configs[0] == new_config
@@ -156,7 +156,7 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
     assert new_config.dataset_warnings.min_num_per_class == 40
     save_config(new_config)
 
-    with jsonlines.open(f"{new_config.artifact_path}/configs.jsonl", "r") as reader:
+    with jsonlines.open(f"{new_config.artifact_path}/config_history.jsonl", "r") as reader:
         all_configs = list(reader)
 
     assert len(all_configs) == 2
