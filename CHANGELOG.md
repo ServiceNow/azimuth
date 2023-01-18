@@ -22,5 +22,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Fix Utterance Details page collapsing with extra long utterances.
 
 ### Security
