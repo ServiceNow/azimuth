@@ -248,10 +248,8 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         }
         for agg in thresholds_per_agg.keys():
             divergence_per_label_per_agg[agg] = np.abs(
-                (
-                    agg_per_label_per_split[DatasetSplitName.train][agg]
-                    - agg_per_label_per_split[DatasetSplitName.eval][agg]
-                )
+                agg_per_label_per_split[DatasetSplitName.train][agg]
+                - agg_per_label_per_split[DatasetSplitName.eval][agg]
             )
             alert_per_label_per_agg[agg] = (
                 divergence_per_label_per_agg[agg] > thresholds_per_agg[agg]

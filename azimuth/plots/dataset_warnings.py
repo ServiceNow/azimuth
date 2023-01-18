@@ -12,9 +12,9 @@ from azimuth.types import DatasetSplitName, PlotSpecification
 from azimuth.types.dataset_warnings import Agg, DatasetWarningPlots
 from azimuth.utils.plots import (
     AXIS_FONT_SIZE,
-    COLORS_PER_SPLIT,
+    DATASET_SPLIT_COLORS,
+    DATASET_SPLIT_PRETTY_NAMES,
     PAPER_MARGINS,
-    SPLIT_PRETTY_NAMES,
     X_LEFT_LEGEND,
     X_RIGHT_LEGEND,
     Y_LEGEND_LINE_1,
@@ -452,9 +452,7 @@ def create_histogram_mean_std(
     """
     fig = go.Figure()
 
-    hist_normalized = dict()
-    for split in hist_per_split.keys():
-        hist_normalized[split] = hist_per_split[split] / max(sum(hist_per_split[split]), 1)
+    hist_normalized = {split: hist / max(sum(hist), 1) for split, hist in hist_per_split.items()}
 
     # Helps position the error bars.
     max_y = max([value.max() for value in hist_normalized.values()])
@@ -462,13 +460,13 @@ def create_histogram_mean_std(
     y_per_split = {DatasetSplitName.eval: 1.14, DatasetSplitName.train: 1.07}
     opacity_per_split = {DatasetSplitName.eval: 1, DatasetSplitName.train: 0.5}
     # reversed because the color overlay looks better when train is first
-    for split in reversed(hist_normalized.keys()):
-        if hist_normalized[split].max() != 0:
+    for split, hist in reversed(hist_normalized.items()):
+        if hist.max() != 0:
             fig.add_bar(
-                x=list(range(1, len(hist_normalized[split]) + 1)),
-                y=hist_normalized[split],
-                name=SPLIT_PRETTY_NAMES[split],
-                marker=dict(color=COLORS_PER_SPLIT[split], opacity=opacity_per_split[split]),
+                x=list(range(1, len(hist) + 1)),
+                y=hist,
+                name=DATASET_SPLIT_PRETTY_NAMES[split],
+                marker=dict(color=DATASET_SPLIT_COLORS[split], opacity=opacity_per_split[split]),
             )
 
             fig.add_scatter(
@@ -477,7 +475,7 @@ def create_histogram_mean_std(
                 name=f"{split}_mean_std",
                 error_x=dict(type="constant", value=np.round(agg_per_split[split][Agg.std], 2)),
                 hoverinfo="x",
-                marker=dict(color=COLORS_PER_SPLIT[split]),
+                marker=dict(color=DATASET_SPLIT_COLORS[split]),
             )
 
     at_least_one_distribution = min([value.max() for value in hist_normalized.values()]) > 0
@@ -553,14 +551,13 @@ def word_count_plot(
         Plot for all classes combined, and plot per class.
 
     """
-    hist_per_split = dict()
-    for split in hist_per_label_per_split.keys():
-        # Sanitize values
-        agg_per_label = agg_per_label_per_split[split]
-        for agg in agg_per_label.keys():
-            agg_per_label[agg] = np.nan_to_num(agg_per_label[agg])
+    # Sanitize values for the plot.
+    agg_per_label_per_split_sanitized = {
+        split: {agg: np.nan_to_num(value) for agg, value in per_split_value.items()}
+        for split, per_split_value in agg_per_label_per_split.items()
+    }
 
-        hist_per_split[split] = hist_per_label_per_split[split].sum(axis=0)
+    hist_per_split = {split: h.sum(axis=0) for split, h in hist_per_label_per_split.items()}
 
     # Traces and Annotations across all labels
     fig_all = create_histogram_mean_std(
@@ -575,7 +572,7 @@ def word_count_plot(
             {split: value[label_id] for split, value in hist_per_label_per_split.items()},
             {
                 split: {agg: value[label_id] for agg, value in per_split_value.items()}
-                for split, per_split_value in agg_per_label_per_split.items()
+                for split, per_split_value in agg_per_label_per_split_sanitized.items()
             },
             {agg: value[label_id] for agg, value in divergence_per_label_per_agg.items()},
         )

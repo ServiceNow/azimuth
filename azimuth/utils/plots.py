@@ -48,9 +48,12 @@ class Colors(str, Enum):
     Text = "#2a3d40"
 
 
-COLORS_PER_SPLIT = {DatasetSplitName.eval: Colors.DataViz1, DatasetSplitName.train: Colors.DataViz2}
+DATASET_SPLIT_COLORS = {
+    DatasetSplitName.eval: Colors.DataViz1,
+    DatasetSplitName.train: Colors.DataViz2,
+}
 
-SPLIT_PRETTY_NAMES = {
+DATASET_SPLIT_PRETTY_NAMES = {
     DatasetSplitName.eval: "evaluation set",
     DatasetSplitName.train: "training set",
 }
