@@ -205,10 +205,10 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
 
         """
         class_index = np.arange(dm.get_num_classes(labels_only=True))
-        agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]] = {
+        value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]] = {
             split: {} for split in self.available_dataset_splits
         }
-        agg_per_label_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]] = {
+        value_per_label_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]] = {
             split: {} for split in self.available_dataset_splits
         }
         hist_per_label_per_split = {}
@@ -223,13 +223,15 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 ]
             ).to_pandas()
 
-            agg_per_split[split][Agg.mean] = df["word_count"].mean()
-            agg_per_split[split][Agg.std] = df["word_count"].std()
+            value_per_agg_per_split[split][Agg.mean] = df["word_count"].mean()
+            value_per_agg_per_split[split][Agg.std] = df["word_count"].std()
 
             # Get mean and std word count per label
             stats_per_label = df.groupby("label").agg(["mean", "std"]).reindex(class_index)
             for agg in [Agg.mean, Agg.std]:
-                agg_per_label_per_split[split][agg] = stats_per_label["word_count"][agg].to_numpy()
+                value_per_label_per_agg_per_split[split][agg] = stats_per_label["word_count"][
+                    agg
+                ].to_numpy()
 
             # Get word count histogram per label. Columns are word counts and rows are labels.
             hist_per_label_per_split[split] = (
@@ -248,8 +250,8 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         }
         for agg in thresholds_per_agg.keys():
             divergence_per_label_per_agg[agg] = np.abs(
-                agg_per_label_per_split[DatasetSplitName.train][agg]
-                - agg_per_label_per_split[DatasetSplitName.eval][agg]
+                value_per_label_per_agg_per_split[DatasetSplitName.train][agg]
+                - value_per_label_per_agg_per_split[DatasetSplitName.eval][agg]
             )
             alert_per_label_per_agg[agg] = (
                 divergence_per_label_per_agg[agg] > thresholds_per_agg[agg]
@@ -303,8 +305,8 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 ],
                 plots=word_count_plot(
                     hist_filled_per_split_per_label,
-                    agg_per_split,
-                    agg_per_label_per_split,
+                    value_per_agg_per_split,
+                    value_per_label_per_agg_per_split,
                     divergence_per_label_per_agg,
                     class_names,
                 ),

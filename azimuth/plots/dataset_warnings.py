@@ -435,14 +435,14 @@ def class_representation(
 
 def create_histogram_mean_std(
     hist_per_split: Dict[DatasetSplitName, np.ndarray],
-    agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]],
+    value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]],
     divergence_per_agg: Optional[Dict[Agg, float]] = None,
 ) -> PlotSpecification:
     """Create the histogram traces and annotations for each label (and "all").
 
     Args:
         hist_per_split: Histogram values for the selected label per split.
-        agg_per_split: Mean and std dev for the selected label per split.
+        value_per_agg_per_split: Mean and std dev for the selected label per split.
         divergence_per_agg: Difference in the mean and std dev. None means one distribution is
             empty or we are generating the plot for 'all' labels.
 
@@ -470,10 +470,12 @@ def create_histogram_mean_std(
             )
 
             fig.add_scatter(
-                x=[np.round(agg_per_split[split][Agg.mean], 2)],
+                x=[np.round(value_per_agg_per_split[split][Agg.mean], 2)],
                 y=[max_y * y_per_split[split]],
                 name=f"{split}_mean_std",
-                error_x=dict(type="constant", value=np.round(agg_per_split[split][Agg.std], 2)),
+                error_x=dict(
+                    type="constant", value=np.round(value_per_agg_per_split[split][Agg.std], 2)
+                ),
                 hoverinfo="x",
                 marker=dict(color=DATASET_SPLIT_COLORS[split]),
             )
@@ -533,8 +535,8 @@ def create_histogram_mean_std(
 
 def word_count_plot(
     hist_per_label_per_split: Dict[DatasetSplitName, np.ndarray],
-    agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]],
-    agg_per_label_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]],
+    value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]],
+    value_per_label_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]],
     divergence_per_label_per_agg: Dict[Agg, np.ndarray],
     class_names: List[str],
 ) -> DatasetWarningPlots:
@@ -542,8 +544,8 @@ def word_count_plot(
 
     Args:
         hist_per_label_per_split: Histogram of word count per label per split.
-        agg_per_split: Mean and std dev per split.
-        agg_per_label_per_split: Mean and std dev per label per split.
+        value_per_agg_per_split: Mean and std dev per split.
+        value_per_label_per_agg_per_split: Mean and std dev per label per split.
         divergence_per_label_per_agg: Alert value for the mean and std dev per label.
         class_names: List of class names.
 
@@ -552,9 +554,9 @@ def word_count_plot(
 
     """
     # Sanitize values for the plot.
-    agg_per_label_per_split_sanitized = {
+    sanitized_value_per_label_per_agg_per_split = {
         split: {agg: np.nan_to_num(value) for agg, value in per_split_value.items()}
-        for split, per_split_value in agg_per_label_per_split.items()
+        for split, per_split_value in value_per_label_per_agg_per_split.items()
     }
 
     hist_per_split = {split: h.sum(axis=0) for split, h in hist_per_label_per_split.items()}
@@ -562,7 +564,7 @@ def word_count_plot(
     # Traces and Annotations across all labels
     fig_all = create_histogram_mean_std(
         hist_per_split,
-        agg_per_split,
+        value_per_agg_per_split,
     )
 
     # Traces and Annotations for each label
@@ -572,7 +574,7 @@ def word_count_plot(
             {split: value[label_id] for split, value in hist_per_label_per_split.items()},
             {
                 split: {agg: value[label_id] for agg, value in per_split_value.items()}
-                for split, per_split_value in agg_per_label_per_split_sanitized.items()
+                for split, per_split_value in sanitized_value_per_label_per_agg_per_split.items()
             },
             {agg: value[label_id] for agg, value in divergence_per_label_per_agg.items()},
         )
