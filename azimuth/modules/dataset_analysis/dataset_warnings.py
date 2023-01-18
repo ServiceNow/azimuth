@@ -1,6 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from collections import defaultdict
 from typing import Dict, List, Set
 
 import numpy as np
@@ -205,12 +206,10 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
 
         """
         class_index = np.arange(dm.get_num_classes(labels_only=True))
-        value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]] = {
-            split: {} for split in self.available_dataset_splits
-        }
-        value_per_label_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]] = {
-            split: {} for split in self.available_dataset_splits
-        }
+        value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]] = defaultdict(dict)
+        value_per_label_per_agg_per_split: Dict[
+            DatasetSplitName, Dict[Agg, np.ndarray]
+        ] = defaultdict(dict)
         hist_per_label_per_split = {}
 
         for split in self.available_dataset_splits:
@@ -248,14 +247,12 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             Agg.mean: self.config.dataset_warnings.max_delta_mean_words,
             Agg.std: self.config.dataset_warnings.max_delta_std_words,
         }
-        for agg in thresholds_per_agg.keys():
+        for agg, threshold in thresholds_per_agg.items():
             divergence_per_label_per_agg[agg] = np.abs(
                 value_per_label_per_agg_per_split[DatasetSplitName.train][agg]
                 - value_per_label_per_agg_per_split[DatasetSplitName.eval][agg]
             )
-            alert_per_label_per_agg[agg] = (
-                divergence_per_label_per_agg[agg] > thresholds_per_agg[agg]
-            )
+            alert_per_label_per_agg[agg] = divergence_per_label_per_agg[agg] > threshold
         alert_per_label = np.any(
             [alert_per_label_per_agg[Agg.mean], alert_per_label_per_agg[Agg.std]], axis=0
         )
