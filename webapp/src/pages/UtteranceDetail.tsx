@@ -30,6 +30,7 @@ import {
 import { DatasetSplitName } from "types/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
+  FADE_OUT_SCROLL_Y,
   ID_TOOLTIP,
   OUTCOME_COLOR,
   SMART_TAG_FAMILIES,
@@ -203,15 +204,16 @@ export const UtteranceDetail = () => {
             />
           )}
         </Box>
-        <Box display="flex" alignItems="center">
-          <UtteranceSaliency
-            variant="subtitle1"
-            tooltip
-            utterance={preprocessingSteps[preprocessingStep].text}
-            modelSaliency={
-              preprocessingStep === 0 ? utterance.modelSaliency : null
-            }
-          />
+        <Box display="flex">
+          <Box maxHeight="13vh" {...FADE_OUT_SCROLL_Y}>
+            <UtteranceSaliency
+              tooltip
+              utterance={preprocessingSteps[preprocessingStep].text}
+              modelSaliency={
+                preprocessingStep === 0 ? utterance.modelSaliency : null
+              }
+            />
+          </Box>
           <CopyButton text={preprocessingSteps[preprocessingStep].text} />
         </Box>
 

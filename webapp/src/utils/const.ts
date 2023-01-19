@@ -27,6 +27,15 @@ The lower the better. An ECE of 0 means perfect calibration.
 
 export const PIPELINE_REQUIRED_TIP = "Unavailable without a pipeline";
 
+const FADE_OUT_LENGTH = "28px";
+export const FADE_OUT_SCROLL_Y = {
+  overflow: "auto",
+  paddingY: FADE_OUT_LENGTH,
+  sx: {
+    mask: `linear-gradient(transparent, black ${FADE_OUT_LENGTH} calc(100% - ${FADE_OUT_LENGTH}), transparent)`,
+  },
+};
+
 export const PAGE_SIZE = 10;
 
 export const DATA_ACTION_NONE_VALUE = "NO_ACTION";
