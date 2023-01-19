@@ -9,6 +9,7 @@ import orjson
 from pydantic import BaseModel, Extra, Field
 
 from azimuth.utils.conversion import orjson_dumps
+from azimuth.utils.openapi import fix_union_types
 from azimuth.utils.pydantic_utils import create_model
 
 
@@ -48,6 +49,10 @@ class AliasModel(BaseModel):
         json_encoders = {np.ndarray: lambda x: x.tolist()}
         json_loads = orjson.loads
         json_dumps = orjson_dumps
+
+        @staticmethod
+        def schema_extra(schema):
+            fix_union_types(schema)
 
 
 class ModuleResponse(AliasModel):

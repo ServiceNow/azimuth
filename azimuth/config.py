@@ -14,6 +14,7 @@ from pydantic import BaseSettings, Extra, Field, root_validator, validator
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
+from azimuth.utils.openapi import fix_union_types, make_all_properties_required
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
@@ -79,16 +80,8 @@ class AzimuthBaseSettings(BaseSettings):
     class Config:
         @staticmethod
         def schema_extra(schema):
-            # For Union types, openapi-typescript understands oneOf better than anyOf.
-            for field in schema["properties"].values():
-                if field.get("type") == "array":
-                    field = field["items"]
-                if "anyOf" in field:
-                    field["oneOf"] = field.pop("anyOf")
-
-            # pydantic considers fields with default values to be optional, but when the API returns
-            # an object, all the default values are set, so the fields are always present.
-            schema["required"] = list(schema["properties"].keys())
+            fix_union_types(schema)
+            make_all_properties_required(schema)
 
 
 class CustomObject(AzimuthBaseSettings):

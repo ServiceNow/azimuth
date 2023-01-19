@@ -281,7 +281,7 @@ export interface components {
      * that all fields are represented correctly.
      */
     DatasetDistributionComparisonValue: {
-      value: (Partial<number> & Partial<number>) | null;
+      value: (number | number) | null;
       alert: boolean;
     };
     /**
@@ -845,7 +845,7 @@ export interface components {
       dissimilar: string[];
       /** Row index computed by Azimuth.. */
       index: number;
-      persistentId: Partial<number> & Partial<string>;
+      persistentId: number | string;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
       dataAction: components["schemas"]["DataAction"];
