@@ -4,6 +4,8 @@
 from enum import Enum
 from typing import List
 
+from azimuth.types import DatasetSplitName
+
 TITLE_FONT_SIZE = 20
 AXIS_FONT_SIZE = 14
 MARGIN = 32
@@ -44,6 +46,17 @@ class Colors(str, Enum):
     Gray_transparent = "rgba(41, 62, 64, 0.08)"
     Blue = "#2196F3"
     Text = "#2a3d40"
+
+
+DATASET_SPLIT_COLORS = {
+    DatasetSplitName.eval: Colors.DataViz1,
+    DatasetSplitName.train: Colors.DataViz2,
+}
+
+DATASET_SPLIT_PRETTY_NAMES = {
+    DatasetSplitName.eval: "evaluation set",
+    DatasetSplitName.train: "training set",
+}
 
 
 def fig_default(fig):
