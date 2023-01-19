@@ -213,13 +213,9 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         hist_per_label_per_split = {}
 
         for split in self.available_dataset_splits:
-            ds = self.get_dataset_split(split).remove_columns([])
+            ds = self.get_dataset_split(split)
             df = ds.remove_columns(
-                [
-                    column
-                    for column in ds.column_names
-                    if column not in [DatasetColumn.word_count, self.config.columns.label]
-                ]
+                list(set(ds.column_names) - {DatasetColumn.word_count, self.config.columns.label})
             ).to_pandas()
 
             value_per_agg_per_split[split][Agg.mean] = df["word_count"].mean()

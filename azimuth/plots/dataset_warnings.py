@@ -452,37 +452,36 @@ def create_histogram_mean_std(
     """
     fig = go.Figure()
 
-    hist_normalized = {split: hist / max(sum(hist), 1) for split, hist in hist_per_split.items()}
+    hist_normalized = {
+        split: hist / sum(hist) for split, hist in hist_per_split.items() if any(hist)
+    }
 
     # Helps position the error bars.
-    max_y = max(value.max() for value in hist_normalized.values())
+    max_y = max((value.max() for value in hist_normalized.values()), default=0)
 
     y_per_split = {DatasetSplitName.eval: 1.14, DatasetSplitName.train: 1.07}
     opacity_per_split = {DatasetSplitName.eval: 1, DatasetSplitName.train: 0.5}
     # reversed because the color overlay looks better when train is first
     for split, hist in reversed(hist_normalized.items()):
-        if hist.max() != 0:
-            fig.add_bar(
-                x=list(range(1, len(hist) + 1)),
-                y=hist,
-                name=DATASET_SPLIT_PRETTY_NAMES[split],
-                marker=dict(color=DATASET_SPLIT_COLORS[split], opacity=opacity_per_split[split]),
-            )
+        fig.add_bar(
+            x=list(range(1, len(hist) + 1)),
+            y=hist,
+            name=DATASET_SPLIT_PRETTY_NAMES[split],
+            marker=dict(color=DATASET_SPLIT_COLORS[split], opacity=opacity_per_split[split]),
+        )
 
-            fig.add_scatter(
-                x=[np.round(value_per_agg_per_split[split][Agg.mean], 2)],
-                y=[max_y * y_per_split[split]],
-                name=f"{split}_mean_std",
-                error_x=dict(
-                    type="constant", value=np.round(value_per_agg_per_split[split][Agg.std], 2)
-                ),
-                hoverinfo="x",
-                marker=dict(color=DATASET_SPLIT_COLORS[split]),
-            )
+        fig.add_scatter(
+            x=[np.round(value_per_agg_per_split[split][Agg.mean], 2)],
+            y=[max_y * y_per_split[split]],
+            name=f"{split}_mean_std",
+            error_x=dict(
+                type="constant", value=np.round(value_per_agg_per_split[split][Agg.std], 2)
+            ),
+            hoverinfo="x",
+            marker=dict(color=DATASET_SPLIT_COLORS[split]),
+        )
 
-    two_distributions = all(any(value > 0 for value in h) for h in hist_normalized.values())
-
-    if divergence_per_agg and two_distributions:
+    if divergence_per_agg and len(hist_normalized) == 2:
         fig.add_annotation(
             x=0,
             y=max_y * 1.2,
@@ -494,8 +493,7 @@ def create_histogram_mean_std(
             showarrow=False,
         )
 
-    empty_distribution = max(value.max() for value in hist_normalized.values()) == 0
-    if empty_distribution:
+    if len(hist_normalized) == 0:
         fig.add_annotation(
             x=0.5,
             y=0.5,
