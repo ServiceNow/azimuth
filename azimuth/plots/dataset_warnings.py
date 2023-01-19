@@ -461,8 +461,8 @@ def create_histogram_mean_std(
 
     y_per_split = {DatasetSplitName.eval: 1.14, DatasetSplitName.train: 1.07}
     opacity_per_split = {DatasetSplitName.eval: 1, DatasetSplitName.train: 0.5}
-    # reversed because the color overlay looks better when train is first
-    for split, hist in reversed(hist_normalized.items()):
+    # sorted because the color overlay looks better when eval is first
+    for split, hist in sorted(hist_normalized.items()):
         fig.add_bar(
             x=list(range(1, len(hist) + 1)),
             y=hist,
