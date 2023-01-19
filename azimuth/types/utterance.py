@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import Field
 
@@ -39,6 +39,9 @@ class ModelSaliency(AliasModel):
 
 class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str], AliasModel):
     index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
+    # Union[int, str] in this order so FastAPI tries to cast to int() first, then str().
+    # If it was reversed, everything would get converted to strings since str() always works.
+    persistent_id: Union[int, str] = Field(..., title="Persistent id")
     model_prediction: Optional[ModelPrediction] = Field(
         ..., title="Model prediction", nullable=True
     )

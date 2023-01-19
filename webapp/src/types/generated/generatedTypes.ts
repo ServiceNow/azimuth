@@ -845,6 +845,7 @@ export interface components {
       dissimilar: string[];
       /** Row index computed by Azimuth.. */
       index: number;
+      persistentId: Partial<number> & Partial<string>;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
       dataAction: components["schemas"]["DataAction"];

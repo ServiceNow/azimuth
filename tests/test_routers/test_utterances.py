@@ -42,6 +42,8 @@ def test_get_utterances(app: FastAPI):
     assert len(resp["utterances"]) == UTTERANCE_COUNT
     assert resp["utteranceCount"] == UTTERANCE_COUNT
     assert is_sorted([u["index"] for u in resp["utterances"]])
+    for utterance in resp["utterances"]:
+        assert utterance["persistentId"] == utterance["index"]
 
 
 def test_get_utterances_sort_confidence(app: FastAPI):

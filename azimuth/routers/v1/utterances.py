@@ -237,6 +237,7 @@ def get_utterances(
     utterances = [
         Utterance(
             index=data[DatasetColumn.row_idx],
+            persistent_id=data[config.columns.persistent_id],
             data_action=next(
                 (t for t, v in tag.items() if t in ALL_DATA_ACTIONS and v),
                 DataAction.no_action,
