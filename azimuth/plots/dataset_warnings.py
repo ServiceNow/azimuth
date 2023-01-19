@@ -443,8 +443,8 @@ def create_histogram_mean_std(
     Args:
         hist_per_split: Histogram values for the selected label per split.
         value_per_agg_per_split: Mean and std dev for the selected label per split.
-        divergence_per_agg: Difference in the mean and std dev. None means one distribution is
-            empty or we are generating the plot for 'all' labels.
+        divergence_per_agg: Difference in the mean and std dev. None means that we are generating
+            the plot for 'all' labels.
 
     Returns:
         Plot for one label.
@@ -480,9 +480,9 @@ def create_histogram_mean_std(
                 marker=dict(color=DATASET_SPLIT_COLORS[split]),
             )
 
-    at_least_one_distribution = any(value > 0 for h in hist_normalized.values() for value in h)
+    two_distributions = all(any(value > 0 for value in h) for h in hist_normalized.values())
 
-    if divergence_per_agg and at_least_one_distribution:
+    if divergence_per_agg and two_distributions:
         fig.add_annotation(
             x=0,
             y=max_y * 1.2,
