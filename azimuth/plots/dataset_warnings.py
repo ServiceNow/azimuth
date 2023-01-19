@@ -455,7 +455,7 @@ def create_histogram_mean_std(
     hist_normalized = {split: hist / max(sum(hist), 1) for split, hist in hist_per_split.items()}
 
     # Helps position the error bars.
-    max_y = max([value.max() for value in hist_normalized.values()])
+    max_y = max(value.max() for value in hist_normalized.values())
 
     y_per_split = {DatasetSplitName.eval: 1.14, DatasetSplitName.train: 1.07}
     opacity_per_split = {DatasetSplitName.eval: 1, DatasetSplitName.train: 0.5}
@@ -480,36 +480,32 @@ def create_histogram_mean_std(
                 marker=dict(color=DATASET_SPLIT_COLORS[split]),
             )
 
-    at_least_one_distribution = min([value.max() for value in hist_normalized.values()]) > 0
+    at_least_one_distribution = any(value > 0 for h in hist_normalized.values() for value in h)
 
     if divergence_per_agg and at_least_one_distribution:
         fig.add_annotation(
-            dict(
-                x=0,
-                y=max_y * 1.2,
-                text=f"Delta of {divergence_per_agg[Agg.mean]:.2f}±"
-                f"{divergence_per_agg[Agg.std]:.2f} tokens",
-                font=dict(color=Colors.Text),
-                xref="paper",
-                xanchor="left",
-                showarrow=False,
-            )
+            x=0,
+            y=max_y * 1.2,
+            text=f"Delta of {divergence_per_agg[Agg.mean]:.2f}±"
+            f"{divergence_per_agg[Agg.std]:.2f} tokens",
+            font=dict(color=Colors.Text),
+            xref="paper",
+            xanchor="left",
+            showarrow=False,
         )
 
-    empty_distribution = max([value.max() for value in hist_normalized.values()]) == 0
+    empty_distribution = max(value.max() for value in hist_normalized.values()) == 0
     if empty_distribution:
         fig.add_annotation(
-            dict(
-                x=0.5,
-                y=0.5,
-                text="No utterances for this class",
-                font=dict(color=Colors.Text, size=AXIS_FONT_SIZE),
-                xref="paper",
-                xanchor="center",
-                yref="paper",
-                yanchor="middle",
-                showarrow=False,
-            )
+            x=0.5,
+            y=0.5,
+            text="No utterances for this class",
+            font=dict(color=Colors.Text, size=AXIS_FONT_SIZE),
+            xref="paper",
+            xanchor="center",
+            yref="paper",
+            yanchor="middle",
+            showarrow=False,
         )
 
     fig.update_layout(

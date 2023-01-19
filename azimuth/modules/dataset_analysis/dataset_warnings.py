@@ -205,7 +205,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             List of syntactic warnings.
 
         """
-        class_index = np.arange(dm.get_num_classes(labels_only=True))
+        class_indices = np.arange(dm.get_num_classes(labels_only=True))
         value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]] = defaultdict(dict)
         value_per_label_per_agg_per_split: Dict[
             DatasetSplitName, Dict[Agg, np.ndarray]
@@ -226,8 +226,8 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             value_per_agg_per_split[split][Agg.std] = df["word_count"].std()
 
             # Get mean and std word count per label
-            stats_per_label = df.groupby("label").agg(["mean", "std"]).reindex(class_index)
-            for agg in [Agg.mean, Agg.std]:
+            stats_per_label = df.groupby("label").agg(list(Agg)).reindex(class_indices)
+            for agg in Agg:
                 value_per_label_per_agg_per_split[split][agg] = stats_per_label["word_count"][
                     agg
                 ].to_numpy()
@@ -237,17 +237,17 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 df.groupby(["label", "word_count"])
                 .size()
                 .unstack(fill_value=0)
-                .reindex(class_index, fill_value=0)
+                .reindex(class_indices, fill_value=0)
             )
 
         # Compute divergence and alerts
-        divergence_per_label_per_agg = dict()
-        alert_per_label_per_agg = dict()
-        thresholds_per_agg = {
+        divergence_per_label_per_agg = {}
+        alert_per_label_per_agg = {}
+        threshold_per_agg = {
             Agg.mean: self.config.dataset_warnings.max_delta_mean_words,
             Agg.std: self.config.dataset_warnings.max_delta_std_words,
         }
-        for agg, threshold in thresholds_per_agg.items():
+        for agg, threshold in threshold_per_agg.items():
             divergence_per_label_per_agg[agg] = np.abs(
                 value_per_label_per_agg_per_split[DatasetSplitName.train][agg]
                 - value_per_label_per_agg_per_split[DatasetSplitName.eval][agg]
@@ -259,14 +259,10 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
 
         # Fill columns so both splits have the same values from 1 to N.
         N = max(
-            [
-                max(hist_per_label_per_split[split].columns)
-                for split in self.available_dataset_splits
-            ]
+            max(hist_per_label_per_split[split].columns) for split in self.available_dataset_splits
         )
         hist_filled_per_split_per_label = dict()
-        for split in self.available_dataset_splits:
-            hist_per_label = hist_per_label_per_split[split]
+        for split, hist_per_label in hist_per_label_per_split.items():
             hist_filled_per_split_per_label[split] = np.zeros([len(hist_per_label), N], dtype=int)
             # Fill with token count (-1 because columns start at 1)
             hist_filled_per_split_per_label[split][
@@ -277,10 +273,10 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         return [
             DatasetWarning(
                 name=f"Length mismatch "
-                f"(>{thresholds_per_agg[Agg.mean]}±{thresholds_per_agg[Agg.std]} words)",
+                f"(>{threshold_per_agg[Agg.mean]}±{threshold_per_agg[Agg.std]} words)",
                 description=f"Delta between the number of words per utterance for a "
                 f"given class in the evaluation set vs the train set is "
-                f"above {thresholds_per_agg[Agg.mean]}±{thresholds_per_agg[Agg.std]}.",
+                f"above {threshold_per_agg[Agg.mean]}±{threshold_per_agg[Agg.std]}.",
                 columns=["mean", "std"],
                 format=FormatType.Decimal,
                 comparisons=[
@@ -289,16 +285,13 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                         alert=alert_per_label[i],
                         data=[
                             DatasetDistributionComparisonValue(
-                                value=divergence_per_label_per_agg[Agg.mean][i],
-                                alert=alert_per_label_per_agg[Agg.mean][i],
-                            ),
-                            DatasetDistributionComparisonValue(
-                                value=divergence_per_label_per_agg[Agg.std][i],
-                                alert=alert_per_label_per_agg[Agg.std][i],
-                            ),
+                                value=divergence_per_label_per_agg[agg][i],
+                                alert=alert_per_label_per_agg[agg][i],
+                            )
+                            for agg in Agg
                         ],
                     )
-                    for i in class_index
+                    for i in class_indices
                 ],
                 plots=word_count_plot(
                     hist_filled_per_split_per_label,
