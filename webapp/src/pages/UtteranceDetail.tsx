@@ -11,7 +11,6 @@ import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
 import Description from "components/Description";
-import FadeOutScrollY from "components/FadeOutScrollY";
 import Loading from "components/Loading";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import Steps from "components/Steps";
@@ -31,6 +30,7 @@ import {
 import { DatasetSplitName } from "types/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
+  FADE_OUT_SCROLL_Y,
   ID_TOOLTIP,
   OUTCOME_COLOR,
   SMART_TAG_FAMILIES,
@@ -205,7 +205,7 @@ export const UtteranceDetail = () => {
           )}
         </Box>
         <Box display="flex">
-          <FadeOutScrollY maxHeight="13vh">
+          <Box maxHeight="13vh" {...FADE_OUT_SCROLL_Y}>
             <UtteranceSaliency
               tooltip
               utterance={preprocessingSteps[preprocessingStep].text}
@@ -213,7 +213,7 @@ export const UtteranceDetail = () => {
                 preprocessingStep === 0 ? utterance.modelSaliency : null
               }
             />
-          </FadeOutScrollY>
+          </Box>
           <CopyButton text={preprocessingSteps[preprocessingStep].text} />
         </Box>
 
