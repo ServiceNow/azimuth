@@ -1,24 +1,58 @@
-cff-version: 1.0.0
+cff-version: 1.2.0
 message: "If you use Azimuth in your projects, please cite it as below."
 authors:
-- family-names: "Branchaud-Charron"
-  given-names: "Frederic"
-- family-names: "Gauthier-Melancon"
-  given-names: "Gabrielle"
-- family-names: "Marinier"
-  given-names: "Joseph"
-- family-names: "Brin"
-  given-names: "Lindsay"
-- family-names: "Tyler"
-  given-names: "Chris"
-- family-names: "Le"
-  given-names: "Di"
-- family-names: "Grande"
-  given-names: "Karine"
-- family-names: "Babu"
-  given-names: "Nandhini"
+- family-names: Branchaud-Charron
+  given-names: Frederic
+- family-names: Gauthier-Melancon
+  given-names: Gabrielle
+- family-names: Marinier
+  given-names: Joseph
+- family-names: Brin
+  given-names: Lindsay
+- family-names: Tyler
+  given-names: Chris
+- family-names: Le
+  given-names: Di
+- family-names: Grande
+  given-names: Karine
+- family-names: Babu
+  given-names: Nandhini
 title: "Azimuth, an open-source dataset and error analysis tool for text classification"
 version: 2.5
-doi: 10.5281/zenodo.6511558
 date-released: 2022-08-17
-url: "https://github.com/ServiceNow/azimuth"
+url: "https://servicenow.github.io/azimuth"
+repository-code: "https://github.com/ServiceNow/azimuth"
+license: Apache-2.0
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.6511558
+preferred-citation:
+  type: conference-paper
+  title: "Azimuth: Systematic Error Analysis for Text Classification"
+  authors:
+  - family-names: Gauthier-Melancon
+    given-names: Gabrielle
+  - family-names: Marquez-Ayala
+    given-names: Orlando
+  - family-names: Brin
+    given-names: Lindsay
+  - family-names: Tyler
+    given-names: Chris
+  - family-names: Branchaud-Charron
+    given-names: Frederic
+  - family-names: Marinier
+    given-names: Joseph
+  - family-names: Grande
+    given-names: Karine
+  - family-names: Le
+    given-names: Di
+  collection-title: "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing: System Demonstrations"
+  collection-type: proceedings
+  month: 12
+  year: 2022
+  publisher:
+    name: "Association for Computational Linguistics"
+  identifiers:
+  - type: other
+    value: "arXiv:2212.08216"
+    description: "The arXiv preprint of the paper"
