@@ -52,6 +52,9 @@ const useStyles = makeStyles((theme) => ({
   hoverableDataCell: {
     position: "relative",
   },
+  idCell: {
+    direction: "rtl", // To get ellipsis on the left, e.g. ...001, ...002, etc.
+  },
   gridContainer: {
     width: "100%",
     height: "100%",
@@ -256,7 +259,7 @@ const UtterancesTable: React.FC<Props> = ({
       sortable: false,
       align: "center",
       headerAlign: "center",
-      cellClassName: classes.hoverableDataCell,
+      cellClassName: `${classes.hoverableDataCell} ${classes.idCell}`,
       renderCell: renderHoverableDataCell,
     },
     {
