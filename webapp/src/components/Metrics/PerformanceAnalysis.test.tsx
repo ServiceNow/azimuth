@@ -23,7 +23,7 @@ const renderPerformanceAnalysis = (
     />,
     { route: "/local?pipeline_index=0", path: "/:jobId?:pipeline" }
   );
-describe("PerturbationTestingPreview", () => {
+describe("PerformanceAnalysis", () => {
   const handlers = [
     getCustomMetricInfoAPIResponse,
     getMetricsPerFilterAPIResponse,
@@ -43,5 +43,96 @@ describe("PerturbationTestingPreview", () => {
     expect(
       screen.getByRole("button", { name: "Training Set", pressed: false })
     ).toHaveValue("train");
+  });
+
+  it("should display the expected columns", async () => {
+    renderPerformanceAnalysis({ train: true, eval: true });
+    await waitFor(() => {
+      const expectedColumnHeaders = [
+        "Label",
+        "Total",
+        "Correct & Predicted",
+        "Correct & Rejected",
+        "Incorrect & Rejected",
+        "Incorrect & Predicted",
+        "Accuracy",
+        "Precision",
+        "Recall",
+        "F1",
+        "ECE",
+      ];
+      const actualColumnHeaders = screen.getAllByRole("columnheader");
+      expectedColumnHeaders.forEach((name, index) => {
+        name.includes("Correct")
+          ? expect(screen.getAllByTestId("CheckIcon")).toBeTruthy()
+          : name.includes("Incorrect")
+          ? expect(screen.getAllByTestId("XIcon")).toBeTruthy()
+          : expect(actualColumnHeaders[index].textContent).toEqual(name);
+      });
+    });
+  });
+
+  it("should display the default sort as desc for colum header 'Total number of utterances'", () => {
+    renderPerformanceAnalysis({ train: true, eval: true });
+    const header = screen.getByRole("columnheader", { name: /Total/ });
+    expect(header).toHaveAttribute("aria-sort", "descending");
+  });
+
+  it("should display the list of options if the user click on the column header 'filterValue'", () => {
+    renderPerformanceAnalysis({ train: true, eval: true });
+    fireEvent.mouseDown(screen.getByRole("button", { name: "Label" }));
+    const filterList = screen.getAllByRole("option");
+    expect(filterList).toHaveLength(10);
+
+    const expectedList = [
+      "Label",
+      "Prediction",
+      "Smart Tags",
+      "Extreme Length",
+      "Partial Syntax",
+      "Dissimilar",
+      "Almost Correct",
+      "Behavioral Testing",
+      "Pipeline Comparison",
+      "Uncertain",
+    ];
+    filterList.forEach((item, index) => {
+      expect(item.textContent).toEqual(expectedList[index]);
+    });
+
+    expect(screen.getByRole("option", { name: "Smart Tags" })).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
+    fireEvent.click(screen.getByRole("option", { name: "Prediction" }));
+    expect(
+      screen.getByRole("columnheader", { name: "Prediction" })
+    ).toBeInTheDocument();
+  });
+
+  it("should not display the Footer component if the number of rows are lesser than initial number", async () => {
+    renderPerformanceAnalysis({ train: true, eval: true });
+    await waitFor(() => expect(screen.queryByText(/See more/)).toBeNull());
+  });
+});
+
+describe("MetricsPerFilterAPIWithFailureResponse", () => {
+  const handlers = [
+    getMetricsPerFilterAPIWithFailureResponse,
+    getCustomMetricInfoAPIResponse,
+  ];
+  const server = setupServer(...handlers);
+
+  beforeAll(() => server.listen());
+  afterEach(() => server.resetHandlers());
+  afterAll(() => server.close());
+  it("should display the error message if the API fails", async () => {
+    renderPerformanceAnalysis({ train: true, eval: true });
+    await waitFor(() => {
+      // expected error message
+      expect(
+        screen.getByText("Something went wrong fetching metrics per filter")
+      ).toBeVisible();
+    });
   });
 });
