@@ -13,11 +13,12 @@ const renderVisualBar = (
   );
 
 describe("VisualBar", () => {
-  it("should render expected value with correct styling (height, width, bgcolor", () => {
+  it("should display expected value with correct styling (height, width, bgcolor)", () => {
     renderVisualBar("39.1%", 0.39134, "#00B686");
-    expect(screen.getByText("39.1%")).toBeVisible();
-    expect(
-      screen.getByText("39.1%").parentElement!.lastChild!.firstChild
-    ).toHaveStyle("width:39.134%;height:90%;background-color:#00B686");
+    const typography = screen.getByText("39.1%");
+    expect(typography).toBeVisible();
+    expect(typography.parentElement!.lastChild!.firstChild).toHaveStyle(
+      "width:39.134%;height:90%;background-color:#00B686"
+    );
   });
 });

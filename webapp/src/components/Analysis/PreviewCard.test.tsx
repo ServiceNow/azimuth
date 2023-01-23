@@ -30,12 +30,12 @@ describe("PreviewCard", () => {
     const link: HTMLAnchorElement = screen.getByRole("link");
     expect(link).toHaveTextContent("Learn more");
     expect(link.href).toContain("/#performance-analysis");
-    expect(screen.getByTestId("LinkIcon")).toBeInTheDocument();
+    expect(screen.getByTestId("OpenInNewIcon")).toBeInTheDocument();
     // verify if the view details is not displayed if 'to' param is unavailable
-    expect(screen.queryByText(/View details/i)).toBeNull();
+    expect(screen.queryByText("View details")).toBeNull();
   });
 
-  it("should display 'View details' button with right href link to route path and 'Learn more' link button with associated href address to documentation", () => {
+  it("should display 'View details' button with right href link to route path and 'Learn more' link button that contain the right link to the documentation", () => {
     const description = (
       <Description
         text="Compare the class distribution of your training and evaluation sets."
@@ -48,14 +48,14 @@ describe("PreviewCard", () => {
       "/local/dataset_class_distribution_analysis?pipeline_index=0"
     );
     const viewDetailsLinkButton: HTMLAnchorElement = screen.getByRole("link", {
-      name: /View details/,
+      name: "View details",
     });
     expect(viewDetailsLinkButton).toBeInTheDocument();
     expect(viewDetailsLinkButton.href).toContain(
       "/local/dataset_class_distribution_analysis?pipeline_index=0"
     );
     const documentLink: HTMLAnchorElement = screen.getByRole("link", {
-      name: /Learn more/,
+      name: "Learn more",
     });
     expect(documentLink.href).toContain("/dataset-warnings/");
   });

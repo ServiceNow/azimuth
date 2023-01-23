@@ -17,7 +17,7 @@ const renderDatasetSplitToggler = (
   );
 
 describe("DatasetSplitToggler", () => {
-  it("should test the toggle buttons - count, display names and icons of it", () => {
+  it("should display the name and icons of the two toggle buttons", () => {
     renderDatasetSplitToggler({ train: true, eval: true }, "eval");
     // verify if the toggles displayed with correct names
     expect(
@@ -44,7 +44,6 @@ describe("DatasetSplitToggler", () => {
       name: "Training Set",
       pressed: false,
     });
-    // after onChange
     fireEvent.click(trainToggleButton);
     expect(handleValueChange).toBeCalledWith("train");
   });
