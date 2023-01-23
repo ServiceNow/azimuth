@@ -49,10 +49,7 @@ class AliasModel(BaseModel):
         json_encoders = {np.ndarray: lambda x: x.tolist()}
         json_loads = orjson.loads
         json_dumps = orjson_dumps
-
-        @staticmethod
-        def schema_extra(schema):
-            fix_union_types(schema)
+        schema_extra = fix_union_types
 
 
 class ModuleResponse(AliasModel):
