@@ -119,7 +119,7 @@ def get_utterances(
     ds_filtered = filter_dataset_split(
         dataset_split_manager.get_dataset_split(table_key),
         dataset_filters,
-        dataset_split_manager.config,
+        config,
         without_postprocessing,
     )
 
@@ -191,8 +191,8 @@ def get_utterances(
                 DatasetColumn.model_confidences,
                 DatasetColumn.postprocessed_confidences,
                 DatasetColumn.pipeline_steps,
-                dataset_split_manager.config.columns.label,
-                dataset_split_manager.config.columns.text_input,
+                config.columns.label,
+                config.columns.text_input,
                 DatasetColumn.model_outcome,
                 DatasetColumn.postprocessed_outcome,
             ]
@@ -237,12 +237,13 @@ def get_utterances(
     utterances = [
         Utterance(
             index=data[DatasetColumn.row_idx],
+            persistent_id=data[config.columns.persistent_id],
             data_action=next(
                 (t for t, v in tag.items() if t in ALL_DATA_ACTIONS and v),
                 DataAction.no_action,
             ),
-            label=data[dataset_split_manager.config.columns.label],
-            utterance=data[dataset_split_manager.config.columns.text_input],
+            label=data[config.columns.label],
+            utterance=data[config.columns.text_input],
             model_prediction=model_prediction,
             model_saliency=model_saliency,
             # Smart tags families
