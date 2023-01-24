@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { renderWithRouterAndRedux } from "mocks/utils";
 import PerformanceAnalysis from "./PerformanceAnalysis";
 import { AvailableDatasetSplits } from "types/api";
@@ -63,11 +63,9 @@ describe("PerformanceAnalysis", () => {
       ];
       const actualColumnHeaders = screen.getAllByRole("columnheader");
       expectedColumnHeaders.forEach((name, index) => {
-        name.includes("Correct")
-          ? expect(screen.getAllByTestId("CheckIcon")).toBeTruthy()
-          : name.includes("Incorrect")
-          ? expect(screen.getAllByTestId("XIcon")).toBeTruthy()
-          : expect(actualColumnHeaders[index].textContent).toEqual(name);
+        name.includes("&")
+          ? within(actualColumnHeaders[index]).getByLabelText(name)
+          : expect(actualColumnHeaders[index]).toHaveTextContent(name);
       });
     });
   });
@@ -82,7 +80,6 @@ describe("PerformanceAnalysis", () => {
     renderPerformanceAnalysis({ train: true, eval: true });
     fireEvent.mouseDown(screen.getByRole("button", { name: "Label" }));
     const filterList = screen.getAllByRole("option");
-    expect(filterList).toHaveLength(10);
 
     const expectedList = [
       "Label",
@@ -96,11 +93,17 @@ describe("PerformanceAnalysis", () => {
       "Pipeline Comparison",
       "Uncertain",
     ];
+    expect(filterList).toHaveLength(expectedList.length);
     filterList.forEach((item, index) => {
-      expect(item.textContent).toEqual(expectedList[index]);
+      expect(item).toHaveTextContent(expectedList[index]);
     });
 
     expect(screen.getByRole("option", { name: "Smart Tags" })).toHaveAttribute(
+      "aria-selected",
+      "false"
+    );
+
+    expect(screen.getByRole("option", { name: "Prediction" })).toHaveAttribute(
       "aria-selected",
       "false"
     );
@@ -110,7 +113,7 @@ describe("PerformanceAnalysis", () => {
     ).toBeInTheDocument();
   });
 
-  it("should not display the Footer component if the number of rows are lesser than initial number", async () => {
+  it("should not display the Footer component if the number of rows is lesser than initial number", async () => {
     renderPerformanceAnalysis({ train: true, eval: true });
     await waitFor(() => expect(screen.queryByText(/See more/)).toBeNull());
   });
