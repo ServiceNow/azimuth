@@ -15,7 +15,12 @@ from azimuth.app import (
     require_editable_config,
     run_startup_tasks,
 )
-from azimuth.config import AzimuthConfig, AzimuthValidationError
+from azimuth.config import (
+    AzimuthConfig,
+    AzimuthValidationError,
+    CustomObject,
+    PipelineDefinition,
+)
 from azimuth.task_manager import TaskManager
 from azimuth.utils.project import update_config
 
@@ -23,6 +28,21 @@ log = structlog.get_logger(__name__)
 router = APIRouter()
 
 TAGS = ["Admin v1"]
+REQUIRED = "required"
+
+
+@router.get(
+    "/default_config",
+    summary="Get default configuration",
+    description="Get the default configuration",
+    response_model=AzimuthConfig,
+    tags=TAGS,
+)
+def get_default_config_def() -> AzimuthConfig:
+    return AzimuthConfig(
+        dataset=CustomObject(class_name=REQUIRED),
+        pipelines=[PipelineDefinition(name=REQUIRED, model=CustomObject(class_name=REQUIRED))],
+    )
 
 
 @router.get(
