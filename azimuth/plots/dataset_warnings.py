@@ -74,16 +74,17 @@ def sample_count_plot(
 
     # Generate warning indicators on the left axis
     alert_text_per_split = {DatasetSplitName.eval: "◓", DatasetSplitName.train: "◒"}
-    common_args = dict(
-        xref="paper",
-        showarrow=False,
-        x=-0.037,
-        font=dict(color=Colors.Orange, size=AXIS_FONT_SIZE),
-    )
     for split, alert in alert_per_cls_per_split.items():
         for idx, cls in enumerate(order):
             if alert[cls]:
-                fig.add_annotation(text=alert_text_per_split[split], y=idx, **common_args)
+                fig.add_annotation(
+                    text=alert_text_per_split[split],
+                    y=idx,
+                    xref="paper",
+                    showarrow=False,
+                    x=-0.037,
+                    font=dict(color=Colors.Orange, size=AXIS_FONT_SIZE),
+                )
 
     y_legend_1 = Y_LEGEND_LINE_1 + 3 * Y_LEGEND_LINE_HEIGHT
     y_legend_2 = Y_LEGEND_LINE_1 + 4 * Y_LEGEND_LINE_HEIGHT

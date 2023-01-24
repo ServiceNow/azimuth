@@ -109,14 +109,10 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             count_norm_per_cls_per_split[DatasetSplitName.eval]
             - count_norm_per_cls_per_split[DatasetSplitName.train]
         )
-        alert_norm_per_cls = np.logical_or(
-            divergence_norm_per_cls > max_delta_representation,
-            divergence_norm_per_cls < -max_delta_representation,
-        )
+        alert_norm_per_cls = np.abs(divergence_norm_per_cls) > max_delta_representation
 
         first_dm = next(iter(dm_dict.values()))
         cls_names = first_dm.get_class_names(labels_only=True)
-        cls_indices = np.arange(first_dm.get_num_classes(labels_only=True))
         return [
             DatasetWarning(
                 name=f"Missing samples (<{min_count_per_cls})",
@@ -126,7 +122,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Integer,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=cls_names[i],
+                        name=cls_name,
                         alert=alert_min_per_cls[i],
                         data=[
                             DatasetDistributionComparisonValue(
@@ -136,7 +132,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                             for s, count in reversed(sorted(count_per_cls_per_split.items()))
                         ],
                     )
-                    for i in cls_indices
+                    for i, cls_name in enumerate(cls_names)
                 ],
                 plots=min_sample_count_plot(
                     count_per_cls_per_split,
@@ -154,7 +150,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Percentage,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=cls_names[i],
+                        name=cls_name,
                         alert=alert_imb_per_cls[i],
                         data=[
                             DatasetDistributionComparisonValue(
@@ -164,7 +160,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                             for s, imb in reversed(sorted(imb_per_cls_per_split.items()))
                         ],
                     )
-                    for i in cls_indices
+                    for i, cls_name in enumerate(cls_names)
                 ],
                 plots=class_imbalance_plot(
                     count_per_cls_per_split,
@@ -183,7 +179,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Percentage,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=cls_names[i],
+                        name=cls_name,
                         alert=alert_norm_per_cls[i],
                         data=[
                             DatasetDistributionComparisonValue(
@@ -192,7 +188,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                             )
                         ],
                     )
-                    for i in cls_indices
+                    for i, cls_name in enumerate(cls_names)
                 ],
                 plots=class_representation(
                     count_per_cls_per_split,
