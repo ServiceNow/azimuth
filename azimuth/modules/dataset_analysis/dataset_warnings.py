@@ -12,7 +12,7 @@ from azimuth.modules.base_classes import ComparisonModule
 from azimuth.plots.dataset_warnings import (
     class_imbalance_plot,
     class_representation,
-    min_nb_samples_plot,
+    min_sample_count_plot,
     word_count_plot,
 )
 from azimuth.types import DatasetColumn, DatasetSplitName
@@ -41,94 +41,108 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         Returns:
             The warnings grouped by type.
         """
-        train_mng = self.get_dataset_split_manager(DatasetSplitName.train)
-        eval_mng = self.get_dataset_split_manager(DatasetSplitName.eval)
-
-        dm = train_mng or eval_mng
+        dm_dict = {
+            split: self.get_dataset_split_manager(split) for split in self.available_dataset_splits
+        }
 
         return [
             DatasetWarningsResponse(
                 warning_groups=[
                     DatasetWarningGroup(
                         name="General Warnings",
-                        warnings=self.get_general_warnings(train_mng, eval_mng),
+                        warnings=self.get_general_warnings(dm_dict),
                     ),
                     DatasetWarningGroup(
                         name="Syntactic Warnings",
-                        warnings=self.get_syntactic_warnings(dm),
+                        warnings=self.get_syntactic_warnings(dm_dict),
                     ),
                 ]
             )
         ]
 
     def get_general_warnings(
-        self, train_mng: DatasetSplitManager, eval_mng: DatasetSplitManager
+        self, dm_dict: Dict[DatasetSplitName, DatasetSplitManager]
     ) -> List[DatasetWarning]:
-        """
-        From the train and eval sets, generate different alerts based on nb of samples and class
-        distribution.
+        """Generate different alerts based on sample count in each dataset split.
 
         Args:
-            train_mng: Manager for the training set
-            eval_mng: Manager for the evaluation set
+            dm_dict: Dict with all dataset split managers.
 
         Returns:
-            Dictionary with different alerts
+            General warnings
         """
-        train_dist = train_mng.class_distribution(labels_only=True)
-        eval_dist = eval_mng.class_distribution(labels_only=True)
-        class_names = train_mng.get_class_names(labels_only=True)
-        min_num_per_class = self.config.dataset_warnings.min_num_per_class
-        alert_train_nb_min = train_dist < min_num_per_class
-        alert_eval_nb_min = eval_dist < min_num_per_class
-        alert_nb_min = alert_train_nb_min | alert_eval_nb_min
+        count_per_cls_per_split = {
+            s: dm.class_distribution(labels_only=True) for s, dm in dm_dict.items()
+        }
 
-        train_mean = np.mean(train_dist)
-        eval_mean = np.mean(eval_dist)
-        perc_imb_train = train_dist / train_mean - 1
-        perc_imb_eval = eval_dist / eval_mean - 1
+        # Compute all data based on class distribution needed for all general warnings.
+        min_count_per_cls = self.config.dataset_warnings.min_num_per_class
         max_delta_imb = self.config.dataset_warnings.max_delta_class_imbalance
-        alert_imb_train = np.abs(perc_imb_train) > max_delta_imb
-        alert_imb_eval = np.abs(perc_imb_eval) > max_delta_imb
-        alert_imb = alert_imb_train | alert_imb_eval
+        alert_min_per_cls_per_split = {}
+        mean_per_split = {}
+        imb_per_cls_per_split = {}
+        count_norm_per_cls_per_split = {}
+        for split, count in count_per_cls_per_split.items():
+            alert_min_per_cls_per_split[split] = count < min_count_per_cls
+            mean_per_split[split] = np.mean(count)
+            imb_per_cls_per_split[split] = count / mean_per_split[split] - 1
+            count_norm_per_cls_per_split[split] = count / sum(count)
 
-        train_dist_norm = train_dist / sum(train_dist)
-        eval_dist_norm = eval_dist / sum(eval_dist)
-        max_delta_representation = self.config.dataset_warnings.max_delta_representation
-        divergence_norm = eval_dist_norm - train_dist_norm
-        alert_norm = np.logical_or(
-            divergence_norm > max_delta_representation, divergence_norm < -max_delta_representation
+        # Missing samples warning
+        alert_min_per_cls = (
+            alert_min_per_cls_per_split[DatasetSplitName.train]
+            | alert_min_per_cls_per_split[DatasetSplitName.eval]
         )
 
+        # Class imbalance warning
+        alert_imb_per_cls_per_split = {
+            s: np.abs(imb) > max_delta_imb for s, imb in imb_per_cls_per_split.items()
+        }
+        alert_imb_per_cls = (
+            alert_imb_per_cls_per_split[DatasetSplitName.train]
+            | alert_imb_per_cls_per_split[DatasetSplitName.eval]
+        )
+
+        # Class representation warning
+        max_delta_representation = self.config.dataset_warnings.max_delta_representation
+        divergence_norm_per_cls = (
+            count_norm_per_cls_per_split[DatasetSplitName.eval]
+            - count_norm_per_cls_per_split[DatasetSplitName.train]
+        )
+        alert_norm_per_cls = np.logical_or(
+            divergence_norm_per_cls > max_delta_representation,
+            divergence_norm_per_cls < -max_delta_representation,
+        )
+
+        first_dm = next(iter(dm_dict.values()))
+        cls_names = first_dm.get_class_names(labels_only=True)
+        cls_indices = np.arange(first_dm.get_num_classes(labels_only=True))
         return [
             DatasetWarning(
-                name=f"Missing samples (<{min_num_per_class})",
+                name=f"Missing samples (<{min_count_per_cls})",
                 description=f"Nb of samples per class in the training or evaluation set is below "
-                f"{min_num_per_class}.",
+                f"{min_count_per_cls}.",
                 columns=["training", "evaluation"],
                 format=FormatType.Integer,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=class_names[i],
-                        alert=alert_nb_min[i],
+                        name=cls_names[i],
+                        alert=alert_min_per_cls[i],
                         data=[
                             DatasetDistributionComparisonValue(
-                                value=int(train_dist[i]), alert=alert_train_nb_min[i]
-                            ),
-                            DatasetDistributionComparisonValue(
-                                value=int(eval_dist[i]), alert=alert_eval_nb_min[i]
-                            ),
+                                value=int(count[i]), alert=alert_min_per_cls_per_split[s][i]
+                            )
+                            # Training set needs to be first
+                            for s, count in reversed(sorted(count_per_cls_per_split.items()))
                         ],
                     )
-                    for i, _ in enumerate(train_dist)
+                    for i in cls_indices
                 ],
-                plots=min_nb_samples_plot(
-                    train_dist,
-                    eval_dist,
-                    min_num_per_class,
-                    alert_train_nb_min,
-                    alert_eval_nb_min,
-                    class_names,
+                plots=min_sample_count_plot(
+                    count_per_cls_per_split,
+                    min_count_per_cls,
+                    alert_min_per_cls_per_split,
+                    cls_names,
                 ),
             ),
             DatasetWarning(
@@ -140,28 +154,24 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Percentage,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=class_names[i],
-                        alert=alert_imb[i],
+                        name=cls_names[i],
+                        alert=alert_imb_per_cls[i],
                         data=[
                             DatasetDistributionComparisonValue(
-                                value=perc_imb_train[i], alert=alert_imb_train[i]
-                            ),
-                            DatasetDistributionComparisonValue(
-                                value=perc_imb_eval[i], alert=alert_imb_eval[i]
-                            ),
+                                value=imb[i], alert=alert_imb_per_cls_per_split[s][i]
+                            )
+                            # Training set needs to be first
+                            for s, imb in reversed(sorted(imb_per_cls_per_split.items()))
                         ],
                     )
-                    for i, _ in enumerate(alert_imb)
+                    for i in cls_indices
                 ],
                 plots=class_imbalance_plot(
-                    train_dist,
-                    eval_dist,
-                    train_mean,
-                    eval_mean,
+                    count_per_cls_per_split,
+                    mean_per_split,
                     max_delta_imb,
-                    alert_imb_train,
-                    alert_imb_eval,
-                    class_names,
+                    alert_imb_per_cls_per_split,
+                    cls_names,
                 ),
             ),
             DatasetWarning(
@@ -173,44 +183,46 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Percentage,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=class_names[i],
-                        alert=alert_norm[i],
+                        name=cls_names[i],
+                        alert=alert_norm_per_cls[i],
                         data=[
                             DatasetDistributionComparisonValue(
-                                value=float(np.abs(divergence_norm[i])), alert=alert_norm[i]
+                                value=float(np.abs(divergence_norm_per_cls[i])),
+                                alert=alert_norm_per_cls[i],
                             )
                         ],
                     )
-                    for i, _ in enumerate(train_dist)
+                    for i in cls_indices
                 ],
                 plots=class_representation(
-                    train_dist,
-                    eval_dist,
-                    train_dist_norm,
-                    eval_dist_norm,
-                    divergence_norm,
+                    count_per_cls_per_split,
+                    count_norm_per_cls_per_split,
+                    divergence_norm_per_cls,
                     max_delta_representation,
-                    class_names,
+                    cls_names,
                 ),
             ),
         ]
 
-    def get_syntactic_warnings(self, dm: DatasetSplitManager) -> List[DatasetWarning]:
+    def get_syntactic_warnings(
+        self, dm_dict: Dict[DatasetSplitName, DatasetSplitManager]
+    ) -> List[DatasetWarning]:
         """Generate warnings related to the syntax of the utterances.
 
         Args:
-            dm: DatasetSplitManager for either split.
+            dm_dict: Dict with all dataset split managers.
 
         Returns:
             List of syntactic warnings.
 
         """
-        class_indices = np.arange(dm.get_num_classes(labels_only=True))
+        first_dm = next(iter(dm_dict.values()))
+        cls_indices = np.arange(first_dm.get_num_classes(labels_only=True))
         value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]] = defaultdict(dict)
-        value_per_label_per_agg_per_split: Dict[
+        value_per_cls_per_agg_per_split: Dict[
             DatasetSplitName, Dict[Agg, np.ndarray]
         ] = defaultdict(dict)
-        hist_per_label_per_split = {}
+        hist_per_cls_per_split = {}
 
         for split in self.available_dataset_splits:
             ds = self.get_dataset_split(split)
@@ -221,51 +233,48 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             value_per_agg_per_split[split][Agg.mean] = df["word_count"].mean()
             value_per_agg_per_split[split][Agg.std] = df["word_count"].std()
 
-            # Get mean and std word count per label
-            stats_per_label = df.groupby("label").agg(list(Agg)).reindex(class_indices)
+            # Get mean and std word count per class
+            stats_per_cls = df.groupby("label").agg(list(Agg)).reindex(cls_indices)
             for agg in Agg:
-                value_per_label_per_agg_per_split[split][agg] = stats_per_label["word_count"][
+                value_per_cls_per_agg_per_split[split][agg] = stats_per_cls["word_count"][
                     agg
                 ].to_numpy()
 
-            # Get word count histogram per label. Columns are word counts and rows are labels.
-            hist_per_label_per_split[split] = (
+            # Get word count histogram per class. Columns are word counts and rows are classes.
+            hist_per_cls_per_split[split] = (
                 df.groupby(["label", "word_count"])
                 .size()
                 .unstack(fill_value=0)
-                .reindex(class_indices, fill_value=0)
+                .reindex(cls_indices, fill_value=0)
             )
 
         # Compute divergence and alerts
-        divergence_per_label_per_agg = {}
-        alert_per_label_per_agg = {}
+        divergence_per_cls_per_agg, alert_per_cls_per_agg = {}, {}
         threshold_per_agg = {
             Agg.mean: self.config.dataset_warnings.max_delta_mean_words,
             Agg.std: self.config.dataset_warnings.max_delta_std_words,
         }
         for agg, threshold in threshold_per_agg.items():
-            divergence_per_label_per_agg[agg] = np.abs(
-                value_per_label_per_agg_per_split[DatasetSplitName.train][agg]
-                - value_per_label_per_agg_per_split[DatasetSplitName.eval][agg]
+            divergence_per_cls_per_agg[agg] = np.abs(
+                value_per_cls_per_agg_per_split[DatasetSplitName.train][agg]
+                - value_per_cls_per_agg_per_split[DatasetSplitName.eval][agg]
             )
-            alert_per_label_per_agg[agg] = divergence_per_label_per_agg[agg] > threshold
-        alert_per_label = np.any(
-            [alert_per_label_per_agg[Agg.mean], alert_per_label_per_agg[Agg.std]], axis=0
+            alert_per_cls_per_agg[agg] = divergence_per_cls_per_agg[agg] > threshold
+        alert_per_cls = np.any(
+            [alert_per_cls_per_agg[Agg.mean], alert_per_cls_per_agg[Agg.std]], axis=0
         )
 
         # Fill columns so both splits have the same values from 1 to N.
-        N = max(
-            max(hist_per_label_per_split[split].columns) for split in self.available_dataset_splits
-        )
-        hist_filled_per_split_per_label = dict()
-        for split, hist_per_label in hist_per_label_per_split.items():
-            hist_filled_per_split_per_label[split] = np.zeros([len(hist_per_label), N], dtype=int)
+        N = max(max(hist.columns) for hist in hist_per_cls_per_split.values())
+        hist_filled_per_cls_per_split = {}
+        for split, hist_per_cls in hist_per_cls_per_split.items():
+            hist_filled_per_cls_per_split[split] = np.zeros([len(hist_per_cls), N], dtype=int)
             # Fill with token count (-1 because columns start at 1)
-            hist_filled_per_split_per_label[split][
-                :, np.array(hist_per_label.columns) - 1
-            ] = hist_per_label.to_numpy()
+            hist_filled_per_cls_per_split[split][
+                :, np.array(hist_per_cls.columns) - 1
+            ] = hist_per_cls.to_numpy()
 
-        class_names = dm.get_class_names(labels_only=True)
+        cls_names = first_dm.get_class_names(labels_only=True)
         return [
             DatasetWarning(
                 name=f"Length mismatch "
@@ -277,24 +286,24 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                 format=FormatType.Decimal,
                 comparisons=[
                     DatasetDistributionComparison(
-                        name=class_names[i],
-                        alert=alert_per_label[i],
+                        name=cls_names[i],
+                        alert=alert_per_cls[i],
                         data=[
                             DatasetDistributionComparisonValue(
-                                value=divergence_per_label_per_agg[agg][i],
-                                alert=alert_per_label_per_agg[agg][i],
+                                value=divergence_per_cls_per_agg[agg][i],
+                                alert=alert_per_cls_per_agg[agg][i],
                             )
                             for agg in Agg
                         ],
                     )
-                    for i in class_indices
+                    for i in cls_indices
                 ],
                 plots=word_count_plot(
-                    hist_filled_per_split_per_label,
+                    hist_filled_per_cls_per_split,
                     value_per_agg_per_split,
-                    value_per_label_per_agg_per_split,
-                    divergence_per_label_per_agg,
-                    class_names,
+                    value_per_cls_per_agg_per_split,
+                    divergence_per_cls_per_agg,
+                    cls_names,
                 ),
             )
         ]

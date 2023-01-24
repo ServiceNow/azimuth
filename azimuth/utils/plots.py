@@ -52,11 +52,15 @@ DATASET_SPLIT_COLORS = {
     DatasetSplitName.eval: Colors.DataViz1,
     DatasetSplitName.train: Colors.DataViz2,
 }
-
 DATASET_SPLIT_PRETTY_NAMES = {
     DatasetSplitName.eval: "evaluation set",
     DatasetSplitName.train: "training set",
 }
+DATASET_SPLIT_OFFSETS = {DatasetSplitName.eval: 0, DatasetSplitName.train: -0.4}
+
+
+def plot_height_based_on_cls_count(cls_count):
+    return PAPER_MARGINS["t"] + PAPER_MARGINS["b"] + max(cls_count, 6) * 23
 
 
 def fig_default(fig):
