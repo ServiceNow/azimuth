@@ -97,16 +97,16 @@ def test_dataset_warnings(app: FastAPI) -> None:
                         {
                             "alert": True,
                             "data": [
-                                {"alert": True, "value": 8.015810276679842},
-                                {"alert": True, "value": 3.5906416471375184},
+                                {"alert": True, "value": 7.92292490118577},
+                                {"alert": True, "value": 3.5343478830359656},
                             ],
                             "name": "negative",
                         },
                         {
                             "alert": True,
                             "data": [
-                                {"alert": True, "value": 7.389473684210527},
-                                {"alert": True, "value": 3.5437914479857975},
+                                {"alert": True, "value": 7.547368421052633},
+                                {"alert": True, "value": 3.475890077806949},
                             ],
                             "name": "positive",
                         },

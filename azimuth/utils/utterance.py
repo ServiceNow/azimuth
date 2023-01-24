@@ -13,5 +13,5 @@ def clean_utterance(utterance: str) -> str:
         utterance_clean: Cleaned utterance.
 
     """
-    utterance_clean = utterance.replace("’", "'").lower()  # Quote->apostrophe (unicode 8217 -> 39)
+    utterance_clean = utterance.replace("’", "'").replace("`", "'").lower()
     return utterance_clean
