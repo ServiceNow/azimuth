@@ -113,19 +113,6 @@ def test_get_utterances_pagination(app: FastAPI):
     assert resp.status_code == 400
 
 
-def test_get_utterances_saliency(app: FastAPI, monkeypatch):
-    import azimuth.routers.v1.utterances as utt_module
-
-    monkeypatch.setattr(utt_module, "saliency_available", lambda x: True)
-    client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0").json()
-    assert len(resp["utterances"]) == UTTERANCE_COUNT
-
-    first_utterance = resp["utterances"][0]
-    assert len(first_utterance["modelPrediction"]["modelPredictions"]) == 2
-    assert len(first_utterance["modelSaliency"]) == 2
-
-
 def test_get_utterances_empty_filters(app: FastAPI):
     client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances?utterance=yukongold").json()

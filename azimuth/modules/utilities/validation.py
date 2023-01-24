@@ -13,6 +13,7 @@ from azimuth.modules.model_contract_task_mapping import model_contract_task_mapp
 from azimuth.types import ModuleOptions, SupportedMethod, SupportedModelContract
 from azimuth.types.validation import ValidationResponse
 from azimuth.utils.logs import MultipleExceptions
+from azimuth.utils.project import predictions_available, saliency_available
 from azimuth.utils.validation import assert_not_none
 
 
@@ -40,7 +41,7 @@ class ValidationModule(AggregationModule[ModelContractConfig]):
 
         model = (
             exception_gatherer.try_calling_function(self.get_model)
-            if self.config.pipelines is not None
+            if predictions_available(self.config)
             else None
         )
         can_load_model = model is not None
@@ -61,7 +62,7 @@ class ValidationModule(AggregationModule[ModelContractConfig]):
                 exception_gatherer.try_calling_function(self._validate_prediction, batch=batch)
                 is not None
             )
-            if can_make_prediction:
+            if can_make_prediction and saliency_available(self.config):
                 can_make_saliency = (
                     exception_gatherer.try_calling_function(self._validate_saliency, batch=batch)
                     is not None

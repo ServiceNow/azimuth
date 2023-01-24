@@ -116,7 +116,7 @@ class HFTextClassificationModule(TextClassificationModule):
 
         """
         if self.saliency_layer is None:
-            return self.empty_saliency_from_batch(batch)
+            raise ValueError("This method should not be called when saliency_layer is not defined.")
 
         pipeline = self.get_model()
 

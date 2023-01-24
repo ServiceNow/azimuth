@@ -41,7 +41,7 @@ def test_validation_module_happy_path_custom_text_classification(guse_text_confi
     assert result.can_load_dataset
     assert result.model_has_correct_type
     assert result.can_make_prediction
-    assert result.can_make_saliency
+    assert not result.can_make_saliency
 
 
 def test_validation_module_cant_load_model(simple_text_config):
