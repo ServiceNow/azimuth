@@ -78,7 +78,7 @@ const Dashboard = () => {
           Go to exploration space
         </Button>
       </Box>
-      {datasetInfo.availableDatasetSplits.train && (
+      {
         <PreviewCard
           title="Dataset Warnings"
           to={`/${jobId}/dataset_warnings${searchString}`}
@@ -93,7 +93,7 @@ const Dashboard = () => {
             <WarningsPreview jobId={jobId} />
           </Box>
         </PreviewCard>
-      )}
+      }
       {datasetInfo.availableDatasetSplits.train &&
         datasetInfo.similarityAvailable && (
           <PreviewCard
