@@ -58,4 +58,4 @@ time will clear that search filter, so does the ✗ in the `Search utterances` f
     saliency values is greater than 60% of the largest saliency value in the utterance.
 
     If saliency maps are not available, the word clouds only show the most **frequent words** which
-    are neither punctuation or stop words, according to the spacy model defined in the config.
+    are neither punctuation nor stop words, according to the spacy model defined in the config.

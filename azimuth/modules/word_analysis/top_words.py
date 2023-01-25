@@ -125,7 +125,7 @@ class TopWordsModule(FilterableModule[TopWordsConfig]):
                         )
                     ]
         # If saliency is not available, we proxy important words as any word that is neither
-        # punctuation or a stop word.
+        # punctuation nor a stop word.
         else:
             spacy_model = spacy.load(self.config.syntax.spacy_model)
             utterances = ds[self.config.columns.text_input]
