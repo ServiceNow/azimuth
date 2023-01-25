@@ -4,7 +4,7 @@
 from typing import Dict
 
 import structlog
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import ValidationError
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -20,6 +20,7 @@ from azimuth.config import (
     AzimuthValidationError,
     CustomObject,
     PipelineDefinition,
+    SupportedLanguage,
 )
 from azimuth.task_manager import TaskManager
 from azimuth.utils.project import update_config
@@ -38,8 +39,11 @@ REQUIRED = "required"
     response_model=AzimuthConfig,
     tags=TAGS,
 )
-def get_default_config_def() -> AzimuthConfig:
+def get_default_config_def(
+    language: SupportedLanguage = Query(AzimuthConfig.__fields__["language"].default),
+) -> AzimuthConfig:
     return AzimuthConfig(
+        language=language,
         dataset=CustomObject(class_name=REQUIRED),
         pipelines=[PipelineDefinition(name=REQUIRED, model=CustomObject(class_name=REQUIRED))],
     )
