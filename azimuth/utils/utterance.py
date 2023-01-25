@@ -1,6 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+import re
 
 
 def clean_utterance(utterance: str) -> str:
@@ -13,5 +14,6 @@ def clean_utterance(utterance: str) -> str:
         utterance_clean: Cleaned utterance.
 
     """
-    utterance_clean = utterance.replace("’", "'").replace("`", "'").lower()
+    re_irregular_apostrophes = re.compile("[’`]")
+    utterance_clean = re_irregular_apostrophes.sub("'", utterance).lower()
     return utterance_clean

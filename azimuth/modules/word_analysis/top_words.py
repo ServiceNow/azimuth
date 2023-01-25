@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 from collections import Counter
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import spacy
@@ -26,7 +26,12 @@ MIN_SALIENCY = 0.01
 
 
 class TopWordsModule(FilterableModule[AzimuthConfig]):
-    """Returns the most important words in terms of their saliency value or frequency."""
+    """Returns the most important words in terms of their saliency value or frequency.
+
+    Note: The config scope is AzimuthConfig because the module relies on both the pipeline or the
+    syntax config, depending if saliency is available. AzimuthConfig is a bit too broad, but it
+    should not be a problem since this module computes fast.
+    """
 
     allowed_mod_options = FilterableModule.allowed_mod_options | {
         "top_x",
@@ -101,7 +106,7 @@ class TopWordsModule(FilterableModule[AzimuthConfig]):
                 )
             ]
 
-        important_words_per_idx = {}
+        important_words_per_idx: Dict[int, List[str]] = {}
         if importance_criteria == TopWordsImportanceCriteria.salient:
             words_saliencies = self.get_words_saliencies(self.get_indices())
             tokenizer = self.get_model().tokenizer
@@ -139,19 +144,15 @@ class TopWordsModule(FilterableModule[AzimuthConfig]):
             get_predictions_from_ds(ds, self.mod_options.without_postprocessing)
         ) != np.array(ds[self.config.columns.label])
 
-        important_words_all = [word for words in important_words_per_idx.values() for word in words]
-        important_words_right = [
-            word
-            for idx, words in important_words_per_idx.items()
-            for word in words
-            if not is_error[idx]
-        ]
-        important_words_errors = [
-            word
-            for idx, words in important_words_per_idx.items()
-            for word in words
-            if is_error[idx]
-        ]
+        important_words_all = []
+        important_words_errors = []
+        important_words_right = []
+        for idx, important_words in important_words_per_idx.items():
+            important_words_all.extend(important_words)
+            if is_error[idx]:
+                important_words_errors.extend(important_words)
+            else:
+                important_words_right.extend(important_words)
 
         top_x = self.mod_options.top_x
 

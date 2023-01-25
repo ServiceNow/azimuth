@@ -65,15 +65,13 @@ def test_top_words_without_saliency(file_text_config_top1):
     )
     [json_output] = mod.compute_on_dataset_split()
 
-    top_word_all = [top_words_result.word for top_words_result in json_output.all]
-    top_word_right = [top_words_result.word for top_words_result in json_output.right]
-    top_word_errors = [top_words_result.word for top_words_result in json_output.errors]
+    top_word_all = {top_words_result.word for top_words_result in json_output.all}
+    top_word_right = {top_words_result.word for top_words_result in json_output.right}
+    top_word_errors = {top_words_result.word for top_words_result in json_output.errors}
 
-    assert all(
-        word in top_word_all for word in ["phone", "potato", "pizza", "forest", "park", "turning"]
-    )
-    assert all(word not in top_word_all for word in ["to", "the", "not", "with", "on"])
-    assert all(word in top_word_right for word in ["phone", "potato", "pizza", "forest"])
-    assert all(word not in top_word_right for word in ["turning", "park"])
-    assert all(word in top_word_errors for word in ["phone", "turning", "park"])
-    assert all(word not in top_word_errors for word in ["potato", "pizza", "forest"])
+    assert {"phone", "potato", "pizza", "forest", "park", "turning"}.issubset(top_word_all)
+    assert {"to", "the", "not", "with", "on"}.isdisjoint(top_word_all)
+    assert {"phone", "potato", "pizza", "forest", "walk", "problem", "order"} == top_word_right
+    assert {"turning", "park"}.isdisjoint(top_word_right)
+    assert {"phone", "turning", "park"} == top_word_errors
+    assert {"potato", "pizza", "forest"}.isdisjoint(top_word_errors)
