@@ -11,7 +11,8 @@ from datasets import ClassLabel
 
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.dataset_analysis.dataset_warnings import DatasetWarningsModule
-from azimuth.types import DatasetSplitName, ModuleOptions
+from azimuth.types import DatasetSplitName
+from tests.utils import generate_mocked_dm, get_tiny_text_config_one_ds_name
 
 
 @pytest.mark.parametrize("remove_one_class", [True, False])
@@ -115,16 +116,27 @@ def remove_one_cls(mod):
     mod.get_dataset_split_manager(DatasetSplitName.eval)._base_dataset_split = augmented
 
 
-def test_with_dataset_and_indices(simple_text_config):
-    with pytest.raises(ValueError):
-        DatasetWarningsModule(
-            dataset_split_name=DatasetSplitName.eval,
-            config=simple_text_config,
-        )
+def test_dataset_warnings_with_one_ds(tiny_text_config_one_ds):
+    split, _ = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
+    generate_mocked_dm(tiny_text_config_one_ds, dataset_split_name=split)  # Needed for word count.
 
-    with pytest.raises(ValueError):
-        DatasetWarningsModule(
-            dataset_split_name=DatasetSplitName.all,
-            config=simple_text_config,
-            mod_options=ModuleOptions(indices=[1, 2]),
-        )
+    mod = DatasetWarningsModule(
+        dataset_split_name=DatasetSplitName.all,
+        config=tiny_text_config_one_ds,
+    )
+    output = mod.compute_on_dataset_split()[0].warning_groups
+
+    general_warnings = output[0]
+    assert len(general_warnings.warnings) == 2, "Only 2 general warnings with one dataset split"
+    assert all(
+        [
+            len(comparison.data) == 1
+            for warning in general_warnings.warnings
+            for comparison in warning.comparisons
+        ]
+    ), "Only data for one split"
+
+    syntactic_warnings = output[1]
+    assert not all(
+        [comparison.alert for comparison in syntactic_warnings.warnings[0].comparisons]
+    ), "No alert with one split"
