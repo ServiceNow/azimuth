@@ -28,7 +28,7 @@ import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
-const INT = { inputProps: { min: 0 } };
+const INT = { inputProps: { min: 1 } };
 const FLOAT = { inputProps: { min: 0, step: 0.1 } };
 const COSINE_SIMILARITY = { inputProps: { min: -1, max: 1, step: 0.1 } };
 
