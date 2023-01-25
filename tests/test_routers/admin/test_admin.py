@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from jsonlines import jsonlines
 from starlette.testclient import TestClient
 
+from azimuth.config import SupportedLanguage, config_defaults_per_language
+
 
 def test_get_default_config(app: FastAPI):
     client = TestClient(app)
@@ -103,6 +105,20 @@ def test_get_default_config(app: FastAPI):
             },
         },
     }
+
+
+def test_get_default_config_french(app: FastAPI):
+    client = TestClient(app)
+    res = client.get("/admin/default_config?language=fr").json()
+
+    defaults = config_defaults_per_language[SupportedLanguage.fr]
+    assert res["language"] == "fr"
+    assert res["behavioral_testing"]["neutral_token"]["prefix_list"] == defaults.prefix_list
+    assert res["behavioral_testing"]["neutral_token"]["suffix_list"] == defaults.suffix_list
+    assert res["syntax"]["spacy_model"] == defaults.spacy_model
+    assert res["syntax"]["subj_tags"] == defaults.subj_tags
+    assert res["syntax"]["obj_tags"] == defaults.obj_tags
+    assert res["similarity"]["faiss_encoder"] == defaults.faiss_encoder
 
 
 def test_get_config(app: FastAPI):

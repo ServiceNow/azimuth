@@ -958,11 +958,22 @@ export interface operations {
   };
   /** Get the default configuration */
   get_default_config_def_admin_default_config_get: {
+    parameters: {
+      query: {
+        language?: components["schemas"]["SupportedLanguage"];
+      };
+    };
     responses: {
       /** Successful Response */
       200: {
         content: {
           "application/json": components["schemas"]["AzimuthConfig"];
+        };
+      };
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };
