@@ -227,7 +227,8 @@ const Settings: React.FC = () => {
                 {
                   ...pipeline,
                   postprocessors: checked
-                    ? config.pipelines![pipelineIndex].postprocessors ?? []
+                    ? config.pipelines![pipelineIndex].postprocessors ??
+                      defaultConfig.pipelines![0].postprocessors
                     : null,
                 },
                 ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
@@ -251,6 +252,7 @@ const Settings: React.FC = () => {
     <NumberField
       label={field}
       value={value}
+      disabled={!resultingConfig.pipelines![pipelineIndex].postprocessors}
       onChange={(newValue) =>
         setPartialConfig({
           ...partialConfig,
@@ -422,7 +424,10 @@ const Settings: React.FC = () => {
                 <FormControl>
                   {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
                   <FormGroup sx={{ gap: 2 }}>
-                    {pipeline.postprocessors?.map((postprocessor, index) => (
+                    {(
+                      pipeline.postprocessors ??
+                      defaultConfig.pipelines![0].postprocessors
+                    )?.map((postprocessor, index) => (
                       <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
                         <Columns columns={3}>
                           {displayReadonlyFields(
