@@ -302,7 +302,9 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             threshold=rejection_class_threshold,
             rejection_class_idx=rejection_class_idx,
         )
-        postprocessed_output = postprocessed_steps[-1].output
+        postprocessed_output = (
+            postprocessed_steps[-1].output if postprocessed_steps else model_out_formatted
+        )
         # Preprocessing steps are not supported at the moment for HF pipelines
         return model_out_formatted, postprocessed_output, [], postprocessed_steps
 
