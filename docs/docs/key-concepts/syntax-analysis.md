@@ -27,32 +27,33 @@ languages supported by Azimuth. Azimuth then computes the smart tags `missing_su
 and `missing_obj` based on the presence of certain tags. Subjects and objects are identified by
 dependency tags that are language-dependent and specified in the
 [:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md), whereas
-verbs are identified by POS tags that are consistent across languages (shown below). The smart
-tag `multiple_sentences` is based on a spaCy sentencizer:
+verbs are identified by POS tags (`["VERB", "AUX"]`) that are consistent across languages.
+
+### Word Count
+
+To compute the number of words per utterance, we use the spacy model from the config.
 
 ```python
 import spacy
-from spacy.lang.en import English
 
-# Part of Speech
-verb_tags = ["VERB", "AUX"]
-
-# Sentencizer; English() should work for other languages that have similar sentence conventions.
-spacy_pipeline = English()
-spacy_pipeline.add_pipe("sentencizer")
+spacy_model = spacy.load(config.syntax.spacy_model)
+doc = spacy_model(utterance)
+tokens = [token.text for token in doc if not token.is_punct]
+word_count = len(tokens)
 ```
+Based on the word count, the `long_sentence` and `short_sentence` smart tags are computed.
 
-### Token Count
-
-To compute the number of tokens per utterance, the following **tokenizer** is used:
+### Sentence Count
+ The smart
+tag `multiple_sentences` is based on a spaCy sentencizer:
 
 ```python
-from transformers import AutoTokenizer
+from spacy.lang.en import English
 
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+# Sentencizer; English() should work for other languages that have similar sentence conventions.
+spacy_sentencizer_en = English()
+spacy_sentencizer_en.add_pipe("sentencizer")
 ```
-
-Based on the token count, the `long_sentence` and `short_sentence` smart tags are computed.
 
 ## Configuration
 

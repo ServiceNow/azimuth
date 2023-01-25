@@ -265,7 +265,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
         hist_filled_per_cls_per_split = {}
         for split, hist_per_cls in hist_per_cls_per_split.items():
             hist_filled_per_cls_per_split[split] = np.zeros([len(hist_per_cls), N], dtype=int)
-            # Fill with token count (-1 because columns start at 1)
+            # Fill with word count (-1 because columns start at 1)
             hist_filled_per_cls_per_split[split][
                 :, np.array(hist_per_cls.columns) - 1
             ] = hist_per_cls.to_numpy()

@@ -24,8 +24,8 @@ dependency tag lists will generally not need to be modified.
         obj_tags: List[str] = []  # Language-based default value (5)
     ```
 
-    1. Maximum number of tokens for a sentence to be tagged as short (e.g <=3 for the default)
-    2. Minimum number of tokens for a sentence to be tagged as long (e.g >=16 for the default)
+    1. Maximum number of words for a sentence to be tagged as short (e.g <=3 for the default)
+    2. Minimum number of words for a sentence to be tagged as long (e.g >=12 for the default)
     3. spaCy model to use for syntax tagging.
     4. spaCy dependency tags used to determine whether a word is a subject (noun).
     5. spaCy dependency tags used to determine whether a word is an object (noun).

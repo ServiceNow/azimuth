@@ -24,7 +24,7 @@ types of analyses that Azimuth provides.
 
     Examples of **individual** smart tags:
 
-    * `long_sentences` identifies utterances with more than X tokens.
+    * `long_sentences` identifies utterances with more than X words.
     * `failed_punctuation` identifies utterances that failed at least one punctuation test.
 
 The full list of smart tags is available in [:material-link: Smart Tags](smart-tags.md).
