@@ -20,6 +20,10 @@ export interface paths {
     /** Get a failure rate per dataset split and per test as well. */
     get: operations["get_perturbation_testing_summary_perturbation_testing_summary_get"];
   };
+  "/admin/default_config": {
+    /** Get the default configuration */
+    get: operations["get_default_config_def_admin_default_config_get"];
+  };
   "/admin/config": {
     /** Get the current configuration */
     get: operations["get_config_def_admin_config_get"];
@@ -942,6 +946,28 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["PerturbationTestingSummary"];
+        };
+      };
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get the default configuration */
+  get_default_config_def_admin_default_config_get: {
+    parameters: {
+      query: {
+        language?: components["schemas"]["SupportedLanguage"];
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AzimuthConfig"];
         };
       };
       /** Validation Error */

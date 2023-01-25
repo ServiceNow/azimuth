@@ -2,6 +2,124 @@ from fastapi import FastAPI
 from jsonlines import jsonlines
 from starlette.testclient import TestClient
 
+from azimuth.config import SupportedLanguage, config_defaults_per_language
+
+
+def test_get_default_config(app: FastAPI):
+    client = TestClient(app)
+    res = client.get("/admin/default_config").json()
+
+    assert res == {
+        "name": "New project",
+        "dataset": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
+        "model_contract": "hf_text_classification",
+        "columns": {
+            "text_input": "utterance",
+            "raw_text_input": "utterance_raw",
+            "label": "label",
+            "failed_parsing_reason": "failed_parsing_reason",
+            "persistent_id": "row_idx",
+        },
+        "rejection_class": "REJECTION_CLASS",
+        "artifact_path": "/cache",
+        "batch_size": 32,
+        "use_cuda": "auto",
+        "large_dask_cluster": False,
+        "read_only_config": False,
+        "language": "en",
+        "syntax": {
+            "short_sentence_max_word": 3,
+            "long_sentence_min_word": 12,
+            "spacy_model": "en_core_web_sm",
+            "subj_tags": ["nsubj", "nsubjpass"],
+            "obj_tags": ["dobj", "pobj", "obj"],
+        },
+        "dataset_warnings": {
+            "min_num_per_class": 20,
+            "max_delta_class_imbalance": 0.5,
+            "max_delta_representation": 0.05,
+            "max_delta_mean_words": 3.0,
+            "max_delta_std_words": 3.0,
+        },
+        "similarity": {
+            "faiss_encoder": "all-MiniLM-L12-v2",
+            "conflicting_neighbors_threshold": 0.9,
+            "no_close_threshold": 0.5,
+        },
+        "pipelines": [
+            {
+                "name": "required",
+                "model": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
+                "postprocessors": [
+                    {
+                        "class_name": "azimuth.utils.ml.postprocessing.Thresholding",
+                        "args": [],
+                        "kwargs": {"threshold": 0.5},
+                        "remote": None,
+                        "threshold": 0.5,
+                    }
+                ],
+            }
+        ],
+        "uncertainty": {"iterations": 1, "high_epistemic_threshold": 0.1},
+        "saliency_layer": None,
+        "behavioral_testing": {
+            "neutral_token": {
+                "threshold": 1.0,
+                "suffix_list": ["pls", "please", "thank you", "appreciated"],
+                "prefix_list": ["pls", "please", "hello", "greetings"],
+            },
+            "punctuation": {"threshold": 1.0},
+            "fuzzy_matching": {"threshold": 1.0},
+            "typo": {"threshold": 1.0, "nb_typos_per_utterance": 1},
+            "seed": 300,
+        },
+        "metrics": {
+            "Accuracy": {
+                "class_name": "datasets.load_metric",
+                "args": [],
+                "kwargs": {"path": "accuracy"},
+                "remote": None,
+                "additional_kwargs": {},
+            },
+            "Precision": {
+                "class_name": "datasets.load_metric",
+                "args": [],
+                "kwargs": {"path": "precision"},
+                "remote": None,
+                "additional_kwargs": {"average": "weighted"},
+            },
+            "Recall": {
+                "class_name": "datasets.load_metric",
+                "args": [],
+                "kwargs": {"path": "recall"},
+                "remote": None,
+                "additional_kwargs": {"average": "weighted"},
+            },
+            "F1": {
+                "class_name": "datasets.load_metric",
+                "args": [],
+                "kwargs": {"path": "f1"},
+                "remote": None,
+                "additional_kwargs": {"average": "weighted"},
+            },
+        },
+    }
+
+
+def test_get_default_config_french(app: FastAPI):
+    client = TestClient(app)
+    res = client.get("/admin/default_config?language=fr").json()
+
+    defaults = config_defaults_per_language[SupportedLanguage.fr]
+    assert res["language"] == "fr"
+    assert res["behavioral_testing"]["neutral_token"]["prefix_list"] == defaults.prefix_list
+    assert res["behavioral_testing"]["neutral_token"]["suffix_list"] == defaults.suffix_list
+    assert res["syntax"]["spacy_model"] == defaults.spacy_model
+    assert res["syntax"]["subj_tags"] == defaults.subj_tags
+    assert res["syntax"]["obj_tags"] == defaults.obj_tags
+    assert res["similarity"]["faiss_encoder"] == defaults.faiss_encoder
+
 
 def test_get_config(app: FastAPI):
     client = TestClient(app)
