@@ -23,7 +23,11 @@ import AccordionLayout from "components/AccordionLayout";
 import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
-import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
+import {
+  getConfigEndpoint,
+  getDefaultConfigEndpoint,
+  updateConfigEndpoint,
+} from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 
@@ -52,15 +56,6 @@ const FIELDS: Record<
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
-
-const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
-  similarity: {
-    faiss_encoder: "",
-    conflicting_neighbors_threshold: 0.9,
-    no_close_threshold: 0.5,
-  },
-  behavioral_testing: {},
-};
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
@@ -179,6 +174,7 @@ const NumberField: React.FC<
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
+  const { data: defaultConfig } = getDefaultConfigEndpoint.useQuery({ jobId });
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig] = updateConfigEndpoint.useMutation();
 
@@ -186,8 +182,8 @@ const Settings: React.FC = () => {
     Partial<AzimuthConfig>
   >({});
 
-  // If config was undefined, PipelineCheck would not even render the page.
-  if (config === undefined) return null;
+  // If config or defaultConfig was undefined, PipelineCheck would not even render the page.
+  if (config === undefined || defaultConfig === undefined) return null;
 
   const resultingConfig = Object.assign({}, config, partialConfig);
 
@@ -203,9 +199,7 @@ const Settings: React.FC = () => {
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
-              [field]: checked
-                ? config[field] ?? CONFIG_SUB_FIELDS[field]
-                : null,
+              [field]: checked ? config[field] ?? defaultConfig[field] : null,
             })
           }
         />
@@ -486,7 +480,7 @@ const Settings: React.FC = () => {
     <FormGroup>
       <Columns columns={5}>
         {Object.entries(
-          resultingConfig[config] ?? CONFIG_SUB_FIELDS[config] ?? {}
+          resultingConfig[config] ?? defaultConfig[config] ?? {}
         ).map(
           ([field, value]) =>
             field in FIELDS && (
