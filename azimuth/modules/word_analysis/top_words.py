@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import spacy
 
-from azimuth.config import AzimuthConfig
+from azimuth.config import TopWordsConfig
 from azimuth.modules.base_classes import FilterableModule
 from azimuth.modules.task_execution import get_task_result
 from azimuth.modules.word_analysis.tokens_to_words import TokensToWordsModule
@@ -25,13 +25,8 @@ from azimuth.utils.utterance import clean_utterance
 MIN_SALIENCY = 0.01
 
 
-class TopWordsModule(FilterableModule[AzimuthConfig]):
-    """Returns the most important words in terms of their saliency value or frequency.
-
-    Note: The config scope is AzimuthConfig because the module relies on both the pipeline or the
-    syntax config, depending if saliency is available. AzimuthConfig is a bit too broad, but it
-    should not be a problem since this module computes fast.
-    """
+class TopWordsModule(FilterableModule[TopWordsConfig]):
+    """Returns the most important words in terms of their saliency value or frequency."""
 
     allowed_mod_options = FilterableModule.allowed_mod_options | {
         "top_x",
