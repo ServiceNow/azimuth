@@ -31,7 +31,7 @@ verbs are identified by POS tags (`["VERB", "AUX"]`) that are consistent across 
 
 ### Word Count
 
-To compute the number of words per utterance, we use the spacy model from the config.
+To compute the number of words per utterance, we use the spaCy model from the config.
 
 ```python
 import spacy
