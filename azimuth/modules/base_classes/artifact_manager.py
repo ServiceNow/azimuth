@@ -4,7 +4,6 @@
 from typing import Callable, Dict, Optional
 
 from datasets import DatasetDict
-from transformers import AutoTokenizer
 
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -116,11 +115,6 @@ class ArtifactManager:
             )
 
         return self.models_mapping[config_key][pipeline_idx]
-
-    def get_tokenizer(self):
-        if self.tokenizer is None:
-            self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-        return self.tokenizer
 
     def get_metric(self, config, name: str, **kwargs):
         hash: Hash = md5_hash({"name": name, **kwargs})

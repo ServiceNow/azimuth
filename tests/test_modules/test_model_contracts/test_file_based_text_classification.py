@@ -4,10 +4,11 @@
 from typing import List, cast
 
 import numpy as np
+import pytest
 
 from azimuth.modules.model_contracts import FileBasedTextClassificationModule
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
-from azimuth.types.task import PredictionResponse, SaliencyResponse
+from azimuth.types.task import PredictionResponse
 
 
 def test_loading_dataset(file_text_config_top3):
@@ -72,17 +73,16 @@ def test_predictions_top3(file_text_config_top3):
 
 
 def test_saliency_top3(file_text_config_top3):
-    task = FileBasedTextClassificationModule(
-        DatasetSplitName.eval,
-        file_text_config_top3,
-        mod_options=ModuleOptions(
-            model_contract_method_name=SupportedMethod.Saliency, pipeline_index=0
-        ),
-    )
+    with pytest.raises(NotImplementedError):
+        task = FileBasedTextClassificationModule(
+            DatasetSplitName.eval,
+            file_text_config_top3,
+            mod_options=ModuleOptions(
+                model_contract_method_name=SupportedMethod.Saliency, pipeline_index=0
+            ),
+        )
 
-    result = cast(List[SaliencyResponse], task.compute_on_dataset_split())
-    assert len(result) == 4
-    assert len(result[0].tokens) == len(result[0].saliency)
+        task.compute_on_dataset_split()
 
 
 def test_predictions_top1(file_text_config_top1):

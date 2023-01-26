@@ -386,13 +386,17 @@ class SyntaxConfig(CommonFieldsConfig):
     syntax: SyntaxOptions = SyntaxOptions()
 
 
+class TopWordsConfig(SyntaxConfig, ModelContractConfig):
+    pass
+
+
 class AzimuthConfig(
     MetricConfig,
     PerturbationTestingConfig,
     SimilarityConfig,
     DatasetWarningConfig,
-    SyntaxConfig,
     LanguageConfig,
+    TopWordsConfig,
     extra=Extra.forbid,
 ):
     # Reminder: If a module depends on an attribute in AzimuthConfig, the module will be forced to

@@ -305,29 +305,3 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         postprocessed_output = postprocessed_steps[-1].output
         # Preprocessing steps are not supported at the moment for HF pipelines
         return model_out_formatted, postprocessed_output, [], postprocessed_steps
-
-    def empty_saliency_from_batch(self, batch) -> List[SaliencyResponse]:
-        """Return dummy output to not break API consumers.
-
-        Args:
-            batch: Utterances.
-
-        Returns:
-            Saliencies of 0.
-
-        """
-        records: List[SaliencyResponse] = []
-        tokenizer = self.artifact_manager.get_tokenizer()
-        for utterance in batch[self.config.columns.text_input]:
-            token_ids = tokenizer(utterance)["input_ids"]
-            tokens = tokenizer.convert_ids_to_tokens(token_ids)
-            tokens = [
-                token for token in tokens if token not in [tokenizer.cls_token, tokenizer.sep_token]
-            ]
-
-            json_output = SaliencyResponse(
-                saliency=[0.0] * len(tokens),
-                tokens=tokens,
-            )
-            records.append(json_output)
-        return records

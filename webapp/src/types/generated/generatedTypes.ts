@@ -134,13 +134,13 @@ export interface components {
       use_cuda: "auto" | boolean;
       large_dask_cluster: boolean;
       read_only_config: boolean;
-      language: components["schemas"]["SupportedLanguage"];
-      syntax: components["schemas"]["SyntaxOptions"];
-      dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
-      similarity: components["schemas"]["SimilarityOptions"] | null;
       pipelines: components["schemas"]["PipelineDefinition"][] | null;
       uncertainty: components["schemas"]["UncertaintyOptions"];
       saliency_layer: string | null;
+      syntax: components["schemas"]["SyntaxOptions"];
+      language: components["schemas"]["SupportedLanguage"];
+      dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
+      similarity: components["schemas"]["SimilarityOptions"] | null;
       behavioral_testing:
         | components["schemas"]["BehavioralTestingOptions"]
         | null;

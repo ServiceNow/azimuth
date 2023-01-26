@@ -11,4 +11,4 @@ from azimuth.types.task import SaliencyResponse
 
 class TextClassificationNoSaliencyModule(TextClassificationModule):
     def saliency(self, batch: Dataset) -> List[SaliencyResponse]:
-        return self.empty_saliency_from_batch(batch)
+        raise NotImplementedError

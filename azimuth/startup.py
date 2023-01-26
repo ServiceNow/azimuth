@@ -26,6 +26,7 @@ from azimuth.utils.project import (
     perturbation_testing_available,
     postprocessing_editable,
     predictions_available,
+    saliency_available,
     similarity_available,
 )
 from azimuth.utils.validation import assert_not_none
@@ -101,9 +102,12 @@ POSTPROCESSING_TASKS = [
     )
 ]
 
+SALIENCY_TASKS = [
+    Startup("saliency", SupportedMethod.Saliency, run_on_all_pipelines=True),
+]
+
 BASE_PREDICTION_TASKS = [
     Startup("prediction", SupportedMethod.Predictions, run_on_all_pipelines=True),
-    Startup("saliency", SupportedMethod.Saliency, run_on_all_pipelines=True),
     Startup(
         "outcome_count",
         SupportedModule.Outcome,
@@ -236,6 +240,8 @@ def startup_tasks(
         # TODO We only check pipeline_index=0, but we should check all pipelines.
         if postprocessing_editable(task_manager.config, 0):
             start_up_tasks += POSTPROCESSING_TASKS
+        if saliency_available(task_manager.config):
+            start_up_tasks += SALIENCY_TASKS
     if similarity_available(task_manager.config):
         start_up_tasks += SIMILARITY_TASKS
 

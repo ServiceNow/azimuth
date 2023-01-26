@@ -58,5 +58,4 @@ time will clear that search filter, so does the ✗ in the `Search utterances` f
     saliency values is greater than 60% of the largest saliency value in the utterance.
 
     If saliency maps are not available, the word clouds only show the most **frequent words** which
-    are not part of a pre-defined list of **stop words**
-    (from [nltk.corpus](https://github.com/nltk/nltk)).
+    are neither punctuation nor stop words, according to the spacy model defined in the config.

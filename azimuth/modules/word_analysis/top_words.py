@@ -1,13 +1,13 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-import string
 from collections import Counter
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
+import spacy
 
-from azimuth.config import ModelContractConfig
+from azimuth.config import TopWordsConfig
 from azimuth.modules.base_classes import FilterableModule
 from azimuth.modules.task_execution import get_task_result
 from azimuth.modules.word_analysis.tokens_to_words import TokensToWordsModule
@@ -19,13 +19,13 @@ from azimuth.types.word_analysis import (
     TopWordsResult,
 )
 from azimuth.utils.dataset_operations import get_predictions_from_ds
-from azimuth.utils.ml.third_parties.stop_words import STOP_WORDS
 from azimuth.utils.project import saliency_available
+from azimuth.utils.utterance import clean_utterance
 
 MIN_SALIENCY = 0.01
 
 
-class TopWordsModule(FilterableModule[ModelContractConfig]):
+class TopWordsModule(FilterableModule[TopWordsConfig]):
     """Returns the most important words in terms of their saliency value or frequency."""
 
     allowed_mod_options = FilterableModule.allowed_mod_options | {
@@ -33,7 +33,6 @@ class TopWordsModule(FilterableModule[ModelContractConfig]):
         "th_importance",
         "force_no_saliency",
     }
-    stop_words_punctuation = list(string.punctuation) + STOP_WORDS
 
     @staticmethod
     def count_words(list_of_words: List[str], top_x: int) -> List[TopWordsResult]:
@@ -102,44 +101,48 @@ class TopWordsModule(FilterableModule[ModelContractConfig]):
                 )
             ]
 
-        # Saliencies will be 0 if saliency maps are not available.
-        words_saliencies = self.get_words_saliencies(self.get_indices())
+        important_words_per_idx: Dict[int, List[str]] = {}
+        if importance_criteria == TopWordsImportanceCriteria.salient:
+            words_saliencies = self.get_words_saliencies(self.get_indices())
+            tokenizer = self.get_model().tokenizer
+            for idx, record in enumerate(words_saliencies):
+                # Put everything to lower case and remove cls/sep tokens.
+                words, saliencies = zip(
+                    *[
+                        (word.lower(), saliency_value)
+                        for word, saliency_value in zip(record.words, record.saliency)
+                        if word not in [tokenizer.cls_token, tokenizer.sep_token]
+                    ]
+                )
+                if words:
+                    importance_saliency = max(
+                        self.mod_options.th_importance * max(record.saliency), MIN_SALIENCY
+                    )
+                    important_words_per_idx[idx] = [
+                        word
+                        for word, _ in filter(
+                            lambda s: s[1] > importance_saliency, zip(words, saliencies)
+                        )
+                    ]
+        # If saliency is not available, we proxy important words as any word that is neither
+        # punctuation nor a stop word.
+        else:
+            spacy_model = spacy.load(self.config.syntax.spacy_model)
+            utterances = ds[self.config.columns.text_input]
+            for idx, utterance in enumerate(utterances):
+                doc = spacy_model(clean_utterance(utterance))
+                important_words_per_idx[idx] = [
+                    token.text for token in doc if not token.is_stop and not token.is_punct
+                ]
 
-        important_words_all = []
-        important_words_right = []
-        important_words_errors = []
-
-        tokenizer = self.artifact_manager.get_tokenizer()
         is_error = np.array(
             get_predictions_from_ds(ds, self.mod_options.without_postprocessing)
         ) != np.array(ds[self.config.columns.label])
 
-        for idx, record in enumerate(words_saliencies):
-            # Put everything to lower case and remove cls/sep tokens.
-            words, saliencies = zip(
-                *[
-                    (word.lower(), saliency_value)
-                    for word, saliency_value in zip(record.words, record.saliency)
-                    if word not in [tokenizer.cls_token, tokenizer.sep_token]
-                ]
-            )
-            if importance_criteria == TopWordsImportanceCriteria.salient and words != []:
-                th_importance = self.mod_options.th_importance
-                assert len(words) == len(saliencies)
-                importance_saliency = max(th_importance * max(record.saliency), MIN_SALIENCY)
-                important_words = [
-                    word
-                    for word, _ in filter(
-                        lambda s: s[1] > importance_saliency, zip(words, saliencies)
-                    )
-                ]
-            # If saliency is not available, we proxy important words as any word that is neither
-            # punctuation or a stop word.
-            else:
-                important_words = [
-                    word for word in words if word not in self.stop_words_punctuation
-                ]
-
+        important_words_all = []
+        important_words_errors = []
+        important_words_right = []
+        for idx, important_words in important_words_per_idx.items():
             important_words_all.extend(important_words)
             if is_error[idx]:
                 important_words_errors.extend(important_words)
