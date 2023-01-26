@@ -314,6 +314,11 @@ export const api = createApi({
           tags.add("Status");
           tags.add("SimilarUtterances");
         }
+        ["uncertainty", "pipelines", "metrics", "syntax"].map((config) => {
+          if (config in partialConfig) {
+            tags.add("Status");
+          }
+        });
         return [...tags];
       },
       async onQueryStarted(
