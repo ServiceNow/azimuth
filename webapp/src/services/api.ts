@@ -301,26 +301,7 @@ export const api = createApi({
         fetchApi({ path: "/admin/config", method: "patch" }),
         "Something went wrong updating config"
       ),
-      invalidatesTags: (...[, , { body: partialConfig }]) => {
-        const tags = new Set<Tag>();
-        // Invalidate DatasetInfo only after the query is fulfilled,
-        // otherwise the response is not up to date or even fails.
-        if ("behavioral_testing" in partialConfig) {
-          tags.add("Status");
-          tags.add("PerturbationTestingSummary");
-          tags.add("PerturbedUtterances");
-        }
-        if ("similarity" in partialConfig) {
-          tags.add("Status");
-          tags.add("SimilarUtterances");
-        }
-        ["uncertainty", "pipelines", "metrics", "syntax"].map((config) => {
-          if (config in partialConfig) {
-            tags.add("Status");
-          }
-        });
-        return [...tags];
-      },
+      invalidatesTags: () => tagTypes,
       async onQueryStarted(
         { jobId, body: partialConfig },
         { dispatch, queryFulfilled }
