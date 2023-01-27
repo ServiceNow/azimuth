@@ -327,10 +327,19 @@ export const api = createApi({
         );
         const patchDatasetInfo = dispatch(
           api.util.updateQueryData("getDatasetInfo", { jobId }, (draft) => {
+            if (partialConfig.name !== undefined) {
+              draft.projectName = partialConfig.name;
+            }
+            if (partialConfig.model_contract !== undefined) {
+              draft.modelContract = partialConfig.model_contract;
+            }
             if ("behavioral_testing" in partialConfig) {
               draft.perturbationTestingAvailable = Boolean(
                 partialConfig.behavioral_testing
               );
+            }
+            if ("pipelines" in partialConfig) {
+              draft.predictionAvailable = Boolean(partialConfig.pipelines);
             }
             if ("similarity" in partialConfig) {
               draft.similarityAvailable = Boolean(partialConfig.similarity);
