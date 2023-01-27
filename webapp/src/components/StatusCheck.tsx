@@ -81,6 +81,14 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
               </Box>
             ))}
           </Box>
+          {Object.values(status.startupTasksStatus).every(
+            (taskStatus) => taskStatus !== "pending"
+          ) && (
+            <Typography variant="h6" align="center">
+              The startup tasks are completed and getting finalized at the back
+              end. Please wait while the application is loaded.
+            </Typography>
+          )}
         </Box>
       </Box>
     );

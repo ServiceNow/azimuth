@@ -24,15 +24,7 @@ const PipelineCheck: React.FC<Props> = ({ children }) => {
   }
 
   if (!config) {
-    return (
-      <>
-        <Typography variant="h6" align="center">
-          The startup tasks are completed and getting finalized at the back end.
-          Please wait while the application is loaded.
-        </Typography>
-        <Loading />
-      </>
-    );
+    return <Loading />;
   }
 
   return config.pipelines &&
