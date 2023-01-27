@@ -390,13 +390,16 @@ class TopWordsConfig(SyntaxConfig, ModelContractConfig):
     pass
 
 
+class MetricPerFilterConfig(
+    PerturbationTestingConfig, SimilarityConfig, SyntaxConfig, LanguageConfig, MetricConfig
+):
+    pass
+
+
 class AzimuthConfig(
-    MetricConfig,
-    PerturbationTestingConfig,
-    SimilarityConfig,
-    DatasetWarningConfig,
-    LanguageConfig,
+    MetricPerFilterConfig,
     TopWordsConfig,
+    DatasetWarningConfig,
     extra=Extra.forbid,
 ):
     # Reminder: If a module depends on an attribute in AzimuthConfig, the module will be forced to

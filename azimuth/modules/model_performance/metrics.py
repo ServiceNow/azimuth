@@ -12,7 +12,7 @@ from datasets import Dataset, Metric
 from sklearn.exceptions import UndefinedMetricWarning
 from tqdm import tqdm
 
-from azimuth.config import AzimuthConfig, MetricConfig
+from azimuth.config import MetricConfig, MetricPerFilterConfig
 from azimuth.modules.base_classes import AggregationModule, FilterableModule
 from azimuth.modules.model_performance.confidence_binning import (
     ConfidenceHistogramModule,
@@ -178,12 +178,12 @@ class MetricsModule(FilterableModule[MetricConfig]):
         return probs
 
 
-class MetricsPerFilterModule(AggregationModule[AzimuthConfig]):
+class MetricsPerFilterModule(AggregationModule[MetricPerFilterConfig]):
     """Computes the metrics for each filter.
 
-    Note: This module has AzimuthConfig as a scope given that it should be recomputed if smart tags
-    are changed when the config is modified. It is not an expirable module because it is too long
-    to compute. As such, it cannot be affected by data actions.
+    Note: This module should be recomputed if smart tags are changed when the config is modified.
+    It is not an expirable module because it is too long to compute. As such, it cannot be
+    affected by data actions.
     """
 
     def get_metrics_for_filter(
