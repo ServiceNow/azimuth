@@ -28,7 +28,7 @@ from azimuth.utils.plots import (
 
 def sample_count_plot(
     count_per_cls_per_split: Dict[DatasetSplitName, np.ndarray],
-    alert_per_cls_per_split: Dict[DatasetSplitName, List[bool]],
+    alert_per_cls_per_split: Dict[DatasetSplitName, np.ndarray],
     cls_names: List[str],
 ):
     """Generate the figure with the number of samples per class.
@@ -44,7 +44,12 @@ def sample_count_plot(
     """
 
     cls_names = shorten_cls_names(cls_names)
-    order = count_per_cls_per_split[DatasetSplitName.eval].argsort()
+    order_split = (
+        DatasetSplitName.eval
+        if DatasetSplitName.eval in count_per_cls_per_split
+        else DatasetSplitName.train
+    )
+    order = count_per_cls_per_split[order_split].argsort()
 
     fig = go.Figure()
     for split, count in sorted(count_per_cls_per_split.items()):
@@ -145,7 +150,7 @@ def sample_count_plot(
 def min_sample_count_plot(
     count_per_cls_per_split: Dict[DatasetSplitName, np.ndarray],
     threshold: int,
-    alert_per_cls_per_split: Dict[DatasetSplitName, List[bool]],
+    alert_per_cls_per_split: Dict[DatasetSplitName, np.ndarray],
     cls_names: List[str],
 ) -> DatasetWarningPlots:
     """Generate the plot for the minimal number of samples per class.
@@ -179,7 +184,7 @@ def class_imbalance_plot(
     count_per_cls_per_split: Dict[DatasetSplitName, np.ndarray],
     mean_per_split: Dict[DatasetSplitName, float],
     max_perc_delta: float,
-    alert_per_cls_per_split: Dict[DatasetSplitName, List[bool]],
+    alert_per_cls_per_split: Dict[DatasetSplitName, np.ndarray],
     cls_names: List[str],
 ) -> DatasetWarningPlots:
     """Generate the plot for the class imbalance warnings.

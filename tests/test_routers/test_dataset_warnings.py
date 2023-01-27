@@ -22,7 +22,7 @@ def test_dataset_warnings(app: FastAPI) -> None:
             "name": "General Warnings",
             "warnings": [
                 {
-                    "columns": ["training", "evaluation"],
+                    "columns": ["train", "eval"],
                     "comparisons": [
                         {
                             "alert": False,
@@ -41,7 +41,7 @@ def test_dataset_warnings(app: FastAPI) -> None:
                     "name": "Missing samples (<20)",
                 },
                 {
-                    "columns": ["training", "evaluation"],
+                    "columns": ["train", "eval"],
                     "comparisons": [
                         {
                             "alert": False,

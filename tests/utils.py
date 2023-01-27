@@ -127,7 +127,7 @@ def get_table_key(config, use_bma=False):
 
 
 def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
-    ds = load_dataset_from_config(config)[DatasetSplitName.eval]
+    ds = load_dataset_from_config(config)[dataset_split_name]
     ds = ds.map(
         lambda x, i: {
             DatasetColumn.model_predictions: [i % 2, 1 - i % 2],

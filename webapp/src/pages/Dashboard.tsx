@@ -78,22 +78,20 @@ const Dashboard = () => {
           Go to exploration space
         </Button>
       </Box>
-      {datasetInfo.availableDatasetSplits.train && (
-        <PreviewCard
-          title="Dataset Warnings"
-          to={`/${jobId}/dataset_warnings${searchString}`}
-          description={
-            <Description
-              text="Investigate issues related to class size, class imbalance, or dataset shift between your training and evaluation sets."
-              link="user-guide/dataset-warnings/"
-            />
-          }
-        >
-          <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
-            <WarningsPreview jobId={jobId} />
-          </Box>
-        </PreviewCard>
-      )}
+      <PreviewCard
+        title="Dataset Warnings"
+        to={`/${jobId}/dataset_warnings${searchString}`}
+        description={
+          <Description
+            text="Investigate issues related to class size, class imbalance, or dataset shift between your training and evaluation sets."
+            link="user-guide/dataset-warnings/"
+          />
+        }
+      >
+        <Box height={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
+          <WarningsPreview jobId={jobId} />
+        </Box>
+      </PreviewCard>
       {datasetInfo.availableDatasetSplits.train &&
         datasetInfo.similarityAvailable && (
           <PreviewCard
