@@ -133,18 +133,18 @@ export interface components {
       use_cuda: "auto" | boolean;
       large_dask_cluster: boolean;
       read_only_config: boolean;
+      dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
       model_contract: components["schemas"]["SupportedModelContract"];
       pipelines: components["schemas"]["PipelineDefinition"][] | null;
       uncertainty: components["schemas"]["UncertaintyOptions"];
       saliency_layer: string | null;
       syntax: components["schemas"]["SyntaxOptions"];
+      metrics: { [key: string]: components["schemas"]["MetricDefinition"] };
       language: components["schemas"]["SupportedLanguage"];
-      dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
       similarity: components["schemas"]["SimilarityOptions"] | null;
       behavioral_testing:
         | components["schemas"]["BehavioralTestingOptions"]
         | null;
-      metrics: { [key: string]: components["schemas"]["MetricDefinition"] };
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.

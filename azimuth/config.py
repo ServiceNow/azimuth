@@ -333,7 +333,7 @@ class ModelContractConfig(CommonFieldsConfig):
         return pipeline_definitions
 
 
-class MetricConfig(ModelContractConfig):
+class MetricsConfig(ModelContractConfig):
     # Custom HuggingFace metrics
     metrics: Dict[str, MetricDefinition] = {
         "Accuracy": MetricDefinition(
@@ -390,13 +390,16 @@ class TopWordsConfig(SyntaxConfig, ModelContractConfig):
     pass
 
 
+class MetricsPerFilterConfig(
+    PerturbationTestingConfig, SimilarityConfig, SyntaxConfig, LanguageConfig, MetricsConfig
+):
+    pass
+
+
 class AzimuthConfig(
-    MetricConfig,
-    PerturbationTestingConfig,
-    SimilarityConfig,
-    DatasetWarningConfig,
-    LanguageConfig,
+    MetricsPerFilterConfig,
     TopWordsConfig,
+    DatasetWarningConfig,
     extra=Extra.forbid,
 ):
     # Reminder: If a module depends on an attribute in AzimuthConfig, the module will be forced to
