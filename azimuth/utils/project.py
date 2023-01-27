@@ -117,7 +117,7 @@ def perturbation_testing_available(config: PerturbationTestingConfig) -> bool:
 def postprocessing_known(config: ModelContractConfig, pipeline_index) -> bool:
     # Sometimes the postprocessing cannot be edited but we still want show the values in the FE.
     # Example: file-based
-    if config.pipelines is None:
+    if not config.pipelines:
         return False
     return config.pipelines[pipeline_index].postprocessors is not None
 
