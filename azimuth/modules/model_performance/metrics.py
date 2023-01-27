@@ -12,7 +12,7 @@ from datasets import Dataset, Metric
 from sklearn.exceptions import UndefinedMetricWarning
 from tqdm import tqdm
 
-from azimuth.config import MetricConfig, MetricPerFilterConfig
+from azimuth.config import MetricsConfig, MetricsPerFilterConfig
 from azimuth.modules.base_classes import AggregationModule, FilterableModule
 from azimuth.modules.model_performance.confidence_binning import (
     ConfidenceHistogramModule,
@@ -56,7 +56,7 @@ def first_value(di: Optional[Dict]) -> Optional[float]:
     return next(iter(di.values()), None)
 
 
-class MetricsModule(FilterableModule[MetricConfig]):
+class MetricsModule(FilterableModule[MetricsConfig]):
     """Computes different metrics on each dataset split."""
 
     def compute_metrics(self, ds: Dataset) -> List[MetricsModuleResponse]:
@@ -178,7 +178,7 @@ class MetricsModule(FilterableModule[MetricConfig]):
         return probs
 
 
-class MetricsPerFilterModule(AggregationModule[MetricPerFilterConfig]):
+class MetricsPerFilterModule(AggregationModule[MetricsPerFilterConfig]):
     """Computes the metrics for each filter.
 
     Note: This module should be recomputed if smart tags are changed when the config is modified.
