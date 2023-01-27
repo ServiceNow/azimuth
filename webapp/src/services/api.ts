@@ -293,6 +293,13 @@ export const api = createApi({
         "Something went wrong fetching config"
       ),
     }),
+    getDefaultConfig: build.query({
+      providesTags: [{ type: "Config" }],
+      queryFn: responseToData(
+        fetchApi({ path: "/admin/default_config", method: "get" }),
+        "Something went wrong fetching default config"
+      ),
+    }),
     updateConfig: build.mutation<
       AzimuthConfig,
       { jobId: string; body: Partial<AzimuthConfig> }
@@ -380,6 +387,7 @@ export const api = createApi({
 export const {
   getConfidenceHistogram: getConfidenceHistogramEndpoint,
   getConfig: getConfigEndpoint,
+  getDefaultConfig: getDefaultConfigEndpoint,
   getConfusionMatrix: getConfusionMatrixEndpoint,
   getDatasetInfo: getDatasetInfoEndpoint,
   getDatasetWarnings: getDatasetWarningsEndpoint,
