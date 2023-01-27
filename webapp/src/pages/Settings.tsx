@@ -157,23 +157,38 @@ const NumberField: React.FC<
     units?: string;
     onChange: (newValue: number) => void;
   }
-> = ({ value, scale = 1, units, onChange, ...props }) => (
-  <TextField
-    variant="standard"
-    size="small"
-    type="number"
-    className="number"
-    title="" // Overwrite any default input validation tooltip
-    value={value * scale}
-    {...(units && {
-      InputProps: {
-        endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
-      },
-    })}
-    onChange={(event) => onChange(Number(event.target.value) / scale)}
-    {...props}
-  />
-);
+> = ({ value, scale = 1, units, onChange, ...props }) => {
+  // Control value with a `string` (and not with a `number`) so that for example
+  // when hitting backspace at the end of `0.01`, you get `0.0` (and not `0`).
+  const [stringValue, setStringValue] = React.useState(String(value * scale));
+
+  React.useEffect(() => {
+    if (value !== Number(stringValue) / scale) {
+      setStringValue(String(value * scale));
+    }
+  }, [value, scale, stringValue]);
+
+  return (
+    <TextField
+      variant="standard"
+      size="small"
+      type="number"
+      className="number"
+      title="" // Overwrite any default input validation tooltip
+      value={stringValue}
+      {...(units && {
+        InputProps: {
+          endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
+        },
+      })}
+      onChange={(event) => {
+        setStringValue(event.target.value);
+        onChange(Number(event.target.value) / scale);
+      }}
+      {...props}
+    />
+  );
+};
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
