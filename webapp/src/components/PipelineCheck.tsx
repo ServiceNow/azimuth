@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Redirect, useLocation, useParams } from "react-router-dom";
@@ -23,7 +24,15 @@ const PipelineCheck: React.FC<Props> = ({ children }) => {
   }
 
   if (!config) {
-    return <Loading />;
+    return (
+      <>
+        <Typography variant="h6" align="center">
+          The startup tasks are completed and getting finalized at the back end.
+          Please wait while the application is loaded.
+        </Typography>
+        <Loading />
+      </>
+    );
   }
 
   return config.pipelines &&
