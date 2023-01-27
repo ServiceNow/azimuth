@@ -157,23 +157,25 @@ const NumberField: React.FC<
     units?: string;
     onChange: (newValue: number) => void;
   }
-> = ({ value, scale = 1, units, onChange, ...props }) => (
-  <TextField
-    variant="standard"
-    size="small"
-    type="number"
-    className="number"
-    title="" // Overwrite any default input validation tooltip
-    value={value * scale}
-    {...(units && {
-      InputProps: {
-        endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
-      },
-    })}
-    onChange={(event) => onChange(Number(event.target.value) / scale)}
-    {...props}
-  />
-);
+> = ({ value, scale = 1, units, onChange, ...props }) => {
+  return (
+    <TextField
+      variant="standard"
+      size="small"
+      type="number"
+      className="number"
+      title="" // Overwrite any default input validation tooltip
+      value={value * scale}
+      {...(units && {
+        InputProps: {
+          endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
+        },
+      })}
+      onChange={(event) => onChange(Number(event.target.value) / scale)}
+      {...props}
+    />
+  );
+};
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
