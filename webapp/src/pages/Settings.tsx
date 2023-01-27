@@ -19,7 +19,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
+import Loading from "components/Loading";
 import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -30,6 +32,7 @@ import {
 } from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
+import { UNKNOWN_ERROR } from "utils/const";
 
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
 const INT = { inputProps: { min: 0 } };
@@ -174,7 +177,11 @@ const NumberField: React.FC<
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
-  const { data: defaultConfig } = getDefaultConfigEndpoint.useQuery({ jobId });
+  const {
+    data: defaultConfig,
+    isLoading,
+    error,
+  } = getDefaultConfigEndpoint.useQuery({ jobId });
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig] = updateConfigEndpoint.useMutation();
 
@@ -183,8 +190,18 @@ const Settings: React.FC = () => {
   >({});
 
   // If config or defaultConfig was undefined, PipelineCheck would not even render the page.
-  if (config === undefined || defaultConfig === undefined) return null;
+  if (config === undefined) return null;
 
+  if (isLoading) {
+    return <Loading />;
+  } else if (error || defaultConfig === undefined) {
+    return (
+      <Box alignItems="center" display="grid" justifyItems="center">
+        <img src={noData} width="50%" alt="No default config data available" />
+        <Typography>{error?.message || UNKNOWN_ERROR}</Typography>
+      </Box>
+    );
+  }
   const resultingConfig = Object.assign({}, config, partialConfig);
 
   const displayToggleSectionTitle = (
