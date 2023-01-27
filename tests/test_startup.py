@@ -23,12 +23,12 @@ from azimuth.types import (
 from tests.utils import get_table_key, get_tiny_text_config_one_ds_name
 
 
-def test_startup_task(tiny_text_config, tiny_text_task_manager):
+def test_startup_task(tiny_text_config, task_manager):
     dms = load_dataset_split_managers_from_config(tiny_text_config)
-    mods = startup_tasks(dms, tiny_text_task_manager)
+    mods = startup_tasks(dms, task_manager, tiny_text_config)
     one_mod = mods["syntax_tags_eval"]
     # We lock the task manager
-    assert tiny_text_task_manager.is_locked
+    assert task_manager.is_locked
     assert not one_mod.done()
     assert all("train" in k or "eval" in k or "all" in k for k in mods.keys())
     assert all(
@@ -37,11 +37,11 @@ def test_startup_task(tiny_text_config, tiny_text_task_manager):
     assert len(mods) == 21
 
 
-def test_startup_task_fast(tiny_text_config, tiny_text_task_manager):
+def test_startup_task_fast(tiny_text_config, task_manager):
     tiny_text_config.behavioral_testing = None
     tiny_text_config.similarity = None
     dms = load_dataset_split_managers_from_config(tiny_text_config)
-    mods = startup_tasks(dms, tiny_text_task_manager)
+    mods = startup_tasks(dms, task_manager, tiny_text_config)
 
     assert not any(
         mod.task_name in (SupportedModule.PerturbationTesting, SupportedModule.NeighborsTagging)
@@ -71,11 +71,11 @@ def test_on_end(tiny_text_config):
     mod.save_result.assert_called_once()
 
 
-def test_startup_task_one_ds(tiny_text_config_one_ds, tiny_text_task_manager):
+def test_startup_task_one_ds(tiny_text_config_one_ds, task_manager):
     dms = load_dataset_split_managers_from_config(tiny_text_config_one_ds)
     assert DatasetSplitName.eval in dms and DatasetSplitName.train in dms
 
-    mods = startup_tasks(dms, tiny_text_task_manager)
+    mods = startup_tasks(dms, task_manager, tiny_text_config_one_ds)
     ds_name, other_ds_name = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
     assert all(
         (DatasetSplitName.all in k or ds_name in k) and other_ds_name not in k for k in mods.keys()
@@ -86,10 +86,10 @@ def test_startup_task_one_ds(tiny_text_config_one_ds, tiny_text_task_manager):
 
 
 @pytest.mark.parametrize("iterations", [20, 1])
-def test_startup_task_bma(tiny_text_config, tiny_text_task_manager, iterations):
+def test_startup_task_bma(tiny_text_config, task_manager, iterations):
     tiny_text_config.uncertainty.iterations = iterations
     dms = load_dataset_split_managers_from_config(tiny_text_config)
-    mods = startup_tasks(dms, tiny_text_task_manager)
+    mods = startup_tasks(dms, task_manager, tiny_text_config)
 
     # Check that we have BMA at some point if iterations > 1
     if iterations == 1:

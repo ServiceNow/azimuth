@@ -72,6 +72,7 @@ def get_class_overlap_plot(
         SupportedModule.ClassOverlap,
         dataset_split_name=dataset_split_name,
         task_manager=task_manager,
+        config=config,
         last_update=-1,
     )[0]
     class_overlap_plot_response: ClassOverlapPlotResponse = make_sankey_plot(
@@ -94,6 +95,7 @@ def get_class_overlap_plot(
 def get_class_overlap(
     dataset_split_name: DatasetSplitName,
     task_manager: TaskManager = Depends(get_task_manager),
+    config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     dataset_split_managers: Dict[DatasetSplitName, DatasetSplitManager] = Depends(
         get_dataset_split_manager_mapping
@@ -106,6 +108,7 @@ def get_class_overlap(
         SupportedModule.ClassOverlap,
         dataset_split_name=dataset_split_name,
         task_manager=task_manager,
+        config=config,
         last_update=-1,
     )[0]
     dataset_class_count = class_overlap_result.s_matrix.shape[0]
@@ -121,6 +124,7 @@ def get_class_overlap(
             SupportedModule.ConfusionMatrix,
             DatasetSplitName.eval,
             task_manager=task_manager,
+            config=config,
             mod_options=ModuleOptions(
                 pipeline_index=pipeline_index, cf_normalize=False, cf_reorder_classes=False
             ),

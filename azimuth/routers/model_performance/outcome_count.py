@@ -7,7 +7,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from starlette.status import HTTP_400_BAD_REQUEST
 
-from azimuth.app import get_dataset_split_manager, get_task_manager
+from azimuth.app import get_config, get_dataset_split_manager, get_task_manager
+from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.task_manager import TaskManager
 from azimuth.types import (
@@ -38,6 +39,7 @@ router = APIRouter()
 def get_outcome_count_per_threshold(
     dataset_split_name: DatasetSplitName,
     task_manager: TaskManager = Depends(get_task_manager),
+    config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
 ) -> OutcomeCountPerThresholdResponse:
@@ -50,6 +52,7 @@ def get_outcome_count_per_threshold(
             SupportedModule.OutcomeCountPerThreshold,
             dataset_split_name,
             task_manager,
+            config=config,
             mod_options=mod_options,
             last_update=dataset_split_manager.last_update,
         )
@@ -69,6 +72,7 @@ def get_outcome_count_per_filter(
     dataset_split_name: DatasetSplitName,
     named_filters: NamedDatasetFilters = Depends(build_named_dataset_filters),
     task_manager: TaskManager = Depends(get_task_manager),
+    config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
     without_postprocessing: bool = Query(False, title="Without Postprocessing"),
@@ -83,6 +87,7 @@ def get_outcome_count_per_filter(
         SupportedModule.OutcomeCountPerFilter,
         dataset_split_name,
         task_manager,
+        config=config,
         mod_options=mod_options,
         last_update=dataset_split_manager.last_update,
     )[0]

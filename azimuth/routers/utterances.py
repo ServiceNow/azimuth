@@ -164,6 +164,7 @@ def get_utterances(
             SupportedMethod.Saliency,
             dataset_split_name,
             task_manager,
+            config=config,
             last_update=dataset_split_manager.last_update,
             mod_options=ModuleOptions(
                 pipeline_index=pipeline_index, indices=ds[DatasetColumn.row_idx]
@@ -274,6 +275,7 @@ def get_perturbed_utterances(
     dataset_split_name: DatasetSplitName,
     index: int,
     task_manager: TaskManager = Depends(get_task_manager),
+    config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
 ) -> List[PerturbedUtteranceWithClassNames]:
@@ -284,13 +286,14 @@ def get_perturbed_utterances(
 
     For endpoints that support per index request, we will not return a list of result.
     """
-    if not perturbation_testing_available(task_manager.config):
+    if not perturbation_testing_available(config):
         return []
 
     response: List[PerturbedUtteranceResult] = get_standard_task_result(
         SupportedModule.PerturbationTesting,
         dataset_split_name,
         task_manager,
+        config=config,
         last_update=dataset_split_manager.last_update,
         mod_options=ModuleOptions(pipeline_index=pipeline_index, indices=[index]),
     )[0]

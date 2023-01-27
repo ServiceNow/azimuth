@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from azimuth.config import AzimuthConfig
 from azimuth.types import (
     DatasetFilters,
     DatasetSplitName,
@@ -12,6 +13,7 @@ from azimuth.utils.routers import get_custom_task_result, get_standard_task_resu
 
 standard_task_result = "task_result"
 custom_task_result = "custom_task_result"
+config = AzimuthConfig()
 task_name = SupportedModule.PerturbationTestingSummary
 dataset_split_name = DatasetSplitName.train
 indices = [1, 2, 3]
@@ -42,12 +44,13 @@ def mock_task_result():
 
 def test_run_standard_task(mock_task_result):
     result = get_standard_task_result(
-        task_name, dataset_split_name, mock_task_result, mod_options, last_update
+        task_name, dataset_split_name, mock_task_result, config, mod_options, last_update
     )
 
     mock_task_result.get_task.assert_called_with(
         task_name=task_name,
         dataset_split_name=dataset_split_name,
+        config=config,
         mod_options=mod_options,
         last_update=last_update,
     )
@@ -56,10 +59,11 @@ def test_run_standard_task(mock_task_result):
 
 
 def test_run_custom_task(mock_task_result):
-    result = get_custom_task_result(task_name, mock_task_result, custom_query, mod_options)
+    result = get_custom_task_result(task_name, mock_task_result, config, custom_query, mod_options)
 
     mock_task_result.get_custom_task.assert_called_with(
         task_name=task_name,
+        config=config,
         custom_query=custom_query,
         mod_options=mod_options,
     )

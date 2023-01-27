@@ -6,7 +6,8 @@ from typing import Dict, List
 
 from fastapi import APIRouter, Depends
 
-from azimuth.app import get_dataset_split_manager_mapping, get_task_manager
+from azimuth.app import get_config, get_dataset_split_manager_mapping, get_task_manager
+from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, SupportedModule
@@ -25,6 +26,7 @@ router = APIRouter()
 )
 def get_dataset_warnings(
     task_manager: TaskManager = Depends(get_task_manager),
+    config: AzimuthConfig = Depends(get_config),
     dataset_split_managers: Dict[DatasetSplitName, DatasetSplitManager] = Depends(
         get_dataset_split_manager_mapping
     ),
@@ -35,6 +37,7 @@ def get_dataset_warnings(
         dataset_split_name=DatasetSplitName.all,
         task_manager=task_manager,
         last_update=get_last_update(list(dataset_split_managers.values())),
+        config=config,
     )[0]
 
     return task_result.warning_groups
