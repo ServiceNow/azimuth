@@ -172,6 +172,23 @@ def test_post_process_file_based(file_text_config_top1):
     assert np.all([len(pred.postprocessing_steps) == 0 for pred in res_low])
 
 
+def test_post_process_no_postprocessors(tiny_text_config_no_postprocessor):
+    indices = [0, 1, 2]
+    mod = HFTextClassificationModule(
+        DatasetSplitName.eval,
+        tiny_text_config_no_postprocessor,
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions,
+            pipeline_index=0,
+            indices=indices,
+        ),
+    )
+    res = cast(List[PredictionResponse], mod.compute_on_dataset_split())
+    assert np.all(
+        [res[idx].model_output.probs == res[idx].postprocessed_output.probs for idx in indices]
+    )
+
+
 def test_get_input(dask_client, simple_text_config):
     mod = HFTextClassificationModule(
         DatasetSplitName.eval,

@@ -237,18 +237,34 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
         json={"model_contract": "file_based_text_classification", "pipelines": None},
     )
     assert res.json()["model_contract"] == "file_based_text_classification"
-    with jsonlines.open(jsonl_file_path, "r") as reader:
-        loaded_configs = list(reader)
-    assert len(loaded_configs) == 2, "Config have been modified once."
-    assert loaded_configs[-1]["model_contract"] == "file_based_text_classification"
-    assert not loaded_configs[-1]["pipelines"]
+    get_config = client.get("/admin/config").json()
+    assert get_config["model_contract"] == "file_based_text_classification"
+    assert not get_config["pipelines"]
 
+    # Config Validation Error
     res = client.patch("/admin/config", json={"model_contract": "potato"})
     assert res.status_code == 400
+    get_config = client.get("/admin/config").json()
+    assert get_config["model_contract"] == "file_based_text_classification"
+
+    # Validation Module Error
+    res = client.patch(
+        "/admin/config",
+        json={
+            "pipelines": [
+                {"model": {"class_name": "tests.test_loading_resources.load_intent_data"}}
+            ]
+        },
+    )
+    assert res.status_code == 500
+    get_config = client.get("/admin/config").json()
+    assert not get_config["pipelines"]
+
     with jsonlines.open(jsonl_file_path, "r") as reader:
         loaded_configs = list(reader)
-    assert len(loaded_configs) == 2, "The invalid config should not be saved."
+    assert len(loaded_configs) == 2, "The config has only been successfully changed once."
     assert loaded_configs[-1]["model_contract"] == "file_based_text_classification"
+    assert not loaded_configs[-1]["pipelines"]
 
     # Revert config change
     _ = client.patch(
