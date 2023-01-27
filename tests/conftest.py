@@ -124,6 +124,16 @@ def tiny_text_config_no_pipeline(tiny_text_config) -> AzimuthConfig:
 
 
 @pytest.fixture
+def tiny_text_config_no_postprocessor(tiny_text_config) -> AzimuthConfig:
+    pipeline_no_postprocessor = deepcopy(PIPELINE_CFG)
+    pipeline_no_postprocessor["postprocessors"] = None
+    tiny_text_config_no_postprocessor = tiny_text_config.copy(
+        deep=True, update=dict(pipelines=[pipeline_no_postprocessor])
+    )
+    return tiny_text_config_no_postprocessor
+
+
+@pytest.fixture
 def tiny_text_task_manager(tiny_text_config, dask_client):
     task_manager = TaskManager(tiny_text_config, cluster=dask_client.cluster)
 

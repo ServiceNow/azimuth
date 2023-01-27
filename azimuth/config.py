@@ -252,8 +252,6 @@ class ProjectConfig(AzimuthBaseSettings):
     name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
     dataset: CustomObject
-    # Which model_contract the application is using.
-    model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
@@ -302,12 +300,14 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         Returns:
             Path to a folder where it is safe to store data.
         """
-        path = pjoin(self.artifact_path, f"{self.name}_{self.model_contract}_{self.to_hash()[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{self.to_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
 
 
 class ModelContractConfig(CommonFieldsConfig):
+    # Which model_contract the application is using.
+    model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification
     # Model object definition.
     pipelines: Optional[List[PipelineDefinition]] = Field(None, nullable=True)
     # Uncertainty configuration

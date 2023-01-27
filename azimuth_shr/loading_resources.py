@@ -36,11 +36,7 @@ def load_hf_text_classif_pipeline(checkpoint_path: str, azimuth_config: AzimuthC
     model = AutoModelForSequenceClassification.from_pretrained(
         checkpoint_path, cache_dir=_CACHED_MODELS_DIR
     )
-    # As of March 28th, 2022, pipelines didn't support fast tokenizers
-    # See https://github.com/huggingface/transformers/issues/7735
-    tokenizer = AutoTokenizer.from_pretrained(
-        checkpoint_path, use_fast=False, cache_dir=_CACHED_MODELS_DIR
-    )
+    tokenizer = AutoTokenizer.from_pretrained(checkpoint_path, cache_dir=_CACHED_MODELS_DIR)
     device = 0 if _should_use_cuda(azimuth_config) else -1
 
     # We set return_all_scores=True to get all softmax outputs

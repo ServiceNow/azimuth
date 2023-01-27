@@ -293,6 +293,13 @@ export const api = createApi({
         "Something went wrong fetching config"
       ),
     }),
+    getDefaultConfig: build.query({
+      providesTags: [{ type: "Config" }],
+      queryFn: responseToData(
+        fetchApi({ path: "/admin/default_config", method: "get" }),
+        "Something went wrong fetching default config"
+      ),
+    }),
     updateConfig: build.mutation<
       AzimuthConfig,
       { jobId: string; body: Partial<AzimuthConfig> }
@@ -327,10 +334,19 @@ export const api = createApi({
         );
         const patchDatasetInfo = dispatch(
           api.util.updateQueryData("getDatasetInfo", { jobId }, (draft) => {
+            if (partialConfig.name !== undefined) {
+              draft.projectName = partialConfig.name;
+            }
+            if (partialConfig.model_contract !== undefined) {
+              draft.modelContract = partialConfig.model_contract;
+            }
             if ("behavioral_testing" in partialConfig) {
               draft.perturbationTestingAvailable = Boolean(
                 partialConfig.behavioral_testing
               );
+            }
+            if ("pipelines" in partialConfig) {
+              draft.predictionAvailable = Boolean(partialConfig.pipelines);
             }
             if ("similarity" in partialConfig) {
               draft.similarityAvailable = Boolean(partialConfig.similarity);
@@ -371,6 +387,7 @@ export const api = createApi({
 export const {
   getConfidenceHistogram: getConfidenceHistogramEndpoint,
   getConfig: getConfigEndpoint,
+  getDefaultConfig: getDefaultConfigEndpoint,
   getConfusionMatrix: getConfusionMatrixEndpoint,
   getDatasetInfo: getDatasetInfoEndpoint,
   getDatasetWarnings: getDatasetWarningsEndpoint,

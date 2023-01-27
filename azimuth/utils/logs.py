@@ -158,8 +158,9 @@ class TimerLogging:
             log.debug("Complete", name=self.name, duration=duration)
 
 
-class MultipleExceptions(BaseException):
+class MultipleExceptions(Exception):
     def __init__(self, exceptions: List[Exception], message="We found the following exceptions: "):
+        super().__init__(exceptions, message)
         self.exceptions = exceptions
         self.message = message
 

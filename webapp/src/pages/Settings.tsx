@@ -19,13 +19,20 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
+import Loading from "components/Loading";
 import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
-import { getConfigEndpoint, updateConfigEndpoint } from "services/api";
+import {
+  getConfigEndpoint,
+  getDefaultConfigEndpoint,
+  updateConfigEndpoint,
+} from "services/api";
 import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
+import { UNKNOWN_ERROR } from "utils/const";
 
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
 const INT = { inputProps: { min: 1 } };
@@ -52,15 +59,6 @@ const FIELDS: Record<
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
-
-const CONFIG_SUB_FIELDS: Partial<AzimuthConfig> = {
-  similarity: {
-    faiss_encoder: "",
-    conflicting_neighbors_threshold: 0.9,
-    no_close_threshold: 0.5,
-  },
-  behavioral_testing: {},
-};
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
@@ -179,6 +177,11 @@ const NumberField: React.FC<
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
+  const {
+    data: defaultConfig,
+    isLoading,
+    error,
+  } = getDefaultConfigEndpoint.useQuery({ jobId });
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig] = updateConfigEndpoint.useMutation();
 
@@ -189,6 +192,16 @@ const Settings: React.FC = () => {
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
 
+  if (isLoading) {
+    return <Loading />;
+  } else if (error || defaultConfig === undefined) {
+    return (
+      <Box alignItems="center" display="grid" justifyItems="center">
+        <img src={noData} width="50%" alt="No default config data available" />
+        <Typography>{error?.message || UNKNOWN_ERROR}</Typography>
+      </Box>
+    );
+  }
   const resultingConfig = Object.assign({}, config, partialConfig);
 
   const displayToggleSectionTitle = (
@@ -203,9 +216,7 @@ const Settings: React.FC = () => {
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
-              [field]: checked
-                ? config[field] ?? CONFIG_SUB_FIELDS[field]
-                : null,
+              [field]: checked ? config[field] ?? defaultConfig[field] : null,
             })
           }
         />
@@ -233,7 +244,8 @@ const Settings: React.FC = () => {
                 {
                   ...pipeline,
                   postprocessors: checked
-                    ? config.pipelines![pipelineIndex].postprocessors ?? []
+                    ? config.pipelines![pipelineIndex].postprocessors ??
+                      defaultConfig.pipelines![0].postprocessors
                     : null,
                 },
                 ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
@@ -257,6 +269,7 @@ const Settings: React.FC = () => {
     <NumberField
       label={field}
       value={value}
+      disabled={!resultingConfig.pipelines![pipelineIndex].postprocessors}
       onChange={(newValue) =>
         setPartialConfig({
           ...partialConfig,
@@ -428,7 +441,10 @@ const Settings: React.FC = () => {
                 <FormControl>
                   {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
                   <FormGroup sx={{ gap: 2 }}>
-                    {pipeline.postprocessors?.map((postprocessor, index) => (
+                    {(
+                      pipeline.postprocessors ??
+                      defaultConfig.pipelines![0].postprocessors
+                    )?.map((postprocessor, index) => (
                       <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
                         <Columns columns={3}>
                           {displayReadonlyFields(
@@ -486,7 +502,7 @@ const Settings: React.FC = () => {
     <FormGroup>
       <Columns columns={5}>
         {Object.entries(
-          resultingConfig[config] ?? CONFIG_SUB_FIELDS[config] ?? {}
+          resultingConfig[config] ?? defaultConfig[config] ?? {}
         ).map(
           ([field, value]) =>
             field in FIELDS && (

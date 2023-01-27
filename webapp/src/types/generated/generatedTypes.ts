@@ -126,7 +126,6 @@ export interface components {
     AzimuthConfig: {
       name: string;
       dataset: components["schemas"]["CustomObject"];
-      model_contract: components["schemas"]["SupportedModelContract"];
       columns: components["schemas"]["ColumnConfiguration"];
       rejection_class: string | null;
       artifact_path: string;
@@ -135,6 +134,7 @@ export interface components {
       large_dask_cluster: boolean;
       read_only_config: boolean;
       dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
+      model_contract: components["schemas"]["SupportedModelContract"];
       pipelines: components["schemas"]["PipelineDefinition"][] | null;
       uncertainty: components["schemas"]["UncertaintyOptions"];
       saliency_layer: string | null;
