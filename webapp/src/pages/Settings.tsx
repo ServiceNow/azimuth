@@ -189,7 +189,7 @@ const Settings: React.FC = () => {
     Partial<AzimuthConfig>
   >({});
 
-  // If config or defaultConfig was undefined, PipelineCheck would not even render the page.
+  // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
 
   if (isLoading) {
