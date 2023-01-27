@@ -81,16 +81,11 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
 
         # Missing samples warning
         min_count_per_cls = self.config.dataset_warnings.min_num_per_class
-        alert_min_per_cls_per_split: Dict[DatasetSplitName, np.ndarray] = defaultdict(
-            partial(np.full, shape=len(cls_names), fill_value=False)
-        )
-        for split, count in count_per_cls_per_split.items():
-            alert_min_per_cls_per_split[split] = count < min_count_per_cls
+        alert_min_per_cls_per_split = {
+            split: count < min_count_per_cls for split, count in count_per_cls_per_split.items()
+        }
 
-        alert_min_per_cls = (
-            alert_min_per_cls_per_split[DatasetSplitName.train]
-            | alert_min_per_cls_per_split[DatasetSplitName.eval]
-        )
+        alert_min_per_cls = np.logical_or.reduce(tuple(alert_min_per_cls_per_split.values()))
 
         warnings = [
             DatasetWarning(
@@ -130,16 +125,11 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             imb_per_cls_per_split[split] = count / mean_per_split[split] - 1
 
         max_delta_imb = self.config.dataset_warnings.max_delta_class_imbalance
-        alert_imb_per_cls_per_split: Dict[DatasetSplitName, np.ndarray] = defaultdict(
-            partial(np.full, shape=len(cls_names), fill_value=False)
-        )
-        for s, imb in imb_per_cls_per_split.items():
-            alert_imb_per_cls_per_split[s] = np.abs(imb) > max_delta_imb
+        alert_imb_per_cls_per_split = {
+            s: np.abs(imb) > max_delta_imb for s, imb in imb_per_cls_per_split.items()
+        }
 
-        alert_imb_per_cls = (
-            alert_imb_per_cls_per_split[DatasetSplitName.train]
-            | alert_imb_per_cls_per_split[DatasetSplitName.eval]
-        )
+        alert_imb_per_cls = np.logical_or.reduce(tuple(alert_imb_per_cls_per_split.values()))
 
         warnings.append(
             DatasetWarning(
