@@ -198,7 +198,8 @@ const Settings: React.FC = () => {
     error,
   } = getDefaultConfigEndpoint.useQuery({ jobId });
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
-  const [updateConfig] = updateConfigEndpoint.useMutation();
+  const [updateConfig, { isLoading: isUpdatingConfig }] =
+    updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
@@ -613,6 +614,7 @@ const Settings: React.FC = () => {
           )}
           <Button
             variant="contained"
+            disabled={isUpdatingConfig}
             onClick={() => updateConfig({ jobId, body: partialConfig })}
           >
             Apply
