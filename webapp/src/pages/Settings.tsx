@@ -416,7 +416,7 @@ const Settings: React.FC = () => {
           </Box>
         </Columns>
       </FormGroup>
-      {resultingConfig.pipelines && (
+      {resultingConfig.pipelines?.length && (
         <>
           {displaySectionTitle("Pipelines")}
           <FormGroup sx={{ gap: 2 }}>
