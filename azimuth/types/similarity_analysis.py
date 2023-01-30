@@ -7,12 +7,10 @@ from typing import List, Optional, Tuple
 from pydantic import Field
 
 from azimuth.types import AliasModel, Array, ModuleResponse
+from azimuth.types.utterance import BaseUtterance
 
 
-class SimilarUtterance(AliasModel):
-    index: int
-    utterance: str
-    label: str
+class SimilarUtterance(BaseUtterance):
     postprocessed_prediction: Optional[str] = Field(..., nullable=True)
     postprocessed_confidence: Optional[float] = Field(..., nullable=True)
     similarity: float

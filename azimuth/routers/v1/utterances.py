@@ -405,6 +405,7 @@ def get_similar(
     similar_utterances = [
         SimilarUtterance(
             index=data[DatasetColumn.row_idx],
+            persistent_id=data[config.columns.persistent_id],
             utterance=data[config.columns.text_input],
             label=data[config.columns.label],
             postprocessed_prediction=data.get(DatasetColumn.postprocessed_prediction, None),
