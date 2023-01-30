@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { Redirect, useLocation, useParams } from "react-router-dom";
