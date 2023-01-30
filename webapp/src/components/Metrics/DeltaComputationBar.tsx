@@ -31,6 +31,7 @@ const DeltaComputationBar: React.FC<Props> = ({
       {value ? (
         <Box width="100%" flex="1" position="relative" marginY={1}>
           <Box
+            data-testid="delta-computation-bar"
             component={motion.div}
             position="absolute"
             overflow="auto"
@@ -49,6 +50,7 @@ const DeltaComputationBar: React.FC<Props> = ({
           ></Box>
 
           <Typography
+            data-testid="delta-computation-value"
             position="absolute"
             sx={{
               ...(value > 0 ? { right: "55%" } : { left: "55%" }),
