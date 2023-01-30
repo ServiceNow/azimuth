@@ -34,7 +34,7 @@ describe("PerformanceAnalysis", () => {
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
-  it("should have two toggle buttons for the train and test", () => {
+  it("should display two toggle buttons for the train and test", () => {
     renderPerformanceAnalysis({ train: true, eval: true });
     // verify if the toggles displayed with correct names
     expect(
