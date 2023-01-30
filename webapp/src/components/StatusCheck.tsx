@@ -90,9 +90,10 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
             <Paper>
               <Box display="flex" alignItems="center" gap={1} margin={2}>
                 {PENDING}
-                <Typography></Typography>
-                The results are being finalized. Hang on for a few more
-                seconds...
+                <Typography>
+                  The results are being finalized. Hang on for a few more
+                  seconds...
+                </Typography>
               </Box>
             </Paper>
           )}
