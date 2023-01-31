@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   formControlLabelClasses,
@@ -601,16 +602,26 @@ const Settings: React.FC = () => {
         <Button variant="contained" onClick={() => setPartialConfig({})}>
           Discard
         </Button>
+
         <Box display="flex" alignItems="center" gap={2}>
-          {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
+          {isUpdatingConfig ? (
             <>
-              <Warning color="warning" />
+              <CircularProgress size={16} />
               <FormHelperText>
-                These changes may trigger some time-consuming computations.
-                <br />
-                Azimuth will not be usable until they complete.
+                Please wait while the config changes are validated.
               </FormHelperText>
             </>
+          ) : (
+            FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
+              <>
+                <Warning color="warning" />
+                <FormHelperText>
+                  These changes may trigger some time-consuming computations.
+                  <br />
+                  Azimuth will not be usable until they complete.
+                </FormHelperText>
+              </>
+            )
           )}
           <Button
             variant="contained"
