@@ -226,18 +226,19 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
             DatasetSplitName, Dict[Agg, np.ndarray]
         ] = defaultdict(dict)
         hist_per_cls_per_split = {}
+        label_col = self.config.columns.label
 
         for split in self.available_dataset_splits:
             ds = self.get_dataset_split(split)
             df = ds.remove_columns(
-                list(set(ds.column_names) - {DatasetColumn.word_count, self.config.columns.label})
+                list(set(ds.column_names) - {DatasetColumn.word_count, label_col})
             ).to_pandas()
 
             value_per_agg_per_split[split][Agg.mean] = df["word_count"].mean()
             value_per_agg_per_split[split][Agg.std] = df["word_count"].std()
 
             # Get mean and std word count per class
-            stats_per_cls = df.groupby("label").agg(list(Agg)).reindex(cls_indices)
+            stats_per_cls = df.groupby(label_col).agg(list(Agg)).reindex(cls_indices)
             for agg in Agg:
                 value_per_cls_per_agg_per_split[split][agg] = stats_per_cls["word_count"][
                     agg
@@ -245,7 +246,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
 
             # Get word count histogram per class. Columns are word counts and rows are classes.
             hist_per_cls_per_split[split] = (
-                df.groupby(["label", "word_count"])
+                df.groupby([label_col, "word_count"])
                 .size()
                 .unstack(fill_value=0)
                 .reindex(cls_indices, fill_value=0)
