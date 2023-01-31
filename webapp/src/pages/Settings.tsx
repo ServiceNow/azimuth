@@ -604,7 +604,14 @@ const Settings: React.FC = () => {
         </Button>
 
         <Box display="flex" alignItems="center" gap={2}>
-          {!isUpdatingConfig &&
+          {isUpdatingConfig ? (
+            <>
+              <CircularProgress size={16} />
+              <FormHelperText>
+                Please wait while the config changes are validated.
+              </FormHelperText>
+            </>
+          ) : (
             FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
               <>
                 <Warning color="warning" />
@@ -614,18 +621,7 @@ const Settings: React.FC = () => {
                   Azimuth will not be usable until they complete.
                 </FormHelperText>
               </>
-            )}
-          {isUpdatingConfig && (
-            <>
-              <CircularProgress
-                color="inherit"
-                size={16}
-                sx={{ marginY: "2px" }}
-              />
-              <FormHelperText>
-                Please wait while the config changes are validated.
-              </FormHelperText>
-            </>
+            )
           )}
           <Button
             variant="contained"
