@@ -210,8 +210,7 @@ class TypoTestOptions(AzimuthBaseSettings):
     nb_typos_per_utterance: int = 1
 
 
-# TODO Change to AzimuthBaseSettings once the front end knows the default values.
-class BehavioralTestingOptions(BaseSettings):
+class BehavioralTestingOptions(AzimuthBaseSettings):
     neutral_token: NeutralTokenOptions = NeutralTokenOptions()
     punctuation: PunctuationTestOptions = PunctuationTestOptions()
     fuzzy_matching: FuzzyMatchingTestOptions = FuzzyMatchingTestOptions()

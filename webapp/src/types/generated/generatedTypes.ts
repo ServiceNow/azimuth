@@ -153,11 +153,11 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     BehavioralTestingOptions: {
-      neutral_token?: components["schemas"]["NeutralTokenOptions"];
-      punctuation?: components["schemas"]["PunctuationTestOptions"];
-      fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
-      typo?: components["schemas"]["TypoTestOptions"];
-      seed?: number;
+      neutral_token: components["schemas"]["NeutralTokenOptions"];
+      punctuation: components["schemas"]["PunctuationTestOptions"];
+      fuzzy_matching: components["schemas"]["FuzzyMatchingTestOptions"];
+      typo: components["schemas"]["TypoTestOptions"];
+      seed: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
