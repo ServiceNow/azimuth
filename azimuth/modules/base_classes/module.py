@@ -35,7 +35,7 @@ class Module(DaskModule[ConfigScope]):
         defined_mod_options = set(self.mod_options.no_alias_dict(exclude_defaults=True).keys())
         if diff := (defined_mod_options - self.allowed_mod_options - self.required_mod_options):
             raise ValueError(f"Unexpected mod_options {diff} for {self.__class__.__name__}.")
-        if self.required_mod_options and self.required_mod_options.isdisjoint(defined_mod_options):
+        if not self.required_mod_options.issubset(defined_mod_options):
             raise ValueError(f"{self.__class__.__name__} requires {self.required_mod_options}.")
 
         self.model_contract_method_name = mod_options.model_contract_method_name
@@ -54,7 +54,7 @@ class Module(DaskModule[ConfigScope]):
         return ModuleEffectiveArguments(
             mod_options=self.mod_options.dict(
                 exclude={"indices", "model_contract_method_name"},
-                include=self.allowed_mod_options.union(self.required_mod_options),
+                include=self.allowed_mod_options | self.required_mod_options,
             ),
             config_scope=self.config.dict(
                 exclude=exclude_fields_from_cache(self.config),
