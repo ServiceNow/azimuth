@@ -86,6 +86,10 @@ export interface paths {
     /** Export the dataset_split to a CSV file and returns it. */
     get: operations["export_dataset_export_dataset_splits__dataset_split_name__utterances_get"];
   };
+  "/export/dataset_splits/{dataset_split_name}/proposed_actions": {
+    /** Export proposed actions to a CSV file and returns it. */
+    get: operations["export_proposed_actions_export_dataset_splits__dataset_split_name__proposed_actions_get"];
+  };
   "/export/perturbation_testing_summary": {
     /** Export the perturbation testing summary to a CSV file and returns it. */
     get: operations["get_export_perturbation_testing_summary_export_perturbation_testing_summary_get"];
@@ -1419,6 +1423,24 @@ export interface operations {
       };
       query: {
         pipeline_index?: number;
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: unknown;
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Export proposed actions to a CSV file and returns it. */
+  export_proposed_actions_export_dataset_splits__dataset_split_name__proposed_actions_get: {
+    parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
     };
     responses: {

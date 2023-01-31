@@ -72,6 +72,20 @@ def export_dataset(
 
 
 @router.get(
+    "/dataset_splits/{dataset_split_name}/proposed_actions",
+    summary="Export proposed actions as csv.",
+    description="Export proposed actions to a CSV file and returns it.",
+    tags=TAGS,
+    response_class=FileResponse,
+)
+def export_proposed_actions(
+    dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
+) -> FileResponse:
+    pt = dataset_split_manager.save_proposed_actions_to_csv()
+    return FileResponse(path=pt, filename=os.path.basename(pt))
+
+
+@router.get(
     "/perturbation_testing_summary",
     summary="Export perturbation testing summary as csv.",
     description="Export the perturbation testing summary to a CSV file and returns it.",

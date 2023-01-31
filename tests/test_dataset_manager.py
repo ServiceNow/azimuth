@@ -406,3 +406,28 @@ def test_custom_persistent_id(simple_text_config, a_text_dataset):
             initial_tags=ALL_STANDARD_TAGS,
             dataset_split=a_text_dataset_new_col,
         )
+
+
+def test_export_proposed_actions(simple_text_config, a_text_dataset):
+    dm = DatasetSplitManager(
+        DatasetSplitName.eval,
+        simple_text_config,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=a_text_dataset,
+    )
+
+    proposed_actions = {0: {"remove": True}, 2: {"relabel": True}}
+
+    dm.add_tags(proposed_actions)
+
+    path = dm.save_proposed_actions_to_csv()
+
+    name = os.path.basename(path)
+    assert name.split("_")[2:6] == ["sentiment-analysis", "eval", "proposed", "actions"]
+
+    df = pd.read_csv(path)
+
+    assert len(df) == 2
+    assert list(df.columns) == [simple_text_config.columns.persistent_id, "proposed_action"]
+    assert list(df[simple_text_config.columns.persistent_id]) == [0, 2]
+    assert list(df["proposed_action"]) == ["remove", "relabel"]
