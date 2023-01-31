@@ -602,26 +602,28 @@ const Settings: React.FC = () => {
         <Button variant="contained" onClick={() => setPartialConfig({})}>
           Discard
         </Button>
-        {isUpdatingConfig && (
-          <Box display="flex" alignItems="center" gap={2}>
-            <CircularProgress
-              color="inherit"
-              size={16}
-              sx={{ marginY: "2px" }}
-            />
-            <FormHelperText>
-              Please wait while the config changes are validated.
-            </FormHelperText>
-          </Box>
-        )}
+
         <Box display="flex" alignItems="center" gap={2}>
-          {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
+          {!isUpdatingConfig &&
+            FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
+              <>
+                <Warning color="warning" />
+                <FormHelperText>
+                  These changes may trigger some time-consuming computations.
+                  <br />
+                  Azimuth will not be usable until they complete.
+                </FormHelperText>
+              </>
+            )}
+          {isUpdatingConfig && (
             <>
-              <Warning color="warning" />
+              <CircularProgress
+                color="inherit"
+                size={16}
+                sx={{ marginY: "2px" }}
+              />
               <FormHelperText>
-                These changes may trigger some time-consuming computations.
-                <br />
-                Azimuth will not be usable until they complete.
+                Please wait while the config changes are validated.
               </FormHelperText>
             </>
           )}
