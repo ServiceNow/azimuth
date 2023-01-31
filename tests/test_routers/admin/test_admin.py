@@ -231,6 +231,8 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     initial_contract = initial_config["model_contract"]
     initial_pipelines = initial_config["pipelines"]
     jsonl_file_path = f"{initial_config['artifact_path']}/config_history.jsonl"
+    with jsonlines.open(jsonl_file_path, "r") as reader:
+        initial_config_count = len(list(reader))
 
     res = client.patch(
         "/admin/config",
@@ -262,7 +264,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
 
     with jsonlines.open(jsonl_file_path, "r") as reader:
         loaded_configs = list(reader)
-    assert len(loaded_configs) == 2, "The config has only been successfully changed once."
+    assert len(loaded_configs) == initial_config_count + 1, "Config have been modified once."
     assert loaded_configs[-1]["model_contract"] == "file_based_text_classification"
     assert not loaded_configs[-1]["pipelines"]
 
