@@ -30,7 +30,9 @@ def test_loading_dataset(file_text_config_top3):
     train_task = FileBasedTextClassificationModule(
         DatasetSplitName.train,
         file_text_config_top3,
-        mod_options=ModuleOptions(model_contract_method_name=SupportedMethod.Predictions),
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
+        ),
     )
 
     # Make sure the training set is read as usual

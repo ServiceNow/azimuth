@@ -186,6 +186,8 @@ class MetricsPerFilterModule(AggregationModule[MetricsPerFilterConfig]):
     affected by data actions.
     """
 
+    required_mod_options = {"pipeline_index"}
+
     def get_metrics_for_filter(
         self, filters_dict: Dict[str, DatasetFilters]
     ) -> List[MetricsPerFilterValue]:
@@ -205,6 +207,7 @@ class MetricsPerFilterModule(AggregationModule[MetricsPerFilterConfig]):
             metrics = MetricsModule(
                 dataset_split_name=self.dataset_split_name,
                 config=self.config,
+                mod_options=self.mod_options,
             ).compute_metrics(ds_filtered)[0]
             accumulator.append(
                 MetricsPerFilterValue(

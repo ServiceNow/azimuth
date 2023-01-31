@@ -235,7 +235,9 @@ def test_load_CLINC150_dataset(clinc_text_config):
     task = HFTextClassificationModule(
         DatasetSplitName.train,
         clinc_text_config,
-        mod_options=ModuleOptions(model_contract_method_name=SupportedMethod.Predictions),
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
+        ),
     )
 
     ds = task.get_dataset_split()

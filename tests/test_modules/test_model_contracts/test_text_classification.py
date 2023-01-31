@@ -25,7 +25,9 @@ def test_create_dataset(simple_text_config):
     task = HFTextClassificationModule(
         DatasetSplitName.eval,
         simple_text_config,
-        mod_options=ModuleOptions(model_contract_method_name=SupportedMethod.Predictions),
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
+        ),
     )
 
     assert task is not None
@@ -324,7 +326,9 @@ def test_extract_output(simple_text_config):
         DatasetSplitName.eval,
         simple_text_config,
         mod_options=ModuleOptions(
-            model_contract_method_name=SupportedMethod.Predictions, indices=[4, 9, 3]
+            model_contract_method_name=SupportedMethod.Predictions,
+            indices=[4, 9, 3],
+            pipeline_index=0,
         ),
     )
     real_output = np.array([[0.1, 0.9]])

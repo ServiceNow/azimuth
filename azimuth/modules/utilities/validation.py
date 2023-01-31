@@ -35,6 +35,8 @@ class ExceptionGatherer:
 
 
 class ValidationModule(AggregationModule[ModelContractConfig]):
+    allowed_mod_options = {"pipeline_index"}
+
     def compute_on_dataset_split(self) -> List[ValidationResponse]:  # type: ignore
         cuda_available = torch.cuda.is_available()
         exception_gatherer = ExceptionGatherer()

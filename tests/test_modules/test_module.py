@@ -184,5 +184,16 @@ def test_validation_priority(simple_text_config):
     assert ds["utterance"] == ["h", "i", "j"]
 
 
+def test_mod_options(tiny_text_config):
+    with pytest.raises(ValueError, match="Unexpected mod_options"):
+        IndexableModule(
+            DatasetSplitName.eval,
+            config=tiny_text_config,
+            mod_options=ModuleOptions(pipeline_index=0),
+        )
+    with pytest.raises(ValueError, match="HFTextClassificationModule requires"):
+        HFTextClassificationModule(DatasetSplitName.eval, config=tiny_text_config)
+
+
 if __name__ == "__main__":
     pytest.main()
