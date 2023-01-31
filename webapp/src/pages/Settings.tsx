@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   formControlLabelClasses,
@@ -601,6 +602,18 @@ const Settings: React.FC = () => {
         <Button variant="contained" onClick={() => setPartialConfig({})}>
           Discard
         </Button>
+        {isUpdatingConfig && (
+          <Box display="flex" alignItems="center" gap={2}>
+            <CircularProgress
+              color="inherit"
+              size={16}
+              sx={{ marginY: "2px" }}
+            />
+            <FormHelperText>
+              Please wait while the config changes are updated.
+            </FormHelperText>
+          </Box>
+        )}
         <Box display="flex" alignItems="center" gap={2}>
           {FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
             <>
