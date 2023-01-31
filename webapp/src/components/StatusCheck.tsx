@@ -4,6 +4,7 @@ import {
   Box,
   capitalize,
   CircularProgress,
+  Paper,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -17,10 +18,12 @@ type Props = {
   children: React.ReactNode;
 };
 
+const PENDING = <CircularProgress size={16} sx={{ margin: "2px" }} />;
+
 const STATUS_ICONS: Record<string, React.ReactElement> = {
   finished: <DoneIcon color="success" />,
   not_started: <DoneIcon color="success" />, // Happens when the task was already computed.
-  pending: <CircularProgress size={16} sx={{ margin: "2px" }} />,
+  pending: PENDING,
   error: <ErrorIcon color="error" />,
   lost: <ErrorIcon color="error" />,
 };
@@ -81,6 +84,19 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
               </Box>
             ))}
           </Box>
+          {Object.values(status.startupTasksStatus).every(
+            (taskStatus) => taskStatus !== "pending"
+          ) && (
+            <Paper>
+              <Box display="flex" alignItems="center" gap={1} margin={2}>
+                {PENDING}
+                <Typography>
+                  The results are being finalized. Hang on for a few more
+                  seconds...
+                </Typography>
+              </Box>
+            </Paper>
+          )}
         </Box>
       </Box>
     );
