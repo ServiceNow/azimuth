@@ -317,8 +317,8 @@ class ModelContractConfig(CommonFieldsConfig):
 
     @validator("pipelines", pre=True)
     def check_pipeline_names(cls, pipeline_definitions):
-        if pipeline_definitions is None:
-            return pipeline_definitions
+        if not pipeline_definitions:
+            return None
         pipeline_definitions = [
             pipeline_def.dict() if isinstance(pipeline_def, PipelineDefinition) else pipeline_def
             for pipeline_def in pipeline_definitions
