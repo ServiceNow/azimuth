@@ -610,7 +610,7 @@ const Settings: React.FC = () => {
               sx={{ marginY: "2px" }}
             />
             <FormHelperText>
-              Please wait while the config changes are updated.
+              Please wait while the config changes are validated.
             </FormHelperText>
           </Box>
         )}
