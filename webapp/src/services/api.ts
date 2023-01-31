@@ -332,7 +332,9 @@ export const api = createApi({
               );
             }
             if ("pipelines" in partialConfig) {
-              draft.predictionAvailable = Boolean(partialConfig.pipelines);
+              draft.predictionAvailable = Boolean(
+                partialConfig.pipelines?.length
+              );
             }
             if ("similarity" in partialConfig) {
               draft.similarityAvailable = Boolean(partialConfig.similarity);
