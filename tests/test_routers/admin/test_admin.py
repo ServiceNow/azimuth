@@ -232,7 +232,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     initial_pipelines = initial_config["pipelines"]
     jsonl_file_path = f"{initial_config['artifact_path']}/config_history.jsonl"
     with jsonlines.open(jsonl_file_path, "r") as reader:
-        initial_config_count = len((list(reader)))
+        initial_config_count = len(list(reader))
 
     res = client.patch(
         "/admin/config",
