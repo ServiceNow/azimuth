@@ -22,6 +22,7 @@ class Module(DaskModule[ConfigScope]):
     with the dataset and the pipelines."""
 
     allowed_mod_options: Set[str] = set()
+    required_mod_options: Set[str] = set()
 
     def __init__(
         self,
@@ -31,11 +32,11 @@ class Module(DaskModule[ConfigScope]):
     ):
         mod_options = mod_options or ModuleOptions()
         self.mod_options = mod_options
-        if diff := (
-            set(self.mod_options.no_alias_dict(exclude_defaults=True).keys())
-            - self.allowed_mod_options
-        ):
+        defined_mod_options = set(self.mod_options.no_alias_dict(exclude_defaults=True).keys())
+        if diff := (defined_mod_options - self.allowed_mod_options - self.required_mod_options):
             raise ValueError(f"Unexpected mod_options {diff} for {self.__class__.__name__}.")
+        if self.required_mod_options and self.required_mod_options.isdisjoint(defined_mod_options):
+            raise ValueError(f"{self.__class__.__name__} requires {self.required_mod_options}.")
 
         self.model_contract_method_name = mod_options.model_contract_method_name
         self.task_name = self.model_contract_method_name or self.__class__.__name__
@@ -52,7 +53,8 @@ class Module(DaskModule[ConfigScope]):
         # model_contract_method_name are excluded too because it's already in the task_name.
         return ModuleEffectiveArguments(
             mod_options=self.mod_options.dict(
-                exclude={"indices", "model_contract_method_name"}, include=self.allowed_mod_options
+                exclude={"indices", "model_contract_method_name"},
+                include=self.allowed_mod_options.union(self.required_mod_options),
             ),
             config_scope=self.config.dict(
                 exclude=exclude_fields_from_cache(self.config),

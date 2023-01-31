@@ -45,6 +45,8 @@ PERTURBATION_TEST_GROUPING = ["family", "name", "perturbation_type", "dataset_sp
 class PerturbationTestingSummaryModule(ComparisonModule[PerturbationTestingConfig]):
     """Summary of perturbation tests per dataset split."""
 
+    required_mod_options = {"pipeline_index"}
+
     def compute_on_dataset_split(  # type: ignore
         self,
     ) -> List[PerturbationTestingSummaryResponse]:

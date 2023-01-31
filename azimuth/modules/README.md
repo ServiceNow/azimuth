@@ -54,7 +54,8 @@ inherit from. Different options are available, with different particularities.
 
 - This is the parent module. No Module should directly inherit from it. It includes a lot of the
   basic methods that apply to all modules.
-- All module options are ignored by default (`allowed_mod_options` is empty) in this module.
+- All module options are ignored by default (`allowed_mod_options` and `required_mod_options` are
+  empty) in this module.
 
 ### Indexable Module
 
@@ -76,9 +77,8 @@ inherit from. Different options are available, with different particularities.
 - It inherits from Dataset Result Module, and is a module that wraps models.
 - These modules handle all the tasks which are in need of direct access to the model in order to
   compute their results (e.g. prediction, saliency).
-- `allowed_mod_options` include some default options that can affect models, such as the `threshold`
-  and the `pipeline_index`. The mod_options `model_contract_method_name` is mandatory as it
-  specifies which method should be called in the module.
+- `allowed_mod_options` include default options that can affect models, such as the `threshold`.
+- `required_mod_options` include both `model_contract_method_name` and `pipeline_index`.
 
 ### Aggregation Module
 - This module inherits from `Module`, and so the same methods and attributes are available.
@@ -88,6 +88,8 @@ inherit from. Different options are available, with different particularities.
 - This module inherits from `AggregationModule` and is similar in all points
 - However, `allowed_mod_options` include `filters`, which mean the dataset can be filtered using `DatasetFilters` (as opposed to regular modules which use indices only).
 - As such, `.get_dataset_split()` returns a subset of the `dataset_split`, based on `filters`.
+- `required_mod_options` include `pipeline_index` since all filterable modules require filtering on the dataset, which involve predictions.
+
 
 #### Comparison Module
 - This module inherits from `AggregationModule` and is similar in all points. The only difference it that it works on multiple dataset split at the same time. As such, it only accepts `DatasetSplitName.all`.
@@ -130,6 +132,9 @@ For example, it should throw if a module is called with the wrong dataset_split,
 `allowed_mod_options` is a set containing the list of `mod_options` that can affect a given module.
 * By default, the set is empty.
 * Different default values are available in the different parent modules below. When overriding the default values, the values from the parent module should be added to the set.
+
+### Required Mod Options
+Similarly, `required_mod_options` is a set containing all `mod_options` that are mandatory for this module.
 
 ## Artifact Manager
 
@@ -204,6 +209,6 @@ Every module result is cached in a HDF5 file. This allows for random-access to t
 re-computation. The caching is implemented in `azimuth.modules.caching.HDF5CacheMixin`. A new cache
 is generated everytime the `.name` of the module changes. The `.name` is generated automatically
 based on the `task_name`, the `dataset_split_name`, and two striped hash sequences, based on
-either `allowed_mod_options` values (minus `indices`) or `config` attribute values. By default, a
+either `allowed_mod_options`/`required_mod_options` values (minus `indices`) or `config` attribute values. By default, a
 new cache folder is created when one of the attribute value from the `ProjectConfig` is changed.
-This includes attributes such as the dataset and model paths.
+This includes attributes related to the dataset.

@@ -14,8 +14,6 @@ from azimuth.utils.dataset_operations import filter_dataset_split
 class AggregationModule(Module[ConfigScope], ABC):
     """Same as Module, but caching is done over a set of indices."""
 
-    allowed_mod_options = {"pipeline_index"}
-
     def get_caching_indices(self) -> List[int]:
         return [-1]  # Aggregation Module cache on one index.
 
@@ -32,7 +30,8 @@ class ComparisonModule(AggregationModule[ConfigScope], ABC):
 class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
     """Filterable Module are affected by filters in mod options."""
 
-    allowed_mod_options = {"filters", "pipeline_index", "without_postprocessing"}
+    allowed_mod_options = {"filters", "without_postprocessing"}
+    required_mod_options = {"pipeline_index"}
 
     def get_dataset_split(self, name: DatasetSplitName = None) -> Dataset:
         """Get the specified dataset_split, filtered according to mod_options.
