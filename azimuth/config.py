@@ -317,6 +317,7 @@ class ModelContractConfig(CommonFieldsConfig):
 
     @validator("pipelines", pre=True)
     def check_pipeline_names(cls, pipeline_definitions):
+        # We support both [] and None (null in JSON), and we standardize it to None.
         if not pipeline_definitions:
             return None
         pipeline_definitions = [
