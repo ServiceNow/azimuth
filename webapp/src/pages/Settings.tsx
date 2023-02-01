@@ -40,7 +40,8 @@ const INT = { inputProps: { min: 1 } };
 const FLOAT = { inputProps: { min: 0, step: 0.1 } };
 const COSINE_SIMILARITY = { inputProps: { min: -1, max: 1, step: 0.1 } };
 
-const READ_ONLY_FIELDS = ["faiss_encoder"];
+const READ_ONLY_FIELDS = ["faiss_encoder", "spacy_model"];
+const READ_ONLY_ARGS_FIELDS = ["subj_tags", "obj_tags"];
 const FIELDS: Record<
   string,
   { scale?: number; units?: string; inputProps: InputBaseComponentProps }
@@ -524,6 +525,8 @@ const Settings: React.FC = () => {
         ).map(([field, value]) =>
           READ_ONLY_FIELDS.includes(field)
             ? displayReadonlyFields(field, value)
+            : READ_ONLY_ARGS_FIELDS.includes(field)
+            ? displayArgumentsList(field, value)
             : field in FIELDS && (
                 <NumberField
                   key={field}
