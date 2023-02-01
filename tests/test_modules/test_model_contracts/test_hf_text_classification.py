@@ -120,11 +120,11 @@ def test_rejection_class(simple_text_config):
         ),
     )
     out = cast(List[PredictionResponse], mod.compute_on_dataset_split())
-    # At least 1 out of the 10 predictions will have confidence < 0.99
-    assert set(k.postprocessed_output.preds[0] != k.model_output.preds[0] for k in out) == {True}
-    rejected_items = filter(
-        lambda k: k.postprocessed_output.preds[0] != k.model_output.preds[0], out
-    )
+
+    # At least 1 out of the 10 predictions will have confidence below the threshold.
+    rej_cls_idx = mod.get_dataset_split_manager().rejection_class_idx
+    rejected_items = [item for item in out if item.postprocessed_output.preds[0] == rej_cls_idx]
+    assert len(rejected_items) > 0
     assert all(
         np.max(pred_response.model_output.probs[0]) <= simple_text_config.pipelines[0].threshold
         for pred_response in rejected_items
