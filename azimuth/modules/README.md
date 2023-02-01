@@ -54,7 +54,7 @@ inherit from. Different options are available, with different particularities.
 
 - This is the parent module. No Module should directly inherit from it. It includes a lot of the
   basic methods that apply to all modules.
-- All module options are ignored by default (`allowed_mod_options` and `required_mod_options` are
+- All module options are ignored by default (`required_mod_options` and `optional_mod_options` are
   empty) in this module.
 
 ### Indexable Module
@@ -63,7 +63,7 @@ inherit from. Different options are available, with different particularities.
   were requested. This has crucial implications for caching: the cache can be retrieved per indices,
   i.e. if we request results for a set of indices that is partially different from a previous set of
   indices, only the missing indices will be computed.
-- `allowed_mod_options` include `indices` for that purpose.
+- `optional_mod_options` include `indices` for that purpose.
 - `.get_dataset_split()` returns a subset of the `dataset_split`, based on `indices`.
 
 #### Dataset Result Module
@@ -77,18 +77,18 @@ inherit from. Different options are available, with different particularities.
 - It inherits from Dataset Result Module, and is a module that wraps models.
 - These modules handle all the tasks which are in need of direct access to the model in order to
   compute their results (e.g. prediction, saliency).
-- `allowed_mod_options` include default options that can affect models, such as the `threshold`.
 - `required_mod_options` include both `model_contract_method_name` and `pipeline_index`.
+- `optional_mod_options` include options that can affect models, such as the `threshold`.
 
 ### Aggregation Module
 - This module inherits from `Module`, and so the same methods and attributes are available.
 - This module performs an aggregation, which makes the length of the module's result not equal to the number of data points that were requested. For example, the metric module will compute `X` metrics, based on a set of `n` data points. This has crucial implications for caching, as the module needs to be recomputed as soon as the set of data points is changed. For that reason, the result of an aggregation task needs to be a list of length one.
 
 #### Filterable Module
-- This module inherits from `AggregationModule` and is similar in all points
-- However, `allowed_mod_options` include `filters`, which mean the dataset can be filtered using `DatasetFilters` (as opposed to regular modules which use indices only).
-- As such, `.get_dataset_split()` returns a subset of the `dataset_split`, based on `filters`.
+- This module inherits from `AggregationModule` and is similar in all points.
 - `required_mod_options` include `pipeline_index` since all filterable modules require filtering on the dataset, which involve predictions.
+- `optional_mod_options` include `filters`, which mean the dataset can be filtered using `DatasetFilters` (as opposed to regular modules which use indices only).
+- As such, `.get_dataset_split()` returns a subset of the `dataset_split`, based on `filters`.
 
 
 #### Comparison Module
@@ -128,13 +128,13 @@ For example, it should throw if a module is called with the wrong dataset_split,
 * The default is that both train and test can be sent.
 * We override this attribute when necessary, such as for Comparison Modules.
 
-### Allowed Mod Options
-`allowed_mod_options` is a set containing the list of `mod_options` that can affect a given module.
+### Required Mod Options
+`required_mod_options` is a set containing all `mod_options` that are mandatory for a given module.
 * By default, the set is empty.
 * Different default values are available in the different parent modules below. When overriding the default values, the values from the parent module should be added to the set.
 
-### Required Mod Options
-Similarly, `required_mod_options` is a set containing all `mod_options` that are mandatory for this module.
+### Optional Mod Options
+Similarly, `optional_mod_options` is a set containing `mod_options` that are optional for a given module.
 
 ## Artifact Manager
 
@@ -209,6 +209,6 @@ Every module result is cached in a HDF5 file. This allows for random-access to t
 re-computation. The caching is implemented in `azimuth.modules.caching.HDF5CacheMixin`. A new cache
 is generated everytime the `.name` of the module changes. The `.name` is generated automatically
 based on the `task_name`, the `dataset_split_name`, and two striped hash sequences, based on
-either `allowed_mod_options`/`required_mod_options` values (minus `indices`) or `config` attribute values. By default, a
+either `required_mod_options`/`optional_mod_options` values (minus `indices`) or `config` attribute values. By default, a
 new cache folder is created when one of the attribute value from the `ProjectConfig` is changed.
 This includes attributes related to the dataset.

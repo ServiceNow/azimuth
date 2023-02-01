@@ -30,7 +30,7 @@ ITERATIONS = 100
 class HFTextClassificationModule(TextClassificationModule):
     """Handles text classification prediction and saliency."""
 
-    allowed_mod_options: Set[str] = TextClassificationModule.allowed_mod_options | {
+    optional_mod_options: Set[str] = TextClassificationModule.optional_mod_options | {
         "gradient_calculation",
         "iterations",
         "use_bma",

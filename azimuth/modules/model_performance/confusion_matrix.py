@@ -22,7 +22,7 @@ MIN_CONFUSION_CUTHILL_MCKEE = 0.1
 class ConfusionMatrixModule(FilterableModule[ModelContractConfig]):
     """Computes the confusion matrix on the specified dataset split."""
 
-    allowed_mod_options = FilterableModule.allowed_mod_options | {
+    optional_mod_options = FilterableModule.optional_mod_options | {
         "cf_normalize",
         "cf_reorder_classes",
     }
