@@ -40,6 +40,7 @@ const INT = { inputProps: { min: 1 } };
 const FLOAT = { inputProps: { min: 0, step: 0.1 } };
 const COSINE_SIMILARITY = { inputProps: { min: -1, max: 1, step: 0.1 } };
 
+const READ_ONLY_FIELDS = ["faiss_encoder"];
 const FIELDS: Record<
   string,
   { scale?: number; units?: string; inputProps: InputBaseComponentProps }
@@ -520,23 +521,27 @@ const Settings: React.FC = () => {
       <Columns columns={5}>
         {Object.entries(
           resultingConfig[config] ?? defaultConfig[config] ?? {}
-        ).map(
-          ([field, value]) =>
-            field in FIELDS && (
-              <NumberField
-                key={field}
-                label={field}
-                value={value}
-                disabled={!resultingConfig[config]}
-                onChange={(newValue) =>
-                  setPartialConfig({
-                    ...partialConfig,
-                    [config]: { ...resultingConfig[config], [field]: newValue },
-                  })
-                }
-                {...FIELDS[field]}
-              />
-            )
+        ).map(([field, value]) =>
+          READ_ONLY_FIELDS.includes(field)
+            ? displayReadonlyFields(field, value)
+            : field in FIELDS && (
+                <NumberField
+                  key={field}
+                  label={field}
+                  value={value}
+                  disabled={!resultingConfig[config]}
+                  onChange={(newValue) =>
+                    setPartialConfig({
+                      ...partialConfig,
+                      [config]: {
+                        ...resultingConfig[config],
+                        [field]: newValue,
+                      },
+                    })
+                  }
+                  {...FIELDS[field]}
+                />
+              )
         )}
       </Columns>
     </FormGroup>
