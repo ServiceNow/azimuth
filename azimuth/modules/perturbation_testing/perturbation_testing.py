@@ -57,7 +57,6 @@ class PerturbationTestingModule(DatasetResultModule[PerturbationTestingConfig]):
 
     """
 
-    allowed_mod_options = DatasetResultModule.allowed_mod_options
     required_mod_options = {"pipeline_index"}
 
     def __init__(

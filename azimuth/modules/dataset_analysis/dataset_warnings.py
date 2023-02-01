@@ -31,7 +31,7 @@ from azimuth.types.dataset_warnings import (
 class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
     """Compute warnings related to difference between the training set and the evaluation set."""
 
-    allowed_mod_options: Set[str] = set()
+    optional_mod_options: Set[str] = set()
 
     def compute_on_dataset_split(self) -> List[DatasetWarningsResponse]:  # type: ignore
         """

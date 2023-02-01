@@ -28,7 +28,7 @@ MIN_SALIENCY = 0.01
 class TopWordsModule(FilterableModule[TopWordsConfig]):
     """Returns the most important words in terms of their saliency value or frequency."""
 
-    allowed_mod_options = FilterableModule.allowed_mod_options | {
+    optional_mod_options = FilterableModule.optional_mod_options | {
         "top_x",
         "th_importance",
         "force_no_saliency",

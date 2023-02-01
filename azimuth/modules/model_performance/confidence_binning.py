@@ -119,8 +119,8 @@ class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
 class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig]):
     """Return confidence bin indices for the selected dataset split."""
 
-    allowed_mod_options = DatasetResultModule.allowed_mod_options | {"threshold"}
     required_mod_options = {"pipeline_index"}
+    optional_mod_options = DatasetResultModule.optional_mod_options | {"threshold"}
 
     def compute_on_dataset_split(self) -> List[int]:  # type: ignore
         """Get the bin indices for each utterance in the dataset split.

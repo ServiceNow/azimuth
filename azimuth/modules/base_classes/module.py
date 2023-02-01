@@ -21,8 +21,8 @@ class Module(DaskModule[ConfigScope]):
     """Abstract class to define functions used by all modules for computing results and interfacing
     with the dataset and the pipelines."""
 
-    allowed_mod_options: Set[str] = set()
     required_mod_options: Set[str] = set()
+    optional_mod_options: Set[str] = set()
 
     def __init__(
         self,
@@ -33,10 +33,10 @@ class Module(DaskModule[ConfigScope]):
         mod_options = mod_options or ModuleOptions()
         self.mod_options = mod_options
         defined_mod_options = set(self.mod_options.no_alias_dict(exclude_defaults=True).keys())
-        if diff := (defined_mod_options - self.allowed_mod_options - self.required_mod_options):
-            raise ValueError(f"Unexpected mod_options {diff} for {self.__class__.__name__}.")
         if not self.required_mod_options.issubset(defined_mod_options):
             raise ValueError(f"{self.__class__.__name__} requires {self.required_mod_options}.")
+        if diff := (defined_mod_options - self.required_mod_options - self.optional_mod_options):
+            raise ValueError(f"Unexpected mod_options {diff} for {self.__class__.__name__}.")
 
         self.model_contract_method_name = mod_options.model_contract_method_name
         self.task_name = self.model_contract_method_name or self.__class__.__name__
@@ -54,7 +54,7 @@ class Module(DaskModule[ConfigScope]):
         return ModuleEffectiveArguments(
             mod_options=self.mod_options.dict(
                 exclude={"indices", "model_contract_method_name"},
-                include=self.allowed_mod_options | self.required_mod_options,
+                include=self.required_mod_options | self.optional_mod_options,
             ),
             config_scope=self.config.dict(
                 exclude=exclude_fields_from_cache(self.config),

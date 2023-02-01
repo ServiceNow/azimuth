@@ -19,7 +19,6 @@ from azimuth.types.word_analysis import TokensToWordsResponse
 class TokensToWordsModule(IndexableModule[ModelContractConfig]):
     """Returns the words in an utterance with their saliency values."""
 
-    allowed_mod_options = IndexableModule.allowed_mod_options
     required_mod_options = {"pipeline_index"}
 
     def get_tokens_saliencies(self, indices: List[int]) -> List[SaliencyResponse]:

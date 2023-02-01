@@ -181,8 +181,8 @@ class OutcomeCountPerFilterModule(FilterableModule[ModelContractConfig]):
 class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
     """Compute the outcome count per threshold."""
 
-    allowed_mod_options = {"nb_bins"}
     required_mod_options = {"pipeline_index"}
+    optional_mod_options = {"nb_bins"}
 
     def compute_on_dataset_split(self) -> List[OutcomeCountPerThresholdResponse]:  # type: ignore
         if not postprocessing_editable(self.config, self.mod_options.pipeline_index):
