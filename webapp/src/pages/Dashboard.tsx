@@ -145,7 +145,11 @@ const Dashboard = () => {
               to={`/${jobId}/dataset_splits/${datasetSplitName}/smart_tags${searchString}`}
               description={smartTagsDescription}
             >
-              <Box maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}>
+              <Box
+                display="flex"
+                flexDirection="column" // Important for the inner Box to overflow correctly
+                maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}
+              >
                 <SmartTagsTable
                   jobId={jobId}
                   pipeline={pipeline}
