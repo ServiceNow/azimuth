@@ -162,13 +162,7 @@ const SmartTagsTable: React.FC<{
   });
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      height="100%"
-      gap={4}
-      minHeight={0}
-    >
+    <Box display="flex" flexDirection="column" gap={4} minHeight={0}>
       <Box display="flex" gap={4}>
         <Box width={340}>
           <DatasetSplitToggler
