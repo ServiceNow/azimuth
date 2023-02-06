@@ -168,7 +168,7 @@ class OutcomeCountPerFilterModule(FilterableModule[ModelContractConfig]):
                     outcome=self.get_outcome_count_per_outcome(ds),
                     **{
                         family.value: self.get_outcome_count_per_tag(
-                            dm, ds, [t.value for t in tags + [SmartTag.no_smart_tag]]
+                            dm, ds, tags + [SmartTag.no_smart_tag]
                         )
                         for family, tags in SMART_TAGS_FAMILY_MAPPING.items()
                     },

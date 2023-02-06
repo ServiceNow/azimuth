@@ -16,6 +16,7 @@ from azimuth.types.tag import (
     SMART_TAGS_FAMILY_MAPPING,
     SmartTag,
     SmartTagFamily,
+    Tag,
     TaggingResponse,
 )
 from azimuth.utils.utterance import clean_utterance
@@ -47,7 +48,7 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
         records: List[TaggingResponse] = []
 
         for utterance in utterances:
-            tag: Dict[SmartTag, bool] = {
+            tag: Dict[Tag, bool] = {
                 smart_tag: False
                 for family in [SmartTagFamily.extreme_length, SmartTagFamily.partial_syntax]
                 for smart_tag in SMART_TAGS_FAMILY_MAPPING[family]
