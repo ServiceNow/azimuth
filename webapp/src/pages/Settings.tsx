@@ -31,7 +31,11 @@ import {
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
 } from "services/api";
-import { AzimuthConfig, PipelineDefinition } from "types/api";
+import {
+  AzimuthConfig,
+  PipelineDefinition,
+  BehavioralTestingOptions,
+} from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
@@ -134,6 +138,7 @@ const displayArgumentsList = (name: string, args: any[]) => (
 
 const displayReadonlyFields = (label: string, value: string | null) => (
   <TextField
+    key={label}
     size="small"
     variant="standard"
     label={label}
@@ -542,6 +547,52 @@ const Settings: React.FC = () => {
     </FormGroup>
   );
 
+  const displayBehaviouralTestingSection = () => (
+    <FormGroup>
+      <Columns columns={5}>
+        {Object.entries(
+          resultingConfig.behavioral_testing ??
+            defaultConfig.behavioral_testing ??
+            {}
+        ).map(
+          (
+            [behavioral_testing_sub_field, behavioral_testing_sub_field_value],
+            index
+          ) =>
+            behavioral_testing_sub_field === "seed" ? (
+              displayReadonlyFields(
+                behavioral_testing_sub_field,
+                String(behavioral_testing_sub_field_value)
+              )
+            ) : (
+              <Box key={index} display="flex" flexDirection="column">
+                <Typography variant="caption">
+                  {behavioral_testing_sub_field}
+                </Typography>
+                <KeyValuePairs>
+                  {Object.entries(
+                    resultingConfig.behavioral_testing?.[
+                      behavioral_testing_sub_field as keyof BehavioralTestingOptions
+                    ] ??
+                      defaultConfig.behavioral_testing![
+                        behavioral_testing_sub_field as keyof BehavioralTestingOptions
+                      ]
+                  ).map(([field, value], index) => (
+                    <React.Fragment key={index}>
+                      <Typography variant="body2">{field}:</Typography>
+                      <Typography variant="body2">
+                        {Array.isArray(value) ? value.join(", ") : value}
+                      </Typography>
+                    </React.Fragment>
+                  ))}
+                </KeyValuePairs>
+              </Box>
+            )
+        )}
+      </Columns>
+    </FormGroup>
+  );
+
   const getAnalysesCustomizationSection = () => (
     <>
       {displaySectionTitle("Dataset Warnings")}
@@ -550,7 +601,8 @@ const Settings: React.FC = () => {
       {getAnalysesCustomization("syntax")}
       {displayToggleSectionTitle("similarity", "Similarity")}
       {getAnalysesCustomization("similarity")}
-      {displayToggleSectionTitle("behavioral_testing", "Perturbation Testing")}
+      {displayToggleSectionTitle("behavioral_testing", "Behavioral Testing")}
+      {displayBehaviouralTestingSection()}
     </>
   );
 
