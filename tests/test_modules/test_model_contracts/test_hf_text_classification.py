@@ -127,8 +127,8 @@ def test_rejection_class(simple_text_config):
     ]
     assert len(rejected_items) > 0
     assert all(
-        np.max(pred_response.model_output.probs[0]) <= simple_text_config.pipelines[0].threshold
-        for pred_response in rejected_items
+        np.max(pred_res.postprocessed_output.probs[0]) <= simple_text_config.pipelines[0].threshold
+        for pred_res in rejected_items
     ), rejected_items
 
 
