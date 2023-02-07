@@ -556,7 +556,7 @@ const Settings: React.FC = () => {
       {getAnalysesCustomization("syntax")}
       {displayToggleSectionTitle("similarity", "Similarity")}
       {getAnalysesCustomization("similarity")}
-      {displayToggleSectionTitle("behavioral_testing", "Perturbation Testing")}
+      {displayToggleSectionTitle("behavioral_testing", "Behavioral Testing")}
       {getAnalysesCustomization("behavioral_testing")}
     </>
   );
