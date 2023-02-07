@@ -31,11 +31,7 @@ import {
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
 } from "services/api";
-import {
-  AzimuthConfig,
-  PipelineDefinition,
-  BehavioralTestingOptions,
-} from "types/api";
+import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
@@ -97,20 +93,20 @@ const KeyValuePairs: React.FC = ({ children }) => (
 );
 
 const displayKeywordArguments = (name: string, kwargs: Record<string, any>) => (
-  <Box display="grid">
+  <Box key={name} display="flex" flexDirection="column">
     <Typography variant="caption">{name}</Typography>
     <KeyValuePairs>
       {Object.entries(kwargs).map(([field, value], index) => (
         <React.Fragment key={index}>
           <Typography variant="body2">{field}:</Typography>
-          <Tooltip title={value}>
+          <Tooltip title={Array.isArray(value) ? value.join(", ") : value}>
             <Typography
               variant="body2"
               whiteSpace="nowrap"
               overflow="hidden"
               textOverflow="ellipsis"
             >
-              {value}
+              {Array.isArray(value) ? value.join(", ") : value}
             </Typography>
           </Tooltip>
         </React.Fragment>
@@ -120,7 +116,7 @@ const displayKeywordArguments = (name: string, kwargs: Record<string, any>) => (
 );
 
 const displayArgumentsList = (name: string, args: any[]) => (
-  <Box display="grid">
+  <Box key={name} display="flex" flexDirection="column">
     <Typography variant="caption">{name}</Typography>
     {args.map((value, index) => (
       <Typography
@@ -550,44 +546,21 @@ const Settings: React.FC = () => {
   const displayBehavioralTestingSection = () => (
     <FormGroup>
       <Columns columns={5}>
-        {Object.entries(
-          resultingConfig.behavioral_testing ??
-            defaultConfig.behavioral_testing ??
-            {}
-        ).map(
-          (
-            [behavioral_testing_sub_field, behavioral_testing_sub_field_value],
-            index
-          ) =>
-            behavioral_testing_sub_field === "seed" ? (
-              displayReadonlyFields(
-                behavioral_testing_sub_field,
-                String(behavioral_testing_sub_field_value)
-              )
-            ) : (
-              <Box key={index} display="flex" flexDirection="column">
-                <Typography variant="caption">
-                  {behavioral_testing_sub_field}
-                </Typography>
-                <KeyValuePairs>
-                  {Object.entries(
-                    resultingConfig.behavioral_testing?.[
-                      behavioral_testing_sub_field as keyof BehavioralTestingOptions
-                    ] ??
-                      defaultConfig.behavioral_testing![
-                        behavioral_testing_sub_field as keyof BehavioralTestingOptions
-                      ]
-                  ).map(([field, value], index) => (
-                    <React.Fragment key={index}>
-                      <Typography variant="body2">{field}:</Typography>
-                      <Typography variant="body2">
-                        {Array.isArray(value) ? value.join(", ") : value}
-                      </Typography>
-                    </React.Fragment>
-                  ))}
-                </KeyValuePairs>
-              </Box>
-            )
+        {(
+          ["neutral_token", "punctuation", "fuzzy_matching", "typo"] as const
+        ).map((category) =>
+          displayKeywordArguments(
+            category,
+            resultingConfig.behavioral_testing?.[category] ??
+              defaultConfig.behavioral_testing![category]
+          )
+        )}
+        {displayReadonlyFields(
+          "seed",
+          String(
+            resultingConfig.behavioral_testing?.seed ??
+              defaultConfig.behavioral_testing!.seed
+          )
         )}
       </Columns>
     </FormGroup>
