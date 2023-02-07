@@ -93,20 +93,20 @@ const KeyValuePairs: React.FC = ({ children }) => (
 );
 
 const displayKeywordArguments = (name: string, kwargs: Record<string, any>) => (
-  <Box display="grid">
+  <Box key={name} display="flex" flexDirection="column">
     <Typography variant="caption">{name}</Typography>
     <KeyValuePairs>
       {Object.entries(kwargs).map(([field, value], index) => (
         <React.Fragment key={index}>
           <Typography variant="body2">{field}:</Typography>
-          <Tooltip title={value}>
+          <Tooltip title={Array.isArray(value) ? value.join(", ") : value}>
             <Typography
               variant="body2"
               whiteSpace="nowrap"
               overflow="hidden"
               textOverflow="ellipsis"
             >
-              {value}
+              {Array.isArray(value) ? value.join(", ") : value}
             </Typography>
           </Tooltip>
         </React.Fragment>
@@ -116,7 +116,7 @@ const displayKeywordArguments = (name: string, kwargs: Record<string, any>) => (
 );
 
 const displayArgumentsList = (name: string, args: any[]) => (
-  <Box display="grid">
+  <Box key={name} display="flex" flexDirection="column">
     <Typography variant="caption">{name}</Typography>
     {args.map((value, index) => (
       <Typography
@@ -134,6 +134,7 @@ const displayArgumentsList = (name: string, args: any[]) => (
 
 const displayReadonlyFields = (label: string, value: string | null) => (
   <TextField
+    key={label}
     size="small"
     variant="standard"
     label={label}
@@ -520,23 +521,28 @@ const Settings: React.FC = () => {
       <Columns columns={5}>
         {Object.entries(
           resultingConfig[config] ?? defaultConfig[config] ?? {}
-        ).map(
-          ([field, value]) =>
-            field in FIELDS && (
-              <NumberField
-                key={field}
-                label={field}
-                value={value}
-                disabled={!resultingConfig[config]}
-                onChange={(newValue) =>
-                  setPartialConfig({
-                    ...partialConfig,
-                    [config]: { ...resultingConfig[config], [field]: newValue },
-                  })
-                }
-                {...FIELDS[field]}
-              />
-            )
+        ).map(([field, value]) =>
+          field in FIELDS ? (
+            <NumberField
+              key={field}
+              label={field}
+              value={value}
+              disabled={!resultingConfig[config]}
+              onChange={(newValue) =>
+                setPartialConfig({
+                  ...partialConfig,
+                  [config]: { ...resultingConfig[config], [field]: newValue },
+                })
+              }
+              {...FIELDS[field]}
+            />
+          ) : Array.isArray(value) ? (
+            displayArgumentsList(field, value)
+          ) : typeof value === "object" ? (
+            displayKeywordArguments(field, value)
+          ) : (
+            displayReadonlyFields(field, value)
+          )
         )}
       </Columns>
     </FormGroup>
@@ -551,6 +557,7 @@ const Settings: React.FC = () => {
       {displayToggleSectionTitle("similarity", "Similarity")}
       {getAnalysesCustomization("similarity")}
       {displayToggleSectionTitle("behavioral_testing", "Perturbation Testing")}
+      {getAnalysesCustomization("behavioral_testing")}
     </>
   );
 
