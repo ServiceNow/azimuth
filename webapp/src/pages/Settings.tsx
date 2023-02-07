@@ -547,7 +547,7 @@ const Settings: React.FC = () => {
     </FormGroup>
   );
 
-  const displayBehaviouralTestingSection = () => (
+  const displayBehavioralTestingSection = () => (
     <FormGroup>
       <Columns columns={5}>
         {Object.entries(
@@ -602,7 +602,7 @@ const Settings: React.FC = () => {
       {displayToggleSectionTitle("similarity", "Similarity")}
       {getAnalysesCustomization("similarity")}
       {displayToggleSectionTitle("behavioral_testing", "Behavioral Testing")}
-      {displayBehaviouralTestingSection()}
+      {displayBehavioralTestingSection()}
     </>
   );
 
