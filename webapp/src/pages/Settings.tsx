@@ -31,11 +31,7 @@ import {
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
 } from "services/api";
-import {
-  AzimuthConfig,
-  PipelineDefinition,
-  BehavioralTestingOptions,
-} from "types/api";
+import { AzimuthConfig, PipelineDefinition } from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
@@ -550,44 +546,32 @@ const Settings: React.FC = () => {
   const displayBehavioralTestingSection = () => (
     <FormGroup>
       <Columns columns={5}>
-        {Object.entries(
-          resultingConfig.behavioral_testing ??
-            defaultConfig.behavioral_testing ??
-            {}
-        ).map(
-          (
-            [behavioral_testing_sub_field, behavioral_testing_sub_field_value],
-            index
-          ) =>
-            behavioral_testing_sub_field === "seed" ? (
-              displayReadonlyFields(
-                behavioral_testing_sub_field,
-                String(behavioral_testing_sub_field_value)
-              )
-            ) : (
-              <Box key={index} display="flex" flexDirection="column">
-                <Typography variant="caption">
-                  {behavioral_testing_sub_field}
-                </Typography>
-                <KeyValuePairs>
-                  {Object.entries(
-                    resultingConfig.behavioral_testing?.[
-                      behavioral_testing_sub_field as keyof BehavioralTestingOptions
-                    ] ??
-                      defaultConfig.behavioral_testing![
-                        behavioral_testing_sub_field as keyof BehavioralTestingOptions
-                      ]
-                  ).map(([field, value], index) => (
-                    <React.Fragment key={index}>
-                      <Typography variant="body2">{field}:</Typography>
-                      <Typography variant="body2">
-                        {Array.isArray(value) ? value.join(", ") : value}
-                      </Typography>
-                    </React.Fragment>
-                  ))}
-                </KeyValuePairs>
-              </Box>
-            )
+        {(
+          ["neutral_token", "punctuation", "fuzzy_matching", "typo"] as const
+        ).map((category, index) => (
+          <Box key={index} display="flex" flexDirection="column">
+            <Typography variant="caption">{category}</Typography>
+            <KeyValuePairs>
+              {Object.entries(
+                resultingConfig.behavioral_testing?.[category] ??
+                  defaultConfig.behavioral_testing![category]
+              ).map(([field, value], index) => (
+                <React.Fragment key={index}>
+                  <Typography variant="body2">{field}:</Typography>
+                  <Typography variant="body2">
+                    {Array.isArray(value) ? value.join(", ") : value}
+                  </Typography>
+                </React.Fragment>
+              ))}
+            </KeyValuePairs>
+          </Box>
+        ))}
+        {displayReadonlyFields(
+          "seed",
+          String(
+            resultingConfig.behavioral_testing?.seed ??
+              defaultConfig.behavioral_testing!.seed
+          )
         )}
       </Columns>
     </FormGroup>
