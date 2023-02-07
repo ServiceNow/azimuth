@@ -406,3 +406,25 @@ def test_custom_persistent_id(simple_text_config, a_text_dataset):
             initial_tags=ALL_STANDARD_TAGS,
             dataset_split=a_text_dataset_new_col,
         )
+
+
+def test_convert_persistent_id_to_row_idx(a_text_dataset, simple_text_config):
+    simple_text_config_persistent_id = simple_text_config.copy()
+    # Set persistent_id as the utterance (str).
+    simple_text_config_persistent_id.columns.persistent_id = simple_text_config.columns.text_input
+    dm = DatasetSplitManager(
+        DatasetSplitName.eval,
+        simple_text_config_persistent_id,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=a_text_dataset,
+    )
+    ds = dm.get_dataset_split()
+
+    persistent_ids = list(reversed(ds[simple_text_config.columns.text_input]))
+    row_indices = dm.get_row_indices_from_persistent_id(persistent_ids)
+    assert row_indices == list(reversed(range(len(ds))))
+
+    random_rows = [10, 0]
+    persistent_ids = ds.select(random_rows)[simple_text_config.columns.text_input]
+    row_indices = dm.get_row_indices_from_persistent_id(persistent_ids)
+    assert row_indices == random_rows

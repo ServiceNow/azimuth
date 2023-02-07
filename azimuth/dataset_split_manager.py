@@ -9,7 +9,7 @@ from copy import copy, deepcopy
 from dataclasses import asdict, dataclass
 from glob import glob
 from os.path import join as pjoin
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import faiss
 import numpy as np
@@ -260,6 +260,12 @@ class DatasetSplitManager:
             lambda u, i: {DatasetColumn.row_idx: i}, with_indices=True
         )
         return dataset_split
+
+    def get_row_indices_from_persistent_id(self, persistent_ids: List[Union[int, str]]):
+        ds = self.get_dataset_split()
+        all_persistent_ids = ds[self.config.columns.persistent_id]
+        indices = [all_persistent_ids.index(persistent_id) for persistent_id in persistent_ids]
+        return indices
 
     def add_tags(
         self,
