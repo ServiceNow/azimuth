@@ -27,7 +27,7 @@ from azimuth.types.perturbation_testing import (
     PerturbedUtteranceDetails,
     PerturbedUtteranceResult,
 )
-from azimuth.types.tag import SmartTag
+from azimuth.types.tag import SmartTag, Tag
 from azimuth.types.task import PredictionResponse
 from azimuth.utils.conversion import flatten
 from azimuth.utils.ml.perturbation_functions import (
@@ -315,7 +315,7 @@ class PerturbationTestingModule(DatasetResultModule[PerturbationTestingConfig]):
         """Compute tags related to Perturbation Tests"""
         tags = {}
         for idx, test_results in enumerate(res):
-            tag = {
+            tag: Dict[Tag, bool] = {
                 SmartTag.failed_fuzzy_matching: any(
                     t.failed
                     for t in test_results

@@ -113,7 +113,7 @@ def filter_dataset_split(
             dataset_split = dataset_split.filter(
                 lambda x: any(
                     (
-                        (not any(x[tag.value] for tag in SMART_TAGS_FAMILY_MAPPING[family]))
+                        (not any(x[tag] for tag in SMART_TAGS_FAMILY_MAPPING[family]))
                         if tag_f == SmartTag.no_smart_tag
                         else x[tag_f]
                     )

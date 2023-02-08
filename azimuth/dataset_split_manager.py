@@ -4,12 +4,12 @@
 
 import os
 import time
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from copy import copy, deepcopy
 from dataclasses import asdict, dataclass
 from glob import glob
 from os.path import join as pjoin
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import faiss
 import numpy as np
@@ -20,7 +20,7 @@ from filelock import FileLock
 
 from azimuth.config import AzimuthConfig, AzimuthValidationError, CommonFieldsConfig
 from azimuth.types import DatasetColumn, DatasetSplitName
-from azimuth.types.tag import SmartTag, Tag
+from azimuth.types.tag import Tag
 from azimuth.utils.validation import assert_not_none
 
 REJECTION_CLASS = "REJECTION_CLASS"
@@ -70,8 +70,8 @@ class DatasetSplitManager:
         self,
         name: DatasetSplitName,
         config: CommonFieldsConfig,
-        initial_tags: List[str],
-        initial_prediction_tags: Optional[List[str]] = None,
+        initial_tags: List[Tag],
+        initial_prediction_tags: Optional[List[Tag]] = None,
         dataset_split: Optional[Dataset] = None,
     ):
         self.name = name
@@ -261,79 +261,45 @@ class DatasetSplitManager:
         )
         return dataset_split
 
-    def _add_tags_to(
-        self, ds: Dataset, tags: Union[Dict[int, Dict[Tag, bool]], Dict[int, Dict[SmartTag, bool]]]
-    ):
-        """Update tags to the specified dataset split.
-
-        Args:
-            tags: Tags where each key is an index and the values are Tags to be updated.
-
-        """
-
-        def check_tags(tags_dict):
-            diff_key = set(tags_dict.keys()).difference(self._tags + self._prediction_tags)
-            if len(diff_key) > 0:
-                raise ValueError(f"Unknown tags: {diff_key}. Expected one of {self._tags}")
-            return tags_dict
-
-        ds = ds.map(lambda u, i: check_tags(tags.get(i, {})), with_indices=True, desc="Set Tag")
-        self._save_base_dataset_split()
-        return ds
-
     def add_tags(
         self,
-        tags: Union[Dict[int, Dict[Tag, bool]], Dict[int, Dict[SmartTag, bool]]],
+        tags: Dict[int, Dict[Tag, bool]],
         table_key: Optional[PredictionTableKey] = None,
     ):
         """Add Tags to the dataset.
 
         Args:
-            tags: Tags where each key is an index and the values are Tags to be updated.
+            tags: Dict where the keys are the row_idx, and the values are tags to be updated.
             table_key: If tags are related to a table, which table is it.
-
         """
-        base_tags = {
-            k: {tag: value for tag, value in v.items() if tag in self._tags}
-            for k, v in tags.items()
-        }
-        predict_tags = {
-            k: {tag: value for tag, value in v.items() if tag in self._prediction_tags}
-            for k, v in tags.items()
-        }
-        if (
-            any(any(tag_values.values()) for tag_values in predict_tags.values())
-            and table_key is None
-        ):
-            raise ValueError(f"No table key supplied for pipeline tags {predict_tags}.")
-
-        # Find unknown tags
-        unknown_tag = {
-            k: {
-                tag: value
-                for tag, value in v.items()
-                if tag not in self._prediction_tags + self._tags
-            }
-            for k, v in tags.items()
-        }
-        unknown_tag = {k: v for k, v in unknown_tag.items() if len(v) > 0}
-        if len(unknown_tag) > 0:
-            raise ValueError(f"Unknown tags {unknown_tag}")
+        base_tags: Dict[int, Dict[Tag, bool]] = defaultdict(dict)
+        pred_tags: Dict[int, Dict[Tag, bool]] = defaultdict(dict)
+        for idx, tag_values in tags.items():
+            for tag, value in tag_values.items():
+                if tag in self._tags:
+                    base_tags[idx][tag] = value
+                elif tag in self._prediction_tags:
+                    if not table_key:
+                        raise ValueError(f"No table key supplied for prediction tags {pred_tags}.")
+                    pred_tags[idx][tag] = value
+                else:
+                    raise ValueError(f"Unknown tag {tag}")
 
         # Process base tags
         base_tags_present = any(len(tag_values) for tag_values in base_tags.values())
         if base_tags_present:
-            self._base_dataset_split = self._add_tags_to(self._base_dataset_split, tags=base_tags)
+            self._base_dataset_split = self._base_dataset_split.map(
+                lambda u, i: base_tags[i], with_indices=True, desc="Set base tag"
+            )
             self._save_base_dataset_split()
 
-        if table_key is not None:
-            # Process prediction table
+        # Process prediction tags
+        if table_key:
             non_null_table_key = assert_not_none(table_key)
-            table = self._get_prediction_table(table_key=non_null_table_key)
-            if table is None:
-                raise ValueError("Can't save tag in an uninitialize dataset.")
-            table = self._add_tags_to(table, tags=predict_tags)
-            self._prediction_tables[non_null_table_key] = table
+            pred_table = self._get_prediction_table(table_key=non_null_table_key)
+            self._prediction_tables[non_null_table_key] = pred_table.map(
+                lambda u, i: pred_tags[i], with_indices=True, desc="Set pipeline tag"
+            )
             self.save_prediction_table(non_null_table_key)
 
     def get_tags(
