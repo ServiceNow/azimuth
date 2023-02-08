@@ -84,7 +84,7 @@ class OutcomeCountPerFilterModule(FilterableModule[ModelContractConfig]):
             indices=assert_is_list(ds[DatasetColumn.row_idx]), table_key=self._get_table_key()
         )
         for utterance_tags, outcome in zip(
-            all_tags, get_outcomes_from_ds(ds, self.mod_options.without_postprocessing)
+            all_tags.values(), get_outcomes_from_ds(ds, self.mod_options.without_postprocessing)
         ):
             no_tag = True
             for filter_, tagged in utterance_tags.items():

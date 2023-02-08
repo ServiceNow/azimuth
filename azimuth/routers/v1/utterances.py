@@ -255,7 +255,7 @@ def get_utterances(
             },
         )
         for data, tag, model_saliency, model_prediction in zip(
-            ds, tags, model_saliencies, predictions
+            ds, tags.values(), model_saliencies, predictions
         )
     ]
 

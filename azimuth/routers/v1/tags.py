@@ -64,6 +64,6 @@ def post_data_actions(
     return DataActionResponse(
         data_actions=[
             DataActionMapping(**{data_action: x[data_action] for data_action in ALL_DATA_ACTIONS})
-            for x in updated_tags
+            for x in updated_tags.values()
         ]
     )
