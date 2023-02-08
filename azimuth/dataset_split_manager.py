@@ -19,8 +19,9 @@ from datasets import ClassLabel, Dataset, concatenate_datasets
 from filelock import FileLock
 
 from azimuth.config import AzimuthConfig, AzimuthValidationError, CommonFieldsConfig
-from azimuth.types import DatasetColumn, DatasetSplitName
-from azimuth.types.tag import Tag
+from azimuth.types import DatasetColumn, DatasetFilters, DatasetSplitName
+from azimuth.types.tag import ALL_DATA_ACTIONS, Tag
+from azimuth.utils.dataset_operations import filter_dataset_split
 from azimuth.utils.validation import assert_not_none
 
 REJECTION_CLASS = "REJECTION_CLASS"
@@ -591,3 +592,35 @@ class DatasetSplitManager:
 
     def _get_new_version_path(self, directory):
         return pjoin(directory, f"version_{time.time()}.arrow")
+
+    def save_proposed_actions_to_csv(self) -> str:
+        """Save proposed actions to a csv file.
+
+        Returns:
+            Path to the csv file.
+        """
+        log.info("Saving proposed actions as csv.", path=self._artifact_path)
+        timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        path = pjoin(
+            self._artifact_path,
+            f"azimuth_export_{self.config.name}_{self.name}_proposed_actions_{timestamp}.csv",
+        )
+
+        ds_with_proposed_actions = filter_dataset_split(
+            self.get_dataset_split(),
+            filters=DatasetFilters(data_action=ALL_DATA_ACTIONS),
+            config=self.config,
+        )
+        persistent_id = self.config.columns.persistent_id
+        ds_with_proposed_actions = ds_with_proposed_actions.remove_columns(
+            list(set(ds_with_proposed_actions.column_names) - {*ALL_DATA_ACTIONS, persistent_id})
+        )
+
+        df: pd.DataFrame = ds_with_proposed_actions.to_pandas()
+        # Return column name with max value for each row.
+        df = df.set_index(persistent_id).idxmax(axis=1).reset_index()
+        df.columns = [persistent_id, "proposed_action"]
+        df.to_csv(path_or_buf=path, index=False)
+
+        log.info("Proposed Actions saved as CSV.", path=path)
+        return path
