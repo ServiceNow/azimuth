@@ -13,8 +13,11 @@ import {
   InputAdornment,
   InputBaseComponentProps,
   inputClasses,
+  InputLabel,
   inputLabelClasses,
+  MenuItem,
   Paper,
+  Select,
   TextField,
   TextFieldProps,
   Tooltip,
@@ -63,7 +66,7 @@ type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
-
+const SUPPORTED_LANGUAGES = ["en", "fr"];
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -548,8 +551,25 @@ const Settings: React.FC = () => {
     </FormGroup>
   );
 
+  const displayAnalysesCustomizationGeneralSection = () => (
+    <FormControl variant="standard" sx={{ m: 1, width: 120 }}>
+      <InputLabel id="supported-language-input-label">
+        supported_language
+      </InputLabel>
+      <Select value={resultingConfig.language} label="supported_language">
+        {SUPPORTED_LANGUAGES.map((language) => (
+          <MenuItem key={language} value={language}>
+            {language}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+
   const getAnalysesCustomizationSection = () => (
     <>
+      {displaySectionTitle("General")}
+      {displayAnalysesCustomizationGeneralSection()}
       {displaySectionTitle("Dataset Warnings")}
       {getAnalysesCustomization("dataset_warnings")}
       {displaySectionTitle("Syntax")}
