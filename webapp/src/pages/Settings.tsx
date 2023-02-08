@@ -34,7 +34,11 @@ import {
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
 } from "services/api";
-import { AzimuthConfig, PipelineDefinition } from "types/api";
+import {
+  AzimuthConfig,
+  PipelineDefinition,
+  SupportedLanguage,
+} from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
@@ -197,11 +201,15 @@ const NumberField: React.FC<
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
+  const [language, setLanguage] = React.useState<
+    SupportedLanguage | undefined
+  >();
+
   const {
     data: defaultConfig,
     isLoading,
     error,
-  } = getDefaultConfigEndpoint.useQuery({ jobId });
+  } = getDefaultConfigEndpoint.useQuery({ jobId, language });
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
@@ -556,7 +564,13 @@ const Settings: React.FC = () => {
       <InputLabel id="supported-language-input-label">
         supported_language
       </InputLabel>
-      <Select value={resultingConfig.language} label="supported_language">
+      <Select
+        value={language ?? resultingConfig.language}
+        label="supported_language"
+        onChange={(event) =>
+          setLanguage(event.target.value as SupportedLanguage)
+        }
+      >
         {SUPPORTED_LANGUAGES.map((language) => (
           <MenuItem key={language} value={language}>
             {language}
