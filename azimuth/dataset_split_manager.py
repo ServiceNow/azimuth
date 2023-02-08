@@ -611,19 +611,14 @@ class DatasetSplitManager:
             filters=DatasetFilters(data_action=ALL_DATA_ACTIONS),
             config=self.config,
         )
-
         persistent_id = self.config.columns.persistent_id
-        df = (
-            ds_with_proposed_actions.remove_columns(
-                list(
-                    set(ds_with_proposed_actions.column_names)
-                    - set(ALL_DATA_ACTIONS + [persistent_id])
-                )
-            )
-            .to_pandas()
-            .set_index(persistent_id)
+        ds_with_proposed_actions = ds_with_proposed_actions.remove_columns(
+            list(set(ds_with_proposed_actions.column_names) - {*ALL_DATA_ACTIONS, persistent_id})
         )
-        df = df.idxmax(axis=1).reset_index()  # Return column name with max value for each row.
+
+        df: pd.DataFrame = ds_with_proposed_actions.to_pandas()
+        # Return column name with max value for each row.
+        df = df.set_index(persistent_id).idxmax(axis=1).reset_index()
         df.columns = [persistent_id, "proposed_action"]
         df.to_csv(path_or_buf=path, index=False)
 

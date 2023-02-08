@@ -65,10 +65,10 @@ def export_dataset(
         if pipeline_index is None
         else PredictionTableKey.from_pipeline_index(pipeline_index, config)
     )
-    pt = dataset_split_manager.save_csv(table_key=table_key)
+    path = dataset_split_manager.save_csv(table_key=table_key)
 
-    filename = os.path.basename(pt)
-    return FileResponse(path=pt, filename=filename)
+    filename = os.path.basename(path)
+    return FileResponse(path=path, filename=filename)
 
 
 @router.get(
@@ -81,8 +81,8 @@ def export_dataset(
 def export_proposed_actions(
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
 ) -> FileResponse:
-    pt = dataset_split_manager.save_proposed_actions_to_csv()
-    return FileResponse(path=pt, filename=os.path.basename(pt))
+    path = dataset_split_manager.save_proposed_actions_to_csv()
+    return FileResponse(path=path, filename=os.path.basename(path))
 
 
 @router.get(
@@ -124,11 +124,11 @@ def get_export_perturbation_testing_summary(
 
     filename = f"azimuth_export_behavioral_testing_summary_{cfg.name}_{file_label}.csv"
 
-    pt = pjoin(cfg.get_artifact_path(), filename)
+    path = pjoin(cfg.get_artifact_path(), filename)
 
-    df.to_csv(pt, index=False)
+    df.to_csv(path, index=False)
 
-    return FileResponse(path=pt, filename=filename)
+    return FileResponse(path=path, filename=filename)
 
 
 @router.get(
@@ -152,7 +152,7 @@ def get_export_perturbed_set(
     cfg = task_manager.config
 
     filename = f"azimuth_export_modified_set_{cfg.name}_{dataset_split_name}_{file_label}.json"
-    pt = pjoin(cfg.get_artifact_path(), filename)
+    path = pjoin(cfg.get_artifact_path(), filename)
 
     task_result: List[List[PerturbedUtteranceResult]] = get_standard_task_result(
         SupportedModule.PerturbationTesting,
@@ -166,9 +166,9 @@ def get_export_perturbed_set(
             dataset_split_manager, task_result, pipeline_index=pipeline_index_not_null
         )
     )
-    with open(pt, "w") as f:
+    with open(path, "w") as f:
         f.write(orjson_dumps(output).decode())
-    return FileResponse(path=pt, filename=filename)
+    return FileResponse(path=path, filename=filename)
 
 
 def make_utterance_level_result(
