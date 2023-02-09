@@ -204,7 +204,6 @@ const Settings: React.FC = () => {
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
   >();
-
   const {
     data: defaultConfig,
     isLoading,
@@ -217,6 +216,17 @@ const Settings: React.FC = () => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
+
+  React.useEffect(() => {
+    if (defaultConfig && language !== undefined) {
+      setPartialConfig({
+        ...partialConfig,
+        syntax: defaultConfig.syntax,
+        similarity: defaultConfig.similarity,
+        behavioral_testing: defaultConfig.behavioral_testing,
+      });
+    }
+  }, [defaultConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
@@ -560,24 +570,33 @@ const Settings: React.FC = () => {
   );
 
   const displayAnalysesCustomizationGeneralSection = () => (
-    <FormControl variant="standard" sx={{ m: 1, width: 120 }}>
-      <InputLabel id="supported-language-input-label">
-        supported_language
-      </InputLabel>
-      <Select
-        value={language ?? resultingConfig.language}
-        label="supported_language"
-        onChange={(event) =>
-          setLanguage(event.target.value as SupportedLanguage)
-        }
-      >
-        {SUPPORTED_LANGUAGES.map((language) => (
-          <MenuItem key={language} value={language}>
-            {language}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Box display="flex" justifyContent="flex-start" gap={5} alignItems="center">
+      <FormControl variant="standard" sx={{ m: 1, width: 120 }}>
+        <InputLabel id="supported-language-input-label">
+          supported_language
+        </InputLabel>
+        <Select
+          value={language ?? resultingConfig.language}
+          label="supported_language"
+          onChange={(event) =>
+            setLanguage(event.target.value as SupportedLanguage)
+          }
+        >
+          {SUPPORTED_LANGUAGES.map((language) => (
+            <MenuItem key={language} value={language}>
+              {language}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Box display="flex" flexDirection="row" gap={1}>
+        <Warning color="warning" />
+        <Typography variant="subtitle2">
+          Changing the language would impact the syntax, similarity and
+          behavioral_testing sections
+        </Typography>
+      </Box>
+    </Box>
   );
 
   const getAnalysesCustomizationSection = () => (
