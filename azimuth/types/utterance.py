@@ -37,15 +37,18 @@ class ModelSaliency(AliasModel):
     saliencies: List[float] = Field(..., title="Saliency")
 
 
-class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str], AliasModel):
-    index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
+class UtterancePatch(AliasModel):
     # Union[int, str] in this order so FastAPI tries to cast to int() first, then defaults to str().
     persistent_id: Union[int, str] = Field(..., title="Persistent id")
+    data_action: DataAction = Field(..., title="Data action tag")
+
+
+class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str], UtterancePatch):
+    index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
     model_prediction: Optional[ModelPrediction] = Field(
         ..., title="Model prediction", nullable=True
     )
     model_saliency: Optional[ModelSaliency] = Field(..., title="Model saliency", nullable=True)
-    data_action: DataAction = Field(..., title="Data action tag")
     label: str = Field(..., title="Label")
     utterance: str = Field(..., title="Utterance")
 
