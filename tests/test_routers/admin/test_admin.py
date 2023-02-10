@@ -28,8 +28,8 @@ def test_get_default_config(app: FastAPI):
         "read_only_config": False,
         "language": "en",
         "syntax": {
-            "short_sentence_max_word": 3,
-            "long_sentence_min_word": 12,
+            "short_utterance_max_word": 3,
+            "long_utterance_min_word": 12,
             "spacy_model": "en_core_web_sm",
             "subj_tags": ["nsubj", "nsubjpass"],
             "obj_tags": ["dobj", "pobj", "obj"],
@@ -213,8 +213,8 @@ def test_get_config(app: FastAPI):
             "no_close_threshold": 0.5,
         },
         "syntax": {
-            "long_sentence_min_word": 12,
-            "short_sentence_max_word": 3,
+            "long_utterance_min_word": 12,
+            "short_utterance_max_word": 3,
             "spacy_model": "en_core_web_sm",
             "subj_tags": ["nsubj", "nsubjpass"],
             "obj_tags": ["dobj", "pobj", "obj"],

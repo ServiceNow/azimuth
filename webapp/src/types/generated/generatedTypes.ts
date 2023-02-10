@@ -724,8 +724,8 @@ export interface components {
     /** An enumeration. */
     SmartTag:
       | "multiple_sentences"
-      | "long_sentence"
-      | "short_sentence"
+      | "long_utterance"
+      | "short_utterance"
       | "missing_subj"
       | "missing_obj"
       | "missing_verb"
@@ -765,8 +765,8 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     SyntaxOptions: {
-      short_sentence_max_word: number;
-      long_sentence_min_word: number;
+      short_utterance_max_word: number;
+      long_utterance_min_word: number;
       spacy_model: components["schemas"]["SupportedSpacyModels"];
       subj_tags: string[];
       obj_tags: string[];

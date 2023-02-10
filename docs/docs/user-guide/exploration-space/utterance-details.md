@@ -20,7 +20,7 @@ The top section shows the utterance details:
           be added as a 4th element at the top.
     * By clicking on the blue chevrons, the prediction results after each post-processing step can be viewed, including the model's output before any post-processing.
 * **Smart tags** (where applicable): An automatically computed tag highlighting a certain
-  characteristic of the utterance (e.g., long sentences, utterance is missing a verb, utterance
+  characteristic of the utterance (e.g., long utterances, utterance is missing a verb, utterance
   contains multiple sentences). For more information,
   see [Smart Tags](../../key-concepts/smart-tags.md).
 * **Proposed Action** (editable): You can add a proposed action to identify further steps required

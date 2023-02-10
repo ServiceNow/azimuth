@@ -1,5 +1,5 @@
 import { rest } from "msw";
-import { MetricsPerFilterAPIResponse, MetricInfo } from "types/api";
+import { MetricInfo, MetricsPerFilterAPIResponse } from "types/api";
 
 const baseUrl = "http://localhost/api/local";
 
@@ -232,7 +232,7 @@ export const getMetricsPerFilterAPIResponse = rest.get(
           },
           {
             utteranceCount: 3,
-            filterValue: "short_sentence",
+            filterValue: "short_utterance",
             outcomeCount: {
               CorrectAndPredicted: 3,
               CorrectAndRejected: 0,

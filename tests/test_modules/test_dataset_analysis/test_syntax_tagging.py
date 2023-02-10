@@ -2,16 +2,18 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 from azimuth.modules.dataset_analysis.syntax_tagging import SyntaxTaggingModule
-from azimuth.types import DatasetSplitName
+from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag
 
 
-def test_syntax_tagging(tiny_text_config):
-    mod = SyntaxTaggingModule(
-        DatasetSplitName.eval,
-        tiny_text_config,
-    )
+def verify_syntax_results(json_output, smart_tags_per_idx, token_count_per_idx):
+    for idx, res in enumerate(json_output):
+        assert all(v for k, v in res.tags.items() if k in smart_tags_per_idx[idx])
+        assert not any(v for k, v in res.tags.items() if k not in smart_tags_per_idx[idx])
+        assert res.adds[DatasetColumn.word_count] == token_count_per_idx[idx]
 
+
+def test_syntax_tagging(tiny_text_config):
     batch = {
         "utterance": [
             "detect files.",
@@ -21,37 +23,39 @@ def test_syntax_tagging(tiny_text_config):
         ],
         "label": [0, 1, 0, 1],
     }
-    json_output = mod.compute(batch)
-    assert len(json_output) == 4
-    assert json_output[0].tags[SmartTag.short] and json_output[0].tags[SmartTag.no_subj]
-    assert not all(
-        v for k, v in json_output[0].tags.items() if k not in [SmartTag.short, SmartTag.no_subj]
+
+    mod = SyntaxTaggingModule(
+        DatasetSplitName.eval,
+        tiny_text_config,
     )
+    json_output = mod.compute(batch)
 
-    assert json_output[1].tags[SmartTag.multi_sent]
-    assert not all(v for k, v in json_output[1].tags.items() if k is not SmartTag.multi_sent)
+    assert len(json_output) == 4
 
-    assert json_output[2].tags[SmartTag.no_obj]
-    assert not all(v for k, v in json_output[2].tags.items() if k is not SmartTag.no_obj)
+    smart_tags_per_idx = [
+        [SmartTag.short, SmartTag.no_subj],
+        [SmartTag.multi_sent, SmartTag.long],
+        [SmartTag.no_obj],
+        [SmartTag.no_obj, SmartTag.no_verb, SmartTag.no_subj, SmartTag.short],
+    ]
+    token_count_per_idx = [2, 18, 4, 3]
 
-    assert json_output[3].tags[SmartTag.no_verb]
-    assert not all(v for k, v in json_output[3].tags.items() if k is not SmartTag.no_verb)
+    verify_syntax_results(json_output, smart_tags_per_idx, token_count_per_idx)
 
     # Edit config values
-    tiny_text_config_2 = tiny_text_config.copy(deep=True)
-    tiny_text_config_2.syntax.short_sentence_max_word = 2
-    tiny_text_config_2.syntax.long_sentence_min_word = 3
+    tiny_text_config_edited = tiny_text_config.copy(deep=True)
+    tiny_text_config_edited.syntax.short_utterance_max_word = 4
+    tiny_text_config_edited.syntax.long_utterance_min_word = 3
 
-    mod_2 = SyntaxTaggingModule(
+    mod = SyntaxTaggingModule(
         DatasetSplitName.eval,
-        tiny_text_config_2,
+        tiny_text_config_edited,
     )
+    json_output = mod.compute(batch)
 
-    json_output_2 = mod_2.compute(batch)
     # Tags should change for utterances below, based on the new config values
-    assert json_output_2[0].tags[SmartTag.short] and not json_output_2[0].tags[SmartTag.long]
-    assert json_output_2[2].tags[SmartTag.long]
-    assert json_output_2[3].tags[SmartTag.long]
+    for idx in [2, 3]:
+        assert json_output[idx].tags[SmartTag.long] and json_output[idx].tags[SmartTag.short]
 
     json_output_all = mod.compute_on_dataset_split()
     ds = mod.get_dataset_split()
@@ -59,12 +63,6 @@ def test_syntax_tagging(tiny_text_config):
 
 
 def test_syntax_tagging_french(simple_text_config_french):
-    mod = SyntaxTaggingModule(
-        DatasetSplitName.eval,
-        simple_text_config_french,
-    )
-
-    assert mod is not None
     batch = {
         "utterance": [
             "adore les biscuits!",
@@ -75,25 +73,22 @@ def test_syntax_tagging_french(simple_text_config_french):
         ],
         "label": [0, 1, 0, 1, 0],
     }
+
+    mod = SyntaxTaggingModule(
+        DatasetSplitName.eval,
+        simple_text_config_french,
+    )
     json_output = mod.compute(batch)
+
     assert len(json_output) == 5
 
-    assert json_output[0].tags[SmartTag.no_subj]
-    assert not any([json_output[0].tags[SmartTag.no_obj], json_output[0].tags[SmartTag.no_verb]])
+    smart_tags_per_idx = [
+        [SmartTag.short, SmartTag.no_subj],
+        [SmartTag.long, SmartTag.multi_sent],
+        [SmartTag.short, SmartTag.no_obj],
+        [SmartTag.no_obj, SmartTag.no_verb, SmartTag.no_subj],
+        [SmartTag.no_subj],
+    ]
+    token_count_per_idx = [3, 17, 3, 5, 7]
 
-    assert not json_output[1].tags[SmartTag.no_subj]
-    assert not json_output[1].tags[SmartTag.no_obj]
-    assert not json_output[1].tags[SmartTag.no_verb]
-
-    assert not any([json_output[2].tags[SmartTag.no_subj], json_output[2].tags[SmartTag.no_verb]])
-    assert json_output[2].tags[SmartTag.no_obj]
-
-    assert json_output[3].tags[SmartTag.no_subj]
-    assert json_output[3].tags[SmartTag.no_obj]
-    assert json_output[3].tags[SmartTag.no_verb]
-
-    assert not json_output[4].tags[SmartTag.no_verb]
-
-    # Sentencizer is from English model but should work for French
-    assert not any(json_output[i].tags[SmartTag.multi_sent] for i in [0, 2, 3])
-    assert json_output[1].tags[SmartTag.multi_sent]
+    verify_syntax_results(json_output, smart_tags_per_idx, token_count_per_idx)

@@ -182,8 +182,8 @@ class DatasetWarningsOptions(AzimuthBaseSettings):
 
 
 class SyntaxOptions(AzimuthBaseSettings):
-    short_sentence_max_word: int = 3
-    long_sentence_min_word: int = 12
+    short_utterance_max_word: int = 3
+    long_utterance_min_word: int = 12
     spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
     subj_tags: List[str] = []  # Language-based dynamic default value
     obj_tags: List[str] = []  # Language-based dynamic default value
@@ -382,7 +382,7 @@ class DatasetWarningConfig(CommonFieldsConfig):
 
 
 class SyntaxConfig(CommonFieldsConfig):
-    # Syntax configuration to change thresholds that determine short and long sentences.
+    # Syntax configuration to change thresholds that determine short and long utterances.
     syntax: SyntaxOptions = SyntaxOptions()
 
 

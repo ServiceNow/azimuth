@@ -167,24 +167,24 @@ def test_dataset_filtering_confidence(simple_text_config):
 def test_dataset_filtering_smart_tags_uses_or_within_family(simple_text_config):
     dm = generate_mocked_dm(simple_text_config)
     ds = dm.get_dataset_split(get_table_key(simple_text_config))
-    ds_filtered_long_sentence = filter_dataset_split(
+    ds_filtered_long_utterance = filter_dataset_split(
         ds,
-        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["long_sentence"]}),
+        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["long_utterance"]}),
         config=dm.config,
     )
-    ds_filtered_short_sentence = filter_dataset_split(
+    ds_filtered_short_utterance = filter_dataset_split(
         ds,
-        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["short_sentence"]}),
+        DatasetFilters(smart_tags={SmartTagFamily.extreme_length: ["short_utterance"]}),
         config=dm.config,
     )
     ds_filtered = filter_dataset_split(
         ds,
         DatasetFilters(
-            smart_tags={SmartTagFamily.extreme_length: ["long_sentence", "short_sentence"]}
+            smart_tags={SmartTagFamily.extreme_length: ["long_utterance", "short_utterance"]}
         ),
         config=dm.config,
     )
-    assert len(ds_filtered) == len(ds_filtered_long_sentence) + len(ds_filtered_short_sentence)
+    assert len(ds_filtered) == len(ds_filtered_long_utterance) + len(ds_filtered_short_utterance)
 
 
 def test_dataset_filtering_without_postprocessing(simple_text_config):

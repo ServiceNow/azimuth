@@ -41,11 +41,10 @@ doc = spacy_model(utterance)
 tokens = [token.text for token in doc if not token.is_punct]
 word_count = len(tokens)
 ```
-Based on the word count, the `long_sentence` and `short_sentence` smart tags are computed.
+Based on the word count, the `long_utterance` and `short_utterance` smart tags are computed.
 
 ### Sentence Count
- The smart
-tag `multiple_sentences` is based on a spaCy sentencizer:
+The smart tag `multiple_sentences` is based on a spaCy sentencizer:
 
 ```python
 from spacy.lang.en import English
@@ -58,7 +57,7 @@ spacy_sentencizer_en.add_pipe("sentencizer")
 ## Configuration
 
 [:material-link: Syntax Analysis Config](../reference/configuration/analyses/syntax.md)
-explains how to edit the thresholds to determine what is considered a short or long sentence,
+explains how to edit the thresholds to determine what is considered a short or long utterance,
 the tags used to detect subjects and objects, and the spaCy model used to parse utterances.
 
 
