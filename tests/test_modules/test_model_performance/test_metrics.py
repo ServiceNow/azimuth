@@ -131,15 +131,15 @@ def test_empty_ds(tiny_text_config):
 
 
 def test_outcome_count_per_threshold(tiny_text_config):
-    nb_bins = 3
+    x_ticks_count = 4
     mod = OutcomeCountPerThresholdModule(
         dataset_split_name=DatasetSplitName.eval,
         config=tiny_text_config,
-        mod_options=ModuleOptions(nb_bins=nb_bins, pipeline_index=0),
+        mod_options=ModuleOptions(x_ticks_count=x_ticks_count, pipeline_index=0),
     )
     num_rows = mod.get_dataset_split().num_rows
     [result] = mod.compute_on_dataset_split()
-    assert len(result.outcome_count_all_thresholds) == nb_bins
+    assert len(result.outcome_count_all_thresholds) == x_ticks_count
     assert all(
         sum(rg_per_th.outcome_count.values()) == num_rows
         for rg_per_th in result.outcome_count_all_thresholds

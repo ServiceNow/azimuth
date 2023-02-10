@@ -182,14 +182,14 @@ class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
     """Compute the outcome count per threshold."""
 
     required_mod_options = {"pipeline_index"}
-    optional_mod_options = {"nb_bins"}
+    optional_mod_options = {"x_ticks_count"}
 
     def compute_on_dataset_split(self) -> List[OutcomeCountPerThresholdResponse]:  # type: ignore
         if not postprocessing_editable(self.config, self.mod_options.pipeline_index):
             # This will give an empty response to the UI, if a user gets to this page.
             return [OutcomeCountPerThresholdResponse(outcome_count_all_thresholds=[])]
-        nb_bins = self.mod_options.nb_bins
-        ths = np.linspace(0, 1, nb_bins, endpoint=False)
+        x_ticks_count = self.mod_options.x_ticks_count
+        ths = np.linspace(0, 1, x_ticks_count)
         result = []
         for th in tqdm(
             ths,

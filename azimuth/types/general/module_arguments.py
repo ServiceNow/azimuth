@@ -93,9 +93,9 @@ class ModuleOptions(AliasModel):
         title="Force Top Words to use frequency instead of "
         "saliency to determine important words.",
     )
-    nb_bins: int = Field(
-        20,
-        title="Nb of bins to compute for different modules.",
+    x_ticks_count: int = Field(
+        21,
+        title="Number of ticks on x axis.",
     )
     cf_normalize: bool = Field(True, title="Normalize the confusion matrix.")
     cf_reorder_classes: bool = Field(
