@@ -1665,7 +1665,7 @@
 <h1 id="syntax-analysis-config">Syntax Analysis Config</h1>
 <p>🔵 <strong>Default value:</strong> <code>SyntaxOptions()</code></p>
 <p>In the Syntax config, users can modify thresholds to determine what is considered a short
-or a long sentence, as well as select the spaCy model and the dependency tags used for certain
+or a long utterance, as well as select the spaCy model and the dependency tags used for certain
 syntax-related smart tags. More details are explained in
 <a href="../../../../key-concepts/syntax-analysis/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Syntax Analysis</a>.</p>
 <p>Note that language-related defaults are dynamically selected based on the language specified in the
@@ -1677,15 +1677,15 @@ dependency tag lists will generally not need to be modified.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">class</span> <span class="nc">SyntaxOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">short_sentence_max_word</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># (1)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">long_sentence_min_word</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span> <span class="c1"># (2)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">short_utterance_max_word</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># (1)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">long_utterance_min_word</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span> <span class="c1"># (2)</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">spacy_model</span><span class="p">:</span> <span class="n">SupportedSpacyModels</span> <span class="o">=</span> <span class="n">SupportedSpacyModels</span><span class="o">.</span><span class="n">use_default</span>  <span class="c1"># Language-based default (3)</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">subj_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Language-based default value (4)</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">obj_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Language-based default value (5)</span>
 </code></pre></div>
 <ol>
-<li>Maximum number of words for a sentence to be tagged as short (e.g &lt;=3 for the default)</li>
-<li>Minimum number of words for a sentence to be tagged as long (e.g &gt;=12 for the default)</li>
+<li>Maximum number of words for an utterance to be tagged as short (e.g &lt;=3 for the default)</li>
+<li>Minimum number of words for an utterance to be tagged as long (e.g &gt;=12 for the default)</li>
 <li>spaCy model to use for syntax tagging.</li>
 <li>spaCy dependency tags used to determine whether a word is a subject (noun).</li>
 <li>spaCy dependency tags used to determine whether a word is an object (noun).</li>
@@ -1694,7 +1694,7 @@ dependency tag lists will generally not need to be modified.</p>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;syntax&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;short_sentence_max_word&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;short_utterance_max_word&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
 </code></pre></div>

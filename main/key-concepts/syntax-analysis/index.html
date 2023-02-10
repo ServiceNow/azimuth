@@ -1833,10 +1833,9 @@ verbs are identified by <abbr title="Part-of-speech">POS</abbr> tags (<code>["VE
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="o">.</span><span class="n">is_punct</span><span class="p">]</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">word_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
 </code></pre></div>
-Based on the word count, the <code>long_sentence</code> and <code>short_sentence</code> smart tags are computed.</p>
+Based on the word count, the <code>long_utterance</code> and <code>short_utterance</code> smart tags are computed.</p>
 <h3 id="sentence-count">Sentence Count</h3>
-<p>The smart
-tag <code>multiple_sentences</code> is based on a spaCy sentencizer:</p>
+<p>The smart tag <code>multiple_sentences</code> is based on a spaCy sentencizer:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span> <span class="nn">spacy.lang.en</span> <span class="kn">import</span> <span class="n">English</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Sentencizer; English() should work for other languages that have similar sentence conventions.</span>
@@ -1845,7 +1844,7 @@ tag <code>multiple_sentences</code> is based on a spaCy sentencizer:</p>
 </code></pre></div>
 <h2 id="configuration">Configuration</h2>
 <p><a href="../../reference/configuration/analyses/syntax/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Syntax Analysis Config</a>
-explains how to edit the thresholds to determine what is considered a short or long sentence,
+explains how to edit the thresholds to determine what is considered a short or long utterance,
 the tags used to detect subjects and objects, and the spaCy model used to parse utterances.</p>
 
 
