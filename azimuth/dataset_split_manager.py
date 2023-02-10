@@ -9,7 +9,7 @@ from copy import copy, deepcopy
 from dataclasses import asdict, dataclass
 from glob import glob
 from os.path import join as pjoin
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import faiss
 import numpy as np
@@ -262,6 +262,12 @@ class DatasetSplitManager:
         )
         return dataset_split
 
+    def get_row_indices_from_persistent_id(self, persistent_ids: List[Union[int, str]]):
+        ds = self.get_dataset_split()
+        all_persistent_ids = ds[self.config.columns.persistent_id]
+        indices = [all_persistent_ids.index(persistent_id) for persistent_id in persistent_ids]
+        return indices
+
     def add_tags(
         self,
         tags: Dict[int, Dict[Tag, bool]],
@@ -305,7 +311,7 @@ class DatasetSplitManager:
 
     def get_tags(
         self, indices: Optional[List[int]] = None, table_key: Optional[PredictionTableKey] = None
-    ) -> List[Dict[str, bool]]:
+    ) -> Dict[int, Dict[Tag, bool]]:
         """Get tags from the dataset split.
 
         Args:
@@ -313,17 +319,17 @@ class DatasetSplitManager:
             table_key: Predictions table to gather prediction tags.
 
         Returns:
-            List of records per index.
-
+            Value of tags per row_idx.
         """
+        ds = self.get_dataset_split(table_key)
         if indices is not None and len(indices) > 0:
-            ds = self.get_dataset_split(table_key).select(indices)
-        else:
-            ds = self.get_dataset_split(table_key)
+            ds = ds.select(indices)
         available_tags = self._tags if table_key is None else self._tags + self._prediction_tags
-        df = pd.DataFrame({t: ds[t] for t in available_tags})
-        tags: List[Dict[str, bool]] = df.to_dict(orient="records")
-        return tags
+
+        return {
+            row_idx: {tag: ds[tag][idx] for tag in available_tags}
+            for idx, row_idx in enumerate(ds["row_idx"])
+        }
 
     def class_distribution(self, labels_only=False):
         """Compute the class distribution for a dataset_split.

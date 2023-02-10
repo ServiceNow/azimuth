@@ -34,42 +34,45 @@ def test_dataset_manager_tags(a_text_dataset, simple_text_config):
         initial_tags=tags,
         dataset_split=a_text_dataset,
     )
-    simple_table_key = get_table_key(simple_text_config)
-    assert os.path.exists(ds_mng._save_path)
-    assert all(t in ds_mng.get_dataset_split(simple_table_key).column_names for t in tags)
-    assert np.array(ds_mng.get_dataset_split(simple_table_key)["red"]).sum() == 0
 
-    # We can tags stuff!
+    assert os.path.exists(ds_mng._save_path)
+    assert all(t in ds_mng.get_dataset_split().column_names for t in tags)
+    assert not any(ds_mng.get_dataset_split()["red"])
+
+    # Utterances can be tagged
     tags_data = {1: {"red": True}, 2: {"red": True, "blue": True}}
-    ds_mng.add_tags(tags_data, simple_table_key)
-    assert np.array(ds_mng.get_dataset_split(simple_table_key)["red"]).sum() == 2
-    assert np.array(ds_mng.get_dataset_split(simple_table_key)["blue"]).sum() == 1
+    ds_mng.add_tags(tags_data)
+    assert sum(ds_mng.get_dataset_split()["red"]) == 2
+    assert sum(ds_mng.get_dataset_split()["blue"]) == 1
 
     # We can reload a dataset!
-    ds_mng2 = DatasetSplitManager(
+    ds_mng = DatasetSplitManager(
         DatasetSplitName.eval,
         config=simple_text_config,
         initial_tags=tags,
         dataset_split=a_text_dataset,
     )
-    assert np.array(ds_mng2.get_dataset_split(simple_table_key)["red"]).sum() == 2
-    assert np.array(ds_mng2.get_dataset_split(simple_table_key)["blue"]).sum() == 1
+    assert sum(ds_mng.get_dataset_split()["red"]) == 2
+    assert sum(ds_mng.get_dataset_split()["blue"]) == 1
 
     # We can't tag garbage
     tags_data = {4: {"red": True}, 5: {"red": True, "garbage": True}}
     with pytest.raises(ValueError):
         ds_mng.add_tags(tags_data)
-    assert "garbage" not in ds_mng.get_dataset_split(simple_table_key).column_names
+    assert "garbage" not in ds_mng.get_dataset_split().column_names
 
     # We can query all tags
-    tags_data = ds_mng.get_tags(table_key=None)
-    assert len(tags_data) == len(ds_mng2.get_dataset_split(simple_table_key))
+    tags_data = ds_mng.get_tags()
+    assert len(tags_data) == len(ds_mng.get_dataset_split())
     assert len(tags_data[0]) == len(tags)
+    assert not any(tags_data[0].values())
+    assert tags_data[1]["red"] and tags_data[2]["red"] and tags_data[2]["blue"]
 
     # We can query some tags
-    tags_data = ds_mng.get_tags(indices=[1, 2], table_key=None)
+    tags_data = ds_mng.get_tags(indices=[1, 2])
     assert len(tags_data) == 2
-    assert len(tags_data[0]) == len(tags)
+    assert len(tags_data[1]) == len(tags)
+    assert tags_data[1]["red"] and tags_data[2]["red"] and tags_data[2]["blue"]
 
 
 def test_dataset_manager_init(a_text_dataset, simple_text_config):
@@ -405,6 +408,28 @@ def test_custom_persistent_id(simple_text_config, a_text_dataset):
             initial_tags=ALL_STANDARD_TAGS,
             dataset_split=a_text_dataset_new_col,
         )
+
+
+def test_convert_persistent_id_to_row_idx(a_text_dataset, simple_text_config):
+    simple_text_config_persistent_id = simple_text_config.copy()
+    # Set persistent_id as the utterance (str).
+    simple_text_config_persistent_id.columns.persistent_id = simple_text_config.columns.text_input
+    dm = DatasetSplitManager(
+        DatasetSplitName.eval,
+        simple_text_config_persistent_id,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=a_text_dataset,
+    )
+    ds = dm.get_dataset_split()
+
+    persistent_ids = list(reversed(ds[simple_text_config.columns.text_input]))
+    row_indices = dm.get_row_indices_from_persistent_id(persistent_ids)
+    assert row_indices == list(reversed(range(len(ds))))
+
+    random_rows = [10, 0]
+    persistent_ids = ds.select(random_rows)[simple_text_config.columns.text_input]
+    row_indices = dm.get_row_indices_from_persistent_id(persistent_ids)
+    assert row_indices == random_rows
 
 
 def test_export_proposed_actions(simple_text_config, a_text_dataset):
