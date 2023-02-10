@@ -319,12 +319,11 @@ class DatasetSplitManager:
             table_key: Predictions table to gather prediction tags.
 
         Returns:
-             Value of tags per row_idx.
+            Value of tags per row_idx.
         """
+        ds = self.get_dataset_split(table_key)
         if indices is not None and len(indices) > 0:
-            ds = self.get_dataset_split(table_key).select(indices)
-        else:
-            ds = self.get_dataset_split(table_key)
+            ds = ds.select(indices)
         available_tags = self._tags if table_key is None else self._tags + self._prediction_tags
 
         return {
