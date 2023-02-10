@@ -572,12 +572,10 @@ const Settings: React.FC = () => {
   const displayAnalysesCustomizationGeneralSection = () => (
     <Box display="flex" justifyContent="flex-start" gap={5} alignItems="center">
       <FormControl variant="standard" sx={{ m: 1, width: 120 }}>
-        <InputLabel id="supported-language-input-label">
-          supported_language
-        </InputLabel>
+        <InputLabel id="supported-language-input-label">language</InputLabel>
         <Select
           value={language ?? resultingConfig.language}
-          label="supported_language"
+          labelId="language"
           onChange={(event) =>
             setLanguage(event.target.value as SupportedLanguage)
           }
@@ -591,7 +589,7 @@ const Settings: React.FC = () => {
       </FormControl>
       <Box display="flex" flexDirection="row" gap={1}>
         <Warning color="warning" />
-        <Typography variant="subtitle2">
+        <Typography variant="body2">
           Changing the language would impact the syntax, similarity and
           behavioral_testing sections
         </Typography>
