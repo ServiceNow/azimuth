@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress, MenuItem, Select } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { updateDataActionsEndpoint } from "services/api";
 import { DataAction, UtterancePatch } from "types/api";
 import { GetUtterancesQueryState } from "utils/api";
@@ -19,7 +19,7 @@ const UtteranceDataAction: React.FC<Props> = ({
   allDataActions,
   getUtterancesQueryState,
 }) => {
-  const [newDataAction, setNewDataAction] = useState<DataAction | "">("");
+  const [newDataAction, setNewDataAction] = React.useState<DataAction | "">("");
 
   const [updateDataAction] = updateDataActionsEndpoint.useMutation();
 

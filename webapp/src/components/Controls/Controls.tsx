@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from "react";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ClearIcon from "@mui/icons-material/Clear";
+import TuneIcon from "@mui/icons-material/Tune";
 import {
   Box,
   Button,
@@ -12,6 +14,20 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import Description from "components/Description";
+import { motion } from "framer-motion";
+import React from "react";
+import { useHistory, useParams } from "react-router-dom";
+import {
+  getDatasetInfoEndpoint,
+  getOutcomeCountPerFilterEndpoint,
+  getUtteranceCountPerFilterEndpoint,
+} from "services/api";
+import {
+  FILTER_CONTAINER_CLOSED_WIDTH,
+  FILTER_CONTAINER_OPENED_WIDTH,
+} from "styles/const";
+import { CountPerFilterResponse, DatasetSplitName } from "types/api";
 import {
   QueryFilterState,
   QueryPaginationState,
@@ -20,33 +36,17 @@ import {
   QueryConfusionMatrixState,
   QueryArrayFiltersState,
 } from "types/models";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import { motion } from "framer-motion";
-import ClearIcon from "@mui/icons-material/Clear";
-import TuneIcon from "@mui/icons-material/Tune";
-import { CountPerFilterResponse, DatasetSplitName } from "types/api";
-import { useHistory, useParams } from "react-router-dom";
-import { constructSearchString, isPipelineSelected } from "utils/helpers";
-import {
-  FILTER_CONTAINER_CLOSED_WIDTH,
-  FILTER_CONTAINER_OPENED_WIDTH,
-} from "styles/const";
-import {
-  getDatasetInfoEndpoint,
-  getOutcomeCountPerFilterEndpoint,
-  getUtteranceCountPerFilterEndpoint,
-} from "services/api";
-import DatasetSplitToggler from "./DatasetSplitToggler";
-import FilterSelector from "./FilterSelector";
-import FilterSlider from "./FilterSlider";
-import FilterTextField from "./FilterTextField";
 import {
   OUTCOME_PRETTY_NAMES,
   SMART_TAG_FAMILIES,
   SMART_TAG_FAMILY_ICONS,
   SMART_TAG_FAMILY_PRETTY_NAMES,
 } from "utils/const";
-import Description from "components/Description";
+import { constructSearchString, isPipelineSelected } from "utils/helpers";
+import DatasetSplitToggler from "./DatasetSplitToggler";
+import FilterSelector from "./FilterSelector";
+import FilterSlider from "./FilterSlider";
+import FilterTextField from "./FilterTextField";
 
 const MotionChevronLeftIcon = motion(ChevronLeftIcon);
 
@@ -73,7 +73,7 @@ const Controls: React.FC<Props> = ({
   postprocessing,
   searchString,
 }) => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = React.useState("");
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const history = useHistory();
   const { jobId, datasetSplitName, mainView } = useParams<{
@@ -169,7 +169,7 @@ const Controls: React.FC<Props> = ({
 
   const transition = { type: "tween" };
 
-  const maxCount = useMemo(() => {
+  const maxCount = React.useMemo(() => {
     return countPerFilter
       ? Math.max(
           ...Object.values(countPerFilter.countPerFilter).flatMap(
