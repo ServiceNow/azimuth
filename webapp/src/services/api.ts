@@ -213,7 +213,16 @@ export const api = createApi({
             dataAction: newValue,
           })),
         }),
-      invalidatesTags: () => ["OutcomeCountPerFilter", "Utterances"],
+      invalidatesTags: () => [
+        "ConfidenceHistogram",
+        "ConfusionMatrix",
+        "Metrics",
+        "MetricsPerFilter",
+        "OutcomeCountPerFilter",
+        "TopWords",
+        "UtteranceCountPerFilter",
+        "Utterances",
+      ],
       async onQueryStarted(
         { persistentIds, newValue, ...args },
         { dispatch, queryFulfilled }
