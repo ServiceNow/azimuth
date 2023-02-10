@@ -572,10 +572,10 @@ const Settings: React.FC = () => {
   const displayAnalysesCustomizationGeneralSection = () => (
     <Box display="flex" justifyContent="flex-start" gap={5} alignItems="center">
       <FormControl variant="standard" sx={{ m: 1, width: 120 }}>
-        <InputLabel id="supported-language-input-label">language</InputLabel>
+        <InputLabel id="language-input-label">language</InputLabel>
         <Select
           value={language ?? resultingConfig.language}
-          labelId="language"
+          labelId="language-input-label"
           onChange={(event) =>
             setLanguage(event.target.value as SupportedLanguage)
           }
