@@ -1,16 +1,19 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from itertools import zip_longest
+
 from azimuth.modules.dataset_analysis.syntax_tagging import SyntaxTaggingModule
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import SmartTag
 
 
 def verify_syntax_results(json_output, smart_tags_per_idx, token_count_per_idx):
-    for idx, res in enumerate(json_output):
-        assert all(v for k, v in res.tags.items() if k in smart_tags_per_idx[idx])
-        assert not any(v for k, v in res.tags.items() if k not in smart_tags_per_idx[idx])
-        assert res.adds[DatasetColumn.word_count] == token_count_per_idx[idx]
+    for res, smart_tags, token_count in zip_longest(
+        json_output, smart_tags_per_idx, token_count_per_idx
+    ):
+        assert list(res.tags.values()) == [k in smart_tags for k in res.tags.keys()]
+        assert res.adds[DatasetColumn.word_count] == token_count
 
 
 def test_syntax_tagging(tiny_text_config):
