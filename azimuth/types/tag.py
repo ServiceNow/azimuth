@@ -36,8 +36,8 @@ class DataAction(Tag, Enum):
 class SmartTag(Tag, Enum):
     # Syntax
     multi_sent = "multiple_sentences"
-    long = "long_sentence"
-    short = "short_sentence"
+    long = "long_utterance"
+    short = "short_utterance"
     no_subj = "missing_subj"
     no_obj = "missing_obj"
     no_verb = "missing_verb"

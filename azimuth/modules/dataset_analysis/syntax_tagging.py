@@ -58,29 +58,27 @@ class SyntaxTaggingModule(DatasetResultModule[SyntaxConfig]):
             # Remove punctuation for word count and smart tags
             tokens = [token.text for token in doc if not token.is_punct]
 
+            if len(tokens) >= syntax_options.long_utterance_min_word:
+                tag[SmartTag.long] = True
+            if len(tokens) <= syntax_options.short_utterance_max_word:
+                tag[SmartTag.short] = True
+
+            sub_toks = [tok for tok in doc if (tok.dep_ in syntax_options.subj_tags)]
+            obj_toks = [tok for tok in doc if (tok.dep_ in syntax_options.obj_tags)]
+            vrb_toks = [tok for tok in doc if (tok.pos_ in self.verb_tags)]
+            if not sub_toks:
+                tag[SmartTag.no_subj] = True
+            if not obj_toks:
+                tag[SmartTag.no_obj] = True
+            if not vrb_toks:
+                tag[SmartTag.no_verb] = True
+
             # Some issues occur with other languages such as french if using doc.sents directly.
             # Hence, we use an English sentencizer that seems to work better for similar languages.
             doc_sentencizer_en = self.spacy_sentencizer_en(clean_utterance(utterance))
             sentence_count = len(list(doc_sentencizer_en.sents))
-
             if sentence_count > 1:
-                # if an utterance has more than one sentence, no other tags are added.
                 tag[SmartTag.multi_sent] = True
-            else:
-                if len(tokens) >= syntax_options.long_sentence_min_word:
-                    tag[SmartTag.long] = True
-                if len(tokens) <= syntax_options.short_sentence_max_word:
-                    tag[SmartTag.short] = True
-
-                sub_toks = [tok for tok in doc if (tok.dep_ in syntax_options.subj_tags)]
-                obj_toks = [tok for tok in doc if (tok.dep_ in syntax_options.obj_tags)]
-                vrb_toks = [tok for tok in doc if (tok.pos_ in self.verb_tags)]
-                if not sub_toks:
-                    tag[SmartTag.no_subj] = True
-                if not obj_toks:
-                    tag[SmartTag.no_obj] = True
-                if not vrb_toks:
-                    tag[SmartTag.no_verb] = True
 
             adds = {DatasetColumn.word_count: len(tokens)}
             records.append(TaggingResponse(tags=tag, adds=adds))
