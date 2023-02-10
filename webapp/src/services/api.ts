@@ -1,9 +1,7 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AzimuthConfig, DataAction, DataActionResponse } from "types/api";
-import { Tags } from "types/models";
+import { AzimuthConfig, DataAction, UtterancePatch } from "types/api";
 import { fetchApi, GetUtterancesQueryState, TypedResponse } from "utils/api";
-import { DATA_ACTION_NONE_VALUE } from "utils/const";
 import { raiseSuccessToast } from "utils/helpers";
 
 const responseToData =
@@ -19,30 +17,6 @@ const responseToData =
       return { error: { message } };
     }
   };
-
-const getDataActions = (
-  ids: number[],
-  newValue: DataAction,
-  allDataActions: string[]
-) => {
-  const newTagsMap: { [id: number]: Tags } = {};
-  ids.forEach((id) => {
-    const allFalse = allDataActions.reduce(
-      (tags: Record<string, boolean>, tag) => ({
-        ...tags,
-        [tag]: false,
-      }),
-      {}
-    );
-    const newTags: Tags =
-      newValue === DATA_ACTION_NONE_VALUE
-        ? allFalse
-        : { ...allFalse, [newValue]: true };
-    newTagsMap[id] = newTags;
-  });
-
-  return newTagsMap;
-};
 
 const tagTypes = [
   "DatasetInfo",
@@ -65,8 +39,6 @@ const tagTypes = [
   "ClassOverlapPlot",
   "ClassOverlap",
 ] as const;
-
-type Tag = typeof tagTypes[number];
 
 export const api = createApi({
   baseQuery: fakeBaseQuery<{ message: string }>(),
@@ -220,39 +192,36 @@ export const api = createApi({
       ),
     }),
     updateDataActions: build.mutation<
-      DataActionResponse,
+      UtterancePatch[],
       {
-        ids: number[];
+        persistentIds: UtterancePatch["persistentId"][];
         newValue: DataAction;
-        allDataActions: string[];
       } & GetUtterancesQueryState
     >({
-      queryFn: async ({
-        jobId,
-        datasetSplitName,
-        ids,
-        newValue,
-        allDataActions,
-      }) =>
+      queryFn: async ({ jobId, datasetSplitName, persistentIds, newValue }) =>
         responseToData(
-          fetchApi({ path: "/tags", method: "post" }),
+          fetchApi({
+            path: "/dataset_splits/{dataset_split_name}/utterances",
+            method: "post",
+          }),
           "Something went wrong updating proposed actions"
         )({
           jobId,
-          body: {
-            datasetSplitName,
-            dataActions: getDataActions(ids, newValue, allDataActions),
-          },
+          datasetSplitName,
+          body: persistentIds.map((persistentId) => ({
+            persistentId,
+            dataAction: newValue,
+          })),
         }),
       invalidatesTags: () => ["OutcomeCountPerFilter", "Utterances"],
       async onQueryStarted(
-        { ids, newValue, allDataActions, ...args },
+        { persistentIds, newValue, ...args },
         { dispatch, queryFulfilled }
       ) {
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
-              if (ids.includes(utterance.index)) {
+              if (persistentIds.includes(utterance.persistentId)) {
                 utterance.dataAction = newValue;
               }
             });

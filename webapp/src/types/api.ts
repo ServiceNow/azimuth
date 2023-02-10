@@ -28,8 +28,6 @@ export interface CountPerFilterResponse
 export type CountPerFilterValue = Partial<OutcomeCountPerFilterValue> &
   UtteranceCountPerFilterValue;
 export type DataAction = components["schemas"]["DataAction"];
-export type DataActionMapping = components["schemas"]["DataActionMapping"];
-export type DataActionResponse = components["schemas"]["DataActionResponse"];
 export type DatasetDistributionComparison =
   components["schemas"]["DatasetDistributionComparison"];
 export type DatasetDistributionComparisonValue =
@@ -68,8 +66,6 @@ export type PerturbedUtterance =
 export type PerturbationType = components["schemas"]["PerturbationType"];
 export type PipelineDefinition = components["schemas"]["PipelineDefinition"];
 export type PlotSpecification = components["schemas"]["PlotSpecification"];
-export type PostDataActionRequest =
-  components["schemas"]["PostDataActionRequest"];
 export type SimilarUtterance = components["schemas"]["SimilarUtterance"];
 export type SimilarUtterancesResponse =
   components["schemas"]["SimilarUtterancesResponse"];
@@ -78,6 +74,7 @@ export type StatusResponse = components["schemas"]["StatusResponse"];
 export type TopWordsResponse = components["schemas"]["TopWordsResponse"];
 export type TopWordsResult = components["schemas"]["TopWordsResult"];
 export type Utterance = components["schemas"]["Utterance"];
+export type UtterancePatch = components["schemas"]["UtterancePatch"];
 export type UtteranceCountPerFilterResponse =
   components["schemas"]["UtteranceCountPerFilterResponse"];
 export type UtteranceCountPerFilterValue =

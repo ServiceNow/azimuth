@@ -292,7 +292,7 @@ export const UtteranceDetail = () => {
         </Typography>
         <Box>
           <UtteranceDataAction
-            utteranceIds={[index]}
+            persistentIds={[utterance.persistentId]}
             dataAction={utterance.dataAction}
             allDataActions={datasetInfo?.dataActions || []}
             getUtterancesQueryState={getUtterancesQueryState}
