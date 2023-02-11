@@ -298,7 +298,7 @@ def patch_utterances(
         UtterancePatch(
             persistent_id=persistent_id,
             data_action=next(
-                iter(tag for tag, value in tags.items() if tag in ALL_DATA_ACTIONS and value),
+                (tag for tag, value in tags.items() if tag in ALL_DATA_ACTIONS and value),
                 DataAction.no_action,
             ),
         )
