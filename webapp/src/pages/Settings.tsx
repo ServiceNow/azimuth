@@ -70,7 +70,7 @@ type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
-const SUPPORTED_LANGUAGES = ["en", "fr"];
+const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -182,7 +182,7 @@ const NumberField: React.FC<
       variant="standard"
       size="small"
       type="number"
-      className="number"
+      className="fixedWidthInput"
       title="" // Overwrite any default input validation tooltip
       value={stringValue}
       {...(units && {
@@ -218,12 +218,39 @@ const Settings: React.FC = () => {
   >({});
 
   React.useEffect(() => {
-    if (defaultConfig && language !== undefined) {
+    if (
+      config &&
+      defaultConfig &&
+      defaultConfig.language !== resultingConfig.language
+    ) {
       setPartialConfig({
-        ...partialConfig,
-        syntax: defaultConfig.syntax,
-        similarity: defaultConfig.similarity,
-        behavioral_testing: defaultConfig.behavioral_testing,
+        language: defaultConfig.language,
+        syntax: {
+          ...(partialConfig.syntax ?? config.syntax),
+          spacy_model: defaultConfig.syntax.spacy_model,
+          subj_tags: defaultConfig.syntax.subj_tags,
+          obj_tags: defaultConfig.syntax.obj_tags,
+        },
+        similarity: {
+          ...(partialConfig.similarity ??
+            config.similarity ??
+            defaultConfig.similarity!),
+          faiss_encoder: defaultConfig.similarity!.faiss_encoder,
+        },
+        behavioral_testing: {
+          ...(partialConfig.behavioral_testing ??
+            config.behavioral_testing ??
+            defaultConfig.behavioral_testing!),
+          neutral_token: {
+            ...(partialConfig.behavioral_testing?.neutral_token ??
+              config.behavioral_testing?.neutral_token ??
+              defaultConfig.behavioral_testing!.neutral_token),
+            suffix_list:
+              defaultConfig.behavioral_testing!.neutral_token.suffix_list,
+            prefix_list:
+              defaultConfig.behavioral_testing!.neutral_token.prefix_list,
+          },
+        },
       });
     }
   }, [defaultConfig]);
@@ -570,31 +597,33 @@ const Settings: React.FC = () => {
   );
 
   const displayAnalysesCustomizationGeneralSection = () => (
-    <Box display="flex" justifyContent="flex-start" gap={5} alignItems="center">
-      <FormControl variant="standard" sx={{ m: 1, width: 120 }}>
-        <InputLabel id="language-input-label">language</InputLabel>
-        <Select
-          value={language ?? resultingConfig.language}
-          labelId="language-input-label"
-          onChange={(event) =>
-            setLanguage(event.target.value as SupportedLanguage)
-          }
-        >
-          {SUPPORTED_LANGUAGES.map((language) => (
-            <MenuItem key={language} value={language}>
-              {language}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Box display="flex" flexDirection="row" gap={1}>
-        <Warning color="warning" />
-        <Typography variant="body2">
-          Changing the language would impact the syntax, similarity and
-          behavioral_testing sections
-        </Typography>
+    <FormGroup>
+      <Box display="flex" gap={5} alignItems="center">
+        <FormControl variant="standard" className="fixedWidthInput">
+          <InputLabel id="language-input-label">language</InputLabel>
+          <Select
+            value={language ?? resultingConfig.language}
+            labelId="language-input-label"
+            onChange={(event) =>
+              setLanguage(event.target.value as SupportedLanguage)
+            }
+          >
+            {SUPPORTED_LANGUAGES.map((language) => (
+              <MenuItem key={language} value={language}>
+                {language}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Box display="flex" flexDirection="row" gap={1}>
+          <Warning color="warning" />
+          <Typography variant="body2">
+            Changing the language would impact the syntax, similarity and
+            behavioral_testing sections
+          </Typography>
+        </Box>
       </Box>
-    </Box>
+    </FormGroup>
   );
 
   const getAnalysesCustomizationSection = () => (
@@ -625,7 +654,7 @@ const Settings: React.FC = () => {
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .number .${inputClasses.root}`]: { width: "12ch" },
+          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
           [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
@@ -657,7 +686,13 @@ const Settings: React.FC = () => {
         </AccordionLayout>
       </Paper>
       <Box display="flex" justifyContent="space-between" paddingY={2}>
-        <Button variant="contained" onClick={() => setPartialConfig({})}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setPartialConfig({});
+            setLanguage(undefined);
+          }}
+        >
           Discard
         </Button>
 
