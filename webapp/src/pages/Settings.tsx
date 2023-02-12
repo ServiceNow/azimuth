@@ -218,11 +218,7 @@ const Settings: React.FC = () => {
   >({});
 
   React.useEffect(() => {
-    if (
-      config &&
-      defaultConfig &&
-      defaultConfig.language !== resultingConfig.language
-    ) {
+    if (config && defaultConfig && defaultConfig.language !== config.language) {
       setPartialConfig({
         language: defaultConfig.language,
         syntax: {
@@ -253,7 +249,7 @@ const Settings: React.FC = () => {
         },
       });
     }
-  }, [defaultConfig]);
+  }, [config, defaultConfig, partialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
