@@ -156,10 +156,10 @@ def test_post_utterances(app: FastAPI) -> None:
     request = [{"persistent_id": 0, "data_action": "remove"}]
     resp = client.post("/dataset_splits/eval/utterances", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
-    assert resp.json() == [{"persistentId": 0, "dataAction": "remove"}]
+    assert resp.json() == request
 
     # Reset tag to NO_ACTION
     request = [{"persistent_id": 0, "data_action": "NO_ACTION"}]
     resp = client.post("/dataset_splits/eval/utterances", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
-    assert resp.json() == [{"persistentId": 0, "dataAction": "NO_ACTION"}]
+    assert resp.json() == request
