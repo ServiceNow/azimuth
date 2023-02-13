@@ -227,13 +227,13 @@ const Settings: React.FC = () => {
           subj_tags: defaultConfig.syntax.subj_tags,
           obj_tags: defaultConfig.syntax.obj_tags,
         },
-        similarity: {
+        similarity: partialConfig.similarity && {
           ...(partialConfig.similarity ??
             config.similarity ??
             defaultConfig.similarity!),
           faiss_encoder: defaultConfig.similarity!.faiss_encoder,
         },
-        behavioral_testing: {
+        behavioral_testing: partialConfig.behavioral_testing && {
           ...(partialConfig.behavioral_testing ??
             config.behavioral_testing ??
             defaultConfig.behavioral_testing!),
