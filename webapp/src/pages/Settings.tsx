@@ -277,7 +277,7 @@ const Settings: React.FC = () => {
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
-              [field]: checked ? config[field] ?? defaultConfig[field] : null,
+              [field]: checked ? defaultConfig[field] : null,
             })
           }
         />
