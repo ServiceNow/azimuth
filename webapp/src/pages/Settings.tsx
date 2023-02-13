@@ -13,8 +13,11 @@ import {
   InputAdornment,
   InputBaseComponentProps,
   inputClasses,
+  InputLabel,
   inputLabelClasses,
+  MenuItem,
   Paper,
+  Select,
   TextField,
   TextFieldProps,
   Tooltip,
@@ -31,7 +34,11 @@ import {
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
 } from "services/api";
-import { AzimuthConfig, PipelineDefinition } from "types/api";
+import {
+  AzimuthConfig,
+  PipelineDefinition,
+  SupportedLanguage,
+} from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
@@ -54,7 +61,7 @@ const FIELDS: Record<
   max_delta_mean_words: { ...FLOAT, units: "words" },
   max_delta_std_words: { ...FLOAT, units: "words" },
   short_utterance_max_word: { ...INT, units: "words" },
-  long_utterance_min_word: { ...INT, units: "words" },
+  short_utterance_max_word: { ...INT, units: "words" },
   temperature: FLOAT,
   threshold: PERCENTAGE,
 };
@@ -63,7 +70,7 @@ type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
-
+const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -175,7 +182,7 @@ const NumberField: React.FC<
       variant="standard"
       size="small"
       type="number"
-      className="number"
+      className="fixedWidthInput"
       title="" // Overwrite any default input validation tooltip
       value={stringValue}
       {...(units && {
@@ -194,11 +201,9 @@ const NumberField: React.FC<
 
 const Settings: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
-  const {
-    data: defaultConfig,
-    isLoading,
-    error,
-  } = getDefaultConfigEndpoint.useQuery({ jobId });
+  const [language, setLanguage] = React.useState<
+    SupportedLanguage | undefined
+  >();
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
@@ -206,6 +211,45 @@ const Settings: React.FC = () => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
+
+  const resultingConfig = Object.assign({}, config, partialConfig);
+
+  const {
+    data: defaultConfig,
+    isLoading,
+    error,
+  } = getDefaultConfigEndpoint.useQuery({
+    jobId,
+    language: language ?? resultingConfig.language,
+  });
+
+  React.useEffect(() => {
+    if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
+      setPartialConfig({
+        language: defaultConfig.language,
+        syntax: {
+          ...resultingConfig.syntax,
+          spacy_model: defaultConfig.syntax.spacy_model,
+          subj_tags: defaultConfig.syntax.subj_tags,
+          obj_tags: defaultConfig.syntax.obj_tags,
+        },
+        similarity: resultingConfig.similarity && {
+          ...resultingConfig.similarity,
+          faiss_encoder: defaultConfig.similarity!.faiss_encoder,
+        },
+        behavioral_testing: resultingConfig.behavioral_testing && {
+          ...resultingConfig.behavioral_testing,
+          neutral_token: {
+            ...resultingConfig.behavioral_testing.neutral_token,
+            suffix_list:
+              defaultConfig.behavioral_testing!.neutral_token.suffix_list,
+            prefix_list:
+              defaultConfig.behavioral_testing!.neutral_token.prefix_list,
+          },
+        },
+      });
+    }
+  }, [defaultConfig, resultingConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
@@ -220,7 +264,6 @@ const Settings: React.FC = () => {
       </Box>
     );
   }
-  const resultingConfig = Object.assign({}, config, partialConfig);
 
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
@@ -234,7 +277,7 @@ const Settings: React.FC = () => {
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
-              [field]: checked ? config[field] ?? defaultConfig[field] : null,
+              [field]: checked ? defaultConfig[field] : null,
             })
           }
         />
@@ -548,8 +591,40 @@ const Settings: React.FC = () => {
     </FormGroup>
   );
 
+  const displayAnalysesCustomizationGeneralSection = () => (
+    <FormGroup>
+      <Box display="flex" gap={5} alignItems="center">
+        <FormControl variant="standard" className="fixedWidthInput">
+          <InputLabel id="language-input-label">language</InputLabel>
+          <Select
+            value={language ?? resultingConfig.language}
+            labelId="language-input-label"
+            onChange={(event) =>
+              setLanguage(event.target.value as SupportedLanguage)
+            }
+          >
+            {SUPPORTED_LANGUAGES.map((language) => (
+              <MenuItem key={language} value={language}>
+                {language}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Box display="flex" flexDirection="row" gap={1}>
+          <Warning color="warning" />
+          <Typography variant="body2">
+            Changing the language would impact the syntax, similarity and
+            behavioral_testing sections
+          </Typography>
+        </Box>
+      </Box>
+    </FormGroup>
+  );
+
   const getAnalysesCustomizationSection = () => (
     <>
+      {displaySectionTitle("General")}
+      {displayAnalysesCustomizationGeneralSection()}
       {displaySectionTitle("Dataset Warnings")}
       {getAnalysesCustomization("dataset_warnings")}
       {displaySectionTitle("Syntax")}
@@ -574,7 +649,7 @@ const Settings: React.FC = () => {
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .number .${inputClasses.root}`]: { width: "12ch" },
+          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
           [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
@@ -606,7 +681,13 @@ const Settings: React.FC = () => {
         </AccordionLayout>
       </Paper>
       <Box display="flex" justifyContent="space-between" paddingY={2}>
-        <Button variant="contained" onClick={() => setPartialConfig({})}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setPartialConfig({});
+            setLanguage(undefined);
+          }}
+        >
           Discard
         </Button>
 
