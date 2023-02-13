@@ -240,7 +240,7 @@ const Settings: React.FC = () => {
         behavioral_testing: resultingConfig.behavioral_testing && {
           ...resultingConfig.behavioral_testing,
           neutral_token: {
-            ...resultingConfig.behavioral_testing?.neutral_token,
+            ...resultingConfig.behavioral_testing.neutral_token,
             suffix_list:
               defaultConfig.behavioral_testing!.neutral_token.suffix_list,
             prefix_list:
