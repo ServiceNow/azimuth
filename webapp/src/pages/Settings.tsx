@@ -204,11 +204,6 @@ const Settings: React.FC = () => {
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
   >();
-  const {
-    data: defaultConfig,
-    isLoading,
-    error,
-  } = getDefaultConfigEndpoint.useQuery({ jobId, language });
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
@@ -218,6 +213,15 @@ const Settings: React.FC = () => {
   >({});
 
   const resultingConfig = Object.assign({}, config, partialConfig);
+
+  const {
+    data: defaultConfig,
+    isLoading,
+    error,
+  } = getDefaultConfigEndpoint.useQuery({
+    jobId,
+    language: language ?? resultingConfig.language,
+  });
 
   React.useEffect(() => {
     if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
@@ -230,15 +234,13 @@ const Settings: React.FC = () => {
           obj_tags: defaultConfig.syntax.obj_tags,
         },
         similarity: resultingConfig.similarity && {
-          ...(resultingConfig.similarity ?? defaultConfig.similarity!),
+          ...resultingConfig.similarity,
           faiss_encoder: defaultConfig.similarity!.faiss_encoder,
         },
         behavioral_testing: resultingConfig.behavioral_testing && {
-          ...(resultingConfig.behavioral_testing ??
-            defaultConfig.behavioral_testing!),
+          ...resultingConfig.behavioral_testing,
           neutral_token: {
-            ...(resultingConfig.behavioral_testing?.neutral_token ??
-              defaultConfig.behavioral_testing!.neutral_token),
+            ...resultingConfig.behavioral_testing?.neutral_token,
             suffix_list:
               defaultConfig.behavioral_testing!.neutral_token.suffix_list,
             prefix_list:
