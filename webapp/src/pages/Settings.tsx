@@ -199,7 +199,11 @@ const NumberField: React.FC<
   );
 };
 
-const Settings: React.FC = () => {
+type props = {
+  setOpen: (close: boolean) => void;
+};
+
+const Settings: React.FC<props> = ({ setOpen }) => {
   const { jobId } = useParams<{ jobId: string }>();
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
@@ -686,6 +690,7 @@ const Settings: React.FC = () => {
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
+            setOpen(false);
           }}
         >
           Discard

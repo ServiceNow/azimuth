@@ -1,5 +1,12 @@
-import { Settings } from "@mui/icons-material";
-import { Box, Breadcrumbs, IconButton, Link, Typography } from "@mui/material";
+import { Settings as SettingsIcon } from "@mui/icons-material";
+import {
+  Box,
+  Breadcrumbs,
+  IconButton,
+  Link,
+  Modal,
+  Typography,
+} from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -14,6 +21,7 @@ import { DatasetSplitName } from "types/api";
 import { constructSearchString } from "utils/helpers";
 import HelpMenu from "components/HelpMenu";
 import PipelineSelect from "components/PipelineSelect";
+import Settings from "pages/Settings";
 
 const useStyles = makeStyles((theme) => ({
   jobHeader: {
@@ -26,6 +34,16 @@ const useStyles = makeStyles((theme) => ({
   label: {
     fontWeight: "bold",
     marginRight: theme.spacing(1),
+  },
+  modal: {
+    position: "absolute",
+    width: "70%",
+    height: "80%",
+    padding: "10px",
+    backgroundColor: theme.palette.background.paper,
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
   },
 }));
 
@@ -79,7 +97,7 @@ const PageHeader = () => {
       })}`
     );
   };
-
+  const [openConfigModal, setOpenConfigModal] = React.useState(false);
   const dashboardPathname = `/${jobId}`;
 
   const isDashboard = location.pathname === dashboardPathname;
@@ -174,10 +192,9 @@ const PageHeader = () => {
               </>
             )}
             <IconButton
-              component={RouterLink}
               size="small"
               color="primary"
-              to={`/${jobId}/settings${searchString}`}
+              onClick={() => setOpenConfigModal(!openConfigModal)}
               sx={{
                 padding: 0,
                 "&:hover > svg": {
@@ -186,10 +203,22 @@ const PageHeader = () => {
                 },
               }}
             >
-              <Settings />
+              <SettingsIcon />
             </IconButton>
             <HelpMenu />
           </Box>
+          <Modal
+            open={openConfigModal}
+            onClose={(_, reason) =>
+              reason === "backdropClick" || reason === "escapeKeyDown"
+                ? setOpenConfigModal(true)
+                : setOpenConfigModal(false)
+            }
+          >
+            <Box className={classes.modal}>
+              <Settings setOpen={setOpenConfigModal} />
+            </Box>
+          </Modal>
         </div>
       )}
     </div>
