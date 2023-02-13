@@ -61,7 +61,7 @@ const FIELDS: Record<
   max_delta_mean_words: { ...FLOAT, units: "words" },
   max_delta_std_words: { ...FLOAT, units: "words" },
   short_utterance_max_word: { ...INT, units: "words" },
-  short_utterance_max_word: { ...INT, units: "words" },
+  long_utterance_min_word: { ...INT, units: "words" },
   temperature: FLOAT,
   threshold: PERCENTAGE,
 };
