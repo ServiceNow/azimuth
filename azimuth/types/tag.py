@@ -5,19 +5,7 @@
 from enum import Enum
 from typing import Any, Dict, List
 
-from pydantic import Field
-
-from azimuth.types import AliasModel, DatasetSplitName, ModuleResponse
-
-
-class DataActionMapping(AliasModel):
-    relabel: bool = Field(..., title="Relabel")
-    augment_with_similar: bool = Field(..., title="Augment with Similar")
-    define_new_class: bool = Field(..., title="Define New Class")
-    merge_classes: bool = Field(..., title="Merge Two Classes")
-    remove: bool = Field(..., title="Remove")
-    investigate: bool = Field(..., title="Investigate")
-
+from azimuth.types import ModuleResponse
 
 Tag = str
 
@@ -134,29 +122,3 @@ ALL_STANDARD_TAGS: List[Tag] = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 class TaggingResponse(ModuleResponse):
     tags: Dict[Tag, bool]
     adds: Dict[str, Any]
-
-
-class DataActionResponse(AliasModel):
-    data_actions: List[DataActionMapping] = Field(..., title="Data action tags")
-
-
-class PostDataActionRequest(AliasModel):
-    dataset_split_name: DatasetSplitName = Field(..., title="Dataset Split Name")
-    data_actions: Dict[int, Dict[Tag, bool]] = Field(..., title="Data action tags")
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "dataset_split_name": "eval",
-                "data_actions": {
-                    1: {
-                        "relabel": True,
-                        "augment_with_similar": False,
-                        "define_new_class": False,
-                        "merge_classes": False,
-                        "remove": False,
-                        "investigate": False,
-                    }
-                },
-            }
-        }

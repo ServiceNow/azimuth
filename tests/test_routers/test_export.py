@@ -40,11 +40,12 @@ def test_get_utterances(app: FastAPI) -> None:
 
 def test_get_proposed_actions(app: FastAPI) -> None:
     client = TestClient(app)
-    request = {
-        "datasetSplitName": "eval",
-        "data_actions": {0: {"remove": True}, 1: {"relabel": True}},
-    }
-    resp = client.post("/tags", json=request)
+
+    request = [
+        {"persistent_id": 0, "data_action": "remove"},
+        {"persistent_id": 1, "data_action": "relabel"},
+    ]
+    resp = client.post("/dataset_splits/eval/utterances", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
 
     resp = client.get("/export/dataset_splits/eval/proposed_actions")

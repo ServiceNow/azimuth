@@ -1,17 +1,18 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
-import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import CustomPagination from "components/CustomPagination";
+import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
+import React from "react";
+import { UtterancePatch } from "types/api";
 import { GetUtterancesQueryState } from "utils/api";
 
 type Props = {
-  selectedIds: number[];
+  selectedPersistentIds: UtterancePatch["persistentId"][];
   allDataActions: string[];
   getUtterancesQueryState: GetUtterancesQueryState;
 };
 
 const UtterancesTableFooter: React.FC<Props> = ({
-  selectedIds,
+  selectedPersistentIds,
   allDataActions,
   getUtterancesQueryState,
 }) => (
@@ -26,17 +27,17 @@ const UtterancesTableFooter: React.FC<Props> = ({
       marginX={2}
       display="flex"
       alignItems="center"
-      visibility={selectedIds.length > 0 ? "visible" : "hidden"}
+      visibility={selectedPersistentIds.length > 0 ? "visible" : "hidden"}
     >
       <Typography variant="body2" sx={{ marginRight: 1 }}>
-        Apply proposed action on {selectedIds.length} rows:
+        Apply proposed action on {selectedPersistentIds.length} rows:
       </Typography>
       <Box
         display="flex"
         width={277} // Width with the longest option augment_with_similar
       >
         <UtteranceDataAction
-          utteranceIds={selectedIds}
+          persistentIds={selectedPersistentIds}
           confirmationButton
           allDataActions={allDataActions || []}
           getUtterancesQueryState={getUtterancesQueryState}

@@ -95,7 +95,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type Row = Utterance & { id: number };
+type Row = Utterance & { id: Utterance["persistentId"] };
 
 type Props = {
   jobId: string;
@@ -138,7 +138,9 @@ const UtterancesTable: React.FC<Props> = ({
   const { data: utterancesResponse, isFetching } =
     getUtterancesEndpoint.useQuery(getUtterancesQueryState);
 
-  const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
+  const [selectedPersistentIds, setSelectedPersistentIds] = React.useState<
+    number[]
+  >([]);
 
   const handlePageChange = (page: number) => {
     const q = constructSearchString({
@@ -236,7 +238,7 @@ const UtterancesTable: React.FC<Props> = ({
     row,
   }: GridCellParams<DataAction, Row>) => (
     <UtteranceDataAction
-      utteranceIds={[row.id]}
+      persistentIds={[row.persistentId]}
       dataAction={value}
       allDataActions={datasetInfo?.dataActions || []}
       getUtterancesQueryState={getUtterancesQueryState}
@@ -247,7 +249,7 @@ const UtterancesTable: React.FC<Props> = ({
   // That's the width of the table when viewed on a MacBook Pro 16 with the filter panel.
   const columns: Column<Row>[] = [
     {
-      field: "id",
+      field: "index",
       headerName: "Id",
       description: ID_TOOLTIP,
       width: 55,
@@ -356,7 +358,7 @@ const UtterancesTable: React.FC<Props> = ({
   const rows: Row[] = React.useMemo(
     () =>
       utterancesResponse?.utterances.map((utterance) => ({
-        id: utterance.index,
+        id: utterance.persistentId,
         ...utterance,
       })) ?? [],
     [utterancesResponse]
@@ -366,7 +368,7 @@ const UtterancesTable: React.FC<Props> = ({
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={`/${jobId}/dataset_splits/${datasetSplitName}/utterances/${props.row.id}${searchString}`}
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/utterances/${props.row.index}${searchString}`}
     >
       <GridRow {...props} />
     </Link>
@@ -416,9 +418,9 @@ const UtterancesTable: React.FC<Props> = ({
         checkboxSelection
         disableColumnMenu
         onSelectionModelChange={(newSelection) => {
-          setSelectedIds(newSelection as number[]);
+          setSelectedPersistentIds(newSelection as number[]);
         }}
-        selectionModel={selectedIds}
+        selectionModel={selectedPersistentIds}
         components={{
           Footer: UtterancesTableFooter,
           Row: RowLink,
@@ -428,7 +430,7 @@ const UtterancesTable: React.FC<Props> = ({
             onClick: (e: React.MouseEvent) => e.stopPropagation(),
           },
           footer: {
-            selectedIds,
+            selectedPersistentIds,
             allDataActions: datasetInfo?.dataActions || [],
             getUtterancesQueryState,
           },

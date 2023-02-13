@@ -4,6 +4,7 @@
 from typing import List
 
 from fastapi import FastAPI
+from starlette.status import HTTP_200_OK
 from starlette.testclient import TestClient
 
 UTTERANCE_COUNT = 42
@@ -147,3 +148,18 @@ def test_perturbed_utterances(app: FastAPI, monkeypatch):
     ).json()
     # Utterance 1 has 11 perturbation tests
     assert len(resp) == 11
+
+
+def test_post_utterances(app: FastAPI) -> None:
+    client = TestClient(app)
+
+    request = [{"persistentId": 0, "dataAction": "remove"}]
+    resp = client.post("/dataset_splits/eval/utterances", json=request)
+    assert resp.status_code == HTTP_200_OK, resp.text
+    assert resp.json() == request
+
+    # Reset tag to NO_ACTION
+    request = [{"persistentId": 0, "dataAction": "NO_ACTION"}]
+    resp = client.post("/dataset_splits/eval/utterances", json=request)
+    assert resp.status_code == HTTP_200_OK, resp.text
+    assert resp.json() == request

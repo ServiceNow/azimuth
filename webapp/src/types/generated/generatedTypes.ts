@@ -38,10 +38,6 @@ export interface paths {
     /** Get data for class overlap, confusion, and related utterance counts. */
     get: operations["get_class_overlap_dataset_splits__dataset_split_name__class_overlap_get"];
   };
-  "/tags": {
-    /** Post new data_action tags */
-    post: operations["post_data_actions_tags_post"];
-  };
   "/dataset_splits/{dataset_split_name}/confidence_histogram": {
     /** Get all confidence bins with their confidence and the outcome count */
     get: operations["get_confidence_histogram_dataset_splits__dataset_split_name__confidence_histogram_get"];
@@ -73,6 +69,8 @@ export interface paths {
   "/dataset_splits/{dataset_split_name}/utterances": {
     /** Get a table view of the utterances according to filters. */
     get: operations["get_utterances_dataset_splits__dataset_split_name__utterances_get"];
+    /** Patch utterances, such as updating proposed actions. */
+    post: operations["patch_utterances_dataset_splits__dataset_split_name__utterances_post"];
   };
   "/dataset_splits/{dataset_split_name}/utterances/{index}/perturbed_utterances": {
     /** Get a perturbed utterances for a single utterance. */
@@ -256,25 +254,6 @@ export interface components {
       | "remove"
       | "investigate"
       | "NO_ACTION";
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
-    DataActionMapping: {
-      relabel: boolean;
-      augmentWithSimilar: boolean;
-      defineNewClass: boolean;
-      mergeClasses: boolean;
-      remove: boolean;
-      investigate: boolean;
-    };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
-    DataActionResponse: {
-      dataActions: components["schemas"]["DataActionMapping"][];
-    };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
@@ -640,14 +619,6 @@ export interface components {
       data: { [key: string]: any }[];
       layout: { [key: string]: any };
     };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
-    PostDataActionRequest: {
-      datasetSplitName: components["schemas"]["DatasetSplitName"];
-      dataActions: { [key: string]: { [key: string]: boolean } };
-    };
     /** Class for saving the results in the dataset and the routes. */
     PostprocessingStepAPIResponse: {
       output: components["schemas"]["PredictionDetails"];
@@ -844,6 +815,8 @@ export interface components {
      * that all fields are represented correctly.
      */
     Utterance: {
+      persistentId: number | string;
+      dataAction: components["schemas"]["DataAction"];
       almostCorrect: string[];
       behavioralTesting: string[];
       pipelineComparison: string[];
@@ -853,10 +826,8 @@ export interface components {
       dissimilar: string[];
       /** Row index computed by Azimuth.. */
       index: number;
-      persistentId: number | string;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
-      dataAction: components["schemas"]["DataAction"];
       label: string;
       utterance: string;
     };
@@ -886,6 +857,14 @@ export interface components {
     UtteranceCountPerFilterValue: {
       utteranceCount: number;
       filterValue: string;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    UtterancePatch: {
+      persistentId: number | string;
+      dataAction: components["schemas"]["DataAction"];
     };
     /** An enumeration. */
     UtterancesSortableColumn:
@@ -1067,33 +1046,6 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
         };
-      };
-    };
-  };
-  /** Post new data_action tags */
-  post_data_actions_tags_post: {
-    parameters: {
-      query: {
-        pipeline_index?: number;
-      };
-    };
-    responses: {
-      /** Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["DataActionResponse"];
-        };
-      };
-      /** Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PostDataActionRequest"];
       };
     };
   };
@@ -1358,6 +1310,33 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
         };
+      };
+    };
+  };
+  /** Patch utterances, such as updating proposed actions. */
+  patch_utterances_dataset_splits__dataset_split_name__utterances_post: {
+    parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UtterancePatch"][];
+        };
+      };
+      /** Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UtterancePatch"][];
       };
     };
   };

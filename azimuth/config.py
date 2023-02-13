@@ -154,7 +154,7 @@ class PipelineDefinition(AzimuthBaseSettings):
         if self.postprocessors is None:
             return None
         thresholding = next(
-            iter([post for post in self.postprocessors if isinstance(post, ThresholdConfig)]), None
+            (post for post in self.postprocessors if isinstance(post, ThresholdConfig)), None
         )
         if thresholding:
             return thresholding.threshold
@@ -165,8 +165,7 @@ class PipelineDefinition(AzimuthBaseSettings):
         if self.postprocessors is None:
             return None
         temp_scaling = next(
-            iter([post for post in self.postprocessors if isinstance(post, TemperatureScaling)]),
-            None,
+            (post for post in self.postprocessors if isinstance(post, TemperatureScaling)), None
         )
         if temp_scaling:
             return temp_scaling.temperature

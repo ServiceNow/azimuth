@@ -155,7 +155,6 @@ def create_app() -> FastAPI:
     from azimuth.routers.v1.model_performance.utterance_count import (
         router as utterance_count_router,
     )
-    from azimuth.routers.v1.tags import router as tags_router
     from azimuth.routers.v1.top_words import router as top_words_router
     from azimuth.routers.v1.utterances import router as utterances_router
     from azimuth.utils.routers import require_application_ready, require_available_model
@@ -168,7 +167,6 @@ def create_app() -> FastAPI:
         prefix="/dataset_splits/{dataset_split_name}/class_overlap",
         dependencies=[Depends(require_application_ready)],
     )
-    api_router.include_router(tags_router, prefix="/tags", dependencies=[])
     api_router.include_router(
         confidence_histogram_router,
         prefix="/dataset_splits/{dataset_split_name}/confidence_histogram",

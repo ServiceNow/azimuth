@@ -5,7 +5,7 @@ from copy import copy
 from enum import Enum
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from starlette.status import HTTP_404_NOT_FOUND
 
 from azimuth.app import (
@@ -46,6 +46,7 @@ from azimuth.types.utterance import (
     ModelPrediction,
     ModelSaliency,
     Utterance,
+    UtterancePatch,
 )
 from azimuth.utils.dataset_operations import filter_dataset_split
 from azimuth.utils.project import (
@@ -262,6 +263,47 @@ def get_utterances(
     return GetUtterancesResponse(
         utterances=utterances, utterance_count=utterance_count, confidence_threshold=threshold
     )
+
+
+@router.post(
+    "",
+    summary="Patch utterances",
+    description="Patch utterances, such as updating proposed actions.",
+    tags=TAGS,
+    response_model=List[UtterancePatch],
+)
+def patch_utterances(
+    utterances: List[UtterancePatch] = Body(...),
+    dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
+    task_manager: TaskManager = Depends(get_task_manager),
+) -> List[UtterancePatch]:
+    persistent_ids = [utterance.persistent_id for utterance in utterances]
+    try:
+        row_indices = dataset_split_manager.get_row_indices_from_persistent_id(persistent_ids)
+    except ValueError as e:
+        raise HTTPException(HTTP_404_NOT_FOUND, detail=f"Persistent id not found: {e}.")
+
+    data_actions = {}
+    for row_idx, utterance in zip(row_indices, utterances):
+        data_actions[row_idx] = {data_action: False for data_action in ALL_DATA_ACTIONS}
+        if utterance.data_action != DataAction.no_action:
+            data_actions[row_idx][utterance.data_action] = True
+
+    dataset_split_manager.add_tags(data_actions)
+
+    task_manager.clear_worker_cache()
+    updated_tags = dataset_split_manager.get_tags(row_indices)
+
+    return [
+        UtterancePatch(
+            persistent_id=persistent_id,
+            data_action=next(
+                (tag for tag, value in tags.items() if tag in ALL_DATA_ACTIONS and value),
+                DataAction.no_action,
+            ),
+        )
+        for persistent_id, tags in zip(persistent_ids, updated_tags.values())
+    ]
 
 
 @router.get(
