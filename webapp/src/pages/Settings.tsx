@@ -10,12 +10,14 @@ import {
   FormGroup,
   formGroupClasses,
   FormHelperText,
+  IconButton,
   InputAdornment,
   InputBaseComponentProps,
   inputClasses,
   InputLabel,
   inputLabelClasses,
   MenuItem,
+  Modal,
   Paper,
   Select,
   TextField,
@@ -25,6 +27,7 @@ import {
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
+import XIcon from "components/Icons/X";
 import Loading from "components/Loading";
 import _ from "lodash";
 import React from "react";
@@ -42,6 +45,8 @@ import {
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
+const CONFIG_UPDATE_MESSAGE =
+  "Please wait while the config changes are validated.";
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
 const INT = { inputProps: { min: 1 } };
 const FLOAT = { inputProps: { min: 0, step: 0.1 } };
@@ -212,6 +217,7 @@ const Settings: React.FC<props> = ({ setOpen }) => {
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
 
+  const [modal, showModal] = React.useState<boolean>(false);
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
@@ -658,10 +664,27 @@ const Settings: React.FC<props> = ({ setOpen }) => {
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
       >
-        <Typography variant="subtitle1" marginBottom={3}>
-          View and edit certain fields from your config file. Once your changes
-          are saved, expect some delays for recomputing the affected tasks.
-        </Typography>
+        <Box display="flex" justifyContent="space-between" marginBottom={3}>
+          <Typography variant="subtitle1">
+            View and edit certain fields from your config file. Once your
+            changes are saved, expect some delays for recomputing the affected
+            tasks.
+          </Typography>
+          <Tooltip title="close" placement="bottom">
+            <IconButton
+              size="small"
+              color="primary"
+              sx={{ padding: 0 }}
+              onClick={() =>
+                Object.keys(partialConfig).length > 0 || isUpdatingConfig
+                  ? showModal(true)
+                  : setOpen(false)
+              }
+            >
+              <XIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
         <AccordionLayout
           name="Project Configuration"
           description="View the fields that define the dataset to load in Azimuth."
@@ -683,6 +706,63 @@ const Settings: React.FC<props> = ({ setOpen }) => {
         >
           {getAnalysesCustomizationSection()}
         </AccordionLayout>
+        <Modal open={modal} onClose={() => showModal(false)}>
+          <Box
+            sx={{
+              position: "absolute",
+              width: "40%",
+              height: "20%",
+              padding: "10px",
+              backgroundColor: (theme) => theme.palette.background.paper,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            {isUpdatingConfig ? (
+              <Box display="flex" flexDirection="column" padding={2} gap={1}>
+                <Typography>{CONFIG_UPDATE_MESSAGE}</Typography>
+                <Button
+                  onClick={() => {
+                    showModal(false);
+                  }}
+                >
+                  Ok
+                </Button>
+              </Box>
+            ) : (
+              Object.keys(partialConfig).length > 0 && (
+                <Box display="flex" flexDirection="column" padding={2} gap={1}>
+                  <Typography>
+                    Are you sure want to discard all your changes?
+                  </Typography>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="flex-start"
+                    gap={2}
+                  >
+                    <Button
+                      onClick={() => {
+                        showModal(false);
+                        setOpen(false);
+                      }}
+                    >
+                      Yes
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        showModal(false);
+                      }}
+                    >
+                      No
+                    </Button>
+                  </Box>
+                </Box>
+              )
+            )}
+          </Box>
+        </Modal>
       </Paper>
       <Box display="flex" justifyContent="space-between" paddingY={2}>
         <Button
@@ -700,9 +780,7 @@ const Settings: React.FC<props> = ({ setOpen }) => {
           {isUpdatingConfig ? (
             <>
               <CircularProgress size={16} />
-              <FormHelperText>
-                Please wait while the config changes are validated.
-              </FormHelperText>
+              <FormHelperText>{CONFIG_UPDATE_MESSAGE}</FormHelperText>
             </>
           ) : (
             FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
