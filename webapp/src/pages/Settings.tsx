@@ -60,8 +60,8 @@ const FIELDS: Record<
   max_delta_representation: PERCENTAGE,
   max_delta_mean_words: { ...FLOAT, units: "words" },
   max_delta_std_words: { ...FLOAT, units: "words" },
-  short_utterance_max_word: { ...INT, units: "words" },
-  long_utterance_min_word: { ...INT, units: "words" },
+  short_sentence_max_word: { ...INT, units: "words" },
+  long_sentence_min_word: { ...INT, units: "words" },
   temperature: FLOAT,
   threshold: PERCENTAGE,
 };
@@ -217,29 +217,27 @@ const Settings: React.FC = () => {
     Partial<AzimuthConfig>
   >({});
 
+  const resultingConfig = Object.assign({}, config, partialConfig);
+
   React.useEffect(() => {
-    if (config && defaultConfig && defaultConfig.language !== config.language) {
+    if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
       setPartialConfig({
         language: defaultConfig.language,
         syntax: {
-          ...(partialConfig.syntax ?? config.syntax),
+          ...resultingConfig.syntax,
           spacy_model: defaultConfig.syntax.spacy_model,
           subj_tags: defaultConfig.syntax.subj_tags,
           obj_tags: defaultConfig.syntax.obj_tags,
         },
-        similarity: partialConfig.similarity && {
-          ...(partialConfig.similarity ??
-            config.similarity ??
-            defaultConfig.similarity!),
+        similarity: resultingConfig.similarity && {
+          ...(resultingConfig.similarity ?? defaultConfig.similarity!),
           faiss_encoder: defaultConfig.similarity!.faiss_encoder,
         },
-        behavioral_testing: partialConfig.behavioral_testing && {
-          ...(partialConfig.behavioral_testing ??
-            config.behavioral_testing ??
+        behavioral_testing: resultingConfig.behavioral_testing && {
+          ...(resultingConfig.behavioral_testing ??
             defaultConfig.behavioral_testing!),
           neutral_token: {
-            ...(partialConfig.behavioral_testing?.neutral_token ??
-              config.behavioral_testing?.neutral_token ??
+            ...(resultingConfig.behavioral_testing?.neutral_token ??
               defaultConfig.behavioral_testing!.neutral_token),
             suffix_list:
               defaultConfig.behavioral_testing!.neutral_token.suffix_list,
@@ -249,7 +247,7 @@ const Settings: React.FC = () => {
         },
       });
     }
-  }, [config, defaultConfig, partialConfig]);
+  }, [defaultConfig, resultingConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
@@ -264,7 +262,6 @@ const Settings: React.FC = () => {
       </Box>
     );
   }
-  const resultingConfig = Object.assign({}, config, partialConfig);
 
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
