@@ -12,6 +12,7 @@ import { SimilarUtterance, Utterance } from "types/api";
 import { QueryPipelineState } from "types/models";
 import { ID_TOOLTIP } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
+import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
 
 const useStyles = makeStyles(() => ({
@@ -23,6 +24,9 @@ const useStyles = makeStyles(() => ({
   hoverableDataCell: {
     position: "relative",
   },
+  idCell: {
+    direction: "rtl", // To get ellipsis on the left, e.g. ...001, ...002, etc.
+  },
 }));
 
 type Row = SimilarUtterance & { id: number };
@@ -30,6 +34,7 @@ type Row = SimilarUtterance & { id: number };
 type Props = {
   baseUrl: string;
   baseUtterance: Utterance;
+  persistentIdColumn: string;
   pipeline: QueryPipelineState;
   utterances: SimilarUtterance[];
 };
@@ -37,6 +42,7 @@ type Props = {
 const SimilarUtterances: React.FC<Props> = ({
   baseUrl,
   baseUtterance,
+  persistentIdColumn,
   pipeline,
   utterances,
 }) => {
@@ -56,6 +62,18 @@ const SimilarUtterances: React.FC<Props> = ({
       sortable: false,
       align: "center",
       headerAlign: "center",
+      cellClassName: `${classes.hoverableDataCell} ${classes.idCell}`,
+      renderCell: ({ value, row }: GridCellParams<number, Row>) => (
+        <HoverableDataCell
+          autoWidth
+          title={getUtteranceIdTooltip({
+            utterance: row,
+            persistentIdColumn: persistentIdColumn,
+          })}
+        >
+          {value}
+        </HoverableDataCell>
+      ),
     },
     {
       field: "utterance",

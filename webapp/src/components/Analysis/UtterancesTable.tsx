@@ -21,7 +21,7 @@ import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import UtteranceSaliency from "components/Utterance/UtteranceSaliency";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { getUtterancesEndpoint } from "services/api";
+import { getConfigEndpoint, getUtterancesEndpoint } from "services/api";
 import {
   DataAction,
   DatasetInfoResponse,
@@ -44,6 +44,7 @@ import {
   SMART_TAG_FAMILIES,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
+import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
 
 const SMART_TAG_WIDTH = 30;
@@ -141,9 +142,23 @@ const UtterancesTable: React.FC<Props> = ({
   const { data: utterancesResponse, isFetching } =
     getUtterancesEndpoint.useQuery(getUtterancesQueryState);
 
+  const rows: Row[] = React.useMemo(
+    () =>
+      utterancesResponse?.utterances.map((utterance) => ({
+        id: utterance.persistentId,
+        ...utterance,
+      })) ?? [],
+    [utterancesResponse]
+  );
+
   const [selectedPersistentIds, setSelectedPersistentIds] = React.useState<
     number[]
   >([]);
+
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+
+  // If config was undefined, PipelineCheck would not even render the page.
+  if (config === undefined) return null;
 
   const handlePageChange = (page: number) => {
     const q = constructSearchString({
@@ -189,6 +204,18 @@ const UtterancesTable: React.FC<Props> = ({
       <div className="MuiDataGrid-columnHeaderTitle">{headerName}</div>
       {filtered && <FilterAltOutlinedIcon fontSize="medium" color="success" />}
     </>
+  );
+
+  const renderId = ({ value, row }: GridCellParams<number, Row>) => (
+    <HoverableDataCell
+      autoWidth
+      title={getUtteranceIdTooltip({
+        utterance: row,
+        persistentIdColumn: config.columns.persistent_id,
+      })}
+    >
+      {value}
+    </HoverableDataCell>
   );
 
   const renderUtterance = ({ row }: GridCellParams<string, Row>) => (
@@ -260,7 +287,7 @@ const UtterancesTable: React.FC<Props> = ({
       align: "center",
       headerAlign: "center",
       cellClassName: `${classes.hoverableDataCell} ${classes.idCell}`,
-      renderCell: renderHoverableDataCell,
+      renderCell: renderId,
     },
     {
       field: "utterance",
@@ -357,15 +384,6 @@ const UtterancesTable: React.FC<Props> = ({
       width: 155,
     },
   ];
-
-  const rows: Row[] = React.useMemo(
-    () =>
-      utterancesResponse?.utterances.map((utterance) => ({
-        id: utterance.persistentId,
-        ...utterance,
-      })) ?? [],
-    [utterancesResponse]
-  );
 
   const searchString = constructSearchString(pipeline);
   const RowLink = (props: RowProps<Row>) => (

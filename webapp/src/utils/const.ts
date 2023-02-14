@@ -8,6 +8,8 @@ import {
   Uncertain,
 } from "components/Icons/SmartTagFamily";
 
+export const AZIMUTH_ID_COLUMN = "row_idx";
+
 export const DATASET_SPLIT_NAMES = ["eval", "train"] as const;
 
 export const DATASET_SPLIT_PRETTY_NAMES = {
@@ -18,7 +20,7 @@ export const DATASET_SPLIT_PRETTY_NAMES = {
 export const UNKNOWN_ERROR = "An unknown error occurred";
 
 export const ID_TOOLTIP =
-  "This id created by Azimuth corresponds to the row_idx column in the dataset split export";
+  "This id created by Azimuth corresponds to the row_idx column in the dataset split export. If a persistent_id column is configured, it will show up on hover.";
 
 export const ECE_TOOLTIP = `
 The ECE measures the calibration of the model, meaning if the confidence of the model matches its accuracy.

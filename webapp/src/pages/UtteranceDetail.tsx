@@ -23,6 +23,7 @@ import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useParams } from "react-router-dom";
 import {
+  getConfigEndpoint,
   getDatasetInfoEndpoint,
   getSimilarUtterancesEndpoint,
   getUtterancesEndpoint,
@@ -36,6 +37,7 @@ import {
   SMART_TAG_FAMILIES,
 } from "utils/const";
 import { camelToTitleCase, formatRatioAsPercentageString } from "utils/format";
+import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
 import { isPipelineSelected } from "utils/helpers";
 
 const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
@@ -105,6 +107,11 @@ export const UtteranceDetail = () => {
   // Index from the right, so we can initialize to the last step
   // without the need for postprocessingSteps.length before it is loaded.
   const [postprocessingStepRaw, setPostprocessingStep] = React.useState(0);
+
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+
+  // If config was undefined, PipelineCheck would not even render the page.
+  if (config === undefined) return null;
 
   if (!utterance) {
     // utterance will be defined while utteranceIsFetching after changing the
@@ -189,7 +196,14 @@ export const UtteranceDetail = () => {
             Id
           </Typography>
         </Tooltip>
-        <Typography variant="body2">{utteranceId}</Typography>
+        <Tooltip
+          title={getUtteranceIdTooltip({
+            utterance: utterance,
+            persistentIdColumn: config.columns.persistent_id,
+          })}
+        >
+          <Typography variant="body2">{utteranceId}</Typography>
+        </Tooltip>
 
         <Box className="header">
           <Typography variant="subtitle2">Utterance</Typography>
@@ -344,6 +358,7 @@ export const UtteranceDetail = () => {
             <SimilarUtterances
               baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
               baseUtterance={utterance}
+              persistentIdColumn={config.columns.persistent_id}
               pipeline={pipeline}
               utterances={similarUtterances?.utterances || []}
             />
