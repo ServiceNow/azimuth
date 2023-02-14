@@ -620,7 +620,7 @@ const Settings: React.FC<props> = ({ setOpen }) => {
             ))}
           </Select>
         </FormControl>
-        <Box display="flex" flexDirection="row" gap={1}>
+        <Box display="flex" gap={1}>
           <Warning color="warning" />
           <Typography variant="body2">
             Changing the language would impact the syntax, similarity and
@@ -648,6 +648,26 @@ const Settings: React.FC<props> = ({ setOpen }) => {
 
   return (
     <Box height="100%" display="flex" flexDirection="column">
+      <Box display="flex" justifyContent="space-between" margin={1}>
+        <Typography variant="subtitle1">
+          View and edit certain fields from your config file. Once your changes
+          are saved, expect some delays for recomputing the affected tasks.
+        </Typography>
+        <Tooltip title="close" placement="bottom">
+          <IconButton
+            size="small"
+            color="primary"
+            sx={{ padding: 0 }}
+            onClick={() =>
+              Object.keys(partialConfig).length > 0 || isUpdatingConfig
+                ? showModal(true)
+                : setOpen(false)
+            }
+          >
+            <XIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
       <Paper
         variant="outlined"
         sx={{
@@ -664,27 +684,6 @@ const Settings: React.FC<props> = ({ setOpen }) => {
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
       >
-        <Box display="flex" justifyContent="space-between" marginBottom={3}>
-          <Typography variant="subtitle1">
-            View and edit certain fields from your config file. Once your
-            changes are saved, expect some delays for recomputing the affected
-            tasks.
-          </Typography>
-          <Tooltip title="close" placement="bottom">
-            <IconButton
-              size="small"
-              color="primary"
-              sx={{ padding: 0 }}
-              onClick={() =>
-                Object.keys(partialConfig).length > 0 || isUpdatingConfig
-                  ? showModal(true)
-                  : setOpen(false)
-              }
-            >
-              <XIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
         <AccordionLayout
           name="Project Configuration"
           description="View the fields that define the dataset to load in Azimuth."
@@ -710,8 +709,8 @@ const Settings: React.FC<props> = ({ setOpen }) => {
           <Box
             sx={{
               position: "absolute",
-              width: "40%",
-              height: "20%",
+              width: "25",
+              height: "10%",
               padding: "10px",
               backgroundColor: (theme) => theme.palette.background.paper,
               top: "50%",
@@ -720,9 +719,17 @@ const Settings: React.FC<props> = ({ setOpen }) => {
             }}
           >
             {isUpdatingConfig ? (
-              <Box display="flex" flexDirection="column" padding={2} gap={1}>
-                <Typography>{CONFIG_UPDATE_MESSAGE}</Typography>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                gap={1}
+              >
+                <Typography variant="body1">{CONFIG_UPDATE_MESSAGE}</Typography>
                 <Button
+                  size="small"
+                  sx={{ width: 10 }}
+                  variant="contained"
                   onClick={() => {
                     showModal(false);
                   }}
@@ -732,17 +739,19 @@ const Settings: React.FC<props> = ({ setOpen }) => {
               </Box>
             ) : (
               Object.keys(partialConfig).length > 0 && (
-                <Box display="flex" flexDirection="column" padding={2} gap={1}>
-                  <Typography>
-                    Are you sure want to discard all your changes?
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  gap={1}
+                >
+                  <Typography variant="body1">
+                    Are you sure you want to discard all your changes?
                   </Typography>
-                  <Box
-                    display="flex"
-                    flexDirection="row"
-                    justifyContent="flex-start"
-                    gap={2}
-                  >
+                  <Box display="flex" alignItems="center" gap={2}>
                     <Button
+                      size="small"
+                      variant="contained"
                       onClick={() => {
                         showModal(false);
                         setOpen(false);
@@ -751,6 +760,8 @@ const Settings: React.FC<props> = ({ setOpen }) => {
                       Yes
                     </Button>
                     <Button
+                      size="small"
+                      variant="contained"
                       onClick={() => {
                         showModal(false);
                       }}
