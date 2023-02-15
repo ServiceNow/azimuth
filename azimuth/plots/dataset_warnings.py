@@ -8,6 +8,7 @@ import numpy as np
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
+from azimuth.config import SyntaxOptions
 from azimuth.types import DatasetSplitName, PlotSpecification
 from azimuth.types.dataset_warnings import Agg, DatasetWarningPlots
 from azimuth.utils.plots import (
@@ -368,6 +369,7 @@ def class_representation(
 def create_histogram_mean_std(
     hist_per_split: Dict[DatasetSplitName, np.ndarray],
     value_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, float]],
+    syntax_options: SyntaxOptions,
     divergence_per_agg: Optional[Dict[Agg, float]] = None,
 ) -> PlotSpecification:
     """Create the histogram traces and annotations for each class (and "all").
@@ -377,6 +379,7 @@ def create_histogram_mean_std(
         value_per_agg_per_split: Mean and std dev for the selected class per split.
         divergence_per_agg: Difference in the mean and std dev. None means that we are generating
             the plot for 'all' classes.
+        syntax_options: SyntaxOptions from config.
 
     Returns:
         Plot for one class.
@@ -391,40 +394,6 @@ def create_histogram_mean_std(
     # Helps position the error bars.
     max_y = max((value.max() for value in hist_normalized.values()), default=0)
 
-    y_per_split = {DatasetSplitName.eval: 1.14, DatasetSplitName.train: 1.07}
-    opacity_per_split = {DatasetSplitName.eval: 1, DatasetSplitName.train: 0.5}
-    # sorted because the color overlay looks better when eval is first
-    for split, hist in sorted(hist_normalized.items()):
-        fig.add_bar(
-            x=list(range(1, len(hist) + 1)),
-            y=hist,
-            name=DATASET_SPLIT_PRETTY_NAMES[split],
-            marker=dict(color=DATASET_SPLIT_COLORS[split], opacity=opacity_per_split[split]),
-        )
-
-        fig.add_scatter(
-            x=[np.round(value_per_agg_per_split[split][Agg.mean], 2)],
-            y=[max_y * y_per_split[split]],
-            name=f"{split}_mean_std",
-            error_x=dict(
-                type="constant", value=np.round(value_per_agg_per_split[split][Agg.std], 2)
-            ),
-            hoverinfo="x",
-            marker=dict(color=DATASET_SPLIT_COLORS[split]),
-        )
-
-    if divergence_per_agg and len(hist_normalized) == 2:
-        fig.add_annotation(
-            x=0,
-            y=max_y * 1.2,
-            text=f"Delta of {divergence_per_agg[Agg.mean]:.2f}±"
-            f"{divergence_per_agg[Agg.std]:.2f} tokens",
-            font=dict(color=Colors.Text),
-            xref="paper",
-            xanchor="left",
-            showarrow=False,
-        )
-
     if len(hist_normalized) == 0:
         fig.add_annotation(
             x=0.5,
@@ -437,6 +406,78 @@ def create_histogram_mean_std(
             yanchor="middle",
             showarrow=False,
         )
+    else:
+        y_per_split = {DatasetSplitName.eval: 1.14, DatasetSplitName.train: 1.07}
+        opacity_per_split = {DatasetSplitName.eval: 1, DatasetSplitName.train: 0.5}
+        # sorted because the color overlay looks better when eval is first
+        for split, hist in sorted(hist_normalized.items()):
+            fig.add_bar(
+                x=list(range(1, len(hist) + 1)),
+                y=hist,
+                name=DATASET_SPLIT_PRETTY_NAMES[split],
+                marker=dict(color=DATASET_SPLIT_COLORS[split], opacity=opacity_per_split[split]),
+            )
+
+            fig.add_scatter(
+                x=[np.round(value_per_agg_per_split[split][Agg.mean], 2)],
+                y=[max_y * y_per_split[split]],
+                name=f"{split}_mean_std",
+                error_x=dict(
+                    type="constant", value=np.round(value_per_agg_per_split[split][Agg.std], 2)
+                ),
+                hoverinfo="x",
+                marker=dict(color=DATASET_SPLIT_COLORS[split]),
+            )
+
+        if divergence_per_agg and len(hist_normalized) == 2:
+            fig.add_annotation(
+                x=0,
+                y=max_y * 1.2,
+                text=f"Delta of {divergence_per_agg[Agg.mean]:.2f}±"
+                f"{divergence_per_agg[Agg.std]:.2f} tokens",
+                font=dict(color=Colors.Text),
+                xref="paper",
+                xanchor="left",
+                showarrow=False,
+            )
+
+        # Add thresholds for short and long utterances.
+        max_x = max((len(hist) for hist in hist_normalized.values()), default=0)
+        for x0, x1, pretty_name, xanchor in zip(
+            [0, float(syntax_options.long_utterance_min_word - 0.5)],
+            [float(syntax_options.short_utterance_max_word) + 0.5, max_x + 1],
+            ["Short utterances", "Long utterances"],
+            ["right", "left"],
+        ):
+            threshold = x1 if xanchor == "right" else x0
+            common_args = dict(layer="below", y0=0, y1=max_y)
+            fig.add_shape(
+                type="rect",
+                x0=x0,
+                x1=x1,
+                line_color="rgba(0,0,0,0)",
+                fillcolor=Colors.Gray_transparent,
+                **common_args,
+            )
+            fig.add_shape(
+                type="line",
+                x0=threshold,
+                x1=threshold,
+                line_color=Colors.Axis,
+                line_width=1,
+                **common_args,
+            )
+            fig.add_annotation(
+                text=pretty_name,
+                x=threshold,
+                xshift=-4 if xanchor == "right" else 4,
+                y=max_y,
+                yanchor="top",
+                yshift=-4,
+                xanchor=xanchor,
+                font=dict(color=Colors.Text),
+                showarrow=False,
+            )
 
     fig.update_layout(
         barmode="overlay",
@@ -465,6 +506,7 @@ def word_count_plot(
     value_per_cls_per_agg_per_split: Dict[DatasetSplitName, Dict[Agg, np.ndarray]],
     divergence_per_cls_per_agg: Dict[Agg, np.ndarray],
     cls_names: List[str],
+    syntax_options: SyntaxOptions,
 ) -> DatasetWarningPlots:
     """Create the plot with the dropdown for all classes.
 
@@ -474,6 +516,7 @@ def word_count_plot(
         value_per_cls_per_agg_per_split: Mean and std dev per class per split.
         divergence_per_cls_per_agg: Alert value for the mean and std dev per class.
         cls_names: List of class names.
+        syntax_options: SyntaxOptions from config.
 
     Returns:
         Plot for all classes combined, and plot per class.
@@ -488,10 +531,7 @@ def word_count_plot(
     hist_per_split = {split: h.sum(axis=0) for split, h in hist_per_cls_per_split.items()}
 
     # Traces and Annotations across all classes
-    fig_all = create_histogram_mean_std(
-        hist_per_split,
-        value_per_agg_per_split,
-    )
+    fig_all = create_histogram_mean_std(hist_per_split, value_per_agg_per_split, syntax_options)
 
     # Traces and Annotations for each class
     figs_dict = {}
@@ -502,6 +542,7 @@ def word_count_plot(
                 split: {agg: value[cls_id] for agg, value in per_split_value.items()}
                 for split, per_split_value in sanitized_value_per_cls_per_agg_per_split.items()
             },
+            syntax_options,
             {agg: value[cls_id] for agg, value in divergence_per_cls_per_agg.items()},
         )
 

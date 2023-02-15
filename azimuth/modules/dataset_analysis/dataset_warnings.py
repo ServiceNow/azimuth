@@ -314,6 +314,7 @@ class DatasetWarningsModule(ComparisonModule[DatasetWarningConfig]):
                     value_per_cls_per_agg_per_split,
                     divergence_per_cls_per_agg,
                     cls_names,
+                    self.config.syntax,
                 ),
             )
         ]
