@@ -117,11 +117,11 @@ follows:
         persistent_id: str = "row_idx" # (5)
     ```
 
-    1. Optional column for the text input that will be send to the pipeline.
+    1. Column for the text input that will be send to the pipeline.
     2. Optional column for the raw text input (before any pre-processing). Unused at the moment.
-    3. Optional column for the label
+    3. Features column for the label
     4. Optional column to specify whether an example has failed preprocessing. Unused at the moment.
-    5. Optional column with a unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed.
+    5. Column with a unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed.
 
 === "Config Example"
 
