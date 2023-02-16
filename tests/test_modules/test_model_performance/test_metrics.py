@@ -139,15 +139,15 @@ def test_outcome_count_per_threshold(tiny_text_config):
     )
     num_rows = mod.get_dataset_split().num_rows
     [result] = mod.compute_on_dataset_split()
-    assert len(result.outcome_count_all_thresholds) == x_ticks_count
+    assert len(result.outcome_count_per_threshold) == x_ticks_count
     assert all(
         sum(rg_per_th.outcome_count.values()) == num_rows
-        for rg_per_th in result.outcome_count_all_thresholds
+        for rg_per_th in result.outcome_count_per_threshold
     )
 
     # Check that outcomes change by threshold
     outcomes_for_all_threshold = defaultdict(list)
-    for rg_per_th in result.outcome_count_all_thresholds:
+    for rg_per_th in result.outcome_count_per_threshold:
         outcomes_for_all_threshold[OutcomeName.IncorrectAndRejected].append(
             rg_per_th.outcome_count.get(OutcomeName.IncorrectAndRejected, 0)
         )

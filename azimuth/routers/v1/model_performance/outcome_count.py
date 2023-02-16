@@ -19,7 +19,6 @@ from azimuth.types import (
 from azimuth.types.model_performance import (
     OutcomeCountPerFilterResponse,
     OutcomeCountPerThresholdResponse,
-    OutcomeCountPerThresholdValue,
 )
 from azimuth.utils.routers import (
     build_named_dataset_filters,
@@ -37,14 +36,14 @@ TAGS = ["Outcome Count v1"]
     summary="Get outcome count for multiple thresholds.",
     description="Get prediction count per outcome for multiple thresholds.",
     tags=TAGS,
-    response_model=List[OutcomeCountPerThresholdValue],
+    response_model=OutcomeCountPerThresholdResponse,
 )
 def get_outcome_count_per_threshold(
     dataset_split_name: DatasetSplitName,
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
-) -> List[OutcomeCountPerThresholdValue]:
+) -> OutcomeCountPerThresholdResponse:
     mod_options = ModuleOptions(
         pipeline_index=pipeline_index,
     )
@@ -60,7 +59,7 @@ def get_outcome_count_per_threshold(
     if len(task_result) == 0:
         raise HTTPException(HTTP_400_BAD_REQUEST, detail="Postprocessing is not editable")
 
-    return task_result[0].outcome_count_all_thresholds
+    return task_result[0]
 
 
 @router.get(

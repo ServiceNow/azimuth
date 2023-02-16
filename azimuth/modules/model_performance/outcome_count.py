@@ -213,4 +213,10 @@ class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
                     outcome_count=Counter(postprocessed_outcomes),
                 )
             )
-        return [OutcomeCountPerThresholdResponse(outcome_count_all_thresholds=result)]
+        return [
+            OutcomeCountPerThresholdResponse(
+                outcome_count_per_threshold=result,
+                confidence_threshold=self.get_threshold(),
+                utterance_count=len(self.get_dataset_split()),
+            )
+        ]
