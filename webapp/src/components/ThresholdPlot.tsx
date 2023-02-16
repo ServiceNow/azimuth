@@ -171,6 +171,7 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
         gridTemplateColumns={`[title] auto [label tick] auto [start] repeat(${xIntervals}, [tick] 1fr) [end] auto`}
         gridTemplateRows={`[start] repeat(${yIntervals}, [tick] 1fr) [tick end label] auto [title] auto`}
         height="100%"
+        marginTop={2}
         maxHeight={600}
         maxWidth={1000}
         width="100%"
@@ -195,12 +196,36 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
                 outcome={outcome}
               />
             ))}
-            {data.outcomeCountPerThreshold.map(({ threshold }, i) => (
-              <GridLine key={i} x={threshold} />
-            ))}
+            {data.outcomeCountPerThreshold.flatMap(({ threshold }, i) =>
+              threshold !== data.confidenceThreshold
+                ? [<GridLine key={i} x={threshold} />]
+                : []
+            )}
+            {/* Separate since the confidence threshold may fall not on a grid line */}
+            {data?.confidenceThreshold && (
+              <GridLine x={data.confidenceThreshold} dashed />
+            )}
             {yTicks.map((y, i) => (
               <GridLine key={i} y={1 - y} dashed={y in majorGridLines} />
             ))}
+          </Box>
+        )}
+        {data?.confidenceThreshold && (
+          <Box
+            gridColumn="start / end"
+            gridRow="start / end"
+            position="relative"
+          >
+            <Typography
+              position="absolute"
+              left={`${data.confidenceThreshold * 100}%`}
+              bottom="100%"
+              whiteSpace="nowrap"
+            >
+              {`Current prediction threshold: ${
+                data.confidenceThreshold * 100
+              }%`}
+            </Typography>
           </Box>
         )}
         <Typography className={classNames(classes.title, classes.xTitle)}>
