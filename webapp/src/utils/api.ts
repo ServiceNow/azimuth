@@ -156,3 +156,10 @@ export const downloadDatasetSplit = downloadFileFromApi(
     method: "get",
   })
 );
+
+export const downloadUtteranceProposedActions = downloadFileFromApi(
+  fetchApi({
+    path: "/export/dataset_splits/{dataset_split_name}/proposed_actions",
+    method: "get",
+  })
+);
