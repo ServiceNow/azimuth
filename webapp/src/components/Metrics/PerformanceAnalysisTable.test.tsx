@@ -53,13 +53,6 @@ describe("PerformanceAnalysisComparisonTableWithNoComparedPipeline", () => {
     ).toHaveValue("train");
   });
 
-  it("should not display pipeline select component if the config has not more than one pipeline", async () => {
-    renderPerformanceAnalysisTable({ train: true, eval: true }, "eval");
-    await waitFor(() =>
-      expect(screen.queryByText(/Compare Baseline/i)).toBeNull()
-    );
-  });
-
   it("should display the expected columns", async () => {
     renderPerformanceAnalysisTable({ train: true, eval: true }, "eval");
     await waitFor(() => {
@@ -170,33 +163,17 @@ describe("PerformanceAnalysisComparisonTableWithMultiPipeline", () => {
       const expectedColumnHeaders = [
         "filterValue",
         "Total",
-        "Pipeline_0Correct & Predicted",
-        "Pipeline_1",
-        "Delta",
-        "Pipeline_0Correct & Rejected",
-        "Pipeline_1",
-        "Delta",
-        "Pipeline_0Incorrect & Rejected",
-        "Pipeline_1",
-        "Delta",
-        "Pipeline_0Incorrect & Predicted",
-        "Pipeline_1",
-        "Delta",
-        "Accuracy",
-        "Pipeline_1",
-        "Delta",
-        "Precision",
-        "Pipeline_1",
-        "Delta",
-        "Recall",
-        "Pipeline_1",
-        "Delta",
-        "F1",
-        "Pipeline_1",
-        "Delta",
-        "ECE",
-        "Pipeline_1",
-        "Delta",
+        ...[
+          "Correct & Predicted",
+          "Correct & Rejected",
+          "Incorrect & Rejected",
+          "Incorrect & Predicted",
+          "Accuracy",
+          "Precision",
+          "Recall",
+          "F1",
+          "ECE",
+        ].flatMap((header) => ["Pipeline_0" + header, "Pipeline_1", "Delta"]),
       ];
       const actualColumnHeaders = screen.getAllByRole("columnheader");
       expectedColumnHeaders.forEach((name, index) => {

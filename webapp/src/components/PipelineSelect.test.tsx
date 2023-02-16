@@ -11,10 +11,10 @@ describe("PipelineSelect", () => {
     { name: "Pipeline_2" },
   ];
   const allPipelines = [
-    { name: "No pipeline" },
-    { name: "Pipeline_0" },
-    { name: "Pipeline_1" },
-    { name: "Pipeline_2" },
+    "No pipeline",
+    "Pipeline_0",
+    "Pipeline_1",
+    "Pipeline_2",
   ];
   it("should list all the pipelines", () => {
     renderWithTheme(
@@ -30,7 +30,7 @@ describe("PipelineSelect", () => {
 
     expect(pipelineListOptions).toHaveLength(allPipelines.length);
     pipelineListOptions.forEach((item, index) => {
-      expect(item).toHaveTextContent(allPipelines[index].name);
+      expect(item).toHaveTextContent(allPipelines[index]);
     });
 
     fireEvent.click(screen.getByRole("option", { name: "Pipeline_0" }));
