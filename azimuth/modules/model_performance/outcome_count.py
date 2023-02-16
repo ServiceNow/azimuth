@@ -186,8 +186,8 @@ class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
 
     def compute_on_dataset_split(self) -> List[OutcomeCountPerThresholdResponse]:  # type: ignore
         if not postprocessing_editable(self.config, self.mod_options.pipeline_index):
-            # This will give an empty response to the UI, if a user gets to this page.
-            return [OutcomeCountPerThresholdResponse(outcome_count_all_thresholds=[])]
+            # This will raise an error if a user gets to this page.
+            return []
         x_ticks_count = self.mod_options.x_ticks_count
         ths = np.linspace(0, 1, x_ticks_count)
         result = []

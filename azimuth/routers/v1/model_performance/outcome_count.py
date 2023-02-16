@@ -4,7 +4,8 @@
 
 from typing import List
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from starlette.status import HTTP_400_BAD_REQUEST
 
 from azimuth.app import get_dataset_split_manager, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -57,8 +58,7 @@ def get_outcome_count_per_threshold(
     )
 
     if len(task_result) == 0:
-        # Non-Editable postprocessing
-        return []
+        raise HTTPException(HTTP_400_BAD_REQUEST, detail="Postprocessing is not editable")
 
     return task_result[0].outcome_count_all_thresholds
 
