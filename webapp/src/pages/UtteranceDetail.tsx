@@ -30,6 +30,7 @@ import {
 import { DatasetSplitName } from "types/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
+  FADE_OUT_SCROLL_Y,
   ID_TOOLTIP,
   OUTCOME_COLOR,
   SMART_TAG_FAMILIES,
@@ -41,13 +42,13 @@ const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
   similarity: (
     <Description
       text="Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class."
-      link="/exploration-space/utterance-details/#semantically-similar-utterances"
+      link="user-guide/exploration-space/utterance-details/#semantically-similar-utterances"
     />
   ),
   perturbedUtterances: (
     <Description
       text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations."
-      link="/exploration-space/utterance-details/#behavioral-tests"
+      link="user-guide/exploration-space/utterance-details/#behavioral-tests"
     />
   ),
 };
@@ -160,7 +161,7 @@ export const UtteranceDetail = () => {
     <Box display="flex" flexDirection="column" gap={2} height="100%">
       <Description
         text="Inspect the details of all of the analyses that have been performed on this utterance."
-        link="/exploration-space/utterance-details/"
+        link="user-guide/exploration-space/utterance-details/"
       />
       <Paper
         variant="outlined"
@@ -203,15 +204,16 @@ export const UtteranceDetail = () => {
             />
           )}
         </Box>
-        <Box display="flex" alignItems="center">
-          <UtteranceSaliency
-            variant="subtitle1"
-            tooltip
-            utterance={preprocessingSteps[preprocessingStep].text}
-            modelSaliency={
-              preprocessingStep === 0 ? utterance.modelSaliency : null
-            }
-          />
+        <Box display="flex">
+          <Box maxHeight="13vh" {...FADE_OUT_SCROLL_Y}>
+            <UtteranceSaliency
+              tooltip
+              utterance={preprocessingSteps[preprocessingStep].text}
+              modelSaliency={
+                preprocessingStep === 0 ? utterance.modelSaliency : null
+              }
+            />
+          </Box>
           <CopyButton text={preprocessingSteps[preprocessingStep].text} />
         </Box>
 
@@ -290,7 +292,7 @@ export const UtteranceDetail = () => {
         </Typography>
         <Box>
           <UtteranceDataAction
-            utteranceIds={[index]}
+            persistentIds={[utterance.persistentId]}
             dataAction={utterance.dataAction}
             allDataActions={datasetInfo?.dataActions || []}
             getUtterancesQueryState={getUtterancesQueryState}

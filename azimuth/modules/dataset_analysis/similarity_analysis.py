@@ -73,33 +73,21 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
     """Compute neighbors for each utterance in a dataset split."""
 
     def compute_on_dataset_split(self) -> List[TaggingResponse]:  # type: ignore
-        if DatasetSplitName.train in self.available_dataset_splits:
-            train_dm: Optional[DatasetSplitManager] = self.get_dataset_split_manager(
-                DatasetSplitName.train
-            )
-            # NOTE: Doing this ensure that the FAISS index exists somewhere.
-            # If FAISSModule fails this module will fail instead of blocking.
-            train_features: Optional[List[Array]] = self._get_features(DatasetSplitName.train)
-        else:
-            train_dm = None
-            train_features = None
+        # Get the features from FAISS for all available splits to make sure they are all computed
+        # and that we can compute neighbors for all splits.
+        features_dict = {
+            split: self._get_features_from_faiss(split) for split in self.available_dataset_splits
+        }
 
-        eval_dm = self.get_dataset_split_manager(DatasetSplitName.eval)
-        eval_features = self._get_features(DatasetSplitName.eval)
-        ds_features = assert_not_none(
-            eval_features if self.dataset_split_name == DatasetSplitName.eval else train_features
-        )
-
+        dm = self.get_dataset_split_manager()
         indices = self.get_indices()
-        neighbors = self.get_neighbors([ds_features[i] for i in indices])
+        features = features_dict[self.dataset_split_name]
+        neighbors = self.get_neighbors([features[i] for i in indices])
 
         similarity_config: SimilarityOptions = assert_not_none(self.config.similarity)
-        dm = assert_not_none(
-            eval_dm if self.dataset_split_name == DatasetSplitName.eval else train_dm
-        )
 
-        conflicting_neighbors_tags = {}
-        no_close_tags = {}
+        conflicting_neighbors_tags = defaultdict(list)
+        no_close_tags = defaultdict(list)
         for split_name, tagname_conflicting_neighbors, tagname_no_close in zip(
             [DatasetSplitName.train, DatasetSplitName.eval],
             [SmartTag.conflicting_neighbors_train, SmartTag.conflicting_neighbors_eval],
@@ -128,10 +116,10 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
             conflicting_neighbors_eval,
             no_close_train,
             no_close_eval,
-        ) in zip(
+        ) in itertools.zip_longest(
             neighbors[DatasetSplitName.train],
             neighbors[DatasetSplitName.eval],
-            conflicting_neighbors_tags.get(DatasetSplitName.train, []),
+            conflicting_neighbors_tags[DatasetSplitName.train],
             conflicting_neighbors_tags[DatasetSplitName.eval],
             no_close_tags[DatasetSplitName.train],
             no_close_tags[DatasetSplitName.eval],
@@ -142,23 +130,27 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
                         SmartTag.conflicting_neighbors_train: False
                         if conflicting_neighbors_train is None
                         else conflicting_neighbors_train[SmartTag.conflicting_neighbors_train],
-                        SmartTag.conflicting_neighbors_eval: conflicting_neighbors_eval[
-                            SmartTag.conflicting_neighbors_eval
-                        ],
-                        SmartTag.no_close_train: no_close_train[SmartTag.no_close_train],
-                        SmartTag.no_close_eval: no_close_eval[SmartTag.no_close_eval],
+                        SmartTag.conflicting_neighbors_eval: False
+                        if conflicting_neighbors_eval is None
+                        else conflicting_neighbors_eval[SmartTag.conflicting_neighbors_eval],
+                        SmartTag.no_close_train: False
+                        if no_close_train is None
+                        else no_close_train[SmartTag.no_close_train],
+                        SmartTag.no_close_eval: False
+                        if no_close_eval is None
+                        else no_close_eval[SmartTag.no_close_eval],
                     },
                     adds={
                         DatasetColumn.neighbors_train: train_neighbors or [],
-                        DatasetColumn.neighbors_eval: eval_neighbors,
+                        DatasetColumn.neighbors_eval: eval_neighbors or [],
                     },
                 )
             )
 
         return results
 
-    def _get_features(self, ds_split_name: DatasetSplitName) -> List[Array]:
-        """Get Sentence embedding features
+    def _get_features_from_faiss(self, ds_split_name: DatasetSplitName) -> List[Array]:
+        """Get Sentence embedding features from FAISS module.
 
         Args:
             ds_split_name: Name of the dataset_split to get
@@ -185,8 +177,8 @@ class NeighborsTaggingModule(DatasetResultModule[SimilarityConfig]):
         for col_name in res[0].adds.keys():
             dm.add_column(key=col_name, features=[r.adds[col_name] for r in res])
 
+    @staticmethod
     def get_conflicting_neighbors_tag(
-        self,
         labels: List[int],
         neighbors: List[List[Tuple[int, float]]],
         dm: DatasetSplitManager,

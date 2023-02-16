@@ -42,6 +42,8 @@ def get_perturbed_utterances(
     perturb_testing = PerturbationTestingModule(
         dataset_split_name=DatasetSplitName.eval,
         config=config,
+        # Mandatory mod_option, but the module doesn't compute any new prediction in this case.
+        mod_options=ModuleOptions(pipeline_index=0),
     )
     mocked_test_result = []
     for perturbation_test in perturb_testing.perturbation_tests:

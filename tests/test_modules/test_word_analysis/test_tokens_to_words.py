@@ -44,7 +44,7 @@ def test_get_words(monkeypatch, simple_text_config, apply_mocked_startup_task):
     mod = TokensToWordsModule(
         dataset_split_name=DatasetSplitName.eval,
         config=simple_text_config,
-        mod_options=ModuleOptions(indices=[0]),
+        mod_options=ModuleOptions(pipeline_index=0, indices=[0]),
     )
     monkeypatch.setattr(mod, "get_tokens_saliencies", fake_saliency_record)
     assert mod is not None

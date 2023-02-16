@@ -40,16 +40,16 @@ def test_top_words(app: FastAPI) -> None:
         ],
         "importanceCriteria": "frequent",
         "right": [
-            {"count": 2, "word": "even"},
             {"count": 2, "word": "humor"},
             {"count": 1, "word": "root"},
             {"count": 1, "word": "clara"},
             {"count": 1, "word": "paul"},
             {"count": 1, "word": "like"},
-            {"count": 1, "word": "though"},
-            {"count": 1, "word": "perhaps"},
             {"count": 1, "word": "emotion"},
             {"count": 1, "word": "closer"},
+            {"count": 1, "word": "pity"},
+            {"count": 1, "word": "horror"},
+            {"count": 1, "word": "fans"},
         ],
     }
 

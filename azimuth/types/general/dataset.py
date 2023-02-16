@@ -12,7 +12,6 @@ class DatasetSplitName(str, Enum):
 
 class DatasetColumn(str, Enum):
     row_idx = "row_idx"
-    idx = "idx"
     model_predictions = "model_predictions"
     postprocessed_prediction = "postprocessed_prediction"
     pipeline_steps = "pipeline_steps"
@@ -21,6 +20,6 @@ class DatasetColumn(str, Enum):
     confidence_bin_idx = "confidence_bin_idx"
     model_outcome = "model_outcome"
     postprocessed_outcome = "postprocessed_outcome"
-    token_count = "token_count"
+    word_count = "word_count"
     neighbors_train = f"neighbors_{DatasetSplitName.train}"
     neighbors_eval = f"neighbors_{DatasetSplitName.eval}"

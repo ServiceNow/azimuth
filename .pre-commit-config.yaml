@@ -63,6 +63,6 @@ repos:
         name: mypy
         language: system
         verbose: true
-        entry: bash -c 'poetry run mypy "azimuth" || true' --
+        entry: poetry run mypy azimuth
         files: azimuth
         pass_filenames: false

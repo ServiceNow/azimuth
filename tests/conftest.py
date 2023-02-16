@@ -109,11 +109,11 @@ def tiny_text_config(simple_text_config) -> AzimuthConfig:
     return tiny_text_config
 
 
-@pytest.fixture
-def tiny_text_config_no_train(tiny_text_config) -> AzimuthConfig:
-    tiny_text_config_no_train = tiny_text_config.copy(deep=True)
-    tiny_text_config_no_train.dataset.kwargs["train"] = False
-    return tiny_text_config_no_train
+@pytest.fixture(params=["train", "eval"])
+def tiny_text_config_one_ds(tiny_text_config, request) -> AzimuthConfig:
+    tiny_text_config_one_ds = tiny_text_config.copy(deep=True)
+    tiny_text_config_one_ds.dataset.kwargs[request.param] = False
+    return tiny_text_config_one_ds
 
 
 @pytest.fixture
@@ -121,6 +121,16 @@ def tiny_text_config_no_pipeline(tiny_text_config) -> AzimuthConfig:
     tiny_text_config_no_pipeline = tiny_text_config.copy(deep=True)
     tiny_text_config_no_pipeline.pipelines = None
     return tiny_text_config_no_pipeline
+
+
+@pytest.fixture
+def tiny_text_config_no_postprocessor(tiny_text_config) -> AzimuthConfig:
+    pipeline_no_postprocessor = deepcopy(PIPELINE_CFG)
+    pipeline_no_postprocessor["postprocessors"] = None
+    tiny_text_config_no_postprocessor = tiny_text_config.copy(
+        deep=True, update=dict(pipelines=[pipeline_no_postprocessor])
+    )
+    return tiny_text_config_no_postprocessor
 
 
 @pytest.fixture
@@ -194,11 +204,14 @@ def file_text_config_no_intent(file_text_config_top1):
 
 
 @pytest.fixture
-def clinc_text_config(simple_text_config):
-    clinc_text_config = simple_text_config.copy(deep=True)
-    clinc_text_config.dataset = DATASET_CLINC150_CFG
-    clinc_text_config.rejection_class = "NO_INTENT"
-    clinc_text_config.name = "clinc-test"
+def clinc_text_config(tmp_path):
+    clinc_text_config = AzimuthConfig(
+        name="clinc-test",
+        dataset=DATASET_CLINC150_CFG,
+        rejection_class="NO_INTENT",
+        pipelines=[PIPELINE_CFG],
+        artifact_path=str(tmp_path),
+    )
     clinc_text_config.pipelines[0].postprocessors[0].temperature = 1
     clinc_text_config.pipelines[0].postprocessors[0].kwargs["temperature"] = 1
     clinc_text_config.pipelines[0].postprocessors[-1].threshold = 0.5

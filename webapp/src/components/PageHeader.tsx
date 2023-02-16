@@ -96,12 +96,16 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/class_overlap`,
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/class_overlap`,
           name: "Class Overlap",
         },
         {
-          pathname: `/${jobId}/pipeline_metrics`,
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/pipeline_metrics`,
           name: "Pipeline Metrics by Data Subpopulation",
+        },
+        {
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/smart_tags`,
+          name: "Smart Tag Analysis",
         },
         {
           pathname: `/${jobId}/settings`,

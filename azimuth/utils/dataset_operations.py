@@ -62,9 +62,12 @@ def filter_dataset_split(
         and config.columns.text_input in dataset_split.column_names
         and dataset_split.num_rows != 0
     ):
-        by = clean_utterance(filters.utterance)
+        cleaned_utterance = clean_utterance(filters.utterance)
+        # Filter in utterances or if string matches a known row_idx or persistent_id
         dataset_split = dataset_split.filter(
-            lambda x: by in clean_utterance(x[config.columns.text_input])
+            lambda x: cleaned_utterance in clean_utterance(x[config.columns.text_input])
+            or filters.utterance == str(x[DatasetColumn.row_idx])
+            or filters.utterance == str(x[config.columns.persistent_id])
         )
     if len(filters.prediction) > 0 and dataset_split.num_rows != 0:
         prediction_column = (
@@ -110,7 +113,7 @@ def filter_dataset_split(
             dataset_split = dataset_split.filter(
                 lambda x: any(
                     (
-                        (not any(x[tag.value] for tag in SMART_TAGS_FAMILY_MAPPING[family]))
+                        (not any(x[tag] for tag in SMART_TAGS_FAMILY_MAPPING[family]))
                         if tag_f == SmartTag.no_smart_tag
                         else x[tag_f]
                     )
@@ -158,7 +161,7 @@ def get_confidences_from_ds(ds: Dataset, without_postprocessing: bool = False) -
 def get_outcomes_from_ds(ds: Dataset, without_postprocessing: bool = False) -> List[OutcomeName]:
     """Get outcomes, with or without postprocessing.
 
-        Args:
+    Args:
         ds: Dataset Split for which to get outcomes.
         without_postprocessing: Determine which column to use.
 

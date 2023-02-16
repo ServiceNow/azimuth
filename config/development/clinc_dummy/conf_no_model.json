@@ -1,6 +1,6 @@
 {
   "name": "CLINC Dummy no model",
-  "pipelines": null,
+  "pipelines": [],
   "dataset": {
     "class_name": "loading_resources.load_CLINC150_data",
     "remote": "/azimuth_shr",

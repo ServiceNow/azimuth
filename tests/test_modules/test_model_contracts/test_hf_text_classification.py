@@ -10,7 +10,7 @@ from datasets import Dataset
 
 from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
-from azimuth.types.general.module_options import GradientCalculation
+from azimuth.types.general.module_arguments import GradientCalculation
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.saliency import find_word_embeddings_layer
 
@@ -120,15 +120,16 @@ def test_rejection_class(simple_text_config):
         ),
     )
     out = cast(List[PredictionResponse], mod.compute_on_dataset_split())
-    # At least 1 out of the 10 predictions will have confidence < 0.99
-    assert set(k.postprocessed_output.preds[0] != k.model_output.preds[0] for k in out) == {True}
-    rejected_items = filter(
-        lambda k: k.postprocessed_output.preds[0] != k.model_output.preds[0], out
-    )
+
+    # At least 1 out of the 10 predictions will have confidence below the threshold.
+    rejected_items = [
+        item for item in out if item.postprocessed_output.preds[0] != item.model_output.preds[0]
+    ]
+    assert len(rejected_items) > 0
     assert all(
-        np.max(pred_response.model_output.probs[0]) <= simple_text_config.pipelines[0].threshold
-        for pred_response in rejected_items
-    )
+        np.max(pred_res.postprocessed_output.probs[0]) <= simple_text_config.pipelines[0].threshold
+        for pred_res in rejected_items
+    ), rejected_items
 
 
 def test_mc_dropout(simple_text_config):
@@ -235,7 +236,9 @@ def test_load_CLINC150_dataset(clinc_text_config):
     task = HFTextClassificationModule(
         DatasetSplitName.train,
         clinc_text_config,
-        mod_options=ModuleOptions(model_contract_method_name=SupportedMethod.Predictions),
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
+        ),
     )
 
     ds = task.get_dataset_split()
@@ -251,3 +254,32 @@ def test_load_CLINC150_dataset(clinc_text_config):
     assert "NO_INTENT" in labels_str and "oos" not in labels_str
     # only 3 classes in the subset: "transfer", "transactions" and "NO_INTENT"
     assert len(ds) == 5
+
+
+def test_long_utterances_truncated(simple_text_config):
+    mod = HFTextClassificationModule(
+        DatasetSplitName.eval,
+        simple_text_config,
+        mod_options=ModuleOptions(
+            pipeline_index=0, model_contract_method_name=SupportedMethod.Predictions
+        ),
+    )
+    batch = Dataset.from_dict(
+        {
+            simple_text_config.columns.text_input: ["Hello " * 1000],
+            simple_text_config.columns.label: [0],
+        }
+    )
+    _ = mod.compute(batch)
+
+    mod = HFTextClassificationModule(
+        DatasetSplitName.eval,
+        simple_text_config,
+        mod_options=ModuleOptions(
+            pipeline_index=0, model_contract_method_name=SupportedMethod.Saliency
+        ),
+    )
+    res = mod.compute(batch)[0]
+    assert (
+        len(res.saliency) == len(res.tokens) == mod.get_model().model.config.max_position_embeddings
+    )

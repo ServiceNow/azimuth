@@ -61,7 +61,9 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         os.makedirs(self.cache_dir, exist_ok=True)
         self._cache_file = pjoin(self.cache_dir, f"{self.name}.h5")
         self._cache_lock = pjoin(self.cache_dir, f"{self.name}.h5.lock")
+        self._cache_effective_arguments = pjoin(self.cache_dir, f"{self.name}.json")
         self._status = "not_started"
+        self._time = time.time()  # Only used for expirable modules
 
     @property
     def name(self):

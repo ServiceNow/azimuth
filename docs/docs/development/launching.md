@@ -115,5 +115,5 @@ To connect the front end to this back end, start the front end using:
 
 !!! tip "Use appropriate port numbers"
     Make sure that your back-end ports match for both commands, and that you specify ports
-    that are not already in use. When ports are not specified, the defaults are 8091 for the back 
+    that are not already in use. When ports are not specified, the defaults are 8091 for the back
     end and 3000 for the front end.

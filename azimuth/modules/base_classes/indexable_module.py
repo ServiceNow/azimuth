@@ -16,7 +16,6 @@ from azimuth.types import (
     DatasetColumn,
     DatasetSplitName,
     InputResponse,
-    ModuleOptions,
     ModuleResponse,
     SupportedMethod,
 )
@@ -35,7 +34,7 @@ from azimuth.utils.validation import assert_not_none
 
 
 class IndexableModule(Module[ConfigScope], ABC):
-    allowed_mod_options: Set[str] = {"indices"}
+    optional_mod_options: Set[str] = {"indices"}
 
     def get_dataset_split(self, name: Optional[DatasetSplitName] = None) -> Dataset:
         """Get the specified dataset_split, according to module indices.
@@ -75,25 +74,8 @@ class DatasetResultModule(IndexableModule[ConfigScope], ABC):
 
 
 class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
-    allowed_mod_options: Set[str] = DatasetResultModule.allowed_mod_options | {
-        "threshold",
-        "pipeline_index",
-        "model_contract_method_name",
-    }
-
-    def __init__(
-        self,
-        dataset_split_name: DatasetSplitName,
-        config: ModelContractConfig,
-        mod_options: Optional[ModuleOptions] = None,
-    ):
-
-        super().__init__(dataset_split_name, config, mod_options=mod_options)
-
-        if self.model_contract_method_name is None:
-            raise ValueError(
-                "A model_contract_method_name needs to be provided for ModelContractModule"
-            )
+    required_mod_options: Set[str] = {"pipeline_index", "model_contract_method_name"}
+    optional_mod_options: Set[str] = DatasetResultModule.optional_mod_options | {"threshold"}
 
     def compute(self, batch: Dataset) -> List[ModuleResponse]:
         my_func = self.route_request(assert_not_none(self.model_contract_method_name))

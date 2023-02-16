@@ -3,6 +3,7 @@ from glob import glob
 from os.path import join as pjoin
 
 import pytest
+from jsonlines import jsonlines
 from pydantic import ValidationError
 
 from azimuth.config import (
@@ -13,6 +14,7 @@ from azimuth.config import (
     ThresholdConfig,
     config_defaults_per_language,
 )
+from azimuth.utils.project import save_config, update_config
 
 CURR_PATH = os.path.dirname(os.path.dirname(__file__))
 
@@ -134,3 +136,28 @@ def test_french_defaults_and_override():
         cfg.behavioral_testing.neutral_token.prefix_list
         == config_defaults_per_language[SupportedLanguage.fr].prefix_list
     ), "Config did not take default French value for prefix list (neutral tokens)"
+
+
+def test_update_config(tiny_text_config, monkeypatch, dask_client):
+    # Changing config for a first time
+    partial_config = {"similarity": None}
+    new_config = update_config(tiny_text_config, partial_config)
+    assert not new_config.similarity
+    save_config(new_config)
+
+    with jsonlines.open(f"{new_config.artifact_path}/config_history.jsonl", "r") as reader:
+        all_configs = list(reader)
+    assert len(all_configs) == 1
+    assert all_configs[0] == new_config
+
+    # Changing config for a second time
+    partial_config = {"dataset_warnings": {"min_num_per_class": 40}}
+    new_config = update_config(new_config, partial_config)
+    assert new_config.dataset_warnings.min_num_per_class == 40
+    save_config(new_config)
+
+    with jsonlines.open(f"{new_config.artifact_path}/config_history.jsonl", "r") as reader:
+        all_configs = list(reader)
+
+    assert len(all_configs) == 2
+    assert all_configs[-1] == new_config

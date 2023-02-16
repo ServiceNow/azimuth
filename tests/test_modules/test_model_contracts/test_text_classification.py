@@ -25,7 +25,9 @@ def test_create_dataset(simple_text_config):
     task = HFTextClassificationModule(
         DatasetSplitName.eval,
         simple_text_config,
-        mod_options=ModuleOptions(model_contract_method_name=SupportedMethod.Predictions),
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
+        ),
     )
 
     assert task is not None
@@ -172,6 +174,23 @@ def test_post_process_file_based(file_text_config_top1):
     assert np.all([len(pred.postprocessing_steps) == 0 for pred in res_low])
 
 
+def test_post_process_no_postprocessors(tiny_text_config_no_postprocessor):
+    indices = [0, 1, 2]
+    mod = HFTextClassificationModule(
+        DatasetSplitName.eval,
+        tiny_text_config_no_postprocessor,
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions,
+            pipeline_index=0,
+            indices=indices,
+        ),
+    )
+    res = cast(List[PredictionResponse], mod.compute_on_dataset_split())
+    assert np.all(
+        [res[idx].model_output.probs == res[idx].postprocessed_output.probs for idx in indices]
+    )
+
+
 def test_get_input(dask_client, simple_text_config):
     mod = HFTextClassificationModule(
         DatasetSplitName.eval,
@@ -307,7 +326,9 @@ def test_extract_output(simple_text_config):
         DatasetSplitName.eval,
         simple_text_config,
         mod_options=ModuleOptions(
-            model_contract_method_name=SupportedMethod.Predictions, indices=[4, 9, 3]
+            model_contract_method_name=SupportedMethod.Predictions,
+            indices=[4, 9, 3],
+            pipeline_index=0,
         ),
     )
     real_output = np.array([[0.1, 0.9]])

@@ -4,6 +4,7 @@
 from typing import List
 
 from fastapi import FastAPI
+from starlette.status import HTTP_200_OK
 from starlette.testclient import TestClient
 
 UTTERANCE_COUNT = 42
@@ -42,6 +43,8 @@ def test_get_utterances(app: FastAPI):
     assert len(resp["utterances"]) == UTTERANCE_COUNT
     assert resp["utteranceCount"] == UTTERANCE_COUNT
     assert is_sorted([u["index"] for u in resp["utterances"]])
+    for utterance in resp["utterances"]:
+        assert utterance["persistentId"] == utterance["index"]
 
 
 def test_get_utterances_sort_confidence(app: FastAPI):
@@ -113,19 +116,6 @@ def test_get_utterances_pagination(app: FastAPI):
     assert resp.status_code == 400
 
 
-def test_get_utterances_saliency(app: FastAPI, monkeypatch):
-    import azimuth.routers.v1.utterances as utt_module
-
-    monkeypatch.setattr(utt_module, "saliency_available", lambda x: True)
-    client = TestClient(app)
-    resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0").json()
-    assert len(resp["utterances"]) == UTTERANCE_COUNT
-
-    first_utterance = resp["utterances"][0]
-    assert len(first_utterance["modelPrediction"]["modelPredictions"]) == 2
-    assert len(first_utterance["modelSaliency"]) == 2
-
-
 def test_get_utterances_empty_filters(app: FastAPI):
     client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances?utterance=yukongold").json()
@@ -156,5 +146,20 @@ def test_perturbed_utterances(app: FastAPI, monkeypatch):
     resp = client.get(
         "/dataset_splits/eval/utterances/1/perturbed_utterances?pipeline_index=0"
     ).json()
-    # Utterance 1 has 15 perturbation tests
-    assert len(resp) == 15
+    # Utterance 1 has 11 perturbation tests
+    assert len(resp) == 11
+
+
+def test_post_utterances(app: FastAPI) -> None:
+    client = TestClient(app)
+
+    request = [{"persistentId": 0, "dataAction": "remove"}]
+    resp = client.post("/dataset_splits/eval/utterances", json=request)
+    assert resp.status_code == HTTP_200_OK, resp.text
+    assert resp.json() == request
+
+    # Reset tag to NO_ACTION
+    request = [{"persistentId": 0, "dataAction": "NO_ACTION"}]
+    resp = client.post("/dataset_splits/eval/utterances", json=request)
+    assert resp.status_code == HTTP_200_OK, resp.text
+    assert resp.json() == request

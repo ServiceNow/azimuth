@@ -12,7 +12,7 @@ from datasets import Dataset
 from azimuth.config import ModelContractConfig
 from azimuth.modules.model_contracts.text_classification import TextClassificationModule
 from azimuth.types import DatasetSplitName, ModuleOptions
-from azimuth.types.general.module_options import GradientCalculation
+from azimuth.types.general.module_arguments import GradientCalculation
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.mc_dropout import MCDropout
 from azimuth.utils.ml.saliency import (
@@ -30,7 +30,7 @@ ITERATIONS = 100
 class HFTextClassificationModule(TextClassificationModule):
     """Handles text classification prediction and saliency."""
 
-    allowed_mod_options: Set[str] = TextClassificationModule.allowed_mod_options | {
+    optional_mod_options: Set[str] = TextClassificationModule.optional_mod_options | {
         "gradient_calculation",
         "iterations",
         "use_bma",
@@ -74,7 +74,12 @@ class HFTextClassificationModule(TextClassificationModule):
                 predictions = np.stack(
                     [
                         self.extract_probs_from_output(
-                            model(utterances, num_workers=0, batch_size=self.config.batch_size)
+                            model(
+                                utterances,
+                                num_workers=0,
+                                batch_size=self.config.batch_size,
+                                truncation=True,
+                            )
                         )
                         for _ in range(self.config.uncertainty.iterations)
                     ],
@@ -85,7 +90,9 @@ class HFTextClassificationModule(TextClassificationModule):
 
         else:
             epistemic = [0.0] * len(utterances)
-            pipeline_out = model(utterances, num_workers=0, batch_size=self.config.batch_size)
+            pipeline_out = model(
+                utterances, num_workers=0, batch_size=self.config.batch_size, truncation=True
+            )
         (
             model_output,
             postprocessed_output,
@@ -116,12 +123,15 @@ class HFTextClassificationModule(TextClassificationModule):
 
         """
         if self.saliency_layer is None:
-            return self.empty_saliency_from_batch(batch)
+            raise ValueError("This method should not be called when saliency_layer is not defined.")
 
         pipeline = self.get_model()
 
         inputs = pipeline.tokenizer(
-            batch[self.config.columns.text_input], return_tensors="pt", padding=True
+            batch[self.config.columns.text_input],
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
         )
         all_tokens = [pipeline.tokenizer.convert_ids_to_tokens(i) for i in inputs["input_ids"]]
 

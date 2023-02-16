@@ -4,7 +4,7 @@
 from typing import Dict
 
 import structlog
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import ValidationError
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -13,14 +13,40 @@ from azimuth.app import (
     get_task_manager,
     initialize_managers,
     require_editable_config,
+    run_startup_tasks,
 )
-from azimuth.config import AzimuthConfig, AzimuthValidationError
+from azimuth.config import (
+    AzimuthConfig,
+    AzimuthValidationError,
+    CustomObject,
+    PipelineDefinition,
+    SupportedLanguage,
+)
 from azimuth.task_manager import TaskManager
+from azimuth.utils.project import update_config
 
 log = structlog.get_logger(__name__)
 router = APIRouter()
 
 TAGS = ["Admin v1"]
+REQUIRED = "required"
+
+
+@router.get(
+    "/default_config",
+    summary="Get default configuration",
+    description="Get the default configuration",
+    response_model=AzimuthConfig,
+    tags=TAGS,
+)
+def get_default_config_def(
+    language: SupportedLanguage = Query(AzimuthConfig.__fields__["language"].default),
+) -> AzimuthConfig:
+    return AzimuthConfig(
+        language=language,
+        dataset=CustomObject(class_name=REQUIRED),
+        pipelines=[PipelineDefinition(name=REQUIRED, model=CustomObject(class_name=REQUIRED))],
+    )
 
 
 @router.get(
@@ -39,19 +65,19 @@ def get_config_def(
 @router.patch(
     "/config",
     summary="Update config",
-    description="Update the config using a changeset.",
+    description="Update the config.",
     tags=TAGS,
     response_model=AzimuthConfig,
     dependencies=[Depends(require_editable_config)],
 )
-def update_config(
+def patch_config(
     task_manager: TaskManager = Depends(get_task_manager),
     config: AzimuthConfig = Depends(get_config),
-    change_set: Dict = Body(...),
+    partial_config: Dict = Body(...),
 ) -> AzimuthConfig:
     try:
-        new_config = config.copy(update=change_set, deep=True)
-        initialize_managers(new_config, task_manager.cluster)
+        new_config = update_config(old_config=config, partial_config=partial_config)
+        run_startup_tasks(new_config, task_manager.cluster)
     except Exception as e:
         log.error("Rollback config update due to error", exc_info=e)
         new_config = config

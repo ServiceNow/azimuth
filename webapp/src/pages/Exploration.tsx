@@ -121,7 +121,7 @@ const Exploration = () => {
                   <>
                     <Description
                       text="Analyze metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
-                      link="/exploration-space/prediction-overview/"
+                      link="user-guide/exploration-space/#prediction-overview"
                     />
                     <Metrics
                       jobId={jobId}
@@ -144,7 +144,7 @@ const Exploration = () => {
                 <>
                   <Description
                     text="Visualize the model confusion between each pair of intents."
-                    link="/exploration-space/confusion-matrix/"
+                    link="user-guide/exploration-space/#confusion-matrix"
                   />
                   <ConfusionMatrix
                     jobId={jobId}

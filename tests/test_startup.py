@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from datasets import Dataset, DatasetDict
 
-from azimuth.app import get_ready_flag, initialize_managers
+from azimuth.app import get_ready_flag, run_startup_tasks
 from azimuth.config import CustomObject
 from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.startup import on_end, startup_tasks
@@ -17,7 +17,7 @@ from azimuth.types import (
     SupportedModule,
 )
 from azimuth.utils.project import load_dataset_split_managers_from_config
-from tests.utils import get_table_key
+from tests.utils import get_table_key, get_tiny_text_config_one_ds_name
 
 
 def test_startup_task(tiny_text_config, tiny_text_task_manager):
@@ -27,10 +27,11 @@ def test_startup_task(tiny_text_config, tiny_text_task_manager):
     # We lock the task manager
     assert tiny_text_task_manager.is_locked
     assert not one_mod.done()
-    assert all("train" in k or "eval" in k for k in mods.keys())
+    assert all("train" in k or "eval" in k or "all" in k for k in mods.keys())
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
     ), "Some modules don't have callbacks!"
+    assert len(mods) == 19
 
 
 def test_startup_task_fast(tiny_text_config, tiny_text_task_manager):
@@ -68,12 +69,15 @@ def test_on_end(tiny_text_config):
     task_manager.clear_worker_cache.assert_called_once()
 
 
-def test_startup_task_no_train(tiny_text_config_no_train, tiny_text_task_manager):
-    dms = load_dataset_split_managers_from_config(tiny_text_config_no_train)
+def test_startup_task_one_ds(tiny_text_config_one_ds, tiny_text_task_manager):
+    dms = load_dataset_split_managers_from_config(tiny_text_config_one_ds)
     assert DatasetSplitName.eval in dms and DatasetSplitName.train in dms
 
     mods = startup_tasks(dms, tiny_text_task_manager)
-    assert all("train" not in k or "eval" in k for k in mods.keys())
+    ds_name, other_ds_name = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
+    assert all(
+        (DatasetSplitName.all in k or ds_name in k) and other_ds_name not in k for k in mods.keys()
+    )
     assert all(
         on_end in [cbk.fn for cbk in mod._callbacks] for mod in mods.values()
     ), "Some modules don't have callbacks!"
@@ -103,7 +107,7 @@ def test_initialize_backbone(tiny_text_config, dask_client):
     event = get_ready_flag()
     assert event is None
     assert get_startup_tasks() is None
-    initialize_managers(tiny_text_config, cluster=dask_client.cluster)
+    run_startup_tasks(tiny_text_config, cluster=dask_client.cluster)
     assert get_task_manager().cluster is dask_client.cluster
     assert get_config() is tiny_text_config
     assert get_dataset_split_manager(DatasetSplitName.train).config is tiny_text_config

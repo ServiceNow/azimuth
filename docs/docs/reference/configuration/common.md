@@ -26,7 +26,7 @@ These fields are generic and can be adapted based on the user's machine.
 
 ## Artifact Path
 
-:blue_circle: **Default value**: `/cache`
+🔵 **Default value**: `/cache`
 
 Where to store the caching artifacts (`HDF5` files and HF datasets). The value needs to be available
 inside Docker (see `docker-compose.yml`). `/cache` is available by default on the docker image.
@@ -38,27 +38,27 @@ inside Docker (see `docker-compose.yml`). `/cache` is available by default on th
 
 ## Batch Size
 
-:blue_circle: **Default value**: 32
+🔵 **Default value**: 32
 
 Batch size to use during inference. A higher batch size will make computation faster, depending on
 the memory available on your machine.
 
 ## Use Cuda
 
-:blue_circle: **Default value**: `auto`
+🔵 **Default value**: `auto`
 
 If cuda is available on your machine, set to `true`, otherwise `false`. Can also be set to "auto"
 and let the user-code take care of it.
 
 ## Large Dask Cluster
 
-:blue_circle: **Default value**: False
+🔵 **Default value**: False
 
 The memory of the dask cluster is usually 6GB. If your models are big or if you encounter garbage collection errors,  you can set the memory to 12GB by setting `large_dask_cluster` to `True`.
 
 ## Read-Only Config
 
-:blue_circle: **Default value**: False
+🔵 **Default value**: False
 
 This field allows to block the changes to the config when set to `True`. This can be useful in certain context, such as when hosting a demo.
 

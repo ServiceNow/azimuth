@@ -7,16 +7,13 @@ import numpy as np
 from datasets import Dataset
 from tqdm import tqdm
 
-from azimuth.config import (
-    AzimuthConfig,
-    CommonFieldsConfig,
-    ModelContractConfig,
-    PipelineDefinition,
-)
+from azimuth.config import ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
+from azimuth.types.general.module_arguments import ModuleEffectiveArguments
 from azimuth.utils.conversion import md5_hash
+from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 from azimuth.utils.validation import assert_not_none
 
 
@@ -24,7 +21,8 @@ class Module(DaskModule[ConfigScope]):
     """Abstract class to define functions used by all modules for computing results and interfacing
     with the dataset and the pipelines."""
 
-    allowed_mod_options: Set[str] = set()
+    required_mod_options: Set[str] = set()
+    optional_mod_options: Set[str] = set()
 
     def __init__(
         self,
@@ -34,33 +32,41 @@ class Module(DaskModule[ConfigScope]):
     ):
         mod_options = mod_options or ModuleOptions()
         self.mod_options = mod_options
-        if diff := (
-            set(self.mod_options.no_alias_dict(exclude_defaults=True).keys())
-            - self.allowed_mod_options
-        ):
+        defined_mod_options = set(self.mod_options.no_alias_dict(exclude_defaults=True).keys())
+        if not self.required_mod_options.issubset(defined_mod_options):
+            raise ValueError(f"{self.__class__.__name__} requires {self.required_mod_options}.")
+        if diff := (defined_mod_options - self.required_mod_options - self.optional_mod_options):
             raise ValueError(f"Unexpected mod_options {diff} for {self.__class__.__name__}.")
 
         self.model_contract_method_name = mod_options.model_contract_method_name
         self.task_name = self.model_contract_method_name or self.__class__.__name__
         super().__init__(dataset_split_name, config)
 
-    def _get_name(self) -> str:
-        options_to_consider = self.mod_options.dict()
-        # Indices are excluded, since the cache for all indices should be in the same folder.
-        options_to_consider = self.mod_options.dict(exclude={"indices"})
-        attributes_to_consider = self.config.dict(
-            include={
-                k: ...
-                for k in set(AzimuthConfig.__fields__.keys()).difference(
-                    CommonFieldsConfig.__fields__.keys()
-                )
-            }
+    def get_effective_arguments(self) -> ModuleEffectiveArguments:
+        """Retrieve arguments affecting the Module, i.e. module options and config scope.
+
+        Returns:
+            Module's Effective Arguments
+        """
+
+        # indices are excluded, since the cache for all indices should be in the same file.
+        # model_contract_method_name are excluded too because it's already in the task_name.
+        return ModuleEffectiveArguments(
+            mod_options=self.mod_options.dict(
+                exclude={"indices", "model_contract_method_name"},
+                include=self.required_mod_options | self.optional_mod_options,
+            ),
+            config_scope=self.config.dict(
+                exclude=exclude_fields_from_cache(self.config),
+            ),
         )
 
-        return (
-            f"{self.task_name}_{self.dataset_split_name}"
-            f"_{md5_hash(options_to_consider)[:5]}_{md5_hash(attributes_to_consider)[:5]}"
-        )
+    def _get_name(self) -> str:
+        effective_arguments = self.get_effective_arguments()
+        hash_options = md5_hash(effective_arguments.mod_options)[:5]
+        hash_attributes = md5_hash(effective_arguments.config_scope)[:5]
+
+        return f"{self.task_name}_{self.dataset_split_name}_{hash_options}_{hash_attributes}"
 
     def get_caching_indices(self) -> List[int]:
         return self.mod_options.indices or self.get_indices()

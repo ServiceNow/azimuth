@@ -34,7 +34,7 @@ _SAMPLE_DATA_DIR = _CURRENT_DIR / "fixtures"
 _SAMPLE_VOCAB_DIR = _SAMPLE_DATA_DIR / "distilbert-tokenizer-files"
 _CHECKPOINT_PATH = str(_SAMPLE_VOCAB_DIR)
 SIMPLE_PERTURBATION_TESTING_CONFIG = BehavioralTestingOptions(
-    neutral_suffix=NeutralTokenOptions(suffix_list=["pls", "thanks"], prefix_list=["pls", "hello"]),
+    neutral_token=NeutralTokenOptions(suffix_list=["pls", "thanks"], prefix_list=["pls", "hello"]),
     typo=TypoTestOptions(threshold=0.005),
 )
 
@@ -79,7 +79,6 @@ def file_based_ds_from_paths(
 ):
     return {
         "class_name": "tests.test_loading_resources.load_file_dataset",
-        "args": ["csv"],
         "kwargs": {
             "data_files": {
                 "train": train,
@@ -128,7 +127,7 @@ def get_table_key(config, use_bma=False):
 
 
 def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
-    ds = load_dataset_from_config(config)[DatasetSplitName.eval]
+    ds = load_dataset_from_config(config)[dataset_split_name]
     ds = ds.map(
         lambda x, i: {
             DatasetColumn.model_predictions: [i % 2, 1 - i % 2],
@@ -168,7 +167,7 @@ def generate_mocked_dm(config, dataset_split_name=DatasetSplitName.eval):
             DatasetColumn.neighbors_eval: [
                 [np.random.randint(1, 1000), np.random.rand()] for i in range(0, 20)
             ],
-            DatasetColumn.token_count: np.random.randint(5, 12),
+            DatasetColumn.word_count: np.random.randint(5, 12),
         }
     )
 
@@ -194,3 +193,11 @@ def add_tags(dm):
     table_key = get_table_key(dm.config)
     add_all_tags_once(ALL_DATA_ACTIONS)
     add_all_tags_once(ALL_SMART_TAGS)
+
+
+def get_tiny_text_config_one_ds_name(config):
+    ds_name = DatasetSplitName.eval if "train" in config.dataset.kwargs else DatasetSplitName.train
+    other_ds_name = (
+        DatasetSplitName.train if ds_name == DatasetSplitName.eval else DatasetSplitName.eval
+    )
+    return ds_name, other_ds_name

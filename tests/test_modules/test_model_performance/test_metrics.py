@@ -21,12 +21,7 @@ from azimuth.modules.model_performance.outcomes import OutcomesModule
 from azimuth.plots.ece import make_ece_figure
 from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions
 from azimuth.types.outcomes import OutcomeName, OutcomeResponse
-from azimuth.types.tag import (
-    ALL_DATA_ACTION_FILTERS,
-    SMART_TAGS_FAMILY_MAPPING,
-    DataAction,
-    SmartTag,
-)
+from azimuth.types.tag import SMART_TAGS_FAMILY_MAPPING, DataAction, SmartTag
 from tests.utils import save_outcomes, save_predictions
 
 
@@ -301,14 +296,6 @@ def test_metrics_per_filter(tiny_text_config, apply_mocked_startup_task):
         smart_tag_metrics = getattr(result.metrics_per_filter, family.value)
         assert sum([mf_v.utterance_count for mf_v in smart_tag_metrics]) == ds_len
         assert len(smart_tag_metrics) == len(smart_tags) + 1
-
-    data_action_metrics = result.metrics_per_filter.data_action
-    assert sum([mf_v.utterance_count for mf_v in data_action_metrics]) == ds_len
-    assert len(data_action_metrics) == len(ALL_DATA_ACTION_FILTERS)
-
-    outcome_metrics = result.metrics_per_filter.outcome
-    assert sum([mf_v.utterance_count for mf_v in outcome_metrics]) == ds_len
-    assert len(outcome_metrics) == 4
 
 
 _CITATION = """\

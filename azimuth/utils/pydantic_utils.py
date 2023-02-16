@@ -1,6 +1,6 @@
-# Copyright ServiceNow, Inc. 2021 – 2022
-# This source code is licensed under the Apache 2.0 license found in the LICENSE file
-# in the root directory of this source tree.
+# Taken from https://github.com/samuelcolvin/pydantic/pull/3946/files
+# When we update pydantic to v1.10 or higher, we can remove this file and use their create_model()
+
 import warnings
 from types import prepare_class, resolve_bases
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast
@@ -8,9 +8,6 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Type, TypeVar, Uni
 from pydantic import BaseConfig, BaseModel, ConfigError
 from pydantic.main import inherit_config
 from pydantic.utils import is_valid_field
-
-# Taken from https://github.com/samuelcolvin/pydantic/pull/3946/files
-# When this is merged, we can add it to our repo
 
 if TYPE_CHECKING:
     from pydantic.typing import AnyClassMethod, DictStrAny  # type: ignore

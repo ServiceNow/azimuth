@@ -5,21 +5,12 @@
 from enum import Enum
 from typing import Any, Dict, List
 
-from pydantic import Field
+from azimuth.types import ModuleResponse
 
-from azimuth.types import AliasModel, DatasetSplitName, ModuleResponse
-
-
-class DataActionMapping(AliasModel):
-    relabel: bool = Field(..., title="Relabel")
-    augment_with_similar: bool = Field(..., title="Augment with Similar")
-    define_new_class: bool = Field(..., title="Define New Class")
-    merge_classes: bool = Field(..., title="Merge Two Classes")
-    remove: bool = Field(..., title="Remove")
-    investigate: bool = Field(..., title="Investigate")
+Tag = str
 
 
-class DataAction(str, Enum):
+class DataAction(Tag, Enum):
     relabel = "relabel"
     augment_with_similar = "augment_with_similar"
     define_new_class = "define_new_class"
@@ -30,11 +21,11 @@ class DataAction(str, Enum):
     no_action = "NO_ACTION"
 
 
-class SmartTag(str, Enum):
+class SmartTag(Tag, Enum):
     # Syntax
     multi_sent = "multiple_sentences"
-    long = "long_sentence"
-    short = "short_sentence"
+    long = "long_utterance"
+    short = "short_utterance"
     no_subj = "missing_subj"
     no_obj = "missing_obj"
     no_verb = "missing_verb"
@@ -80,16 +71,15 @@ PIPELINE_SMART_TAG_FAMILIES = [
     SmartTagFamily.uncertain,
 ]
 
-Tag = str
-ALL_DATA_ACTION_FILTERS = [a.value for a in DataAction]
-ALL_DATA_ACTIONS = [a for a in ALL_DATA_ACTION_FILTERS if a != DataAction.no_action]
+ALL_DATA_ACTION_FILTERS: List[Tag] = list(DataAction)
+ALL_DATA_ACTIONS: List[Tag] = [a for a in ALL_DATA_ACTION_FILTERS if a != DataAction.no_action]
 
-ALL_SMART_TAG_FILTERS = [a.value for a in SmartTag]
-ALL_SMART_TAGS = [a for a in ALL_SMART_TAG_FILTERS if a != SmartTag.no_smart_tag]
+ALL_SMART_TAG_FILTERS = list(SmartTag)
+ALL_SMART_TAGS: List[Tag] = [a for a in ALL_SMART_TAG_FILTERS if a != SmartTag.no_smart_tag]
 
 ALL_TAGS = ALL_SMART_TAGS + ALL_DATA_ACTIONS
 
-SMART_TAGS_FAMILY_MAPPING = {
+SMART_TAGS_FAMILY_MAPPING: Dict[SmartTagFamily, List[Tag]] = {
     SmartTagFamily.extreme_length: [
         SmartTag.multi_sent,
         SmartTag.short,
@@ -126,35 +116,9 @@ SMART_TAGS_FAMILY_MAPPING = {
 ALL_PREDICTION_TAGS: List[Tag] = [
     tag for family in PIPELINE_SMART_TAG_FAMILIES for tag in SMART_TAGS_FAMILY_MAPPING[family]
 ]
-ALL_STANDARD_TAGS = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
+ALL_STANDARD_TAGS: List[Tag] = list(set(ALL_TAGS) - set(ALL_PREDICTION_TAGS))
 
 
 class TaggingResponse(ModuleResponse):
-    tags: Dict[str, bool]
+    tags: Dict[Tag, bool]
     adds: Dict[str, Any]
-
-
-class DataActionResponse(AliasModel):
-    data_actions: List[DataActionMapping] = Field(..., title="Data action tags")
-
-
-class PostDataActionRequest(AliasModel):
-    dataset_split_name: DatasetSplitName = Field(DatasetSplitName.eval, title="Dataset Split Name")
-    data_actions: Dict[int, Dict[str, bool]] = Field(..., title="Data action tags")
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "dataset_split_name": "eval",
-                "data_actions": {
-                    1: {
-                        "relabel": True,
-                        "augment_with_similar": False,
-                        "define_new_class": False,
-                        "merge_classes": False,
-                        "remove": False,
-                        "investigate": False,
-                    }
-                },
-            }
-        }

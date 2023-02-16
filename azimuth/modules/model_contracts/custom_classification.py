@@ -25,7 +25,7 @@ class CustomTextClassificationModule(TextClassificationNoSaliencyModule):
          but it doesn't support saliency.
     """
 
-    allowed_mod_options = ModelContractModule.allowed_mod_options | {"iterations", "use_bma"}
+    optional_mod_options = ModelContractModule.optional_mod_options | {"iterations", "use_bma"}
 
     def predict(self, batch: Dataset) -> List[PredictionResponse]:
         """Predict the bath of utterances. The epistemic uncertainty is dummy.

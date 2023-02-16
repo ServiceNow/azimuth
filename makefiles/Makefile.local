@@ -56,5 +56,5 @@ launch.local:
 clean:
 	mkdir -p ./cache
 	rm -rf ./cache/$(TARGET)*
-	rm -rf /tmp/azimuth_test_cache || true
+	rm -rf /tmp/azimuth_test_cache
 	find ./azimuth_shr -name 'cache' -exec rm -rf {} +

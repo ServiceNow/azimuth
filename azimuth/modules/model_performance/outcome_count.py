@@ -8,7 +8,7 @@ import numpy as np
 from datasets import Dataset
 from tqdm import tqdm
 
-from azimuth.config import AzimuthConfig, ModelContractConfig
+from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import AggregationModule, FilterableModule
 from azimuth.modules.model_performance.outcomes import OutcomesModule
@@ -35,7 +35,7 @@ from azimuth.utils.project import postprocessing_editable
 from azimuth.utils.validation import assert_is_list
 
 
-class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
+class OutcomeCountPerFilterModule(FilterableModule[ModelContractConfig]):
     """Computes the outcome count for each filter."""
 
     def get_outcome_count_per_class(
@@ -84,7 +84,7 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
             indices=assert_is_list(ds[DatasetColumn.row_idx]), table_key=self._get_table_key()
         )
         for utterance_tags, outcome in zip(
-            all_tags, get_outcomes_from_ds(ds, self.mod_options.without_postprocessing)
+            all_tags.values(), get_outcomes_from_ds(ds, self.mod_options.without_postprocessing)
         ):
             no_tag = True
             for filter_, tagged in utterance_tags.items():
@@ -168,7 +168,7 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
                     outcome=self.get_outcome_count_per_outcome(ds),
                     **{
                         family.value: self.get_outcome_count_per_tag(
-                            dm, ds, [t.value for t in tags + [SmartTag.no_smart_tag]]
+                            dm, ds, tags + [SmartTag.no_smart_tag]
                         )
                         for family, tags in SMART_TAGS_FAMILY_MAPPING.items()
                     },
@@ -181,7 +181,8 @@ class OutcomeCountPerFilterModule(FilterableModule[AzimuthConfig]):
 class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
     """Compute the outcome count per threshold."""
 
-    allowed_mod_options = {"nb_bins", "pipeline_index"}
+    required_mod_options = {"pipeline_index"}
+    optional_mod_options = {"nb_bins"}
 
     def compute_on_dataset_split(self) -> List[OutcomeCountPerThresholdResponse]:  # type: ignore
         if not postprocessing_editable(self.config, self.mod_options.pipeline_index):

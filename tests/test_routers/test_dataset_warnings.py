@@ -22,7 +22,7 @@ def test_dataset_warnings(app: FastAPI) -> None:
             "name": "General Warnings",
             "warnings": [
                 {
-                    "columns": ["training", "evaluation"],
+                    "columns": ["train", "eval"],
                     "comparisons": [
                         {
                             "alert": False,
@@ -41,7 +41,7 @@ def test_dataset_warnings(app: FastAPI) -> None:
                     "name": "Missing samples (<20)",
                 },
                 {
-                    "columns": ["training", "evaluation"],
+                    "columns": ["train", "eval"],
                     "comparisons": [
                         {
                             "alert": False,
@@ -97,25 +97,25 @@ def test_dataset_warnings(app: FastAPI) -> None:
                         {
                             "alert": True,
                             "data": [
-                                {"alert": True, "value": 12.071146245059289},
-                                {"alert": True, "value": 4.469294371655238},
+                                {"alert": True, "value": 7.92292490118577},
+                                {"alert": True, "value": 3.5343478830359656},
                             ],
                             "name": "negative",
                         },
                         {
                             "alert": True,
                             "data": [
-                                {"alert": True, "value": 11.15263157894737},
-                                {"alert": True, "value": 3.219210813495705},
+                                {"alert": True, "value": 7.547368421052633},
+                                {"alert": True, "value": 3.475890077806949},
                             ],
                             "name": "positive",
                         },
                     ],
-                    "description": "Delta between the number of tokens of a given "
+                    "description": "Delta between the number of words per utterance for a given "
                     "class in the evaluation set vs the train set "
-                    "is above 3±3.",
+                    "is above 3.0±3.0.",
                     "format": "Decimal",
-                    "name": "Length mismatch (>3±3 tokens)",
+                    "name": "Length mismatch (>3.0±3.0 words)",
                 }
             ],
         },

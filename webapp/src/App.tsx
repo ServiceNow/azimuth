@@ -85,16 +85,30 @@ export default class App extends React.Component<Props> {
                               </BasicLayout>
                             </Route>
                             <Route path="/:jobId/settings" exact>
-                              <BasicLayout>
+                              <BasicLayout maxWidth="md">
                                 <Settings />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/class_overlap" exact>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/class_overlap"
+                              exact
+                            >
                               <BasicLayout maxWidth="md">
                                 <ClassOverlap />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/smart_tags" exact>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/pipeline_metrics"
+                              exact
+                            >
+                              <BasicLayout>
+                                <PerformanceAnalysis />
+                              </BasicLayout>
+                            </Route>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/smart_tags"
+                              exact
+                            >
                               <BasicLayout>
                                 <SmartTags />
                               </BasicLayout>
@@ -135,11 +149,6 @@ export default class App extends React.Component<Props> {
                             >
                               <BasicLayout>
                                 <UtteranceDetail />
-                              </BasicLayout>
-                            </Route>
-                            <Route path="/:jobId/pipeline_metrics" exact>
-                              <BasicLayout>
-                                <PerformanceAnalysis />
                               </BasicLayout>
                             </Route>
                             <Route>

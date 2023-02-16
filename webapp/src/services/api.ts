@@ -1,9 +1,7 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AzimuthConfig, DataAction, DataActionResponse } from "types/api";
-import { Tags } from "types/models";
-import { GetUtterancesQueryState, fetchApi, TypedResponse } from "utils/api";
-import { DATA_ACTION_NONE_VALUE } from "utils/const";
+import { AzimuthConfig, DataAction, UtterancePatch } from "types/api";
+import { fetchApi, GetUtterancesQueryState, TypedResponse } from "utils/api";
 import { raiseSuccessToast } from "utils/helpers";
 
 const responseToData =
@@ -19,30 +17,6 @@ const responseToData =
       return { error: { message } };
     }
   };
-
-const getDataActions = (
-  ids: number[],
-  newValue: DataAction,
-  allDataActions: string[]
-) => {
-  const newTagsMap: { [id: number]: Tags } = {};
-  ids.forEach((id) => {
-    const allFalse = allDataActions.reduce(
-      (tags: Record<string, boolean>, tag) => ({
-        ...tags,
-        [tag]: false,
-      }),
-      {}
-    );
-    const newTags: Tags =
-      newValue === DATA_ACTION_NONE_VALUE
-        ? allFalse
-        : { ...allFalse, [newValue]: true };
-    newTagsMap[id] = newTags;
-  });
-
-  return newTagsMap;
-};
 
 const tagTypes = [
   "DatasetInfo",
@@ -65,8 +39,6 @@ const tagTypes = [
   "ClassOverlapPlot",
   "ClassOverlap",
 ] as const;
-
-type Tag = typeof tagTypes[number];
 
 export const api = createApi({
   baseQuery: fakeBaseQuery<{ message: string }>(),
@@ -156,7 +128,7 @@ export const api = createApi({
       providesTags: () => [{ type: "DatasetWarnings" }],
       queryFn: responseToData(
         fetchApi({ path: "/dataset_warnings", method: "get" }),
-        "Something went wrong fetching dataset class distribution analysis"
+        "Something went wrong fetching dataset warnings"
       ),
     }),
     getUtterances: build.query({
@@ -203,7 +175,7 @@ export const api = createApi({
       providesTags: () => [{ type: "ClassOverlap" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_overlap",
+          path: "/dataset_splits/{dataset_split_name}/class_overlap",
           method: "get",
         }),
         "Something went wrong fetching class overlap"
@@ -213,46 +185,52 @@ export const api = createApi({
       providesTags: () => [{ type: "ClassOverlapPlot" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_overlap/plot",
+          path: "/dataset_splits/{dataset_split_name}/class_overlap/plot",
           method: "get",
         }),
-        "Something went wrong fetching spectral clustering class overlap data"
+        "Something went wrong fetching class overlap plot"
       ),
     }),
     updateDataActions: build.mutation<
-      DataActionResponse,
+      UtterancePatch[],
       {
-        ids: number[];
+        persistentIds: UtterancePatch["persistentId"][];
         newValue: DataAction;
-        allDataActions: string[];
       } & GetUtterancesQueryState
     >({
-      queryFn: async ({
-        jobId,
-        datasetSplitName,
-        ids,
-        newValue,
-        allDataActions,
-      }) =>
+      queryFn: async ({ jobId, datasetSplitName, persistentIds, newValue }) =>
         responseToData(
-          fetchApi({ path: "/tags", method: "post" }),
-          "Something went wrong updating the resolution"
+          fetchApi({
+            path: "/dataset_splits/{dataset_split_name}/utterances",
+            method: "post",
+          }),
+          "Something went wrong updating proposed actions"
         )({
           jobId,
-          body: {
-            datasetSplitName,
-            dataActions: getDataActions(ids, newValue, allDataActions),
-          },
+          datasetSplitName,
+          body: persistentIds.map((persistentId) => ({
+            persistentId,
+            dataAction: newValue,
+          })),
         }),
-      invalidatesTags: () => ["OutcomeCountPerFilter", "Utterances"],
+      invalidatesTags: () => [
+        "ConfidenceHistogram",
+        "ConfusionMatrix",
+        "Metrics",
+        "MetricsPerFilter",
+        "OutcomeCountPerFilter",
+        "TopWords",
+        "UtteranceCountPerFilter",
+        "Utterances",
+      ],
       async onQueryStarted(
-        { ids, newValue, allDataActions, ...args },
+        { persistentIds, newValue, ...args },
         { dispatch, queryFulfilled }
       ) {
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
-              if (ids.includes(utterance.index)) {
+              if (persistentIds.includes(utterance.persistentId)) {
                 utterance.dataAction = newValue;
               }
             });
@@ -293,6 +271,13 @@ export const api = createApi({
         "Something went wrong fetching config"
       ),
     }),
+    getDefaultConfig: build.query({
+      providesTags: [{ type: "Config" }],
+      queryFn: responseToData(
+        fetchApi({ path: "/admin/default_config", method: "get" }),
+        "Something went wrong fetching default config"
+      ),
+    }),
     updateConfig: build.mutation<
       AzimuthConfig,
       { jobId: string; body: Partial<AzimuthConfig> }
@@ -301,21 +286,7 @@ export const api = createApi({
         fetchApi({ path: "/admin/config", method: "patch" }),
         "Something went wrong updating config"
       ),
-      invalidatesTags: (...[, , { body: partialConfig }]) => {
-        const tags = new Set<Tag>();
-        // Invalidate DatasetInfo only after the query is fulfilled,
-        // otherwise the response is not up to date or even fails.
-        if ("behavioral_testing" in partialConfig) {
-          tags.add("Status");
-          tags.add("PerturbationTestingSummary");
-          tags.add("PerturbedUtterances");
-        }
-        if ("similarity" in partialConfig) {
-          tags.add("Status");
-          tags.add("SimilarUtterances");
-        }
-        return [...tags];
-      },
+      invalidatesTags: () => tagTypes,
       async onQueryStarted(
         { jobId, body: partialConfig },
         { dispatch, queryFulfilled }
@@ -327,9 +298,20 @@ export const api = createApi({
         );
         const patchDatasetInfo = dispatch(
           api.util.updateQueryData("getDatasetInfo", { jobId }, (draft) => {
+            if (partialConfig.name !== undefined) {
+              draft.projectName = partialConfig.name;
+            }
+            if (partialConfig.model_contract !== undefined) {
+              draft.modelContract = partialConfig.model_contract;
+            }
             if ("behavioral_testing" in partialConfig) {
               draft.perturbationTestingAvailable = Boolean(
                 partialConfig.behavioral_testing
+              );
+            }
+            if ("pipelines" in partialConfig) {
+              draft.predictionAvailable = Boolean(
+                partialConfig.pipelines?.length
               );
             }
             if ("similarity" in partialConfig) {
@@ -362,7 +344,7 @@ export const api = createApi({
       providesTags: () => [{ type: "Status" }],
       queryFn: responseToData(
         fetchApi({ path: "/status", method: "get" }),
-        "Something went wrong fetching the status"
+        "Something went wrong fetching status"
       ),
     }),
   }),
@@ -371,6 +353,7 @@ export const api = createApi({
 export const {
   getConfidenceHistogram: getConfidenceHistogramEndpoint,
   getConfig: getConfigEndpoint,
+  getDefaultConfig: getDefaultConfigEndpoint,
   getConfusionMatrix: getConfusionMatrixEndpoint,
   getDatasetInfo: getDatasetInfoEndpoint,
   getDatasetWarnings: getDatasetWarningsEndpoint,

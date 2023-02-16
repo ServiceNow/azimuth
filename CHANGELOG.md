@@ -12,6 +12,8 @@ Released changes are shown in the
 
 ### Added
 - Persistent id.
+- New fields in config page.
+- The initial config file and all subsequent changes are saved in the caching folder.
 
 ### Changed
 
@@ -20,5 +22,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Fix Utterance Details page collapsing with extra long utterances.
 
 ### Security

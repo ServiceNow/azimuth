@@ -73,7 +73,7 @@ def get_count_per_filter(
                 )
             },
             **{
-                t.value: sum(ds[t]) if t in ds.column_names else 0
+                t: sum(ds[t]) if t in ds.column_names else 0
                 for t in SMART_TAGS_FAMILY_MAPPING[tag_family]
             },
         )

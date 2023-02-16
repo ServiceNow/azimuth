@@ -21,7 +21,7 @@ The top banner contains useful information and links.
 * The **project name** from the config file is shown.
 * A dropdown :material-arrow-down-drop-circle-outline: allows you to select the different pipelines
   defined in the config. It also allows you to select no pipelines.
-* The [**settings**](settings.md) :gear: allow you to enable/disable different analyses.
+* The [**settings**](settings.md) :fontawesome-solid-gear: allows you to edit the config.
 * A link to the support Slack channel and to the documentation is available in the help
   :material-help-circle: option.
 
