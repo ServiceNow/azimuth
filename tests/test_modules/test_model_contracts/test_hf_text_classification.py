@@ -254,3 +254,26 @@ def test_load_CLINC150_dataset(clinc_text_config):
     assert "NO_INTENT" in labels_str and "oos" not in labels_str
     # only 3 classes in the subset: "transfer", "transactions" and "NO_INTENT"
     assert len(ds) == 5
+
+
+def test_long_utterances_truncated(simple_text_config):
+    mod = HFTextClassificationModule(
+        DatasetSplitName.eval,
+        simple_text_config,
+        mod_options=ModuleOptions(
+            pipeline_index=0, model_contract_method_name=SupportedMethod.Predictions
+        ),
+    )
+
+    max_input_size = max(mod.get_model().tokenizer.max_model_input_sizes.values())
+    batch = Dataset.from_dict({"utterance": ["potato " * max_input_size], "label": [0]})
+    _ = mod.compute(batch)
+
+    mod = HFTextClassificationModule(
+        DatasetSplitName.eval,
+        simple_text_config,
+        mod_options=ModuleOptions(
+            pipeline_index=0, model_contract_method_name=SupportedMethod.Saliency
+        ),
+    )
+    mod.compute(batch)
