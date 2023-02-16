@@ -1,5 +1,10 @@
 # Releases
 
+## [2.5.3] - 2022-02-16
+
+### Fixed
+- Support truncation for HF pipelines.
+
 ## [2.5.2] - 2022-12-20
 
 ### Fixed
