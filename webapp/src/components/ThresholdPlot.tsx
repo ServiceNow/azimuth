@@ -38,11 +38,6 @@ const useStyles = makeStyles((theme) => ({
     gridColumn: "start / end",
     gridRow: "start / end",
     placeSelf: "center",
-    "p&": {
-      // TODO what?
-      backgroundColor: theme.palette.background.paper,
-      padding: theme.spacing(),
-    },
   },
   xTitle: {
     gridRow: "title",
