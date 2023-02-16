@@ -138,7 +138,9 @@ def config_structured_output(num_classes, threshold=0.8):
             self.threshold = threshold
             self.no_prediction_idx = no_prediction_idx
 
-        def __call__(self, utterances: List[str], num_workers=0, batch_size=32) -> MyOutputFormat:
+        def __call__(
+            self, utterances: List[str], num_workers=0, batch_size=32, truncation=True
+        ) -> MyOutputFormat:
             # Random logits based on the first letter
             initial_logits = np.stack(
                 [np.random.RandomState(ord(s[0])).randn(self.num_classes) * 2 for s in utterances]
