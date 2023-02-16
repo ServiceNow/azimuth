@@ -1,5 +1,3 @@
 {
-  "model_max_length": 512,
-  "max_position_embeddings": 512,
   "do_lower_case": true
 }

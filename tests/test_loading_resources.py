@@ -24,7 +24,7 @@ from azimuth.config import AzimuthConfig
 from azimuth.utils.ml.seeding import RandomContext
 from azimuth_shr.loading_resources import align_labels
 
-_CURRENT_DIR = "/tmp/az_mddel"
+_CACHE_DIR = "/tmp/azimuth_test_models"
 _MAX_DATASET_LEN = 42
 
 
@@ -40,17 +40,13 @@ def load_hf_text_classif_pipeline(checkpoint_path: str, azimuth_config: AzimuthC
     # The first time, we load a random model, save it for subsequent loads
     use_cuda = _should_use_cuda(azimuth_config)
     try:
-        model = DistilBertForSequenceClassification.from_pretrained(_CURRENT_DIR)
+        model = DistilBertForSequenceClassification.from_pretrained(_CACHE_DIR)
     except OSError:
         with RandomContext(seed=2022):
             model = DistilBertForSequenceClassification(DistilBertConfig())
             model.init_weights()
-            model.save_pretrained(_CURRENT_DIR)
-    # As of Jan 6, 2021, pipelines didn't support fast tokenizers
-    # See https://github.com/huggingface/transformers/issues/7735
-    tokenizer = DistilBertTokenizer.from_pretrained(
-        checkpoint_path, use_fast=False, model_max_length=model.config.max_position_embeddings
-    )
+            model.save_pretrained(_CACHE_DIR)
+    tokenizer = DistilBertTokenizer.from_pretrained(checkpoint_path)
     device = 0 if use_cuda else -1
 
     # We set return_all_scores=True to get all softmax outputs
@@ -102,15 +98,11 @@ def load_tf_model(checkpoint_path: str) -> Callable:
 
     # The first time, we load a random model, save it for subsequent loads
     try:
-        model = DistilBertModel.from_pretrained(_CURRENT_DIR)
+        model = DistilBertModel.from_pretrained(_CACHE_DIR)
     except OSError:
         model = DistilBertModel(DistilBertConfig())
-        model.save_pretrained(_CURRENT_DIR)
-    # As of Jan 6, 2021, pipelines didn't support fast tokenizers
-    # See https://github.com/huggingface/transformers/issues/7735
-    tokenizer = DistilBertTokenizer.from_pretrained(
-        checkpoint_path, use_fast=False, cache_dir=_CURRENT_DIR
-    )
+        model.save_pretrained(_CACHE_DIR)
+    tokenizer = DistilBertTokenizer.from_pretrained(checkpoint_path, cache_dir=_CACHE_DIR)
 
     # Create embedder from tokenizer + model
     def embedder(utterances):
