@@ -264,9 +264,12 @@ def test_long_utterances_truncated(simple_text_config):
             pipeline_index=0, model_contract_method_name=SupportedMethod.Predictions
         ),
     )
-
-    max_input_size = max(mod.get_model().tokenizer.max_model_input_sizes.values())
-    batch = Dataset.from_dict({"utterance": ["potato " * max_input_size], "label": [0]})
+    batch = Dataset.from_dict(
+        {
+            simple_text_config.columns.text_input: ["Hello " * 1000],
+            simple_text_config.columns.label: [0],
+        }
+    )
     _ = mod.compute(batch)
 
     mod = HFTextClassificationModule(
@@ -276,4 +279,7 @@ def test_long_utterances_truncated(simple_text_config):
             pipeline_index=0, model_contract_method_name=SupportedMethod.Saliency
         ),
     )
-    mod.compute(batch)
+    res = mod.compute(batch)[0]
+    assert (
+        len(res.saliency) == len(res.tokens) == mod.get_model().model.config.max_position_embeddings
+    )

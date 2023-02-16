@@ -24,7 +24,7 @@ from azimuth.config import AzimuthConfig
 from azimuth.utils.ml.seeding import RandomContext
 from azimuth_shr.loading_resources import align_labels
 
-_CURRENT_DIR = "/tmp"
+_CURRENT_DIR = "/tmp/az_mddel"
 _MAX_DATASET_LEN = 42
 
 
@@ -49,7 +49,7 @@ def load_hf_text_classif_pipeline(checkpoint_path: str, azimuth_config: AzimuthC
     # As of Jan 6, 2021, pipelines didn't support fast tokenizers
     # See https://github.com/huggingface/transformers/issues/7735
     tokenizer = DistilBertTokenizer.from_pretrained(
-        checkpoint_path, use_fast=False, cache_dir=_CURRENT_DIR
+        checkpoint_path, use_fast=False, model_max_length=model.config.max_position_embeddings
     )
     device = 0 if use_cuda else -1
 
