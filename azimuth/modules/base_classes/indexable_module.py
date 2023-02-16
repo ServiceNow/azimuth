@@ -48,7 +48,7 @@ class IndexableModule(Module[ConfigScope], ABC):
             The loaded dataset_split.
 
         """
-        dataset_split = self.get_full_dataset_split(name)
+        dataset_split = super().get_dataset_split(name)
         indices = self.mod_options.indices
         if indices:
             dataset_split = dataset_split.select(indices)
