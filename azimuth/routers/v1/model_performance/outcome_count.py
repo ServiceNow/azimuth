@@ -48,16 +48,16 @@ def get_outcome_count_per_threshold(
         pipeline_index=pipeline_index,
     )
 
-    task_result: List[OutcomeCountPerThresholdResponse] = get_standard_task_result(
-        SupportedModule.OutcomeCountPerThreshold,
-        dataset_split_name,
-        task_manager,
-        mod_options=mod_options,
-        last_update=dataset_split_manager.last_update,
-    )
-
-    if len(task_result) == 0:
-        raise HTTPException(HTTP_400_BAD_REQUEST, detail="Postprocessing is not editable")
+    try:
+        task_result: List[OutcomeCountPerThresholdResponse] = get_standard_task_result(
+            SupportedModule.OutcomeCountPerThreshold,
+            dataset_split_name,
+            task_manager,
+            mod_options=mod_options,
+            last_update=dataset_split_manager.last_update,
+        )
+    except ValueError as e:
+        raise HTTPException(HTTP_400_BAD_REQUEST, detail=str(e))
 
     return task_result[0]
 
