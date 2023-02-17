@@ -28,10 +28,7 @@ def test_create_sentiment_pipeline(simple_text_config):
     # By default, use L2 gradient calculation
     assert task.gradient_calculation == GradientCalculation.L2
 
-    sa = task.get_model()
-
-    # As of Jan 6, 2021, fast tokenizers are not supported in pipelines
-    assert not sa.tokenizer.is_fast
+    _ = task.get_model()
 
     # Test a different gradient calculation option
     task = HFTextClassificationModule(
@@ -185,9 +182,9 @@ def test_saliency(dask_client, simple_text_config):
         ),
     )
     out = cast(List[SaliencyResponse], mod.compute_on_dataset_split())
-    pipeline = mod.get_model()
+    hf_pipeline = mod.get_model()
     assert len(out) == 2
-    assert not any(any(tok == pipeline.tokenizer.pad_token for tok in rec.tokens) for rec in out)
+    assert not any(any(tok == hf_pipeline.tokenizer.pad_token for tok in rec.tokens) for rec in out)
 
 
 def test_custom_class_saliency(simple_text_config):

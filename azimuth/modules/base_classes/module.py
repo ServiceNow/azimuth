@@ -155,7 +155,8 @@ class Module(DaskModule[ConfigScope]):
         """Load the model according to the config and module options.
 
         This will invoke the Python method supplied in the config.
-        See our API Doc for more details.
+        See our API Doc for more details. It can return a HF Pipeline, a Callable (which can be just
+        a model or a custom pipeline) and a file prediction reader.
 
         Returns:
             Loaded model according to user spec.
@@ -163,7 +164,7 @@ class Module(DaskModule[ConfigScope]):
         Raises:
             ValueError if no valid pipeline exists.
         """
-        _ = self.get_current_pipeline()  # Validate current pipeline exists
+        _ = self.get_current_pipeline_definition()  # Validate current pipeline exists
         return self.artifact_manager.get_model(self.config, self.mod_options.pipeline_index)
 
     def _get_table_key(self) -> Optional[PredictionTableKey]:
@@ -176,7 +177,7 @@ class Module(DaskModule[ConfigScope]):
             self.config, ModelContractConfig
         ):
             return None
-        current_pipeline = self.get_current_pipeline()
+        current_pipeline = self.get_current_pipeline_definition()
         use_bma = self.mod_options.use_bma
         table_key = PredictionTableKey(
             temperature=current_pipeline.temperature,
@@ -188,18 +189,18 @@ class Module(DaskModule[ConfigScope]):
 
     def get_threshold(self) -> Optional[float]:
         # The default is None so we have to handle it this way.
-        current_pipeline = self.get_current_pipeline()
+        current_pipeline = self.get_current_pipeline_definition()
 
         thresh = self.mod_options.threshold
         if thresh is None:
             thresh = current_pipeline.threshold
         return thresh
 
-    def get_current_pipeline(self) -> PipelineDefinition:
-        """Get current pipeline for this spec.
+    def get_current_pipeline_definition(self) -> PipelineDefinition:
+        """Get the current pipeline definition from the config.
 
         Returns:
-            Config of the current pipeline.
+            Definition of the current pipeline from the config.
 
         Raises:
             ValueError if no valid pipeline exists.
@@ -211,7 +212,7 @@ class Module(DaskModule[ConfigScope]):
                 " as it does not use ModelContractScope."
             )
         if self.config.pipelines is None:
-            raise ValueError("A model was not provided in the config.")
+            raise ValueError("A pipeline was not provided in the config.")
         if self.mod_options.pipeline_index is None:
             raise ValueError(
                 f"`pipeline_index` is None, expected one"

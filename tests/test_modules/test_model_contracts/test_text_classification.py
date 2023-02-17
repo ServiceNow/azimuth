@@ -54,9 +54,9 @@ def test_cuda_support(simple_text_config):
 
     # Since we share one model across all instances, the device could still be CPU, so reset it
     HFTextClassificationModule.pipeline = None
-    model = task.get_model()
+    hf_pipeline = task.get_model()
     # index 0 may not always be correct
-    assert model.device == torch.device("cuda", index=0)
+    assert hf_pipeline.device == torch.device("cuda", index=0)
 
     json_output = cast(SaliencyResponse, task.compute(batch)[0])
 
@@ -258,8 +258,8 @@ def test_temperature_scaling(simple_text_config):
             model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
         ),
     )
-    model = mod.get_model()
-    output = np.array([record["score"] for record in model(batch["utterance"])[0]])
+    hf_pipeline = mod.get_model()
+    output = np.array([record["score"] for record in hf_pipeline(batch["utterance"])[0]])
     assert np.allclose(output, pred.postprocessed_output.probs[0])
 
 
