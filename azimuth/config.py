@@ -375,14 +375,14 @@ class SimilarityConfig(CommonFieldsConfig):
     similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), nullable=True)
 
 
-class DatasetWarningConfig(CommonFieldsConfig):
-    # Dataset warnings configuration to change thresholds that trigger warnings
-    dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
-
-
 class SyntaxConfig(CommonFieldsConfig):
     # Syntax configuration to change thresholds that determine short and long utterances.
     syntax: SyntaxOptions = SyntaxOptions()
+
+
+class DatasetWarningConfig(SyntaxConfig):
+    # Dataset warnings configuration to change thresholds that trigger warnings
+    dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
 
 
 class TopWordsConfig(SyntaxConfig, ModelContractConfig):

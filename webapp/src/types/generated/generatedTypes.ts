@@ -135,12 +135,12 @@ export interface components {
       use_cuda: "auto" | boolean;
       large_dask_cluster: boolean;
       read_only_config: boolean;
+      syntax: components["schemas"]["SyntaxOptions"];
       dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
       model_contract: components["schemas"]["SupportedModelContract"];
       pipelines: components["schemas"]["PipelineDefinition"][] | null;
       uncertainty: components["schemas"]["UncertaintyOptions"];
       saliency_layer: string | null;
-      syntax: components["schemas"]["SyntaxOptions"];
       metrics: { [key: string]: components["schemas"]["MetricDefinition"] };
       language: components["schemas"]["SupportedLanguage"];
       similarity: components["schemas"]["SimilarityOptions"] | null;
