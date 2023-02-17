@@ -1856,7 +1856,7 @@ follows:</p>
 </tr>
 <tr>
 <td><code>persistent_id</code></td>
-<td><code>persistent_id</code></td>
+<td><code>row_idx</code></td>
 <td>A unique identifier for each utterance, as type <code>datasets.Value("int16")</code> or <code>datasets.Value("string")</code>.</td>
 </tr>
 </tbody>
@@ -1878,7 +1878,7 @@ follows:</p>
 <li>Optional column for the raw text input (before any pre-processing). Unused at the moment.</li>
 <li>Features column for the label</li>
 <li>Optional column to specify whether an example has failed preprocessing. Unused at the moment.</li>
-<li>Unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed.</li>
+<li>Column with a unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed.</li>
 </ol>
 </div>
 <div class="tabbed-block">
