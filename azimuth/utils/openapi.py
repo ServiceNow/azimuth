@@ -4,8 +4,9 @@ from typing import Dict
 def fix_union_types(schema: Dict):
     """Replace oneOf with anyOf, which openapi-typescript understands better."""
     for field in schema["properties"].values():
-        if field.get("type") == "array":
-            field = field["items"]
+        field = field.get("additionalProperties", field)  # Dict values (if applicable)
+        field = field.get("items", field)  # List items (if applicable)
+
         if "anyOf" in field:
             field["oneOf"] = field.pop("anyOf")
 
