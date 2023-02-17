@@ -443,14 +443,9 @@ def create_histogram_mean_std(
 
         # Add thresholds for short and long utterances.
         max_x = max((len(hist) for hist in hist_normalized.values()), default=0)
-        for threshold, edge, pretty_name, xanchor in zip(
-            [
-                syntax_options.short_utterance_max_word + 0.5,
-                syntax_options.long_utterance_min_word - 0.5,
-            ],
-            [0, max_x + 1],
-            ["Short utterances", "Long utterances"],
-            ["right", "left"],
+        for threshold, edge, pretty_name, xanchor in (
+            (syntax_options.short_utterance_max_word + 0.5, 0, "Short utterances", "right"),
+            (syntax_options.long_utterance_min_word - 0.5, max_x + 1, "Long utterances", "left"),
         ):
             common_args = dict(layer="below", y0=0, y1=max_y)
             fig.add_shape(
