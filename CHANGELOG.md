@@ -14,6 +14,7 @@ Released changes are shown in the
 - Persistent id.
 - New fields in config page.
 - The initial config file and all subsequent changes are saved in the caching folder.
+- Outcome option to dropdown in Smart Tag Analysis
 
 ### Changed
 
