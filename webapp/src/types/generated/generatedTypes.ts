@@ -667,6 +667,8 @@ export interface components {
      * that all fields are represented correctly.
      */
     SimilarUtterance: {
+      persistentId: number | string;
+      /** Row index created by Azimuth */
       index: number;
       utterance: string;
       label: string;
@@ -816,6 +818,10 @@ export interface components {
      */
     Utterance: {
       persistentId: number | string;
+      /** Row index created by Azimuth */
+      index: number;
+      utterance: string;
+      label: string;
       dataAction: components["schemas"]["DataAction"];
       almostCorrect: string[];
       behavioralTesting: string[];
@@ -824,12 +830,8 @@ export interface components {
       extremeLength: string[];
       partialSyntax: string[];
       dissimilar: string[];
-      /** Row index computed by Azimuth.. */
-      index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
-      label: string;
-      utterance: string;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure

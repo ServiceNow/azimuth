@@ -9,10 +9,11 @@ const isOverflown = (element: Element) =>
 type GridCellExpandProps = {
   autoWidth?: boolean;
   children: React.ReactNode;
+  title?: React.ReactNode; // Named after Tooltip's title prop
 };
 
 const HoverableDataCell = (props: GridCellExpandProps) => {
-  const { autoWidth = false, children } = props;
+  const { autoWidth = false, children, title } = props;
 
   const wrapper = React.useRef<HTMLDivElement | null>(null);
   const cellDiv = React.useRef(null);
@@ -23,7 +24,8 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
 
   const handleMouseEnter = () => {
     const isCurrentlyOverflown = isOverflown(cellValue.current!);
-    setShowPopper(isCurrentlyOverflown);
+    // If a title is specified, ignore overflow and always show popper.
+    setShowPopper(isCurrentlyOverflown || Boolean(title));
     setAnchorEl(cellDiv.current);
     setShowFullCell(true);
   };
@@ -95,7 +97,7 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
               outline: "none",
             }}
           >
-            {children}
+            {title || children}
           </Paper>
         </Popper>
       )}
@@ -103,4 +105,4 @@ const HoverableDataCell = (props: GridCellExpandProps) => {
   );
 };
 
-export default HoverableDataCell;
+export default React.memo(HoverableDataCell);

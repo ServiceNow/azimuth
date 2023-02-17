@@ -102,7 +102,7 @@ follows:
 |------------|-----------|-------------------------------------------------------------------|
 | `text_input` | `utterance` | The preprocessed utterance.                                       |
 | `label`      | `label`     | The class label for the utterance, as type `datasets.ClassLabel`. |
-| `persistent_id`      | `persistent_id`     | A unique identifier for each utterance, as type `datasets.Value("int16")` or `datasets.Value("string")`. |
+| `persistent_id` | `row_idx` | A unique identifier for each utterance, as type `datasets.Value("int16")` or `datasets.Value("string")`. |
 
 === "Class Definition"
 
@@ -121,7 +121,7 @@ follows:
     2. Optional column for the raw text input (before any pre-processing). Unused at the moment.
     3. Features column for the label
     4. Optional column to specify whether an example has failed preprocessing. Unused at the moment.
-    5. Unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed.
+    5. Column with a unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed.
 
 === "Config Example"
 
