@@ -150,16 +150,16 @@ def test_perturbed_utterances(app: FastAPI, monkeypatch):
     assert len(resp) == 11
 
 
-def test_post_utterances(app: FastAPI) -> None:
+def test_patch_utterances(app: FastAPI) -> None:
     client = TestClient(app)
 
     request = [{"persistentId": 0, "dataAction": "remove"}]
-    resp = client.post("/dataset_splits/eval/utterances", json=request)
+    resp = client.patch("/dataset_splits/eval/utterances", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
     assert resp.json() == request
 
     # Reset tag to NO_ACTION
     request = [{"persistentId": 0, "dataAction": "NO_ACTION"}]
-    resp = client.post("/dataset_splits/eval/utterances", json=request)
+    resp = client.patch("/dataset_splits/eval/utterances", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
     assert resp.json() == request

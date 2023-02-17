@@ -265,7 +265,7 @@ def get_utterances(
     )
 
 
-@router.post(
+@router.patch(
     "",
     summary="Patch utterances",
     description="Patch utterances, such as updating proposed actions.",
