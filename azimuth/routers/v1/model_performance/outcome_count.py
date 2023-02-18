@@ -4,7 +4,8 @@
 
 from typing import List
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from starlette.status import HTTP_400_BAD_REQUEST
 
 from azimuth.app import get_dataset_split_manager, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -18,7 +19,6 @@ from azimuth.types import (
 from azimuth.types.model_performance import (
     OutcomeCountPerFilterResponse,
     OutcomeCountPerThresholdResponse,
-    OutcomeCountPerThresholdValue,
 )
 from azimuth.utils.routers import (
     build_named_dataset_filters,
@@ -36,31 +36,30 @@ TAGS = ["Outcome Count v1"]
     summary="Get outcome count for multiple thresholds.",
     description="Get prediction count per outcome for multiple thresholds.",
     tags=TAGS,
-    response_model=List[OutcomeCountPerThresholdValue],
+    response_model=OutcomeCountPerThresholdResponse,
 )
 def get_outcome_count_per_threshold(
     dataset_split_name: DatasetSplitName,
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
-) -> List[OutcomeCountPerThresholdValue]:
+) -> OutcomeCountPerThresholdResponse:
     mod_options = ModuleOptions(
         pipeline_index=pipeline_index,
     )
 
-    task_result: List[OutcomeCountPerThresholdResponse] = get_standard_task_result(
-        SupportedModule.OutcomeCountPerThreshold,
-        dataset_split_name,
-        task_manager,
-        mod_options=mod_options,
-        last_update=dataset_split_manager.last_update,
-    )
+    try:
+        task_result: List[OutcomeCountPerThresholdResponse] = get_standard_task_result(
+            SupportedModule.OutcomeCountPerThreshold,
+            dataset_split_name,
+            task_manager,
+            mod_options=mod_options,
+            last_update=dataset_split_manager.last_update,
+        )
+    except ValueError as e:
+        raise HTTPException(HTTP_400_BAD_REQUEST, detail=str(e))
 
-    if len(task_result) == 0:
-        # Non-Editable postprocessing
-        return []
-
-    return task_result[0].outcome_count_all_thresholds
+    return task_result[0]
 
 
 @router.get(

@@ -65,7 +65,7 @@ class GetUtterancesResponse(AliasModel):
     utterances: List[Utterance] = Field(..., title="Utterances")
     utterance_count: int = Field(..., title="Utterance count")
     confidence_threshold: Optional[float] = Field(
-        ..., title="Confidence threshold in selected pipeline (if any)", nullable=True
+        ..., title="Confidence threshold in the selected pipeline (if any)", nullable=True
     )
 
     class Config:

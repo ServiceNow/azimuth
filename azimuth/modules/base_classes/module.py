@@ -107,11 +107,11 @@ class Module(DaskModule[ConfigScope]):
     def compute(self, batch: Dataset) -> List[ModuleResponse]:
         raise NotImplementedError
 
-    def get_full_dataset_split(self, name: Optional[DatasetSplitName] = None) -> Dataset:
-        """Get the specified dataset_split without any filters/indices.
+    def get_dataset_split(self, name: Optional[DatasetSplitName] = None) -> Dataset:
+        """Get the specified dataset_split. For regular modules, not filtering or indexing is done.
 
         Args:
-            name: Which dataset_split to select.
+            name: Which dataset_split to get.
 
         Returns:
             The loaded dataset_split.
@@ -128,18 +128,6 @@ class Module(DaskModule[ConfigScope]):
         dm = self.get_dataset_split_manager(dataset_split_name)
         dataset_split: Dataset = dm.get_dataset_split(self._get_table_key())
         return dataset_split
-
-    def get_dataset_split(self, name: Optional[DatasetSplitName] = None) -> Dataset:
-        """Get the specified dataset_split. For regular modules, not filtering or indexing is done.
-
-        Args:
-            name: Which dataset_split to get.
-
-        Returns:
-            The loaded dataset_split.
-
-        """
-        return self.get_full_dataset_split(name)
 
     def get_dataset_split_manager(
         self, name: Optional[DatasetSplitName] = None

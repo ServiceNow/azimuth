@@ -16,6 +16,7 @@ Released changes are shown in the
 - The initial config file and all subsequent changes are saved in the caching folder.
 
 ### Changed
+- Change the outcome per threshold bar chart to area chart, making the x axis continuous, and add vertical dashed line marking current threshold.
 
 ### Deprecated/Breaking Changes
 

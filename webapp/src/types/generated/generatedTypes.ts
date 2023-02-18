@@ -506,6 +506,15 @@ export interface components {
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
+    OutcomeCountPerThresholdResponse: {
+      outcomeCountPerThreshold: components["schemas"]["OutcomeCountPerThresholdValue"][];
+      confidenceThreshold: number | null;
+      utteranceCount: number;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
     OutcomeCountPerThresholdValue: {
       threshold: number;
       outcomeCount: { [key: string]: number };
@@ -1181,7 +1190,7 @@ export interface operations {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["OutcomeCountPerThresholdValue"][];
+          "application/json": components["schemas"]["OutcomeCountPerThresholdResponse"];
         };
       };
       /** Validation Error */
