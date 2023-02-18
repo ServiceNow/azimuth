@@ -70,7 +70,7 @@ export interface paths {
     /** Get a table view of the utterances according to filters. */
     get: operations["get_utterances_dataset_splits__dataset_split_name__utterances_get"];
     /** Patch utterances, such as updating proposed actions. */
-    post: operations["patch_utterances_dataset_splits__dataset_split_name__utterances_post"];
+    patch: operations["patch_utterances_dataset_splits__dataset_split_name__utterances_patch"];
   };
   "/dataset_splits/{dataset_split_name}/utterances/{index}/perturbed_utterances": {
     /** Get a perturbed utterances for a single utterance. */
@@ -1325,7 +1325,7 @@ export interface operations {
     };
   };
   /** Patch utterances, such as updating proposed actions. */
-  patch_utterances_dataset_splits__dataset_split_name__utterances_post: {
+  patch_utterances_dataset_splits__dataset_split_name__utterances_patch: {
     parameters: {
       path: {
         dataset_split_name: components["schemas"]["DatasetSplitName"];

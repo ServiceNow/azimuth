@@ -202,7 +202,7 @@ export const api = createApi({
         responseToData(
           fetchApi({
             path: "/dataset_splits/{dataset_split_name}/utterances",
-            method: "post",
+            method: "patch",
           }),
           "Something went wrong updating proposed actions"
         )({
