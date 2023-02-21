@@ -202,6 +202,10 @@ def make_startup_tasks(
         task_launched = task.future is not None
         if task_launched:
             task.add_done_callback(on_end, dm=dm, task_manager=task_manager)
+        # If the task is not launched (because it is cached), we save the module cached results in
+        # the dataset, so that it contains the relevant data associated with the config.
+        elif isinstance(task, DatasetResultModule):
+            task.save_result(task.result(), assert_not_none(dm))
         tasks[dataset_split_name] = task
     return tasks
 
