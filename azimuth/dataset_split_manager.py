@@ -262,11 +262,32 @@ class DatasetSplitManager:
         )
         return dataset_split
 
-    def get_row_indices_from_persistent_id(self, persistent_ids: List[Union[int, str]]):
-        ds = self.get_dataset_split()
-        all_persistent_ids = ds[self.config.columns.persistent_id]
-        indices = [all_persistent_ids.index(persistent_id) for persistent_id in persistent_ids]
-        return indices
+    def get_row_indices_from_persistent_id(
+        self, persistent_ids: List[Union[int, str]], ignore_not_found: bool = False
+    ) -> List[Optional[int]]:
+        """Get the list of row_idx from a list of persistent_id.
+
+        Args:
+            persistent_ids: List to process
+            ignore_not_found: Ignore if the persistent_id is not present in the dataset split.
+
+        Returns:
+            List of row_idx. May contain None if persistent_id not found.
+
+        Raises:
+            If ignore_not_found is set to False and the persistent_id is not in the dataset.
+        """
+        all_persistent_ids = self.get_dataset_split()[self.config.columns.persistent_id]
+        all_indices: List[Optional[int]] = []
+        for persistent_id in persistent_ids:
+            try:
+                all_indices.append(all_persistent_ids.index(persistent_id))
+            except ValueError:
+                if ignore_not_found:
+                    all_indices.append(None)
+                else:
+                    raise
+        return all_indices
 
     def add_tags(
         self,

@@ -4,7 +4,7 @@
 from typing import List
 
 from fastapi import FastAPI
-from starlette.status import HTTP_200_OK
+from starlette.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from starlette.testclient import TestClient
 
 UTTERANCE_COUNT = 42
@@ -157,6 +157,19 @@ def test_patch_utterances(app: FastAPI) -> None:
     resp = client.patch("/dataset_splits/eval/utterances", json=request)
     assert resp.status_code == HTTP_200_OK, resp.text
     assert resp.json() == request
+
+    # Set tag of a non-existent persistent-id (raise)
+    request = [
+        {"persistentId": "potato", "dataAction": "augment_with_similar"},
+        {"persistentId": 0, "dataAction": "relabel"},
+    ]
+    resp = client.patch("/dataset_splits/eval/utterances", json=request)
+    assert resp.status_code == HTTP_404_NOT_FOUND, resp.text
+
+    # Set tag of a non-existent persistent-id (ignore)
+    resp = client.patch("/dataset_splits/eval/utterances?ignore_not_found=true", json=request)
+    assert resp.status_code == HTTP_200_OK, resp.text
+    assert resp.json() == [request[1]]  # Only the second requested element was applied.
 
     # Reset tag to NO_ACTION
     request = [{"persistentId": 0, "dataAction": "NO_ACTION"}]

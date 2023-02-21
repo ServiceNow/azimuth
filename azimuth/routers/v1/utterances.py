@@ -276,15 +276,22 @@ def patch_utterances(
     utterances: List[UtterancePatch] = Body(...),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     task_manager: TaskManager = Depends(get_task_manager),
+    ignore_not_found: bool = False,
 ) -> List[UtterancePatch]:
     persistent_ids = [utterance.persistent_id for utterance in utterances]
     try:
-        row_indices = dataset_split_manager.get_row_indices_from_persistent_id(persistent_ids)
+        row_indices = dataset_split_manager.get_row_indices_from_persistent_id(
+            persistent_ids, ignore_not_found
+        )
     except ValueError as e:
         raise HTTPException(HTTP_404_NOT_FOUND, detail=f"Persistent id not found: {e}.")
 
+    row_indices_found = [idx for idx in row_indices if idx is not None]
+    utterances_found = [
+        utterance for idx, utterance in zip(row_indices, utterances) if idx is not None
+    ]
     data_actions = {}
-    for row_idx, utterance in zip(row_indices, utterances):
+    for row_idx, utterance in zip(row_indices_found, utterances_found):
         data_actions[row_idx] = {data_action: False for data_action in ALL_DATA_ACTIONS}
         if utterance.data_action != DataAction.no_action:
             data_actions[row_idx][utterance.data_action] = True
@@ -292,8 +299,9 @@ def patch_utterances(
     dataset_split_manager.add_tags(data_actions)
 
     task_manager.clear_worker_cache()
-    updated_tags = dataset_split_manager.get_tags(row_indices)
+    updated_tags = dataset_split_manager.get_tags(row_indices_found)
 
+    persistent_ids_found = [utterance.persistent_id for utterance in utterances_found]
     return [
         UtterancePatch(
             persistent_id=persistent_id,
@@ -302,7 +310,7 @@ def patch_utterances(
                 DataAction.no_action,
             ),
         )
-        for persistent_id, tags in zip(persistent_ids, updated_tags.values())
+        for persistent_id, tags in zip(persistent_ids_found, updated_tags.values())
     ]
 
 

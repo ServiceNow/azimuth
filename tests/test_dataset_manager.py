@@ -431,6 +431,12 @@ def test_convert_persistent_id_to_row_idx(a_text_dataset, simple_text_config):
     row_indices = dm.get_row_indices_from_persistent_id(persistent_ids)
     assert row_indices == random_rows
 
+    with pytest.raises(ValueError):
+        _ = dm.get_row_indices_from_persistent_id(["I love potatoes"])
+    assert [None] == dm.get_row_indices_from_persistent_id(
+        ["I love potatoes"], ignore_not_found=True
+    )
+
 
 def test_export_proposed_actions(simple_text_config, a_text_dataset):
     dm = DatasetSplitManager(
