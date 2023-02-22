@@ -408,9 +408,7 @@ const UtterancesTable: React.FC<Props> = ({
         />
         <Button
           className={classes.exportButton}
-          onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
-            setAnchorEl(event.currentTarget)
-          }
+          onClick={(event) => setAnchorEl(event.currentTarget)}
           startIcon={<GetApp />}
           endIcon={<ArrowDropDown />}
         >
@@ -440,8 +438,6 @@ const UtterancesTable: React.FC<Props> = ({
               downloadUtteranceProposedActions({
                 jobId,
                 datasetSplitName,
-                ...filters,
-                ...pipeline,
               });
               setAnchorEl(null);
             }}
