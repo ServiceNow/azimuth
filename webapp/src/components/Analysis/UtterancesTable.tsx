@@ -1,7 +1,7 @@
-import { GetApp, SvgIconComponent } from "@mui/icons-material";
+import { ArrowDropDown, GetApp, SvgIconComponent } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Menu, MenuItem } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -36,7 +36,10 @@ import {
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
-import { downloadDatasetSplit } from "utils/api";
+import {
+  downloadDatasetSplit,
+  downloadUtteranceProposedActions,
+} from "utils/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
   ID_TOOLTIP,
@@ -154,6 +157,7 @@ const UtterancesTable: React.FC<Props> = ({
   const [selectedPersistentIds, setSelectedPersistentIds] = React.useState<
     number[]
   >([]);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
 
@@ -403,19 +407,48 @@ const UtterancesTable: React.FC<Props> = ({
           link="user-guide/exploration-space/utterance-table/"
         />
         <Button
+          id="export-button"
+          aria-controls="export-menu"
+          aria-haspopup="true"
           className={classes.exportButton}
-          onClick={() =>
-            downloadDatasetSplit({
-              jobId,
-              datasetSplitName,
-              ...filters,
-              ...pipeline,
-            })
-          }
+          onClick={(event) => setAnchorEl(event.currentTarget)}
           startIcon={<GetApp />}
+          endIcon={<ArrowDropDown />}
         >
           Export
         </Button>
+        <Menu
+          id="export-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              downloadDatasetSplit({
+                jobId,
+                datasetSplitName,
+                ...filters,
+                ...pipeline,
+              });
+              setAnchorEl(null);
+            }}
+          >
+            Export utterances
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              downloadUtteranceProposedActions({
+                jobId,
+                datasetSplitName,
+              });
+              setAnchorEl(null);
+            }}
+          >
+            Export proposed actions
+          </MenuItem>
+        </Menu>
       </div>
       <Table
         pagination
