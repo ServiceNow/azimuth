@@ -407,6 +407,9 @@ const UtterancesTable: React.FC<Props> = ({
           link="user-guide/exploration-space/utterance-table/"
         />
         <Button
+          id="export-button"
+          aria-controls="export-menu"
+          aria-haspopup="true"
           className={classes.exportButton}
           onClick={(event) => setAnchorEl(event.currentTarget)}
           startIcon={<GetApp />}
@@ -415,6 +418,7 @@ const UtterancesTable: React.FC<Props> = ({
           Export
         </Button>
         <Menu
+          id="export-menu"
           anchorEl={anchorEl}
           keepMounted
           open={Boolean(anchorEl)}
