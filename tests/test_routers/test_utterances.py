@@ -116,6 +116,48 @@ def test_get_utterances_pagination(app: FastAPI):
     assert resp.status_code == 400
 
 
+def test_get_utterances_filtering_and_indexing(app: FastAPI):
+    client = TestClient(app)
+
+    # Filtering on label
+    resp = client.get("/dataset_splits/eval/utterances?label=negative").json()
+    assert len(resp["utterances"]) == 22
+    assert resp["utteranceCount"] == 22
+    assert all(u["label"] == "negative" for u in resp["utterances"])
+
+    # Filtering on prediction
+    resp = client.get("/dataset_splits/eval/utterances?pipeline_index=0&prediction=negative").json()
+    assert len(resp["utterances"]) == 3
+    assert resp["utteranceCount"] == 3
+    assert all(
+        u["modelPrediction"]["postprocessedPrediction"] == "negative" for u in resp["utterances"]
+    )
+
+    # Filtering on index
+    resp = client.get("/dataset_splits/eval/utterances?indices=3").json()
+    assert len(resp["utterances"]) == 1
+    assert resp["utteranceCount"] == 1
+    assert resp["utterances"][0]["index"] == 3
+
+    # Filtering on indices
+    resp = client.get("/dataset_splits/eval/utterances?indices=3&indices=4").json()
+    assert len(resp["utterances"]) == 2
+    assert resp["utteranceCount"] == 2
+    assert [res["index"] for res in resp["utterances"]] == [3, 4]
+
+    # Filtering on label and index (not empty)
+    resp = client.get("/dataset_splits/eval/utterances?label=positive&indices=3").json()
+    assert len(resp["utterances"]) == 1
+    assert resp["utteranceCount"] == 1
+    assert resp["utterances"][0]["label"] == "positive"
+    assert resp["utterances"][0]["index"] == 3
+
+    # Filtering on label and index (empty)
+    resp = client.get("/dataset_splits/eval/utterances?label=negative&indices=3").json()
+    assert len(resp["utterances"]) == 0
+    assert resp["utteranceCount"] == 0
+
+
 def test_get_utterances_empty_filters(app: FastAPI):
     client = TestClient(app)
     resp = client.get("/dataset_splits/eval/utterances?utterance=yukongold").json()
