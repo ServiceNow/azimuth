@@ -274,9 +274,15 @@ def get_utterances(
 )
 def patch_utterances(
     utterances: List[UtterancePatch] = Body(...),
+    config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     task_manager: TaskManager = Depends(get_task_manager),
+    ignore_not_found: bool = Query(False),
 ) -> List[UtterancePatch]:
+    if ignore_not_found:
+        all_persistent_ids = dataset_split_manager.get_dataset_split()[config.columns.persistent_id]
+        utterances = [u for u in utterances if u.persistent_id in all_persistent_ids]
+
     persistent_ids = [utterance.persistent_id for utterance in utterances]
     try:
         row_indices = dataset_split_manager.get_row_indices_from_persistent_id(persistent_ids)

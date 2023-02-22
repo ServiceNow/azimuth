@@ -1330,6 +1330,9 @@ export interface operations {
       path: {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
+      query: {
+        ignore_not_found?: boolean;
+      };
     };
     responses: {
       /** Successful Response */
