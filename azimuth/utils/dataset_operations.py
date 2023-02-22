@@ -50,19 +50,11 @@ def filter_dataset_split(
                 lambda x: filters.confidence_min <= x[0] <= filters.confidence_max,
                 input_columns=confidence_column,
             )
-    if (
-        len(filters.label) > 0
-        and config.columns.label in dataset_split.column_names
-        and dataset_split.num_rows != 0
-    ):
+    if len(filters.label) > 0 and dataset_split.num_rows != 0:
         dataset_split = dataset_split.filter(
             lambda x: x in filters.label, input_columns=config.columns.label
         )
-    if (
-        filters.utterance is not None
-        and config.columns.text_input in dataset_split.column_names
-        and dataset_split.num_rows != 0
-    ):
+    if filters.utterance is not None and dataset_split.num_rows != 0:
         cleaned_utterance = clean_utterance(filters.utterance)
         # Filter in utterances or if string matches a known row_idx or persistent_id
         dataset_split = dataset_split.filter(
