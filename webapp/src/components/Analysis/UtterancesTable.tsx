@@ -1,6 +1,7 @@
 import { ArrowDropDown, GetApp, SvgIconComponent } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
+import UploadIcon from "@mui/icons-material/Upload";
 import { Box, Button, Menu, MenuItem } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
@@ -73,6 +74,7 @@ const useStyles = makeStyles((theme) => ({
   gridHeaderActions: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "space-between",
   },
   searchContainer: {
     marginLeft: theme.spacing(2),
@@ -406,49 +408,63 @@ const UtterancesTable: React.FC<Props> = ({
           text="Explore utterances and propose actions. Click on a row to inspect the utterance details."
           link="user-guide/exploration-space/utterance-table/"
         />
-        <Button
-          id="export-button"
-          aria-controls="export-menu"
-          aria-haspopup="true"
-          className={classes.exportButton}
-          onClick={(event) => setAnchorEl(event.currentTarget)}
-          startIcon={<GetApp />}
-          endIcon={<ArrowDropDown />}
-        >
-          Export
-        </Button>
-        <Menu
-          id="export-menu"
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-        >
-          <MenuItem
-            onClick={() => {
-              downloadDatasetSplit({
-                jobId,
-                datasetSplitName,
-                ...filters,
-                ...pipeline,
-              });
-              setAnchorEl(null);
-            }}
+        <Box display="flex" alignItems="center" gap={2}>
+          <Button
+            className={classes.exportButton}
+            component="label"
+            startIcon={<UploadIcon />}
           >
-            Export utterances
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              downloadUtteranceProposedActions({
-                jobId,
-                datasetSplitName,
-              });
-              setAnchorEl(null);
-            }}
+            Import
+            <input
+              hidden
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              type="file"
+            />
+          </Button>
+          <Button
+            id="export-button"
+            aria-controls="export-menu"
+            aria-haspopup="true"
+            className={classes.exportButton}
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            startIcon={<GetApp />}
+            endIcon={<ArrowDropDown />}
           >
-            Export proposed actions
-          </MenuItem>
-        </Menu>
+            Export
+          </Button>
+          <Menu
+            id="export-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+          >
+            <MenuItem
+              onClick={() => {
+                downloadDatasetSplit({
+                  jobId,
+                  datasetSplitName,
+                  ...filters,
+                  ...pipeline,
+                });
+                setAnchorEl(null);
+              }}
+            >
+              Export utterances
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                downloadUtteranceProposedActions({
+                  jobId,
+                  datasetSplitName,
+                });
+                setAnchorEl(null);
+              }}
+            >
+              Export proposed actions
+            </MenuItem>
+          </Menu>
+        </Box>
       </div>
       <Table
         pagination
