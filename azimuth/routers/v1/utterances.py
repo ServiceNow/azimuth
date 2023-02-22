@@ -111,8 +111,11 @@ def get_utterances(
     else:
         threshold, table_key = None, None
 
+    ds = dataset_split_manager.get_dataset_split(table_key)
+    if indices is not None:
+        ds = ds.select(indices)
     ds = filter_dataset_split(
-        dataset_split_manager.get_dataset_split(table_key),
+        ds,
         named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         config,
         without_postprocessing,
@@ -120,13 +123,6 @@ def get_utterances(
     ds = dataset_split_manager.get_dataset_split_with_class_names(table_key=table_key).select(
         ds[DatasetColumn.row_idx]
     )
-
-    if indices is not None:
-        if len(set(indices) - set(ds[DatasetColumn.row_idx])) > 0:
-            raise HTTPException(
-                HTTP_404_NOT_FOUND, detail=f"Indices {indices} not found after filtering"
-            )
-        ds = ds.filter(lambda i: i in indices, input_columns=DatasetColumn.row_idx)
 
     # We create _top_conf and _top_prediction because we can't sort on columns made of lists.
     # They start with an underscore to emphasize that they are not saved and that therefore they
