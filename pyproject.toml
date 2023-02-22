@@ -57,8 +57,11 @@ aiofiles = "^0.6.0"
 dask = "2021.12.0"
 distributed = "2021.12.0"
 
+[tool.poetry.extras]
+cpu = ["onnxruntime"]
+gpu = ["onnxruntime-gpu"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^6.0"
 pytest-cov = "2.11.1"
 pytest-env = "^0.6.2"
@@ -83,11 +86,6 @@ pyinstrument = "^4.3.0"
 # Documentation
 mkdocs = "^1.2.3"
 mkdocs-material = "^8.1.7"
-
-[tool.poetry.extras]
-cpu = ["onnxruntime"]
-gpu = ["onnxruntime-gpu"]
-
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
