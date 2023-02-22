@@ -64,6 +64,7 @@ from azimuth.utils.routers import (
     require_available_model,
     require_pipeline_index,
 )
+from azimuth.utils.validation import assert_not_none
 
 router = APIRouter()
 
@@ -80,7 +81,7 @@ class UtterancesSortableColumn(str, Enum):
 
 @router.get(
     "",
-    summary="Get table view",
+    summary="Get utterances table view",
     description="Get a table view of the utterances according to filters.",
     tags=TAGS,
     response_model=GetUtterancesResponse,
@@ -100,46 +101,28 @@ def get_utterances(
     pagination: Optional[PaginationParams] = Depends(get_pagination),
     without_postprocessing: bool = Query(False, title="Without Postprocessing"),
 ) -> GetUtterancesResponse:
-    threshold = (
-        config.pipelines[pipeline_index].threshold
-        if config.pipelines is not None
-        and pipeline_index is not None
-        and postprocessing_known(task_manager.config, pipeline_index)
-        else None
-    )
-
-    dataset_filters = named_filters.to_dataset_filters(dataset_split_manager.get_class_names())
-    table_key = (
-        PredictionTableKey.from_pipeline_index(
-            pipeline_index,
-            config,
+    if predictions_available(config) and pipeline_index is not None:
+        threshold = (
+            assert_not_none(config.pipelines)[pipeline_index].threshold
+            if postprocessing_known(task_manager.config, pipeline_index)
+            else None
         )
-        if pipeline_index is not None
-        else None
-    )
-    ds_filtered = filter_dataset_split(
-        dataset_split_manager.get_dataset_split(table_key),
-        dataset_filters,
+        table_key = PredictionTableKey.from_pipeline_index(pipeline_index, config)
+    else:
+        threshold, table_key = None, None
+
+    ds = dataset_split_manager.get_dataset_split(table_key)
+    if indices is not None:
+        ds = ds.select(indices)
+    ds = filter_dataset_split(
+        ds,
+        named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         config,
         without_postprocessing,
     )
-
-    if len(ds_filtered) == 0:
-        # No utterances, empty response.
-        return GetUtterancesResponse(
-            utterances=[], utterance_count=0, confidence_threshold=threshold
-        )
-
     ds = dataset_split_manager.get_dataset_split_with_class_names(table_key=table_key).select(
-        ds_filtered[DatasetColumn.row_idx]
+        ds[DatasetColumn.row_idx]
     )
-
-    if indices is not None:
-        if len(set(indices) - set(ds[DatasetColumn.row_idx])) > 0:
-            raise HTTPException(
-                HTTP_404_NOT_FOUND, detail=f"Indices not found after filtering {indices}"
-            )
-        ds = ds.filter(lambda i: i in indices, input_columns=DatasetColumn.row_idx)
 
     # We create _top_conf and _top_prediction because we can't sort on columns made of lists.
     # They start with an underscore to emphasize that they are not saved and that therefore they
@@ -173,46 +156,11 @@ def get_utterances(
         ]
         ds = ds.filter(lambda i: i in indices, input_columns=DatasetColumn.row_idx)
 
-    if len(ds) == 0:
+    if utterance_count == 0:
         # No utterances, empty response.
         return GetUtterancesResponse(
             utterances=[], utterance_count=utterance_count, confidence_threshold=threshold
         )
-
-    indices_subset = ds[DatasetColumn.row_idx]
-    tags = dataset_split_manager.get_tags(indices_subset, table_key=table_key)
-
-    if predictions_available(config) and pipeline_index is not None:
-        # For memory efficiency
-        ds = ds.with_format(
-            columns=[
-                DatasetColumn.row_idx,
-                DatasetColumn.model_predictions,
-                DatasetColumn.postprocessed_prediction,
-                DatasetColumn.model_confidences,
-                DatasetColumn.postprocessed_confidences,
-                DatasetColumn.pipeline_steps,
-                config.columns.label,
-                config.columns.text_input,
-                DatasetColumn.model_outcome,
-                DatasetColumn.postprocessed_outcome,
-            ]
-        )
-        predictions: List[Optional[ModelPrediction]] = [
-            ModelPrediction(
-                model_predictions=data[DatasetColumn.model_predictions],
-                postprocessed_prediction=data[DatasetColumn.postprocessed_prediction],
-                model_confidences=data[DatasetColumn.model_confidences],
-                postprocessed_confidences=data[DatasetColumn.postprocessed_confidences],
-                model_outcome=data[DatasetColumn.model_outcome],
-                postprocessed_outcome=data[DatasetColumn.postprocessed_outcome],
-                preprocessing_steps=data[DatasetColumn.pipeline_steps]["preprocessing_steps"],
-                postprocessing_steps=data[DatasetColumn.pipeline_steps]["postprocessing_steps"],
-            )
-            for data in ds
-        ]
-    else:
-        predictions = [None] * len(ds)
 
     if saliency_available(config) and pipeline_index is not None:
         saliency_results = get_standard_task_result(
@@ -220,7 +168,9 @@ def get_utterances(
             dataset_split_name,
             task_manager,
             last_update=dataset_split_manager.last_update,
-            mod_options=ModuleOptions(pipeline_index=pipeline_index, indices=indices_subset),
+            mod_options=ModuleOptions(
+                pipeline_index=pipeline_index, indices=ds[DatasetColumn.row_idx]
+            ),
         )
         model_saliencies: List[Optional[ModelSaliency]] = [
             ModelSaliency(
@@ -235,29 +185,36 @@ def get_utterances(
     available_families = copy(DATASET_SMART_TAG_FAMILIES)
     if pipeline_index is not None:
         available_families += PIPELINE_SMART_TAG_FAMILIES
+
     utterances = [
         Utterance(
             index=data[DatasetColumn.row_idx],
             persistent_id=data[config.columns.persistent_id],
-            data_action=next(
-                (t for t, v in tag.items() if t in ALL_DATA_ACTIONS and v),
-                DataAction.no_action,
-            ),
+            data_action=next((t for t in ALL_DATA_ACTIONS if data[t]), DataAction.no_action),
             label=data[config.columns.label],
             utterance=data[config.columns.text_input],
-            model_prediction=model_prediction,
+            model_prediction=ModelPrediction(
+                model_predictions=data[DatasetColumn.model_predictions],
+                postprocessed_prediction=data[DatasetColumn.postprocessed_prediction],
+                model_confidences=data[DatasetColumn.model_confidences],
+                postprocessed_confidences=data[DatasetColumn.postprocessed_confidences],
+                model_outcome=data[DatasetColumn.model_outcome],
+                postprocessed_outcome=data[DatasetColumn.postprocessed_outcome],
+                preprocessing_steps=data[DatasetColumn.pipeline_steps]["preprocessing_steps"],
+                postprocessing_steps=data[DatasetColumn.pipeline_steps]["postprocessing_steps"],
+            )
+            if predictions_available(config) and pipeline_index is not None
+            else None,
             model_saliency=model_saliency,
             # Smart tags families
             **{
-                family.value: [t for t in tags_in_family if tag[t]]
+                family.value: [t for t in tags_in_family if data[t]]
                 if family in available_families
                 else []
                 for family, tags_in_family in SMART_TAGS_FAMILY_MAPPING.items()
             },
         )
-        for data, tag, model_saliency, model_prediction in zip(
-            ds, tags.values(), model_saliencies, predictions
-        )
+        for data, model_saliency in zip(ds, model_saliencies)
     ]
 
     return GetUtterancesResponse(

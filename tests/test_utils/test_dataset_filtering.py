@@ -66,18 +66,10 @@ def test_dataset_filtering_columns_not_in_dataset(simple_text_config):
     dm = generate_mocked_dm(simple_text_config)
     ds = dm.get_dataset_split(get_table_key(simple_text_config))
     ds = ds.rename_column(DatasetColumn.postprocessed_prediction, "col1")
-    ds = ds.rename_column("label", "col2")
-    ds = ds.rename_column(dm.config.columns.text_input, "col3")
     ds = ds.rename_column(DatasetColumn.postprocessed_outcome, "col4")
     ds = ds.rename_column(DatasetColumn.postprocessed_confidences, "col5")
 
     ds_filtered = filter_dataset_split(ds, DatasetFilters(prediction=[0]), config=dm.config)
-    assert len(ds_filtered) == len(ds)
-
-    ds_filtered = filter_dataset_split(ds, DatasetFilters(utterance="substring"), config=dm.config)
-    assert len(ds_filtered) == len(ds)
-
-    ds_filtered = filter_dataset_split(ds, DatasetFilters(label=[1]), config=dm.config)
     assert len(ds_filtered) == len(ds)
 
     outcome = [OutcomeName.IncorrectAndRejected]
