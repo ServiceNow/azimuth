@@ -22,12 +22,17 @@ import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import UtteranceSaliency from "components/Utterance/UtteranceSaliency";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { getConfigEndpoint, getUtterancesEndpoint } from "services/api";
+import {
+  getConfigEndpoint,
+  getUtterancesEndpoint,
+  updateDataActionsEndpoint,
+} from "services/api";
 import {
   DataAction,
   DatasetInfoResponse,
   DatasetSplitName,
   Utterance,
+  UtterancePatch,
   UtterancesSortableColumn,
 } from "types/api";
 import {
@@ -52,6 +57,10 @@ import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
 
 const SMART_TAG_WIDTH = 30;
+const API_HEADERS = {
+  row_idx: "persistentId",
+  proposed_action: "dataAction",
+};
 
 const useStyles = makeStyles((theme) => ({
   hoverableDataCell: {
@@ -146,6 +155,8 @@ const UtterancesTable: React.FC<Props> = ({
 
   const { data: utterancesResponse, isFetching } =
     getUtterancesEndpoint.useQuery(getUtterancesQueryState);
+
+  const [updateDataAction] = updateDataActionsEndpoint.useMutation();
 
   const rows: Row[] = React.useMemo(
     () =>
@@ -392,6 +403,59 @@ const UtterancesTable: React.FC<Props> = ({
   ];
 
   const searchString = constructSearchString(pipeline);
+
+  const importProposedActions = (file: File) => {
+    const fileReader = new FileReader();
+    fileReader.onload = (event) => {
+      if (event.target) {
+        const data = event.target.result as string;
+        console.log(data);
+        const headers: string[] = data.slice(0, data.indexOf("\n")).split(",");
+        const parsedCSVData: UtterancePatch[] = data
+          .slice(data.indexOf("\n") + 1)
+          .split("\n")
+          .map((row) => {
+            const values = row.split(",");
+            const obj = headers.reduce((object, header, index) => {
+              return Object.assign(object, {
+                [API_HEADERS[
+                  header.replace(/[^a-zA-Z_]/g, "") as keyof typeof API_HEADERS
+                ]]: values[index].replace(/[^a-zA-Z0-9_]/g, ""),
+              });
+            }, {});
+            return obj as UtterancePatch;
+          });
+
+        const groupByPersistentId: Record<
+          string,
+          UtterancePatch["persistentId"][]
+        > = parsedCSVData.reduce(
+          (
+            accumulated: Record<string, UtterancePatch["persistentId"][]>,
+            { persistentId, dataAction }: UtterancePatch
+          ) => ({
+            ...accumulated,
+            [dataAction]: accumulated[dataAction]
+              ? accumulated[dataAction].concat(persistentId)
+              : [persistentId],
+          }),
+          {}
+        );
+        Object.entries(groupByPersistentId).map(
+          ([dataAction, persistentIds]) => {
+            const newValue = dataAction as DataAction;
+            updateDataAction({
+              persistentIds,
+              newValue,
+              ...getUtterancesQueryState,
+            });
+          }
+        );
+      }
+    };
+    fileReader.readAsText(file, "UTF8");
+  };
+
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
@@ -419,6 +483,11 @@ const UtterancesTable: React.FC<Props> = ({
               hidden
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               type="file"
+              onChange={(event) => {
+                if (event.target.files) {
+                  importProposedActions(event.target.files[0]);
+                }
+              }}
             />
           </Button>
           <Button
