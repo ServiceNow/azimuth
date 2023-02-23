@@ -62,8 +62,8 @@ export const getConfigAPIResponse = rest.get(
       uncertainty: { iterations: 1, high_epistemic_threshold: 0.1 },
       saliency_layer: "distilbert.embeddings.word_embeddings",
       syntax: {
-        short_sentence_max_word: 3,
-        long_sentence_min_word: 12,
+        short_utterance_max_word: 3,
+        long_utterance_min_word: 12,
         spacy_model: "en_core_web_sm",
         subj_tags: ["nsubj", "nsubjpass"],
         obj_tags: ["dobj", "pobj", "obj"],
@@ -245,8 +245,8 @@ export const getConfigMultipipelineAPIResponse = rest.get(
       uncertainty: { iterations: 1, high_epistemic_threshold: 0.1 },
       saliency_layer: "distilbert.embeddings.word_embeddings",
       syntax: {
-        short_sentence_max_word: 3,
-        long_sentence_min_word: 12,
+        short_utterance_max_word: 3,
+        long_utterance_min_word: 12,
         spacy_model: "en_core_web_sm",
         subj_tags: ["nsubj", "nsubjpass"],
         obj_tags: ["dobj", "pobj", "obj"],

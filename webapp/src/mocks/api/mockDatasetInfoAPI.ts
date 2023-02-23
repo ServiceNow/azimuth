@@ -20,8 +20,8 @@ export const getDatasetInfoAPIResponse = rest.get(
       ],
       smartTags: [
         "multiple_sentences",
-        "long_sentence",
-        "short_sentence",
+        "long_utterance",
+        "short_utterance",
         "missing_subj",
         "missing_obj",
         "missing_verb",
