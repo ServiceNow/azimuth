@@ -13,7 +13,7 @@ describe("PerformanceAnalysisComparisonWithoutPipeline", () => {
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
-  it("should display 'pipeline requied' message if no pipeline selected or exist in the config", () => {
+  it("should display 'pipeline required' message if no pipeline selected or exist in the config", () => {
     renderWithRouterAndRedux(<PerformanceAnalysis />, {
       route: "/local/dataset_splits/eval/pipeline_metrics",
       path: "/:jobId/dataset_splits/:datasetSplitName/pipeline_metrics",
@@ -25,8 +25,7 @@ describe("PerformanceAnalysisComparisonWithoutPipeline", () => {
     expect(
       screen.getByText("Analyze metrics for different data subpopulations.")
     ).toBeVisible();
-    const link: HTMLAnchorElement = screen.getByRole("link");
-    expect(link).toHaveAttribute(
+    expect(screen.getByRole("link")).toHaveAttribute(
       "href",
       "https://servicenow.github.io/azimuth/main/user-guide/pipeline-metrics-comparison/"
     );
