@@ -73,7 +73,7 @@ describe("PerformanceAnalysisComparisonTableWithNoComparedPipeline", () => {
       expectedColumnHeaders.forEach((name, index) => {
         name.includes("&")
           ? within(actualColumnHeaders[index]).getByLabelText(name)
-          : expect(actualColumnHeaders[index]).toHaveTextContent(name);
+          : expect(actualColumnHeaders[index].textContent).toBe(name);
       });
     });
   });
@@ -103,7 +103,7 @@ describe("PerformanceAnalysisComparisonTableWithNoComparedPipeline", () => {
     ];
     expect(filterList).toHaveLength(expectedList.length);
     filterList.forEach((item, index) => {
-      expect(item).toHaveTextContent(expectedList[index]);
+      expect(item.textContent).toBe(expectedList[index]);
     });
 
     expect(screen.getByRole("option", { name: "Smart Tags" })).toHaveAttribute(
@@ -145,7 +145,7 @@ describe("PerformanceAnalysisComparisonTableWithMultiPipeline", () => {
       ];
       expect(pipelineList).toHaveLength(expectedPipelineList.length);
       pipelineList.forEach((item, index) => {
-        expect(item).toHaveTextContent(expectedPipelineList[index]);
+        expect(item.textContent).toBe(expectedPipelineList[index]);
       });
       expect(screen.getByRole("option", { name: "Pipeline_0" })).toHaveClass(
         "Mui-disabled"
@@ -177,7 +177,7 @@ describe("PerformanceAnalysisComparisonTableWithMultiPipeline", () => {
       ];
       const actualColumnHeaders = screen.getAllByRole("columnheader");
       expectedColumnHeaders.forEach((name, index) => {
-        expect(actualColumnHeaders[index]).toHaveTextContent(name);
+        expect(actualColumnHeaders[index].textContent).toBe(name);
       });
     });
   });

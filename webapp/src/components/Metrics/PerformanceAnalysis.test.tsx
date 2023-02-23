@@ -65,7 +65,7 @@ describe("PerformanceAnalysis", () => {
       expectedColumnHeaders.forEach((name, index) => {
         name.includes("&")
           ? within(actualColumnHeaders[index]).getByLabelText(name)
-          : expect(actualColumnHeaders[index]).toHaveTextContent(name);
+          : expect(actualColumnHeaders[index].textContent).toBe(name);
       });
     });
   });
@@ -95,7 +95,7 @@ describe("PerformanceAnalysis", () => {
     ];
     expect(filterList).toHaveLength(expectedList.length);
     filterList.forEach((item, index) => {
-      expect(item).toHaveTextContent(expectedList[index]);
+      expect(item.textContent).toBe(expectedList[index]);
     });
 
     expect(screen.getByRole("option", { name: "Smart Tags" })).toHaveAttribute(

@@ -30,7 +30,7 @@ describe("PipelineSelect", () => {
 
     expect(pipelineListOptions).toHaveLength(allPipelines.length);
     pipelineListOptions.forEach((item, index) => {
-      expect(item).toHaveTextContent(allPipelines[index]);
+      expect(item.textContent).toBe(allPipelines[index]);
     });
 
     fireEvent.click(screen.getByRole("option", { name: "Pipeline_0" }));
