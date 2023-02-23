@@ -67,10 +67,6 @@ const Exploration = () => {
     );
   };
 
-  if (!isPipelineSelected(pipeline) && mainView !== "utterances") {
-    setMainView("utterances");
-  }
-
   return (
     <>
       <PageHeader />
