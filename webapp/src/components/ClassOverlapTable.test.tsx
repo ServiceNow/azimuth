@@ -70,7 +70,7 @@ describe("ClassOverlapTable", () => {
     ).toBeNull();
   });
 
-  it("should not display the Footer component if the number of rows is lesser than initial number", async () => {
+  it("should not display the Footer component if the number of rows is less than initial number", async () => {
     renderClassOverlapTable({ train: true, eval: true }, { pipelineIndex: 0 });
     await waitFor(() => expect(screen.queryByText(/See more/)).toBeNull());
   });
