@@ -33,7 +33,7 @@ REQUIRED = "required"
 
 
 @router.get(
-    "/default_config",
+    "/default",
     summary="Get default configuration",
     description="Get the default configuration",
     response_model=AzimuthConfig,
@@ -50,7 +50,7 @@ def get_default_config_def(
 
 
 @router.get(
-    "/config",
+    "",
     summary="Get configuration",
     description="Get the current configuration",
     response_model=AzimuthConfig,
@@ -63,7 +63,7 @@ def get_config_def(
 
 
 @router.patch(
-    "/config",
+    "",
     summary="Update config",
     description="Update the config.",
     tags=TAGS,

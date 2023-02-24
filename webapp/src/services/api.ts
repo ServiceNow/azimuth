@@ -267,14 +267,14 @@ export const api = createApi({
     getConfig: build.query({
       providesTags: [{ type: "Config" }],
       queryFn: responseToData(
-        fetchApi({ path: "/admin/config", method: "get" }),
+        fetchApi({ path: "/config", method: "get" }),
         "Something went wrong fetching config"
       ),
     }),
     getDefaultConfig: build.query({
       providesTags: [{ type: "Config" }],
       queryFn: responseToData(
-        fetchApi({ path: "/admin/default_config", method: "get" }),
+        fetchApi({ path: "/config/default", method: "get" }),
         "Something went wrong fetching default config"
       ),
     }),
@@ -283,7 +283,7 @@ export const api = createApi({
       { jobId: string; body: Partial<AzimuthConfig> }
     >({
       queryFn: responseToData(
-        fetchApi({ path: "/admin/config", method: "patch" }),
+        fetchApi({ path: "/config", method: "patch" }),
         "Something went wrong updating config"
       ),
       invalidatesTags: () => tagTypes,

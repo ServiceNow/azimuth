@@ -136,7 +136,7 @@ def create_app() -> FastAPI:
     )
 
     # Setup routes
-    from azimuth.routers.v1.admin import router as admin_router
+    from azimuth.routers.v1.admin import router as config_router
     from azimuth.routers.v1.app import router as app_router
     from azimuth.routers.v1.class_overlap import router as class_overlap_router
     from azimuth.routers.v1.custom_utterances import router as custom_utterances_router
@@ -161,7 +161,7 @@ def create_app() -> FastAPI:
 
     api_router = APIRouter()
     api_router.include_router(app_router, prefix="")
-    api_router.include_router(admin_router, prefix="/admin")
+    api_router.include_router(config_router, prefix="/config")
     api_router.include_router(
         class_overlap_router,
         prefix="/dataset_splits/{dataset_split_name}/class_overlap",
