@@ -20,15 +20,15 @@ export interface paths {
     /** Get a failure rate per dataset split and per test as well. */
     get: operations["get_perturbation_testing_summary_perturbation_testing_summary_get"];
   };
-  "/admin/default_config": {
+  "/config/default": {
     /** Get the default configuration */
-    get: operations["get_default_config_def_admin_default_config_get"];
+    get: operations["get_default_config_def_config_default_get"];
   };
-  "/admin/config": {
+  "/config": {
     /** Get the current configuration */
-    get: operations["get_config_def_admin_config_get"];
+    get: operations["get_config_def_config_get"];
     /** Update the config. */
-    patch: operations["patch_config_admin_config_patch"];
+    patch: operations["patch_config_config_patch"];
   };
   "/dataset_splits/{dataset_split_name}/class_overlap/plot": {
     /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
@@ -951,7 +951,7 @@ export interface operations {
     };
   };
   /** Get the default configuration */
-  get_default_config_def_admin_default_config_get: {
+  get_default_config_def_config_default_get: {
     parameters: {
       query: {
         language?: components["schemas"]["SupportedLanguage"];
@@ -973,7 +973,7 @@ export interface operations {
     };
   };
   /** Get the current configuration */
-  get_config_def_admin_config_get: {
+  get_config_def_config_get: {
     responses: {
       /** Successful Response */
       200: {
@@ -984,7 +984,7 @@ export interface operations {
     };
   };
   /** Update the config. */
-  patch_config_admin_config_patch: {
+  patch_config_config_patch: {
     responses: {
       /** Successful Response */
       200: {

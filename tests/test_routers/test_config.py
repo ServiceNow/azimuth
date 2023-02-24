@@ -7,7 +7,7 @@ from azimuth.config import SupportedLanguage, config_defaults_per_language
 
 def test_get_default_config(app: FastAPI):
     client = TestClient(app)
-    res = client.get("/admin/default_config").json()
+    res = client.get("/config/default").json()
 
     assert res == {
         "name": "New project",
@@ -109,7 +109,7 @@ def test_get_default_config(app: FastAPI):
 
 def test_get_default_config_french(app: FastAPI):
     client = TestClient(app)
-    res = client.get("/admin/default_config?language=fr").json()
+    res = client.get("/config/default?language=fr").json()
 
     defaults = config_defaults_per_language[SupportedLanguage.fr]
     assert res["language"] == "fr"
@@ -123,7 +123,7 @@ def test_get_default_config_french(app: FastAPI):
 
 def test_get_config(app: FastAPI):
     client = TestClient(app)
-    res = client.get("/admin/config").json()
+    res = client.get("/config").json()
 
     assert res == {
         "artifact_path": "/tmp/azimuth_test_cache",
@@ -227,7 +227,7 @@ def test_get_config(app: FastAPI):
 
 def test_update_config(app: FastAPI, wait_for_startup_after):
     client = TestClient(app)
-    initial_config = client.get("/admin/config").json()
+    initial_config = client.get("/config").json()
     initial_contract = initial_config["model_contract"]
     initial_pipelines = initial_config["pipelines"]
     jsonl_file_path = f"{initial_config['artifact_path']}/config_history.jsonl"
@@ -235,23 +235,23 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
         initial_config_count = len(list(reader))
 
     res = client.patch(
-        "/admin/config",
+        "/config",
         json={"model_contract": "file_based_text_classification", "pipelines": None},
     )
     assert res.json()["model_contract"] == "file_based_text_classification"
-    get_config = client.get("/admin/config").json()
+    get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
     assert not get_config["pipelines"]
 
     # Config Validation Error
-    res = client.patch("/admin/config", json={"model_contract": "potato"})
+    res = client.patch("/config", json={"model_contract": "potato"})
     assert res.status_code == 400
-    get_config = client.get("/admin/config").json()
+    get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
 
     # Validation Module Error
     res = client.patch(
-        "/admin/config",
+        "/config",
         json={
             "pipelines": [
                 {"model": {"class_name": "tests.test_loading_resources.load_intent_data"}}
@@ -259,7 +259,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
         },
     )
     assert res.status_code == 500
-    get_config = client.get("/admin/config").json()
+    get_config = client.get("/config").json()
     assert not get_config["pipelines"]
 
     with jsonlines.open(jsonl_file_path, "r") as reader:
@@ -270,5 +270,5 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
 
     # Revert config change
     _ = client.patch(
-        "/admin/config", json={"model_contract": initial_contract, "pipelines": initial_pipelines}
+        "/config", json={"model_contract": initial_contract, "pipelines": initial_pipelines}
     )
