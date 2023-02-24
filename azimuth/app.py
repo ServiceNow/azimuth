@@ -136,9 +136,9 @@ def create_app() -> FastAPI:
     )
 
     # Setup routes
-    from azimuth.routers.v1.admin import router as config_router
     from azimuth.routers.v1.app import router as app_router
     from azimuth.routers.v1.class_overlap import router as class_overlap_router
+    from azimuth.routers.v1.config import router as config_router
     from azimuth.routers.v1.custom_utterances import router as custom_utterances_router
     from azimuth.routers.v1.dataset_warnings import router as dataset_warnings_router
     from azimuth.routers.v1.export import router as export_router
