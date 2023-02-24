@@ -409,7 +409,6 @@ const UtterancesTable: React.FC<Props> = ({
     fileReader.onload = (event) => {
       if (event.target) {
         const data = event.target.result as string;
-        console.log(data);
         const headers: string[] = data.slice(0, data.indexOf("\n")).split(",");
         const parsedCSVData: UtterancePatch[] = data
           .slice(data.indexOf("\n") + 1)
