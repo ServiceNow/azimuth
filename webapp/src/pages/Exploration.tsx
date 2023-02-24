@@ -67,6 +67,12 @@ const Exploration = () => {
     );
   };
 
+  React.useEffect(() => {
+    if (!isPipelineSelected(pipeline) && mainView !== "utterances") {
+      setMainView("utterances");
+    }
+  }, [pipeline]);
+
   return (
     <>
       <PageHeader />

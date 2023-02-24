@@ -71,9 +71,7 @@ const Dashboard = () => {
           color="secondary"
           variant="contained"
           component={Link}
-          to={`/${jobId}/dataset_splits/${firstAvailableDatasetSplit}/${
-            !isPipelineSelected(pipeline) ? `utterances` : `prediction_overview`
-          }${searchString}`}
+          to={`/${jobId}/dataset_splits/${firstAvailableDatasetSplit}/prediction_overview${searchString}`}
           sx={{ gap: 1 }}
         >
           <Telescope fontSize="large" />
