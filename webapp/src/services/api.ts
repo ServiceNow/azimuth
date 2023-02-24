@@ -22,6 +22,7 @@ const tagTypes = [
   "DatasetInfo",
   "ConfidenceHistogram",
   "Config",
+  "DefaultConfig",
   "Metrics",
   "OutcomeCountPerThreshold",
   "OutcomeCountPerFilter",
@@ -272,7 +273,7 @@ export const api = createApi({
       ),
     }),
     getDefaultConfig: build.query({
-      providesTags: [{ type: "Config" }],
+      providesTags: [{ type: "DefaultConfig" }],
       queryFn: responseToData(
         fetchApi({ path: "/config/default", method: "get" }),
         "Something went wrong fetching default config"
