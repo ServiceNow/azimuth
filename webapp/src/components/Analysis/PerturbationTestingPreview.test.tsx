@@ -97,13 +97,13 @@ describe("PerturbationTestingPreview", () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     const header = screen.getByRole("columnheader", { name: /Failure Rate/ });
     // before toggle changes
-    expect(header).toHaveTextContent("Evaluation Set");
+    expect(header.textContent).toBe("FR on Evaluation Set");
     expect(
       screen.getByLabelText("Failure Rate on Evaluation Set")
     ).toBeInTheDocument();
     // after toggle changes
     fireEvent.click(screen.getByRole("button", { pressed: false }));
-    expect(header).toHaveTextContent("Training Set");
+    expect(header.textContent).toBe("FR on Training Set");
     expect(
       screen.getByLabelText("Failure Rate on Training Set")
     ).toBeInTheDocument();

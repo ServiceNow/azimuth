@@ -28,7 +28,7 @@ describe("PreviewCard", () => {
     ).toBeVisible();
     // verify the documentation link
     const link: HTMLAnchorElement = screen.getByRole("link");
-    expect(link).toHaveTextContent("Learn more");
+    expect(link.textContent).toBe("Learn more");
     expect(link.href).toContain("/#performance-analysis");
     expect(screen.getByTestId("OpenInNewIcon")).toBeInTheDocument();
     // verify if the view details is not displayed if 'to' param is unavailable
