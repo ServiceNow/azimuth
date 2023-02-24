@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { renderWithRouterAndRedux } from "mocks/utils";
 import ClassOverlapTable from "./ClassOverlapTable";
 import { AvailableDatasetSplits } from "types/api";
@@ -57,6 +57,7 @@ describe("ClassOverlapTable", () => {
     const header = screen.getByRole("columnheader", {
       name: /Class overlap/,
     });
+    expect(header.textContent).toBe("Semantic Overlap Score");
     expect(header).toHaveAttribute("aria-sort", "descending");
   });
 
@@ -70,8 +71,8 @@ describe("ClassOverlapTable", () => {
     ).toBeNull();
   });
 
-  it("should not display the Footer component if the number of rows is less than initial number", async () => {
+  it("should not display the Footer component if the number of rows is less than initial number", () => {
     renderClassOverlapTable({ train: true, eval: true }, { pipelineIndex: 0 });
-    await waitFor(() => expect(screen.queryByText(/See more/)).toBeNull());
+    expect(screen.queryByText(/See more/)).toBeNull();
   });
 });
