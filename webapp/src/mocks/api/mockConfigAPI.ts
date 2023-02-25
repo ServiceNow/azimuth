@@ -4,7 +4,7 @@ import { AzimuthConfig } from "types/api";
 const baseUrl = "http://localhost/api/local";
 
 export const getConfigAPIResponse = rest.get(
-  `${baseUrl}/admin/config`,
+  `${baseUrl}/config`,
   (req, res, ctx) => {
     const azimuthConfigResponse: AzimuthConfig = {
       name: "Sentiment Analysis",
@@ -121,7 +121,7 @@ export const getConfigAPIResponse = rest.get(
 );
 
 export const getConfigMultipipelineAPIResponse = rest.get(
-  `${baseUrl}/admin/config`,
+  `${baseUrl}/config`,
   (req, res, ctx) => {
     const azimuthConfigMultipipelineResponse: AzimuthConfig = {
       name: "Sentiment Analysis",
