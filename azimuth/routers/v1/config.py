@@ -28,7 +28,7 @@ from azimuth.utils.project import update_config
 log = structlog.get_logger(__name__)
 router = APIRouter()
 
-TAGS = ["Admin v1"]
+TAGS = ["Config v1"]
 REQUIRED = "required"
 
 
