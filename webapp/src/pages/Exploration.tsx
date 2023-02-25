@@ -71,7 +71,7 @@ const Exploration = () => {
     if (!isPipelineSelected(pipeline) && mainView !== "utterances") {
       setMainView("utterances");
     }
-  }, [pipeline]);
+  }, [mainView, pipeline]);
 
   return (
     <>
