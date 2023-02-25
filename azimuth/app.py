@@ -160,59 +160,72 @@ def create_app() -> FastAPI:
     from azimuth.utils.routers import require_application_ready, require_available_model
 
     api_router = APIRouter()
-    api_router.include_router(app_router, prefix="")
-    api_router.include_router(config_router, prefix="/config")
+    api_router.include_router(app_router, prefix="", tags=["App"])
+    api_router.include_router(config_router, prefix="/config", tags=["Config"])
     api_router.include_router(
         class_overlap_router,
         prefix="/dataset_splits/{dataset_split_name}/class_overlap",
+        tags=["Class Overlap"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         confidence_histogram_router,
         prefix="/dataset_splits/{dataset_split_name}/confidence_histogram",
+        tags=["Confidence Histogram"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         dataset_warnings_router,
         prefix="/dataset_warnings",
+        tags=["Dataset Warnings"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         metrics_router,
         prefix="/dataset_splits/{dataset_split_name}/metrics",
+        tags=["Metrics"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         outcome_count_router,
         prefix="/dataset_splits/{dataset_split_name}/outcome_count",
+        tags=["Outcome Count"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         utterance_count_router,
         prefix="/dataset_splits/{dataset_split_name}/utterance_count",
+        tags=["Utterance Count"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         utterances_router,
         prefix="/dataset_splits/{dataset_split_name}/utterances",
+        tags=["Utterances"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
-        export_router, prefix="/export", dependencies=[Depends(require_application_ready)]
+        export_router,
+        prefix="/export",
+        tags=["Export"],
+        dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         custom_utterances_router,
         prefix="/custom_utterances",
+        tags=["Custom Utterances"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         top_words_router,
         prefix="/dataset_splits/{dataset_split_name}/top_words",
+        tags=["Top Words"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         confusion_matrix_router,
         prefix="/dataset_splits/{dataset_split_name}/confusion_matrix",
+        tags=["Confusion Matrix"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     app.include_router(api_router)

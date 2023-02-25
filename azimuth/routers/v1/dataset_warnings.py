@@ -15,15 +15,12 @@ from azimuth.utils.routers import get_last_update, get_standard_task_result
 
 router = APIRouter()
 
-TAGS = ["Dataset Warnings v1"]
-
 
 @router.get(
     "",
     summary="Get dataset warnings.",
     description="Get the warnings related to the dataset, such as differences between the training "
     "and the evaluation set.",
-    tags=TAGS,
     response_model=List[DatasetWarningGroup],
 )
 def get_dataset_warnings(

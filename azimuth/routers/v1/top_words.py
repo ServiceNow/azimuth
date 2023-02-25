@@ -22,14 +22,11 @@ from azimuth.utils.routers import (
 
 router = APIRouter()
 
-TAGS = ["Top Words v1"]
-
 
 @router.get(
     "",
     summary="Get most important words.",
     description="Get most important words for right predictions and errors based on filters.",
-    tags=TAGS,
     response_model=TopWordsResponse,
 )
 def get_top_words(

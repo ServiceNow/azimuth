@@ -30,14 +30,11 @@ from azimuth.utils.routers import (
 
 router = APIRouter()
 
-TAGS = ["Metrics v1"]
-
 
 @router.get(
     "",
     summary="Get metrics.",
     description="Get metrics (ECE, outcome count, precision and so on).",
-    tags=TAGS,
     response_model=MetricsAPIResponse,
 )
 def get_metrics(
@@ -71,7 +68,6 @@ def get_metrics(
     "/per_filter",
     summary="Get metrics for each filter.",
     description="Get metrics for each filter based on the current filtering.",
-    tags=TAGS,
     response_model=MetricsPerFilterAPIResponse,
 )
 def get_metrics_per_filter(

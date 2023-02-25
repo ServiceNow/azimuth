@@ -29,8 +29,6 @@ from azimuth.utils.routers import build_named_dataset_filters
 
 router = APIRouter()
 
-TAGS = ["Utterance Count v1"]
-
 
 def get_default_counter(value_list) -> Counter:
     return Counter(**{value: 0 for value in value_list})
@@ -47,7 +45,6 @@ def counter_to_count_per_filter_value(counter: Counter) -> List[UtteranceCountPe
     "/per_filter",
     summary="Get count for each filter.",
     description="Get count for each filter based on the current filtering.",
-    tags=TAGS,
     response_model=UtteranceCountPerFilterResponse,
 )
 def get_count_per_filter(

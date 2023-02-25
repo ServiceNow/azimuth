@@ -22,14 +22,11 @@ from azimuth.utils.routers import (
 
 router = APIRouter()
 
-TAGS = ["Confidence Histogram v1"]
-
 
 @router.get(
     "",
     summary="Get confidence histogram values",
     description="Get all confidence bins with their confidence and the outcome count",
-    tags=TAGS,
     response_model=ConfidenceHistogramResponse,
 )
 def get_confidence_histogram(

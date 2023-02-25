@@ -28,7 +28,6 @@ from azimuth.utils.project import update_config
 log = structlog.get_logger(__name__)
 router = APIRouter()
 
-TAGS = ["Config v1"]
 REQUIRED = "required"
 
 
@@ -37,7 +36,6 @@ REQUIRED = "required"
     summary="Get default configuration",
     description="Get the default configuration",
     response_model=AzimuthConfig,
-    tags=TAGS,
 )
 def get_default_config_def(
     language: SupportedLanguage = Query(AzimuthConfig.__fields__["language"].default),
@@ -54,7 +52,6 @@ def get_default_config_def(
     summary="Get configuration",
     description="Get the current configuration",
     response_model=AzimuthConfig,
-    tags=TAGS,
 )
 def get_config_def(
     config: AzimuthConfig = Depends(get_config),
@@ -66,7 +63,6 @@ def get_config_def(
     "",
     summary="Update config",
     description="Update the config.",
-    tags=TAGS,
     response_model=AzimuthConfig,
     dependencies=[Depends(require_editable_config)],
 )

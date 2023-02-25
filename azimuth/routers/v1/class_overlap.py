@@ -30,7 +30,6 @@ from azimuth.utils.routers import get_standard_task_result, query_pipeline_index
 
 router = APIRouter()
 
-TAGS = ["Class Overlap v1"]
 
 EPSILON = 1e-4
 
@@ -40,7 +39,6 @@ EPSILON = 1e-4
     summary="Get class overlap plot.",
     description="Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling "
     "(currently set to all samples).",
-    tags=TAGS,
     response_model=ClassOverlapPlotResponse,
 )
 def get_class_overlap_plot(
@@ -91,7 +89,6 @@ def get_class_overlap_plot(
     "",
     summary="Get class overlap table.",
     description="Get data for class overlap, confusion, and related utterance counts.",
-    tags=TAGS,
     response_model=ClassOverlapTableResponse,
 )
 def get_class_overlap(
