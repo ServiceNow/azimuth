@@ -212,7 +212,7 @@ class Module(DaskModule[ConfigScope]):
                 " as it does not use ModelContractScope."
             )
         if self.config.pipelines is None:
-            raise ValueError("A pipeline was not provided in the config.")
+            raise ValueError("No pipelines configured.")
         if self.mod_options.pipeline_index is None:
             raise ValueError(
                 f"`pipeline_index` is None, expected one"
