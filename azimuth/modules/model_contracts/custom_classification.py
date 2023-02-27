@@ -16,13 +16,11 @@ log = structlog.get_logger(__file__)
 
 
 class CustomTextClassificationModule(TextClassificationNoSaliencyModule):
-    """Handles text classification prediction where we are not using HuggingFace
-    as the underlying framework.
-
+    """Handles text classification prediction where we are not using HF as the underlying framework.
 
     Notes:
-        This should be able to handle any framework/models,
-         but it doesn't support saliency.
+        This should be able to handle any framework/models, but it doesn't support saliency.
+        The model should be a callable.
     """
 
     optional_mod_options = ModelContractModule.optional_mod_options | {"iterations", "use_bma"}
@@ -38,18 +36,16 @@ class CustomTextClassificationModule(TextClassificationNoSaliencyModule):
 
         """
         utterances = batch[self.config.columns.text_input]
+        epistemic = [0.0] * len(utterances)  # dummy epistemic
 
-        # In this case, the model is a Callable, not a Pipeline
-        model: Callable = self.get_model()
-        # dummy epistemic
-        epistemic = [0.0] * len(utterances)
-        model_out = model(utterances)
+        model_or_custom_pipeline: Callable = self.get_model()
+        predictions = model_or_custom_pipeline(utterances)
         (
             raw,
             postprocessed,
             preprocessing_steps,
             postprocessing_steps,
-        ) = self.get_postprocessed_output(batch, model_out)
+        ) = self.get_postprocessed_output(batch, predictions)
 
         return self._parse_prediction_output(
             batch, raw, postprocessed, preprocessing_steps, postprocessing_steps, epistemic

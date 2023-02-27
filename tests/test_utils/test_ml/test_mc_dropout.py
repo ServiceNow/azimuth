@@ -17,22 +17,27 @@ def test_mc_dropout_context(simple_text_config):
             model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
         ),
     )
-    model = mod.get_model()
-    model.model.eval()
+    hf_pipeline = mod.get_model()
+    hf_pipeline.model.eval()
     # Get a batch
     batch = mod.get_dataset_split()[[1, 2, 3]]
 
     # Model is deterministic.
-    preds = [[[r["score"] for r in res] for res in model(batch["utterance"])] for _ in range(10)]
+    preds = [
+        [[r["score"] for r in res] for res in hf_pipeline(batch["utterance"])] for _ in range(10)
+    ]
     assert all(np.allclose(preds[0], p) for p in preds)
 
-    with MCDropout(model.model):
+    with MCDropout(hf_pipeline.model):
         # The model is now not deterministic.
         preds = [
-            [[r["score"] for r in res] for res in model(batch["utterance"])] for _ in range(10)
+            [[r["score"] for r in res] for res in hf_pipeline(batch["utterance"])]
+            for _ in range(10)
         ]
         assert not all(np.allclose(preds[0], p) for p in preds)
 
     # When out of the MCDropout context, the model is deterministic again.
-    preds = [[[r["score"] for r in res] for res in model(batch["utterance"])] for _ in range(10)]
+    preds = [
+        [[r["score"] for r in res] for res in hf_pipeline(batch["utterance"])] for _ in range(10)
+    ]
     assert all(np.allclose(preds[0], p) for p in preds)

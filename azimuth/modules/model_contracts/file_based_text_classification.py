@@ -35,10 +35,10 @@ class FileBasedTextClassificationModule(TextClassificationNoSaliencyModule):
 
         """
         # We only have predictions for the test set
-        model = self.get_model()
-        model_out = model(batch, self.dataset_split_name)
+        prediction_reader = self.get_model()
+        predictions = prediction_reader(batch, self.dataset_split_name)
         # Ignore postprocessing as we expect file-based to be postprocessed already.
-        raw, _, _, _ = self.get_postprocessed_output(batch, model_out)
+        raw, _, _, _ = self.get_postprocessed_output(batch, predictions)
         epistemic = [0.0] * len(batch[DatasetColumn.row_idx])
         return self._parse_prediction_output(batch, raw, raw, [], [], epistemic)
 

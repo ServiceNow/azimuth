@@ -189,7 +189,7 @@ def query_pipeline_index(
     elif config.pipelines is None:
         raise HTTPException(
             HTTP_400_BAD_REQUEST,
-            detail=f"Current config has no model specified,"
+            detail=f"Current config has no pipeline specified,"
             f" but pipeline index {pipeline_index} was requested.",
         )
     elif len(config.pipelines) < pipeline_index:
@@ -207,7 +207,7 @@ def require_available_model(
 ):
     if not predictions_available(config) or pipeline_index is None:
         raise HTTPException(
-            400, detail="This route requires a model, but none was provided in the configuration."
+            400, detail="This route requires a pipeline, but none was provided in the config."
         )
 
 

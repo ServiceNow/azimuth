@@ -64,33 +64,34 @@ class HFTextClassificationModule(TextClassificationModule):
         """
         utterances = batch[self.config.columns.text_input]
 
-        model = self.get_model()
+        hf_pipeline = self.get_model()
         use_bma = self.mod_options.use_bma and self.config.uncertainty.iterations > 1
         if use_bma:
-            # structlog warning issue tracked in BaaL #192
+            # TODO structlog warning issue tracked in BaaL #192
             from baal.active.heuristics import BALD
 
-            with MCDropout(model.model):
-                predictions = np.stack(
+            with MCDropout(hf_pipeline.model):
+                n = self.config.uncertainty.iterations
+                n_predictions = np.stack(
                     [
                         self.extract_probs_from_output(
-                            model(
+                            hf_pipeline(
                                 utterances,
                                 num_workers=0,
                                 batch_size=self.config.batch_size,
                                 truncation=True,
                             )
                         )
-                        for _ in range(self.config.uncertainty.iterations)
+                        for _ in range(n)
                     ],
                     axis=-1,
                 )
-                epistemic: List[float] = BALD().get_uncertainties(predictions)
-                pipeline_out = predictions.mean(-1)
+                epistemic: List[float] = BALD().get_uncertainties(n_predictions)
+                predictions = n_predictions.mean(-1)
 
         else:
             epistemic = [0.0] * len(utterances)
-            pipeline_out = model(
+            predictions = hf_pipeline(
                 utterances, num_workers=0, batch_size=self.config.batch_size, truncation=True
             )
         (
@@ -98,7 +99,7 @@ class HFTextClassificationModule(TextClassificationModule):
             postprocessed_output,
             preprocessing_steps,
             postprocessing_steps,
-        ) = self.get_postprocessed_output(batch, pipeline_out)
+        ) = self.get_postprocessed_output(batch, predictions)
 
         return self._parse_prediction_output(
             batch,
@@ -125,40 +126,44 @@ class HFTextClassificationModule(TextClassificationModule):
         if self.saliency_layer is None:
             raise ValueError("This method should not be called when saliency_layer is not defined.")
 
-        pipeline = self.get_model()
+        hf_pipeline = self.get_model()
 
-        inputs = pipeline.tokenizer(
+        inputs = hf_pipeline.tokenizer(
             batch[self.config.columns.text_input],
             return_tensors="pt",
             padding=True,
             truncation=True,
         )
-        all_tokens = [pipeline.tokenizer.convert_ids_to_tokens(i) for i in inputs["input_ids"]]
+        all_tokens = [hf_pipeline.tokenizer.convert_ids_to_tokens(i) for i in inputs["input_ids"]]
 
         # Move to the same device as the pipeline
-        inputs["input_ids"] = inputs["input_ids"].to(pipeline.device)
-        inputs["attention_mask"] = inputs["attention_mask"].to(pipeline.device)
+        inputs["input_ids"] = inputs["input_ids"].to(hf_pipeline.device)
+        inputs["attention_mask"] = inputs["attention_mask"].to(hf_pipeline.device)
 
-        logits = pipeline.model(**inputs)[0]
+        logits = hf_pipeline.model(**inputs)[0]
         output = torch.softmax(logits, dim=1).detach().cpu().numpy()
         prediction = output.argmax(-1)
 
         embeddings_list: List[np.ndarray] = []
-        handle = register_embedding_list_hook(pipeline.model, embeddings_list, self.saliency_layer)
+        handle = register_embedding_list_hook(
+            hf_pipeline.model, embeddings_list, self.saliency_layer
+        )
         embeddings_gradients: List[np.ndarray] = []
         hook = register_embedding_gradient_hook(
-            pipeline.model, embeddings_gradients, self.saliency_layer
+            hf_pipeline.model, embeddings_gradients, self.saliency_layer
         )
 
         filter_class = self.mod_options.filter_class
         selected_classes = (
             [filter_class] * len(prediction) if filter_class is not None else prediction
         )
-        inputs["labels"] = torch.tensor(selected_classes, dtype=torch.long, device=pipeline.device)
+        inputs["labels"] = torch.tensor(
+            selected_classes, dtype=torch.long, device=hf_pipeline.device
+        )
 
         # Do backward pass to compute gradients
-        pipeline.model.zero_grad()
-        _loss = pipeline.model(**inputs)[0]  # loss is at index 0 when passing labels
+        hf_pipeline.model.zero_grad()
+        _loss = hf_pipeline.model(**inputs)[0]  # loss is at index 0 when passing labels
         _loss.backward()
         handle.remove()
         hook.remove()
@@ -169,7 +174,7 @@ class HFTextClassificationModule(TextClassificationModule):
             saliency_values, tokens = zip(
                 *list(
                     filter(
-                        lambda tok: tok[1] != pipeline.tokenizer.pad_token,
+                        lambda tok: tok[1] != hf_pipeline.tokenizer.pad_token,
                         zip(saliency_values, tokens),
                     )
                 )

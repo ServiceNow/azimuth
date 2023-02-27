@@ -34,8 +34,8 @@ def test_model_loading(simple_text_config):
             model_contract_method_name=SupportedMethod.Inputs, pipeline_index=0
         ),
     )
-    model = mod.get_model()
-    assert callable(model)
+    hf_pipeline = mod.get_model()
+    assert callable(hf_pipeline)
 
 
 def test_threshold(simple_text_config):
