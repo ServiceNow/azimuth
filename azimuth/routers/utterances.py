@@ -68,8 +68,6 @@ from azimuth.utils.validation import assert_not_none
 
 router = APIRouter()
 
-TAGS = ["Utterances v1"]
-
 
 class UtterancesSortableColumn(str, Enum):
     index = "index"  # type: ignore
@@ -83,7 +81,6 @@ class UtterancesSortableColumn(str, Enum):
     "",
     summary="Get utterances table view",
     description="Get a table view of the utterances according to filters.",
-    tags=TAGS,
     response_model=GetUtterancesResponse,
 )
 def get_utterances(
@@ -226,7 +223,6 @@ def get_utterances(
     "",
     summary="Patch utterances",
     description="Patch utterances, such as updating proposed actions.",
-    tags=TAGS,
     response_model=List[UtterancePatch],
 )
 def patch_utterances(
@@ -273,7 +269,6 @@ def patch_utterances(
     "/{index}/perturbed_utterances",
     summary="Get a perturbed utterances for a single utterance.",
     description="Get a perturbed utterances for a single utterance.",
-    tags=TAGS,
     response_model=List[PerturbedUtteranceWithClassNames],
     dependencies=[Depends(require_available_model)],
 )
@@ -316,7 +311,6 @@ def get_perturbed_utterances(
     "/{index}/similar_utterances",
     summary="Get similar examples to a query",
     description="Get similar examples using a KNN approach.",
-    tags=TAGS,
     response_model=SimilarUtterancesResponse,
 )
 def get_similar(

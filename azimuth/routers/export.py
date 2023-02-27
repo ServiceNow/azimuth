@@ -45,14 +45,11 @@ from azimuth.utils.validation import assert_not_none
 
 router = APIRouter()
 
-TAGS = ["Export v1"]
-
 
 @router.get(
     "/dataset_splits/{dataset_split_name}/utterances",
     summary="Export dataset_split as csv.",
     description="Export the dataset_split to a CSV file and returns it.",
-    tags=TAGS,
     response_class=FileResponse,
 )
 def export_dataset(
@@ -75,7 +72,6 @@ def export_dataset(
     "/dataset_splits/{dataset_split_name}/proposed_actions",
     summary="Export proposed actions as csv.",
     description="Export proposed actions to a CSV file and returns it.",
-    tags=TAGS,
     response_class=FileResponse,
 )
 def export_proposed_actions(
@@ -89,7 +85,6 @@ def export_proposed_actions(
     "/perturbation_testing_summary",
     summary="Export perturbation testing summary as csv.",
     description="Export the perturbation testing summary to a CSV file and returns it.",
-    tags=TAGS,
     response_class=FileResponse,
     dependencies=[Depends(require_available_model)],
 )
@@ -136,7 +131,6 @@ def get_export_perturbation_testing_summary(
     summary="Export perturbed dataset split as json.",
     description="Export the perturbed dataset split (training or evaluation) to a JSON file and "
     "returns it.",
-    tags=TAGS,
     response_class=FileResponse,
     dependencies=[Depends(require_available_model)],
 )

@@ -22,14 +22,11 @@ from azimuth.utils.routers import (
 
 router = APIRouter()
 
-TAGS = ["Confusion Matrix v1"]
-
 
 @router.get(
     "",
     summary="Get confusion matrix.",
     description="Get confusion matrix on specified filters.",
-    tags=TAGS,
     response_model=ConfusionMatrixResponse,
 )
 def get_confusion_matrix(

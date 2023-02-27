@@ -171,7 +171,7 @@ def test_get_utterances_empty_filters(app: FastAPI):
 
 
 def test_get_utterances_no_pipeline(app: FastAPI, monkeypatch):
-    import azimuth.routers.v1.utterances as utt_module
+    import azimuth.routers.utterances as utt_module
 
     monkeypatch.setattr(utt_module, "saliency_available", lambda x: True)
     client = TestClient(app)

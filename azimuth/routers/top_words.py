@@ -13,7 +13,7 @@ from azimuth.types import (
     NamedDatasetFilters,
     SupportedModule,
 )
-from azimuth.types.model_performance import ConfidenceHistogramResponse
+from azimuth.types.word_analysis import TopWordsResponse
 from azimuth.utils.routers import (
     build_named_dataset_filters,
     get_standard_task_result,
@@ -22,36 +22,35 @@ from azimuth.utils.routers import (
 
 router = APIRouter()
 
-TAGS = ["Confidence Histogram v1"]
-
 
 @router.get(
     "",
-    summary="Get confidence histogram values",
-    description="Get all confidence bins with their confidence and the outcome count",
-    tags=TAGS,
-    response_model=ConfidenceHistogramResponse,
+    summary="Get most important words.",
+    description="Get most important words for right predictions and errors based on filters.",
+    response_model=TopWordsResponse,
 )
-def get_confidence_histogram(
+def get_top_words(
     dataset_split_name: DatasetSplitName,
     named_filters: NamedDatasetFilters = Depends(build_named_dataset_filters),
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
     without_postprocessing: bool = Query(False, title="Without Postprocessing"),
-) -> ConfidenceHistogramResponse:
+) -> TopWordsResponse:
+
     mod_options = ModuleOptions(
         filters=named_filters.to_dataset_filters(dataset_split_manager.get_class_names()),
         pipeline_index=pipeline_index,
+        force_no_saliency=pipeline_index is None,
         without_postprocessing=without_postprocessing,
     )
 
-    result: ConfidenceHistogramResponse = get_standard_task_result(
-        task_name=SupportedModule.ConfidenceHistogram,
-        dataset_split_name=dataset_split_name,
-        task_manager=task_manager,
+    task_result: TopWordsResponse = get_standard_task_result(
+        SupportedModule.TopWords,
+        dataset_split_name,
+        task_manager,
         mod_options=mod_options,
         last_update=dataset_split_manager.last_update,
     )[0]
 
-    return result
+    return task_result

@@ -28,14 +28,11 @@ from azimuth.utils.routers import (
 
 router = APIRouter()
 
-TAGS = ["Outcome Count v1"]
-
 
 @router.get(
     "/per_threshold",
     summary="Get outcome count for multiple thresholds.",
     description="Get prediction count per outcome for multiple thresholds.",
-    tags=TAGS,
     response_model=OutcomeCountPerThresholdResponse,
 )
 def get_outcome_count_per_threshold(
@@ -66,7 +63,6 @@ def get_outcome_count_per_threshold(
     "/per_filter",
     summary="Get outcome count for each filter.",
     description="Get outcome count for each filter based on the current filtering.",
-    tags=TAGS,
     response_model=OutcomeCountPerFilterResponse,
 )
 def get_outcome_count_per_filter(

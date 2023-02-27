@@ -48,15 +48,12 @@ from azimuth.utils.validation import assert_not_none
 
 router = APIRouter()
 
-TAGS = ["App v1"]
-
 
 @router.get(
     "/status",
     summary="Get status",
     description="Get the status of the app",
     response_model=StatusResponse,
-    tags=TAGS,
 )
 def get_status(
     startup_tasks=Depends(get_startup_tasks),
@@ -80,7 +77,6 @@ def get_status(
     "/dataset_info",
     summary="Get dataset info",
     description="Get the current dataset info",
-    tags=TAGS,
     response_model=DatasetInfoResponse,
 )
 def get_dataset_info(
@@ -129,7 +125,6 @@ def get_dataset_info(
     "/custom_metrics_info",
     summary="Gives information about custom metrics.",
     description="Gives the description of all custom metrics.",
-    tags=TAGS,
     response_model=Dict[str, MetricInfo],
 )
 def custom_metrics_info(
@@ -155,7 +150,6 @@ def custom_metrics_info(
     "/perturbation_testing_summary",
     summary="Get the perturbation testing summary.",
     description="Get a failure rate per dataset split and per test as well.",
-    tags=TAGS,
     response_model=PerturbationTestingSummary,
     dependencies=[Depends(require_application_ready), Depends(require_available_model)],
 )
