@@ -71,7 +71,8 @@ class HFTextClassificationModule(TextClassificationModule):
             from baal.active.heuristics import BALD
 
             with MCDropout(hf_pipeline.model):
-                multiple_predictions = np.stack(
+                n = self.config.uncertainty.iterations
+                n_predictions = np.stack(
                     [
                         self.extract_probs_from_output(
                             hf_pipeline(
@@ -81,12 +82,12 @@ class HFTextClassificationModule(TextClassificationModule):
                                 truncation=True,
                             )
                         )
-                        for _ in range(self.config.uncertainty.iterations)
+                        for _ in range(n)
                     ],
                     axis=-1,
                 )
-                epistemic: List[float] = BALD().get_uncertainties(multiple_predictions)
-                predictions = multiple_predictions.mean(-1)
+                epistemic: List[float] = BALD().get_uncertainties(n_predictions)
+                predictions = n_predictions.mean(-1)
 
         else:
             epistemic = [0.0] * len(utterances)

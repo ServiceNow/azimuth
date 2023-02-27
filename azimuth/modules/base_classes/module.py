@@ -164,7 +164,7 @@ class Module(DaskModule[ConfigScope]):
         Raises:
             ValueError if no valid pipeline exists.
         """
-        _ = self.get_current_pipeline_definition()  # Validate current pipeline exists
+        _ = self.get_pipeline_definition()  # Validate current pipeline exists
         return self.artifact_manager.get_model(self.config, self.mod_options.pipeline_index)
 
     def _get_table_key(self) -> Optional[PredictionTableKey]:
@@ -177,10 +177,9 @@ class Module(DaskModule[ConfigScope]):
             self.config, ModelContractConfig
         ):
             return None
-        current_pipeline = self.get_current_pipeline_definition()
         use_bma = self.mod_options.use_bma
         table_key = PredictionTableKey(
-            temperature=current_pipeline.temperature,
+            temperature=self.get_pipeline_definition().temperature,
             threshold=self.get_threshold(),
             use_bma=use_bma,
             pipeline_index=self.mod_options.pipeline_index,
@@ -189,18 +188,16 @@ class Module(DaskModule[ConfigScope]):
 
     def get_threshold(self) -> Optional[float]:
         # The default is None so we have to handle it this way.
-        current_pipeline = self.get_current_pipeline_definition()
-
         thresh = self.mod_options.threshold
         if thresh is None:
-            thresh = current_pipeline.threshold
+            thresh = self.get_pipeline_definition().threshold
         return thresh
 
-    def get_current_pipeline_definition(self) -> PipelineDefinition:
-        """Get the current pipeline definition from the config.
+    def get_pipeline_definition(self) -> PipelineDefinition:
+        """Get the pipeline definition from the config according to the pipeline_index.
 
         Returns:
-            Definition of the current pipeline from the config.
+            Definition of the pipeline from the config.
 
         Raises:
             ValueError if no valid pipeline exists.
