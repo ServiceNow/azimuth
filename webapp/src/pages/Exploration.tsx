@@ -61,17 +61,20 @@ const Exploration = () => {
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
-  const setMainView = (mainView: MainView) => {
-    history.push(
-      `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}${searchString}`
-    );
-  };
+  const setMainView = React.useCallback(
+    (mainView: MainView) => {
+      history.push(
+        `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}${searchString}`
+      );
+    },
+    [history, jobId, datasetSplitName, searchString]
+  );
 
   React.useEffect(() => {
     if (!isPipelineSelected(pipeline) && mainView !== "utterances") {
       setMainView("utterances");
     }
-  }, [mainView, pipeline]);
+  }, [setMainView, mainView, pipeline]);
 
   return (
     <>
