@@ -20,6 +20,7 @@ import { getOutcomeCountPerFilterEndpoint } from "services/api";
 import {
   AvailableDatasetSplits,
   DatasetSplitName,
+  Outcome,
   OutcomeCountPerFilterValue,
 } from "types/api";
 import { QueryPipelineState } from "types/models";
@@ -63,7 +64,7 @@ const SmartTagsTable: React.FC<{
   const [transpose, setTranspose] = React.useState(false);
 
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
-    React.useState<"label" | "prediction">("label");
+    React.useState<"label" | "prediction" | "outcome">("label");
 
   const [ascending, setAscending] = React.useState(false);
   const [sortBy, setSortBy] = React.useState<SortBy>("utteranceCount");
@@ -207,7 +208,9 @@ const SmartTagsTable: React.FC<{
                 [transpose ? "top" : "left"]: 0,
               }}
             >
-              {classCount.filterValue}
+              {selectedMetricPerFilterOption === "outcome"
+                ? OUTCOME_PRETTY_NAMES[classCount.filterValue as Outcome]
+                : classCount.filterValue}
             </Typography>
             <Typography
               variant="body2"
@@ -467,6 +470,9 @@ const SmartTagsTable: React.FC<{
               </MenuItem>
               <MenuItem key="prediction" value="prediction">
                 Prediction
+              </MenuItem>
+              <MenuItem key="outcome" value="outcome">
+                Outcome
               </MenuItem>
             </Select>
           </TableSortLabel>
