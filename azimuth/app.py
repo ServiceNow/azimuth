@@ -136,27 +136,27 @@ def create_app() -> FastAPI:
     )
 
     # Setup routes
-    from azimuth.routers.v1.app import router as app_router
-    from azimuth.routers.v1.class_overlap import router as class_overlap_router
-    from azimuth.routers.v1.config import router as config_router
-    from azimuth.routers.v1.custom_utterances import router as custom_utterances_router
-    from azimuth.routers.v1.dataset_warnings import router as dataset_warnings_router
-    from azimuth.routers.v1.export import router as export_router
-    from azimuth.routers.v1.model_performance.confidence_histogram import (
+    from azimuth.routers.app import router as app_router
+    from azimuth.routers.class_overlap import router as class_overlap_router
+    from azimuth.routers.config import router as config_router
+    from azimuth.routers.custom_utterances import router as custom_utterances_router
+    from azimuth.routers.dataset_warnings import router as dataset_warnings_router
+    from azimuth.routers.export import router as export_router
+    from azimuth.routers.model_performance.confidence_histogram import (
         router as confidence_histogram_router,
     )
-    from azimuth.routers.v1.model_performance.confusion_matrix import (
+    from azimuth.routers.model_performance.confusion_matrix import (
         router as confusion_matrix_router,
     )
-    from azimuth.routers.v1.model_performance.metrics import router as metrics_router
-    from azimuth.routers.v1.model_performance.outcome_count import (
+    from azimuth.routers.model_performance.metrics import router as metrics_router
+    from azimuth.routers.model_performance.outcome_count import (
         router as outcome_count_router,
     )
-    from azimuth.routers.v1.model_performance.utterance_count import (
+    from azimuth.routers.model_performance.utterance_count import (
         router as utterance_count_router,
     )
-    from azimuth.routers.v1.top_words import router as top_words_router
-    from azimuth.routers.v1.utterances import router as utterances_router
+    from azimuth.routers.top_words import router as top_words_router
+    from azimuth.routers.utterances import router as utterances_router
     from azimuth.utils.routers import require_application_ready, require_available_model
 
     api_router = APIRouter()
