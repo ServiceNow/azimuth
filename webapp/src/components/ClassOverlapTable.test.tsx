@@ -74,7 +74,8 @@ describe("ClassOverlapTable", () => {
   it("should not display the Footer component if the number of rows is less than initial number", async () => {
     renderClassOverlapTable({ train: true, eval: true }, { pipelineIndex: 0 });
     await waitFor(() => {
-      expect(screen.getAllByRole("row")[1]).toHaveClass("MuiDataGrid-row"); // This test case ensures API responses are fetched to verify the "see more" displayed on the page.
+      // Wait for the API data to be loaded before verifying that there is no "See more" button.
+      expect(screen.getAllByRole("row")[1]).toHaveClass("MuiDataGrid-row");
     });
     expect(screen.queryByText(/See more/i)).toBeNull();
   });
