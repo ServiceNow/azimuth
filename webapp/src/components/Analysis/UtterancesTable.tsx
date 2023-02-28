@@ -2,7 +2,7 @@ import { ArrowDropDown, GetApp, SvgIconComponent } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
 import UploadIcon from "@mui/icons-material/Upload";
-import { Box, Button, Menu, MenuItem, Modal, Typography } from "@mui/material";
+import { Box, Button, Dialog, Menu, MenuItem, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -57,10 +57,6 @@ import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
 import { constructSearchString, isPipelineSelected } from "utils/helpers";
 
 const SMART_TAG_WIDTH = 30;
-const API_HEADERS = {
-  row_idx: "persistentId",
-  proposed_action: "dataAction",
-};
 
 const useStyles = makeStyles((theme) => ({
   hoverableDataCell: {
@@ -86,14 +82,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
   },
   modal: {
-    position: "absolute",
-    width: "20",
-    height: "15%",
-    padding: "10px",
-    backgroundColor: theme.palette.background.paper,
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    padding: theme.spacing(1),
   },
   searchContainer: {
     marginLeft: theme.spacing(2),
@@ -176,8 +165,8 @@ const UtterancesTable: React.FC<Props> = ({
       })) ?? [],
     [utterancesResponse]
   );
-  const [modal, showModal] = React.useState<boolean>(false);
-  const [modalMessage, showModalMessage] = React.useState<string>("");
+  const [dialog, showDialog] = React.useState<boolean>(false);
+  const [dialogMessage, showDialogMessage] = React.useState<string>("");
   const [selectedPersistentIds, setSelectedPersistentIds] = React.useState<
     number[]
   >([]);
@@ -415,51 +404,6 @@ const UtterancesTable: React.FC<Props> = ({
 
   const searchString = constructSearchString(pipeline);
 
-  const removeSpecialCharacters = (text: string) =>
-    text.replace(/[^a-zA-Z0-9_]/g, "");
-
-  const parseCSVData = (data: string) => {
-    const headers: string[] = data.slice(0, data.indexOf("\n")).split(",");
-    const headersWithoutSpecialCharacters: string[] = headers.map((h) =>
-      removeSpecialCharacters(h)
-    ); // This line is to remove all the extra space and special characters if any except underscore, alphabets and numbers.
-    const validHeaders = ["row_idx", "proposed_action"].map((header) =>
-      headersWithoutSpecialCharacters.includes(header)
-    );
-    if (validHeaders.some((valid) => !valid)) {
-      showModalMessage(
-        "The CSV file did not have the row_idx and proposed_action column headers to update the proposed action."
-      );
-      showModal(true);
-    } else {
-      const parsedData: UtterancePatch[] = data
-        .slice(data.indexOf("\n") + 1)
-        .split("\n")
-        .map((row) => {
-          if (row) {
-            const values = row
-              .split(",")
-              .map((r) => removeSpecialCharacters(r));
-            const obj = headersWithoutSpecialCharacters.reduce(
-              (object, header, index) => {
-                return Object.assign(object, {
-                  [API_HEADERS[header as keyof typeof API_HEADERS]]:
-                    removeSpecialCharacters(values[index]),
-                });
-              },
-              {}
-            );
-            return obj as UtterancePatch;
-          } else {
-            showModalMessage("There are no records in the CSV file.");
-            showModal(true);
-            return {} as UtterancePatch;
-          }
-        });
-      Object.keys(parsedData[0]).length > 0 && updateProposedAction(parsedData);
-    }
-  };
-
   const updateProposedAction = (data: UtterancePatch[]) => {
     const groupByPersistentId: Record<
       string,
@@ -476,14 +420,16 @@ const UtterancesTable: React.FC<Props> = ({
       }),
       {}
     );
-    Object.entries(groupByPersistentId).map(([dataAction, persistentIds]) => {
-      const newValue = dataAction as DataAction;
-      updateDataAction({
-        persistentIds,
-        newValue,
-        ...getUtterancesQueryState,
-      });
-    });
+    Object.entries(groupByPersistentId).forEach(
+      ([dataAction, persistentIds]) => {
+        const newValue = dataAction as DataAction;
+        updateDataAction({
+          persistentIds,
+          newValue,
+          ...getUtterancesQueryState,
+        });
+      }
+    );
   };
 
   const importProposedActions = (file: File) => {
@@ -491,10 +437,32 @@ const UtterancesTable: React.FC<Props> = ({
     fileReader.onload = ({ target }) => {
       if (target) {
         const result = target.result as string;
-        parseCSVData(result);
+        const [header, ...rows] = result.split("\n");
+        if (rows.join()) {
+          const headers: string[] = header.trim().split(",");
+          if (
+            [config.columns.persistent_id, "proposed_action"].every((h) =>
+              headers.includes(h)
+            )
+          ) {
+            const utterancePatch: UtterancePatch[] = rows.map((row) => {
+              const [persistentId, dataAction] = row.trim().split(",");
+              return { persistentId, dataAction } as UtterancePatch;
+            });
+            updateProposedAction(utterancePatch);
+          } else {
+            showDialogMessage(
+              "The CSV file did not have the row_idx and proposed_action column headers to update the proposed action."
+            );
+            showDialog(true);
+          }
+        } else {
+          showDialogMessage("There are no records in the CSV file.");
+          showDialog(true);
+        }
       }
     };
-    fileReader.readAsText(file, "UTF8");
+    fileReader.readAsText(file);
   };
 
   const RowLink = (props: RowProps<Row>) => (
@@ -508,7 +476,7 @@ const UtterancesTable: React.FC<Props> = ({
 
   return (
     <Box className={classes.gridContainer}>
-      <Modal open={modal} onClose={() => showModal(false)}>
+      <Dialog open={dialog} onClose={() => showDialog(false)}>
         <Box className={classes.modal}>
           <Box
             display="flex"
@@ -516,20 +484,20 @@ const UtterancesTable: React.FC<Props> = ({
             alignItems="center"
             gap={1}
           >
-            <Typography variant="body1">{modalMessage}</Typography>
+            <Typography variant="body1">{dialogMessage}</Typography>
             <Button
               size="small"
               sx={{ width: 8 }}
               variant="contained"
               onClick={() => {
-                showModal(false);
+                showDialog(false);
               }}
             >
               Ok
             </Button>
           </Box>
         </Box>
-      </Modal>
+      </Dialog>
       <div className={classes.gridHeaderActions}>
         <Description
           text="Explore utterances and propose actions. Click on a row to inspect the utterance details."
@@ -544,10 +512,10 @@ const UtterancesTable: React.FC<Props> = ({
             Import
             <input
               hidden
-              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              accept=".csv"
               type="file"
               onChange={({ target: { files } }) => {
-                if (files) {
+                if (files?.length) {
                   importProposedActions(files[0]);
                 }
               }}
