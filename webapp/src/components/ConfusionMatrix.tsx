@@ -11,7 +11,7 @@ import {
 import makeStyles from "@mui/styles/makeStyles";
 import noData from "assets/void.svg";
 import React from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import {
@@ -147,6 +147,15 @@ const ConfusionMatrix: React.FC<Props> = ({
 
   const renderCell = (value: number, rowIndex: number, columnIndex: number) => (
     <Box
+      component={Link}
+      to={`utterances${constructSearchString({
+        ...confusionMatrix,
+        ...filters,
+        ...pipeline,
+        ...postprocessing,
+        prediction: [data.classNames[columnIndex]],
+        label: [data.classNames[rowIndex]],
+      })}`}
       key={`column-${columnIndex} row-${rowIndex}`}
       className={`column-${columnIndex} row-${rowIndex}`}
       gridColumn={columnIndex + CONFUSION_COLUMN_OFFSET + 1}
@@ -169,6 +178,8 @@ const ConfusionMatrix: React.FC<Props> = ({
           ].main,
           value / maxCount
         ),
+        color: "unset",
+        textDecoration: "unset",
       })}
     >
       {value > 0 && (
