@@ -65,7 +65,6 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-    cursor: "default",
     width: "100%",
     height: "100%",
     backgroundColor: theme.palette.background.paper,
@@ -294,6 +293,14 @@ const ConfusionMatrix: React.FC<Props> = ({
 
           {data.classNames.flatMap((className, i) => [
             <Typography
+              component={Link}
+              to={`utterances${constructSearchString({
+                ...confusionMatrix,
+                ...filters,
+                ...pipeline,
+                ...postprocessing,
+                prediction: [data.classNames[i]],
+              })}`}
               key={`column-${i}`}
               className={classNames(
                 `column-${i}`,
@@ -313,11 +320,21 @@ const ConfusionMatrix: React.FC<Props> = ({
                   height: "auto",
                   overflow: "initial",
                 },
+                color: "unset",
+                textDecoration: "unset",
               }}
             >
               {className}
             </Typography>,
             <Typography
+              component={Link}
+              to={`utterances${constructSearchString({
+                ...confusionMatrix,
+                ...filters,
+                ...pipeline,
+                ...postprocessing,
+                label: [data.classNames[i]],
+              })}`}
               key={`row-${i}`}
               className={classNames(
                 `row-${i}`,
@@ -336,6 +353,8 @@ const ConfusionMatrix: React.FC<Props> = ({
                   width: "auto",
                   overflow: "initial",
                 },
+                color: "unset",
+                textDecoration: "unset",
               }}
             >
               {className}
