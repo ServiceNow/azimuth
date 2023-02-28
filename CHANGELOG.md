@@ -14,7 +14,8 @@ Released changes are shown in the
 - Persistent id.
 - New fields in config page.
 - The initial config file and all subsequent changes are saved in the caching folder.
-- Outcome option to dropdown in Smart Tag Analysis
+- Outcome option to dropdown in Smart Tag Analysis.
+- Link from confusion matrix cells to utterance table.
 
 ### Changed
 - Change the outcome per threshold bar chart to area chart, making the x axis continuous, and add vertical dashed line marking current threshold.
