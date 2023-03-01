@@ -258,8 +258,8 @@ def require_application_ready(
 
 
 def get_pagination(
-    limit: Optional[int] = Query(None, title="Limit"),
-    offset: Optional[int] = Query(None, title="Offset"),
+    limit: Optional[int] = Query(None, title="Limit", ge=1),
+    offset: Optional[int] = Query(None, title="Offset", ge=0),
 ) -> Optional[PaginationParams]:
     """Get the pagination parameters if available.
 
