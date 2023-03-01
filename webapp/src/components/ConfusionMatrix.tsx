@@ -11,7 +11,7 @@ import {
 import makeStyles from "@mui/styles/makeStyles";
 import noData from "assets/void.svg";
 import React from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { getConfusionMatrixEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
 import {
@@ -65,7 +65,6 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-    cursor: "default",
     width: "100%",
     height: "100%",
     backgroundColor: theme.palette.background.paper,
@@ -147,6 +146,15 @@ const ConfusionMatrix: React.FC<Props> = ({
 
   const renderCell = (value: number, rowIndex: number, columnIndex: number) => (
     <Box
+      component={Link}
+      to={`utterances${constructSearchString({
+        ...confusionMatrix,
+        ...filters,
+        ...pipeline,
+        ...postprocessing,
+        prediction: [data.classNames[columnIndex]],
+        label: [data.classNames[rowIndex]],
+      })}`}
       key={`column-${columnIndex} row-${rowIndex}`}
       className={`column-${columnIndex} row-${rowIndex}`}
       gridColumn={columnIndex + CONFUSION_COLUMN_OFFSET + 1}
@@ -169,6 +177,8 @@ const ConfusionMatrix: React.FC<Props> = ({
           ].main,
           value / maxCount
         ),
+        color: "unset",
+        textDecoration: "unset",
       })}
     >
       {value > 0 && (
@@ -283,6 +293,14 @@ const ConfusionMatrix: React.FC<Props> = ({
 
           {data.classNames.flatMap((className, i) => [
             <Typography
+              component={Link}
+              to={`utterances${constructSearchString({
+                ...confusionMatrix,
+                ...filters,
+                ...pipeline,
+                ...postprocessing,
+                prediction: [data.classNames[i]],
+              })}`}
               key={`column-${i}`}
               className={classNames(
                 `column-${i}`,
@@ -302,11 +320,21 @@ const ConfusionMatrix: React.FC<Props> = ({
                   height: "auto",
                   overflow: "initial",
                 },
+                color: "unset",
+                textDecoration: "unset",
               }}
             >
               {className}
             </Typography>,
             <Typography
+              component={Link}
+              to={`utterances${constructSearchString({
+                ...confusionMatrix,
+                ...filters,
+                ...pipeline,
+                ...postprocessing,
+                label: [data.classNames[i]],
+              })}`}
               key={`row-${i}`}
               className={classNames(
                 `row-${i}`,
@@ -325,6 +353,8 @@ const ConfusionMatrix: React.FC<Props> = ({
                   width: "auto",
                   overflow: "initial",
                 },
+                color: "unset",
+                textDecoration: "unset",
               }}
             >
               {className}
