@@ -2,7 +2,7 @@ import { ArrowDropDown, GetApp, SvgIconComponent } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
 import UploadIcon from "@mui/icons-material/Upload";
-import { Box, Button, Dialog, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -54,7 +54,11 @@ import {
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
-import { constructSearchString, isPipelineSelected } from "utils/helpers";
+import {
+  constructSearchString,
+  isPipelineSelected,
+  raiseErrorToast,
+} from "utils/helpers";
 
 const SMART_TAG_WIDTH = 30;
 
@@ -81,9 +85,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  modal: {
-    padding: theme.spacing(1),
-  },
   searchContainer: {
     marginLeft: theme.spacing(2),
     alignItems: "center",
@@ -102,9 +103,6 @@ const useStyles = makeStyles((theme) => ({
   wordWrap: {
     lineHeight: "normal",
     whiteSpace: "normal",
-  },
-  exportButton: {
-    marginLeft: "auto",
   },
   filterIcon: {
     marginLeft: theme.spacing(1),
@@ -165,8 +163,6 @@ const UtterancesTable: React.FC<Props> = ({
       })) ?? [],
     [utterancesResponse]
   );
-  const [dialog, showDialog] = React.useState<boolean>(false);
-  const [dialogMessage, showDialogMessage] = React.useState<string>("");
   const [selectedPersistentIds, setSelectedPersistentIds] = React.useState<
     number[]
   >([]);
@@ -437,29 +433,23 @@ const UtterancesTable: React.FC<Props> = ({
     fileReader.onload = ({ target }) => {
       if (target) {
         const result = target.result as string;
-        const [header, ...rows] = result.split("\n");
-        if (rows.join()) {
-          const headers: string[] = header.trim().split(",");
-          if (
-            [config.columns.persistent_id, "proposed_action"].every((h) =>
-              headers.includes(h)
-            )
-          ) {
-            const utterancePatch: UtterancePatch[] = rows.map((row) => {
-              const [persistentId, dataAction] = row.trim().split(",");
-              return { persistentId, dataAction } as UtterancePatch;
-            });
-            updateProposedAction(utterancePatch);
-          } else {
-            showDialogMessage(
-              "The CSV file did not have the row_idx and proposed_action column headers to update the proposed action."
-            );
-            showDialog(true);
-          }
-        } else {
-          showDialogMessage("There are no records in the CSV file.");
-          showDialog(true);
-        }
+        const [header, ...rows] = result.split(/\r?\n/).slice(0, -1);
+        rows.length === 0 &&
+          raiseErrorToast("There are no records in the CSV file.");
+
+        const headers: string[] = header.split(",");
+        [config.columns.persistent_id, "proposed_action"].every(
+          (h) => !headers.includes(h)
+        ) &&
+          raiseErrorToast(
+            `The CSV file did not have the ${config.columns.persistent_id} and proposed_action column headers to update the proposed action.`
+          );
+
+        const utterancePatch = rows.map((row) => {
+          const [persistentId, dataAction] = row.split(",");
+          return { persistentId, dataAction } as UtterancePatch;
+        });
+        updateProposedAction(utterancePatch);
       }
     };
     fileReader.readAsText(file);
@@ -476,39 +466,13 @@ const UtterancesTable: React.FC<Props> = ({
 
   return (
     <Box className={classes.gridContainer}>
-      <Dialog open={dialog} onClose={() => showDialog(false)}>
-        <Box className={classes.modal}>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            gap={1}
-          >
-            <Typography variant="body1">{dialogMessage}</Typography>
-            <Button
-              size="small"
-              sx={{ width: 8 }}
-              variant="contained"
-              onClick={() => {
-                showDialog(false);
-              }}
-            >
-              Ok
-            </Button>
-          </Box>
-        </Box>
-      </Dialog>
       <div className={classes.gridHeaderActions}>
         <Description
           text="Explore utterances and propose actions. Click on a row to inspect the utterance details."
           link="user-guide/exploration-space/utterance-table/"
         />
         <Box display="flex" alignItems="center" gap={2}>
-          <Button
-            className={classes.exportButton}
-            component="label"
-            startIcon={<UploadIcon />}
-          >
+          <Button component="label" startIcon={<UploadIcon />}>
             Import
             <input
               hidden
@@ -525,7 +489,6 @@ const UtterancesTable: React.FC<Props> = ({
             id="export-button"
             aria-controls="export-menu"
             aria-haspopup="true"
-            className={classes.exportButton}
             onClick={(event) => setAnchorEl(event.currentTarget)}
             startIcon={<GetApp />}
             endIcon={<ArrowDropDown />}
