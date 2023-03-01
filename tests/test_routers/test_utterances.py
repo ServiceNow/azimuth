@@ -4,7 +4,7 @@
 from typing import List
 
 from fastapi import FastAPI
-from starlette.status import HTTP_200_OK, HTTP_404_NOT_FOUND
+from starlette.status import HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_ENTITY
 from starlette.testclient import TestClient
 
 UTTERANCE_COUNT = 42
@@ -100,6 +100,13 @@ def test_get_utterances_sort_unavailable_column(app: FastAPI):
 
 def test_get_utterances_pagination(app: FastAPI):
     client = TestClient(app)
+
+    resp = client.get("/dataset_splits/eval/utterances?limit=0&offset=0")
+    assert resp.status_code == HTTP_422_UNPROCESSABLE_ENTITY, resp.text
+
+    resp = client.get("/dataset_splits/eval/utterances?limit=10&offset=-1")
+    assert resp.status_code == HTTP_422_UNPROCESSABLE_ENTITY, resp.text
+
     resp = client.get("/dataset_splits/eval/utterances?limit=10&offset=10").json()
     assert len(resp["utterances"]) == 10
     assert resp["utteranceCount"] == UTTERANCE_COUNT
