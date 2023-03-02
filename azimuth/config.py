@@ -9,6 +9,7 @@ from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
+from jsonlines import jsonlines
 from pydantic import BaseSettings, Extra, Field, root_validator, validator
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
@@ -65,8 +66,17 @@ config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
 
 
 def parse_args():
+    """Parse CLI args.
+
+    Returns: argparse Namespace
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("config_path", default=None, nargs="?")
+    parser.add_argument(
+        "--load-config-history",
+        action="store_true",
+        help="Load the last config from history, or if empty, default to config_path.",
+    )
     parser.add_argument("--port", default=8091, help="Port to serve the API.")
     parser.add_argument("--debug", action="store_true")
     return parser.parse_args()
@@ -302,6 +312,9 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         os.makedirs(path, exist_ok=True)
         return path
 
+    def get_config_history_path(self):
+        return f"{self.artifact_path}/config_history.jsonl"
+
 
 class ModelContractConfig(CommonFieldsConfig):
     # Which model_contract the application is using.
@@ -421,12 +434,13 @@ class AzimuthConfig(
         return values
 
 
-def load_azimuth_config(config_path: Optional[str]) -> AzimuthConfig:
+def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:
     """
     Load the configuration from a file or make a pre-built one from a folder.
 
     Args:
         config_path: Path to a json file or a directory with the prediction files.
+        load_config_history: Load the last config from history, or if empty, default to config_path.
 
     Returns:
         The loaded config.
@@ -437,6 +451,17 @@ def load_azimuth_config(config_path: Optional[str]) -> AzimuthConfig:
     log.info("-------------Loading Config--------------")
     # Loading config from config_path if specified, or else from environment variables only.
     cfg = AzimuthConfig.parse_file(config_path) if config_path else AzimuthConfig()
+
+    if load_config_history:
+        config_history_path = cfg.get_config_history_path()
+        try:
+            with jsonlines.open(config_history_path, mode="r") as config_history:
+                *_, last_config = config_history
+        except (FileNotFoundError, ValueError):
+            log.info("Empty or invalid config history.")
+        else:
+            log.info(f"Loading latest config from {config_history_path}.")
+            cfg = AzimuthConfig.parse_obj(last_config)
 
     log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
 

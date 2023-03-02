@@ -39,6 +39,7 @@ RUN poetry config virtualenvs.create false && \
 # Install the project.
 COPY . /app/
 RUN poetry install --extras ${DEVICE} --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
-ENV CFG_PATH="/config/nlp_sa/conf.json"
-ENV PORT=8091
-CMD ["sh","-c","umask 0002; python runner.py ${CFG_PATH} --port ${PORT}"]
+ENV CFG_PATH=
+ENV LOAD_CONFIG_HISTORY=
+ENV PORT=
+CMD ["sh","-c","umask 0002; python runner.py ${CFG_PATH} ${if ${LOAD_CONFIG_HISTORY},--load-config-history} ${if ${PORT},--port ${PORT}}"]

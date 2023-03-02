@@ -71,6 +71,15 @@ def patch_config(
     config: AzimuthConfig = Depends(get_config),
     partial_config: Dict = Body(...),
 ) -> AzimuthConfig:
+    if (
+        "artifact_path" in partial_config
+        and partial_config["artifact_path"] != config.artifact_path
+    ):
+        raise HTTPException(
+            HTTP_400_BAD_REQUEST,
+            detail="Cannot edit artifact_path, otherwise config history would become inconsistent.",
+        )
+
     try:
         new_config = update_config(old_config=config, partial_config=partial_config)
         run_startup_tasks(new_config, task_manager.cluster)

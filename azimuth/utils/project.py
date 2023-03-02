@@ -56,7 +56,7 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
 def save_config(azimuth_config: AzimuthConfig):
     """Append config to config_history.jsonl to retrieve past configs."""
     # TODO https://stackoverflow.com/questions/2333872/how-to-make-file-creation-an-atomic-operation
-    with jsonlines.open(f"{azimuth_config.artifact_path}/config_history.jsonl", mode="a") as f:
+    with jsonlines.open(azimuth_config.get_config_history_path(), mode="a") as f:
         f.write(azimuth_config.dict())
 
 

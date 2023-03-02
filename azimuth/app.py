@@ -74,11 +74,12 @@ def require_editable_config(config: AzimuthConfig = Depends(get_config)):
         raise HTTPException(HTTP_403_FORBIDDEN, detail="The Azimuth config is currently read-only.")
 
 
-def start_app(config_path: Optional[str], debug: bool) -> FastAPI:
+def start_app(config_path: Optional[str], load_config_history: bool, debug: bool) -> FastAPI:
     """Launch the application's API.
 
     Args:
         config_path: path to the config
+        load_config_history: Load the last config from history, or if empty, default to config_path.
         debug: Debug flag
 
     Returns:
@@ -96,7 +97,7 @@ def start_app(config_path: Optional[str], debug: bool) -> FastAPI:
 
     log.info("🔭 Azimuth starting 🔭")
 
-    azimuth_config = load_azimuth_config(config_path)
+    azimuth_config = load_azimuth_config(config_path, load_config_history)
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
 
