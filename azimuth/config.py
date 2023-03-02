@@ -66,7 +66,7 @@ config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_path", default="/config/config.json")
+    parser.add_argument("config_path", default=None, nargs="?")
     parser.add_argument("--port", default=8091, help="Port to serve the API.")
     parser.add_argument("--debug", action="store_true")
     return parser.parse_args()
@@ -421,7 +421,7 @@ class AzimuthConfig(
         return values
 
 
-def load_azimuth_config(config_path: str) -> AzimuthConfig:
+def load_azimuth_config(config_path: Optional[str]) -> AzimuthConfig:
     """
     Load the configuration from a file or make a pre-built one from a folder.
 
@@ -435,10 +435,8 @@ def load_azimuth_config(config_path: str) -> AzimuthConfig:
         If the file does not exist or the prediction file are not present.
     """
     log.info("-------------Loading Config--------------")
-    if not os.path.isfile(config_path):
-        raise EnvironmentError(f"{config_path} does not exists!")
-
-    cfg = AzimuthConfig.parse_file(config_path)
+    # Loading config from config_path if specified, or else from environment variables only.
+    cfg = AzimuthConfig.parse_file(config_path) if config_path else AzimuthConfig()
 
     log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
 

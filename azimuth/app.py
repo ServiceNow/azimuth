@@ -74,7 +74,7 @@ def require_editable_config(config: AzimuthConfig = Depends(get_config)):
         raise HTTPException(HTTP_403_FORBIDDEN, detail="The Azimuth config is currently read-only.")
 
 
-def start_app(config_path, debug=False) -> FastAPI:
+def start_app(config_path: Optional[str], debug: bool) -> FastAPI:
     """Launch the application's API.
 
     Args:
