@@ -34,6 +34,9 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
         ValueError if neither validation or test exists in the dataset
 
     """
+    if azimuth_config.dataset is None:
+        raise ValueError("No dataset configured.")
+
     dataset_in_config: DatasetDict = load_custom_object(
         azimuth_config.dataset, azimuth_config=azimuth_config
     )

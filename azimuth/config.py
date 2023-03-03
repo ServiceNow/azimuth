@@ -259,7 +259,7 @@ class ProjectConfig(AzimuthBaseSettings):
     # Name of the current project.
     name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
-    dataset: CustomObject
+    dataset: Optional[CustomObject] = None
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
@@ -468,12 +468,14 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
 
     log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
 
-    remote_mention = "" if not cfg.dataset.remote else f"from {cfg.dataset.remote} "
-    log.info(
-        f"Dataset will be loaded with {cfg.dataset.class_name} "
-        + remote_mention
-        + f"with the following args and kwargs: {cfg.dataset.args} {cfg.dataset.kwargs}."
-    )
+    if cfg.dataset:
+        remote_mention = "" if not cfg.dataset.remote else f"from {cfg.dataset.remote} "
+        log.info(
+            f"Dataset will be loaded with {cfg.dataset.class_name} "
+            + remote_mention
+            + f"with the following args and kwargs: {cfg.dataset.args} {cfg.dataset.kwargs}."
+        )
+
     if cfg.pipelines:
         for pipeline_idx, pipeline in enumerate(cfg.pipelines):
             remote_pipeline = cfg.pipelines[pipeline_idx].model.remote

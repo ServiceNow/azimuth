@@ -42,7 +42,6 @@ def get_default_config_def(
 ) -> AzimuthConfig:
     return AzimuthConfig(
         language=language,
-        dataset=CustomObject(class_name=REQUIRED),
         pipelines=[PipelineDefinition(name=REQUIRED, model=CustomObject(class_name=REQUIRED))],
     )
 
