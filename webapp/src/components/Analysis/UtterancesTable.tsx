@@ -434,16 +434,21 @@ const UtterancesTable: React.FC<Props> = ({
       if (target) {
         const result = target.result as string;
         const [header, ...rows] = result.split(/\r?\n/).slice(0, -1);
-        rows.length === 0 &&
+        if (rows.length === 0) {
           raiseErrorToast("There are no records in the CSV file.");
-
+          return null;
+        }
         const headers: string[] = header.split(",");
-        [config.columns.persistent_id, "proposed_action"].every(
-          (h) => !headers.includes(h)
-        ) &&
+        if (
+          ![config.columns.persistent_id, "proposed_action"].every((h) =>
+            headers.includes(h)
+          )
+        ) {
           raiseErrorToast(
             `The CSV file did not have the ${config.columns.persistent_id} and proposed_action column headers to update the proposed action.`
           );
+          return null;
+        }
 
         const utterancePatch = rows.map((row) => {
           const [persistentId, dataAction] = row.split(",");
