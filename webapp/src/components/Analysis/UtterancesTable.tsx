@@ -400,34 +400,6 @@ const UtterancesTable: React.FC<Props> = ({
 
   const searchString = constructSearchString(pipeline);
 
-  const updateProposedAction = (data: UtterancePatch[]) => {
-    const groupByPersistentId: Record<
-      string,
-      UtterancePatch["persistentId"][]
-    > = data.reduce(
-      (
-        accumulated: Record<string, UtterancePatch["persistentId"][]>,
-        { persistentId, dataAction }: UtterancePatch
-      ) => ({
-        ...accumulated,
-        [dataAction]: accumulated[dataAction]
-          ? accumulated[dataAction].concat(persistentId)
-          : [persistentId],
-      }),
-      {}
-    );
-    Object.entries(groupByPersistentId).forEach(
-      ([dataAction, persistentIds]) => {
-        const newValue = dataAction as DataAction;
-        updateDataAction({
-          persistentIds,
-          newValue,
-          ...getUtterancesQueryState,
-        });
-      }
-    );
-  };
-
   const importProposedActions = (file: File) => {
     const fileReader = new FileReader();
     fileReader.onload = ({ target }) => {
@@ -454,7 +426,10 @@ const UtterancesTable: React.FC<Props> = ({
           const [persistentId, dataAction] = row.split(",");
           return { persistentId, dataAction } as UtterancePatch;
         });
-        updateProposedAction(utterancePatch);
+        updateDataAction({
+          utterancePatch,
+          utteranceQuery: getUtterancesQueryState,
+        });
       }
     };
     fileReader.readAsText(file);

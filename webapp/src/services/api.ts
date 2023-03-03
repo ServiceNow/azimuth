@@ -195,25 +195,21 @@ export const api = createApi({
     updateDataActions: build.mutation<
       UtterancePatch[],
       {
-        persistentIds: UtterancePatch["persistentId"][];
-        newValue: DataAction;
-      } & GetUtterancesQueryState
+        utterancePatch: {
+          persistentId: UtterancePatch["persistentId"];
+          dataAction: DataAction;
+        }[];
+        utteranceQuery: GetUtterancesQueryState;
+      }
     >({
-      queryFn: async ({ jobId, datasetSplitName, persistentIds, newValue }) =>
+      queryFn: async ({ utterancePatch, utteranceQuery }) =>
         responseToData(
           fetchApi({
             path: "/dataset_splits/{dataset_split_name}/utterances",
             method: "patch",
           }),
           "Something went wrong updating proposed actions"
-        )({
-          jobId,
-          datasetSplitName,
-          body: persistentIds.map((persistentId) => ({
-            persistentId,
-            dataAction: newValue,
-          })),
-        }),
+        )({ ...utteranceQuery, body: utterancePatch }),
       invalidatesTags: () => [
         "ConfidenceHistogram",
         "ConfusionMatrix",
@@ -225,17 +221,17 @@ export const api = createApi({
         "Utterances",
       ],
       async onQueryStarted(
-        { persistentIds, newValue, ...args },
+        { utterancePatch, ...args },
         { dispatch, queryFulfilled }
       ) {
         const patchResult = dispatch(
-          api.util.updateQueryData("getUtterances", args, (draft) => {
-            draft.utterances.forEach((utterance) => {
-              if (persistentIds.includes(utterance.persistentId)) {
-                utterance.dataAction = newValue;
-              }
-            });
-          })
+          api.util.updateQueryData(
+            "getUtterances",
+            args.utteranceQuery,
+            (draft) => {
+              Object.assign(draft, utterancePatch);
+            }
+          )
         );
         try {
           await queryFulfilled;
