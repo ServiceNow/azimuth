@@ -42,4 +42,5 @@ RUN poetry install --extras ${DEVICE} --no-interaction --no-ansi $(/usr/bin/test
 ENV CFG_PATH=
 ENV LOAD_CONFIG_HISTORY=
 ENV PORT=
+ENV ARTIFACT_PATH=/cache
 CMD ["sh","-c","umask 0002; python runner.py ${CFG_PATH} ${if ${LOAD_CONFIG_HISTORY},--load-config-history} ${if ${PORT},--port ${PORT}}"]

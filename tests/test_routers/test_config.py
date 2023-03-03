@@ -21,7 +21,7 @@ def test_get_default_config(app: FastAPI):
             "persistent_id": "row_idx",
         },
         "rejection_class": "REJECTION_CLASS",
-        "artifact_path": "/cache",
+        "artifact_path": "cache",
         "batch_size": 32,
         "use_cuda": "auto",
         "large_dask_cluster": False,

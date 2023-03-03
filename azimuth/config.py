@@ -286,8 +286,11 @@ class ProjectConfig(AzimuthBaseSettings):
 class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     """Fields that can be modified without affecting caching."""
 
-    # Where to store artifacts. (HDF5 files,  HF datasets, Dask config)
-    artifact_path: str = "/cache"
+    artifact_path: str = Field(
+        "cache",
+        description="Where to store artifacts "
+        "(Azimuth config history, HDF5 files, HF datasets, Dask config).",
+    )
     # Batch size to use during inference.
     batch_size: int = Field(32, exclude_from_cache=True)
     # Will use CUDA and will need GPUs if set to True.
