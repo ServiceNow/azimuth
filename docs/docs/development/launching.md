@@ -72,7 +72,7 @@ make LOAD_CONFIG_HISTORY=1 launch.local
 In fact, it is possible to specify both `LOAD_CONFIG_HISTORY=1` and a `CFG_PATH` together, in which case Azimuth will automatically
 
 1. load the config from `CFG_PATH` when it first starts (if `config_history.jsonl` is empty); and
-2. load the config from `config_history.jsonl` from then on if it is restarted.
+2. load the config from `config_history.jsonl` from then on (if Azimuth is restarted).
 
 Although confusing, this comes in very handy in some contexts like a docker container that might be stopped and restarted with the same command. For example:
 ```shell
