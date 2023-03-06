@@ -31,7 +31,6 @@ include makefiles/Makefile.security
 include makefiles/Makefile.test
 include makefiles/Makefile.local
 include makefiles/Makefile.demo
-include makefiles/Makefile.docs
 
 .PHONY: build
 build: build_be build_fe
