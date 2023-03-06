@@ -2,7 +2,7 @@ import { ArrowDropDown, GetApp, SvgIconComponent } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
 import UploadIcon from "@mui/icons-material/Upload";
-import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Button, Menu, MenuItem } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -412,23 +412,22 @@ const UtterancesTable: React.FC<Props> = ({
         }
         const headers: string[] = header.split(",");
         if (
-          ![config.columns.persistent_id, "proposed_action"].every((h) =>
-            headers.includes(h)
+          ![config.columns.persistent_id, "proposed_action"].every(
+            (h, index) => headers.includes(h) || headers.indexOf(h) === index
           )
         ) {
           raiseErrorToast(
-            `The CSV file did not have the ${config.columns.persistent_id} and proposed_action column headers to update the proposed action.`
+            `The CSV file either did not have the ${config.columns.persistent_id} and proposed_action column headers, or the columns are not in the correct order to update the proposed action.`
           );
           return null;
         }
-
         const utterancePatch = rows.map((row) => {
           const [persistentId, dataAction] = row.split(",");
           return { persistentId, dataAction } as UtterancePatch;
         });
         updateDataAction({
           utterancePatch,
-          utteranceQuery: getUtterancesQueryState,
+          ...getUtterancesQueryState,
         });
       }
     };

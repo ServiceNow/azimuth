@@ -1,6 +1,6 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AzimuthConfig, DataAction, UtterancePatch } from "types/api";
+import { AzimuthConfig, UtterancePatch } from "types/api";
 import { fetchApi, GetUtterancesQueryState, TypedResponse } from "utils/api";
 import { raiseSuccessToast } from "utils/helpers";
 
@@ -195,14 +195,10 @@ export const api = createApi({
     updateDataActions: build.mutation<
       UtterancePatch[],
       {
-        utterancePatch: {
-          persistentId: UtterancePatch["persistentId"];
-          dataAction: DataAction;
-        }[];
-        utteranceQuery: GetUtterancesQueryState;
-      }
+        utterancePatch: UtterancePatch[];
+      } & GetUtterancesQueryState
     >({
-      queryFn: async ({ utterancePatch, utteranceQuery }) =>
+      queryFn: async ({ utterancePatch, ...utteranceQuery }) =>
         responseToData(
           fetchApi({
             path: "/dataset_splits/{dataset_split_name}/utterances",
@@ -225,13 +221,16 @@ export const api = createApi({
         { dispatch, queryFulfilled }
       ) {
         const patchResult = dispatch(
-          api.util.updateQueryData(
-            "getUtterances",
-            args.utteranceQuery,
-            (draft) => {
-              Object.assign(draft, utterancePatch);
-            }
-          )
+          api.util.updateQueryData("getUtterances", args, (draft) => {
+            draft.utterances.forEach((utterance) => {
+              Object.assign(
+                utterance,
+                utterancePatch.filter(
+                  ({ persistentId }) => persistentId === utterance.persistentId
+                )
+              );
+            });
+          })
         );
         try {
           await queryFulfilled;

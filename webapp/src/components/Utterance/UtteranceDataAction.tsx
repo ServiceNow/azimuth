@@ -32,7 +32,7 @@ const UtteranceDataAction: React.FC<Props> = ({
     );
     updateDataAction({
       utterancePatch,
-      utteranceQuery: getUtterancesQueryState,
+      ...getUtterancesQueryState,
     });
   };
 
