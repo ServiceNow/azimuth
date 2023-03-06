@@ -699,8 +699,11 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     SimilarityOptions: {
+      /** Language-based dynamic default value. */
       faiss_encoder: string;
+      /** Threshold to use when finding conflicting neighbors. */
       conflicting_neighbors_threshold: number;
+      /** Threshold to determine whether there are close neighbors. */
       no_close_threshold: number;
     };
     /** An enumeration. */
@@ -818,7 +821,9 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     UncertaintyOptions: {
+      /** Number of MC sampling to do. 1 disables BMA. */
       iterations: number;
+      /** Threshold to determine high epistemic items. */
       high_epistemic_threshold: number;
     };
     /**

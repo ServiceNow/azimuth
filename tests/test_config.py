@@ -138,6 +138,93 @@ def test_french_defaults_and_override():
     ), "Config did not take default French value for prefix list (neutral tokens)"
 
 
+def test_config_min_max_values():
+    AzimuthConfig(
+        **MINIMAL_CONFIG,
+        pipelines=[{"model": {"class_name": "Cls"}, "postprocessors": [{"temperature": 0}]}],
+    )
+    with pytest.raises(ValidationError):
+        AzimuthConfig(
+            **MINIMAL_CONFIG,
+            pipelines=[{"model": {"class_name": "Cls"}, "postprocessors": [{"temperature": -0.1}]}],
+        )
+
+    AzimuthConfig(
+        **MINIMAL_CONFIG,
+        pipelines=[{"model": {"class_name": "Cls"}, "postprocessors": [{"threshold": 0}]}],
+    )
+    AzimuthConfig(
+        **MINIMAL_CONFIG,
+        pipelines=[{"model": {"class_name": "Cls"}, "postprocessors": [{"threshold": 1}]}],
+    )
+    with pytest.raises(ValidationError):
+        AzimuthConfig(
+            **MINIMAL_CONFIG,
+            pipelines=[{"model": {"class_name": "Cls"}, "postprocessors": [{"threshold": -0.1}]}],
+        )
+    with pytest.raises(ValidationError):
+        AzimuthConfig(
+            **MINIMAL_CONFIG,
+            pipelines=[{"model": {"class_name": "Cls"}, "postprocessors": [{"threshold": 1.1}]}],
+        )
+
+    AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"min_num_per_class": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"min_num_per_class": 0})
+
+    AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_class_imbalance": 0})
+    AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_class_imbalance": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_class_imbalance": -0.1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_class_imbalance": 1.1})
+
+    AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_representation": 0})
+    AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_representation": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_representation": -0.1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_representation": 1.1})
+
+    AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_mean_words": 0})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_mean_words": -0.1})
+
+    AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_std_words": 0})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, dataset_warnings={"max_delta_std_words": -0.1})
+
+    AzimuthConfig(**MINIMAL_CONFIG, syntax={"short_utterance_max_word": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, syntax={"short_utterance_max_word": 0})
+
+    AzimuthConfig(**MINIMAL_CONFIG, syntax={"long_utterance_min_word": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, syntax={"long_utterance_min_word": 0})
+
+    AzimuthConfig(**MINIMAL_CONFIG, similarity={"conflicting_neighbors_threshold": 0})
+    AzimuthConfig(**MINIMAL_CONFIG, similarity={"conflicting_neighbors_threshold": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, similarity={"conflicting_neighbors_threshold": -0.1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, similarity={"conflicting_neighbors_threshold": 1.1})
+
+    AzimuthConfig(**MINIMAL_CONFIG, similarity={"no_close_threshold": -1})
+    AzimuthConfig(**MINIMAL_CONFIG, similarity={"no_close_threshold": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, similarity={"no_close_threshold": -1.1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, similarity={"no_close_threshold": 1.1})
+
+    AzimuthConfig(**MINIMAL_CONFIG, uncertainty={"iterations": 1})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, uncertainty={"iterations": 0})
+
+    AzimuthConfig(**MINIMAL_CONFIG, uncertainty={"high_epistemic_threshold": 0})
+    with pytest.raises(ValidationError):
+        AzimuthConfig(**MINIMAL_CONFIG, uncertainty={"high_epistemic_threshold": -0.1})
+
+
 def test_update_config(tiny_text_config, monkeypatch, dask_client):
     # Changing config for a first time
     partial_config = {"similarity": None}
