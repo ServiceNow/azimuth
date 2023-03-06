@@ -115,7 +115,7 @@ class TemperatureScaling(CustomObject):
     class_name: Literal[
         "azimuth.utils.ml.postprocessing.TemperatureScaling"
     ] = "azimuth.utils.ml.postprocessing.TemperatureScaling"
-    temperature: float = Field(1, env="TEMP")
+    temperature: float = Field(1, ge=0, env="TEMP")
 
     @root_validator()
     def check_temps(cls, values):
@@ -131,7 +131,7 @@ class ThresholdConfig(CustomObject):
     class_name: Literal[
         "azimuth.utils.ml.postprocessing.Thresholding"
     ] = "azimuth.utils.ml.postprocessing.Thresholding"
-    threshold: float = Field(0.5, env="TH")
+    threshold: float = Field(0.5, ge=0, le=1, env="TH")
 
     @root_validator()
     def check_threshold(cls, values):
@@ -173,16 +173,16 @@ class PipelineDefinition(AzimuthBaseSettings):
 
 
 class DatasetWarningsOptions(AzimuthBaseSettings):
-    min_num_per_class: int = 20
-    max_delta_class_imbalance: float = 0.5
-    max_delta_representation: float = 0.05
-    max_delta_mean_words: float = 3.0
-    max_delta_std_words: float = 3.0
+    min_num_per_class: int = Field(20, ge=1)
+    max_delta_class_imbalance: float = Field(0.5, ge=0, le=1)
+    max_delta_representation: float = Field(0.05, ge=0, le=1)
+    max_delta_mean_words: float = Field(3, ge=0)
+    max_delta_std_words: float = Field(3, ge=0)
 
 
 class SyntaxOptions(AzimuthBaseSettings):
-    short_utterance_max_word: int = 3
-    long_utterance_min_word: int = 12
+    short_utterance_max_word: int = Field(3, ge=1)
+    long_utterance_min_word: int = Field(12, ge=1)
     spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
     subj_tags: List[str] = []  # Language-based dynamic default value
     obj_tags: List[str] = []  # Language-based dynamic default value
@@ -220,16 +220,20 @@ class BehavioralTestingOptions(AzimuthBaseSettings):
 
 
 class SimilarityOptions(AzimuthBaseSettings):
-    faiss_encoder: str = ""  # Language-based dynamic default value
-    # Threshold to use when finding conflicting neighbors.
-    conflicting_neighbors_threshold: float = 0.9
-    # Threshold to determine whether there are close neighbors.
-    no_close_threshold: float = 0.5
+    faiss_encoder: str = Field("", description="Language-based dynamic default value.")
+    conflicting_neighbors_threshold: float = Field(
+        0.9, ge=0, le=1, description="Threshold to use when finding conflicting neighbors."
+    )
+    no_close_threshold: float = Field(
+        0.5, ge=-1, le=1, description="Threshold to determine whether there are close neighbors."
+    )
 
 
 class UncertaintyOptions(AzimuthBaseSettings):
-    iterations: int = 1  # Number of MC sampling to do. 1 disables BMA.
-    high_epistemic_threshold: float = 0.1  # Threshold to determine high epistemic items.
+    iterations: int = Field(1, ge=1, description="Number of MC sampling to do. 1 disables BMA.")
+    high_epistemic_threshold: float = Field(
+        0.1, ge=0, description="Threshold to determine high epistemic items."
+    )
 
 
 class ColumnConfiguration(AzimuthBaseSettings):
@@ -407,16 +411,15 @@ class AzimuthConfig(
     @root_validator()
     def dynamic_language_config_values(cls, values):
         defaults = config_defaults_per_language[values["language"]]
-        if values["behavioral_testing"]:
-            neutral_token = values["behavioral_testing"].neutral_token
+        if behavioral_testing := values.get("behavioral_testing"):
+            neutral_token = behavioral_testing.neutral_token
             neutral_token.prefix_list = neutral_token.prefix_list or defaults.prefix_list
             neutral_token.suffix_list = neutral_token.suffix_list or defaults.suffix_list
-        syntax = values["syntax"]
-        syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
-        syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
-        syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
-        if values["similarity"]:
-            similarity = values["similarity"]
+        if syntax := values.get("syntax"):
+            syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
+            syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
+            syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
+        if similarity := values.get("similarity"):
             similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
         return values
 
