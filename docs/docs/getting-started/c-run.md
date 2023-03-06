@@ -146,6 +146,7 @@ They are the following:
 * You can specify the device on which to run Azimuth, with `DEVICE` being one of `auto`, `gpu` or `cpu`. If
   none is provided, `auto` will be used. Ex: `DEVICE=gpu`.
 * Specify `READ_ONLY_CONFIG=1` to lock the config once Azimuth is launched.
+* Specify `LOAD_CONFIG_HISTORY=1` to load the latest config from Azimuth's config history.
 
 !!! note "Config file prevails over environment variables"
 
