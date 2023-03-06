@@ -28,7 +28,7 @@ These fields are generic and can be adapted based on the user's machine.
 
 🔵 **Default value**: `cache`
 
-Where to store artifacts (Azimuth config history, HDF5 files, HF datasets, Dask config).
+Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).
 
 !!! tip "Using Docker?"
 
