@@ -74,12 +74,13 @@ In fact, it is possible to specify both `LOAD_CONFIG_HISTORY=1` and a `CFG_PATH`
 1. load the config from `CFG_PATH` when it first starts (if `config_history.jsonl` is empty); and
 2. load the config from `config_history.jsonl` from then on (if Azimuth is restarted).
 
-Although confusing, this comes in very handy in some contexts like a docker container that might be stopped and restarted with the same command. For example:
+For example:
 ```shell
 make CFG_PATH=local_configs/development/clinc_dummy/conf.json \
      LOAD_CONFIG_HISTORY=1 \
      launch.local
 ```
+Although confusing, this comes in very handy in some contexts like a docker container that might be stopped and restarted with the same command.
 
 ??? warning "Using `LOAD_CONFIG_HISTORY=1` with a custom `artifact_path`"
     The location of `config_history.jsonl` depends on `artifact_path`, so if you customized it in your config, it needs to be consistent when you restart Azimuth. The easiest solution is to always specify both `LOAD_CONFIG_HISTORY=1` and a `CFG_PATH` together, like in the example above. Alternatively, you can specify the environment variable `ARTIFACT_PATH`:

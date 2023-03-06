@@ -117,10 +117,11 @@ In fact, it is possible to specify both `LOAD_CONFIG_HISTORY=1` and a `CFG_PATH`
 1. load the config from `CFG_PATH` when it first starts (if `config_history.jsonl` is empty); and
 2. load the config from `config_history.jsonl` from then on (if Azimuth is restarted).
 
-Although confusing, this enables you to stop and restart the docker container with the same command. For example:
+For example:
 ```shell
 make CFG_PATH=/config/my_project/conf.json LOAD_CONFIG_HISTORY=1 launch
 ```
+Although confusing, this enables you to stop and restart the docker container with the same command.
 
 ## Advanced Settings
 
