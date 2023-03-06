@@ -43,4 +43,4 @@ ENV CFG_PATH=
 ENV LOAD_CONFIG_HISTORY=
 ENV PORT=
 ENV ARTIFACT_PATH=/cache
-CMD ["sh","-c","umask 0002; python runner.py ${CFG_PATH} ${if ${LOAD_CONFIG_HISTORY},--load-config-history} ${if ${PORT},--port ${PORT}}"]
+CMD ["sh","-c","umask 0002; python runner.py ${CFG_PATH} ${LOAD_CONFIG_HISTORY:+--load-config-history} ${PORT:+--port ${PORT}}"]
