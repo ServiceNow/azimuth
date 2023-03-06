@@ -108,6 +108,20 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
 4. The **app will be accessible** at `http://localhost:8080` after a few minutes of waiting. The
    start-up tasks will start.
 
+After a successful start, Azimuth saves the provided config in its `config_history.jsonl` artifact. If you use the API to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
+```shell
+make LOAD_CONFIG_HISTORY=1 launch
+```
+In fact, it is possible to specify both `LOAD_CONFIG_HISTORY=1` and a `CFG_PATH` together, in which case Azimuth will automatically
+
+1. load the config from `CFG_PATH` when it first starts (if `config_history.jsonl` is empty); and
+2. load the config from `config_history.jsonl` from then on (if Azimuth is restarted).
+
+Although confusing, this enables you to stop and restart the docker container with the same command. For example:
+```shell
+make CFG_PATH=/config/my_project/conf.json LOAD_CONFIG_HISTORY=1 launch
+```
+
 ## Advanced Settings
 
 ### Additional Config Fields
