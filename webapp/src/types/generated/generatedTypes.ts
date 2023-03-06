@@ -130,6 +130,7 @@ export interface components {
       dataset: components["schemas"]["CustomObject"];
       columns: components["schemas"]["ColumnConfiguration"];
       rejection_class: string | null;
+      /** Where to store artifacts (Azimuth config history, HDF5 files, HF datasets). */
       artifact_path: string;
       batch_size: number;
       use_cuda: "auto" | boolean;
