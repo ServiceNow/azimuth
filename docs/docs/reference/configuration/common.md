@@ -7,7 +7,7 @@ These fields are generic and can be adapted based on the user's machine.
     ```python
     class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         """"""
-        artifact_path: str = "/cache"
+        artifact_path: str = "cache"
         batch_size: int = 32
         use_cuda: Union[Literal["auto"], bool] = "auto"
         large_dask_cluster: bool = False
@@ -26,15 +26,13 @@ These fields are generic and can be adapted based on the user's machine.
 
 ## Artifact Path
 
-🔵 **Default value**: `/cache`
+🔵 **Default value**: `cache`
 
-Where to store the caching artifacts (`HDF5` files and HF datasets). The value needs to be available
-inside Docker (see `docker-compose.yml`). `/cache` is available by default on the docker image.
+Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).
 
-!!! tip "Not using Docker?"
+!!! tip "Using Docker?"
 
-    If Azimuth is run without Docker, the cache needs to be a path with write access (`/cache` will not
-    work).
+    Our Azimuth Docker image has `ARTIFACT_PATH=/cache` defined, effectively defining `/cache` as the default `artifact_path`.
 
 ## Batch Size
 

@@ -9,6 +9,7 @@ from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
+from jsonlines import jsonlines
 from pydantic import BaseSettings, Extra, Field, root_validator, validator
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
@@ -65,8 +66,17 @@ config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
 
 
 def parse_args():
+    """Parse CLI args.
+
+    Returns: argparse Namespace
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_path", default="/config/config.json")
+    parser.add_argument("config_path", default=None, nargs="?")
+    parser.add_argument(
+        "--load-config-history",
+        action="store_true",
+        help="Load the last config from history, or if empty, default to config_path.",
+    )
     parser.add_argument("--port", default=8091, help="Port to serve the API.")
     parser.add_argument("--debug", action="store_true")
     return parser.parse_args()
@@ -253,7 +263,7 @@ class ProjectConfig(AzimuthBaseSettings):
     # Name of the current project.
     name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
-    dataset: CustomObject
+    dataset: Optional[CustomObject] = None
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
@@ -280,8 +290,10 @@ class ProjectConfig(AzimuthBaseSettings):
 class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     """Fields that can be modified without affecting caching."""
 
-    # Where to store artifacts. (HDF5 files,  HF datasets, Dask config)
-    artifact_path: str = "/cache"
+    artifact_path: str = Field(
+        "cache",
+        description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
+    )
     # Batch size to use during inference.
     batch_size: int = Field(32, exclude_from_cache=True)
     # Will use CUDA and will need GPUs if set to True.
@@ -305,6 +317,9 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         path = pjoin(self.artifact_path, f"{self.name}_{self.to_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
+
+    def get_config_history_path(self):
+        return f"{self.artifact_path}/config_history.jsonl"
 
 
 class ModelContractConfig(CommonFieldsConfig):
@@ -424,12 +439,13 @@ class AzimuthConfig(
         return values
 
 
-def load_azimuth_config(config_path: str) -> AzimuthConfig:
+def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:
     """
     Load the configuration from a file or make a pre-built one from a folder.
 
     Args:
         config_path: Path to a json file or a directory with the prediction files.
+        load_config_history: Load the last config from history, or if empty, default to config_path.
 
     Returns:
         The loaded config.
@@ -438,19 +454,30 @@ def load_azimuth_config(config_path: str) -> AzimuthConfig:
         If the file does not exist or the prediction file are not present.
     """
     log.info("-------------Loading Config--------------")
-    if not os.path.isfile(config_path):
-        raise EnvironmentError(f"{config_path} does not exists!")
+    # Loading config from config_path if specified, or else from environment variables only.
+    cfg = AzimuthConfig.parse_file(config_path) if config_path else AzimuthConfig()
 
-    cfg = AzimuthConfig.parse_file(config_path)
+    if load_config_history:
+        config_history_path = cfg.get_config_history_path()
+        try:
+            with jsonlines.open(config_history_path, mode="r") as config_history:
+                *_, last_config = config_history
+        except (FileNotFoundError, ValueError):
+            log.info("Empty or invalid config history.")
+        else:
+            log.info(f"Loading latest config from {config_history_path}.")
+            cfg = AzimuthConfig.parse_obj(last_config)
 
     log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
 
-    remote_mention = "" if not cfg.dataset.remote else f"from {cfg.dataset.remote} "
-    log.info(
-        f"Dataset will be loaded with {cfg.dataset.class_name} "
-        + remote_mention
-        + f"with the following args and kwargs: {cfg.dataset.args} {cfg.dataset.kwargs}."
-    )
+    if cfg.dataset:
+        remote_mention = "" if not cfg.dataset.remote else f"from {cfg.dataset.remote} "
+        log.info(
+            f"Dataset will be loaded with {cfg.dataset.class_name} "
+            + remote_mention
+            + f"with the following args and kwargs: {cfg.dataset.args} {cfg.dataset.kwargs}."
+        )
+
     if cfg.pipelines:
         for pipeline_idx, pipeline in enumerate(cfg.pipelines):
             remote_pipeline = cfg.pipelines[pipeline_idx].model.remote

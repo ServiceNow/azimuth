@@ -6,4 +6,6 @@ from azimuth.app import start_app
 from azimuth.config import parse_args
 
 args = parse_args()
-app = start_app(config_path=args.config_path, debug=args.debug)
+app = start_app(
+    config_path=args.config_path, load_config_history=args.load_config_history, debug=args.debug
+)

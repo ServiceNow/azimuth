@@ -16,6 +16,7 @@ Released changes are shown in the
 - The initial config file and all subsequent changes are saved in the caching folder.
 - Outcome option to dropdown in Smart Tag Analysis.
 - Link from confusion matrix cells and row/column labels to utterance table.
+- Preserve edits done to the config via the API when relaunching Azimuth with the env var `LOAD_CONFIG_HISTORY=1`.
 
 ### Changed
 - Change the outcome per threshold bar chart to area chart, making the x axis continuous, and add vertical dashed line marking current threshold.
