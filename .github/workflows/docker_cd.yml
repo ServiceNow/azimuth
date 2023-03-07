@@ -17,6 +17,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - run: |
+         make DEVICE=gpu build push
+         make DEVICE=cpu build push
          make TAG=$VERSION DEVICE=gpu build push
          make TAG=$VERSION DEVICE=cpu build push
         env:
