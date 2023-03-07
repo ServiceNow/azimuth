@@ -405,24 +405,24 @@ const UtterancesTable: React.FC<Props> = ({
     fileReader.onload = ({ target }) => {
       if (target) {
         const result = target.result as string;
-        const [header, ...rows] = result.split(/\r?\n/).slice(0, -1);
+        const [header, ...rows] = result.trimEnd().split(/\r?\n/);
         if (rows.length === 0) {
           raiseErrorToast("There are no records in the CSV file.");
-          return null;
+          return;
         }
         if (header !== `${config.columns.persistent_id},proposed_action`) {
           raiseErrorToast(
             `The CSV file must have column headers ${config.columns.persistent_id} and proposed_action, in that order.`
           );
-          return null;
+          return;
         }
 
-        const utterancePatch = rows.map((row) => {
+        const body = rows.map((row) => {
           const [persistentId, dataAction] = row.split(",");
           return { persistentId, dataAction } as UtterancePatch;
         });
         updateDataAction({
-          body: utterancePatch,
+          body,
           ...getUtterancesQueryState,
         });
       }

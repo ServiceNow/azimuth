@@ -24,14 +24,12 @@ const UtteranceDataAction: React.FC<Props> = ({
   const [updateDataAction] = updateDataActionsEndpoint.useMutation();
 
   const handleDataActionChange = (newValue: DataAction) => {
-    const utterancePatch: UtterancePatch[] = persistentIds.map(
-      (persistentId) => ({
-        persistentId,
-        dataAction: newValue,
-      })
-    );
+    const body: UtterancePatch[] = persistentIds.map((persistentId) => ({
+      persistentId,
+      dataAction: newValue,
+    }));
     updateDataAction({
-      body: utterancePatch,
+      body,
       ...getUtterancesQueryState,
     });
   };

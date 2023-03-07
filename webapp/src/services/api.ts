@@ -220,11 +220,11 @@ export const api = createApi({
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
-              const patchUtterance = body.find(
-                ({ persistentId }) => persistentId === utterance.persistentId
+              const found = body.find(
+                ({ persistentId }) => persistentId == utterance.persistentId
               );
-              if (patchUtterance) {
-                utterance.dataAction = patchUtterance.dataAction;
+              if (found) {
+                utterance.dataAction = found.dataAction;
               }
             });
           })
