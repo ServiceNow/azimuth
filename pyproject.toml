@@ -27,7 +27,7 @@ onnxruntime = { version = "1.12.1", optional = true }
 onnxruntime-gpu = { version = "1.12.1", optional = true }
 scipy = "^1.6.3"
 spectral-metric = "0.6.1"
-torch = { version = "1.9.0", source = "PyPI" }
+torch = { version = "1.13.1", source = "PyPI" }
 
 # NLP libraries
 transformers = "4.16.2"
