@@ -1832,22 +1832,42 @@ The following instructions are inspired from <a href="https://gist.github.com/ia
 <li>You can consult the openapi documentation at <code>localhost:8091/docs</code>. From there, you can consult the API documentation and try out the different endpoints. This can be useful for debugging.</li>
 <li>Note that the back end will not reload automatically based on code changes.</li>
 </ul>
+<p>After a successful start, Azimuth saves the provided config in its <code>config_history.jsonl</code> artifact. If you use the API to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make<span class="w"> </span><span class="nv">LOAD_CONFIG_HISTORY</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>launch.local
+</code></pre></div>
+In fact, it is possible to specify both <code>LOAD_CONFIG_HISTORY=1</code> and a <code>CFG_PATH</code> together, in which case Azimuth will automatically</p>
+<ol>
+<li>load the config from <code>CFG_PATH</code> when it first starts (if <code>config_history.jsonl</code> is empty); and</li>
+<li>load the config from <code>config_history.jsonl</code> from then on (if Azimuth is restarted).</li>
+</ol>
+<p>For example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>make<span class="w"> </span><span class="nv">CFG_PATH</span><span class="o">=</span>local_configs/development/clinc_dummy/conf.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">     </span><span class="nv">LOAD_CONFIG_HISTORY</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">     </span>launch.local
+</code></pre></div>
+Although confusing, this comes in very handy in some contexts like a docker container that might be stopped and restarted with the same command.</p>
+<details class="warning">
+<summary>Using <code>LOAD_CONFIG_HISTORY=1</code> with a custom <code>artifact_path</code></summary>
+<p>The location of <code>config_history.jsonl</code> depends on <code>artifact_path</code>, so if you customized it in your config, it needs to be consistent when you restart Azimuth. The easiest solution is to always specify both <code>LOAD_CONFIG_HISTORY=1</code> and a <code>CFG_PATH</code> together, like in the example above. Alternatively, you can specify the environment variable <code>ARTIFACT_PATH</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>make<span class="w"> </span><span class="nv">ARTIFACT_PATH</span><span class="o">=</span>cache<span class="w"> </span><span class="nv">LOAD_CONFIG_HISTORY</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>launch.local
+</code></pre></div></p>
+</details>
 <div class="admonition warning">
 <p class="admonition-title">Cleaning the Cache</p>
 <p>If you make changes to back-end modules that result in different module responses, you will need to delete the cache, using:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make clean
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make clean
 </code></pre></div>
 As soon as you have an error in the start-up task, a good reflex is to use this command.
 Optionally, you can clean a single project by supplying the project name as an argument.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>make TARGET=CLINC clean
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>make TARGET=CLINC clean
 </code></pre></div>
 will delete all cache folders beginning with <code>CLINC</code>.</p>
 </div>
 <h3 id="front-end">Front End</h3>
 <p>You can then launch the front end using:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>cd webapp
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>yarn        # Only needed when dependencies were updated.
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>yarn start
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>cd webapp
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>yarn        # Only needed when dependencies were updated.
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>yarn start
 </code></pre></div></p>
 <ul>
 <li>The front-end app will launch and automatically connect to the back-end API, assuming you launched it already.</li>
@@ -1860,7 +1880,7 @@ will delete all cache folders beginning with <code>CLINC</code>.</p>
 <h3 id="launch-using-docker">Launch Using Docker</h3>
 <ul>
 <li>Docker compose will build the images and connect them, using the following command.
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make CFG_PATH=/config/examples/.../conf.json launch
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>make CFG_PATH=/config/examples/.../conf.json launch
 </code></pre></div>
   <em>Note that the path starts with <code>/config</code> as we mount <code>./config:/config</code>.</em></li>
 </ul>
@@ -1868,10 +1888,10 @@ will delete all cache folders beginning with <code>CLINC</code>.</p>
 <p>You can launch multiple instances of Azimuth (e.g., to compare effects of code changes) by
 specifying front-end and back-end ports.</p>
 <p>To specify the back-end port, start the back end using:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>make CFG_PATH={path to config file} PORT={back-end port} launch.local
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>make CFG_PATH={path to config file} PORT={back-end port} launch.local
 </code></pre></div></p>
 <p>To connect the front end to this back end, start the front end using:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>REACT_APP_BACKEND_PORT={back-end port} PORT={front-end port} yarn start
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>REACT_APP_BACKEND_PORT={back-end port} PORT={front-end port} yarn start
 </code></pre></div></p>
 <div class="admonition tip">
 <p class="admonition-title">Use appropriate port numbers</p>

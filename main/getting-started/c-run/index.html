@@ -1882,6 +1882,18 @@ dataset and model are available in <code>config/examples</code> (<code>CLINC</co
 <li>The <strong>app will be accessible</strong> at <code>http://localhost:8080</code> after a few minutes of waiting. The
    start-up tasks will start.</li>
 </ol>
+<p>After a successful start, Azimuth saves the provided config in its <code>config_history.jsonl</code> artifact. If you use the <abbr title="Application Programming Interface">API</abbr> to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span><span class="nv">LOAD_CONFIG_HISTORY</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>launch
+</code></pre></div>
+In fact, it is possible to specify both <code>LOAD_CONFIG_HISTORY=1</code> and a <code>CFG_PATH</code> together, in which case Azimuth will automatically</p>
+<ol>
+<li>load the config from <code>CFG_PATH</code> when it first starts (if <code>config_history.jsonl</code> is empty); and</li>
+<li>load the config from <code>config_history.jsonl</code> from then on (if Azimuth is restarted).</li>
+</ol>
+<p>For example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span><span class="nv">CFG_PATH</span><span class="o">=</span>/config/my_project/conf.json<span class="w"> </span><span class="nv">LOAD_CONFIG_HISTORY</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>launch
+</code></pre></div>
+Although confusing, this enables you to stop and restart the docker container with the same command.</p>
 <h2 id="advanced-settings">Advanced Settings</h2>
 <h3 id="additional-config-fields">Additional Config Fields</h3>
 <p>The <a href="../../reference/configuration/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> <strong>
@@ -1902,6 +1914,7 @@ They are the following:</p>
 <li>You can specify the device on which to run Azimuth, with <code>DEVICE</code> being one of <code>auto</code>, <code>gpu</code> or <code>cpu</code>. If
   none is provided, <code>auto</code> will be used. Ex: <code>DEVICE=gpu</code>.</li>
 <li>Specify <code>READ_ONLY_CONFIG=1</code> to lock the config once Azimuth is launched.</li>
+<li>Specify <code>LOAD_CONFIG_HISTORY=1</code> to load the latest config from Azimuth's config history.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Config file prevails over environment variables</p>
