@@ -410,23 +410,19 @@ const UtterancesTable: React.FC<Props> = ({
           raiseErrorToast("There are no records in the CSV file.");
           return null;
         }
-        const headers: string[] = header.split(",");
-        if (
-          ![config.columns.persistent_id, "proposed_action"].every(
-            (h, index) => headers.includes(h) || headers.indexOf(h) === index
-          )
-        ) {
+        if (header !== `${config.columns.persistent_id},proposed_action`) {
           raiseErrorToast(
-            `The CSV file either did not have the ${config.columns.persistent_id} and proposed_action column headers, or the columns are not in the correct order to update the proposed action.`
+            `The CSV file must have column headers ${config.columns.persistent_id} and proposed_action, in that order.`
           );
           return null;
         }
+
         const utterancePatch = rows.map((row) => {
           const [persistentId, dataAction] = row.split(",");
           return { persistentId, dataAction } as UtterancePatch;
         });
         updateDataAction({
-          utterancePatch,
+          body: utterancePatch,
           ...getUtterancesQueryState,
         });
       }

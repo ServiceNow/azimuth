@@ -195,17 +195,17 @@ export const api = createApi({
     updateDataActions: build.mutation<
       UtterancePatch[],
       {
-        utterancePatch: UtterancePatch[];
-      } & GetUtterancesQueryState
+        body: UtterancePatch[];
+      } & Omit<GetUtterancesQueryState, "body">
     >({
-      queryFn: async ({ utterancePatch, ...utteranceQuery }) =>
+      queryFn: async ({ jobId, datasetSplitName, body }) =>
         responseToData(
           fetchApi({
             path: "/dataset_splits/{dataset_split_name}/utterances",
             method: "patch",
           }),
           "Something went wrong updating proposed actions"
-        )({ ...utteranceQuery, body: utterancePatch }),
+        )({ jobId, datasetSplitName, body }),
       invalidatesTags: () => [
         "ConfidenceHistogram",
         "ConfusionMatrix",
@@ -216,19 +216,16 @@ export const api = createApi({
         "UtteranceCountPerFilter",
         "Utterances",
       ],
-      async onQueryStarted(
-        { utterancePatch, ...args },
-        { dispatch, queryFulfilled }
-      ) {
+      async onQueryStarted({ body, ...args }, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
-              Object.assign(
-                utterance,
-                utterancePatch.filter(
+              return {
+                ...utterance,
+                ...body.filter(
                   ({ persistentId }) => persistentId === utterance.persistentId
-                )
-              );
+                )[0],
+              };
             });
           })
         );
