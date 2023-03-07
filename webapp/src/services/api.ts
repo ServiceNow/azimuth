@@ -220,12 +220,12 @@ export const api = createApi({
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
-              return {
-                ...utterance,
-                ...body.filter(
-                  ({ persistentId }) => persistentId === utterance.persistentId
-                )[0],
-              };
+              const patchUtterance = body.find(
+                ({ persistentId }) => persistentId === utterance.persistentId
+              );
+              if (patchUtterance) {
+                utterance.dataAction = patchUtterance.dataAction;
+              }
             });
           })
         );
