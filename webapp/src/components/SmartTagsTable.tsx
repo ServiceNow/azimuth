@@ -165,6 +165,63 @@ const SmartTagsTable: React.FC<{
     ...(transpose && { IconComponent: ArrowForward }),
   });
 
+  const Bar: React.FC<{
+    rowCount: number;
+    cellCount: number;
+    barCount: number;
+    filterValue: string;
+    family: SmartTagFamily;
+    outcome: Outcome;
+  }> = ({ rowCount, cellCount, barCount, filterValue, family, outcome }) => (
+    <Tooltip
+      title={
+        <>
+          <Typography variant="inherit">
+            {barCount} utterance{barCount === 1 ? " is " : "s are "}
+            <Typography variant="inherit" component="span" fontWeight="bold">
+              {OUTCOME_PRETTY_NAMES[outcome]}
+            </Typography>
+          </Typography>
+          <Typography variant="inherit">
+            out of {cellCount} utterance{cellCount === 1 ? "" : "s"} tagged{" "}
+            <Typography variant="inherit" component="span" fontWeight="bold">
+              {SMART_TAG_FAMILY_PRETTY_NAMES[family]}
+            </Typography>
+          </Typography>
+          <Typography variant="inherit">
+            out of {rowCount} utterance{rowCount === 1 ? "" : "s"} labeled{" "}
+            <Typography variant="inherit" component="span" fontWeight="bold">
+              {filterValue}
+            </Typography>
+          </Typography>
+        </>
+      }
+    >
+      <Box
+        component={motion.div}
+        bgcolor={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
+        height="100%"
+        animate={{ width: `${rowCount && (100 * barCount) / rowCount}%` }}
+        initial={false}
+        transition={{ type: "tween" }}
+        display="flex"
+      >
+        <Link
+          component={RouterLink}
+          width="100%"
+          to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview${constructSearchString(
+            {
+              [selectedMetricPerFilterOption]: [filterValue],
+              outcome: [outcome],
+              [family]: smartTags(family),
+              ...pipeline,
+            }
+          )}`}
+        />
+      </Box>
+    </Tooltip>
+  );
+
   return (
     <Box display="flex" flexDirection="column" gap={4} minHeight={0}>
       <Box display="flex" gap={4}>
@@ -352,84 +409,15 @@ const SmartTagsTable: React.FC<{
                 >
                   {cell &&
                     ALL_OUTCOMES.map((outcome) => (
-                      <Tooltip
+                      <Bar
                         key={outcome}
-                        title={
-                          <>
-                            <Typography variant="inherit">
-                              {`${cell.outcomeCount[outcome]} utterance${
-                                cell.outcomeCount[outcome] === 1
-                                  ? " is"
-                                  : "s are"
-                              } `}
-                              <Typography
-                                variant="inherit"
-                                component="span"
-                                fontWeight="bold"
-                              >
-                                {OUTCOME_PRETTY_NAMES[outcome]}
-                              </Typography>
-                            </Typography>
-                            <Typography variant="inherit">
-                              {`out of ${cell.utteranceCount} utterance${
-                                cell.utteranceCount === 1 ? "" : "s"
-                              } tagged `}
-                              <Typography
-                                variant="inherit"
-                                component="span"
-                                fontWeight="bold"
-                              >
-                                {SMART_TAG_FAMILY_PRETTY_NAMES[family]}
-                              </Typography>
-                            </Typography>
-                            <Typography variant="inherit">
-                              {`out of ${row.utteranceCount} utterance${
-                                row.utteranceCount === 1 ? "" : "s"
-                              } labeled `}
-                              <Typography
-                                variant="inherit"
-                                component="span"
-                                fontWeight="bold"
-                              >
-                                {row.filterValue}
-                              </Typography>
-                            </Typography>
-                          </>
-                        }
-                      >
-                        <Box
-                          component={motion.div}
-                          bgcolor={(theme) =>
-                            theme.palette[OUTCOME_COLOR[outcome]].main
-                          }
-                          height="100%"
-                          animate={{
-                            width: `${
-                              row.utteranceCount &&
-                              (100 * cell.outcomeCount[outcome]) /
-                                row.utteranceCount
-                            }%`,
-                          }}
-                          initial={false}
-                          transition={{ type: "tween" }}
-                          display="flex"
-                        >
-                          <Link
-                            component={RouterLink}
-                            width="100%"
-                            to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview${constructSearchString(
-                              {
-                                [selectedMetricPerFilterOption]: [
-                                  row.filterValue,
-                                ],
-                                outcome: [outcome],
-                                [family]: smartTags(family),
-                                ...pipeline,
-                              }
-                            )}`}
-                          />
-                        </Box>
-                      </Tooltip>
+                        rowCount={row.utteranceCount}
+                        cellCount={cell.utteranceCount}
+                        barCount={cell.outcomeCount[outcome]}
+                        filterValue={row.filterValue}
+                        family={family}
+                        outcome={outcome}
+                      />
                     ))}
                 </Box>
               );
