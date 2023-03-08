@@ -163,6 +163,7 @@ const UtterancesTable: React.FC<Props> = ({
       })) ?? [],
     [utterancesResponse]
   );
+
   const [selectedPersistentIds, setSelectedPersistentIds] = React.useState<
     number[]
   >([]);
