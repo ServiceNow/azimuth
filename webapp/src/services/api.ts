@@ -227,6 +227,7 @@ export const api = createApi({
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
               const found = body.find(
+                // Support persistent ids that can be either strings or numbers.
                 // eslint-disable-next-line eqeqeq
                 ({ persistentId }) => persistentId == utterance.persistentId
               );
