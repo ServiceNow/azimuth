@@ -221,6 +221,7 @@ export const api = createApi({
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
               const found = body.find(
+                // eslint-disable-next-line eqeqeq
                 ({ persistentId }) => persistentId == utterance.persistentId
               );
               if (found) {
