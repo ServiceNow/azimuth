@@ -228,12 +228,8 @@ const SmartTagsTable: React.FC<{
                 display="flex"
                 justifyContent="space-between"
                 alignItems="flex-end"
-                flexDirection={transpose ? undefined : "column-reverse"}
-                {...{ [transpose ? "width" : "height"]: "100%" }}
-                {...{
-                  [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
-                  [`grid${transpose ? "Row" : "Column"}`]: 3,
-                }}
+                gridColumn={classIndex + 2}
+                gridRow={3}
               >
                 <Typography variant="subtitle2" lineHeight={1} fontSize={12}>
                   0
@@ -246,10 +242,8 @@ const SmartTagsTable: React.FC<{
               <Typography
                 variant="body2"
                 align="right"
-                {...{
-                  [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
-                  [`grid${transpose ? "Row" : "Column"}`]: 3,
-                }}
+                gridRow={classIndex + 2}
+                gridColumn={3}
               >
                 {classCount.utteranceCount}
               </Typography>
