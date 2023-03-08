@@ -422,6 +422,7 @@ const UtterancesTable: React.FC<Props> = ({
           return { persistentId, dataAction } as UtterancePatch;
         });
         updateDataAction({
+          ignoreNotFound: true,
           body,
           ...getUtterancesQueryState,
         });

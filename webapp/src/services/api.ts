@@ -1,7 +1,12 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { AzimuthConfig, UtterancePatch } from "types/api";
-import { fetchApi, GetUtterancesQueryState, TypedResponse } from "utils/api";
+import {
+  fetchApi,
+  GetUtterancesQueryState,
+  PatchUtterancesQueryState,
+  TypedResponse,
+} from "utils/api";
 import { raiseSuccessToast } from "utils/helpers";
 
 const responseToData =
@@ -194,18 +199,16 @@ export const api = createApi({
     }),
     updateDataActions: build.mutation<
       UtterancePatch[],
-      {
-        body: UtterancePatch[];
-      } & Omit<GetUtterancesQueryState, "body">
+      PatchUtterancesQueryState & Omit<GetUtterancesQueryState, "body">
     >({
-      queryFn: async ({ jobId, datasetSplitName, body }) =>
+      queryFn: async ({ jobId, datasetSplitName, ignoreNotFound, body }) =>
         responseToData(
           fetchApi({
             path: "/dataset_splits/{dataset_split_name}/utterances",
             method: "patch",
           }),
           "Something went wrong updating proposed actions"
-        )({ jobId, datasetSplitName, body }),
+        )({ jobId, datasetSplitName, ignoreNotFound, body }),
       invalidatesTags: () => [
         "ConfidenceHistogram",
         "ConfusionMatrix",
@@ -216,7 +219,10 @@ export const api = createApi({
         "UtteranceCountPerFilter",
         "Utterances",
       ],
-      async onQueryStarted({ body, ...args }, { dispatch, queryFulfilled }) {
+      async onQueryStarted(
+        { ignoreNotFound, body, ...args },
+        { dispatch, queryFulfilled }
+      ) {
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
