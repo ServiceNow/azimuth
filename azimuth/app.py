@@ -9,14 +9,18 @@ import structlog
 from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
+    HTTP_422_UNPROCESSABLE_ENTITY,
     HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_503_SERVICE_UNAVAILABLE,
 )
 
 from azimuth.config import AzimuthConfig, load_azimuth_config
@@ -37,6 +41,21 @@ _task_manager: Optional[TaskManager] = None
 _startup_tasks: Optional[Dict[str, DaskModule]] = None
 _azimuth_config: Optional[AzimuthConfig] = None
 _ready_flag: Optional[Event] = None
+
+
+COMMON_HTTP_ERROR_CODES = (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_422_UNPROCESSABLE_ENTITY,  # Override responses from FastAPI ValidationError
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_503_SERVICE_UNAVAILABLE,
+)
+
+
+class HTTPExceptionModel(BaseModel):
+    detail: str
 
 
 async def handle_validation_error(request: Request, exception: RequestValidationError):
@@ -159,6 +178,7 @@ def create_app() -> FastAPI:
         description="Azimuth API",
         version="1.0",
         default_response_class=JSONResponseIgnoreNan,
+        responses={code: {"model": HTTPExceptionModel} for code in COMMON_HTTP_ERROR_CODES},
         exception_handlers={
             RequestValidationError: handle_validation_error,
             HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,

@@ -356,8 +356,8 @@ export interface components {
       utteranceCount: number;
       confidenceThreshold: number | null;
     };
-    HTTPValidationError: {
-      detail?: components["schemas"]["ValidationError"][];
+    HTTPExceptionModel: {
+      detail: string;
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -890,11 +890,6 @@ export interface components {
       | "label"
       | "prediction"
       | "confidence";
-    ValidationError: {
-      loc: string[];
-      msg: string;
-      type: string;
-    };
   };
 }
 
@@ -908,6 +903,48 @@ export interface operations {
           "application/json": components["schemas"]["StatusResponse"];
         };
       };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
     };
   };
   /** Get the current dataset info */
@@ -917,6 +954,48 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["DatasetInfoResponse"];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -930,6 +1009,48 @@ export interface operations {
           "application/json": {
             [key: string]: components["schemas"]["MetricInfo"];
           };
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -948,10 +1069,46 @@ export interface operations {
           "application/json": components["schemas"]["PerturbationTestingSummary"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -970,10 +1127,46 @@ export interface operations {
           "application/json": components["schemas"]["AzimuthConfig"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -987,6 +1180,48 @@ export interface operations {
           "application/json": components["schemas"]["AzimuthConfig"];
         };
       };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
     };
   };
   /** Update the config. */
@@ -998,10 +1233,46 @@ export interface operations {
           "application/json": components["schemas"]["AzimuthConfig"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1033,10 +1304,46 @@ export interface operations {
           "application/json": components["schemas"]["ClassOverlapPlotResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1058,10 +1365,46 @@ export interface operations {
           "application/json": components["schemas"]["ClassOverlapTableResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1098,10 +1441,46 @@ export interface operations {
           "application/json": components["schemas"]["ConfidenceHistogramResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1113,6 +1492,48 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["DatasetWarningGroup"][];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1149,10 +1570,46 @@ export interface operations {
           "application/json": components["schemas"]["MetricsAPIResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1174,10 +1631,46 @@ export interface operations {
           "application/json": components["schemas"]["MetricsPerFilterAPIResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1199,10 +1692,46 @@ export interface operations {
           "application/json": components["schemas"]["OutcomeCountPerThresholdResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1239,10 +1768,46 @@ export interface operations {
           "application/json": components["schemas"]["OutcomeCountPerFilterResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1277,10 +1842,46 @@ export interface operations {
           "application/json": components["schemas"]["UtteranceCountPerFilterResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1322,10 +1923,46 @@ export interface operations {
           "application/json": components["schemas"]["GetUtterancesResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1347,10 +1984,46 @@ export interface operations {
           "application/json": components["schemas"]["UtterancePatch"][];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1378,10 +2051,46 @@ export interface operations {
           "application/json": components["schemas"]["PerturbedUtteranceWithClassNames"][];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1406,10 +2115,46 @@ export interface operations {
           "application/json": components["schemas"]["SimilarUtterancesResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1427,10 +2172,46 @@ export interface operations {
     responses: {
       /** Successful Response */
       200: unknown;
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1445,10 +2226,46 @@ export interface operations {
     responses: {
       /** Successful Response */
       200: unknown;
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1463,10 +2280,46 @@ export interface operations {
     responses: {
       /** Successful Response */
       200: unknown;
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1484,10 +2337,46 @@ export interface operations {
     responses: {
       /** Successful Response */
       200: unknown;
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1506,10 +2395,46 @@ export interface operations {
           "application/json": { [key: string]: any };
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1529,10 +2454,46 @@ export interface operations {
           "application/json": components["schemas"]["SaliencyResponse"][];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1569,10 +2530,46 @@ export interface operations {
           "application/json": components["schemas"]["TopWordsResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1611,10 +2608,46 @@ export interface operations {
           "application/json": components["schemas"]["ConfusionMatrixResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
