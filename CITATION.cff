@@ -52,6 +52,7 @@ preferred-citation:
   year: 2022
   publisher:
     name: "Association for Computational Linguistics"
+  url: "https://aclanthology.org/2022.emnlp-demos.30/"
   identifiers:
   - type: other
     value: "arXiv:2212.08216"
