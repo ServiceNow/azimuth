@@ -3,7 +3,7 @@
 # in the root directory of this source tree.
 
 from fastapi import FastAPI
-from starlette.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY
+from starlette.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from starlette.testclient import TestClient
 
 
@@ -12,8 +12,7 @@ def test_get_confidence_histogram_wrong_dataset(app: FastAPI) -> None:
 
     invalid_dataset_split_name = "potato"
     resp = client.get(f"/dataset_splits/{invalid_dataset_split_name}/confidence_histogram")
-    # TODO by default fastapi raises 422 for invalid split name but surely it should be 404?
-    assert resp.status_code == HTTP_422_UNPROCESSABLE_ENTITY, resp.text
+    assert resp.status_code == HTTP_404_NOT_FOUND, resp.text
 
 
 def test_get_confidence_histogram(app: FastAPI) -> None:
