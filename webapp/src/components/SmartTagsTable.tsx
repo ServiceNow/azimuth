@@ -305,8 +305,8 @@ const SmartTagsTable: React.FC<{
           "& > *": { paddingX: 2 },
         }}
       >
-        {sortedRows?.map((classCount, classIndex) => (
-          <React.Fragment key={classCount.filterValue}>
+        {sortedRows?.map((row, rowIndex) => (
+          <React.Fragment key={row.filterValue}>
             <Typography
               variant="subtitle2"
               align={transpose ? "center" : "right"}
@@ -316,26 +316,26 @@ const SmartTagsTable: React.FC<{
               position="sticky"
               bgcolor={(theme) => theme.palette.background.paper}
               {...{
-                [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
+                [`grid${transpose ? "Column" : "Row"}`]: rowIndex + 2,
                 [`grid${transpose ? "Row" : "Column"}`]: 1,
                 [transpose ? "top" : "left"]: 0,
               }}
             >
               {metricPerFilterOption === "outcome"
-                ? OUTCOME_PRETTY_NAMES[classCount.filterValue as Outcome]
-                : classCount.filterValue}
+                ? OUTCOME_PRETTY_NAMES[row.filterValue as Outcome]
+                : row.filterValue}
             </Typography>
-            {classCount.accuracy !== undefined && (
+            {row.accuracy !== undefined && (
               <Typography
                 variant="body2"
-                key={`accuracy${classCount.filterValue}`}
+                key={`accuracy${row.filterValue}`}
                 align="right"
                 {...{
-                  [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
+                  [`grid${transpose ? "Column" : "Row"}`]: rowIndex + 2,
                   [`grid${transpose ? "Row" : "Column"}`]: 2,
                 }}
               >
-                {formatRatioAsPercentageString(classCount.accuracy, 1)}
+                {formatRatioAsPercentageString(row.accuracy, 1)}
               </Typography>
             )}
             {transpose ? (
@@ -343,24 +343,24 @@ const SmartTagsTable: React.FC<{
                 display="flex"
                 justifyContent="space-between"
                 alignItems="flex-end"
-                gridColumn={classIndex + 2}
+                gridColumn={rowIndex + 2}
                 gridRow={3}
               >
                 <Typography variant="subtitle2" lineHeight={1} fontSize={12}>
                   0
                 </Typography>
                 <Typography variant="subtitle2" lineHeight={1} fontSize={12}>
-                  {classCount.utteranceCount}
+                  {row.utteranceCount}
                 </Typography>
               </Box>
             ) : (
               <Typography
                 variant="body2"
                 align="right"
-                gridRow={classIndex + 2}
+                gridRow={rowIndex + 2}
                 gridColumn={3}
               >
-                {classCount.utteranceCount}
+                {row.utteranceCount}
               </Typography>
             )}
           </React.Fragment>
@@ -453,13 +453,13 @@ const SmartTagsTable: React.FC<{
                 </Box>
               )}
             </Box>
-            {sortedRows?.map((row, classIndex) => {
+            {sortedRows?.map((row, rowIndex) => {
               const cell = row.countPerSmartTagFamily[family];
               return (
                 <Box
                   key={row.filterValue}
                   {...{
-                    [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
+                    [`grid${transpose ? "Column" : "Row"}`]: rowIndex + 2,
                     [`grid${transpose ? "Row" : "Column"}`]: familyIndex + 4,
                   }}
                 >
