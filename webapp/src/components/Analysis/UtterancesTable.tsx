@@ -1,6 +1,7 @@
 import { ArrowDropDown, GetApp, SvgIconComponent } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
+import UploadIcon from "@mui/icons-material/Upload";
 import { Box, Button, Menu, MenuItem } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
@@ -21,12 +22,17 @@ import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import UtteranceSaliency from "components/Utterance/UtteranceSaliency";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { getConfigEndpoint, getUtterancesEndpoint } from "services/api";
+import {
+  getConfigEndpoint,
+  getUtterancesEndpoint,
+  updateDataActionsEndpoint,
+} from "services/api";
 import {
   DataAction,
   DatasetInfoResponse,
   DatasetSplitName,
   Utterance,
+  UtterancePatch,
   UtterancesSortableColumn,
 } from "types/api";
 import {
@@ -48,7 +54,11 @@ import {
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
 import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
-import { constructSearchString, isPipelineSelected } from "utils/helpers";
+import {
+  constructSearchString,
+  isPipelineSelected,
+  raiseErrorToast,
+} from "utils/helpers";
 
 const SMART_TAG_WIDTH = 30;
 
@@ -73,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
   gridHeaderActions: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "space-between",
   },
   searchContainer: {
     marginLeft: theme.spacing(2),
@@ -92,9 +103,6 @@ const useStyles = makeStyles((theme) => ({
   wordWrap: {
     lineHeight: "normal",
     whiteSpace: "normal",
-  },
-  exportButton: {
-    marginLeft: "auto",
   },
   filterIcon: {
     marginLeft: theme.spacing(1),
@@ -144,6 +152,8 @@ const UtterancesTable: React.FC<Props> = ({
 
   const { data: utterancesResponse, isFetching } =
     getUtterancesEndpoint.useQuery(getUtterancesQueryState);
+
+  const [updateDataAction] = updateDataActionsEndpoint.useMutation();
 
   const rows: Row[] = React.useMemo(
     () =>
@@ -390,6 +400,38 @@ const UtterancesTable: React.FC<Props> = ({
   ];
 
   const searchString = constructSearchString(pipeline);
+
+  const importProposedActions = (file: File) => {
+    const fileReader = new FileReader();
+    fileReader.onload = ({ target }) => {
+      if (target) {
+        const result = target.result as string;
+        const [header, ...rows] = result.trimEnd().split(/\r?\n/);
+        if (rows.length === 0) {
+          raiseErrorToast("There are no records in the CSV file.");
+          return;
+        }
+        if (header !== `${config.columns.persistent_id},proposed_action`) {
+          raiseErrorToast(
+            `The CSV file must have column headers ${config.columns.persistent_id} and proposed_action, in that order.`
+          );
+          return;
+        }
+
+        const body = rows.map((row) => {
+          const [persistentId, dataAction] = row.split(",");
+          return { persistentId, dataAction } as UtterancePatch;
+        });
+        updateDataAction({
+          ignoreNotFound: true,
+          body,
+          ...getUtterancesQueryState,
+        });
+      }
+    };
+    fileReader.readAsText(file);
+  };
+
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
@@ -406,49 +448,63 @@ const UtterancesTable: React.FC<Props> = ({
           text="Explore utterances and propose actions. Click on a row to inspect the utterance details."
           link="user-guide/exploration-space/utterance-table/"
         />
-        <Button
-          id="export-button"
-          aria-controls="export-menu"
-          aria-haspopup="true"
-          className={classes.exportButton}
-          onClick={(event) => setAnchorEl(event.currentTarget)}
-          startIcon={<GetApp />}
-          endIcon={<ArrowDropDown />}
-        >
-          Export
-        </Button>
-        <Menu
-          id="export-menu"
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-        >
-          <MenuItem
-            onClick={() => {
-              downloadDatasetSplit({
-                jobId,
-                datasetSplitName,
-                ...filters,
-                ...pipeline,
-              });
-              setAnchorEl(null);
-            }}
+        <Box display="flex" alignItems="center" gap={2}>
+          <Button component="label" startIcon={<UploadIcon />}>
+            Import
+            <input
+              hidden
+              accept=".csv"
+              type="file"
+              onChange={({ target: { files } }) => {
+                if (files?.length) {
+                  importProposedActions(files[0]);
+                }
+              }}
+            />
+          </Button>
+          <Button
+            id="export-button"
+            aria-controls="export-menu"
+            aria-haspopup="true"
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            startIcon={<GetApp />}
+            endIcon={<ArrowDropDown />}
           >
-            Export utterances
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              downloadUtteranceProposedActions({
-                jobId,
-                datasetSplitName,
-              });
-              setAnchorEl(null);
-            }}
+            Export
+          </Button>
+          <Menu
+            id="export-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
           >
-            Export proposed actions
-          </MenuItem>
-        </Menu>
+            <MenuItem
+              onClick={() => {
+                downloadDatasetSplit({
+                  jobId,
+                  datasetSplitName,
+                  ...filters,
+                  ...pipeline,
+                });
+                setAnchorEl(null);
+              }}
+            >
+              Export utterances
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                downloadUtteranceProposedActions({
+                  jobId,
+                  datasetSplitName,
+                });
+                setAnchorEl(null);
+              }}
+            >
+              Export proposed actions
+            </MenuItem>
+          </Menu>
+        </Box>
       </div>
       <Table
         pagination

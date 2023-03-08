@@ -1,7 +1,12 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AzimuthConfig, DataAction, UtterancePatch } from "types/api";
-import { fetchApi, GetUtterancesQueryState, TypedResponse } from "utils/api";
+import { AzimuthConfig, UtterancePatch } from "types/api";
+import {
+  fetchApi,
+  GetUtterancesQueryState,
+  PatchUtterancesQueryState,
+  TypedResponse,
+} from "utils/api";
 import { raiseSuccessToast } from "utils/helpers";
 
 const responseToData =
@@ -194,26 +199,16 @@ export const api = createApi({
     }),
     updateDataActions: build.mutation<
       UtterancePatch[],
-      {
-        persistentIds: UtterancePatch["persistentId"][];
-        newValue: DataAction;
-      } & GetUtterancesQueryState
+      PatchUtterancesQueryState & Omit<GetUtterancesQueryState, "body">
     >({
-      queryFn: async ({ jobId, datasetSplitName, persistentIds, newValue }) =>
+      queryFn: async ({ jobId, datasetSplitName, ignoreNotFound, body }) =>
         responseToData(
           fetchApi({
             path: "/dataset_splits/{dataset_split_name}/utterances",
             method: "patch",
           }),
           "Something went wrong updating proposed actions"
-        )({
-          jobId,
-          datasetSplitName,
-          body: persistentIds.map((persistentId) => ({
-            persistentId,
-            dataAction: newValue,
-          })),
-        }),
+        )({ jobId, datasetSplitName, ignoreNotFound, body }),
       invalidatesTags: () => [
         "ConfidenceHistogram",
         "ConfusionMatrix",
@@ -225,14 +220,19 @@ export const api = createApi({
         "Utterances",
       ],
       async onQueryStarted(
-        { persistentIds, newValue, ...args },
+        { ignoreNotFound, body, ...args },
         { dispatch, queryFulfilled }
       ) {
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
-              if (persistentIds.includes(utterance.persistentId)) {
-                utterance.dataAction = newValue;
+              const found = body.find(
+                // Support persistent ids that can be either strings or numbers.
+                // eslint-disable-next-line eqeqeq
+                ({ persistentId }) => persistentId == utterance.persistentId
+              );
+              if (found) {
+                utterance.dataAction = found.dataAction;
               }
             });
           })

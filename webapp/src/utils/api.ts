@@ -97,6 +97,10 @@ export type GetUtterancesQueryState = OperationArgs<
   paths["/dataset_splits/{dataset_split_name}/utterances"]["get"]
 >;
 
+export type PatchUtterancesQueryState = OperationArgs<
+  paths["/dataset_splits/{dataset_split_name}/utterances"]["patch"]
+>;
+
 // There doesn't seem to be a better way to do this:
 // https://medium.com/@drevets/you-cant-prompt-a-file-download-with-the-content-disposition-header-using-axios-xhr-sorry-56577aa706d6
 const downloadFileFromApi =
