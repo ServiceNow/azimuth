@@ -246,11 +246,13 @@ const SmartTagsTable: React.FC<{
       <Box
         display="grid"
         gridTemplateColumns={`repeat(${transpose ? 1 : 3}, min-content)`}
-        gridAutoColumns={160}
+        gridAutoColumns={176}
         gridAutoRows="min-content"
         overflow="auto"
-        columnGap={4}
-        sx={{ overscrollBehaviorX: "contain" }} // Stops accidental navigation on horizontal scroll with touch pad
+        sx={{
+          overscrollBehaviorX: "contain", // Stops accidental navigation on horizontal scroll with touch pad
+          "& > *": { paddingX: 2 },
+        }}
       >
         {sortedRows?.map((classCount, classIndex) => (
           <React.Fragment key={classCount.filterValue}>
@@ -398,27 +400,31 @@ const SmartTagsTable: React.FC<{
               return (
                 <Box
                   key={row.filterValue}
-                  display="flex"
-                  borderLeft="solid 1px"
-                  borderRight="solid 1px"
-                  paddingY={0.5}
                   {...{
                     [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
                     [`grid${transpose ? "Row" : "Column"}`]: familyIndex + 4,
                   }}
                 >
-                  {cell &&
-                    ALL_OUTCOMES.map((outcome) => (
-                      <Bar
-                        key={outcome}
-                        rowCount={row.utteranceCount}
-                        cellCount={cell.utteranceCount}
-                        barCount={cell.outcomeCount[outcome]}
-                        filterValue={row.filterValue}
-                        family={family}
-                        outcome={outcome}
-                      />
-                    ))}
+                  <Box
+                    height="100%"
+                    display="flex"
+                    borderLeft="solid 1px"
+                    borderRight="solid 1px"
+                    paddingY={0.5}
+                  >
+                    {cell &&
+                      ALL_OUTCOMES.map((outcome) => (
+                        <Bar
+                          key={outcome}
+                          rowCount={row.utteranceCount}
+                          cellCount={cell.utteranceCount}
+                          barCount={cell.outcomeCount[outcome]}
+                          filterValue={row.filterValue}
+                          family={family}
+                          outcome={outcome}
+                        />
+                      ))}
+                  </Box>
                 </Box>
               );
             })}
