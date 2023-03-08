@@ -26,7 +26,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y curl gcc make && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl -sSL https://install.python-poetry.org | python - --version 1.3.2 \
+RUN curl -sSL https://install.python-poetry.org | python - --version 1.4.0 \
     && ln -sf /usr/local/poetry/bin/poetry /usr/local/bin/poetry
 
 # Install dependencies.
