@@ -38,7 +38,10 @@ import { formatRatioAsPercentageString } from "utils/format";
 import { constructSearchString } from "utils/helpers";
 import DatasetSplitToggler from "./Controls/DatasetSplitToggler";
 
+type MetricPerFilterOption = "label" | "prediction" | "outcome";
+
 type SortBy = "filterValue" | "utteranceCount" | "accuracy" | SmartTagFamily;
+
 type Row = {
   filterValue: string;
   utteranceCount: number;
@@ -64,7 +67,7 @@ const SmartTagsTable: React.FC<{
   const [transpose, setTranspose] = React.useState(false);
 
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
-    React.useState<"label" | "prediction" | "outcome">("label");
+    React.useState<MetricPerFilterOption>("label");
 
   const [ascending, setAscending] = React.useState(false);
   const [sortBy, setSortBy] = React.useState<SortBy>("utteranceCount");
@@ -457,7 +460,7 @@ const SmartTagsTable: React.FC<{
               value={selectedMetricPerFilterOption}
               onChange={(event) =>
                 setSelectedMetricPerFilterOption(
-                  event.target.value as "label" | "prediction"
+                  event.target.value as MetricPerFilterOption
                 )
               }
             >
