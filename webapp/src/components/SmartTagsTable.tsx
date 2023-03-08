@@ -355,8 +355,10 @@ const SmartTagsTable: React.FC<{
                           <>
                             <Typography variant="inherit">
                               {`${cell.outcomeCount[outcome]} utterance${
-                                cell.outcomeCount[outcome] === 1 ? "" : "s"
-                              } are `}
+                                cell.outcomeCount[outcome] === 1
+                                  ? " is"
+                                  : "s are"
+                              } `}
                               <Typography
                                 variant="inherit"
                                 component="span"
