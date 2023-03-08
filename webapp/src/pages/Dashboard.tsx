@@ -113,30 +113,6 @@ const Dashboard = () => {
             />
           </PreviewCard>
         )}
-      <WithDatasetSplitNameState
-        defaultDatasetSplitName={firstAvailableDatasetSplit}
-        render={(datasetSplitName, setDatasetSplitName) => (
-          <PreviewCard
-            title="Smart Tag Analysis"
-            to={`/${jobId}/dataset_splits/${datasetSplitName}/smart_tags${searchString}`}
-            description={smartTagsDescription}
-          >
-            <Box
-              display="flex"
-              flexDirection="column" // Important for the inner Box to overflow correctly
-              maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}
-            >
-              <SmartTagsTable
-                jobId={jobId}
-                pipeline={pipeline}
-                availableDatasetSplits={datasetInfo.availableDatasetSplits}
-                datasetSplitName={datasetSplitName}
-                setDatasetSplitName={setDatasetSplitName}
-              />
-            </Box>
-          </PreviewCard>
-        )}
-      />
       {isPipelineSelected(pipeline) && (
         <WithDatasetSplitNameState
           defaultDatasetSplitName={firstAvailableDatasetSplit}
@@ -162,6 +138,30 @@ const Dashboard = () => {
           )}
         />
       )}
+      <WithDatasetSplitNameState
+        defaultDatasetSplitName={firstAvailableDatasetSplit}
+        render={(datasetSplitName, setDatasetSplitName) => (
+          <PreviewCard
+            title="Smart Tag Analysis"
+            to={`/${jobId}/dataset_splits/${datasetSplitName}/smart_tags${searchString}`}
+            description={smartTagsDescription}
+          >
+            <Box
+              display="flex"
+              flexDirection="column" // Important for the inner Box to overflow correctly
+              maxHeight={DEFAULT_PREVIEW_CONTENT_HEIGHT}
+            >
+              <SmartTagsTable
+                jobId={jobId}
+                pipeline={pipeline}
+                availableDatasetSplits={datasetInfo.availableDatasetSplits}
+                datasetSplitName={datasetSplitName}
+                setDatasetSplitName={setDatasetSplitName}
+              />
+            </Box>
+          </PreviewCard>
+        )}
+      />
       {isPipelineSelected(pipeline) &&
         datasetInfo.perturbationTestingAvailable && (
           <PreviewCard
