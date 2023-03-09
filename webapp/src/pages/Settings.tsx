@@ -167,6 +167,33 @@ const displayReadonlyFields = (label: string, value: string | null) => (
   />
 );
 
+const StringField: React.FC<
+  Omit<TextFieldProps, "onChange"> & {
+    label: string;
+    value: string | null;
+    onChange: (newValue: string) => void;
+  }
+> = ({ label, value, onChange, ...props }) => {
+  return (
+    <TextField
+      key={label}
+      size="small"
+      variant="standard"
+      className="fixedWidthInput"
+      label={label}
+      value={String(value)}
+      inputProps={{
+        sx: {
+          textOverflow: "ellipsis",
+          ...(value === null && { fontStyle: "italic" }),
+        },
+      }}
+      onChange={({ target: { value } }) => onChange(value)}
+      {...props}
+    />
+  );
+};
+
 const NumberField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
     value: number;
@@ -447,6 +474,28 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
+  const displayStringOnlyFields = (
+    field: string,
+    value: string | null,
+    config?: SubConfigKeys
+  ) => (
+    <StringField
+      label={config === "columns" ? "" : field}
+      value={String(value)}
+      onChange={(newValue) =>
+        config
+          ? setPartialConfig({
+              ...partialConfig,
+              [config]: { ...resultingConfig[config], [field]: newValue },
+            })
+          : setPartialConfig({
+              ...partialConfig,
+              [field]: newValue,
+            })
+      }
+    />
+  );
+
   const displayPostprocessorNumberField = (
     pipelineIndex: number,
     pipeline: PipelineDefinition,
@@ -515,8 +564,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields("name", resultingConfig.name)}
-          {displayReadonlyFields(
+          {displayStringOnlyFields("name", resultingConfig.name)}
+          {displayStringOnlyFields(
             "rejection_class",
             resultingConfig.rejection_class
           )}
@@ -524,13 +573,17 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
               <Typography variant="body2">text_input:</Typography>
-              <Typography variant="body2">
-                {resultingConfig.columns.text_input}
-              </Typography>
+              {displayStringOnlyFields(
+                "text_input",
+                resultingConfig.columns.text_input,
+                "columns"
+              )}
               <Typography variant="body2">label:</Typography>
-              <Typography variant="body2">
-                {resultingConfig.columns.label}
-              </Typography>
+              {displayStringOnlyFields(
+                "label",
+                resultingConfig.columns.label,
+                "columns"
+              )}
             </KeyValuePairs>
           </Box>
         </Columns>
@@ -538,11 +591,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("Dataset")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields(
+          {displayStringOnlyFields(
             "class_name",
-            resultingConfig.dataset.class_name
+            resultingConfig.dataset.class_name,
+            "dataset"
           )}
-          {displayReadonlyFields("remote", resultingConfig.dataset.remote)}
+          {displayStringOnlyFields(
+            "remote",
+            resultingConfig.dataset.remote,
+            "dataset"
+          )}
           {resultingConfig.dataset.args.length > 0 &&
             displayArgumentsList("args", resultingConfig.dataset.args)}
           {Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
@@ -556,11 +614,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields(
+          {displayStringOnlyFields(
             "model_contract",
             resultingConfig.model_contract
           )}
-          {displayReadonlyFields(
+          {displayStringOnlyFields(
             "saliency_layer",
             resultingConfig.saliency_layer
           )}
@@ -716,8 +774,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             displayArgumentsList(field, value)
           ) : typeof value === "object" ? (
             displayKeywordArguments(field, value)
-          ) : (
+          ) : config === "behavioral_testing" ? (
             displayReadonlyFields(field, value)
+          ) : (
+            displayStringOnlyFields(field, value, config)
           )
         )}
       </Columns>
