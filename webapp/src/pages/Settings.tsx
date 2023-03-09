@@ -661,18 +661,18 @@ const Settings: React.FC<props> = ({ setOpen }) => {
               size="small"
               color="primary"
               sx={{ padding: 0 }}
-              onClick={() =>
-                Object.keys(partialConfig).length > 0 || isUpdatingConfig
-                  ? isUpdatingConfig
-                    ? window.alert(CONFIG_UPDATE_MESSAGE)
-                    : Object.keys(partialConfig).length > 0 &&
-                      window.confirm(
-                        "Are you sure you want to discard all your changes?"
-                      )
-                    ? setOpen(false)
-                    : setOpen(true)
-                  : setOpen(false)
-              }
+              onClick={() => {
+                if (isUpdatingConfig) {
+                  window.alert(CONFIG_UPDATE_MESSAGE);
+                } else if (
+                  Object.keys(partialConfig).length === 0 ||
+                  window.confirm(
+                    "Are you sure you want to discard all your changes?"
+                  )
+                ) {
+                  setOpen(false);
+                }
+              }}
             >
               <XIcon />
             </IconButton>

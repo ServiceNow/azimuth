@@ -30,7 +30,6 @@ import PerturbationTestingSummary from "pages/PerturbationTestingSummary";
 import Threshold from "pages/Threshold";
 import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
-import Settings from "pages/Settings";
 import NotFound from "pages/NotFound";
 import ClassOverlap from "pages/ClassOverlap";
 import SmartTags from "pages/SmartTags";
