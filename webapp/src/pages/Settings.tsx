@@ -1,4 +1,4 @@
-import { Warning } from "@mui/icons-material";
+import { Close, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -29,7 +29,6 @@ import {
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
-import XIcon from "components/Icons/X";
 import Loading from "components/Loading";
 import _ from "lodash";
 import React from "react";
@@ -674,7 +673,7 @@ const Settings: React.FC<props> = ({ setOpen }) => {
                 }
               }}
             >
-              <XIcon />
+              <Close />
             </IconButton>
           </Tooltip>
         </Box>
