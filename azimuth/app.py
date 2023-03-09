@@ -48,7 +48,11 @@ COMMON_HTTP_ERROR_CODES = (
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-    HTTP_422_UNPROCESSABLE_ENTITY,  # Override responses from FastAPI ValidationError
+    # The default handler for RequestValidationError was returning an HTTP_422_UNPROCESSABLE_ENTITY.
+    # We overwrite that handler with the following handle_validation_error(), which returns more
+    # conventional HTTP codes.
+    # This overwrites the default ValidationError response for 422 in the OpenAPI spec.
+    HTTP_422_UNPROCESSABLE_ENTITY,
     HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_503_SERVICE_UNAVAILABLE,
 )
