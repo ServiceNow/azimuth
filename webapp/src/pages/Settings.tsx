@@ -4,6 +4,9 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   formControlLabelClasses,
@@ -17,7 +20,6 @@ import {
   InputLabel,
   inputLabelClasses,
   MenuItem,
-  Modal,
   Paper,
   Select,
   TextField,
@@ -217,7 +219,6 @@ const Settings: React.FC<props> = ({ setOpen }) => {
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
 
-  const [modal, showModal] = React.useState<boolean>(false);
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
@@ -647,135 +648,77 @@ const Settings: React.FC<props> = ({ setOpen }) => {
   );
 
   return (
-    <Box height="100%" display="flex" flexDirection="column">
-      <Box display="flex" justifyContent="space-between" margin={1}>
-        <Typography variant="subtitle1">
-          View and edit certain fields from your config file. Once your changes
-          are saved, expect some delays for recomputing the affected tasks.
-        </Typography>
-        <Tooltip title="close" placement="bottom">
-          <IconButton
-            size="small"
-            color="primary"
-            sx={{ padding: 0 }}
-            onClick={() =>
-              Object.keys(partialConfig).length > 0 || isUpdatingConfig
-                ? showModal(true)
-                : setOpen(false)
-            }
+    <>
+      <DialogTitle id="config-dialog-title">
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="subtitle1">
+            View and edit certain fields from your config file. Once your
+            changes are saved, expect some delays for recomputing the affected
+            tasks.
+          </Typography>
+          <Tooltip title="close" placement="bottom">
+            <IconButton
+              size="small"
+              color="primary"
+              sx={{ padding: 0 }}
+              onClick={() =>
+                Object.keys(partialConfig).length > 0 || isUpdatingConfig
+                  ? isUpdatingConfig
+                    ? window.confirm(CONFIG_UPDATE_MESSAGE)
+                    : Object.keys(partialConfig).length > 0 &&
+                      window.confirm(
+                        "Are you sure you want to discard all your changes?"
+                      )
+                    ? setOpen(false)
+                    : setOpen(true)
+                  : setOpen(false)
+              }
+            >
+              <XIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </DialogTitle>
+      <DialogContent dividers>
+        <Box
+          sx={{
+            flex: 1,
+            padding: 2,
+            overflow: "auto",
+            [`& .${formControlLabelClasses.labelPlacementStart}`]: {
+              justifyContent: "flex-end",
+              marginLeft: 0,
+            },
+            [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
+            [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
+            [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
+            [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
+          }}
+        >
+          <AccordionLayout
+            name="Project Configuration"
+            description="View the fields that define the dataset to load in Azimuth."
+            link="reference/configuration/project/"
           >
-            <XIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      <Paper
-        variant="outlined"
-        sx={{
-          flex: 1,
-          padding: 2,
-          overflow: "auto",
-          [`& .${formControlLabelClasses.labelPlacementStart}`]: {
-            justifyContent: "flex-end",
-            marginLeft: 0,
-          },
-          [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
-          [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
-          [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
-        }}
-      >
-        <AccordionLayout
-          name="Project Configuration"
-          description="View the fields that define the dataset to load in Azimuth."
-          link="reference/configuration/project/"
-        >
-          {getProjectConfigSection()}
-        </AccordionLayout>
-        <AccordionLayout
-          name="Model Contract Configuration"
-          description="View and edit some fields that define the ML pipelines and the metrics."
-          link="reference/configuration/model_contract/"
-        >
-          {getModelContractConfigSection()}
-        </AccordionLayout>
-        <AccordionLayout
-          name="Analyses Customization"
-          description="Enable or disable some analyses and edit corresponding thresholds."
-          link="reference/configuration/analyses/"
-        >
-          {getAnalysesCustomizationSection()}
-        </AccordionLayout>
-        <Modal open={modal} onClose={() => showModal(false)}>
-          <Box
-            sx={{
-              position: "absolute",
-              width: "25",
-              height: "10%",
-              padding: "10px",
-              backgroundColor: (theme) => theme.palette.background.paper,
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
+            {getProjectConfigSection()}
+          </AccordionLayout>
+          <AccordionLayout
+            name="Model Contract Configuration"
+            description="View and edit some fields that define the ML pipelines and the metrics."
+            link="reference/configuration/model_contract/"
           >
-            {isUpdatingConfig ? (
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                gap={1}
-              >
-                <Typography variant="body1">{CONFIG_UPDATE_MESSAGE}</Typography>
-                <Button
-                  size="small"
-                  sx={{ width: 10 }}
-                  variant="contained"
-                  onClick={() => {
-                    showModal(false);
-                  }}
-                >
-                  Ok
-                </Button>
-              </Box>
-            ) : (
-              Object.keys(partialConfig).length > 0 && (
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  gap={1}
-                >
-                  <Typography variant="body1">
-                    Are you sure you want to discard all your changes?
-                  </Typography>
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      onClick={() => {
-                        showModal(false);
-                        setOpen(false);
-                      }}
-                    >
-                      Yes
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      onClick={() => {
-                        showModal(false);
-                      }}
-                    >
-                      No
-                    </Button>
-                  </Box>
-                </Box>
-              )
-            )}
-          </Box>
-        </Modal>
-      </Paper>
-      <Box display="flex" justifyContent="space-between" paddingY={2}>
+            {getModelContractConfigSection()}
+          </AccordionLayout>
+          <AccordionLayout
+            name="Analyses Customization"
+            description="Enable or disable some analyses and edit corresponding thresholds."
+            link="reference/configuration/analyses/"
+          >
+            {getAnalysesCustomizationSection()}
+          </AccordionLayout>
+        </Box>
+      </DialogContent>
+      <DialogActions>
         <Button
           variant="contained"
           onClick={() => {
@@ -813,8 +756,8 @@ const Settings: React.FC<props> = ({ setOpen }) => {
             Apply
           </Button>
         </Box>
-      </Box>
-    </Box>
+      </DialogActions>
+    </>
   );
 };
 

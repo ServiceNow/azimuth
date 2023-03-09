@@ -2,9 +2,9 @@ import { Settings as SettingsIcon } from "@mui/icons-material";
 import {
   Box,
   Breadcrumbs,
+  Dialog,
   IconButton,
   Link,
-  Modal,
   Typography,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
@@ -34,16 +34,6 @@ const useStyles = makeStyles((theme) => ({
   label: {
     fontWeight: "bold",
     marginRight: theme.spacing(1),
-  },
-  modal: {
-    position: "absolute",
-    width: "70%",
-    height: "80%",
-    padding: "10px",
-    backgroundColor: theme.palette.background.paper,
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
   },
 }));
 
@@ -194,7 +184,7 @@ const PageHeader = () => {
             <IconButton
               size="small"
               color="primary"
-              onClick={() => setOpenConfigModal(!openConfigModal)}
+              onClick={() => setOpenConfigModal(true)}
               sx={{
                 padding: 0,
                 "&:hover > svg": {
@@ -207,18 +197,30 @@ const PageHeader = () => {
             </IconButton>
             <HelpMenu />
           </Box>
-          <Modal
+          <Dialog
+            aria-labelledby="config-dialog-title"
+            maxWidth="md"
+            scroll="paper"
             open={openConfigModal}
             onClose={(_, reason) =>
               reason === "backdropClick" || reason === "escapeKeyDown"
                 ? setOpenConfigModal(true)
                 : setOpenConfigModal(false)
             }
+            sx={{
+              "& .MuiDialogContent-root": {
+                padding: (theme) => theme.spacing(1),
+              },
+              "& .MuiDialogActions-root": {
+                display: "flex",
+                justifyContent: "space-between",
+                paddingX: (theme) => theme.spacing(2),
+                gap: 1,
+              },
+            }}
           >
-            <Box className={classes.modal}>
-              <Settings setOpen={setOpenConfigModal} />
-            </Box>
-          </Modal>
+            <Settings setOpen={setOpenConfigModal} />
+          </Dialog>
         </div>
       )}
     </div>
