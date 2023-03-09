@@ -201,9 +201,7 @@ const PageHeader = () => {
             aria-labelledby="config-dialog-title"
             maxWidth="md"
             scroll="paper"
-            disableEscapeKeyDown
             open={openConfigModal}
-            onClose={(_, reason) => setOpenConfigModal(false)}
             sx={{
               "& .MuiDialogContent-root": {
                 padding: (theme) => theme.spacing(1),
