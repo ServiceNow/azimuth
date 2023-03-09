@@ -664,7 +664,7 @@ const Settings: React.FC<props> = ({ setOpen }) => {
               onClick={() =>
                 Object.keys(partialConfig).length > 0 || isUpdatingConfig
                   ? isUpdatingConfig
-                    ? window.confirm(CONFIG_UPDATE_MESSAGE)
+                    ? window.alert(CONFIG_UPDATE_MESSAGE)
                     : Object.keys(partialConfig).length > 0 &&
                       window.confirm(
                         "Are you sure you want to discard all your changes?"
