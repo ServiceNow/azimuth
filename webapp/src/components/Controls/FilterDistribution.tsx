@@ -28,7 +28,7 @@ const FilterDistribution: React.FC<Props> = ({ maxCount, filter }) => {
         initial={false}
         transition={transition}
         bgcolor={
-          outcomeCount ? undefined : (theme) => theme.palette.primary.main
+          outcomeCount ? undefined : (theme) => theme.palette.secondary.dark
         }
       >
         {outcomeCount &&

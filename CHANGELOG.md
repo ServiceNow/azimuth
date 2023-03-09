@@ -17,6 +17,7 @@ Released changes are shown in the
 - Outcome option to dropdown in Smart Tag Analysis.
 - Link from confusion matrix cells and row/column labels to utterance table.
 - Preserve edits done to the config via the API when relaunching Azimuth with the env var `LOAD_CONFIG_HISTORY=1`.
+- Support for dataset-only smart tag analysis.
 
 ### Changed
 - Change the outcome per threshold bar chart to area chart, making the x axis continuous, and add vertical dashed line marking current threshold.
