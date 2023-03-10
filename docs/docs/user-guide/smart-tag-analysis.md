@@ -3,6 +3,7 @@
 The Smart Tag Analysis shows the proportion of samples that have been tagged by each smart tag
 family, broken down by [**prediction outcomes**](../key-concepts/outcomes.md), along with
 sample counts and prediction accuracies.
+If no pipeline is selected, only the sample count will be available.
 
 The analyses associated with each smart tag family may also be associated with
 a specific model behavior, failure mode, and/or approach to address any issues. For example,
@@ -40,7 +41,7 @@ interpreted as references to rows.
 
 ### Columns
 - The first column shows the class variable for which other values are presented. Use the
-  dropdown :material-arrow-down-drop-circle-outline: to switch between labels and predictions.
+  dropdown :material-arrow-down-drop-circle-outline: to switch between labels, predictions and outcomes.
 - The second and third columns show sample count and pipeline accuracy, which can help with
   identifying or prioritizing classes to investigate. For example, you may want to sort by
   accuracy in ascending order, to focus on classes for which the model had more difficulty.
