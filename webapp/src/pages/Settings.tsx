@@ -206,7 +206,7 @@ const NumberField: React.FC<
 };
 
 type Props = {
-  onClose: (close: boolean) => void;
+  onClose: () => void;
 };
 
 const Settings: React.FC<Props> = ({ onClose }) => {
@@ -237,7 +237,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
 
   React.useEffect(() => {
     if (isUpdateSuccessful) {
-      onClose(false);
+      onClose();
     }
     if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
       setPartialConfig({
@@ -680,7 +680,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                   "Are you sure you want to discard all your changes?"
                 )
               ) {
-                onClose(false);
+                onClose();
               }
             }}
           >
@@ -730,7 +730,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
-            onClose(false);
+            onClose();
           }}
         >
           Discard

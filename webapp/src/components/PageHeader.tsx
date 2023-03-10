@@ -202,7 +202,7 @@ const PageHeader = () => {
             maxWidth="md"
             open={openConfigModal}
           >
-            <Settings onClose={setOpenConfigModal} />
+            <Settings onClose={() => setOpenConfigModal(false)} />
           </Dialog>
         </div>
       )}
