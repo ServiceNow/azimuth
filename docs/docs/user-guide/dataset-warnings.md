@@ -39,6 +39,7 @@ above `Z`% (default is 5%), the analysis flags it.
 Length mismatch compares the number of **words per utterance** in both sets. The application flags
 a warning if the mean and/or standard deviation between the 2 distributions is above `A` and `B` (
 default is 3 for both) respectively.
+The values determining a short and a long utterance for the smart tags are displayed on the plot.
 
 ## Configuration
 
