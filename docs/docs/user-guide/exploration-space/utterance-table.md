@@ -20,10 +20,12 @@ the [:material-link: Utterance Details](utterance-details.md) page.
     :material-sort: Click a column header to sort the table by the column values. Each click
     rotates between ascending order, descending order, and no sorting.
 
-### ID
+### Index
 
-A **unique ID** for each utterance is created for referencing purposes. When exporting the
-utterances, the utterance ID refers to the column `row_idx`.
+A **unique index** for each utterance is generated for referencing purposes. When exporting the
+utterances, the utterance index refers to the column `row_idx`.
+
+If a persistent id is provided in the [column](../../reference/configuration/project.md#columns) section of the config, hovering on the index will display both the generated index and the persistent id, when they differ.
 
 ### Utterance
 
@@ -53,10 +55,24 @@ information, see [Smart Tags](../../key-concepts/smart-tags.md).
 
 For each data point, the user can specify if an action needs to be
 taken. [Proposed Actions](../../key-concepts/proposed-actions.md) are explained in the Key Concepts
-section. The actions are done outside the app. Export the proposed actions in a `.csv` file and use
-the list to resolve the utterance issues. The exported file also contains the smart tags.
+section. The actions are done outside the app, using the exported list to resolve the utterance issues.
 
 !!! tip "Apply in batch"
 
     Proposed actions can be applied in **batches** by selecting multiple rows (or selecting all
     based on the current search) and applying the change.
+
+![Screenshot](../../_static/images/exploration-space/import-export.png){: style="width:400px"}
+
+#### Exporting
+To export the proposed actions, two options are available:
+
+1. **Only exporting the proposed actions**. In the CSV, only rows with proposed actions will be present, and the two columns will be the [persistent id](../../reference/configuration/project.md#columns) and the proposed action.
+1. **Exporting the complete dataset**, including all columns (smart tags, predictions, and so on). This can be useful for purposes other than proposed actions.
+
+#### Importing
+From the CSV exported by the first option, proposed actions can be imported back into Azimuth using the import button.
+
+* This can be useful if the dataset is changed (for example, labels modified or rows removed), and the user wants to verify if the proposed actions were fixed.
+* It can also be useful if you need to kill Azimuth and restart without having access to the cache.
+* By default, if some persistent ids are in the imported file, but not in the dataset in Azimuth, they will be ignored.
