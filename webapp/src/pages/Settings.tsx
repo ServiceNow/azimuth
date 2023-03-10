@@ -205,11 +205,11 @@ const NumberField: React.FC<
   );
 };
 
-type props = {
-  onClose: () => void;
+type Props = {
+  onClose: (close: boolean) => void;
 };
 
-const Settings: React.FC<props> = ({ onClose }) => {
+const Settings: React.FC<Props> = ({ onClose }) => {
   const { jobId } = useParams<{ jobId: string }>();
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
@@ -667,7 +667,7 @@ const Settings: React.FC<props> = ({ onClose }) => {
                   "Are you sure you want to discard all your changes?"
                 )
               ) {
-                onClose();
+                onClose(false);
               }
             }}
           >
@@ -710,17 +710,13 @@ const Settings: React.FC<props> = ({ onClose }) => {
           {getAnalysesCustomizationSection()}
         </AccordionLayout>
       </DialogContent>
-      <DialogActions
-        sx={{
-          justifyContent: "space-between",
-        }}
-      >
+      <DialogActions sx={{ justifyContent: "space-between" }}>
         <Button
           variant="contained"
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
-            onClose();
+            onClose(false);
           }}
         >
           Discard
