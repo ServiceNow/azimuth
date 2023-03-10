@@ -374,11 +374,54 @@ const Settings: React.FC<Props> = ({ onClose }) => {
         config
           ? setPartialConfig({
               ...partialConfig,
-              [config]: { ...resultingConfig[config], [field]: newValue },
+              [config]: {
+                ...resultingConfig[config],
+                [field]: newValue,
+              },
             })
           : setPartialConfig({
               ...partialConfig,
               [field]: newValue,
+            })
+      }
+    />
+  );
+
+  const displayPipelineStringOnlyFields = (
+    pipelineIndex: number,
+    pipeline: PipelineDefinition,
+    field: string,
+    value: string | null
+  ) => (
+    <StringField
+      label={field}
+      value={String(value)}
+      onChange={(newValue) =>
+        field === "class_name" || field === "remote"
+          ? setPartialConfig({
+              ...partialConfig,
+              pipelines: [
+                ...resultingConfig.pipelines!.slice(0, pipelineIndex),
+                {
+                  ...pipeline,
+                  model: {
+                    ...pipeline.model,
+                    [field]: newValue,
+                  },
+                },
+                ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+              ],
+            })
+          : setPartialConfig({
+              ...partialConfig,
+              pipelines: [
+                ...resultingConfig.pipelines!.slice(0, pipelineIndex),
+                {
+                  ...pipeline,
+                  [field]: newValue,
+                },
+                ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+              ],
             })
       }
     />
@@ -554,7 +597,12 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                   {displaySectionTitle("General")}
                   <FormGroup>
                     <Columns columns={3}>
-                      {displayReadonlyFields("name", pipeline.name)}
+                      {displayPipelineStringOnlyFields(
+                        pipelineIndex,
+                        pipeline,
+                        "name",
+                        pipeline.name
+                      )}
                     </Columns>
                   </FormGroup>
                 </FormControl>
@@ -562,11 +610,18 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                   {displaySectionTitle("Model")}
                   <FormGroup>
                     <Columns columns={3}>
-                      {displayReadonlyFields(
+                      {displayPipelineStringOnlyFields(
+                        pipelineIndex,
+                        pipeline,
                         "class_name",
                         pipeline.model.class_name
                       )}
-                      {displayReadonlyFields("remote", pipeline.model.remote)}
+                      {displayPipelineStringOnlyFields(
+                        pipelineIndex,
+                        pipeline,
+                        "remote",
+                        pipeline.model.remote
+                      )}
                       {pipeline.model.args.length > 0 &&
                         displayArgumentsList("args", pipeline.model.args)}
                       {Object.keys(pipeline.model.kwargs).length > 0 &&
