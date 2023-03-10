@@ -215,8 +215,10 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     SupportedLanguage | undefined
   >();
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
-  const [updateConfig, { isLoading: isUpdatingConfig }] =
-    updateConfigEndpoint.useMutation();
+  const [
+    updateConfig,
+    { isLoading: isUpdatingConfig, isSuccess: isUpdateSuccessful },
+  ] = updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
@@ -234,6 +236,9 @@ const Settings: React.FC<Props> = ({ onClose }) => {
   });
 
   React.useEffect(() => {
+    if (isUpdateSuccessful) {
+      onClose(false);
+    }
     if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
       setPartialConfig({
         language: defaultConfig.language,
@@ -259,7 +264,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
         },
       });
     }
-  }, [defaultConfig, resultingConfig]);
+  }, [defaultConfig, resultingConfig, isUpdateSuccessful, onClose]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
@@ -284,6 +289,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
         <Checkbox
           size="small"
           checked={Boolean(resultingConfig[field])}
+          disabled={isUpdatingConfig}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -306,6 +312,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
         <Checkbox
           size="small"
           checked={Boolean(pipeline.postprocessors)}
+          disabled={isUpdatingConfig}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -340,7 +347,10 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     <NumberField
       label={field}
       value={value}
-      disabled={!resultingConfig.pipelines![pipelineIndex].postprocessors}
+      disabled={
+        !resultingConfig.pipelines![pipelineIndex].postprocessors ||
+        isUpdatingConfig
+      }
       onChange={(newValue) =>
         setPartialConfig({
           ...partialConfig,
@@ -453,7 +463,9 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                     <Typography variant="body2">{field}:</Typography>
                     <NumberField
                       value={value}
-                      disabled={!resultingConfig.uncertainty}
+                      disabled={
+                        !resultingConfig.uncertainty || isUpdatingConfig
+                      }
                       onChange={(newValue) =>
                         setPartialConfig({
                           ...partialConfig,
@@ -557,6 +569,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
               <Checkbox
                 size="small"
                 checked={Boolean(resultingConfig.metrics[metricName])}
+                disabled={isUpdatingConfig}
                 onChange={(e) =>
                   handleCustomMetricUpdate(e.target.checked, metricName)
                 }
@@ -580,7 +593,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
               key={field}
               label={field}
               value={value}
-              disabled={!resultingConfig[config]}
+              disabled={!resultingConfig[config] || isUpdatingConfig}
               onChange={(newValue) =>
                 setPartialConfig({
                   ...partialConfig,
@@ -607,6 +620,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
         <FormControl variant="standard" className="fixedWidthInput">
           <InputLabel id="language-input-label">language</InputLabel>
           <Select
+            disabled={isUpdatingConfig}
             value={language ?? resultingConfig.language}
             labelId="language-input-label"
             onChange={(event) =>
@@ -649,7 +663,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
   return (
     <>
       <DialogTitle id="config-dialog-title">
-        <Box display="flex" justifyContent="space-between">
+        <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1">
             View and edit certain fields from your config file. Once your
             changes are saved, expect some delays for recomputing the affected
@@ -658,7 +672,6 @@ const Settings: React.FC<Props> = ({ onClose }) => {
           <IconButton
             size="small"
             color="primary"
-            sx={{ padding: 0 }}
             disabled={isUpdatingConfig}
             onClick={() => {
               if (
@@ -713,6 +726,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
       <DialogActions sx={{ justifyContent: "space-between" }}>
         <Button
           variant="contained"
+          disabled={Object.keys(partialConfig).length === 0 || isUpdatingConfig}
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
@@ -745,7 +759,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
             disabled={isUpdatingConfig}
             onClick={() => updateConfig({ jobId, body: partialConfig })}
           >
-            Apply
+            Apply and Close
           </Button>
         </Box>
       </DialogActions>
