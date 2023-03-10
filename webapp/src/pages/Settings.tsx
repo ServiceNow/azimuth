@@ -215,10 +215,8 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     SupportedLanguage | undefined
   >();
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
-  const [
-    updateConfig,
-    { isLoading: isUpdatingConfig, isSuccess: isUpdateSuccessful },
-  ] = updateConfigEndpoint.useMutation();
+  const [updateConfig, { isLoading: isUpdatingConfig }] =
+    updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
@@ -236,9 +234,6 @@ const Settings: React.FC<Props> = ({ onClose }) => {
   });
 
   React.useEffect(() => {
-    if (isUpdateSuccessful) {
-      onClose();
-    }
     if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
       setPartialConfig({
         language: defaultConfig.language,
@@ -264,7 +259,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
         },
       });
     }
-  }, [defaultConfig, resultingConfig, isUpdateSuccessful, onClose]);
+  }, [defaultConfig, resultingConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
@@ -757,9 +752,13 @@ const Settings: React.FC<Props> = ({ onClose }) => {
           <Button
             variant="contained"
             disabled={isUpdatingConfig}
-            onClick={() => updateConfig({ jobId, body: partialConfig })}
+            onClick={() =>
+              updateConfig({ jobId, body: partialConfig })
+                .unwrap()
+                .then(onClose)
+            }
           >
-            Apply and Close
+            Apply and close
           </Button>
         </Box>
       </DialogActions>
