@@ -202,19 +202,8 @@ const PageHeader = () => {
             maxWidth="md"
             scroll="paper"
             open={openConfigModal}
-            sx={{
-              "& .MuiDialogContent-root": {
-                padding: (theme) => theme.spacing(1),
-              },
-              "& .MuiDialogActions-root": {
-                display: "flex",
-                justifyContent: "space-between",
-                paddingX: (theme) => theme.spacing(2),
-                gap: 1,
-              },
-            }}
           >
-            <Settings setOpen={setOpenConfigModal} />
+            <Settings onClose={setOpenConfigModal} />
           </Dialog>
         </div>
       )}

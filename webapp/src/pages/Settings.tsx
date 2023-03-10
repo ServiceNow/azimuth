@@ -206,10 +206,10 @@ const NumberField: React.FC<
 };
 
 type props = {
-  setOpen: (close: boolean) => void;
+  onClose: () => void;
 };
 
-const Settings: React.FC<props> = ({ setOpen }) => {
+const Settings: React.FC<props> = ({ onClose }) => {
   const { jobId } = useParams<{ jobId: string }>();
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
@@ -655,75 +655,72 @@ const Settings: React.FC<props> = ({ setOpen }) => {
             changes are saved, expect some delays for recomputing the affected
             tasks.
           </Typography>
-          <Tooltip title="close" placement="bottom">
-            <IconButton
-              size="small"
-              color="primary"
-              sx={{ padding: 0 }}
-              onClick={() => {
-                if (isUpdatingConfig) {
-                  window.alert(CONFIG_UPDATE_MESSAGE);
-                } else if (
-                  Object.keys(partialConfig).length === 0 ||
-                  window.confirm(
-                    "Are you sure you want to discard all your changes?"
-                  )
-                ) {
-                  setOpen(false);
-                }
-              }}
-            >
-              <Close />
-            </IconButton>
-          </Tooltip>
+          <IconButton
+            size="small"
+            color="primary"
+            sx={{ padding: 0 }}
+            disabled={isUpdatingConfig}
+            onClick={() => {
+              if (
+                Object.keys(partialConfig).length === 0 ||
+                window.confirm(
+                  "Are you sure you want to discard all your changes?"
+                )
+              ) {
+                onClose();
+              }
+            }}
+          >
+            <Close />
+          </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent dividers>
-        <Box
-          sx={{
-            flex: 1,
-            padding: 2,
-            overflow: "auto",
-            [`& .${formControlLabelClasses.labelPlacementStart}`]: {
-              justifyContent: "flex-end",
-              marginLeft: 0,
-            },
-            [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-            [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
-            [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
-            [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
-          }}
+      <DialogContent
+        dividers
+        sx={{
+          [`& .${formControlLabelClasses.labelPlacementStart}`]: {
+            justifyContent: "flex-end",
+            marginLeft: 0,
+          },
+          [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
+          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
+          [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
+          [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
+        }}
+      >
+        <AccordionLayout
+          name="Project Configuration"
+          description="View the fields that define the dataset to load in Azimuth."
+          link="reference/configuration/project/"
         >
-          <AccordionLayout
-            name="Project Configuration"
-            description="View the fields that define the dataset to load in Azimuth."
-            link="reference/configuration/project/"
-          >
-            {getProjectConfigSection()}
-          </AccordionLayout>
-          <AccordionLayout
-            name="Model Contract Configuration"
-            description="View and edit some fields that define the ML pipelines and the metrics."
-            link="reference/configuration/model_contract/"
-          >
-            {getModelContractConfigSection()}
-          </AccordionLayout>
-          <AccordionLayout
-            name="Analyses Customization"
-            description="Enable or disable some analyses and edit corresponding thresholds."
-            link="reference/configuration/analyses/"
-          >
-            {getAnalysesCustomizationSection()}
-          </AccordionLayout>
-        </Box>
+          {getProjectConfigSection()}
+        </AccordionLayout>
+        <AccordionLayout
+          name="Model Contract Configuration"
+          description="View and edit some fields that define the ML pipelines and the metrics."
+          link="reference/configuration/model_contract/"
+        >
+          {getModelContractConfigSection()}
+        </AccordionLayout>
+        <AccordionLayout
+          name="Analyses Customization"
+          description="Enable or disable some analyses and edit corresponding thresholds."
+          link="reference/configuration/analyses/"
+        >
+          {getAnalysesCustomizationSection()}
+        </AccordionLayout>
       </DialogContent>
-      <DialogActions>
+      <DialogActions
+        sx={{
+          justifyContent: "space-between",
+        }}
+      >
         <Button
           variant="contained"
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
-            setOpen(false);
+            onClose();
           }}
         >
           Discard
