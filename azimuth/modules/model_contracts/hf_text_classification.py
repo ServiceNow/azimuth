@@ -74,7 +74,12 @@ class HFTextClassificationModule(TextClassificationModule):
                 predictions = np.stack(
                     [
                         self.extract_probs_from_output(
-                            model(utterances, num_workers=0, batch_size=self.config.batch_size)
+                            model(
+                                utterances,
+                                num_workers=0,
+                                batch_size=self.config.batch_size,
+                                truncation=True,
+                            )
                         )
                         for _ in range(self.config.uncertainty.iterations)
                     ],
@@ -85,7 +90,9 @@ class HFTextClassificationModule(TextClassificationModule):
 
         else:
             epistemic = [0.0] * len(utterances)
-            pipeline_out = model(utterances, num_workers=0, batch_size=self.config.batch_size)
+            pipeline_out = model(
+                utterances, num_workers=0, batch_size=self.config.batch_size, truncation=True
+            )
         (
             model_output,
             postprocessed_output,
@@ -121,7 +128,10 @@ class HFTextClassificationModule(TextClassificationModule):
         pipeline = self.get_model()
 
         inputs = pipeline.tokenizer(
-            batch[self.config.columns.text_input], return_tensors="pt", padding=True
+            batch[self.config.columns.text_input],
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
         )
         all_tokens = [pipeline.tokenizer.convert_ids_to_tokens(i) for i in inputs["input_ids"]]
 

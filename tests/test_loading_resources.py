@@ -23,7 +23,7 @@ from transformers import (
 from azimuth.config import AzimuthConfig
 from azimuth.utils.ml.seeding import RandomContext
 
-_CURRENT_DIR = "/tmp"
+_CACHE_DIR = "/tmp/azimuth_test_models"
 _MAX_DATASET_LEN = 42
 
 
@@ -39,17 +39,13 @@ def load_hf_text_classif_pipeline(checkpoint_path: str, azimuth_config: AzimuthC
     # The first time, we load a random model, save it for subsequent loads
     use_cuda = _should_use_cuda(azimuth_config)
     try:
-        model = DistilBertForSequenceClassification.from_pretrained(_CURRENT_DIR)
+        model = DistilBertForSequenceClassification.from_pretrained(_CACHE_DIR)
     except OSError:
         with RandomContext(seed=2022):
             model = DistilBertForSequenceClassification(DistilBertConfig())
             model.init_weights()
-            model.save_pretrained(_CURRENT_DIR)
-    # As of Jan 6, 2021, pipelines didn't support fast tokenizers
-    # See https://github.com/huggingface/transformers/issues/7735
-    tokenizer = DistilBertTokenizer.from_pretrained(
-        checkpoint_path, use_fast=False, cache_dir=_CURRENT_DIR
-    )
+            model.save_pretrained(_CACHE_DIR)
+    tokenizer = DistilBertTokenizer.from_pretrained(checkpoint_path)
     device = 0 if use_cuda else -1
 
     # We set return_all_scores=True to get all softmax outputs
@@ -103,15 +99,11 @@ def load_tf_model(checkpoint_path: str) -> Callable:
 
     # The first time, we load a random model, save it for subsequent loads
     try:
-        model = DistilBertModel.from_pretrained(_CURRENT_DIR)
+        model = DistilBertModel.from_pretrained(_CACHE_DIR)
     except OSError:
         model = DistilBertModel(DistilBertConfig())
-        model.save_pretrained(_CURRENT_DIR)
-    # As of Jan 6, 2021, pipelines didn't support fast tokenizers
-    # See https://github.com/huggingface/transformers/issues/7735
-    tokenizer = DistilBertTokenizer.from_pretrained(
-        checkpoint_path, use_fast=False, cache_dir=_CURRENT_DIR
-    )
+        model.save_pretrained(_CACHE_DIR)
+    tokenizer = DistilBertTokenizer.from_pretrained(checkpoint_path, cache_dir=_CACHE_DIR)
 
     # Create embedder from tokenizer + model
     def embedder(utterances):
@@ -139,7 +131,9 @@ def config_structured_output(num_classes, threshold=0.8):
             self.threshold = threshold
             self.no_prediction_idx = no_prediction_idx
 
-        def __call__(self, utterances: List[str], num_workers=0, batch_size=32) -> MyOutputFormat:
+        def __call__(
+            self, utterances: List[str], num_workers=0, batch_size=32, truncation=True
+        ) -> MyOutputFormat:
             # Random logits based on the first letter
             initial_logits = np.stack(
                 [np.random.RandomState(ord(s[0])).randn(self.num_classes) * 2 for s in utterances]
