@@ -725,7 +725,6 @@ const Settings: React.FC<Props> = ({ onClose }) => {
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
-            onClose();
           }}
         >
           Discard
