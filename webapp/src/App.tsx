@@ -14,6 +14,7 @@ import {
 } from "@mui/material/styles";
 import AppLayout from "components/AppLayout";
 import BasicLayout from "components/BasicLayout";
+import PageHeader from "components/PageHeader";
 import WarningsOverview from "pages/WarningsOverview";
 import UtteranceDetail from "pages/UtteranceDetail";
 import customTheme, { GlobalCss } from "styles/theme";
@@ -77,6 +78,7 @@ export default class App extends React.Component<Props> {
                     <Route path="/:jobId">
                       <StatusCheck>
                         <PipelineCheck>
+                          <PageHeader />
                           <Switch>
                             <Route path="/:jobId" exact>
                               <BasicLayout maxWidth="md">
