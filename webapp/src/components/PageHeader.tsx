@@ -200,6 +200,7 @@ const PageHeader = () => {
           <Dialog
             aria-labelledby="config-dialog-title"
             maxWidth="md"
+            fullWidth
             open={openConfigModal}
           >
             <Settings onClose={() => setOpenConfigModal(false)} />
