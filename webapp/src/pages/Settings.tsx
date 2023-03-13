@@ -221,6 +221,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
+  const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
 
   const resultingConfig = Object.assign({}, config, partialConfig);
 
@@ -670,7 +671,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
             disabled={isUpdatingConfig}
             onClick={() => {
               if (
-                Object.keys(partialConfig).length === 0 ||
+                isEmptyPartialConfig ||
                 window.confirm(
                   "Are you sure you want to discard all your changes?"
                 )
@@ -721,7 +722,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
       <DialogActions sx={{ justifyContent: "space-between" }}>
         <Button
           variant="contained"
-          disabled={Object.keys(partialConfig).length === 0 || isUpdatingConfig}
+          disabled={isEmptyPartialConfig || isUpdatingConfig}
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
@@ -750,12 +751,12 @@ const Settings: React.FC<Props> = ({ onClose }) => {
           )}
           <Button
             variant="contained"
-            disabled={isUpdatingConfig}
-            onClick={() =>
+            disabled={isEmptyPartialConfig || isUpdatingConfig}
+            onClick={() => {
               updateConfig({ jobId, body: partialConfig })
                 .unwrap()
-                .then(onClose)
-            }
+                .then(onClose);
+            }}
           >
             Apply and close
           </Button>
