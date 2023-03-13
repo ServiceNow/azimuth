@@ -632,8 +632,8 @@ const Settings: React.FC<Props> = ({ onClose }) => {
         <Box display="flex" gap={1}>
           <Warning color="warning" />
           <Typography variant="body2">
-            Changing the language would impact the syntax, similarity and
-            behavioral_testing sections
+            Changing the language would impact the Syntax, Similarity and
+            Behavioral Testing sections
           </Typography>
         </Box>
       </Box>
