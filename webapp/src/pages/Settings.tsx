@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -208,10 +209,11 @@ const NumberField: React.FC<
 };
 
 type Props = {
+  open: boolean;
   onClose: () => void;
 };
 
-const Settings: React.FC<Props> = ({ onClose }) => {
+const Settings: React.FC<Props> = ({ open, onClose }) => {
   const { jobId } = useParams<{ jobId: string }>();
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
@@ -224,6 +226,16 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     Partial<AzimuthConfig>
   >({});
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
+
+  const handleDiscard = () => {
+    setPartialConfig({});
+    setLanguage(undefined);
+  };
+
+  const handleClose = () => {
+    handleDiscard();
+    onClose();
+  };
 
   const resultingConfig = Object.assign({}, config, partialConfig);
 
@@ -267,10 +279,109 @@ const Settings: React.FC<Props> = ({ onClose }) => {
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
 
+  const renderDialog = (children: React.ReactNode) => (
+    <Dialog
+      aria-labelledby="config-dialog-title"
+      maxWidth="md"
+      fullWidth
+      open={open}
+    >
+      <DialogTitle id="config-dialog-title">
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="subtitle1">
+            View and edit certain fields from your config file. Once your
+            changes are saved, expect some delays for recomputing the affected
+            tasks.
+          </Typography>
+          <IconButton
+            size="small"
+            color="primary"
+            disabled={isUpdatingConfig}
+            onClick={() => {
+              if (
+                isEmptyPartialConfig ||
+                window.confirm(
+                  "Are you sure you want to discard all your changes?"
+                )
+              ) {
+                handleClose();
+              }
+            }}
+          >
+            <Close />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent
+        dividers
+        sx={{
+          [`& .${formControlLabelClasses.root}`]: { alignSelf: "start" },
+          [`& .${formControlLabelClasses.labelPlacementStart}`]: {
+            marginLeft: 0,
+          },
+          [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
+          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
+          [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
+          [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
+        }}
+      >
+        {children}
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="contained"
+          disabled={isEmptyPartialConfig || isUpdatingConfig}
+          onClick={() => {
+            setPartialConfig({});
+            setLanguage(undefined);
+          }}
+        >
+          Discard
+        </Button>
+        <Box
+          flex={1}
+          display="flex"
+          alignItems="center"
+          justifyContent="end"
+          gap={1}
+        >
+          {isUpdatingConfig ? (
+            <>
+              <CircularProgress size={16} />
+              <FormHelperText>{CONFIG_UPDATE_MESSAGE}</FormHelperText>
+            </>
+          ) : (
+            FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
+              <>
+                <Warning color="warning" />
+                <FormHelperText>
+                  These changes may trigger some time-consuming computations.
+                  <br />
+                  Azimuth will not be usable until they complete.
+                </FormHelperText>
+              </>
+            )
+          )}
+        </Box>
+        <Button
+          variant="contained"
+          disabled={isEmptyPartialConfig || isUpdatingConfig}
+          onClick={() => {
+            updateConfig({ jobId, body: partialConfig })
+              .unwrap()
+              .then(handleClose);
+          }}
+        >
+          Apply and close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
   if (isLoading) {
-    return <Loading />;
+    return renderDialog(<Loading />);
   } else if (error || defaultConfig === undefined) {
-    return (
+    return renderDialog(
       <Box alignItems="center" display="grid" justifyItems="center">
         <img src={noData} width="50%" alt="No default config data available" />
         <Typography>{error?.message || UNKNOWN_ERROR}</Typography>
@@ -658,112 +769,29 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     </>
   );
 
-  return (
+  return renderDialog(
     <>
-      <DialogTitle id="config-dialog-title">
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1">
-            View and edit certain fields from your config file. Once your
-            changes are saved, expect some delays for recomputing the affected
-            tasks.
-          </Typography>
-          <IconButton
-            size="small"
-            color="primary"
-            disabled={isUpdatingConfig}
-            onClick={() => {
-              if (
-                isEmptyPartialConfig ||
-                window.confirm(
-                  "Are you sure you want to discard all your changes?"
-                )
-              ) {
-                onClose();
-              }
-            }}
-          >
-            <Close />
-          </IconButton>
-        </Box>
-      </DialogTitle>
-      <DialogContent
-        dividers
-        sx={{
-          [`& .${formControlLabelClasses.root}`]: { alignSelf: "start" },
-          [`& .${formControlLabelClasses.labelPlacementStart}`]: {
-            marginLeft: 0,
-          },
-          [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
-          [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
-          [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
-        }}
+      <AccordionLayout
+        name="Project Configuration"
+        description="View the fields that define the dataset to load in Azimuth."
+        link="reference/configuration/project/"
       >
-        <AccordionLayout
-          name="Project Configuration"
-          description="View the fields that define the dataset to load in Azimuth."
-          link="reference/configuration/project/"
-        >
-          {getProjectConfigSection()}
-        </AccordionLayout>
-        <AccordionLayout
-          name="Model Contract Configuration"
-          description="View and edit some fields that define the ML pipelines and the metrics."
-          link="reference/configuration/model_contract/"
-        >
-          {getModelContractConfigSection()}
-        </AccordionLayout>
-        <AccordionLayout
-          name="Analyses Customization"
-          description="Enable or disable some analyses and edit corresponding thresholds."
-          link="reference/configuration/analyses/"
-        >
-          {getAnalysesCustomizationSection()}
-        </AccordionLayout>
-      </DialogContent>
-      <DialogActions sx={{ justifyContent: "space-between" }}>
-        <Button
-          variant="contained"
-          disabled={isEmptyPartialConfig || isUpdatingConfig}
-          onClick={() => {
-            setPartialConfig({});
-            setLanguage(undefined);
-          }}
-        >
-          Discard
-        </Button>
-
-        <Box display="flex" alignItems="center" gap={2}>
-          {isUpdatingConfig ? (
-            <>
-              <CircularProgress size={16} />
-              <FormHelperText>{CONFIG_UPDATE_MESSAGE}</FormHelperText>
-            </>
-          ) : (
-            FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
-              <>
-                <Warning color="warning" />
-                <FormHelperText>
-                  These changes may trigger some time-consuming computations.
-                  <br />
-                  Azimuth will not be usable until they complete.
-                </FormHelperText>
-              </>
-            )
-          )}
-          <Button
-            variant="contained"
-            disabled={isEmptyPartialConfig || isUpdatingConfig}
-            onClick={() => {
-              updateConfig({ jobId, body: partialConfig })
-                .unwrap()
-                .then(onClose);
-            }}
-          >
-            Apply and close
-          </Button>
-        </Box>
-      </DialogActions>
+        {getProjectConfigSection()}
+      </AccordionLayout>
+      <AccordionLayout
+        name="Model Contract Configuration"
+        description="View and edit some fields that define the ML pipelines and the metrics."
+        link="reference/configuration/model_contract/"
+      >
+        {getModelContractConfigSection()}
+      </AccordionLayout>
+      <AccordionLayout
+        name="Analyses Customization"
+        description="Enable or disable some analyses and edit corresponding thresholds."
+        link="reference/configuration/analyses/"
+      >
+        {getAnalysesCustomizationSection()}
+      </AccordionLayout>
     </>
   );
 };
