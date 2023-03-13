@@ -1,5 +1,12 @@
-import { Settings } from "@mui/icons-material";
-import { Box, Breadcrumbs, IconButton, Link, Typography } from "@mui/material";
+import { Settings as SettingsIcon } from "@mui/icons-material";
+import {
+  Box,
+  Breadcrumbs,
+  Dialog,
+  IconButton,
+  Link,
+  Typography,
+} from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -14,6 +21,7 @@ import { DatasetSplitName } from "types/api";
 import { constructSearchString } from "utils/helpers";
 import HelpMenu from "components/HelpMenu";
 import PipelineSelect from "components/PipelineSelect";
+import Settings from "pages/Settings";
 
 const useStyles = makeStyles((theme) => ({
   jobHeader: {
@@ -79,7 +87,7 @@ const PageHeader = () => {
       })}`
     );
   };
-
+  const [openConfigModal, setOpenConfigModal] = React.useState(false);
   const dashboardPathname = `/${jobId}`;
 
   const isDashboard = location.pathname === dashboardPathname;
@@ -174,10 +182,9 @@ const PageHeader = () => {
               </>
             )}
             <IconButton
-              component={RouterLink}
               size="small"
               color="primary"
-              to={`/${jobId}/settings${searchString}`}
+              onClick={() => setOpenConfigModal(true)}
               sx={{
                 padding: 0,
                 "&:hover > svg": {
@@ -186,10 +193,18 @@ const PageHeader = () => {
                 },
               }}
             >
-              <Settings />
+              <SettingsIcon />
             </IconButton>
             <HelpMenu />
           </Box>
+          <Dialog
+            aria-labelledby="config-dialog-title"
+            maxWidth="md"
+            fullWidth
+            open={openConfigModal}
+          >
+            <Settings onClose={() => setOpenConfigModal(false)} />
+          </Dialog>
         </div>
       )}
     </div>

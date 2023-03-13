@@ -30,7 +30,6 @@ import PerturbationTestingSummary from "pages/PerturbationTestingSummary";
 import Threshold from "pages/Threshold";
 import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
-import Settings from "pages/Settings";
 import NotFound from "pages/NotFound";
 import ClassOverlap from "pages/ClassOverlap";
 import SmartTags from "pages/SmartTags";
@@ -82,11 +81,6 @@ export default class App extends React.Component<Props> {
                             <Route path="/:jobId" exact>
                               <BasicLayout maxWidth="md">
                                 <Dashboard />
-                              </BasicLayout>
-                            </Route>
-                            <Route path="/:jobId/settings" exact>
-                              <BasicLayout maxWidth="md">
-                                <Settings />
                               </BasicLayout>
                             </Route>
                             <Route
