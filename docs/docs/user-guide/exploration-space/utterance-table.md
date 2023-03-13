@@ -20,12 +20,12 @@ the [:material-link: Utterance Details](utterance-details.md) page.
     :material-sort: Click a column header to sort the table by the column values. Each click
     rotates between ascending order, descending order, and no sorting.
 
-### Index
+### Id
 
 A **unique index** for each utterance is generated for referencing purposes. When exporting the
 utterances, the utterance index refers to the column `row_idx`.
 
-If a persistent id is provided in the [column](../../reference/configuration/project.md#columns) section of the config, hovering on the index will display both the generated index and the persistent id, when they differ.
+If a persistent id is provided in the [columns](../../reference/configuration/project.md#columns) section of the config, hovering on the index will display both the generated index and the persistent id, when they differ.
 
 ### Utterance
 
@@ -67,12 +67,12 @@ section. The actions are done outside the app, using the exported list to resolv
 #### Exporting
 To export the proposed actions, two options are available:
 
-1. **Only exporting the proposed actions**. In the CSV, only rows with proposed actions will be present, and the two columns will be the [persistent id](../../reference/configuration/project.md#columns) and the proposed action.
+1. **Exporting only the proposed actions**. In the CSV, only rows with proposed actions will be present, and the two columns will be the [persistent id](../../reference/configuration/project.md#columns) and the proposed action.
 1. **Exporting the complete dataset**, including all columns (smart tags, predictions, and so on). This can be useful for purposes other than proposed actions.
 
 #### Importing
 From the CSV exported by the first option, proposed actions can be imported back into Azimuth using the import button.
 
-* This can be useful if the dataset is changed (for example, labels modified or rows removed), and the user wants to verify if the proposed actions were fixed.
-* It can also be useful if you need to kill Azimuth and restart without having access to the cache.
+* This can be useful if the dataset is changed (for example, labels modified or rows removed), and the user wants to verify if the proposed actions were resolved.
+* It can also be useful if you need to kill Azimuth and restart it without having access to the cache.
 * By default, if some persistent ids are in the imported file, but not in the dataset in Azimuth, they will be ignored.

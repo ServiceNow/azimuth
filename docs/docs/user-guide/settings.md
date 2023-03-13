@@ -6,5 +6,5 @@ Click on :fontawesome-solid-gear: in the top right of the Azimuth app to access 
 ![Screenshot](../_static/images/settings.png)
 
 * `Discard` any current modifications if you change your mind.
-* When clicking `Apply and Close`, the start-up tasks may start again, depending on the changes made to the config.
-* Only some fields are modifiable through this screen.
+* When clicking `Apply and close`, the start-up tasks may start again, depending on the changes made to the config.
+* For now, only select fields are editable through this screen.

@@ -22,4 +22,4 @@ Toggling off  "Reorder classes" disables the reordering and allows showing the c
 
 ## Interaction
 Users can click on any confusion matrix cell, row, or column to filter the data accordingly.
-For example, clicking on a row label will filter the data on that specific label.
+For example, clicking on a row label will filter the utterances with that specific label.

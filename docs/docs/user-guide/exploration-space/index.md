@@ -79,7 +79,7 @@ filters are listed below.
 
 ![Screenshot](../../_static/images/control-panel/utterances-search.png){: style="width:200px"}
 
-* **Search a particular string** to filter utterances. The string will be searched in the utterance text, as well as in the indices and the persistent ids.
+* **Search a particular string** to filter utterances. It can be a substring from the utterance or its exact index or persistent id.
 * Filter predictions based on their **confidence value**. You can specify a minimum and a maximum
   value.
 * Filter predictions according to their prediction [**outcomes**](../../key-concepts/outcomes.md).
