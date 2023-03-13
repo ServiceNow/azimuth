@@ -1101,7 +1101,7 @@
         
           <li class="md-nav__item">
   <a href="#id" class="md-nav__link">
-    ID
+    Id
   </a>
   
 </li>
@@ -1131,6 +1131,26 @@
   <a href="#proposed-action" class="md-nav__link">
     Proposed Action
   </a>
+  
+    <nav class="md-nav" aria-label="Proposed Action">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exporting" class="md-nav__link">
+    Exporting
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#importing" class="md-nav__link">
+    Importing
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1731,7 +1751,7 @@
         
           <li class="md-nav__item">
   <a href="#id" class="md-nav__link">
-    ID
+    Id
   </a>
   
 </li>
@@ -1761,6 +1781,26 @@
   <a href="#proposed-action" class="md-nav__link">
     Proposed Action
   </a>
+  
+    <nav class="md-nav" aria-label="Proposed Action">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exporting" class="md-nav__link">
+    Exporting
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#importing" class="md-nav__link">
+    Importing
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1804,9 +1844,10 @@ window using the <span class="keys"><kbd class="key-control">Ctrl</kbd></span> o
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m18 21-4-4h3V7h-3l4-4 4 4h-3v10h3M2 19v-2h10v2M2 13v-2h7v2M2 7V5h4v2H2Z"/></svg></span> Click a column header to sort the table by the column values. Each click
 rotates between ascending order, descending order, and no sorting.</p>
 </div>
-<h3 id="id">ID</h3>
-<p>A <strong>unique ID</strong> for each utterance is created for referencing purposes. When exporting the
-utterances, the utterance ID refers to the column <code>row_idx</code>.</p>
+<h3 id="id">Id</h3>
+<p>A <strong>unique index</strong> for each utterance is generated for referencing purposes. When exporting the
+utterances, the utterance index refers to the column <code>row_idx</code>.</p>
+<p>If a persistent id is provided in the <a href="../../../reference/configuration/project/#columns">columns</a> section of the config, hovering on the index will display both the generated index and the persistent id, when they differ.</p>
 <h3 id="utterance">Utterance</h3>
 <p>Utterances appear as available in the dataset provided. Hover over the utterances to display the
 <strong>copy button <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12V1Z"/></svg></span></strong>.</p>
@@ -1826,13 +1867,26 @@ information, see <a href="../../../key-concepts/smart-tags/">Smart Tags</a>.</p>
 <h3 id="proposed-action">Proposed Action</h3>
 <p>For each data point, the user can specify if an action needs to be
 taken. <a href="../../../key-concepts/proposed-actions/">Proposed Actions</a> are explained in the Key Concepts
-section. The actions are done outside the app. Export the proposed actions in a <code>.csv</code> file and use
-the list to resolve the utterance issues. The exported file also contains the smart tags.</p>
+section. The actions are done outside the app, using the exported list to resolve the utterance issues.</p>
 <div class="admonition tip">
 <p class="admonition-title">Apply in batch</p>
 <p>Proposed actions can be applied in <strong>batches</strong> by selecting multiple rows (or selecting all
 based on the current search) and applying the change.</p>
 </div>
+<p><img alt="Screenshot" src="../../../_static/images/exploration-space/import-export.png" style="width:400px" /></p>
+<h4 id="exporting">Exporting</h4>
+<p>To export the proposed actions, two options are available:</p>
+<ol>
+<li><strong>Exporting only the proposed actions</strong>. In the CSV, only rows with proposed actions will be present, and the two columns will be the <a href="../../../reference/configuration/project/#columns">persistent id</a> and the proposed action.</li>
+<li><strong>Exporting the complete dataset</strong>, including all columns (smart tags, predictions, and so on). This can be useful for purposes other than proposed actions.</li>
+</ol>
+<h4 id="importing">Importing</h4>
+<p>From the CSV exported by the first option, proposed actions can be imported back into Azimuth using the import button.</p>
+<ul>
+<li>This can be useful if the dataset is changed (for example, labels modified or rows removed), and the user wants to verify if the proposed actions were resolved.</li>
+<li>It can also be useful if you need to kill Azimuth and restart it without having access to the cache.</li>
+<li>By default, if some persistent ids are in the imported file, but not in the dataset in Azimuth, they will be ignored.</li>
+</ul>
 
 
 

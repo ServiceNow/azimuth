@@ -1748,7 +1748,8 @@
 <h1 id="smart-tag-analysis">Smart Tag Analysis</h1>
 <p>The Smart Tag Analysis shows the proportion of samples that have been tagged by each smart tag
 family, broken down by <a href="../../key-concepts/outcomes/"><strong>prediction outcomes</strong></a>, along with
-sample counts and prediction accuracies.</p>
+sample counts and prediction accuracies.
+If no pipeline is selected, only the sample count will be available.</p>
 <p>The analyses associated with each smart tag family may also be associated with
 a specific model behavior, failure mode, and/or approach to address any issues. For example,
 <code>Dissimilar</code> smart tags are associated with class definition issues, such as class overlap, and
@@ -1783,7 +1784,7 @@ interpreted as references to rows.</p>
 <h3 id="columns">Columns</h3>
 <ul>
 <li>The first column shows the class variable for which other values are presented. Use the
-  dropdown <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8m-5 6 5 5 5-5H7Z"/></svg></span> to switch between labels and predictions.</li>
+  dropdown <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8m-5 6 5 5 5-5H7Z"/></svg></span> to switch between labels, predictions and outcomes.</li>
 <li>The second and third columns show sample count and pipeline accuracy, which can help with
   identifying or prioritizing classes to investigate. For example, you may want to sort by
   accuracy in ascending order, to focus on classes for which the model had more difficulty.</li>

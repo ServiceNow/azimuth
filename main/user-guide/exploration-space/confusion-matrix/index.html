@@ -1091,6 +1091,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#interaction" class="md-nav__link">
+    Interaction
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1701,6 +1708,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#interaction" class="md-nav__link">
+    Interaction
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1720,25 +1734,24 @@
 
 
 <h1 id="confusion-matrix">Confusion Matrix</h1>
-<p>The confusion matrix displays the <strong>model confusion between each pair of intents</strong>. The confusion is
-defined as the number of utterances with a given label that are predicted as another label.</p>
+<p>The confusion matrix displays the <strong>model confusion between each pair of intents</strong>.
+The confusion is defined as the number of utterances with a given label that are predicted as another label.
+The prediction <a href="../../../key-concepts/outcomes/">outcome</a> colors are shown on the confusion matrix.</p>
+<p><img alt="Screenshot" src="../../../_static/images/exploration-space/confusion-matrix.png" /></p>
 <h2 id="normalization">Normalization</h2>
 <p>The toggle "Normalize" in the top right corner allows alternating between normalized and raw values.
 When normalized, the number of utterances is divided by to the total number of utterances
 with the given label.</p>
-<h2 id="class-ordering">Class Ordering</h2>
-<p>The default order for the rows and columns is determined based on the reverse Cuthill-Mckee algorithm, which will group as many classes as possible with similar confusion. The algorithm ignores all confusion values under 10%. The rejection class is also ignored and is always the last one in the order.</p>
-<p>Toggling off  "Reorder classes" disables the reordering and allows showing the confusion matrix according to the class order provided by the user.</p>
-<div class="admonition tip">
-<p class="admonition-title">Outcome colors</p>
-<p>The prediction <a href="../../../key-concepts/outcomes/">outcome</a> colors are shown on the confusion
-matrix.</p>
-</div>
-<p><img alt="Screenshot" src="../../../_static/images/exploration-space/confusion-matrix.png" /></p>
 <div class="admonition example">
 <p class="admonition-title">Example</p>
 <p>In this example, 45% of utterances labeled as <code>bill_due</code> were predicted as <code>bill_balance</code>.</p>
 </div>
+<h2 id="class-ordering">Class Ordering</h2>
+<p>The default order for the rows and columns is determined based on the reverse Cuthill-Mckee algorithm, which will group as many classes as possible with similar confusion. The algorithm ignores all confusion values under 10%. The rejection class is also ignored and is always the last one in the order.</p>
+<p>Toggling off  "Reorder classes" disables the reordering and allows showing the confusion matrix according to the class order provided by the user.</p>
+<h2 id="interaction">Interaction</h2>
+<p>Users can click on any confusion matrix cell, row, or column to filter the data accordingly.
+For example, clicking on a row label will filter the utterances with that specific label.</p>
 
 
 
