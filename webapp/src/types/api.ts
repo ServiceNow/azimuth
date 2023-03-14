@@ -72,6 +72,10 @@ export type SimilarUtterancesResponse =
 export type SmartTag = components["schemas"]["SmartTag"];
 export type StatusResponse = components["schemas"]["StatusResponse"];
 export type SupportedLanguage = components["schemas"]["SupportedLanguage"];
+export type SupportedModelContract =
+  components["schemas"]["SupportedModelContract"];
+export type SupportedSpacyModels =
+  components["schemas"]["SupportedSpacyModels"];
 export type TopWordsResponse = components["schemas"]["TopWordsResponse"];
 export type TopWordsResult = components["schemas"]["TopWordsResult"];
 export type Utterance = components["schemas"]["Utterance"];
