@@ -151,6 +151,7 @@ const displayReadonlyFields = (label: string, value: string | null) => (
     size="small"
     variant="standard"
     label={label}
+    InputLabelProps={{ shrink: true }}
     value={String(value)}
     InputProps={{
       readOnly: true,
@@ -190,6 +191,7 @@ const NumberField: React.FC<
       type="number"
       className="fixedWidthInput"
       title="" // Overwrite any default input validation tooltip
+      InputLabelProps={{ shrink: true }}
       value={stringValue}
       {...(units && {
         InputProps: {
