@@ -43,6 +43,8 @@ import {
   AzimuthConfig,
   PipelineDefinition,
   SupportedLanguage,
+  SupportedModelContract,
+  SupportedSpacyModels,
 } from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
@@ -78,6 +80,15 @@ type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
+const SUPPORTED_MODEL_CONTRACT: SupportedModelContract[] = [
+  "hf_text_classification",
+  "file_based_text_classification",
+  "custom_text_classification",
+];
+const SUPPORTED_SPACY_MODELS: SupportedSpacyModels[] = [
+  "en_core_web_sm",
+  "fr_core_news_md",
+];
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -482,6 +493,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     <StringField
       label={config === "columns" ? "" : field}
       value={String(value)}
+      disabled={isUpdatingConfig}
       onChange={(newValue) =>
         config
           ? setPartialConfig({
@@ -506,8 +518,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     value: string | null
   ) => (
     <StringField
+      key={pipelineIndex}
       label={field}
       value={String(value)}
+      disabled={isUpdatingConfig}
       onChange={(newValue) =>
         field === "class_name" || field === "remote"
           ? setPartialConfig({
@@ -657,10 +671,28 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayStringOnlyFields(
-            "model_contract",
-            resultingConfig.model_contract
-          )}
+          <FormControl variant="standard" className="fixedWidthInput">
+            <InputLabel id="model-contract-input-label">
+              model_contract
+            </InputLabel>
+            <Select
+              value={resultingConfig.model_contract}
+              disabled={isUpdatingConfig}
+              labelId="model-contract-input-label"
+              onChange={({ target: { value } }) =>
+                setPartialConfig({
+                  ...partialConfig,
+                  model_contract: value as SupportedModelContract,
+                })
+              }
+            >
+              {SUPPORTED_MODEL_CONTRACT.map((modelContract) => (
+                <MenuItem key={modelContract} value={modelContract}>
+                  {modelContract}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           {displayStringOnlyFields(
             "saliency_layer",
             resultingConfig.saliency_layer
@@ -831,6 +863,37 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             displayKeywordArguments(field, value)
           ) : config === "behavioral_testing" ? (
             displayReadonlyFields(field, value)
+          ) : field === "spacy_model" ? (
+            <FormControl
+              key={field}
+              variant="standard"
+              className="fixedWidthInput"
+            >
+              <InputLabel id="spacy-model-input-label">{field}</InputLabel>
+              <Select
+                value={value}
+                disabled={isUpdatingConfig}
+                labelId="spacy-model-input-label"
+                onChange={({ target: { value } }) => {
+                  setPartialConfig({
+                    ...partialConfig,
+                    syntax: {
+                      ...resultingConfig.syntax,
+                      spacy_model: value as SupportedSpacyModels,
+                    },
+                  });
+                }}
+              >
+                <MenuItem value=" ">
+                  <em>None</em>
+                </MenuItem>
+                {SUPPORTED_SPACY_MODELS.map((spacyModel) => (
+                  <MenuItem key={spacyModel} value={spacyModel}>
+                    {spacyModel}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           ) : (
             displayStringOnlyFields(field, value, config)
           )
