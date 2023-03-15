@@ -1,7 +1,6 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from datetime import datetime, timezone
 from typing import Dict, Optional
 
 import jsonlines
@@ -10,6 +9,7 @@ from datasets import DatasetDict
 
 from azimuth.config import (
     AzimuthConfig,
+    AzimuthConfigHistory,
     ModelContractConfig,
     PerturbationTestingConfig,
     SimilarityConfig,
@@ -59,10 +59,9 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
 
 def save_config(azimuth_config: AzimuthConfig):
     """Append config to config_history.jsonl to retrieve past configs."""
-    current_time_utc = str(datetime.now(timezone.utc))
     # TODO https://stackoverflow.com/questions/2333872/how-to-make-file-creation-an-atomic-operation
     with jsonlines.open(azimuth_config.get_config_history_path(), mode="a") as f:
-        f.write({"created_on": current_time_utc, "config": azimuth_config.dict()})
+        f.write(AzimuthConfigHistory(config=azimuth_config).dict())
 
 
 def update_config(old_config: AzimuthConfig, partial_config: Dict) -> AzimuthConfig:
