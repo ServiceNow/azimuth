@@ -79,8 +79,8 @@ class DatasetSplitManager:
         self._tags = initial_tags
         self._prediction_tags = initial_prediction_tags or []
         self.config = config
-        self._artifact_path = config.get_artifact_path()
-        self._hf_path = pjoin(self._artifact_path, "HF_datasets", self.name)
+        self._project_path = config.get_project_path()
+        self._hf_path = pjoin(self._project_path, "HF_datasets", self.name)
         self._base_dataset_path = pjoin(self._hf_path, "base_tables")
         os.makedirs(self._base_dataset_path, exist_ok=True)
         self._save_path = pjoin(self._base_dataset_path, "cache_ds.arrow")
@@ -211,10 +211,10 @@ class DatasetSplitManager:
         Returns:
             Local path to the csv.
         """
-        log.info("Saving dataset_split as csv.", path=self._artifact_path)
+        log.info("Saving dataset_split as csv.", path=self._project_path)
         file_label = time.strftime("%Y%m%d_%H%M%S", time.localtime())
         pt = pjoin(
-            self._artifact_path,
+            self._project_path,
             f"azimuth_export_{self.config.name}_{self.name}_{file_label}.csv",
         )
 
@@ -605,10 +605,10 @@ class DatasetSplitManager:
         Returns:
             Path to the csv file.
         """
-        log.info("Saving proposed actions as csv.", path=self._artifact_path)
+        log.info("Saving proposed actions as csv.", path=self._project_path)
         timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
         path = pjoin(
-            self._artifact_path,
+            self._project_path,
             f"azimuth_export_{self.config.name}_{self.name}_proposed_actions_{timestamp}.csv",
         )
 

@@ -20,10 +20,10 @@ def test_ds_loading(simple_text_config):
     assert isinstance(ds, Dataset)
     assert len(ds) >= 1
 
-    config_key = mod.config.to_hash()
-    assert len(mod.artifact_manager.dataset_split_managers_mapping[config_key]) == 1
+    project_hash = mod.config.get_project_hash()
+    assert len(mod.artifact_manager.dataset_split_managers_mapping[project_hash]) == 1
     mod.clear_cache()
-    assert mod.artifact_manager.dataset_split_managers_mapping.get(config_key) is None
+    assert mod.artifact_manager.dataset_split_managers_mapping.get(project_hash) is None
 
 
 def test_model_loading(simple_text_config):

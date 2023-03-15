@@ -77,7 +77,7 @@ def get_perturbed_utterances(
         mocked_test_result += perturbation_test_results
 
     pt = pjoin(
-        config.get_artifact_path(),
+        config.get_project_path(),
         "azimuth_generate_perturbation_tests.json",
     )
     with open(pt, "w") as f:

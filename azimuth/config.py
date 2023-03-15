@@ -277,7 +277,7 @@ class ProjectConfig(AzimuthBaseSettings):
             )
         return copy
 
-    def to_hash(self):
+    def get_project_hash(self):
         return md5_hash(
             self.dict(
                 include=ProjectConfig.__fields__.keys(),
@@ -305,7 +305,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # Disable configuration changes
     read_only_config: bool = Field(False, exclude_from_cache=True)
 
-    def get_artifact_path(self) -> str:
+    def get_project_path(self) -> str:
         """Generate a path for caching.
 
         The path contains the project name, the task and a subset of a hash of the project config.
@@ -314,7 +314,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         Returns:
             Path to a folder where it is safe to store data.
         """
-        path = pjoin(self.artifact_path, f"{self.name}_{self.to_hash()[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{self.get_project_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
 
