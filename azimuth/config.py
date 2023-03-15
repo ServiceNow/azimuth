@@ -461,7 +461,8 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
         config_history_path = cfg.get_config_history_path()
         try:
             with jsonlines.open(config_history_path, mode="r") as config_history:
-                *_, last_config = config_history
+                *_, last_config_info = config_history
+                last_config = last_config_info["config"]
         except (FileNotFoundError, ValueError):
             log.info("Empty or invalid config history.")
         else:

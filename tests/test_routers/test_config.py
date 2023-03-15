@@ -265,8 +265,8 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     with jsonlines.open(jsonl_file_path, "r") as reader:
         loaded_configs = list(reader)
     assert len(loaded_configs) == initial_config_count + 1, "Config have been modified once."
-    assert loaded_configs[-1]["model_contract"] == "file_based_text_classification"
-    assert not loaded_configs[-1]["pipelines"]
+    assert loaded_configs[-1]["config"]["model_contract"] == "file_based_text_classification"
+    assert not loaded_configs[-1]["config"]["pipelines"]
 
     # Revert config change
     _ = client.patch(
