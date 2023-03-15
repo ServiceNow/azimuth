@@ -308,7 +308,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     def get_project_path(self) -> str:
         """Generate a path for caching.
 
-        The path contains the project name, the task and a subset of a hash of the project config.
+        The path contains the project name and a subset of a hash of the project config.
         Additional fields in the config won't result in a different hash.
 
         Returns:
