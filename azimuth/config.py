@@ -4,6 +4,7 @@
 
 import argparse
 import os
+from datetime import datetime, timezone
 from enum import Enum
 from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
@@ -439,6 +440,11 @@ class AzimuthConfig(
         return values
 
 
+class AzimuthConfigHistory(AzimuthBaseSettings):
+    config: AzimuthConfig
+    created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)))
+
+
 def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:
     """
     Load the configuration from a file or make a pre-built one from a folder.
@@ -461,13 +467,12 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
         config_history_path = cfg.get_config_history_path()
         try:
             with jsonlines.open(config_history_path, mode="r") as config_history:
-                *_, last_config_info = config_history
-                last_config = last_config_info["config"]
+                *_, last_config = config_history
         except (FileNotFoundError, ValueError):
             log.info("Empty or invalid config history.")
         else:
             log.info(f"Loading latest config from {config_history_path}.")
-            cfg = AzimuthConfig.parse_obj(last_config)
+            cfg = AzimuthConfigHistory.parse_obj(last_config).config
 
     log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
 
