@@ -22,6 +22,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  SelectProps,
   TextField,
   TextFieldProps,
   Tooltip,
@@ -99,7 +100,7 @@ const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
 ];
 
 const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
-  <Box display="grid" gap={2} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
+  <Box display="grid" gap={4} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
     {children}
   </Box>
 );
@@ -176,33 +177,56 @@ const displayReadonlyFields = (label: string, value: string | null) => (
     }}
   />
 );
+const SelectField: React.FC<
+  Omit<SelectProps, "onChange"> & {
+    label: string;
+    value: any;
+    onChange: (newValue: any) => void;
+    noneValue?: string;
+    children: React.ReactElement<typeof MenuItem>[];
+  }
+> = ({ label, value, onChange, children, noneValue, ...props }) => (
+  <FormControl variant="standard" className="fixedWidthInput">
+    <InputLabel id={`${label}-input-label`} shrink={true}>
+      {label}
+    </InputLabel>
+    <Select
+      value={value}
+      labelId={`${label}-input-label`}
+      onChange={({ target: { value } }) => onChange(value)}
+      {...props}
+    >
+      {noneValue && (
+        <MenuItem value="">
+          <em>None</em>
+        </MenuItem>
+      )}
+      {children}
+    </Select>
+  </FormControl>
+);
 
 const StringField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
     label: string;
-    value: string | null;
+    value: string;
     onChange: (newValue: string) => void;
   }
-> = ({ label, value, onChange, ...props }) => {
-  return (
-    <TextField
-      key={label}
-      size="small"
-      variant="standard"
-      className="fixedWidthInput"
-      label={label}
-      value={String(value)}
-      inputProps={{
-        sx: {
-          textOverflow: "ellipsis",
-          ...(value === null && { fontStyle: "italic" }),
-        },
-      }}
-      onChange={({ target: { value } }) => onChange(value)}
-      {...props}
-    />
-  );
-};
+> = ({ label, value, onChange, ...props }) => (
+  <TextField
+    size="small"
+    variant="standard"
+    label={label}
+    value={String(value)}
+    inputProps={{
+      sx: {
+        textOverflow: "ellipsis",
+      },
+    }}
+    onChange={({ target: { value } }) => onChange(value)}
+    {...props}
+  />
+);
 
 const NumberField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
@@ -373,13 +397,15 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     />
   );
 
-  const displayStringOnlyFields = (
+  const displayStringField = (
     field: string,
     value: string | null,
-    config?: SubConfigKeys
+    config?: SubConfigKeys,
+    label: string = field
   ) => (
     <StringField
-      label={config === "columns" ? "" : field}
+      key={field}
+      label={label}
       value={String(value)}
       disabled={isUpdatingConfig}
       onChange={(newValue) =>
@@ -399,11 +425,13 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     />
   );
 
-  const displayPipelineStringOnlyFields = (
+  const displayPipelineStringField = (
     pipelineIndex: number,
     pipeline: PipelineDefinition,
     field: string,
-    value: string | null
+    value: string | null,
+    subPipeline?: keyof PipelineDefinition,
+    postprocessorIdx?: number
   ) => (
     <StringField
       key={pipelineIndex}
@@ -411,32 +439,31 @@ const Settings: React.FC<Props> = ({ onClose }) => {
       value={String(value)}
       disabled={isUpdatingConfig}
       onChange={(newValue) =>
-        field === "class_name" || field === "remote"
-          ? setPartialConfig({
-              ...partialConfig,
-              pipelines: [
-                ...resultingConfig.pipelines!.slice(0, pipelineIndex),
-                {
-                  ...pipeline,
-                  model: {
-                    ...pipeline.model,
-                    [field]: newValue,
-                  },
-                },
-                ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
-              ],
-            })
-          : setPartialConfig({
-              ...partialConfig,
-              pipelines: [
-                ...resultingConfig.pipelines!.slice(0, pipelineIndex),
-                {
-                  ...pipeline,
-                  [field]: newValue,
-                },
-                ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
-              ],
-            })
+        setPartialConfig({
+          ...partialConfig,
+          pipelines: [
+            ...resultingConfig.pipelines!.slice(0, pipelineIndex),
+            {
+              name: subPipeline ? pipeline.name : newValue,
+              model: {
+                ...pipeline.model,
+                ...(subPipeline === "model" && { [field]: newValue }),
+              },
+              postprocessors:
+                postprocessorIdx && subPipeline === "postprocessors"
+                  ? [
+                      ...pipeline.postprocessors!.slice(0, postprocessorIdx),
+                      {
+                        ...pipeline.postprocessors![postprocessorIdx],
+                        [field]: newValue,
+                      },
+                      ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
+                    ]
+                  : pipeline.postprocessors,
+            },
+            ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+          ],
+        })
       }
     />
   );
@@ -509,39 +536,47 @@ const Settings: React.FC<Props> = ({ onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayStringOnlyFields("name", resultingConfig.name)}
-          {displayStringOnlyFields(
+          {displayStringField("name", resultingConfig.name)}
+          {displayStringField(
             "rejection_class",
             resultingConfig.rejection_class
           )}
-          <Box display="flex" flexDirection="column">
+          {/* <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
-              <Typography variant="body2">text_input:</Typography>
-              {displayStringOnlyFields(
-                "text_input",
-                resultingConfig.columns.text_input,
-                "columns"
-              )}
-              <Typography variant="body2">label:</Typography>
-              {displayStringOnlyFields(
-                "label",
-                resultingConfig.columns.label,
-                "columns"
-              )}
+              <React.Fragment key="text_input">
+                <Typography key="txtInput" variant="body2">
+                  text_input:
+                </Typography>
+                {displayStringField(
+                  "text_input",
+                  resultingConfig.columns.text_input,
+                  "columns",
+                  ""
+                )}
+              </React.Fragment>
+              <React.Fragment key="label">
+                <Typography variant="body2">label:</Typography>
+                {displayStringField(
+                  "label",
+                  resultingConfig.columns.label,
+                  "columns",
+                  ""
+                )}
+              </React.Fragment>
             </KeyValuePairs>
-          </Box>
+          </Box> */}
         </Columns>
       </FormGroup>
       {displaySectionTitle("Dataset")}
       <FormGroup>
         <Columns columns={3}>
-          {displayStringOnlyFields(
+          {displayStringField(
             "class_name",
             resultingConfig.dataset.class_name,
             "dataset"
           )}
-          {displayStringOnlyFields(
+          {displayStringField(
             "remote",
             resultingConfig.dataset.remote,
             "dataset"
@@ -559,32 +594,24 @@ const Settings: React.FC<Props> = ({ onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          <FormControl variant="standard" className="fixedWidthInput">
-            <InputLabel id="model-contract-input-label">
-              model_contract
-            </InputLabel>
-            <Select
-              value={resultingConfig.model_contract}
-              disabled={isUpdatingConfig}
-              labelId="model-contract-input-label"
-              onChange={({ target: { value } }) =>
-                setPartialConfig({
-                  ...partialConfig,
-                  model_contract: value as SupportedModelContract,
-                })
-              }
-            >
-              {SUPPORTED_MODEL_CONTRACT.map((modelContract) => (
-                <MenuItem key={modelContract} value={modelContract}>
-                  {modelContract}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {displayStringOnlyFields(
-            "saliency_layer",
-            resultingConfig.saliency_layer
-          )}
+          <SelectField
+            label="model_contract"
+            value={resultingConfig.model_contract}
+            disabled={isUpdatingConfig}
+            onChange={(newValue) => {
+              setPartialConfig({
+                ...partialConfig,
+                model_contract: newValue as SupportedModelContract,
+              });
+            }}
+          >
+            {SUPPORTED_MODEL_CONTRACT.map((modelContract) => (
+              <MenuItem key={modelContract} value={modelContract}>
+                {modelContract}
+              </MenuItem>
+            ))}
+          </SelectField>
+          {displayStringField("saliency_layer", resultingConfig.saliency_layer)}
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">uncertainty</Typography>
             <KeyValuePairs>
@@ -629,7 +656,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                   {displaySectionTitle("General")}
                   <FormGroup>
                     <Columns columns={3}>
-                      {displayPipelineStringOnlyFields(
+                      {displayPipelineStringField(
                         pipelineIndex,
                         pipeline,
                         "name",
@@ -642,17 +669,19 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                   {displaySectionTitle("Model")}
                   <FormGroup>
                     <Columns columns={3}>
-                      {displayPipelineStringOnlyFields(
+                      {displayPipelineStringField(
                         pipelineIndex,
                         pipeline,
                         "class_name",
-                        pipeline.model.class_name
+                        pipeline.model.class_name,
+                        "model"
                       )}
-                      {displayPipelineStringOnlyFields(
+                      {displayPipelineStringField(
                         pipelineIndex,
                         pipeline,
                         "remote",
-                        pipeline.model.remote
+                        pipeline.model.remote,
+                        "model"
                       )}
                       {pipeline.model.args.length > 0 &&
                         displayArgumentsList("args", pipeline.model.args)}
@@ -673,9 +702,13 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                     )?.map((postprocessor, index) => (
                       <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
                         <Columns columns={3}>
-                          {displayReadonlyFields(
+                          {displayPipelineStringField(
+                            pipelineIndex,
+                            pipeline,
                             "class_name",
-                            postprocessor.class_name
+                            postprocessor.class_name,
+                            "postprocessors",
+                            index
                           )}
                           {"temperature" in postprocessor &&
                             displayPostprocessorNumberField(
@@ -749,41 +782,33 @@ const Settings: React.FC<Props> = ({ onClose }) => {
             displayArgumentsList(field, value)
           ) : typeof value === "object" ? (
             displayKeywordArguments(field, value)
-          ) : config === "behavioral_testing" ? (
+          ) : field === "seed" ? (
             displayReadonlyFields(field, value)
           ) : field === "spacy_model" ? (
-            <FormControl
+            <SelectField
               key={field}
-              variant="standard"
-              className="fixedWidthInput"
+              label={field}
+              value={value}
+              disabled={isUpdatingConfig}
+              onChange={(newValue) =>
+                setPartialConfig({
+                  ...partialConfig,
+                  syntax: {
+                    ...resultingConfig.syntax,
+                    spacy_model: newValue as SupportedSpacyModels,
+                  },
+                })
+              }
+              noneValue="None"
             >
-              <InputLabel id="spacy-model-input-label">{field}</InputLabel>
-              <Select
-                value={value}
-                disabled={isUpdatingConfig}
-                labelId="spacy-model-input-label"
-                onChange={({ target: { value } }) => {
-                  setPartialConfig({
-                    ...partialConfig,
-                    syntax: {
-                      ...resultingConfig.syntax,
-                      spacy_model: value as SupportedSpacyModels,
-                    },
-                  });
-                }}
-              >
-                <MenuItem value=" ">
-                  <em>None</em>
+              {SUPPORTED_SPACY_MODELS.map((spacyModel) => (
+                <MenuItem key={spacyModel} value={spacyModel}>
+                  {spacyModel}
                 </MenuItem>
-                {SUPPORTED_SPACY_MODELS.map((spacyModel) => (
-                  <MenuItem key={spacyModel} value={spacyModel}>
-                    {spacyModel}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              ))}
+            </SelectField>
           ) : (
-            displayStringOnlyFields(field, value, config)
+            displayStringField(field, value, config)
           )
         )}
       </Columns>
@@ -793,23 +818,18 @@ const Settings: React.FC<Props> = ({ onClose }) => {
   const displayAnalysesCustomizationGeneralSection = () => (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
-        <FormControl variant="standard" className="fixedWidthInput">
-          <InputLabel id="language-input-label">language</InputLabel>
-          <Select
-            disabled={isUpdatingConfig}
-            value={language ?? resultingConfig.language}
-            labelId="language-input-label"
-            onChange={(event) =>
-              setLanguage(event.target.value as SupportedLanguage)
-            }
-          >
-            {SUPPORTED_LANGUAGES.map((language) => (
-              <MenuItem key={language} value={language}>
-                {language}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <SelectField
+          label="language"
+          value={language ?? resultingConfig.language}
+          disabled={isUpdatingConfig}
+          onChange={(newValue) => setLanguage(newValue as SupportedLanguage)}
+        >
+          {SUPPORTED_LANGUAGES.map((language) => (
+            <MenuItem key={language} value={language}>
+              {language}
+            </MenuItem>
+          ))}
+        </SelectField>
         <Box display="flex" gap={1}>
           <Warning color="warning" />
           <Typography variant="body2">
@@ -836,7 +856,6 @@ const Settings: React.FC<Props> = ({ onClose }) => {
     </>
   );
 
-  console.log("partialconfig=>", partialConfig);
   return (
     <>
       <DialogTitle id="config-dialog-title">
