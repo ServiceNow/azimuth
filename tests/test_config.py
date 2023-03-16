@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from glob import glob
 from os.path import join as pjoin
 
@@ -13,6 +14,7 @@ from azimuth.config import (
     TemperatureScaling,
     ThresholdConfig,
     config_defaults_per_language,
+    load_azimuth_config,
 )
 from azimuth.utils.project import save_config, update_config
 
@@ -226,16 +228,18 @@ def test_config_min_max_values():
 
 
 def test_update_config(tiny_text_config, monkeypatch, dask_client):
+    config_history_path = tiny_text_config.get_config_history_path()
+
     # Changing config for a first time
     partial_config = {"similarity": None}
     new_config = update_config(tiny_text_config, partial_config)
     assert not new_config.similarity
     save_config(new_config)
 
-    with jsonlines.open(f"{new_config.artifact_path}/config_history.jsonl", "r") as reader:
+    with jsonlines.open(config_history_path, "r") as reader:
         all_configs = list(reader)
     assert len(all_configs) == 1
-    assert all_configs[0] == new_config
+    assert all_configs[0]["config"] == new_config
 
     # Changing config for a second time
     partial_config = {"dataset_warnings": {"min_num_per_class": 40}}
@@ -243,8 +247,25 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
     assert new_config.dataset_warnings.min_num_per_class == 40
     save_config(new_config)
 
-    with jsonlines.open(f"{new_config.artifact_path}/config_history.jsonl", "r") as reader:
+    with jsonlines.open(config_history_path, "r") as reader:
         all_configs = list(reader)
 
     assert len(all_configs) == 2
-    assert all_configs[-1] == new_config
+    assert all_configs[-1]["config"] == new_config
+
+    assert datetime.fromisoformat(all_configs[-1]["created_on"]) > datetime.fromisoformat(
+        all_configs[0]["created_on"]
+    ), "Second config should be created on after the first one."
+
+
+def test_load_from_config_history(tiny_text_config):
+    # With no config history, the loaded config is the default, not the tiny_text_config.
+    cfg = load_azimuth_config(config_path=None, load_config_history=True)
+    assert cfg == AzimuthConfig()
+
+    # With a config history, the loaded config is the last one from the config history.
+    save_config(tiny_text_config)
+    os.environ["ARTIFACT_PATH"] = tiny_text_config.artifact_path
+    cfg = load_azimuth_config(config_path=None, load_config_history=True)
+    assert cfg == tiny_text_config
+    del os.environ["ARTIFACT_PATH"]

@@ -272,7 +272,7 @@ def test_multi_tables(a_text_dataset, simple_text_config):
     assert "is_potato" in dm.get_dataset_split(simple_table_key).column_names
 
     # Check that there are 2 tables created.
-    assert "HF_datasets" in os.listdir(dm._artifact_path)
+    assert "HF_datasets" in os.listdir(dm._project_path)
     assert len(os.listdir(os.path.join(dm._hf_path, "prediction_tables"))) == 2
 
     with pytest.raises(ValueError, match="Length mismatch"):

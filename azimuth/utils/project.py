@@ -9,6 +9,7 @@ from datasets import DatasetDict
 
 from azimuth.config import (
     AzimuthConfig,
+    AzimuthConfigHistory,
     ModelContractConfig,
     PerturbationTestingConfig,
     SimilarityConfig,
@@ -60,7 +61,7 @@ def save_config(azimuth_config: AzimuthConfig):
     """Append config to config_history.jsonl to retrieve past configs."""
     # TODO https://stackoverflow.com/questions/2333872/how-to-make-file-creation-an-atomic-operation
     with jsonlines.open(azimuth_config.get_config_history_path(), mode="a") as f:
-        f.write(azimuth_config.dict())
+        f.write(AzimuthConfigHistory(config=azimuth_config).dict())
 
 
 def update_config(old_config: AzimuthConfig, partial_config: Dict) -> AzimuthConfig:
