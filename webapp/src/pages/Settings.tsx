@@ -177,34 +177,6 @@ const displayReadonlyFields = (label: string, value: string | null) => (
     }}
   />
 );
-const SelectField: React.FC<
-  Omit<SelectProps, "onChange"> & {
-    label: string;
-    value: any;
-    onChange: (newValue: any) => void;
-    noneValue?: string;
-    children: React.ReactElement<typeof MenuItem>[];
-  }
-> = ({ label, value, onChange, children, noneValue, ...props }) => (
-  <FormControl variant="standard" className="fixedWidthInput">
-    <InputLabel id={`${label}-input-label`} shrink={true}>
-      {label}
-    </InputLabel>
-    <Select
-      value={value}
-      labelId={`${label}-input-label`}
-      onChange={({ target: { value } }) => onChange(value)}
-      {...props}
-    >
-      {noneValue && (
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
-      )}
-      {children}
-    </Select>
-  </FormControl>
-);
 
 const StringField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
@@ -594,7 +566,8 @@ const Settings: React.FC<Props> = ({ onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          <SelectField
+          <StringField
+            select
             label="model_contract"
             value={resultingConfig.model_contract}
             disabled={isUpdatingConfig}
@@ -610,7 +583,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                 {modelContract}
               </MenuItem>
             ))}
-          </SelectField>
+          </StringField>
           {displayStringField("saliency_layer", resultingConfig.saliency_layer)}
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">uncertainty</Typography>
@@ -785,7 +758,8 @@ const Settings: React.FC<Props> = ({ onClose }) => {
           ) : field === "seed" ? (
             displayReadonlyFields(field, value)
           ) : field === "spacy_model" ? (
-            <SelectField
+            <StringField
+              select
               key={field}
               label={field}
               value={value}
@@ -799,14 +773,13 @@ const Settings: React.FC<Props> = ({ onClose }) => {
                   },
                 })
               }
-              noneValue="None"
             >
               {SUPPORTED_SPACY_MODELS.map((spacyModel) => (
                 <MenuItem key={spacyModel} value={spacyModel}>
                   {spacyModel}
                 </MenuItem>
               ))}
-            </SelectField>
+            </StringField>
           ) : (
             displayStringField(field, value, config)
           )
@@ -818,8 +791,10 @@ const Settings: React.FC<Props> = ({ onClose }) => {
   const displayAnalysesCustomizationGeneralSection = () => (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
-        <SelectField
+        <StringField
+          select
           label="language"
+          className="fixedWidthInput"
           value={language ?? resultingConfig.language}
           disabled={isUpdatingConfig}
           onChange={(newValue) => setLanguage(newValue as SupportedLanguage)}
@@ -829,7 +804,7 @@ const Settings: React.FC<Props> = ({ onClose }) => {
               {language}
             </MenuItem>
           ))}
-        </SelectField>
+        </StringField>
         <Box display="flex" gap={1}>
           <Warning color="warning" />
           <Typography variant="body2">
