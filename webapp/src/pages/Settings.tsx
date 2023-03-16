@@ -180,16 +180,13 @@ const displayReadonlyFields = (label: string, value: string | null) => (
 
 const StringField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
-    label: string;
     value: string;
     onChange: (newValue: string) => void;
   }
-> = ({ label, value, onChange, ...props }) => (
+> = ({ onChange, ...props }) => (
   <TextField
     size="small"
     variant="standard"
-    label={label}
-    value={String(value)}
     inputProps={{
       sx: {
         textOverflow: "ellipsis",
