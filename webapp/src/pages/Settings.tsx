@@ -175,6 +175,56 @@ const StringField: React.FC<
     {...props}
   />
 );
+const SelectField: React.FC<
+  Omit<SelectProps, "onChange"> & {
+    label: string;
+    value: any;
+    onChange: (newValue: any) => void;
+    noneValue?: string;
+    children: React.ReactElement<typeof MenuItem>[];
+  }
+> = ({ label, value, onChange, children, noneValue, ...props }) => (
+  <FormControl variant="standard" className="fixedWidthInput">
+    <InputLabel id={`${label}-input-label`} shrink={true}>
+      {label}
+    </InputLabel>
+    <Select
+      value={value}
+      labelId={`${label}-input-label`}
+      onChange={({ target: { value } }) => onChange(value)}
+      {...props}
+    >
+      {noneValue && (
+        <MenuItem value="">
+          <em>None</em>
+        </MenuItem>
+      )}
+      {children}
+    </Select>
+  </FormControl>
+);
+
+const StringField: React.FC<
+  Omit<TextFieldProps, "onChange"> & {
+    label: string;
+    value: string;
+    onChange: (newValue: string) => void;
+  }
+> = ({ label, value, onChange, ...props }) => (
+  <TextField
+    size="small"
+    variant="standard"
+    label={label}
+    value={String(value)}
+    inputProps={{
+      sx: {
+        textOverflow: "ellipsis",
+      },
+    }}
+    onChange={({ target: { value } }) => onChange(value)}
+    {...props}
+  />
+);
 
 const NumberField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
@@ -602,7 +652,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             "rejection_class",
             resultingConfig.rejection_class
           )}
-          <Box display="flex" flexDirection="column">
+          {/* <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
               <Typography variant="body2">text_input:</Typography>
@@ -620,7 +670,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 ""
               )}
             </KeyValuePairs>
-          </Box>
+          </Box> */}
         </Columns>
       </FormGroup>
       {displaySectionTitle("Dataset")}
