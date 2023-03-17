@@ -185,6 +185,7 @@ const StringField: React.FC<
   <TextField
     size="small"
     variant="standard"
+    InputLabelProps={{ shrink: true }}
     inputProps={{
       sx: {
         textOverflow: "ellipsis",
@@ -512,7 +513,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     postprocessorIdx?: number
   ) => (
     <StringField
-      key={pipelineIndex}
+      key={field}
       label={field}
       value={String(value)}
       disabled={isUpdatingConfig}
