@@ -294,6 +294,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     artifact_path: str = Field(
         "cache",
         description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
+        exclude_from_cache=True,
     )
     # Batch size to use during inference.
     batch_size: int = Field(32, exclude_from_cache=True)
