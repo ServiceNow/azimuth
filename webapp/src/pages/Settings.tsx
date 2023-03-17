@@ -621,7 +621,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             "rejection_class",
             resultingConfig.rejection_class
           )}
-          {/* <Box display="flex" flexDirection="column">
+          <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
               <Typography variant="body2">text_input:</Typography>
@@ -639,7 +639,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 ""
               )}
             </KeyValuePairs>
-          </Box> */}
+          </Box>
         </Columns>
       </FormGroup>
       {displaySectionTitle("Dataset")}
