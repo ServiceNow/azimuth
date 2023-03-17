@@ -689,6 +689,9 @@ const Settings: React.FC<Props> = ({ onClose }) => {
       <DialogContent
         dividers
         sx={{
+          [`& .${formControlLabelClasses.root}`]: {
+            width: "fit-content",
+          },
           [`& .${formControlLabelClasses.labelPlacementStart}`]: {
             justifyContent: "flex-end",
             marginLeft: 0,
