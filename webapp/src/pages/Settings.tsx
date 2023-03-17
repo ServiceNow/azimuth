@@ -185,6 +185,7 @@ const StringField: React.FC<
   <TextField
     size="small"
     variant="standard"
+    InputLabelProps={{ shrink: true }}
     inputProps={{
       sx: {
         textOverflow: "ellipsis",
