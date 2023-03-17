@@ -287,7 +287,9 @@ export const api = createApi({
         fetchApi({ path: "/config", method: "patch" }),
         "Something went wrong updating config"
       ),
-      invalidatesTags: () => tagTypes,
+      // We invalidate Status first, so StatusCheck stops rendering the app if
+      // necessary. We await queryFulfilled before invalidating the other tags.
+      invalidatesTags: () => ["Status"],
       async onQueryStarted(
         { jobId, body: partialConfig },
         { dispatch, queryFulfilled }
@@ -334,7 +336,11 @@ export const api = createApi({
               Object.assign(draft, data);
             })
           );
-          dispatch(api.util.invalidateTags(["DatasetInfo"]));
+          dispatch(
+            api.util.invalidateTags(
+              tagTypes.filter((tag) => tag !== "Config" && tag !== "Status")
+            )
+          );
         } catch {
           patchConfig.undo();
           patchDatasetInfo.undo();

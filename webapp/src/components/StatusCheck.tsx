@@ -30,20 +30,20 @@ const STATUS_ICONS: Record<string, React.ReactElement> = {
 
 const StatusCheck: React.FC<Props> = ({ children }) => {
   const { jobId } = useParams<{ jobId: string }>();
-  const { data: status, refetch } = getStatusEndpoint.useQuery({ jobId });
+  const { data, isFetching, refetch } = getStatusEndpoint.useQuery({ jobId });
 
   React.useEffect(() => {
-    if (!status?.startupTasksReady) {
+    if (!data?.startupTasksReady) {
       const timer = setTimeout(refetch, 5000);
       return () => clearTimeout(timer);
     }
   });
 
-  if (!status) {
+  if (!data) {
     return <Loading />;
   }
 
-  if (!status.startupTasksReady) {
+  if (!data.startupTasksReady) {
     return (
       <Box
         display="flex"
@@ -77,14 +77,14 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
             columnGap={8}
             gridTemplateColumns="repeat(2, 1fr)"
           >
-            {Object.entries(status.startupTasksStatus).map(([task, status]) => (
+            {Object.entries(data.startupTasksStatus).map(([task, status]) => (
               <Box key={task} display="flex" alignItems="center" gap={1}>
                 <Tooltip title={status}>{STATUS_ICONS[status]}</Tooltip>
                 <Typography>{capitalize(task).replace(/_/g, " ")}</Typography>
               </Box>
             ))}
           </Box>
-          {Object.values(status.startupTasksStatus).every(
+          {Object.values(data.startupTasksStatus).every(
             (taskStatus) => taskStatus !== "pending"
           ) && (
             <Paper>
@@ -100,6 +100,12 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
         </Box>
       </Box>
     );
+  }
+
+  if (isFetching) {
+    // We can't be sure if the app is ready or not, so we don't render the
+    // children to avoid making other API calls that would fail.
+    return <Loading />;
   }
 
   return <>{children}</>;
