@@ -78,7 +78,7 @@ type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
-const SUPPORTED_MODEL_CONTRACT: SupportedModelContract[] = [
+const SUPPORTED_MODEL_CONTRACTS: SupportedModelContract[] = [
   "hf_text_classification",
   "file_based_text_classification",
   "custom_text_classification",
@@ -619,7 +619,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             "rejection_class",
             resultingConfig.rejection_class
           )}
-          {/* <Box display="flex" flexDirection="column">
+          <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
               <React.Fragment key="text_input">
@@ -643,7 +643,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 )}
               </React.Fragment>
             </KeyValuePairs>
-          </Box> */}
+          </Box>
         </Columns>
       </FormGroup>
       {displaySectionTitle("Dataset")}
@@ -684,7 +684,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               });
             }}
           >
-            {SUPPORTED_MODEL_CONTRACT.map((modelContract) => (
+            {SUPPORTED_MODEL_CONTRACTS.map((modelContract) => (
               <MenuItem key={modelContract} value={modelContract}>
                 {modelContract}
               </MenuItem>
