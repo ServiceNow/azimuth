@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timezone
 from enum import Enum
 from os.path import join as pjoin
-from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, TypeVar, Union
 
 import structlog
 from jsonlines import jsonlines
@@ -445,7 +445,9 @@ class AzimuthConfigHistory(AzimuthBaseSettings):
     created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)))
 
 
-def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:
+def load_azimuth_config(
+    config_path: Optional[str], load_config_history: bool
+) -> Tuple[AzimuthConfig, bool]:
     """
     Load the configuration from a file or make a pre-built one from a folder.
 
@@ -455,6 +457,7 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
 
     Returns:
         The loaded config.
+        Whether or not the config came from the config history.
 
     Raises:
         If the file does not exist or the prediction file are not present.
@@ -462,6 +465,7 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
     log.info("-------------Loading Config--------------")
     # Loading config from config_path if specified, or else from environment variables only.
     cfg = AzimuthConfig.parse_file(config_path) if config_path else AzimuthConfig()
+    came_from_config_history = False
 
     if load_config_history:
         config_history_path = cfg.get_config_history_path()
@@ -473,6 +477,7 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
         else:
             log.info(f"Loading latest config from {config_history_path}.")
             cfg = AzimuthConfigHistory.parse_obj(last_config).config
+            came_from_config_history = True
 
     log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
 
@@ -504,4 +509,4 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
     log.info(f"The following additional fields were set: {not_default_config_values}")
     log.info("-------------Config loaded--------------")
 
-    return cfg
+    return cfg, came_from_config_history

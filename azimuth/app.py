@@ -97,13 +97,13 @@ def start_app(config_path: Optional[str], load_config_history: bool, debug: bool
 
     log.info("🔭 Azimuth starting 🔭")
 
-    azimuth_config = load_azimuth_config(config_path, load_config_history)
+    azimuth_config, came_from_config_history = load_azimuth_config(config_path, load_config_history)
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
-    run_startup_tasks(azimuth_config, local_cluster, load_config_history)
+    run_startup_tasks(azimuth_config, local_cluster, came_from_config_history)
     assert_not_none(_task_manager).client.run(set_logger_config, level)
 
     app = create_app()
@@ -296,14 +296,15 @@ def run_validation(
 
 
 def run_startup_tasks(
-    azimuth_config: AzimuthConfig, cluster: SpecCluster, load_config_history: bool = False
+    azimuth_config: AzimuthConfig, cluster: SpecCluster, came_from_config_history: bool = False
 ):
     """Initialize managers, run validation and startup tasks.
 
     Args:
         azimuth_config: Config
         cluster: Cluster
-        load_config_history: Determine if config is loaded from history. If yes, we don't save it.
+        came_from_config_history: Whether or not the config came from the config history,
+            in which case we don't save it again.
 
     """
     initialize_managers(azimuth_config, cluster)
@@ -315,7 +316,7 @@ def run_startup_tasks(
     if _dataset_split_managers.get(DatasetSplitName.eval):
         run_validation(DatasetSplitName.eval, task_manager, azimuth_config)
 
-    if not load_config_history:
+    if not came_from_config_history:
         save_config(azimuth_config)  # Save only after the validation modules ran successfully
 
     global _startup_tasks, _ready_flag
