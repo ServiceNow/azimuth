@@ -260,12 +260,14 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
 
 def test_load_from_config_history(tiny_text_config):
     # With no config history, the loaded config is the default, not the tiny_text_config.
-    cfg = load_azimuth_config(config_path=None, load_config_history=True)
+    cfg, came_from_config_history = load_azimuth_config(config_path=None, load_config_history=True)
     assert cfg == AzimuthConfig()
+    assert not came_from_config_history
 
     # With a config history, the loaded config is the last one from the config history.
     save_config(tiny_text_config)
     os.environ["ARTIFACT_PATH"] = tiny_text_config.artifact_path
-    cfg = load_azimuth_config(config_path=None, load_config_history=True)
+    cfg, came_from_config_history = load_azimuth_config(config_path=None, load_config_history=True)
     assert cfg == tiny_text_config
+    assert came_from_config_history
     del os.environ["ARTIFACT_PATH"]
