@@ -105,6 +105,4 @@ def patch_config(
 def attribute_changed_in_config(
     attribute: str, partial_config: Dict[str, Any], config: AzimuthConfig
 ) -> bool:
-    return attribute in partial_config and partial_config[attribute] != config.__getattribute__(
-        attribute
-    )
+    return attribute in partial_config and partial_config[attribute] != getattr(config, attribute)
