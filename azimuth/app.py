@@ -134,6 +134,8 @@ def create_app() -> FastAPI:
         description="Azimuth API",
         version="1.0",
         default_response_class=JSONResponseIgnoreNan,
+        root_path=".",  # Tells Swagger UI and ReDoc to fetch the OpenAPI spec from ./openapi.json
+        # (relative) so it works through the front-end proxy.
     )
 
     # Setup routes
