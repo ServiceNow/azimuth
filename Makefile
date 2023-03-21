@@ -55,7 +55,7 @@ compose: build launch
 
 .PHONY: launch
 launch:
-	docker-compose -f docker-compose.yml $(COMPOSE_EXT) --env-file $(ENV_FILE) up
+	docker compose -f docker-compose.yml $(COMPOSE_EXT) --env-file $(ENV_FILE) up
 
 .PHONY: push
 push:
