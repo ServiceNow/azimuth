@@ -8,8 +8,20 @@ from typing import Dict, Optional
 import structlog
 from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
-from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_422_UNPROCESSABLE_ENTITY,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_503_SERVICE_UNAVAILABLE,
+)
 
 from azimuth.config import AzimuthConfig, load_azimuth_config
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -29,6 +41,42 @@ _task_manager: Optional[TaskManager] = None
 _startup_tasks: Optional[Dict[str, DaskModule]] = None
 _azimuth_config: Optional[AzimuthConfig] = None
 _ready_flag: Optional[Event] = None
+
+
+COMMON_HTTP_ERROR_CODES = (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    # The default handler for RequestValidationError was returning an HTTP_422_UNPROCESSABLE_ENTITY.
+    # We overwrite that handler with the following handle_validation_error(), which returns more
+    # conventional HTTP codes.
+    # This overwrites the default ValidationError response for 422 in the OpenAPI spec.
+    HTTP_422_UNPROCESSABLE_ENTITY,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_503_SERVICE_UNAVAILABLE,
+)
+
+
+class HTTPExceptionModel(BaseModel):
+    detail: str
+
+
+async def handle_validation_error(request: Request, exception: RequestValidationError):
+    return JSONResponse(
+        status_code=HTTP_404_NOT_FOUND  # for errors in paths, e.g., /dataset_splits/potato
+        if "path" in (error["loc"][0] for error in exception.errors())
+        else HTTP_400_BAD_REQUEST,  # for other errors like in query params, e.g., pipeline_index=-1
+        content={"detail": str(exception)},
+    )
+
+
+async def handle_internal_error(request: Request, exception: Exception):
+    # Don't expose this unexpected internal error as that could expose a security vulnerability.
+    return JSONResponse(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error"},
+    )
 
 
 def get_dataset_split_manager_mapping() -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
@@ -134,6 +182,11 @@ def create_app() -> FastAPI:
         description="Azimuth API",
         version="1.0",
         default_response_class=JSONResponseIgnoreNan,
+        responses={code: {"model": HTTPExceptionModel} for code in COMMON_HTTP_ERROR_CODES},
+        exception_handlers={
+            RequestValidationError: handle_validation_error,
+            HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
+        },
         root_path=".",  # Tells Swagger UI and ReDoc to fetch the OpenAPI spec from ./openapi.json
         # (relative) so it works through the front-end proxy.
     )

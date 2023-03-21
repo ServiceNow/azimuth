@@ -82,4 +82,3 @@ export type UtteranceCountPerFilterValue =
   components["schemas"]["UtteranceCountPerFilterValue"];
 export type UtterancesSortableColumn =
   components["schemas"]["UtterancesSortableColumn"];
-export type ValidationError = components["schemas"]["ValidationError"];
