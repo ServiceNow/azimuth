@@ -440,6 +440,54 @@ class AzimuthConfig(
             similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
         return values
 
+    @classmethod
+    def load(cls, config_path: Optional[str], load_config_history: bool) -> "AzimuthConfig":
+        # Loading config from config_path if specified, or else from environment variables only.
+        cfg = cls.parse_file(config_path) if config_path else cls()
+
+        if load_config_history:
+            config_history_path = cfg.get_config_history_path()
+            try:
+                with jsonlines.open(config_history_path, mode="r") as config_history:
+                    *_, last_config = config_history
+            except (FileNotFoundError, ValueError):
+                log.info("Empty or invalid config history.")
+            else:
+                log.info(f"Loading latest config from {config_history_path}.")
+                cfg = AzimuthConfigHistory.parse_obj(last_config).config
+
+        return cfg
+
+    def log_info(self):
+        log.info(f"Config loaded for {self.name} with {self.model_contract} as a model contract.")
+
+        if self.dataset:
+            remote_mention = "" if not self.dataset.remote else f"from {self.dataset.remote} "
+            log.info(
+                f"Dataset will be loaded with {self.dataset.class_name} "
+                + remote_mention
+                + f"with the following args and kwargs: {self.dataset.args} {self.dataset.kwargs}."
+            )
+
+        if self.pipelines:
+            for pipeline_idx, pipeline in enumerate(self.pipelines):
+                remote_pipeline = self.pipelines[pipeline_idx].model.remote
+                remote_mention = "" if not remote_pipeline else f"from {remote_pipeline} "
+                log.info(
+                    f"Pipeline {pipeline_idx} "
+                    f"will be loaded with {self.pipelines[pipeline_idx].model.class_name} "
+                    + remote_mention
+                    + f"with the following args: {self.pipelines[pipeline_idx].model.kwargs}. "
+                    f"Processors are set to {self.pipelines[pipeline_idx].postprocessors}."
+                )
+
+        not_default_config_values = self.dict(
+            exclude_defaults=True,
+            exclude={"name", "model_contract", "dataset", "pipelines"},
+            exclude_unset=True,
+        )
+        log.info(f"The following additional fields were set: {not_default_config_values}")
+
 
 class AzimuthConfigHistory(AzimuthBaseSettings):
     config: AzimuthConfig
@@ -447,62 +495,9 @@ class AzimuthConfigHistory(AzimuthBaseSettings):
 
 
 def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:
-    """
-    Load the configuration from a file or make a pre-built one from a folder.
-
-    Args:
-        config_path: Path to a json file or a directory with the prediction files.
-        load_config_history: Load the last config from history, or if empty, default to config_path.
-
-    Returns:
-        The loaded config.
-
-    Raises:
-        If the file does not exist or the prediction file are not present.
-    """
     log.info("-------------Loading Config--------------")
-    # Loading config from config_path if specified, or else from environment variables only.
-    cfg = AzimuthConfig.parse_file(config_path) if config_path else AzimuthConfig()
-
-    if load_config_history:
-        config_history_path = cfg.get_config_history_path()
-        try:
-            with jsonlines.open(config_history_path, mode="r") as config_history:
-                *_, last_config = config_history
-        except (FileNotFoundError, ValueError):
-            log.info("Empty or invalid config history.")
-        else:
-            log.info(f"Loading latest config from {config_history_path}.")
-            cfg = AzimuthConfigHistory.parse_obj(last_config).config
-
-    log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
-
-    if cfg.dataset:
-        remote_mention = "" if not cfg.dataset.remote else f"from {cfg.dataset.remote} "
-        log.info(
-            f"Dataset will be loaded with {cfg.dataset.class_name} "
-            + remote_mention
-            + f"with the following args and kwargs: {cfg.dataset.args} {cfg.dataset.kwargs}."
-        )
-
-    if cfg.pipelines:
-        for pipeline_idx, pipeline in enumerate(cfg.pipelines):
-            remote_pipeline = cfg.pipelines[pipeline_idx].model.remote
-            remote_mention = "" if not remote_pipeline else f"from {remote_pipeline} "
-            log.info(
-                f"Pipeline {pipeline_idx} "
-                f"will be loaded with {cfg.pipelines[pipeline_idx].model.class_name} "
-                + remote_mention
-                + f"with the following args: {cfg.pipelines[pipeline_idx].model.kwargs}. "
-                f"Processors are set to {cfg.pipelines[pipeline_idx].postprocessors}."
-            )
-
-    not_default_config_values = cfg.dict(
-        exclude_defaults=True,
-        exclude={"name", "model_contract", "dataset", "pipelines"},
-        exclude_unset=True,
-    )
-    log.info(f"The following additional fields were set: {not_default_config_values}")
+    cfg = AzimuthConfig.load(config_path, load_config_history)
+    cfg.log_info()
     log.info("-------------Config loaded--------------")
 
     return cfg
