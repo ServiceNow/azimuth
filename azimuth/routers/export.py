@@ -112,14 +112,13 @@ def get_export_perturbation_testing_summary(
         mod_options=ModuleOptions(pipeline_index=pipeline_index),
     )[0].all_tests_summary
 
-    cfg = task_manager.config
     df = pd.DataFrame.from_records([t.dict() for t in task_result])
     df["example"] = df["example"].apply(lambda i: i["perturbedUtterance"])
     file_label = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 
-    filename = f"azimuth_export_behavioral_testing_summary_{cfg.name}_{file_label}.csv"
+    filename = f"azimuth_export_behavioral_testing_summary_{config.name}_{file_label}.csv"
 
-    path = pjoin(cfg.get_project_path(), filename)
+    path = pjoin(config.get_project_path(), filename)
 
     df.to_csv(path, index=False)
 
@@ -143,10 +142,9 @@ def get_export_perturbed_set(
 ) -> FileResponse:
     pipeline_index_not_null = assert_not_none(pipeline_index)
     file_label = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-    cfg = task_manager.config
 
-    filename = f"azimuth_export_modified_set_{cfg.name}_{dataset_split_name}_{file_label}.json"
-    path = pjoin(cfg.get_project_path(), filename)
+    filename = f"azimuth_export_modified_set_{config.name}_{dataset_split_name}_{file_label}.json"
+    path = pjoin(config.get_project_path(), filename)
 
     task_result: List[List[PerturbedUtteranceResult]] = get_standard_task_result(
         SupportedModule.PerturbationTesting,

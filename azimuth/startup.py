@@ -1,7 +1,6 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
 import threading
 import time
 from collections import defaultdict
@@ -236,18 +235,18 @@ def startup_tasks(
     ]
     if predictions_available(config):
         start_up_tasks += BASE_PREDICTION_TASKS
-        if perturbation_testing_available(task_manager.config):
+        if perturbation_testing_available(config):
             start_up_tasks += PERTURBATION_TESTING_TASKS
-        if task_manager.config.uncertainty.iterations > 1:
+        if config.uncertainty.iterations > 1:
             start_up_tasks += BMA_PREDICTION_TASKS
         if config.pipelines is not None and len(config.pipelines) > 1:
             start_up_tasks += PIPELINE_COMPARISON_TASKS
         # TODO We only check pipeline_index=0, but we should check all pipelines.
-        if postprocessing_editable(task_manager.config, 0):
+        if postprocessing_editable(config, 0):
             start_up_tasks += POSTPROCESSING_TASKS
-        if saliency_available(task_manager.config):
+        if saliency_available(config):
             start_up_tasks += SALIENCY_TASKS
-    if similarity_available(task_manager.config):
+    if similarity_available(config):
         start_up_tasks += SIMILARITY_TASKS
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)

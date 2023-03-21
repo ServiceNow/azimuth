@@ -84,14 +84,11 @@ def get_dataset_info(
         get_dataset_split_manager_mapping
     ),
     startup_tasks: Dict[str, Module] = Depends(get_startup_tasks),
-    task_manager: TaskManager = Depends(get_task_manager),
     config: AzimuthConfig = Depends(get_config),
 ):
     eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
     training_dm = dataset_split_managers.get(DatasetSplitName.train)
     dm = assert_not_none(eval_dm or training_dm)
-
-    model_contract = task_manager.config.model_contract
 
     return DatasetInfoResponse(
         project_name=config.name,
@@ -105,19 +102,16 @@ def get_dataset_info(
         if training_dm is not None
         else [],
         startup_tasks={k: v.status() for k, v in startup_tasks.items()},
-        model_contract=model_contract,
-        prediction_available=predictions_available(task_manager.config),
-        perturbation_testing_available=perturbation_testing_available(task_manager.config),
+        model_contract=config.model_contract,
+        prediction_available=predictions_available(config),
+        perturbation_testing_available=perturbation_testing_available(config),
         available_dataset_splits=AvailableDatasetSplits(
             eval=eval_dm is not None, train=training_dm is not None
         ),
-        similarity_available=similarity_available(task_manager.config),
+        similarity_available=similarity_available(config),
         postprocessing_editable=None
         if config.pipelines is None
-        else [
-            postprocessing_editable(task_manager.config, idx)
-            for idx in range(len(config.pipelines))
-        ],
+        else [postprocessing_editable(config, idx) for idx in range(len(config.pipelines))],
     )
 
 

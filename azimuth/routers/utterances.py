@@ -101,7 +101,7 @@ def get_utterances(
     if predictions_available(config) and pipeline_index is not None:
         threshold = (
             assert_not_none(config.pipelines)[pipeline_index].threshold
-            if postprocessing_known(task_manager.config, pipeline_index)
+            if postprocessing_known(config, pipeline_index)
             else None
         )
         table_key = PredictionTableKey.from_pipeline_index(pipeline_index, config)
