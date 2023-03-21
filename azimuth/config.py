@@ -288,14 +288,20 @@ class ProjectConfig(AzimuthBaseSettings):
         )
 
 
-class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
-    """Fields that can be modified without affecting caching."""
-
+class ArtifactsConfig(AzimuthBaseSettings, extra=Extra.ignore):
     artifact_path: str = Field(
         "cache",
         description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
         exclude_from_cache=True,
     )
+
+    def get_config_history_path(self):
+        return f"{self.artifact_path}/config_history.jsonl"
+
+
+class CommonFieldsConfig(ArtifactsConfig, ProjectConfig, extra=Extra.ignore):
+    """Fields that can be modified without affecting caching."""
+
     # Batch size to use during inference.
     batch_size: int = Field(32, exclude_from_cache=True)
     # Will use CUDA and will need GPUs if set to True.
@@ -319,9 +325,6 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
         path = pjoin(self.artifact_path, f"{self.name}_{self.get_project_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
-
-    def get_config_history_path(self):
-        return f"{self.artifact_path}/config_history.jsonl"
 
 
 class ModelContractConfig(CommonFieldsConfig):
@@ -443,7 +446,7 @@ class AzimuthConfig(
     @classmethod
     def load(cls, config_path: Optional[str], load_config_history: bool) -> "AzimuthConfig":
         # Loading config from config_path if specified, or else from environment variables only.
-        cfg = cls.parse_file(config_path) if config_path else cls()
+        cfg = ArtifactsConfig.parse_file(config_path) if config_path else ArtifactsConfig()
 
         if load_config_history:
             config_history_path = cfg.get_config_history_path()
@@ -454,9 +457,9 @@ class AzimuthConfig(
                 log.info("Empty or invalid config history.")
             else:
                 log.info(f"Loading latest config from {config_history_path}.")
-                cfg = AzimuthConfigHistory.parse_obj(last_config).config
+                return AzimuthConfigHistory.parse_obj(last_config).config
 
-        return cfg
+        return cls.parse_file(config_path) if config_path else cls()
 
     def log_info(self):
         log.info(f"Config loaded for {self.name} with {self.model_contract} as a model contract.")
