@@ -939,6 +939,69 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
+  const getCommonFieldsConfigSection = () => (
+    <Box marginY={1.5}>
+      <FormGroup>
+        <Columns columns={4}>
+          {displayReadonlyFields(
+            "artifact_path",
+            resultingConfig.artifact_path
+          )}
+          <NumberField
+            key="batch_size"
+            label="batch_size"
+            value={resultingConfig.batch_size}
+            disabled={isUpdatingConfig}
+            onChange={(newValue) =>
+              setPartialConfig({
+                ...partialConfig,
+                batch_size: newValue,
+              })
+            }
+            {...FIELDS["batch_size"]}
+          />
+          <StringField
+            select
+            label="use_cuda"
+            className="fixedWidthInput"
+            value={String(resultingConfig.use_cuda)}
+            disabled={isUpdatingConfig}
+            onChange={(newValue: string | boolean) =>
+              newValue &&
+              setPartialConfig({
+                ...partialConfig,
+                use_cuda: newValue === "auto" ? newValue : Boolean(newValue),
+              })
+            }
+          >
+            {["auto", "true", "false"].map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </StringField>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={Boolean(resultingConfig.large_dask_cluster)}
+                disabled={isUpdatingConfig}
+                onChange={(...[, checked]) =>
+                  setPartialConfig({
+                    ...partialConfig,
+                    large_dask_cluster: checked,
+                  })
+                }
+              />
+            }
+            label="large_dask_cluster"
+            labelPlacement="start"
+          />
+        </Columns>
+      </FormGroup>
+    </Box>
+  );
+
   const displayAnalysesCustomizationGeneralSection = () => (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
@@ -997,6 +1060,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         link="reference/configuration/model_contract/"
       >
         {getModelContractConfigSection()}
+      </AccordionLayout>
+      <AccordionLayout
+        name="Common Fields Configuration"
+        description="View and edit generic fields adpated based on the user's machine."
+        link="reference/configuration/common/"
+      >
+        {getCommonFieldsConfigSection()}
       </AccordionLayout>
       <AccordionLayout
         name="Analyses Customization"
