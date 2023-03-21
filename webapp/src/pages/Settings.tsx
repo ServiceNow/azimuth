@@ -254,6 +254,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
+  const isNullString = (value: string) => value === "null";
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
 
   const handleDiscard = () => {
@@ -493,12 +494,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               ...partialConfig,
               [config]: {
                 ...resultingConfig[config],
-                [field]: newValue,
+                [field]: isNullString(newValue) ? null : newValue,
               },
             })
           : setPartialConfig({
               ...partialConfig,
-              [field]: newValue,
+              [field]: isNullString(newValue) ? null : newValue,
             })
       }
     />
