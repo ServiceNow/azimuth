@@ -6,8 +6,6 @@ import React from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { getDatasetInfoEndpoint } from "services/api";
 import { DatasetSplitName } from "types/api";
-import { PIPELINE_REQUIRED_TIP } from "utils/const";
-import { isPipelineSelected } from "utils/helpers";
 
 export const smartTagsDescription = (
   <Description
@@ -33,22 +31,15 @@ const SmartTags = () => {
     <Box display="flex" flexDirection="column" height="100%">
       <Typography variant="h4">Smart Tag Analysis</Typography>
       {smartTagsDescription}
-      {isPipelineSelected(pipeline) ? (
-        <Paper
-          variant="outlined"
-          sx={{ marginTop: 4, minHeight: 0, padding: 4 }}
-        >
-          <SmartTagsTable
-            jobId={jobId}
-            pipeline={pipeline}
-            availableDatasetSplits={datasetInfo?.availableDatasetSplits}
-            datasetSplitName={datasetSplitName}
-            setDatasetSplitName={setDatasetSplitName}
-          />
-        </Paper>
-      ) : (
-        <Typography>{PIPELINE_REQUIRED_TIP}</Typography>
-      )}
+      <Paper variant="outlined" sx={{ marginTop: 4, minHeight: 0, padding: 4 }}>
+        <SmartTagsTable
+          jobId={jobId}
+          pipeline={pipeline}
+          availableDatasetSplits={datasetInfo?.availableDatasetSplits}
+          datasetSplitName={datasetSplitName}
+          setDatasetSplitName={setDatasetSplitName}
+        />
+      </Paper>
     </Box>
   );
 };

@@ -33,19 +33,19 @@ def load_your_dataset(azimuth_config: AzimuthConfig, **kwargs) -> DatasetDict:
 
 ### Dataset splits
 
-Azimuth expects the `train` and one of `validation` or `test` splits to be available. If
-both `validation` and `test` are available, we will pick the former. The `train` is not mandatory for Azimuth to run.
+Azimuth expects either `train`, `validation` or `test` splits to be available.
+
+* If both `validation` and `test` are available, we will pick the former as the `evaluation` split.
+* The app can load a `train` split only, an `evaluation` split only, or both.
 
 ## Column names and rejection class
 
 Go to the [:material-link: Project Config](../configuration/project.md) to see other attributes that
 should be set along with the dataset.
 
-## Example
+## Examples
 
 Using this API, we can load SST2, a sentiment analysis dataset.
-
-**Note:** in this case, we can omit `azimuth_config` from the definition because we don't need it.
 
 === "azimuth_shr/loading_resources.py"
 
@@ -76,5 +76,40 @@ Using this API, we can load SST2, a sentiment analysis dataset.
       "rejection_class": null
     }
     ```
+
+We can also load a CSV file.
+
+=== "azimuth_shr/loading_resources.py"
+
+    ```python
+    from datasets import DatasetDict, load_dataset
+
+
+    def load_csv(train_path=None, validation_path=None) -> DatasetDict:
+        data_files = dict()
+        if train_path:
+            data_files["train"] = train_path
+        if validation_path:
+            data_files["validation"] = validation_path
+        ds_dict = load_dataset(path="csv", data_files=data_files)
+        return ds_dict
+    ```
+=== "Configuration file"
+
+    ```json
+    {
+      "dataset": {
+        "class_name": "loading_resources.load_csv",
+        "remote": "/azimuth_shr",
+        "kwargs": {
+          "train_path": "path_to_data"
+        }
+      }
+    }
+    ```
+
+**Note:** in both cases, we can omit `azimuth_config` from the definition because we don't need it.
+
+For more examples, users can refer to `azimuth_shr/loading_resources.py` in the repo.
 
 --8<-- "includes/abbreviations.md"

@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { toast } from "react-toastify";
+import { CountPerFilterValue, OutcomeCountPerFilterValue } from "types/api";
 import {
   QueryClassOverlapState,
   QueryFilterState,
@@ -106,3 +107,8 @@ export const isPipelineSelected = (
 ): pipeline is Required<QueryPipelineState> => {
   return pipeline.pipelineIndex !== undefined;
 };
+
+export const isOutcomeCountPerFilterValue = (
+  countPerFilterValue: CountPerFilterValue
+): countPerFilterValue is OutcomeCountPerFilterValue =>
+  Boolean(countPerFilterValue.outcomeCount);

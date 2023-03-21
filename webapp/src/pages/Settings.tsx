@@ -1,15 +1,19 @@
-import { Warning } from "@mui/icons-material";
+import { Close, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
   Checkbox,
   CircularProgress,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   formControlLabelClasses,
   FormGroup,
   formGroupClasses,
   FormHelperText,
+  IconButton,
   InputAdornment,
   InputBaseComponentProps,
   inputClasses,
@@ -42,6 +46,8 @@ import {
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
+const CONFIG_UPDATE_MESSAGE =
+  "Please wait while the config changes are validated.";
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
 const INT = { inputProps: { min: 1 } };
 const FLOAT = { inputProps: { min: 0, step: 0.1 } };
@@ -145,6 +151,7 @@ const displayReadonlyFields = (label: string, value: string | null) => (
     size="small"
     variant="standard"
     label={label}
+    InputLabelProps={{ shrink: true }}
     value={String(value)}
     InputProps={{
       readOnly: true,
@@ -184,6 +191,7 @@ const NumberField: React.FC<
       type="number"
       className="fixedWidthInput"
       title="" // Overwrite any default input validation tooltip
+      InputLabelProps={{ shrink: true }}
       value={stringValue}
       {...(units && {
         InputProps: {
@@ -199,7 +207,11 @@ const NumberField: React.FC<
   );
 };
 
-const Settings: React.FC = () => {
+type Props = {
+  onClose: () => void;
+};
+
+const Settings: React.FC<Props> = ({ onClose }) => {
   const { jobId } = useParams<{ jobId: string }>();
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
@@ -211,6 +223,7 @@ const Settings: React.FC = () => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
+  const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
 
   const resultingConfig = Object.assign({}, config, partialConfig);
 
@@ -274,6 +287,7 @@ const Settings: React.FC = () => {
         <Checkbox
           size="small"
           checked={Boolean(resultingConfig[field])}
+          disabled={isUpdatingConfig}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -296,6 +310,7 @@ const Settings: React.FC = () => {
         <Checkbox
           size="small"
           checked={Boolean(pipeline.postprocessors)}
+          disabled={isUpdatingConfig}
           onChange={(...[, checked]) =>
             setPartialConfig({
               ...partialConfig,
@@ -330,7 +345,10 @@ const Settings: React.FC = () => {
     <NumberField
       label={field}
       value={value}
-      disabled={!resultingConfig.pipelines![pipelineIndex].postprocessors}
+      disabled={
+        !resultingConfig.pipelines![pipelineIndex].postprocessors ||
+        isUpdatingConfig
+      }
       onChange={(newValue) =>
         setPartialConfig({
           ...partialConfig,
@@ -443,7 +461,9 @@ const Settings: React.FC = () => {
                     <Typography variant="body2">{field}:</Typography>
                     <NumberField
                       value={value}
-                      disabled={!resultingConfig.uncertainty}
+                      disabled={
+                        !resultingConfig.uncertainty || isUpdatingConfig
+                      }
                       onChange={(newValue) =>
                         setPartialConfig({
                           ...partialConfig,
@@ -547,6 +567,7 @@ const Settings: React.FC = () => {
               <Checkbox
                 size="small"
                 checked={Boolean(resultingConfig.metrics[metricName])}
+                disabled={isUpdatingConfig}
                 onChange={(e) =>
                   handleCustomMetricUpdate(e.target.checked, metricName)
                 }
@@ -570,7 +591,7 @@ const Settings: React.FC = () => {
               key={field}
               label={field}
               value={value}
-              disabled={!resultingConfig[config]}
+              disabled={!resultingConfig[config] || isUpdatingConfig}
               onChange={(newValue) =>
                 setPartialConfig({
                   ...partialConfig,
@@ -597,6 +618,7 @@ const Settings: React.FC = () => {
         <FormControl variant="standard" className="fixedWidthInput">
           <InputLabel id="language-input-label">language</InputLabel>
           <Select
+            disabled={isUpdatingConfig}
             value={language ?? resultingConfig.language}
             labelId="language-input-label"
             onChange={(event) =>
@@ -610,11 +632,11 @@ const Settings: React.FC = () => {
             ))}
           </Select>
         </FormControl>
-        <Box display="flex" flexDirection="row" gap={1}>
+        <Box display="flex" gap={1}>
           <Warning color="warning" />
           <Typography variant="body2">
-            Changing the language would impact the syntax, similarity and
-            behavioral_testing sections
+            Changing the language would impact the Syntax, Similarity and
+            Behavioral Testing sections
           </Typography>
         </Box>
       </Box>
@@ -637,15 +659,38 @@ const Settings: React.FC = () => {
   );
 
   return (
-    <Box height="100%" display="flex" flexDirection="column">
-      <Paper
-        variant="outlined"
+    <>
+      <DialogTitle id="config-dialog-title">
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="subtitle1">
+            View and edit certain fields from your config file. Once your
+            changes are saved, expect some delays for recomputing the affected
+            tasks.
+          </Typography>
+          <IconButton
+            size="small"
+            color="primary"
+            disabled={isUpdatingConfig}
+            onClick={() => {
+              if (
+                isEmptyPartialConfig ||
+                window.confirm(
+                  "Are you sure you want to discard all your changes?"
+                )
+              ) {
+                onClose();
+              }
+            }}
+          >
+            <Close />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent
+        dividers
         sx={{
-          flex: 1,
-          padding: 2,
-          overflow: "auto",
+          [`& .${formControlLabelClasses.root}`]: { alignSelf: "start" },
           [`& .${formControlLabelClasses.labelPlacementStart}`]: {
-            justifyContent: "flex-end",
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
@@ -654,10 +699,6 @@ const Settings: React.FC = () => {
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
       >
-        <Typography variant="subtitle1" marginBottom={3}>
-          View and edit certain fields from your config file. Once your changes
-          are saved, expect some delays for recomputing the affected tasks.
-        </Typography>
         <AccordionLayout
           name="Project Configuration"
           description="View the fields that define the dataset to load in Azimuth."
@@ -679,10 +720,11 @@ const Settings: React.FC = () => {
         >
           {getAnalysesCustomizationSection()}
         </AccordionLayout>
-      </Paper>
-      <Box display="flex" justifyContent="space-between" paddingY={2}>
+      </DialogContent>
+      <DialogActions sx={{ justifyContent: "space-between" }}>
         <Button
           variant="contained"
+          disabled={isEmptyPartialConfig || isUpdatingConfig}
           onClick={() => {
             setPartialConfig({});
             setLanguage(undefined);
@@ -695,9 +737,7 @@ const Settings: React.FC = () => {
           {isUpdatingConfig ? (
             <>
               <CircularProgress size={16} />
-              <FormHelperText>
-                Please wait while the config changes are validated.
-              </FormHelperText>
+              <FormHelperText>{CONFIG_UPDATE_MESSAGE}</FormHelperText>
             </>
           ) : (
             FIELDS_TRIGGERING_STARTUP_TASKS.some((f) => partialConfig[f]) && (
@@ -713,14 +753,18 @@ const Settings: React.FC = () => {
           )}
           <Button
             variant="contained"
-            disabled={isUpdatingConfig}
-            onClick={() => updateConfig({ jobId, body: partialConfig })}
+            disabled={isEmptyPartialConfig || isUpdatingConfig}
+            onClick={() => {
+              updateConfig({ jobId, body: partialConfig })
+                .unwrap()
+                .then(onClose);
+            }}
           >
-            Apply
+            Apply and close
           </Button>
         </Box>
-      </Box>
-    </Box>
+      </DialogActions>
+    </>
   );
 };
 

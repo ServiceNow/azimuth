@@ -119,7 +119,7 @@ def get_export_perturbation_testing_summary(
 
     filename = f"azimuth_export_behavioral_testing_summary_{cfg.name}_{file_label}.csv"
 
-    path = pjoin(cfg.get_artifact_path(), filename)
+    path = pjoin(cfg.get_project_path(), filename)
 
     df.to_csv(path, index=False)
 
@@ -146,7 +146,7 @@ def get_export_perturbed_set(
     cfg = task_manager.config
 
     filename = f"azimuth_export_modified_set_{cfg.name}_{dataset_split_name}_{file_label}.json"
-    path = pjoin(cfg.get_artifact_path(), filename)
+    path = pjoin(cfg.get_project_path(), filename)
 
     task_result: List[List[PerturbedUtteranceResult]] = get_standard_task_result(
         SupportedModule.PerturbationTesting,

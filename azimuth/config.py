@@ -4,6 +4,7 @@
 
 import argparse
 import os
+from datetime import datetime, timezone
 from enum import Enum
 from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
@@ -277,7 +278,7 @@ class ProjectConfig(AzimuthBaseSettings):
             )
         return copy
 
-    def to_hash(self):
+    def get_project_hash(self):
         return md5_hash(
             self.dict(
                 include=ProjectConfig.__fields__.keys(),
@@ -293,6 +294,7 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     artifact_path: str = Field(
         "cache",
         description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
+        exclude_from_cache=True,
     )
     # Batch size to use during inference.
     batch_size: int = Field(32, exclude_from_cache=True)
@@ -305,16 +307,16 @@ class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
     # Disable configuration changes
     read_only_config: bool = Field(False, exclude_from_cache=True)
 
-    def get_artifact_path(self) -> str:
+    def get_project_path(self) -> str:
         """Generate a path for caching.
 
-        The path contains the project name, the task and a subset of a hash of the project config.
+        The path contains the project name and a subset of a hash of the project config.
         Additional fields in the config won't result in a different hash.
 
         Returns:
             Path to a folder where it is safe to store data.
         """
-        path = pjoin(self.artifact_path, f"{self.name}_{self.to_hash()[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{self.get_project_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
 
@@ -439,6 +441,11 @@ class AzimuthConfig(
         return values
 
 
+class AzimuthConfigHistory(AzimuthBaseSettings):
+    config: AzimuthConfig
+    created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)))
+
+
 def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:
     """
     Load the configuration from a file or make a pre-built one from a folder.
@@ -466,7 +473,7 @@ def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -
             log.info("Empty or invalid config history.")
         else:
             log.info(f"Loading latest config from {config_history_path}.")
-            cfg = AzimuthConfig.parse_obj(last_config)
+            cfg = AzimuthConfigHistory.parse_obj(last_config).config
 
     log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
 

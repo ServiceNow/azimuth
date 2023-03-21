@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Dict
+from typing import Any, Dict
 
 import structlog
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
@@ -23,6 +23,7 @@ from azimuth.config import (
     SupportedLanguage,
 )
 from azimuth.task_manager import TaskManager
+from azimuth.utils.cluster import default_cluster
 from azimuth.utils.project import update_config
 
 log = structlog.get_logger(__name__)
@@ -70,10 +71,7 @@ def patch_config(
     config: AzimuthConfig = Depends(get_config),
     partial_config: Dict = Body(...),
 ) -> AzimuthConfig:
-    if (
-        "artifact_path" in partial_config
-        and partial_config["artifact_path"] != config.artifact_path
-    ):
+    if attribute_changed_in_config("artifact_path", partial_config, config):
         raise HTTPException(
             HTTP_400_BAD_REQUEST,
             detail="Cannot edit artifact_path, otherwise config history would become inconsistent.",
@@ -81,7 +79,11 @@ def patch_config(
 
     try:
         new_config = update_config(old_config=config, partial_config=partial_config)
-        run_startup_tasks(new_config, task_manager.cluster)
+        if attribute_changed_in_config("large_dask_cluster", partial_config, config):
+            cluster = default_cluster(partial_config["large_dask_cluster"])
+        else:
+            cluster = task_manager.cluster
+        run_startup_tasks(new_config, cluster)
     except Exception as e:
         log.error("Rollback config update due to error", exc_info=e)
         new_config = config
@@ -96,3 +98,9 @@ def patch_config(
     # Clear workers so that they load the correct config.
     task_manager.clear_worker_cache()
     return new_config
+
+
+def attribute_changed_in_config(
+    attribute: str, partial_config: Dict[str, Any], config: AzimuthConfig
+) -> bool:
+    return attribute in partial_config and partial_config[attribute] != getattr(config, attribute)

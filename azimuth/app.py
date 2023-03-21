@@ -187,6 +187,8 @@ def create_app() -> FastAPI:
             RequestValidationError: handle_validation_error,
             HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
         },
+        root_path=".",  # Tells Swagger UI and ReDoc to fetch the OpenAPI spec from ./openapi.json
+        # (relative) so it works through the front-end proxy.
     )
 
     # Setup routes

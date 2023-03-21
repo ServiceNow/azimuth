@@ -1,6 +1,7 @@
 import { ArrowForward } from "@mui/icons-material";
 import {
   Box,
+  BoxProps,
   FormControlLabel,
   Link,
   MenuItem,
@@ -16,16 +17,21 @@ import Loading from "components/Loading";
 import { motion } from "framer-motion";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { getOutcomeCountPerFilterEndpoint } from "services/api";
+import {
+  getOutcomeCountPerFilterEndpoint,
+  getUtteranceCountPerFilterEndpoint,
+} from "services/api";
 import {
   AvailableDatasetSplits,
+  CountPerFilterResponse,
+  CountPerFilterValue,
   DatasetSplitName,
   Outcome,
-  OutcomeCountPerFilterValue,
 } from "types/api";
 import { QueryPipelineState } from "types/models";
 import {
   ALL_OUTCOMES,
+  DATASET_SMART_TAG_FAMILIES,
   OUTCOME_COLOR,
   OUTCOME_PRETTY_NAMES,
   SmartTagFamily,
@@ -35,22 +41,33 @@ import {
   UNKNOWN_ERROR,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
-import { constructSearchString } from "utils/helpers";
+import {
+  constructSearchString,
+  isOutcomeCountPerFilterValue,
+  isPipelineSelected,
+} from "utils/helpers";
 import DatasetSplitToggler from "./Controls/DatasetSplitToggler";
 
+type MetricPerFilterOption = "label" | "prediction" | "outcome";
+
 type SortBy = "filterValue" | "utteranceCount" | "accuracy" | SmartTagFamily;
+
 type Row = {
   filterValue: string;
   utteranceCount: number;
-  accuracy: number;
-  outcomeCountPerSmartTagFamily: Partial<
-    Record<SmartTagFamily, OutcomeCountPerFilterValue>
-  >;
+  accuracy?: number;
+  countPerSmartTagFamily: Partial<Record<SmartTagFamily, CountPerFilterValue>>;
 } & Partial<Record<SmartTagFamily, number>>;
+
+type Query = {
+  data?: CountPerFilterResponse;
+  isFetching: boolean;
+  error?: { message?: string };
+};
 
 const SmartTagsTable: React.FC<{
   jobId: string;
-  pipeline: Required<QueryPipelineState>;
+  pipeline: QueryPipelineState;
   availableDatasetSplits: AvailableDatasetSplits | undefined;
   datasetSplitName: DatasetSplitName;
   setDatasetSplitName: (name: DatasetSplitName) => void;
@@ -64,7 +81,11 @@ const SmartTagsTable: React.FC<{
   const [transpose, setTranspose] = React.useState(false);
 
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
-    React.useState<"label" | "prediction" | "outcome">("label");
+    React.useState<MetricPerFilterOption>("label");
+
+  const metricPerFilterOption = isPipelineSelected(pipeline)
+    ? selectedMetricPerFilterOption
+    : "label";
 
   const [ascending, setAscending] = React.useState(false);
   const [sortBy, setSortBy] = React.useState<SortBy>("utteranceCount");
@@ -73,59 +94,80 @@ const SmartTagsTable: React.FC<{
     data: overall,
     isFetching,
     error,
-  } = getOutcomeCountPerFilterEndpoint.useQuery({
-    jobId,
-    datasetSplitName,
-    ...pipeline,
-  });
+  }: Query = isPipelineSelected(pipeline)
+    ? getOutcomeCountPerFilterEndpoint.useQuery({
+        jobId,
+        datasetSplitName,
+        ...pipeline,
+      })
+    : getUtteranceCountPerFilterEndpoint.useQuery({
+        jobId,
+        datasetSplitName,
+      });
 
   const smartTags = (family: SmartTagFamily) =>
-    overall?.countPerFilter[family].flatMap(({ filterValue }) =>
+    overall?.countPerFilter[family]?.flatMap(({ filterValue }) =>
       filterValue === "NO_SMART_TAGS" ? [] : [filterValue]
     );
 
-  const allData = SMART_TAG_FAMILIES.map((family) =>
-    getOutcomeCountPerFilterEndpoint.useQuery(
-      {
-        jobId,
-        datasetSplitName,
-        [family]: smartTags(family),
-        ...pipeline,
-      },
-      { skip: overall === undefined }
-    )
+  const allData = SMART_TAG_FAMILIES.map<Query>((family, familyIndex) =>
+    isPipelineSelected(pipeline)
+      ? getOutcomeCountPerFilterEndpoint.useQuery(
+          {
+            jobId,
+            datasetSplitName,
+            [family]: smartTags(family),
+            ...pipeline,
+          },
+          { skip: overall === undefined }
+        )
+      : getUtteranceCountPerFilterEndpoint.useQuery(
+          {
+            jobId,
+            datasetSplitName,
+            [family]: smartTags(family),
+          },
+          {
+            skip:
+              overall === undefined ||
+              // React requires to call the same number of hooks in the same
+              // order on every render, but we can skip the pipeline-specific queries.
+              familyIndex >= DATASET_SMART_TAG_FAMILIES.length,
+          }
+        )
   );
 
   const rows = React.useMemo(() => {
     if (overall === undefined) return undefined;
     const rows = Object.fromEntries(
-      overall.countPerFilter[selectedMetricPerFilterOption].map<[string, Row]>(
+      overall.countPerFilter[metricPerFilterOption]!.map<[string, Row]>(
         ({ filterValue, utteranceCount, outcomeCount }) => [
           filterValue,
           {
             filterValue,
             utteranceCount,
             accuracy:
+              outcomeCount &&
               ALL_OUTCOMES.filter((outcome) => outcome.startsWith("Correct"))
                 .map((outcome) => outcomeCount[outcome])
                 .reduce((a, b) => a + b) / utteranceCount,
-            outcomeCountPerSmartTagFamily: {},
+            countPerSmartTagFamily: {},
           },
         ]
       )
     );
     SMART_TAG_FAMILIES.forEach((family, familyIndex) => {
-      allData[familyIndex].data?.countPerFilter[
-        selectedMetricPerFilterOption
-      ].forEach((cell) => {
+      allData[familyIndex]?.data?.countPerFilter[
+        metricPerFilterOption
+      ]?.forEach((cell) => {
         const { filterValue, utteranceCount } = cell;
-        rows[filterValue][family] =
-          utteranceCount && utteranceCount / rows[filterValue].utteranceCount;
-        rows[filterValue].outcomeCountPerSmartTagFamily[family] = cell;
+        const row = rows[filterValue];
+        row[family] = utteranceCount && utteranceCount / row.utteranceCount; // Used for sorting
+        row.countPerSmartTagFamily[family] = cell;
       });
     });
     return Object.values(rows);
-  }, [overall, allData, selectedMetricPerFilterOption]);
+  }, [overall, allData, metricPerFilterOption]);
 
   const sortedRows = React.useMemo(
     () =>
@@ -162,6 +204,75 @@ const SmartTagsTable: React.FC<{
     ...(transpose && { IconComponent: ArrowForward }),
   });
 
+  const Bar: React.FC<
+    {
+      rowCount: number;
+      cellCount: number;
+      barCount?: number;
+      filterValue: string;
+      family: SmartTagFamily;
+      outcome?: Outcome;
+    } & BoxProps
+  > = ({
+    rowCount,
+    cellCount,
+    barCount = cellCount,
+    filterValue,
+    family,
+    outcome,
+    ...boxProps
+  }) => (
+    <Tooltip
+      title={
+        <>
+          {outcome && (
+            <Typography variant="inherit">
+              {barCount} utterance{barCount === 1 ? " is " : "s are "}
+              <Typography variant="inherit" component="span" fontWeight="bold">
+                {OUTCOME_PRETTY_NAMES[outcome]}
+              </Typography>
+            </Typography>
+          )}
+          <Typography variant="inherit">
+            out of {cellCount} utterance{cellCount === 1 ? "" : "s"} tagged{" "}
+            <Typography variant="inherit" component="span" fontWeight="bold">
+              {SMART_TAG_FAMILY_PRETTY_NAMES[family]}
+            </Typography>
+          </Typography>
+          <Typography variant="inherit">
+            out of {rowCount} utterance{rowCount === 1 ? "" : "s"} labeled{" "}
+            <Typography variant="inherit" component="span" fontWeight="bold">
+              {filterValue}
+            </Typography>
+          </Typography>
+        </>
+      }
+    >
+      <Box
+        component={motion.div}
+        height="100%"
+        animate={{ width: `${rowCount && (100 * barCount) / rowCount}%` }}
+        initial={false}
+        transition={{ type: "tween" }}
+        display="flex"
+        {...boxProps}
+      >
+        <Link
+          component={RouterLink}
+          width="100%"
+          to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview${constructSearchString(
+            {
+              [metricPerFilterOption]: [filterValue],
+              outcome: outcome && [outcome],
+              [family]: smartTags(family),
+              ...pipeline,
+            }
+          )}`}
+        />
+      </Box>
+    </Tooltip>
+  );
+
   return (
     <Box display="flex" flexDirection="column" gap={4} minHeight={0}>
       <Box display="flex" gap={4}>
@@ -186,14 +297,16 @@ const SmartTagsTable: React.FC<{
       <Box
         display="grid"
         gridTemplateColumns={`repeat(${transpose ? 1 : 3}, min-content)`}
-        gridAutoColumns={160}
+        gridAutoColumns={176}
         gridAutoRows="min-content"
         overflow="auto"
-        columnGap={4}
-        sx={{ overscrollBehaviorX: "contain" }} // Stops accidental navigation on horizontal scroll with touch pad
+        sx={{
+          overscrollBehaviorX: "contain", // Stops accidental navigation on horizontal scroll with touch pad
+          "& > *": { paddingX: 2 },
+        }}
       >
-        {sortedRows?.map((classCount, classIndex) => (
-          <React.Fragment key={classCount.filterValue}>
+        {sortedRows?.map((row, rowIndex) => (
+          <React.Fragment key={row.filterValue}>
             <Typography
               variant="subtitle2"
               align={transpose ? "center" : "right"}
@@ -203,75 +316,73 @@ const SmartTagsTable: React.FC<{
               position="sticky"
               bgcolor={(theme) => theme.palette.background.paper}
               {...{
-                [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
+                [`grid${transpose ? "Column" : "Row"}`]: rowIndex + 2,
                 [`grid${transpose ? "Row" : "Column"}`]: 1,
                 [transpose ? "top" : "left"]: 0,
               }}
             >
-              {selectedMetricPerFilterOption === "outcome"
-                ? OUTCOME_PRETTY_NAMES[classCount.filterValue as Outcome]
-                : classCount.filterValue}
+              {metricPerFilterOption === "outcome"
+                ? OUTCOME_PRETTY_NAMES[row.filterValue as Outcome]
+                : row.filterValue}
             </Typography>
-            <Typography
-              variant="body2"
-              key={`accuracy${classCount.filterValue}`}
-              align="right"
-              {...{
-                [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
-                [`grid${transpose ? "Row" : "Column"}`]: 2,
-              }}
-            >
-              {formatRatioAsPercentageString(classCount.accuracy, 1)}
-            </Typography>
+            {row.accuracy !== undefined && (
+              <Typography
+                variant="body2"
+                key={`accuracy${row.filterValue}`}
+                align="right"
+                {...{
+                  [`grid${transpose ? "Column" : "Row"}`]: rowIndex + 2,
+                  [`grid${transpose ? "Row" : "Column"}`]: 2,
+                }}
+              >
+                {formatRatioAsPercentageString(row.accuracy, 1)}
+              </Typography>
+            )}
             {transpose ? (
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="flex-end"
-                flexDirection={transpose ? undefined : "column-reverse"}
-                {...{ [transpose ? "width" : "height"]: "100%" }}
-                {...{
-                  [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
-                  [`grid${transpose ? "Row" : "Column"}`]: 3,
-                }}
+                gridColumn={rowIndex + 2}
+                gridRow={3}
               >
                 <Typography variant="subtitle2" lineHeight={1} fontSize={12}>
                   0
                 </Typography>
                 <Typography variant="subtitle2" lineHeight={1} fontSize={12}>
-                  {classCount.utteranceCount}
+                  {row.utteranceCount}
                 </Typography>
               </Box>
             ) : (
               <Typography
                 variant="body2"
                 align="right"
-                {...{
-                  [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
-                  [`grid${transpose ? "Row" : "Column"}`]: 3,
-                }}
+                gridRow={rowIndex + 2}
+                gridColumn={3}
               >
-                {classCount.utteranceCount}
+                {row.utteranceCount}
               </Typography>
             )}
           </React.Fragment>
         ))}
-        <Typography
-          variant="subtitle2"
-          align="right"
-          noWrap
-          position="sticky"
-          bgcolor={(theme) => theme.palette.background.paper}
-          {...{
-            [`grid${transpose ? "Column" : "Row"}`]: 1,
-            [`grid${transpose ? "Row" : "Column"}`]: 2,
-            [transpose ? "left" : "top"]: 0,
-          }}
-        >
-          <TableSortLabel {...getSortLabelProps("accuracy")}>
-            Accuracy
-          </TableSortLabel>
-        </Typography>
+        {isPipelineSelected(pipeline) && (
+          <Typography
+            variant="subtitle2"
+            align="right"
+            noWrap
+            position="sticky"
+            bgcolor={(theme) => theme.palette.background.paper}
+            {...{
+              [`grid${transpose ? "Column" : "Row"}`]: 1,
+              [`grid${transpose ? "Row" : "Column"}`]: 2,
+              [transpose ? "left" : "top"]: 0,
+            }}
+          >
+            <TableSortLabel {...getSortLabelProps("accuracy")}>
+              Accuracy
+            </TableSortLabel>
+          </Typography>
+        )}
         <Typography
           variant="subtitle2"
           align="right"
@@ -288,7 +399,10 @@ const SmartTagsTable: React.FC<{
             Total
           </TableSortLabel>
         </Typography>
-        {SMART_TAG_FAMILIES.map((family, familyIndex) => (
+        {(isPipelineSelected(pipeline)
+          ? SMART_TAG_FAMILIES
+          : DATASET_SMART_TAG_FAMILIES
+        ).map((family, familyIndex) => (
           <React.Fragment key={familyIndex}>
             <Box
               display="flex"
@@ -339,99 +453,49 @@ const SmartTagsTable: React.FC<{
                 </Box>
               )}
             </Box>
-            {sortedRows?.map((row, classIndex) => {
-              const cell = row.outcomeCountPerSmartTagFamily[family];
+            {sortedRows?.map((row, rowIndex) => {
+              const cell = row.countPerSmartTagFamily[family];
               return (
                 <Box
                   key={row.filterValue}
-                  display="flex"
-                  borderLeft="solid 1px"
-                  borderRight="solid 1px"
-                  paddingY={0.5}
                   {...{
-                    [`grid${transpose ? "Column" : "Row"}`]: classIndex + 2,
+                    [`grid${transpose ? "Column" : "Row"}`]: rowIndex + 2,
                     [`grid${transpose ? "Row" : "Column"}`]: familyIndex + 4,
                   }}
                 >
-                  {cell &&
-                    ALL_OUTCOMES.map((outcome) => (
-                      <Tooltip
-                        key={outcome}
-                        title={
-                          <>
-                            <Typography variant="inherit">
-                              {`${cell.outcomeCount[outcome]} utterance${
-                                cell.outcomeCount[outcome] === 1 ? "" : "s"
-                              } are `}
-                              <Typography
-                                variant="inherit"
-                                component="span"
-                                fontWeight="bold"
-                              >
-                                {OUTCOME_PRETTY_NAMES[outcome]}
-                              </Typography>
-                            </Typography>
-                            <Typography variant="inherit">
-                              {`out of ${cell.utteranceCount} utterance${
-                                cell.utteranceCount === 1 ? "" : "s"
-                              } tagged `}
-                              <Typography
-                                variant="inherit"
-                                component="span"
-                                fontWeight="bold"
-                              >
-                                {SMART_TAG_FAMILY_PRETTY_NAMES[family]}
-                              </Typography>
-                            </Typography>
-                            <Typography variant="inherit">
-                              {`out of ${row.utteranceCount} utterance${
-                                row.utteranceCount === 1 ? "" : "s"
-                              } labeled `}
-                              <Typography
-                                variant="inherit"
-                                component="span"
-                                fontWeight="bold"
-                              >
-                                {row.filterValue}
-                              </Typography>
-                            </Typography>
-                          </>
-                        }
-                      >
-                        <Box
-                          component={motion.div}
-                          bgcolor={(theme) =>
-                            theme.palette[OUTCOME_COLOR[outcome]].main
-                          }
-                          height="100%"
-                          animate={{
-                            width: `${
-                              row.utteranceCount &&
-                              (100 * cell.outcomeCount[outcome]) /
-                                row.utteranceCount
-                            }%`,
-                          }}
-                          initial={false}
-                          transition={{ type: "tween" }}
-                          display="flex"
-                        >
-                          <Link
-                            component={RouterLink}
-                            width="100%"
-                            to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview${constructSearchString(
-                              {
-                                [selectedMetricPerFilterOption]: [
-                                  row.filterValue,
-                                ],
-                                outcome: [outcome],
-                                [family]: smartTags(family),
-                                ...pipeline,
-                              }
-                            )}`}
+                  <Box
+                    height="100%"
+                    display="flex"
+                    borderLeft="solid 1px"
+                    borderRight="solid 1px"
+                    paddingY={0.5}
+                  >
+                    {cell &&
+                      (isOutcomeCountPerFilterValue(cell) ? (
+                        ALL_OUTCOMES.map((outcome) => (
+                          <Bar
+                            key={outcome}
+                            rowCount={row.utteranceCount}
+                            cellCount={cell.utteranceCount}
+                            barCount={cell.outcomeCount[outcome]}
+                            filterValue={row.filterValue}
+                            family={family}
+                            outcome={outcome}
+                            bgcolor={(theme) =>
+                              theme.palette[OUTCOME_COLOR[outcome]].main
+                            }
                           />
-                        </Box>
-                      </Tooltip>
-                    ))}
+                        ))
+                      ) : (
+                        <Bar
+                          rowCount={row.utteranceCount}
+                          cellCount={cell.utteranceCount}
+                          filterValue={row.filterValue}
+                          family={family}
+                          bgcolor={(theme) => theme.palette.secondary.dark}
+                        />
+                      ))}
+                  </Box>
                 </Box>
               );
             })}
@@ -458,20 +522,28 @@ const SmartTagsTable: React.FC<{
               onClick={(event) => event.stopPropagation()}
               variant="standard"
               id="filter-by-select"
-              value={selectedMetricPerFilterOption}
+              value={metricPerFilterOption}
               onChange={(event) =>
                 setSelectedMetricPerFilterOption(
-                  event.target.value as "label" | "prediction"
+                  event.target.value as MetricPerFilterOption
                 )
               }
             >
               <MenuItem key="label" value="label">
                 Label
               </MenuItem>
-              <MenuItem key="prediction" value="prediction">
+              <MenuItem
+                key="prediction"
+                value="prediction"
+                disabled={!isPipelineSelected(pipeline)}
+              >
                 Prediction
               </MenuItem>
-              <MenuItem key="outcome" value="outcome">
+              <MenuItem
+                key="outcome"
+                value="outcome"
+                disabled={!isPipelineSelected(pipeline)}
+              >
                 Outcome
               </MenuItem>
             </Select>

@@ -50,7 +50,8 @@ class Startup:
 START_UP_THREAD_NAME = "Azimuth_Startup"
 
 SIMILARITY_TASKS = [
-    Startup("neighbors_tags", SupportedModule.NeighborsTagging),
+    Startup("faiss", SupportedModule.FAISS),
+    Startup("neighbors_tags", SupportedModule.NeighborsTagging, dependency_names=["faiss"]),
     Startup(
         "class_overlap",
         SupportedModule.ClassOverlap,
@@ -96,7 +97,7 @@ POSTPROCESSING_TASKS = [
     Startup(
         "outcome_count_per_threshold",
         SupportedModule.OutcomeCountPerThreshold,
-        dependency_names=["prediction", "outcome_count"],
+        dependency_names=["prediction", "outcome"],
         run_on_all_pipelines=True,
         dataset_split_names=[DatasetSplitName.eval],
     )
@@ -109,7 +110,7 @@ SALIENCY_TASKS = [
 BASE_PREDICTION_TASKS = [
     Startup("prediction", SupportedMethod.Predictions, run_on_all_pipelines=True),
     Startup(
-        "outcome_count",
+        "outcome",
         SupportedModule.Outcome,
         dependency_names=["prediction"],
         run_on_all_pipelines=True,
@@ -125,7 +126,7 @@ BASE_PREDICTION_TASKS = [
         SupportedModule.MetricsPerFilter,
         dependency_names=[
             "prediction",
-            "outcome_count",
+            "outcome",
             "prediction_comparison",
             "perturbation_testing",
             "neighbors_tags",

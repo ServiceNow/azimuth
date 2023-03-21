@@ -57,7 +57,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         self.future: Optional[Future] = None
         self.done_event: Optional[Event] = None
         # We cache the result in a HDF5 file and we have a FileLock.
-        self.cache_dir = pjoin(self.config.get_artifact_path(), self.__class__.__name__)
+        self.cache_dir = pjoin(self.config.get_project_path(), self.__class__.__name__)
         os.makedirs(self.cache_dir, exist_ok=True)
         self._cache_file = pjoin(self.cache_dir, f"{self.name}.h5")
         self._cache_lock = pjoin(self.cache_dir, f"{self.name}.h5.lock")
