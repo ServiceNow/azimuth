@@ -367,7 +367,8 @@ def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
     if _dataset_split_managers.get(DatasetSplitName.eval):
         run_validation(DatasetSplitName.eval, task_manager, azimuth_config)
 
-    save_config(azimuth_config)  # Save only after the validation modules ran successfully
+    if not azimuth_config.is_last_in_config_history():
+        save_config(azimuth_config)  # Save only after the validation modules ran successfully
 
     global _startup_tasks, _ready_flag
     _startup_tasks = startup_tasks(_dataset_split_managers, task_manager)

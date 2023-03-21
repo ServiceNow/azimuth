@@ -450,16 +450,28 @@ class AzimuthConfig(
 
         if load_config_history:
             config_history_path = cfg.get_config_history_path()
-            try:
-                with jsonlines.open(config_history_path, mode="r") as config_history:
-                    *_, last_config = config_history
-            except (FileNotFoundError, ValueError):
-                log.info("Empty or invalid config history.")
-            else:
+            last_config = cls.load_last_config_from_history(config_history_path)
+            if last_config:
                 log.info(f"Loading latest config from {config_history_path}.")
-                return AzimuthConfigHistory.parse_obj(last_config).config
+                return last_config
+            else:
+                log.info("Empty or invalid config history.")
 
         return cls.parse_file(config_path) if config_path else cls()
+
+    @classmethod
+    def load_last_config_from_history(cls, config_history_path: str) -> Optional["AzimuthConfig"]:
+        try:
+            with jsonlines.open(config_history_path, mode="r") as config_history:
+                *_, last_config = config_history
+        except (FileNotFoundError, ValueError):
+            return None
+        else:
+            return AzimuthConfigHistory.parse_obj(last_config).config
+
+    def is_last_in_config_history(self) -> bool:
+        last_config = self.load_last_config_from_history(self.get_config_history_path())
+        return self == last_config
 
     def log_info(self):
         log.info(f"Config loaded for {self.name} with {self.model_contract} as a model contract.")
