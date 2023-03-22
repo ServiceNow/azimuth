@@ -251,6 +251,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   React.useEffect(() => {
     if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
       setPartialConfig({
+        ...partialConfig,
         language: defaultConfig.language,
         syntax: {
           ...resultingConfig.syntax,
