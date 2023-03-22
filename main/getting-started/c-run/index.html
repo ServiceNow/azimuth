@@ -1879,8 +1879,8 @@ dataset and model are available in <code>config/examples</code> (<code>CLINC</co
 <li>Execute the following <strong>command</strong>:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make launch
 </code></pre></div></li>
-<li>The <strong>app will be accessible</strong> at <code>http://localhost:8080</code> after a few minutes of waiting. The
-   start-up tasks will start.</li>
+<li>The <strong>app will be accessible</strong> at http://localhost:8080 after a few minutes of waiting. The
+    start-up tasks will start. The back-end <abbr title="Application Programming Interface">API</abbr> will be accessible at http://localhost:8080/api/local/docs.</li>
 </ol>
 <p>After a successful start, Azimuth saves the provided config in its <code>config_history.jsonl</code> artifact. If you use the <abbr title="Application Programming Interface">API</abbr> to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span><span class="nv">LOAD_CONFIG_HISTORY</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>launch
