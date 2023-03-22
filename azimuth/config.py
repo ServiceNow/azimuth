@@ -503,6 +503,13 @@ class AzimuthConfig(
         )
         log.info(f"The following additional fields were set: {not_default_config_values}")
 
+    def save(self):
+        """Append config to config_history.jsonl to retrieve past configs."""
+        # TODO https://stackoverflow.com/questions/2333872/
+        #  how-to-make-file-creation-an-atomic-operation
+        with jsonlines.open(self.get_config_history_path(), mode="a") as f:
+            f.write(AzimuthConfigHistory(config=self).dict())
+
 
 class AzimuthConfigHistory(AzimuthBaseSettings):
     config: AzimuthConfig

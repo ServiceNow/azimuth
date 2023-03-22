@@ -33,7 +33,7 @@ from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
 from azimuth.utils.logs import set_logger_config
-from azimuth.utils.project import load_dataset_split_managers_from_config, save_config
+from azimuth.utils.project import load_dataset_split_managers_from_config
 from azimuth.utils.validation import assert_not_none
 
 _dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]] = {}
@@ -368,7 +368,7 @@ def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
         run_validation(DatasetSplitName.eval, task_manager, azimuth_config)
 
     if not azimuth_config.is_last_in_config_history():
-        save_config(azimuth_config)  # Save only after the validation modules ran successfully
+        azimuth_config.save()  # Save only after the validation modules ran successfully
 
     global _startup_tasks, _ready_flag
     _startup_tasks = startup_tasks(_dataset_split_managers, task_manager)

@@ -3,13 +3,11 @@
 # in the root directory of this source tree.
 from typing import Dict, Optional
 
-import jsonlines
 import structlog
 from datasets import DatasetDict
 
 from azimuth.config import (
     AzimuthConfig,
-    AzimuthConfigHistory,
     ModelContractConfig,
     PerturbationTestingConfig,
     SimilarityConfig,
@@ -55,13 +53,6 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
             f"Found {tuple(dataset_in_config.keys())}."
         )
     return dataset_train_eval
-
-
-def save_config(azimuth_config: AzimuthConfig):
-    """Append config to config_history.jsonl to retrieve past configs."""
-    # TODO https://stackoverflow.com/questions/2333872/how-to-make-file-creation-an-atomic-operation
-    with jsonlines.open(azimuth_config.get_config_history_path(), mode="a") as f:
-        f.write(AzimuthConfigHistory(config=azimuth_config).dict())
 
 
 def update_config(old_config: AzimuthConfig, partial_config: Dict) -> AzimuthConfig:
