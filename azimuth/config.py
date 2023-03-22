@@ -450,16 +450,24 @@ class AzimuthConfig(
 
         if load_config_history:
             config_history_path = cfg.get_config_history_path()
-            try:
-                with jsonlines.open(config_history_path, mode="r") as config_history:
-                    *_, last_config = config_history
-            except (FileNotFoundError, ValueError):
-                log.info("Empty or invalid config history.")
-            else:
+            last_config = cls.load_last_from_config_history(config_history_path)
+            if last_config:
                 log.info(f"Loading latest config from {config_history_path}.")
-                return AzimuthConfigHistory.parse_obj(last_config).config
+                return last_config
+
+            log.info("Empty or invalid config history.")
 
         return cls.parse_file(config_path) if config_path else cls()
+
+    @classmethod
+    def load_last_from_config_history(cls, config_history_path: str) -> Optional["AzimuthConfig"]:
+        try:
+            with jsonlines.open(config_history_path, mode="r") as config_history:
+                *_, last_config = config_history
+        except (FileNotFoundError, ValueError):
+            return None
+        else:
+            return AzimuthConfigHistory.parse_obj(last_config).config
 
     def log_info(self):
         log.info(f"Config loaded for {self.name} with {self.model_contract} as a model contract.")
@@ -490,6 +498,15 @@ class AzimuthConfig(
             exclude_unset=True,
         )
         log.info(f"The following additional fields were set: {not_default_config_values}")
+
+    def save(self):
+        """Append config to config_history.jsonl to retrieve past configs."""
+        if self == self.load_last_from_config_history(self.get_config_history_path()):
+            return
+        # TODO https://stackoverflow.com/questions/2333872/
+        #  how-to-make-file-creation-an-atomic-operation
+        with jsonlines.open(self.get_config_history_path(), mode="a") as f:
+            f.write(AzimuthConfigHistory(config=self).dict())
 
 
 class AzimuthConfigHistory(AzimuthBaseSettings):

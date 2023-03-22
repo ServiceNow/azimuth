@@ -242,6 +242,9 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
     assert not get_config["pipelines"]
+    with jsonlines.open(jsonl_file_path, "r") as reader:
+        new_config_count = len(list(reader))
+    assert new_config_count == initial_config_count + 1
 
     # Config Validation Error
     res = client.patch("/config", json={"model_contract": "potato"})
@@ -262,9 +265,14 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     get_config = client.get("/config").json()
     assert not get_config["pipelines"]
 
+    # Empty update
+    res = client.patch("/config", json={})
+    assert res.status_code == 200
+    assert get_config == client.get("/config").json()
+
     with jsonlines.open(jsonl_file_path, "r") as reader:
         loaded_configs = list(reader)
-    assert len(loaded_configs) == initial_config_count + 1, "Config have been modified once."
+    assert len(loaded_configs) == new_config_count, "No config should have been saved since."
     assert loaded_configs[-1]["config"]["model_contract"] == "file_based_text_classification"
     assert not loaded_configs[-1]["config"]["pipelines"]
 

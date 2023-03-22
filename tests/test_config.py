@@ -16,7 +16,7 @@ from azimuth.config import (
     config_defaults_per_language,
     load_azimuth_config,
 )
-from azimuth.utils.project import save_config, update_config
+from azimuth.utils.project import update_config
 
 CURR_PATH = os.path.dirname(os.path.dirname(__file__))
 
@@ -234,7 +234,7 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
     partial_config = {"similarity": None}
     new_config = update_config(tiny_text_config, partial_config)
     assert not new_config.similarity
-    save_config(new_config)
+    new_config.save()
 
     with jsonlines.open(config_history_path, "r") as reader:
         all_configs = list(reader)
@@ -245,7 +245,7 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
     partial_config = {"dataset_warnings": {"min_num_per_class": 40}}
     new_config = update_config(new_config, partial_config)
     assert new_config.dataset_warnings.min_num_per_class == 40
-    save_config(new_config)
+    new_config.save()
 
     with jsonlines.open(config_history_path, "r") as reader:
         all_configs = list(reader)
@@ -264,7 +264,7 @@ def test_load_from_config_history(tiny_text_config):
     assert cfg == AzimuthConfig()
 
     # With a config history, the loaded config is the last one from the config history.
-    save_config(tiny_text_config)
+    tiny_text_config.save()
     os.environ["ARTIFACT_PATH"] = tiny_text_config.artifact_path
     cfg = load_azimuth_config(config_path=None, load_config_history=True)
     assert cfg == tiny_text_config
