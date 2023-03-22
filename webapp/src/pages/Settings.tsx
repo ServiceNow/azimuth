@@ -71,6 +71,7 @@ const FIELDS: Record<
   long_utterance_min_word: { ...INT, units: "words" },
   temperature: FLOAT,
   threshold: PERCENTAGE,
+  seed: INT,
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
@@ -863,8 +864,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             displayArgumentsList(field, value)
           ) : typeof value === "object" ? (
             displayKeywordArguments(field, value)
-          ) : field === "seed" ? (
-            displayReadonlyFields(field, value)
           ) : field === "spacy_model" ? (
             <StringField
               select
