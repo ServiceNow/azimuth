@@ -27,7 +27,6 @@ import {
   Paper,
   TextField,
   TextFieldProps,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
@@ -118,46 +117,6 @@ const displaySectionTitle = (section: string) => (
 const KeyValuePairs: React.FC = ({ children }) => (
   <Box display="grid" gridTemplateColumns="max-content auto" gap={1}>
     {children}
-  </Box>
-);
-
-const displayKeywordArguments = (name: string, kwargs: Record<string, any>) => (
-  <Box key={name} display="flex" flexDirection="column">
-    <Typography variant="caption">{name}</Typography>
-    <KeyValuePairs>
-      {Object.entries(kwargs).map(([field, value], index) => (
-        <React.Fragment key={index}>
-          <Typography variant="body2">{field}:</Typography>
-          <Tooltip title={Array.isArray(value) ? value.join(", ") : value}>
-            <Typography
-              variant="body2"
-              whiteSpace="nowrap"
-              overflow="hidden"
-              textOverflow="ellipsis"
-            >
-              {Array.isArray(value) ? value.join(", ") : value}
-            </Typography>
-          </Tooltip>
-        </React.Fragment>
-      ))}
-    </KeyValuePairs>
-  </Box>
-);
-
-const displayArgumentsList = (name: string, args: any[]) => (
-  <Box key={name} display="flex" flexDirection="column">
-    <Typography variant="caption">{name}</Typography>
-    {args.map((value, index) => (
-      <Typography
-        key={index}
-        variant="body2"
-        whiteSpace="nowrap"
-        overflow="hidden"
-        textOverflow="ellipsis"
-      >
-        {value}
-      </Typography>
-    ))}
   </Box>
 );
 
@@ -263,6 +222,72 @@ const StringArrayField: React.FC<
     }}
   />
 );
+
+const stringifyJSON = (value: unknown, spaces = 2) =>
+  JSON.stringify(value, null, spaces)
+    .slice(2, -2) // Remove enclosing brackets or braces, and newlines
+    .replace(new RegExp(`^ {${spaces}}`, "gm"), ""); // Unindent
+
+const JSONField: React.FC<
+  Omit<TextFieldProps, "onChange"> &
+    (
+      | ({ array: true } & FieldProps<any[]>)
+      | ({ array?: false } & FieldProps<Record<string, unknown>>)
+    )
+> = ({ value, onChange, array, ...props }) => {
+  const [stringValue, setStringValue] = React.useState(stringifyJSON(value));
+
+  React.useEffect(() => setStringValue(stringifyJSON(value)), [value]);
+
+  const [errorText, setErrorText] = React.useState("");
+
+  const adornments = array ? (["[", "]"] as const) : (["{", "}"] as const);
+
+  return (
+    <TextField
+      {...FIELD_COMMON_PROPS}
+      multiline
+      value={stringValue}
+      error={errorText !== ""}
+      helperText={errorText}
+      onChange={(event) => {
+        setStringValue(event.target.value);
+        // Update errorText if there is one, but wait for blur to add one.
+        if (errorText) {
+          try {
+            JSON.parse(adornments.join(event.target.value));
+            setErrorText("");
+          } catch (error) {
+            setErrorText((error as SyntaxError).message);
+          }
+        }
+      }}
+      onBlur={
+        onChange &&
+        ((event) => {
+          try {
+            onChange(JSON.parse(adornments.join(event.target.value)));
+          } catch (error) {
+            setErrorText((error as SyntaxError).message);
+          }
+        })
+      }
+      InputProps={{
+        startAdornment: (
+          <Typography variant="inherit" alignSelf="start">
+            {adornments[0]}&nbsp;
+          </Typography>
+        ),
+        endAdornment: (
+          <Typography variant="inherit" alignSelf="end">
+            &nbsp;{adornments[1]}
+          </Typography>
+        ),
+      }}
+      {...props}
+    />
+  );
+};
 
 type Props = {
   open: boolean;
@@ -452,6 +477,26 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       </Box>
     );
   }
+
+  // TODO Reuse that kind of handler to reduce duplication.
+  const updateModel = (
+    pipelineIndex: number,
+    update: Partial<PipelineDefinition["model"]>
+  ) =>
+    setPartialConfig({
+      ...partialConfig,
+      pipelines: [
+        ...resultingConfig.pipelines!.slice(0, pipelineIndex),
+        {
+          ...resultingConfig.pipelines![pipelineIndex],
+          model: {
+            ...resultingConfig.pipelines![pipelineIndex].model,
+            ...update,
+          },
+        },
+        ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+      ],
+    });
 
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
@@ -649,7 +694,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     <>
       {displaySectionTitle("General")}
       <FormGroup>
-        <Columns columns={3}>
+        <Columns columns={4}>
           {displayStringField("name", resultingConfig.name)}
           {displayStringField(
             "rejection_class",
@@ -675,7 +720,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       </FormGroup>
       {displaySectionTitle("Dataset")}
       <FormGroup>
-        <Columns columns={3}>
+        <Columns columns={2}>
           {displayStringField(
             "class_name",
             resultingConfig.dataset.class_name,
@@ -686,10 +731,29 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             resultingConfig.dataset.remote,
             "dataset"
           )}
-          {resultingConfig.dataset.args.length > 0 &&
-            displayArgumentsList("args", resultingConfig.dataset.args)}
-          {Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
-            displayKeywordArguments("kwargs", resultingConfig.dataset.kwargs)}
+          <JSONField
+            array
+            label="args"
+            value={resultingConfig.dataset.args}
+            disabled={isUpdatingConfig}
+            onChange={(args) =>
+              setPartialConfig({
+                ...partialConfig,
+                dataset: { ...resultingConfig.dataset, args },
+              })
+            }
+          />
+          <JSONField
+            label="kwargs"
+            value={resultingConfig.dataset.kwargs}
+            disabled={isUpdatingConfig}
+            onChange={(kwargs) =>
+              setPartialConfig({
+                ...partialConfig,
+                dataset: { ...resultingConfig.dataset, kwargs },
+              })
+            }
+          />
         </Columns>
       </FormGroup>
     </>
@@ -698,7 +762,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     <>
       {displaySectionTitle("General")}
       <FormGroup>
-        <Columns columns={3}>
+        <Columns columns={4}>
           <StringField
             select
             label="model_contract"
@@ -761,7 +825,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 <FormControl>
                   {displaySectionTitle("General")}
                   <FormGroup>
-                    <Columns columns={3}>
+                    <Columns columns={2}>
                       {displayPipelineStringField(
                         pipelineIndex,
                         pipeline,
@@ -774,7 +838,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 <FormControl>
                   {displaySectionTitle("Model")}
                   <FormGroup>
-                    <Columns columns={3}>
+                    <Columns columns={2}>
                       {displayPipelineStringField(
                         pipelineIndex,
                         pipeline,
@@ -789,13 +853,23 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         pipeline.model.remote,
                         "model"
                       )}
-                      {pipeline.model.args.length > 0 &&
-                        displayArgumentsList("args", pipeline.model.args)}
-                      {Object.keys(pipeline.model.kwargs).length > 0 &&
-                        displayKeywordArguments(
-                          "kwargs",
-                          pipeline.model.kwargs
-                        )}
+                      <JSONField
+                        array
+                        label="args"
+                        value={pipeline.model.args}
+                        disabled={isUpdatingConfig}
+                        onChange={(args) =>
+                          updateModel(pipelineIndex, { args })
+                        }
+                      />
+                      <JSONField
+                        label="kwargs"
+                        value={pipeline.model.kwargs}
+                        disabled={isUpdatingConfig}
+                        onChange={(kwargs) =>
+                          updateModel(pipelineIndex, { kwargs })
+                        }
+                      />
                     </Columns>
                   </FormGroup>
                 </FormControl>
@@ -807,7 +881,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       defaultConfig.pipelines![0].postprocessors
                     )?.map((postprocessor, index) => (
                       <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
-                        <Columns columns={3}>
+                        <Columns columns={2}>
                           {displayPipelineStringField(
                             pipelineIndex,
                             pipeline,
