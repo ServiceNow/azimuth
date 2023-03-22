@@ -22,7 +22,7 @@ else
 endif
 
 ifeq ($(DEVICE),gpu)
-	COMPOSE_EXT=-gpu
+	COMPOSE_EXT=-f docker-compose-gpu.yml
 else
 	COMPOSE_EXT=
 endif
@@ -55,7 +55,7 @@ compose: build launch
 
 .PHONY: launch
 launch:
-	docker compose -f docker-compose$(COMPOSE_EXT).yml --env-file $(ENV_FILE) up
+	docker compose -f docker-compose.yml $(COMPOSE_EXT) --env-file $(ENV_FILE) up
 
 .PHONY: push
 push:
