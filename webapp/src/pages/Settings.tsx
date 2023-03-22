@@ -531,7 +531,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 ...(subPipeline === "model" && { [field]: newValue }),
               },
               postprocessors:
-                postprocessorIdx && subPipeline === "postprocessors"
+                postprocessorIdx !== undefined &&
+                subPipeline === "postprocessors"
                   ? [
                       ...pipeline.postprocessors!.slice(0, postprocessorIdx),
                       {
