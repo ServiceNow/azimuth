@@ -454,8 +454,8 @@ class AzimuthConfig(
             if last_config:
                 log.info(f"Loading latest config from {config_history_path}.")
                 return last_config
-            else:
-                log.info("Empty or invalid config history.")
+
+            log.info("Empty or invalid config history.")
 
         return cls.parse_file(config_path) if config_path else cls()
 
