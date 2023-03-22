@@ -13,14 +13,10 @@ services:
       - "NAME"
       - "BEHAVIORAL_TESTING"
       - "SIMILARITY"
-    ports:
-      - "8091:8091"
     volumes:
     - ./config:/config
     - ./azimuth_shr:/azimuth_shr
     - ./cache:/cache
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
   web:
     image: "${REGISTRY}/azimuth-app:${FRONTEND_VERSION}"
     command:
@@ -30,5 +26,5 @@ services:
       - "PORT=8080"
     ports:
       - "8080:8080"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    links:
+      - backend:host.docker.internal

@@ -105,8 +105,8 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
     ```
     make launch
     ```
-4. The **app will be accessible** at `http://localhost:8080` after a few minutes of waiting. The
-   start-up tasks will start.
+4. The **app will be accessible** at http://localhost:8080 after a few minutes of waiting. The
+    start-up tasks will start. The back-end API will be accessible at http://localhost:8080/api/local/docs.
 
 After a successful start, Azimuth saves the provided config in its `config_history.jsonl` artifact. If you use the API to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
 ```shell
