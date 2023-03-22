@@ -1,12 +1,5 @@
 import { Settings as SettingsIcon } from "@mui/icons-material";
-import {
-  Box,
-  Breadcrumbs,
-  Dialog,
-  IconButton,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Breadcrumbs, IconButton, Link, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -87,7 +80,7 @@ const PageHeader = () => {
       })}`
     );
   };
-  const [openConfigModal, setOpenConfigModal] = React.useState(false);
+  const [configOpen, setConfigOpen] = React.useState(false);
   const dashboardPathname = `/${jobId}`;
 
   const isDashboard = location.pathname === dashboardPathname;
@@ -184,7 +177,7 @@ const PageHeader = () => {
             <IconButton
               size="small"
               color="primary"
-              onClick={() => setOpenConfigModal(true)}
+              onClick={() => setConfigOpen(true)}
               sx={{
                 padding: 0,
                 "&:hover > svg": {
@@ -197,14 +190,7 @@ const PageHeader = () => {
             </IconButton>
             <HelpMenu />
           </Box>
-          <Dialog
-            aria-labelledby="config-dialog-title"
-            maxWidth="md"
-            fullWidth
-            open={openConfigModal}
-          >
-            <Settings onClose={() => setOpenConfigModal(false)} />
-          </Dialog>
+          <Settings open={configOpen} onClose={() => setConfigOpen(false)} />
         </div>
       )}
     </div>
