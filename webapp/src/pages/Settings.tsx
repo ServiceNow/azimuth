@@ -1,8 +1,12 @@
 import { Close, Warning } from "@mui/icons-material";
 import {
+  Autocomplete,
+  autocompleteClasses,
   Box,
   Button,
   Checkbox,
+  Chip,
+  chipClasses,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -112,7 +116,7 @@ const displaySectionTitle = (section: string) => (
 );
 
 const KeyValuePairs: React.FC = ({ children }) => (
-  <Box display="grid" gridTemplateColumns="max-content auto" columnGap={1}>
+  <Box display="grid" gridTemplateColumns="max-content auto" gap={1}>
     {children}
   </Box>
 );
@@ -214,6 +218,51 @@ const NumberField: React.FC<
     />
   );
 };
+
+const StringArrayField: React.FC<
+  FieldProps<string[]> & { label?: string; units?: string; disabled: boolean }
+> = ({ value, onChange, label, units = label || "token", disabled }) => (
+  <Autocomplete
+    disableClearable
+    freeSolo
+    multiple
+    options={[]}
+    value={value}
+    disabled={disabled}
+    onChange={onChange && ((_, newValue) => onChange(newValue as string[]))}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        {...FIELD_COMMON_PROPS}
+        label={label}
+        FormHelperTextProps={{ sx: { fontWeight: "unset" } }}
+        helperText={
+          <>
+            Write a{/^[aeiou]/.test(units) && "n"} {units} and press enter
+          </>
+        }
+      />
+    )}
+    renderTags={(value, getTagProps) =>
+      value.map((option, index) => (
+        <Chip size="small" label={option} {...getTagProps({ index })} />
+      ))
+    }
+    sx={{
+      [`& .${autocompleteClasses.inputRoot}`]: {
+        gap: 0.5,
+        [`& .${autocompleteClasses.tag}`]: {
+          height: 20,
+          margin: 0,
+          [`& .${chipClasses.deleteIcon}`]: {
+            marginLeft: "-6px",
+            marginRight: "2px",
+          },
+        },
+      },
+    }}
+  />
+);
 
 type Props = {
   open: boolean;
@@ -330,7 +379,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
           [`& .fixedWidthInput .${inputClasses.root}`]: { maxWidth: "12ch" },
-          [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
+          [`& .${inputClasses.root}`]: {
+            fontSize: 14,
+            paddingY: "0 !important", // for multiline Input, !important for Autocomplete
+          },
+          [`& .${inputClasses.input}`]: {
+            paddingY: "0 !important", // for regular Input, !important for Autocomplete
+          },
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
       >
@@ -830,38 +885,48 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               {...FIELDS[field]}
             />
           ) : Array.isArray(value) ? (
-            displayArgumentsList(field, value)
+            <StringArrayField
+              key={field}
+              label={field}
+              value={value}
+              disabled={!resultingConfig[config] || isUpdatingConfig}
+              onChange={(newValue) =>
+                setPartialConfig({
+                  ...partialConfig,
+                  [config]: { ...resultingConfig[config], [field]: newValue },
+                })
+              }
+            />
           ) : typeof value === "object" ? (
-            <Box key={field} display="flex" flexDirection="column">
+            <Box
+              key={field}
+              display="flex"
+              flexDirection="column"
+              {...(field === "neutral_token" && {
+                sx: { gridColumnEnd: "span 2" },
+              })}
+            >
               <Typography variant="caption">{field}</Typography>
               <KeyValuePairs>
                 {Object.entries(value).map(([objField, objValue], index) => (
                   <React.Fragment key={index}>
                     <Typography variant="body2">{objField}:</Typography>
                     {Array.isArray(objValue) ? (
-                      <StringField
-                        key={objField}
-                        value={objValue.join(", ")}
-                        disabled={
-                          isUpdatingConfig ||
-                          (config && !resultingConfig[config])
-                        }
+                      <StringArrayField
+                        value={objValue}
+                        disabled={!resultingConfig[config] || isUpdatingConfig}
                         onChange={(newValue) =>
                           setPartialConfig({
                             ...partialConfig,
                             [config]: {
                               ...resultingConfig[config],
-                              [field]: {
-                                ...value,
-                                [objField]: newValue.split(", "),
-                              },
+                              [field]: { ...value, [objField]: newValue },
                             },
                           })
                         }
                       />
                     ) : (
                       <NumberField
-                        key={index}
                         value={objValue as number}
                         disabled={!resultingConfig[config] || isUpdatingConfig}
                         onChange={(newValue) =>
@@ -869,10 +934,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                             ...partialConfig,
                             [config]: {
                               ...resultingConfig[config],
-                              [field]: {
-                                ...value,
-                                [objField]: newValue,
-                              },
+                              [field]: { ...value, [objField]: newValue },
                             },
                           })
                         }
