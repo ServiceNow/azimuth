@@ -488,7 +488,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       key={field}
       label={label}
       value={String(value)}
-      disabled={isUpdatingConfig}
+      disabled={isUpdatingConfig || (config && !resultingConfig[config])}
       onChange={(newValue) =>
         config
           ? setPartialConfig({
@@ -625,26 +625,20 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
-              <React.Fragment key="text_input">
-                <Typography key="txtInput" variant="body2">
-                  text_input:
-                </Typography>
-                {displayStringField(
-                  "text_input",
-                  resultingConfig.columns.text_input,
-                  "columns",
-                  ""
-                )}
-              </React.Fragment>
-              <React.Fragment key="label">
-                <Typography variant="body2">label:</Typography>
-                {displayStringField(
-                  "label",
-                  resultingConfig.columns.label,
-                  "columns",
-                  ""
-                )}
-              </React.Fragment>
+              <Typography variant="body2">text_input:</Typography>
+              {displayStringField(
+                "text_input",
+                resultingConfig.columns.text_input,
+                "columns",
+                ""
+              )}
+              <Typography variant="body2">label:</Typography>
+              {displayStringField(
+                "label",
+                resultingConfig.columns.label,
+                "columns",
+                ""
+              )}
             </KeyValuePairs>
           </Box>
         </Columns>
