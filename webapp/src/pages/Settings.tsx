@@ -871,28 +871,26 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <React.Fragment key={index}>
                     <Typography variant="body2">{objField}:</Typography>
                     {Array.isArray(objValue) ? (
-                      <Tooltip title={objValue.join(", ")}>
-                        <StringField
-                          key={objField}
-                          value={objValue.join(", ")}
-                          disabled={
-                            isUpdatingConfig ||
-                            (config && !resultingConfig[config])
-                          }
-                          onChange={(newValue) =>
-                            setPartialConfig({
-                              ...partialConfig,
-                              [config]: {
-                                ...resultingConfig[config],
-                                [field]: {
-                                  ...value,
-                                  [objField]: newValue.split(", "),
-                                },
+                      <StringField
+                        key={objField}
+                        value={objValue.join(", ")}
+                        disabled={
+                          isUpdatingConfig ||
+                          (config && !resultingConfig[config])
+                        }
+                        onChange={(newValue) =>
+                          setPartialConfig({
+                            ...partialConfig,
+                            [config]: {
+                              ...resultingConfig[config],
+                              [field]: {
+                                ...value,
+                                [objField]: newValue.split(", "),
                               },
-                            })
-                          }
-                        />
-                      </Tooltip>
+                            },
+                          })
+                        }
+                      />
                     ) : (
                       <NumberField
                         sx={{ width: "10ch" }}
