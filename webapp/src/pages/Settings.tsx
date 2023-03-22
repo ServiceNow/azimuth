@@ -157,16 +157,19 @@ const displayArgumentsList = (name: string, args: any[]) => (
   </Box>
 );
 
+type FieldProps<T> = { value: T; onChange?: (newValue: T) => void };
+
+const FIELD_COMMON_PROPS = {
+  size: "small",
+  variant: "standard",
+  InputLabelProps: { shrink: true },
+} as const;
+
 const StringField: React.FC<
-  Omit<TextFieldProps, "onChange"> & {
-    value: string;
-    onChange?: (newValue: string) => void;
-  }
+  Omit<TextFieldProps, "onChange"> & FieldProps<string>
 > = ({ onChange, ...props }) => (
   <TextField
-    size="small"
-    variant="standard"
-    InputLabelProps={{ shrink: true }}
+    {...FIELD_COMMON_PROPS}
     inputProps={{
       sx: {
         textOverflow: "ellipsis",
@@ -178,12 +181,8 @@ const StringField: React.FC<
 );
 
 const NumberField: React.FC<
-  Omit<TextFieldProps, "onChange"> & {
-    value: number;
-    scale?: number;
-    units?: string;
-    onChange: (newValue: number) => void;
-  }
+  Omit<TextFieldProps, "onChange"> &
+    FieldProps<number> & { scale?: number; units?: string }
 > = ({ value, scale = 1, units, onChange, ...props }) => {
   // Control value with a `string` (and not with a `number`) so that for example
   // when hitting backspace at the end of `0.01`, you get `0.0` (and not `0`).
@@ -197,12 +196,10 @@ const NumberField: React.FC<
 
   return (
     <TextField
-      variant="standard"
-      size="small"
+      {...FIELD_COMMON_PROPS}
       type="number"
       className="fixedWidthInput"
       title="" // Overwrite any default input validation tooltip
-      InputLabelProps={{ shrink: true }}
       value={stringValue}
       {...(units && {
         InputProps: {
@@ -211,7 +208,7 @@ const NumberField: React.FC<
       })}
       onChange={(event) => {
         setStringValue(event.target.value);
-        onChange(Number(event.target.value) / scale);
+        onChange && onChange(Number(event.target.value) / scale);
       }}
       {...props}
     />
@@ -800,8 +797,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 size="small"
                 checked={Boolean(resultingConfig.metrics[metricName])}
                 disabled={isUpdatingConfig}
-                onChange={(e) =>
-                  handleCustomMetricUpdate(e.target.checked, metricName)
+                onChange={(...[, checked]) =>
+                  handleCustomMetricUpdate(checked, metricName)
                 }
               />
             }
