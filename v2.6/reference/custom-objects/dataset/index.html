@@ -15,7 +15,7 @@
         <link rel="next" href="../model/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.2">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.3">
     
     
       
@@ -23,7 +23,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.7bf56d0a.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.c4a75a56.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.a0c5b2b5.min.css">
@@ -1514,8 +1514,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
+  <a href="#examples" class="md-nav__link">
+    Examples
   </a>
   
 </li>
@@ -1735,8 +1735,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
+  <a href="#examples" class="md-nav__link">
+    Examples
   </a>
   
 </li>
@@ -1787,14 +1787,16 @@ resources from HuggingFace:</p>
 about dataset loading using Huggingface.</p>
 </div>
 <h3 id="dataset-splits">Dataset splits</h3>
-<p>Azimuth expects the <code>train</code> and one of <code>validation</code> or <code>test</code> splits to be available. If
-both <code>validation</code> and <code>test</code> are available, we will pick the former. The <code>train</code> is not mandatory for Azimuth to run.</p>
+<p>Azimuth expects either <code>train</code>, <code>validation</code> or <code>test</code> splits to be available.</p>
+<ul>
+<li>If both <code>validation</code> and <code>test</code> are available, we will pick the former as the <code>evaluation</code> split.</li>
+<li>The app can load a <code>train</code> split only, an <code>evaluation</code> split only, or both.</li>
+</ul>
 <h2 id="column-names-and-rejection-class">Column names and rejection class</h2>
 <p>Go to the <a href="../../configuration/project/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Project Config</a> to see other attributes that
 should be set along with the dataset.</p>
-<h2 id="example">Example</h2>
+<h2 id="examples">Examples</h2>
 <p>Using this <abbr title="Application Programming Interface">API</abbr>, we can load SST2, a sentiment analysis dataset.</p>
-<p><strong>Note:</strong> in this case, we can omit <code>azimuth_config</code> from the definition because we don't need it.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">azimuth_shr/loading_resources.py</label><label for="__tabbed_1_2">Configuration file</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -1826,6 +1828,39 @@ should be set along with the dataset.</p>
 </div>
 </div>
 </div>
+<p>We can also load a CSV file.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">azimuth_shr/loading_resources.py</label><label for="__tabbed_2_2">Configuration file</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">DatasetDict</span><span class="p">,</span> <span class="n">load_dataset</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validation_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatasetDict</span><span class="p">:</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">data_files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">if</span> <span class="n">train_path</span><span class="p">:</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="n">data_files</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_path</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">if</span> <span class="n">validation_path</span><span class="p">:</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">data_files</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validation_path</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">ds_dict</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="n">data_files</span><span class="o">=</span><span class="n">data_files</span><span class="p">)</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="k">return</span> <span class="n">ds_dict</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;dataset&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">&quot;class_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;loading_resources.load_csv&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">&quot;remote&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/azimuth_shr&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">&quot;kwargs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="nt">&quot;train_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;path_to_data&quot;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p><strong>Note:</strong> in both cases, we can omit <code>azimuth_config</code> from the definition because we don't need it.</p>
+<p>For more examples, users can refer to <code>azimuth_shr/loading_resources.py</code> in the repo.</p>
 
 
 
@@ -1866,7 +1901,7 @@ should be set along with the dataset.</p>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "search.suggest", "navigation.indexes", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "main", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.fc8c2696.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.efa0ade1.min.js"></script>
       
     
   </body>
