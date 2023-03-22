@@ -262,6 +262,11 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     get_config = client.get("/config").json()
     assert not get_config["pipelines"]
 
+    # Empty update
+    res = client.patch("/config", json={})
+    assert res.status_code == 200
+    assert get_config == client.get("/config").json()
+
     with jsonlines.open(jsonl_file_path, "r") as reader:
         loaded_configs = list(reader)
     assert len(loaded_configs) == initial_config_count + 1, "Config have been modified once."
