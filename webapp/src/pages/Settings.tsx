@@ -72,6 +72,7 @@ const FIELDS: Record<
   temperature: FLOAT,
   threshold: PERCENTAGE,
   seed: INT,
+  nb_typos_per_utterance: INT,
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
@@ -858,7 +859,65 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           ) : Array.isArray(value) ? (
             displayArgumentsList(field, value)
           ) : typeof value === "object" ? (
-            displayKeywordArguments(field, value)
+            <Box
+              key={field}
+              display="flex"
+              flexDirection="column"
+              marginRight={2}
+            >
+              <Typography variant="caption">{field}</Typography>
+              <KeyValuePairs>
+                {Object.entries(value).map(([objField, objValue], index) => (
+                  <React.Fragment key={index}>
+                    <Typography variant="body2">{objField}:</Typography>
+                    {Array.isArray(objValue) ? (
+                      <Tooltip title={objValue.join(", ")}>
+                        <StringField
+                          key={objField}
+                          value={objValue.join(", ")}
+                          disabled={
+                            isUpdatingConfig ||
+                            (config && !resultingConfig[config])
+                          }
+                          onChange={(newValue) =>
+                            setPartialConfig({
+                              ...partialConfig,
+                              [config]: {
+                                ...resultingConfig[config],
+                                [field]: {
+                                  ...value,
+                                  [objField]: newValue.split(", "),
+                                },
+                              },
+                            })
+                          }
+                        />
+                      </Tooltip>
+                    ) : (
+                      <NumberField
+                        sx={{ width: "10ch" }}
+                        key={index}
+                        value={objValue as number}
+                        disabled={!resultingConfig[config] || isUpdatingConfig}
+                        onChange={(newValue) =>
+                          setPartialConfig({
+                            ...partialConfig,
+                            [config]: {
+                              ...resultingConfig[config],
+                              [field]: {
+                                ...value,
+                                [objField]: newValue,
+                              },
+                            },
+                          })
+                        }
+                        {...FIELDS[field]}
+                      />
+                    )}
+                  </React.Fragment>
+                ))}
+              </KeyValuePairs>
+            </Box>
           ) : field === "spacy_model" ? (
             <StringField
               select
