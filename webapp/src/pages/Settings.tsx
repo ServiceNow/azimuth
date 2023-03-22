@@ -176,26 +176,6 @@ const StringField: React.FC<
   />
 );
 
-const StringField: React.FC<
-  Omit<TextFieldProps, "onChange"> & {
-    value: string;
-    onChange: (newValue: string) => void;
-  }
-> = ({ onChange, ...props }) => (
-  <TextField
-    size="small"
-    variant="standard"
-    InputLabelProps={{ shrink: true }}
-    inputProps={{
-      sx: {
-        textOverflow: "ellipsis",
-      },
-    }}
-    onChange={({ target: { value } }) => onChange(value)}
-    {...props}
-  />
-);
-
 const NumberField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
     value: number;
@@ -639,6 +619,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 "columns",
                 ""
               )}
+              <Typography variant="body2">persistent_id:</Typography>
+              {displayStringField(
+                "persistent_id",
+                resultingConfig.columns.persistent_id,
+                "columns",
+                ""
+              )}
             </KeyValuePairs>
           </Box>
         </Columns>
@@ -940,15 +927,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   );
 
   const getCommonFieldsConfigSection = () => (
-    <Box marginY={1.5}>
+    <Box marginTop={2}>
       <FormGroup>
         <Columns columns={4}>
-          {displayReadonlyFields(
-            "artifact_path",
-            resultingConfig.artifact_path
-          )}
+          {displayReadonlyField("artifact_path", resultingConfig.artifact_path)}
           <NumberField
-            key="batch_size"
             label="batch_size"
             value={resultingConfig.batch_size}
             disabled={isUpdatingConfig}
@@ -970,7 +953,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               newValue &&
               setPartialConfig({
                 ...partialConfig,
-                use_cuda: newValue === "auto" ? newValue : Boolean(newValue),
+                use_cuda:
+                  newValue === "true" || (newValue === "auto" && "auto"),
               })
             }
           >
@@ -984,7 +968,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             control={
               <Checkbox
                 size="small"
-                checked={Boolean(resultingConfig.large_dask_cluster)}
+                checked={resultingConfig.large_dask_cluster}
                 disabled={isUpdatingConfig}
                 onChange={(...[, checked]) =>
                   setPartialConfig({
@@ -995,7 +979,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               />
             }
             label="large_dask_cluster"
-            labelPlacement="start"
           />
         </Columns>
       </FormGroup>
