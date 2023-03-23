@@ -950,7 +950,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             value={String(resultingConfig.use_cuda)}
             disabled={isUpdatingConfig}
             onChange={(newValue: string | boolean) =>
-              newValue &&
               setPartialConfig({
                 ...partialConfig,
                 use_cuda:
