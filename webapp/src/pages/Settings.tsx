@@ -161,14 +161,14 @@ const NumberField: React.FC<
     <TextField
       {...FIELD_COMMON_PROPS}
       type="number"
-      className="fixedWidthInput"
       title="" // Overwrite any default input validation tooltip
       value={stringValue}
-      {...(units && {
-        InputProps: {
-          endAdornment: <InputAdornment position="end">{units}</InputAdornment>,
-        },
-      })}
+      InputProps={{
+        sx: { maxWidth: "12ch" },
+        endAdornment: units && (
+          <InputAdornment position="end">{units}</InputAdornment>
+        ),
+      }}
       onChange={(event) => {
         setStringValue(event.target.value);
         onChange && onChange(Number(event.target.value) / scale);
@@ -406,7 +406,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .fixedWidthInput .${inputClasses.root}`]: { maxWidth: "12ch" },
           [`& .${inputClasses.root}`]: {
             fontSize: 14,
             paddingY: "0 !important", // for multiline Input, !important for Autocomplete
