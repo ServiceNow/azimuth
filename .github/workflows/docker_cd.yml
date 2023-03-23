@@ -18,10 +18,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push CPU Docker image
         run: |
-          make build push
-          make TAG=$VERSION build push
+          make DEVICE=cpu build push
+          make DEVICE=cpu TAG=$VERSION build push
         env:
-          DEVICE: cpu
           VERSION: ${{ steps.get_version.outputs.VERSION }}
   docker-deploy-gpu:
     runs-on: ubuntu-latest
@@ -37,9 +36,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push GPU Docker image
         run: |
-          make build push
-          make TAG=$VERSION build push
+          make DEVICE=gpu build push
+          make DEVICE=gpu TAG=$VERSION build push
         env:
-          DEVICE: gpu
           VERSION: ${{ steps.get_version.outputs.VERSION }}
 
