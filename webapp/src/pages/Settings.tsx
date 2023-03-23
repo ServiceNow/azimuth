@@ -236,6 +236,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   >({});
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
+  const isNull = (value: string) => (value === "" ? null : value);
 
   const handleDiscard = () => {
     setPartialConfig({});
