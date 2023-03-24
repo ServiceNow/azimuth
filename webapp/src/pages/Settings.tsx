@@ -236,7 +236,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   >({});
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
-  const isNull = (value: string) => (value === "" ? null : value);
+
+  const handleDiscard = () => {
+    setPartialConfig({});
+    setLanguage(undefined);
+  };
+
+  const handleClose = () => {
+    handleDiscard();
+    onClose();
+  };
 
   const handleDiscard = () => {
     setPartialConfig({});
@@ -942,7 +951,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 batch_size: newValue,
               })
             }
-            {...FIELDS["batch_size"]}
+            {...INT}
           />
           <StringField
             select
@@ -1046,7 +1055,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       </AccordionLayout>
       <AccordionLayout
         name="Common Fields Configuration"
-        description="View and edit generic fields adpated based on the user's machine."
+        description="View and edit generic fields that can be adapted based on the user's machine."
         link="reference/configuration/common/"
       >
         {getCommonFieldsConfigSection()}
