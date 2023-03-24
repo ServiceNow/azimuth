@@ -18,11 +18,9 @@ import {
   InputAdornment,
   InputBaseComponentProps,
   inputClasses,
-  InputLabel,
   inputLabelClasses,
   MenuItem,
   Paper,
-  Select,
   TextField,
   TextFieldProps,
   Tooltip,
@@ -43,6 +41,8 @@ import {
   AzimuthConfig,
   PipelineDefinition,
   SupportedLanguage,
+  SupportedModelContract,
+  SupportedSpacyModels,
 } from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
@@ -71,6 +71,7 @@ const FIELDS: Record<
   long_utterance_min_word: { ...INT, units: "words" },
   temperature: FLOAT,
   threshold: PERCENTAGE,
+  seed: INT,
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
@@ -78,6 +79,15 @@ type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
+const SUPPORTED_MODEL_CONTRACTS: SupportedModelContract[] = [
+  "hf_text_classification",
+  "file_based_text_classification",
+  "custom_text_classification",
+];
+const SUPPORTED_SPACY_MODELS: SupportedSpacyModels[] = [
+  "en_core_web_sm",
+  "fr_core_news_md",
+];
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -89,7 +99,7 @@ const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
 ];
 
 const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
-  <Box display="grid" gap={2} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
+  <Box display="grid" gap={4} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
     {children}
   </Box>
 );
@@ -146,24 +156,23 @@ const displayArgumentsList = (name: string, args: any[]) => (
   </Box>
 );
 
-const displayReadonlyFields = (label: string, value: string | null) => (
+const StringField: React.FC<
+  Omit<TextFieldProps, "onChange"> & {
+    value: string;
+    onChange: (newValue: string) => void;
+  }
+> = ({ onChange, ...props }) => (
   <TextField
-    key={label}
     size="small"
     variant="standard"
-    label={label}
     InputLabelProps={{ shrink: true }}
-    value={String(value)}
-    InputProps={{
-      readOnly: true,
-      disableUnderline: true,
-    }}
     inputProps={{
       sx: {
         textOverflow: "ellipsis",
-        ...(value === null && { fontStyle: "italic" }),
       },
     }}
+    onChange={({ target: { value } }) => onChange(value)}
+    {...props}
   />
 );
 
@@ -225,6 +234,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
+
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
 
   const handleDiscard = () => {
@@ -321,7 +331,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
+          [`& .fixedWidthInput .${inputClasses.root}`]: { maxWidth: "12ch" },
           [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
@@ -447,6 +457,78 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
+  const displayStringField = (
+    field: string,
+    value: string | null,
+    config?: SubConfigKeys,
+    label: string = field
+  ) => (
+    <StringField
+      key={field}
+      label={label}
+      value={value ?? ""}
+      disabled={isUpdatingConfig || (config && !resultingConfig[config])}
+      onChange={(newValue) =>
+        config
+          ? setPartialConfig({
+              ...partialConfig,
+              [config]: {
+                ...resultingConfig[config],
+                [field]: newValue || null,
+              },
+            })
+          : setPartialConfig({
+              ...partialConfig,
+              [field]: newValue || null,
+            })
+      }
+    />
+  );
+
+  const displayPipelineStringField = (
+    pipelineIndex: number,
+    pipeline: PipelineDefinition,
+    field: string,
+    value: string | null,
+    subPipeline?: keyof PipelineDefinition,
+    postprocessorIdx?: number
+  ) => (
+    <StringField
+      key={field}
+      label={field}
+      value={String(value)}
+      disabled={isUpdatingConfig}
+      onChange={(newValue) =>
+        setPartialConfig({
+          ...partialConfig,
+          pipelines: [
+            ...resultingConfig.pipelines!.slice(0, pipelineIndex),
+            {
+              name: subPipeline ? pipeline.name : newValue,
+              model: {
+                ...pipeline.model,
+                ...(subPipeline === "model" && { [field]: newValue }),
+              },
+              postprocessors:
+                postprocessorIdx !== undefined &&
+                subPipeline === "postprocessors"
+                  ? [
+                      ...pipeline.postprocessors!.slice(0, postprocessorIdx),
+                      {
+                        ...pipeline.postprocessors![postprocessorIdx],
+                        [field]: newValue,
+                      },
+                      ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
+                    ]
+                  : pipeline.postprocessors,
+            },
+            ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+          ],
+        })
+      }
+    />
+  );
+
   const displayPostprocessorNumberField = (
     pipelineIndex: number,
     pipeline: PipelineDefinition,
@@ -515,8 +597,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields("name", resultingConfig.name)}
-          {displayReadonlyFields(
+          {displayStringField("name", resultingConfig.name)}
+          {displayStringField(
             "rejection_class",
             resultingConfig.rejection_class
           )}
@@ -524,13 +606,19 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
               <Typography variant="body2">text_input:</Typography>
-              <Typography variant="body2">
-                {resultingConfig.columns.text_input}
-              </Typography>
+              {displayStringField(
+                "text_input",
+                resultingConfig.columns.text_input,
+                "columns",
+                ""
+              )}
               <Typography variant="body2">label:</Typography>
-              <Typography variant="body2">
-                {resultingConfig.columns.label}
-              </Typography>
+              {displayStringField(
+                "label",
+                resultingConfig.columns.label,
+                "columns",
+                ""
+              )}
             </KeyValuePairs>
           </Box>
         </Columns>
@@ -538,11 +626,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("Dataset")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields(
+          {displayStringField(
             "class_name",
-            resultingConfig.dataset.class_name
+            resultingConfig.dataset.class_name,
+            "dataset"
           )}
-          {displayReadonlyFields("remote", resultingConfig.dataset.remote)}
+          {displayStringField(
+            "remote",
+            resultingConfig.dataset.remote,
+            "dataset"
+          )}
           {resultingConfig.dataset.args.length > 0 &&
             displayArgumentsList("args", resultingConfig.dataset.args)}
           {Object.keys(resultingConfig.dataset.kwargs).length > 0 &&
@@ -556,14 +649,25 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={3}>
-          {displayReadonlyFields(
-            "model_contract",
-            resultingConfig.model_contract
-          )}
-          {displayReadonlyFields(
-            "saliency_layer",
-            resultingConfig.saliency_layer
-          )}
+          <StringField
+            select
+            label="model_contract"
+            value={resultingConfig.model_contract}
+            disabled={isUpdatingConfig}
+            onChange={(newValue) => {
+              setPartialConfig({
+                ...partialConfig,
+                model_contract: newValue as SupportedModelContract,
+              });
+            }}
+          >
+            {SUPPORTED_MODEL_CONTRACTS.map((modelContract) => (
+              <MenuItem key={modelContract} value={modelContract}>
+                {modelContract}
+              </MenuItem>
+            ))}
+          </StringField>
+          {displayStringField("saliency_layer", resultingConfig.saliency_layer)}
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">uncertainty</Typography>
             <KeyValuePairs>
@@ -608,7 +712,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   {displaySectionTitle("General")}
                   <FormGroup>
                     <Columns columns={3}>
-                      {displayReadonlyFields("name", pipeline.name)}
+                      {displayPipelineStringField(
+                        pipelineIndex,
+                        pipeline,
+                        "name",
+                        pipeline.name
+                      )}
                     </Columns>
                   </FormGroup>
                 </FormControl>
@@ -616,11 +725,20 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   {displaySectionTitle("Model")}
                   <FormGroup>
                     <Columns columns={3}>
-                      {displayReadonlyFields(
+                      {displayPipelineStringField(
+                        pipelineIndex,
+                        pipeline,
                         "class_name",
-                        pipeline.model.class_name
+                        pipeline.model.class_name,
+                        "model"
                       )}
-                      {displayReadonlyFields("remote", pipeline.model.remote)}
+                      {displayPipelineStringField(
+                        pipelineIndex,
+                        pipeline,
+                        "remote",
+                        pipeline.model.remote,
+                        "model"
+                      )}
                       {pipeline.model.args.length > 0 &&
                         displayArgumentsList("args", pipeline.model.args)}
                       {Object.keys(pipeline.model.kwargs).length > 0 &&
@@ -640,9 +758,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     )?.map((postprocessor, index) => (
                       <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
                         <Columns columns={3}>
-                          {displayReadonlyFields(
+                          {displayPipelineStringField(
+                            pipelineIndex,
+                            pipeline,
                             "class_name",
-                            postprocessor.class_name
+                            postprocessor.class_name,
+                            "postprocessors",
+                            index
                           )}
                           {"temperature" in postprocessor &&
                             displayPostprocessorNumberField(
@@ -715,9 +837,82 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           ) : Array.isArray(value) ? (
             displayArgumentsList(field, value)
           ) : typeof value === "object" ? (
-            displayKeywordArguments(field, value)
+            <Box key={field} display="flex" flexDirection="column">
+              <Typography variant="caption">{field}</Typography>
+              <KeyValuePairs>
+                {Object.entries(value).map(([objField, objValue], index) => (
+                  <React.Fragment key={index}>
+                    <Typography variant="body2">{objField}:</Typography>
+                    {Array.isArray(objValue) ? (
+                      <StringField
+                        key={objField}
+                        value={objValue.join(", ")}
+                        disabled={
+                          isUpdatingConfig ||
+                          (config && !resultingConfig[config])
+                        }
+                        onChange={(newValue) =>
+                          setPartialConfig({
+                            ...partialConfig,
+                            [config]: {
+                              ...resultingConfig[config],
+                              [field]: {
+                                ...value,
+                                [objField]: newValue.split(", "),
+                              },
+                            },
+                          })
+                        }
+                      />
+                    ) : (
+                      <NumberField
+                        key={index}
+                        value={objValue as number}
+                        disabled={!resultingConfig[config] || isUpdatingConfig}
+                        onChange={(newValue) =>
+                          setPartialConfig({
+                            ...partialConfig,
+                            [config]: {
+                              ...resultingConfig[config],
+                              [field]: {
+                                ...value,
+                                [objField]: newValue,
+                              },
+                            },
+                          })
+                        }
+                        {...INT}
+                      />
+                    )}
+                  </React.Fragment>
+                ))}
+              </KeyValuePairs>
+            </Box>
+          ) : field === "spacy_model" ? (
+            <StringField
+              select
+              key={field}
+              label={field}
+              value={value}
+              disabled={isUpdatingConfig}
+              onChange={(newValue) =>
+                setPartialConfig({
+                  ...partialConfig,
+                  syntax: {
+                    ...resultingConfig.syntax,
+                    spacy_model: newValue as SupportedSpacyModels,
+                  },
+                })
+              }
+            >
+              {SUPPORTED_SPACY_MODELS.map((spacyModel) => (
+                <MenuItem key={spacyModel} value={spacyModel}>
+                  {spacyModel}
+                </MenuItem>
+              ))}
+            </StringField>
           ) : (
-            displayReadonlyFields(field, value)
+            displayStringField(field, value, config)
           )
         )}
       </Columns>
@@ -727,23 +922,20 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   const displayAnalysesCustomizationGeneralSection = () => (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
-        <FormControl variant="standard" className="fixedWidthInput">
-          <InputLabel id="language-input-label">language</InputLabel>
-          <Select
-            disabled={isUpdatingConfig}
-            value={language ?? resultingConfig.language}
-            labelId="language-input-label"
-            onChange={(event) =>
-              setLanguage(event.target.value as SupportedLanguage)
-            }
-          >
-            {SUPPORTED_LANGUAGES.map((language) => (
-              <MenuItem key={language} value={language}>
-                {language}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <StringField
+          select
+          label="language"
+          sx={{ width: "6ch" }}
+          value={language ?? resultingConfig.language}
+          disabled={isUpdatingConfig}
+          onChange={(newValue) => setLanguage(newValue as SupportedLanguage)}
+        >
+          {SUPPORTED_LANGUAGES.map((language) => (
+            <MenuItem key={language} value={language}>
+              {language}
+            </MenuItem>
+          ))}
+        </StringField>
         <Box display="flex" gap={1}>
           <Warning color="warning" />
           <Typography variant="body2">
