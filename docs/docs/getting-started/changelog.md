@@ -25,7 +25,7 @@
 - **Better support for CSV files.** New helper function to load CSV files. Example provided [here](../reference/custom-objects/dataset.md#examples).
 
 ### Changed
-- **Enhanced config page.** Additional fields from the config can be modified from the [settings page](../user-guide/settings.md), allowing to restart some start-up tasks based on the requested changes.
+- **Enhanced config page.** All fields from the config can now be modified from the [settings page](../user-guide/settings.md), allowing to restart some start-up tasks based on the requested changes.
 - **Syntax smart tags.**
     - Syntax smart tags are now computed even if utterances have more than one sentence.
     - For that reason, `short_sentence` and `long_sentence` were renamed to `short_utterance` and `long_utterance`. The default value for `long_utterance` was set to 12 words.
