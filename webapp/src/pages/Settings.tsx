@@ -286,7 +286,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         },
       });
     }
-  }, [defaultConfig, resultingConfig]);
+  }, [defaultConfig, resultingConfig, partialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
