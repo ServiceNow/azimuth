@@ -72,7 +72,6 @@ const FIELDS: Record<
   temperature: FLOAT,
   threshold: PERCENTAGE,
   seed: INT,
-  nb_typos_per_utterance: INT,
 };
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
@@ -256,7 +255,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<AzimuthConfig>
   >({});
-  const isNullString = (value: string) => value === "null";
+
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
 
   const handleDiscard = () => {
@@ -353,7 +352,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             marginLeft: 0,
           },
           [`& .${formGroupClasses.root}`]: { marginX: 2, marginBottom: 2 },
-          [`& .fixedWidthInput .${inputClasses.root}`]: { width: "12ch" },
+          [`& .fixedWidthInput .${inputClasses.root}`]: { maxWidth: "12ch" },
           [`& .${inputClasses.input}`]: { fontSize: 14, padding: 0 },
           [`& .${inputLabelClasses.root}`]: { fontWeight: "bold" },
         }}
@@ -488,7 +487,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     <StringField
       key={field}
       label={label}
-      value={String(value)}
+      value={value ?? ""}
       disabled={isUpdatingConfig || (config && !resultingConfig[config])}
       onChange={(newValue) =>
         config
@@ -496,12 +495,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               ...partialConfig,
               [config]: {
                 ...resultingConfig[config],
-                [field]: isNullString(newValue) ? null : newValue,
+                [field]: newValue || null,
               },
             })
           : setPartialConfig({
               ...partialConfig,
-              [field]: isNullString(newValue) ? null : newValue,
+              [field]: newValue || null,
             })
       }
     />
@@ -859,12 +858,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           ) : Array.isArray(value) ? (
             displayArgumentsList(field, value)
           ) : typeof value === "object" ? (
-            <Box
-              key={field}
-              display="flex"
-              flexDirection="column"
-              marginRight={2}
-            >
+            <Box key={field} display="flex" flexDirection="column">
               <Typography variant="caption">{field}</Typography>
               <KeyValuePairs>
                 {Object.entries(value).map(([objField, objValue], index) => (
@@ -893,7 +887,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       />
                     ) : (
                       <NumberField
-                        sx={{ width: "10ch" }}
                         key={index}
                         value={objValue as number}
                         disabled={!resultingConfig[config] || isUpdatingConfig}
@@ -909,7 +902,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                             },
                           })
                         }
-                        {...FIELDS[field]}
+                        {...INT}
                       />
                     )}
                   </React.Fragment>
@@ -953,7 +946,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <StringField
           select
           label="language"
-          className="fixedWidthInput"
+          sx={{ width: "6ch" }}
           value={language ?? resultingConfig.language}
           disabled={isUpdatingConfig}
           onChange={(newValue) => setLanguage(newValue as SupportedLanguage)}
