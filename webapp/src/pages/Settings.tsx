@@ -156,6 +156,27 @@ const displayArgumentsList = (name: string, args: any[]) => (
   </Box>
 );
 
+const displayReadonlyField = (label: string, value: string | null) => (
+  <TextField
+    key={label}
+    size="small"
+    variant="standard"
+    label={label}
+    InputLabelProps={{ shrink: true }}
+    value={String(value)}
+    InputProps={{
+      readOnly: true,
+      disableUnderline: true,
+    }}
+    inputProps={{
+      sx: {
+        textOverflow: "ellipsis",
+        ...(value === null && { fontStyle: "italic" }),
+      },
+    }}
+  />
+);
+
 const StringField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
     value: string;
@@ -236,16 +257,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   >({});
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
-
-  const handleDiscard = () => {
-    setPartialConfig({});
-    setLanguage(undefined);
-  };
-
-  const handleClose = () => {
-    handleDiscard();
-    onClose();
-  };
 
   const handleDiscard = () => {
     setPartialConfig({});
