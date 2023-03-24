@@ -156,27 +156,6 @@ const displayArgumentsList = (name: string, args: any[]) => (
   </Box>
 );
 
-const displayReadonlyFields = (label: string, value: string | null) => (
-  <TextField
-    key={label}
-    size="small"
-    variant="standard"
-    label={label}
-    InputLabelProps={{ shrink: true }}
-    value={String(value)}
-    InputProps={{
-      readOnly: true,
-      disableUnderline: true,
-    }}
-    inputProps={{
-      sx: {
-        textOverflow: "ellipsis",
-        ...(value === null && { fontStyle: "italic" }),
-      },
-    }}
-  />
-);
-
 const StringField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
     value: string;
