@@ -944,7 +944,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             className="fixedWidthInput"
             value={String(resultingConfig.use_cuda)}
             disabled={isUpdatingConfig}
-            onChange={(newValue: string | boolean) =>
+            onChange={(newValue) =>
               setPartialConfig({
                 ...partialConfig,
                 use_cuda:
