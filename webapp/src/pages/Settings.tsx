@@ -724,7 +724,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     <NumberField
                       value={value}
                       disabled={
-                        !resultingConfig.uncertainty || isUpdatingConfig
+                        resultingConfig.uncertainty === null || isUpdatingConfig
                       }
                       onChange={(newValue) =>
                         updateSubConfig("uncertainty", { [field]: newValue })
@@ -903,7 +903,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
-              disabled={!resultingConfig[config] || isUpdatingConfig}
+              disabled={resultingConfig[config] === null || isUpdatingConfig}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
               }
@@ -914,7 +914,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
-              disabled={!resultingConfig[config] || isUpdatingConfig}
+              disabled={resultingConfig[config] === null || isUpdatingConfig}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
               }
@@ -936,7 +936,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     {Array.isArray(objValue) ? (
                       <StringArrayField
                         value={objValue}
-                        disabled={!resultingConfig[config] || isUpdatingConfig}
+                        disabled={
+                          resultingConfig[config] === null || isUpdatingConfig
+                        }
                         onChange={(newValue) =>
                           updateSubConfig(config, {
                             [field]: { ...value, [objField]: newValue },
@@ -946,7 +948,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     ) : (
                       <NumberField
                         value={objValue as number}
-                        disabled={!resultingConfig[config] || isUpdatingConfig}
+                        disabled={
+                          resultingConfig[config] === null || isUpdatingConfig
+                        }
                         onChange={(newValue) =>
                           updateSubConfig(config, {
                             [field]: { ...value, [objField]: newValue },
