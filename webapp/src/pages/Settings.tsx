@@ -77,7 +77,10 @@ const FIELDS: Record<
   seed: INT,
 };
 
-type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
+type SubConfigKeys = keyof PickByValue<
+  AzimuthConfig,
+  { [key: string]: unknown } | null
+>;
 
 const COLUMNS = ["text_input", "label", "persistent_id"] as const;
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
@@ -119,6 +122,12 @@ const KeyValuePairs: React.FC = ({ children }) => (
     {children}
   </Box>
 );
+
+const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) => [
+  ...array.slice(0, index),
+  { ...array[index], ...update },
+  ...array.slice(index + 1),
+];
 
 type FieldProps<T> = { value: T; onChange?: (newValue: T) => void };
 
@@ -333,10 +342,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     language: language ?? resultingConfig.language,
   });
 
+  const updatePartialConfig = React.useCallback(
+    (update: Partial<AzimuthConfig>) =>
+      setPartialConfig({ ...partialConfig, ...update }),
+    [setPartialConfig, partialConfig]
+  );
+
   React.useEffect(() => {
     if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
-      setPartialConfig({
-        ...partialConfig,
+      updatePartialConfig({
         language: defaultConfig.language,
         syntax: {
           ...resultingConfig.syntax,
@@ -360,7 +374,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         },
       });
     }
-  }, [defaultConfig, resultingConfig, partialConfig]);
+  }, [defaultConfig, resultingConfig, updatePartialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
@@ -480,24 +494,42 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     );
   }
 
-  // TODO Reuse that kind of handler to reduce duplication.
+  const updateSubConfig = <Key extends SubConfigKeys>(
+    key: Key,
+    update: Partial<AzimuthConfig[Key]>
+  ) => updatePartialConfig({ [key]: { ...resultingConfig[key], ...update } });
+
+  const updatePipeline = (
+    pipelineIndex: number,
+    update: Partial<PipelineDefinition>
+  ) =>
+    updatePartialConfig({
+      pipelines: updateArrayAt(
+        resultingConfig.pipelines!,
+        pipelineIndex,
+        update
+      ),
+    });
+
   const updateModel = (
     pipelineIndex: number,
     update: Partial<PipelineDefinition["model"]>
   ) =>
-    setPartialConfig({
-      ...partialConfig,
-      pipelines: [
-        ...resultingConfig.pipelines!.slice(0, pipelineIndex),
-        {
-          ...resultingConfig.pipelines![pipelineIndex],
-          model: {
-            ...resultingConfig.pipelines![pipelineIndex].model,
-            ...update,
-          },
-        },
-        ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
-      ],
+    updatePipeline(pipelineIndex, {
+      model: { ...resultingConfig.pipelines![pipelineIndex].model, ...update },
+    });
+
+  const updatePostprocessor = (
+    pipelineIndex: number,
+    postprocessorIndex: number,
+    update: Partial<NonNullable<PipelineDefinition["postprocessors"]>[number]>
+  ) =>
+    updatePipeline(pipelineIndex, {
+      postprocessors: updateArrayAt(
+        resultingConfig.pipelines![pipelineIndex].postprocessors!,
+        postprocessorIndex,
+        update
+      ),
     });
 
   const displayToggleSectionTitle = (
@@ -511,8 +543,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           checked={Boolean(resultingConfig[field])}
           disabled={isUpdatingConfig}
           onChange={(...[, checked]) =>
-            setPartialConfig({
-              ...partialConfig,
+            updatePartialConfig({
               [field]: checked ? defaultConfig[field] : null,
             })
           }
@@ -534,20 +565,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           checked={Boolean(pipeline.postprocessors)}
           disabled={isUpdatingConfig}
           onChange={(...[, checked]) =>
-            setPartialConfig({
-              ...partialConfig,
-              pipelines: [
-                // TODO refactor pipelineIndex if we want to support adding or removing pipelines
-                ...resultingConfig.pipelines!.slice(0, pipelineIndex),
-                {
-                  ...pipeline,
-                  postprocessors: checked
-                    ? config.pipelines![pipelineIndex].postprocessors ??
-                      defaultConfig.pipelines![0].postprocessors
-                    : null,
-                },
-                ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
-              ],
+            updatePipeline(pipelineIndex, {
+              postprocessors: checked
+                ? config.pipelines![pipelineIndex].postprocessors ??
+                  defaultConfig.pipelines![0].postprocessors
+                : null,
             })
           }
         />
@@ -570,17 +592,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       disabled={isUpdatingConfig || (config && !resultingConfig[config])}
       onChange={(newValue) =>
         config
-          ? setPartialConfig({
-              ...partialConfig,
-              [config]: {
-                ...resultingConfig[config],
-                [field]: newValue || null,
-              },
-            })
-          : setPartialConfig({
-              ...partialConfig,
-              [field]: newValue || null,
-            })
+          ? updateSubConfig(config, { [field]: newValue || null })
+          : updatePartialConfig({ [field]: newValue || null })
       }
     />
   );
@@ -598,42 +611,25 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       label={field}
       value={String(value)}
       disabled={isUpdatingConfig}
-      onChange={(newValue) =>
-        setPartialConfig({
-          ...partialConfig,
-          pipelines: [
-            ...resultingConfig.pipelines!.slice(0, pipelineIndex),
-            {
-              name: subPipeline ? pipeline.name : newValue,
-              model: {
-                ...pipeline.model,
-                ...(subPipeline === "model" && { [field]: newValue }),
-              },
-              postprocessors:
-                postprocessorIdx !== undefined &&
-                subPipeline === "postprocessors"
-                  ? [
-                      ...pipeline.postprocessors!.slice(0, postprocessorIdx),
-                      {
-                        ...pipeline.postprocessors![postprocessorIdx],
-                        [field]: newValue,
-                      },
-                      ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
-                    ]
-                  : pipeline.postprocessors,
-            },
-            ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
-          ],
-        })
-      }
+      onChange={(newValue) => {
+        if (subPipeline === "model") {
+          updateModel(pipelineIndex, { [field]: newValue });
+        } else if (subPipeline === "postprocessors") {
+          updatePostprocessor(pipelineIndex, postprocessorIdx!, {
+            [field]: newValue,
+          });
+        } else {
+          updatePipeline(pipelineIndex, { [field]: newValue });
+        }
+      }}
     />
   );
 
   const displayPostprocessorNumberField = (
     pipelineIndex: number,
-    pipeline: PipelineDefinition,
+    pipeline: PipelineDefinition, // TODO
     field: string,
-    postprocessorIdx: number,
+    postprocessorIndex: number,
     value: number
   ) => (
     <NumberField
@@ -644,24 +640,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         isUpdatingConfig
       }
       onChange={(newValue) =>
-        setPartialConfig({
-          ...partialConfig,
-          pipelines: [
-            ...resultingConfig.pipelines!.slice(0, pipelineIndex),
-            {
-              ...pipeline,
-              postprocessors: [
-                ...pipeline.postprocessors!.slice(0, postprocessorIdx),
-                {
-                  ...pipeline.postprocessors![postprocessorIdx],
-                  [field]: newValue,
-                  kwargs: { [field]: newValue },
-                },
-                ...pipeline.postprocessors!.slice(postprocessorIdx + 1),
-              ],
-            },
-            ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
-          ],
+        updatePostprocessor(pipelineIndex, postprocessorIndex, {
+          [field]: newValue,
+          kwargs: { [field]: newValue },
         })
       }
       {...FIELDS[field]}
@@ -669,8 +650,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   );
 
   const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
-    setPartialConfig({
-      ...partialConfig,
+    updatePartialConfig({
       metrics: checked
         ? {
             ...resultingConfig.metrics,
@@ -738,23 +718,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="args"
             value={resultingConfig.dataset.args}
             disabled={isUpdatingConfig}
-            onChange={(args) =>
-              setPartialConfig({
-                ...partialConfig,
-                dataset: { ...resultingConfig.dataset, args },
-              })
-            }
+            onChange={(args) => updateSubConfig("dataset", { args })}
           />
           <JSONField
             label="kwargs"
             value={resultingConfig.dataset.kwargs}
             disabled={isUpdatingConfig}
-            onChange={(kwargs) =>
-              setPartialConfig({
-                ...partialConfig,
-                dataset: { ...resultingConfig.dataset, kwargs },
-              })
-            }
+            onChange={(kwargs) => updateSubConfig("dataset", { kwargs })}
           />
         </Columns>
       </FormGroup>
@@ -770,10 +740,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="model_contract"
             value={resultingConfig.model_contract}
             disabled={isUpdatingConfig}
-            onChange={(newValue) => {
-              setPartialConfig({
-                ...partialConfig,
-                model_contract: newValue as SupportedModelContract,
+            onChange={(model_contract) => {
+              updatePartialConfig({
+                model_contract: model_contract as SupportedModelContract,
               });
             }}
           >
@@ -797,13 +766,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         !resultingConfig.uncertainty || isUpdatingConfig
                       }
                       onChange={(newValue) =>
-                        setPartialConfig({
-                          ...partialConfig,
-                          uncertainty: {
-                            ...resultingConfig.uncertainty,
-                            [field]: newValue,
-                          },
-                        })
+                        updateSubConfig("uncertainty", { [field]: newValue })
                       }
                       {...FIELDS[field]}
                     />
@@ -953,10 +916,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               value={value}
               disabled={!resultingConfig[config] || isUpdatingConfig}
               onChange={(newValue) =>
-                setPartialConfig({
-                  ...partialConfig,
-                  [config]: { ...resultingConfig[config], [field]: newValue },
-                })
+                updateSubConfig(config, { [field]: newValue })
               }
               {...FIELDS[field]}
             />
@@ -967,10 +927,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               value={value}
               disabled={!resultingConfig[config] || isUpdatingConfig}
               onChange={(newValue) =>
-                setPartialConfig({
-                  ...partialConfig,
-                  [config]: { ...resultingConfig[config], [field]: newValue },
-                })
+                updateSubConfig(config, { [field]: newValue })
               }
             />
           ) : typeof value === "object" ? (
@@ -992,12 +949,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         value={objValue}
                         disabled={!resultingConfig[config] || isUpdatingConfig}
                         onChange={(newValue) =>
-                          setPartialConfig({
-                            ...partialConfig,
-                            [config]: {
-                              ...resultingConfig[config],
-                              [field]: { ...value, [objField]: newValue },
-                            },
+                          updateSubConfig(config, {
+                            [field]: { ...value, [objField]: newValue },
                           })
                         }
                       />
@@ -1006,12 +959,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         value={objValue as number}
                         disabled={!resultingConfig[config] || isUpdatingConfig}
                         onChange={(newValue) =>
-                          setPartialConfig({
-                            ...partialConfig,
-                            [config]: {
-                              ...resultingConfig[config],
-                              [field]: { ...value, [objField]: newValue },
-                            },
+                          updateSubConfig(config, {
+                            [field]: { ...value, [objField]: newValue },
                           })
                         }
                         {...INT}
@@ -1028,13 +977,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               label={field}
               value={value}
               disabled={isUpdatingConfig}
-              onChange={(newValue) =>
-                setPartialConfig({
-                  ...partialConfig,
-                  syntax: {
-                    ...resultingConfig.syntax,
-                    spacy_model: newValue as SupportedSpacyModels,
-                  },
+              onChange={(spacy_model) =>
+                updateSubConfig("syntax", {
+                  spacy_model: spacy_model as SupportedSpacyModels,
                 })
               }
             >
@@ -1065,12 +1010,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="batch_size"
             value={resultingConfig.batch_size}
             disabled={isUpdatingConfig}
-            onChange={(newValue) =>
-              setPartialConfig({
-                ...partialConfig,
-                batch_size: newValue,
-              })
-            }
+            onChange={(batch_size) => updatePartialConfig({ batch_size })}
             {...INT}
           />
           <StringField
@@ -1079,11 +1019,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             className="fixedWidthInput"
             value={String(resultingConfig.use_cuda)}
             disabled={isUpdatingConfig}
-            onChange={(newValue) =>
-              setPartialConfig({
-                ...partialConfig,
-                use_cuda:
-                  newValue === "true" || (newValue === "auto" && "auto"),
+            onChange={(use_cuda) =>
+              updatePartialConfig({
+                use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
               })
             }
           >
@@ -1099,11 +1037,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 size="small"
                 checked={resultingConfig.large_dask_cluster}
                 disabled={isUpdatingConfig}
-                onChange={(...[, checked]) =>
-                  setPartialConfig({
-                    ...partialConfig,
-                    large_dask_cluster: checked,
-                  })
+                onChange={(...[, large_dask_cluster]) =>
+                  updatePartialConfig({ large_dask_cluster })
                 }
               />
             }
