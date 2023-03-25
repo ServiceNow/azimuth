@@ -23,6 +23,7 @@ const Description: React.FC<Props> = ({ text, link }) => {
           variant="body2"
           color="secondary"
           target="_blank"
+          onClick={(event) => event.stopPropagation()}
         >
           <OpenInNewIcon sx={{ marginRight: 0.5, marginY: "-5px" }} />
           Learn more
