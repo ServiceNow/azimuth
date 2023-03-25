@@ -72,8 +72,6 @@ const FIELDS: Record<
   max_delta_std_words: { ...FLOAT, units: "words" },
   short_utterance_max_word: { ...INT, units: "words" },
   long_utterance_min_word: { ...INT, units: "words" },
-  temperature: FLOAT,
-  threshold: PERCENTAGE,
   seed: INT,
 };
 
@@ -598,30 +596,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const displayPostprocessorNumberField = (
-    pipelineIndex: number,
-    pipeline: PipelineDefinition, // TODO
-    field: string,
-    postprocessorIndex: number,
-    value: number
-  ) => (
-    <NumberField
-      label={field}
-      value={value}
-      disabled={
-        !resultingConfig.pipelines![pipelineIndex].postprocessors ||
-        isUpdatingConfig
-      }
-      onChange={(newValue) =>
-        updatePostprocessor(pipelineIndex, postprocessorIndex, {
-          [field]: newValue,
-          kwargs: { [field]: newValue },
-        })
-      }
-      {...FIELDS[field]}
-    />
-  );
-
   const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
     updatePartialConfig({
       metrics: checked
@@ -837,22 +811,40 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                               })
                             }
                           />
-                          {"temperature" in postprocessor &&
-                            displayPostprocessorNumberField(
-                              pipelineIndex,
-                              pipeline,
-                              "temperature",
-                              index,
-                              postprocessor.temperature
-                            )}
-                          {"threshold" in postprocessor &&
-                            displayPostprocessorNumberField(
-                              pipelineIndex,
-                              pipeline,
-                              "threshold",
-                              index,
-                              postprocessor.threshold
-                            )}
+                          {"temperature" in postprocessor && (
+                            <NumberField
+                              label="temperature"
+                              value={postprocessor.temperature}
+                              disabled={
+                                resultingConfig.pipelines![pipelineIndex]
+                                  .postprocessors === null || isUpdatingConfig
+                              }
+                              onChange={(temperature) =>
+                                updatePostprocessor(pipelineIndex, index, {
+                                  temperature,
+                                  kwargs: { temperature },
+                                })
+                              }
+                              {...FLOAT}
+                            />
+                          )}
+                          {"threshold" in postprocessor && (
+                            <NumberField
+                              label="threshold"
+                              value={postprocessor.threshold}
+                              disabled={
+                                resultingConfig.pipelines![pipelineIndex]
+                                  .postprocessors === null || isUpdatingConfig
+                              }
+                              onChange={(threshold) =>
+                                updatePostprocessor(pipelineIndex, index, {
+                                  threshold,
+                                  kwargs: { threshold },
+                                })
+                              }
+                              {...PERCENTAGE}
+                            />
+                          )}
                         </Columns>
                       </Paper>
                     ))}
