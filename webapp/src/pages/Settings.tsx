@@ -76,6 +76,7 @@ const FIELDS: Record<
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
+const COLUMNS = ["text_input", "label", "persistent_id"] as const;
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
@@ -159,7 +160,7 @@ const displayArgumentsList = (name: string, args: any[]) => (
 const StringField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
     value: string;
-    onChange: (newValue: string) => void;
+    onChange?: (newValue: string) => void;
   }
 > = ({ onChange, ...props }) => (
   <TextField
@@ -171,7 +172,7 @@ const StringField: React.FC<
         textOverflow: "ellipsis",
       },
     }}
-    onChange={({ target: { value } }) => onChange(value)}
+    onChange={onChange && ((event) => onChange(event.target.value))}
     {...props}
   />
 );
@@ -285,7 +286,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         },
       });
     }
-  }, [defaultConfig, resultingConfig]);
+  }, [defaultConfig, resultingConfig, partialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
@@ -605,20 +606,17 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
-              <Typography variant="body2">text_input:</Typography>
-              {displayStringField(
-                "text_input",
-                resultingConfig.columns.text_input,
-                "columns",
-                ""
-              )}
-              <Typography variant="body2">label:</Typography>
-              {displayStringField(
-                "label",
-                resultingConfig.columns.label,
-                "columns",
-                ""
-              )}
+              {COLUMNS.map((column) => (
+                <React.Fragment key={column}>
+                  <Typography variant="body2">{column}:</Typography>
+                  {displayStringField(
+                    column,
+                    resultingConfig.columns[column],
+                    "columns",
+                    ""
+                  )}
+                </React.Fragment>
+              ))}
             </KeyValuePairs>
           </Box>
         </Columns>
@@ -919,6 +917,68 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
+  const getCommonFieldsConfigSection = () => (
+    <Box marginTop={2}>
+      <FormGroup>
+        <Columns columns={4}>
+          <StringField
+            label="artifact_path"
+            value={resultingConfig.artifact_path}
+            InputProps={{ readOnly: true, disableUnderline: true }}
+          />
+          <NumberField
+            label="batch_size"
+            value={resultingConfig.batch_size}
+            disabled={isUpdatingConfig}
+            onChange={(newValue) =>
+              setPartialConfig({
+                ...partialConfig,
+                batch_size: newValue,
+              })
+            }
+            {...INT}
+          />
+          <StringField
+            select
+            label="use_cuda"
+            className="fixedWidthInput"
+            value={String(resultingConfig.use_cuda)}
+            disabled={isUpdatingConfig}
+            onChange={(newValue) =>
+              setPartialConfig({
+                ...partialConfig,
+                use_cuda:
+                  newValue === "true" || (newValue === "auto" && "auto"),
+              })
+            }
+          >
+            {["auto", "true", "false"].map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </StringField>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={resultingConfig.large_dask_cluster}
+                disabled={isUpdatingConfig}
+                onChange={(...[, checked]) =>
+                  setPartialConfig({
+                    ...partialConfig,
+                    large_dask_cluster: checked,
+                  })
+                }
+              />
+            }
+            label="large_dask_cluster"
+          />
+        </Columns>
+      </FormGroup>
+    </Box>
+  );
+
   const displayAnalysesCustomizationGeneralSection = () => (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
@@ -977,6 +1037,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         link="reference/configuration/model_contract/"
       >
         {getModelContractConfigSection()}
+      </AccordionLayout>
+      <AccordionLayout
+        name="Common Fields Configuration"
+        description="View and edit generic fields that can be adapted based on the user's machine."
+        link="reference/configuration/common/"
+      >
+        {getCommonFieldsConfigSection()}
       </AccordionLayout>
       <AccordionLayout
         name="Analyses Customization"
