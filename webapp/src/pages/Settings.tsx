@@ -93,6 +93,9 @@ const SUPPORTED_SPACY_MODELS: SupportedSpacyModels[] = [
   "en_core_web_sm",
   "fr_core_news_md",
 ];
+const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
+type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
+
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "behavioral_testing",
   "similarity",
@@ -139,13 +142,19 @@ const StringField = <T extends string | null>({
   value,
   onChange,
   nullable,
+  options,
   ...props
 }: Omit<TextFieldProps, "onChange"> &
   FieldProps<T> &
-  (null extends T ? { nullable: true } : { nullable?: false })) => (
+  (null extends T
+    ? { nullable: true; options?: never }
+    : { nullable?: false } & (string extends T // so T is string, not a literal
+        ? { select?: false; options?: never }
+        : { select?: true; options: readonly NonNullable<T>[] }))) => (
   <TextField
     {...FIELD_COMMON_PROPS}
     {...(nullable && { placeholder: "null" })}
+    select={Boolean(options)}
     inputProps={{ sx: { textOverflow: "ellipsis" } }}
     value={value ?? ""}
     onChange={
@@ -155,7 +164,13 @@ const StringField = <T extends string | null>({
         : (event) => onChange((event.target.value || null) as T))
     }
     {...props}
-  />
+  >
+    {options?.map((option) => (
+      <MenuItem key={option} value={option}>
+        {option}
+      </MenuItem>
+    ))}
+  </TextField>
 );
 
 const NumberField: React.FC<
@@ -689,22 +704,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       <FormGroup>
         <Columns columns={4}>
           <StringField
-            select
             label="model_contract"
+            options={SUPPORTED_MODEL_CONTRACTS}
             value={resultingConfig.model_contract}
             disabled={isUpdatingConfig}
-            onChange={(model_contract) => {
-              updatePartialConfig({
-                model_contract: model_contract as SupportedModelContract,
-              });
-            }}
-          >
-            {SUPPORTED_MODEL_CONTRACTS.map((modelContract) => (
-              <MenuItem key={modelContract} value={modelContract}>
-                {modelContract}
-              </MenuItem>
-            ))}
-          </StringField>
+            onChange={(model_contract) =>
+              updatePartialConfig({ model_contract })
+            }
+          />
           <StringField
             label="saliency_layer"
             nullable
@@ -965,33 +972,27 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             </Box>
           ) : config === "syntax" && field === "spacy_model" ? (
             <StringField
-              select
               key={field}
               label={field}
+              options={SUPPORTED_SPACY_MODELS}
               value={resultingConfig.syntax.spacy_model}
               disabled={isUpdatingConfig}
               onChange={(spacy_model) =>
-                updateSubConfig("syntax", {
-                  spacy_model: spacy_model as SupportedSpacyModels,
-                })
-              }
-            >
-              {SUPPORTED_SPACY_MODELS.map((spacyModel) => (
-                <MenuItem key={spacyModel} value={spacyModel}>
-                  {spacyModel}
-                </MenuItem>
-              ))}
-            </StringField>
-          ) : (
-            <StringField
-              key={field}
-              label={field}
-              value={value}
-              disabled={resultingConfig[config] === null || isUpdatingConfig}
-              onChange={(newValue) =>
-                updateSubConfig(config, { [field]: newValue })
+                updateSubConfig("syntax", { spacy_model })
               }
             />
+          ) : (
+            typeof value === "string" && (
+              <StringField
+                key={field}
+                label={field}
+                value={value}
+                disabled={resultingConfig[config] === null || isUpdatingConfig}
+                onChange={(newValue) =>
+                  updateSubConfig(config, { [field]: newValue })
+                }
+              />
+            )
           )
         )}
       </Columns>
@@ -1015,23 +1016,17 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             {...INT}
           />
           <StringField
-            select
             label="use_cuda"
+            options={USE_CUDA_OPTIONS}
             className="fixedWidthInput"
-            value={String(resultingConfig.use_cuda)}
+            value={String(resultingConfig.use_cuda) as UseCUDAOption}
             disabled={isUpdatingConfig}
             onChange={(use_cuda) =>
               updatePartialConfig({
                 use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
               })
             }
-          >
-            {["auto", "true", "false"].map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </StringField>
+          />
           <FormControlLabel
             control={
               <Checkbox
@@ -1054,19 +1049,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
         <StringField
-          select
           label="language"
+          options={SUPPORTED_LANGUAGES}
           sx={{ width: "6ch" }}
           value={language ?? resultingConfig.language}
           disabled={isUpdatingConfig}
-          onChange={(newValue) => setLanguage(newValue as SupportedLanguage)}
-        >
-          {SUPPORTED_LANGUAGES.map((language) => (
-            <MenuItem key={language} value={language}>
-              {language}
-            </MenuItem>
-          ))}
-        </StringField>
+          onChange={(newValue) => setLanguage(newValue)}
+        />
         <Box display="flex" gap={1}>
           <Warning color="warning" />
           <Typography variant="body2">
