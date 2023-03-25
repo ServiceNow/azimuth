@@ -585,25 +585,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const displayStringField = (
-    field: string,
-    value: string | null,
-    config?: SubConfigKeys,
-    label: string = field
-  ) => (
-    <StringField
-      key={field}
-      label={label}
-      value={value ?? ""}
-      disabled={isUpdatingConfig || (config && !resultingConfig[config])}
-      onChange={(newValue) =>
-        config
-          ? updateSubConfig(config, { [field]: newValue || null })
-          : updatePartialConfig({ [field]: newValue || null })
-      }
-    />
-  );
-
   const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
     updatePartialConfig({
       metrics: checked
@@ -632,23 +613,35 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("General")}
       <FormGroup>
         <Columns columns={4}>
-          {displayStringField("name", resultingConfig.name)}
-          {displayStringField(
-            "rejection_class",
-            resultingConfig.rejection_class
-          )}
+          <StringField
+            label="name"
+            value={resultingConfig.name}
+            disabled={isUpdatingConfig}
+            onChange={(name) => updatePartialConfig({ name })}
+          />
+          <StringField
+            label="rejection_class"
+            nullable
+            value={resultingConfig.rejection_class}
+            disabled={isUpdatingConfig}
+            onChange={(rejection_class) =>
+              updatePartialConfig({ rejection_class })
+            }
+          />
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
               {COLUMNS.map((column) => (
                 <React.Fragment key={column}>
                   <Typography variant="body2">{column}:</Typography>
-                  {displayStringField(
-                    column,
-                    resultingConfig.columns[column],
-                    "columns",
-                    ""
-                  )}
+                  <StringField
+                    label={column}
+                    value={resultingConfig.columns[column]}
+                    disabled={isUpdatingConfig}
+                    onChange={(newValue) =>
+                      updateSubConfig("columns", { [column]: newValue })
+                    }
+                  />
                 </React.Fragment>
               ))}
             </KeyValuePairs>
@@ -658,16 +651,21 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("Dataset")}
       <FormGroup>
         <Columns columns={2}>
-          {displayStringField(
-            "class_name",
-            resultingConfig.dataset.class_name,
-            "dataset"
-          )}
-          {displayStringField(
-            "remote",
-            resultingConfig.dataset.remote,
-            "dataset"
-          )}
+          <StringField
+            label="class_name"
+            value={resultingConfig.dataset.class_name}
+            disabled={isUpdatingConfig}
+            onChange={(class_name) =>
+              updateSubConfig("dataset", { class_name })
+            }
+          />
+          <StringField
+            label="remote"
+            nullable
+            value={resultingConfig.dataset.remote}
+            disabled={isUpdatingConfig}
+            onChange={(remote) => updateSubConfig("dataset", { remote })}
+          />
           <JSONField
             array
             label="args"
@@ -707,7 +705,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               </MenuItem>
             ))}
           </StringField>
-          {displayStringField("saliency_layer", resultingConfig.saliency_layer)}
+          <StringField
+            label="saliency_layer"
+            nullable
+            value={resultingConfig.saliency_layer}
+            disabled={isUpdatingConfig}
+            onChange={(saliency_layer) =>
+              updatePartialConfig({ saliency_layer })
+            }
+          />
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">uncertainty</Typography>
             <KeyValuePairs>
@@ -973,7 +979,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               ))}
             </StringField>
           ) : (
-            displayStringField(field, value, config)
+            <StringField
+              key={field}
+              label={field}
+              value={value}
+              disabled={resultingConfig[config] === null || isUpdatingConfig}
+              onChange={(newValue) =>
+                updateSubConfig(config, { [field]: newValue })
+              }
+            />
           )
         )}
       </Columns>
