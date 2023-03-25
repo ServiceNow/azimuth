@@ -76,6 +76,7 @@ const FIELDS: Record<
 
 type SubConfigKeys = keyof PickByValue<AzimuthConfig, object | null>;
 
+const COLUMNS = ["text_input", "label", "persistent_id"] as const;
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
@@ -605,27 +606,17 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">columns</Typography>
             <KeyValuePairs>
-              <Typography variant="body2">text_input:</Typography>
-              {displayStringField(
-                "text_input",
-                resultingConfig.columns.text_input,
-                "columns",
-                ""
-              )}
-              <Typography variant="body2">label:</Typography>
-              {displayStringField(
-                "label",
-                resultingConfig.columns.label,
-                "columns",
-                ""
-              )}
-              <Typography variant="body2">persistent_id:</Typography>
-              {displayStringField(
-                "persistent_id",
-                resultingConfig.columns.persistent_id,
-                "columns",
-                ""
-              )}
+              {COLUMNS.map((column) => (
+                <React.Fragment key={column}>
+                  <Typography variant="body2">{column}:</Typography>
+                  {displayStringField(
+                    column,
+                    resultingConfig.columns[column],
+                    "columns",
+                    ""
+                  )}
+                </React.Fragment>
+              ))}
             </KeyValuePairs>
           </Box>
         </Columns>
