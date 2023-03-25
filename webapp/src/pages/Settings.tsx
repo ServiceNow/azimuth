@@ -156,31 +156,10 @@ const displayArgumentsList = (name: string, args: any[]) => (
   </Box>
 );
 
-const displayReadonlyField = (label: string, value: string | null) => (
-  <TextField
-    key={label}
-    size="small"
-    variant="standard"
-    label={label}
-    InputLabelProps={{ shrink: true }}
-    value={String(value)}
-    InputProps={{
-      readOnly: true,
-      disableUnderline: true,
-    }}
-    inputProps={{
-      sx: {
-        textOverflow: "ellipsis",
-        ...(value === null && { fontStyle: "italic" }),
-      },
-    }}
-  />
-);
-
 const StringField: React.FC<
   Omit<TextFieldProps, "onChange"> & {
     value: string;
-    onChange: (newValue: string) => void;
+    onChange?: (newValue: string) => void;
   }
 > = ({ onChange, ...props }) => (
   <TextField
@@ -192,7 +171,7 @@ const StringField: React.FC<
         textOverflow: "ellipsis",
       },
     }}
-    onChange={({ target: { value } }) => onChange(value)}
+    onChange={onChange && ((event) => onChange(event.target.value))}
     {...props}
   />
 );
@@ -951,7 +930,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     <Box marginTop={2}>
       <FormGroup>
         <Columns columns={4}>
-          {displayReadonlyField("artifact_path", resultingConfig.artifact_path)}
+          <StringField
+            label="artifact_path"
+            value={resultingConfig.artifact_path}
+            InputProps={{ readOnly: true, disableUnderline: true }}
+          />
           <NumberField
             label="batch_size"
             value={resultingConfig.batch_size}
