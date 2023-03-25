@@ -598,33 +598,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const displayPipelineStringField = (
-    pipelineIndex: number,
-    pipeline: PipelineDefinition,
-    field: string,
-    value: string | null,
-    subPipeline?: keyof PipelineDefinition,
-    postprocessorIdx?: number
-  ) => (
-    <StringField
-      key={field}
-      label={field}
-      value={String(value)}
-      disabled={isUpdatingConfig}
-      onChange={(newValue) => {
-        if (subPipeline === "model") {
-          updateModel(pipelineIndex, { [field]: newValue });
-        } else if (subPipeline === "postprocessors") {
-          updatePostprocessor(pipelineIndex, postprocessorIdx!, {
-            [field]: newValue,
-          });
-        } else {
-          updatePipeline(pipelineIndex, { [field]: newValue });
-        }
-      }}
-    />
-  );
-
   const displayPostprocessorNumberField = (
     pipelineIndex: number,
     pipeline: PipelineDefinition, // TODO
@@ -791,12 +764,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   {displaySectionTitle("General")}
                   <FormGroup>
                     <Columns columns={2}>
-                      {displayPipelineStringField(
-                        pipelineIndex,
-                        pipeline,
-                        "name",
-                        pipeline.name
-                      )}
+                      <StringField
+                        label="name"
+                        value={pipeline.name}
+                        disabled={isUpdatingConfig}
+                        onChange={(name) =>
+                          updatePipeline(pipelineIndex, { name })
+                        }
+                      />
                     </Columns>
                   </FormGroup>
                 </FormControl>
@@ -804,20 +779,22 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   {displaySectionTitle("Model")}
                   <FormGroup>
                     <Columns columns={2}>
-                      {displayPipelineStringField(
-                        pipelineIndex,
-                        pipeline,
-                        "class_name",
-                        pipeline.model.class_name,
-                        "model"
-                      )}
-                      {displayPipelineStringField(
-                        pipelineIndex,
-                        pipeline,
-                        "remote",
-                        pipeline.model.remote,
-                        "model"
-                      )}
+                      <StringField
+                        label="class_name"
+                        value={pipeline.model.class_name}
+                        disabled={isUpdatingConfig}
+                        onChange={(class_name) =>
+                          updateModel(pipelineIndex, { class_name })
+                        }
+                      />
+                      <StringField
+                        label="remote"
+                        value={pipeline.model.remote ?? ""}
+                        disabled={isUpdatingConfig}
+                        onChange={(remote) =>
+                          updateModel(pipelineIndex, { remote: remote || null })
+                        }
+                      />
                       <JSONField
                         array
                         label="args"
@@ -847,14 +824,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     )?.map((postprocessor, index) => (
                       <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
                         <Columns columns={2}>
-                          {displayPipelineStringField(
-                            pipelineIndex,
-                            pipeline,
-                            "class_name",
-                            postprocessor.class_name,
-                            "postprocessors",
-                            index
-                          )}
+                          <StringField
+                            label="class_name"
+                            value={postprocessor.class_name}
+                            disabled={isUpdatingConfig}
+                            onChange={(class_name) =>
+                              updatePostprocessor(pipelineIndex, index, {
+                                class_name,
+                              })
+                            }
+                          />
                           {"temperature" in postprocessor &&
                             displayPostprocessorNumberField(
                               pipelineIndex,
