@@ -827,7 +827,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                           <StringField
                             label="class_name"
                             value={postprocessor.class_name}
-                            disabled={isUpdatingConfig}
+                            disabled={
+                              resultingConfig.pipelines![pipelineIndex]
+                                .postprocessors === null || isUpdatingConfig
+                            }
                             onChange={(class_name) =>
                               updatePostprocessor(pipelineIndex, index, {
                                 class_name,
