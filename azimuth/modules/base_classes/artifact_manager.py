@@ -1,6 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from multiprocessing import Lock
 from typing import Callable, Dict, Optional
 
 from datasets import DatasetDict
@@ -38,9 +39,10 @@ class ArtifactManager:
 
     @classmethod
     def get_instance(cls):
-        if cls.instance is None:
-            cls.instance = cls()
-        return cls.instance
+        with Lock():
+            if cls.instance is None:
+                cls.instance = cls()
+            return cls.instance
 
     def get_dataset_split_manager(
         self, config: AzimuthConfig, name: DatasetSplitName
@@ -124,4 +126,5 @@ class ArtifactManager:
 
     @classmethod
     def clear_cache(cls) -> None:
-        cls.instance = None
+        with Lock():
+            cls.instance = None
