@@ -143,7 +143,7 @@ class TaskManager:
                 mod_options=mod_options,
             )
             # Check if this task already exist.
-            key = "_".join(map(str, task.task_id))
+            key = task.task_id
             if key in self.current_tasks:
                 task = self.current_tasks[key]
             else:
@@ -197,7 +197,7 @@ class TaskManager:
                 mod_options=mod_options,
             )
             # Check if this task already exist.
-            key = "_".join(map(str, task.task_id + (hash(str(custom_query)),)))
+            key = task.custom_query_task_id(custom_query)
             if key in self.current_tasks:
                 task = self.current_tasks[key]
             else:
