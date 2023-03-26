@@ -152,13 +152,15 @@ def start_app(config_path: Optional[str], load_config_history: bool, debug: bool
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
     run_startup_tasks(azimuth_config, local_cluster)
-    assert_not_none(_task_manager).client.run(set_logger_config, level)
+    task_manager = assert_not_none(_task_manager)
+    task_manager.client.run(set_logger_config, level)
 
     app = create_app()
 
     log.info("All routes added to router.")
 
     if debug:
+        log.debug(f"See Dask dashboard at {task_manager.client.dashboard_link}.")
         for r in app.router.routes:
             log.debug("Route", methods=r.__dict__.get("methods"), path=r.__dict__["path"])
 
