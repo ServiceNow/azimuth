@@ -1,19 +1,21 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-
+import pytest
 from fastapi import FastAPI
 from starlette.status import HTTP_200_OK
 from starlette.testclient import TestClient
 
 common_metric_response = {
-    "customMetrics": {
-        "Accuracy": 0.07142857142857142,
-        "F1": 0.12349206349206351,
-        "Precision": 0.4682539682539682,
-        "Recall": 0.07142857142857142,
-    },
-    "ece": 0.5196982765240196,
+    "customMetrics": pytest.approx(
+        {
+            "Accuracy": 0.07142857142857142,
+            "F1": 0.12349206349206351,
+            "Precision": 0.4682539682539682,
+            "Recall": 0.07142857142857142,
+        }
+    ),
+    "ece": pytest.approx(0.5196982765240196),
     "outcomeCount": {
         "CorrectAndPredicted": 3,
         "CorrectAndRejected": 0,

@@ -42,6 +42,7 @@
     - Bump `datasets` from 1.16.1 to 2.1.0
     - Bump `tensorflow` from 2.8.0 to 2.11.0
     - Bump `torch` from 1.9.0 to 1.13.1
+    - Bump `numpy` to 1.23.5
 
 ### Fixed
 - Fix the Utterance Details page collapsing with extra long utterances.
