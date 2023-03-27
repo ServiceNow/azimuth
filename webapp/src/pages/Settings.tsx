@@ -135,17 +135,25 @@ const FIELD_COMMON_PROPS = {
   InputLabelProps: { shrink: true },
 } as const;
 
-const StringField: React.FC<
-  Omit<TextFieldProps, "onChange"> & FieldProps<string>
-> = ({ onChange, ...props }) => (
+const StringField = <T extends string | null>({
+  value,
+  onChange,
+  nullable,
+  ...props
+}: Omit<TextFieldProps, "onChange"> &
+  FieldProps<T> &
+  (null extends T ? { nullable: true } : { nullable?: false })) => (
   <TextField
     {...FIELD_COMMON_PROPS}
-    inputProps={{
-      sx: {
-        textOverflow: "ellipsis",
-      },
-    }}
-    onChange={onChange && ((event) => onChange(event.target.value))}
+    {...(nullable && { placeholder: "null" })}
+    inputProps={{ sx: { textOverflow: "ellipsis" } }}
+    value={value ?? ""}
+    onChange={
+      onChange &&
+      (nullable
+        ? (event) => onChange(event.target.value as T)
+        : (event) => onChange((event.target.value || null) as T))
+    }
     {...props}
   />
 );
@@ -763,10 +771,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       />
                       <StringField
                         label="remote"
-                        value={pipeline.model.remote ?? ""}
+                        nullable
+                        value={pipeline.model.remote}
                         disabled={isUpdatingConfig}
                         onChange={(remote) =>
-                          updateModel(pipelineIndex, { remote: remote || null })
+                          updateModel(pipelineIndex, { remote })
                         }
                       />
                       <JSONField
@@ -944,12 +953,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 ))}
               </KeyValuePairs>
             </Box>
-          ) : field === "spacy_model" ? (
+          ) : config === "syntax" && field === "spacy_model" ? (
             <StringField
               select
               key={field}
               label={field}
-              value={value}
+              value={resultingConfig.syntax.spacy_model}
               disabled={isUpdatingConfig}
               onChange={(spacy_model) =>
                 updateSubConfig("syntax", {
