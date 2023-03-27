@@ -4,6 +4,7 @@ services:
     image: ${REGISTRY}/azimuth:${BACKEND_VERSION}_${DEVICE}
     environment:
       - "CFG_PATH=${CFG_PATH}"
+      - "LOAD_CONFIG_HISTORY=${LOAD_CONFIG_HISTORY}"
       - "HF_HOME=/azimuth_shr/huggingface_cache"
       - "SENTENCE_TRANSFORMERS_HOME=/azimuth_shr/sentence_transformers"
       - "TFHUB_CACHE_DIR=/azimuth_shr/tf_hub"
@@ -12,14 +13,10 @@ services:
       - "NAME"
       - "BEHAVIORAL_TESTING"
       - "SIMILARITY"
-    ports:
-      - "8091:8091"
     volumes:
     - ./config:/config
     - ./azimuth_shr:/azimuth_shr
     - ./cache:/cache
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
   web:
     image: "${REGISTRY}/azimuth-app:${FRONTEND_VERSION}"
     command:
@@ -29,5 +26,5 @@ services:
       - "PORT=8080"
     ports:
       - "8080:8080"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    links:
+      - backend:host.docker.internal

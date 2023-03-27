@@ -1,12 +1,14 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+
 from azimuth.modules.perturbation_testing import (
     PerturbationTestingMergedModule,
     PerturbationTestingModule,
     PerturbationTestingSummaryModule,
 )
 from azimuth.types import DatasetSplitName, ModuleOptions
+from tests.utils import get_tiny_text_config_one_ds_name
 
 
 def test_perturbation_testing_summary(tiny_text_config):
@@ -39,20 +41,24 @@ def test_perturbation_testing_summary(tiny_text_config):
             assert any(test.name in r.name for r in res)
 
 
-def test_without_train(tiny_text_config_no_train):
+def test_perturbation_testing_summary_one_ds(tiny_text_config_one_ds):
     mod = PerturbationTestingMergedModule(
         dataset_split_name=DatasetSplitName.all,
-        config=tiny_text_config_no_train,
+        config=tiny_text_config_one_ds,
         mod_options=ModuleOptions(pipeline_index=0),
     )
     [res] = mod.compute_on_dataset_split()
-    assert res.eval_failure_rate >= 0.0 and res.train_failure_rate == 0.0
+    ds_name, other_ds_name = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
+    assert (
+        getattr(res, f"{ds_name}_failure_rate") >= 0.0
+        and getattr(res, f"{other_ds_name}_failure_rate") == 0.0
+    )
 
     mod_sum = PerturbationTestingSummaryModule(
         dataset_split_name=DatasetSplitName.all,
-        config=tiny_text_config_no_train,
+        config=tiny_text_config_one_ds,
         mod_options=ModuleOptions(pipeline_index=0),
     )
 
     res = mod_sum.compute_on_dataset_split()[0]
-    assert all(t.train_count == 0 for t in res.all_tests_summary)
+    assert all(getattr(t, f"{other_ds_name}_count") == 0 for t in res.all_tests_summary)

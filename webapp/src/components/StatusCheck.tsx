@@ -4,6 +4,7 @@ import {
   Box,
   capitalize,
   CircularProgress,
+  Paper,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -17,30 +18,32 @@ type Props = {
   children: React.ReactNode;
 };
 
+const PENDING = <CircularProgress size={16} sx={{ margin: "2px" }} />;
+
 const STATUS_ICONS: Record<string, React.ReactElement> = {
   finished: <DoneIcon color="success" />,
   not_started: <DoneIcon color="success" />, // Happens when the task was already computed.
-  pending: <CircularProgress size={16} sx={{ margin: "2px" }} />,
+  pending: PENDING,
   error: <ErrorIcon color="error" />,
   lost: <ErrorIcon color="error" />,
 };
 
 const StatusCheck: React.FC<Props> = ({ children }) => {
   const { jobId } = useParams<{ jobId: string }>();
-  const { data: status, refetch } = getStatusEndpoint.useQuery({ jobId });
+  const { data, isFetching, refetch } = getStatusEndpoint.useQuery({ jobId });
 
   React.useEffect(() => {
-    if (!status?.startupTasksReady) {
+    if (!data?.startupTasksReady) {
       const timer = setTimeout(refetch, 5000);
       return () => clearTimeout(timer);
     }
   });
 
-  if (!status) {
+  if (!data) {
     return <Loading />;
   }
 
-  if (!status.startupTasksReady) {
+  if (!data.startupTasksReady) {
     return (
       <Box
         display="flex"
@@ -74,16 +77,35 @@ const StatusCheck: React.FC<Props> = ({ children }) => {
             columnGap={8}
             gridTemplateColumns="repeat(2, 1fr)"
           >
-            {Object.entries(status.startupTasksStatus).map(([task, status]) => (
+            {Object.entries(data.startupTasksStatus).map(([task, status]) => (
               <Box key={task} display="flex" alignItems="center" gap={1}>
                 <Tooltip title={status}>{STATUS_ICONS[status]}</Tooltip>
                 <Typography>{capitalize(task).replace(/_/g, " ")}</Typography>
               </Box>
             ))}
           </Box>
+          {Object.values(data.startupTasksStatus).every(
+            (taskStatus) => taskStatus !== "pending"
+          ) && (
+            <Paper>
+              <Box display="flex" alignItems="center" gap={1} margin={2}>
+                {PENDING}
+                <Typography>
+                  The results are being finalized. Hang on for a few more
+                  seconds...
+                </Typography>
+              </Box>
+            </Paper>
+          )}
         </Box>
       </Box>
     );
+  }
+
+  if (isFetching) {
+    // We can't be sure if the app is ready or not, so we don't render the
+    // children to avoid making other API calls that would fail.
+    return <Loading />;
   }
 
   return <>{children}</>;

@@ -11,7 +11,6 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
-- Persistent id.
 
 ### Changed
 

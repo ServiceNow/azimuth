@@ -20,18 +20,24 @@ import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { getClassOverlapPlotEndpoint } from "services/api";
+import { DatasetSplitName } from "types/api";
 import { QueryClassOverlapState } from "types/models";
+import { DATASET_SPLIT_PRETTY_NAMES } from "utils/const";
 import { constructSearchString } from "utils/helpers";
 
 const OVERLAP_THRESHOLD_INPUT_PROPS = { step: 0.01, min: 0, max: 1 };
 
 const ClassOverlap = () => {
   const history = useHistory();
-  const { jobId } = useParams<{ jobId: string }>();
+  const { jobId, datasetSplitName } = useParams<{
+    jobId: string;
+    datasetSplitName: DatasetSplitName;
+  }>();
   const { classOverlap, pipeline } = useQueryState();
 
   const { data, error, isFetching } = getClassOverlapPlotEndpoint.useQuery({
     jobId,
+    datasetSplitName,
     ...classOverlap,
   });
 
@@ -46,13 +52,11 @@ const ClassOverlap = () => {
   const setQuery = React.useCallback(
     (newClassOverlap: QueryClassOverlapState) =>
       history.push(
-        `/${jobId}/class_overlap${constructSearchString({
-          ...pipeline,
-          ...classOverlap,
-          ...newClassOverlap,
-        })}`
+        `/${jobId}/dataset_splits/${datasetSplitName}/class_overlap${constructSearchString(
+          { ...pipeline, ...classOverlap, ...newClassOverlap }
+        )}`
       ),
-    [history, jobId, pipeline, classOverlap]
+    [history, jobId, datasetSplitName, pipeline, classOverlap]
   );
 
   const commitOverlapThreshold = useDebounced(
@@ -61,6 +65,14 @@ const ClassOverlap = () => {
       [setQuery]
     )
   );
+
+  if (datasetSplitName !== "train") {
+    return (
+      <Typography>
+        Only available on {DATASET_SPLIT_PRETTY_NAMES.train} set
+      </Typography>
+    );
+  }
 
   const checkValid = data?.plot.data[0].node.x.length > 0;
 
@@ -71,7 +83,7 @@ const ClassOverlap = () => {
         {
           <Description
             text="Assess semantic overlap between class pairs."
-            link="/class-overlap/"
+            link="user-guide/class-overlap/"
           />
         }
       </Box>
@@ -107,7 +119,7 @@ const ClassOverlap = () => {
               text={
                 "Assess magnitude of overlap and select class pairs to explore further. For suggested workflow:"
               }
-              link="/class-overlap/#suggested_workflow/"
+              link="user-guide/class-overlap/#suggested_workflow/"
             />
             <Typography variant="body2" marginTop={0.25}>
               Flows between class nodes indicate whether a source class's
@@ -229,6 +241,7 @@ const ClassOverlap = () => {
                 <TextField
                   size="small"
                   type="number"
+                  title="" // Overwrite any default input validation tooltip
                   value={overlapThreshold ?? data.defaultOverlapThreshold}
                   inputProps={OVERLAP_THRESHOLD_INPUT_PROPS}
                   onChange={({ target: { value } }) => {

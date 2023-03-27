@@ -1,7 +1,8 @@
-import { GetApp, SvgIconComponent } from "@mui/icons-material";
+import { ArrowDropDown, GetApp, SvgIconComponent } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import { Box, Button } from "@mui/material";
+import UploadIcon from "@mui/icons-material/Upload";
+import { Box, Button, Menu, MenuItem } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import {
   GridCellParams,
@@ -21,12 +22,17 @@ import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import UtteranceSaliency from "components/Utterance/UtteranceSaliency";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { getUtterancesEndpoint } from "services/api";
+import {
+  getConfigEndpoint,
+  getUtterancesEndpoint,
+  updateDataActionsEndpoint,
+} from "services/api";
 import {
   DataAction,
   DatasetInfoResponse,
   DatasetSplitName,
   Utterance,
+  UtterancePatch,
   UtterancesSortableColumn,
 } from "types/api";
 import {
@@ -36,7 +42,10 @@ import {
   QueryPipelineState,
   QueryPostprocessingState,
 } from "types/models";
-import { downloadDatasetSplit } from "utils/api";
+import {
+  downloadDatasetSplit,
+  downloadUtteranceProposedActions,
+} from "utils/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
   ID_TOOLTIP,
@@ -44,13 +53,21 @@ import {
   SMART_TAG_FAMILIES,
 } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
-import { constructSearchString, isPipelineSelected } from "utils/helpers";
+import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
+import {
+  constructSearchString,
+  isPipelineSelected,
+  raiseErrorToast,
+} from "utils/helpers";
 
 const SMART_TAG_WIDTH = 30;
 
 const useStyles = makeStyles((theme) => ({
   hoverableDataCell: {
     position: "relative",
+  },
+  idCell: {
+    direction: "rtl", // To get ellipsis on the left, e.g. ...001, ...002, etc.
   },
   gridContainer: {
     width: "100%",
@@ -66,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
   gridHeaderActions: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "space-between",
   },
   searchContainer: {
     marginLeft: theme.spacing(2),
@@ -86,16 +104,13 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "normal",
     whiteSpace: "normal",
   },
-  exportButton: {
-    marginLeft: "auto",
-  },
   filterIcon: {
     marginLeft: theme.spacing(1),
     width: 18,
   },
 }));
 
-type Row = Utterance & { id: number };
+type Row = Utterance & { id: Utterance["persistentId"] };
 
 type Props = {
   jobId: string;
@@ -138,7 +153,26 @@ const UtterancesTable: React.FC<Props> = ({
   const { data: utterancesResponse, isFetching } =
     getUtterancesEndpoint.useQuery(getUtterancesQueryState);
 
-  const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
+  const [updateDataAction] = updateDataActionsEndpoint.useMutation();
+
+  const rows: Row[] = React.useMemo(
+    () =>
+      utterancesResponse?.utterances.map((utterance) => ({
+        id: utterance.persistentId,
+        ...utterance,
+      })) ?? [],
+    [utterancesResponse]
+  );
+
+  const [selectedPersistentIds, setSelectedPersistentIds] = React.useState<
+    number[]
+  >([]);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+
+  // If config was undefined, PipelineCheck would not even render the page.
+  if (config === undefined) return null;
 
   const handlePageChange = (page: number) => {
     const q = constructSearchString({
@@ -184,6 +218,18 @@ const UtterancesTable: React.FC<Props> = ({
       <div className="MuiDataGrid-columnHeaderTitle">{headerName}</div>
       {filtered && <FilterAltOutlinedIcon fontSize="medium" color="success" />}
     </>
+  );
+
+  const renderId = ({ value, row }: GridCellParams<number, Row>) => (
+    <HoverableDataCell
+      autoWidth
+      title={getUtteranceIdTooltip({
+        utterance: row,
+        persistentIdColumn: config.columns.persistent_id,
+      })}
+    >
+      {value}
+    </HoverableDataCell>
   );
 
   const renderUtterance = ({ row }: GridCellParams<string, Row>) => (
@@ -236,7 +282,7 @@ const UtterancesTable: React.FC<Props> = ({
     row,
   }: GridCellParams<DataAction, Row>) => (
     <UtteranceDataAction
-      utteranceIds={[row.id]}
+      persistentIds={[row.persistentId]}
       dataAction={value}
       allDataActions={datasetInfo?.dataActions || []}
       getUtterancesQueryState={getUtterancesQueryState}
@@ -247,15 +293,15 @@ const UtterancesTable: React.FC<Props> = ({
   // That's the width of the table when viewed on a MacBook Pro 16 with the filter panel.
   const columns: Column<Row>[] = [
     {
-      field: "id",
+      field: "index",
       headerName: "Id",
       description: ID_TOOLTIP,
       width: 55,
       sortable: false,
       align: "center",
       headerAlign: "center",
-      cellClassName: classes.hoverableDataCell,
-      renderCell: renderHoverableDataCell,
+      cellClassName: `${classes.hoverableDataCell} ${classes.idCell}`,
+      renderCell: renderId,
     },
     {
       field: "utterance",
@@ -353,20 +399,43 @@ const UtterancesTable: React.FC<Props> = ({
     },
   ];
 
-  const rows: Row[] = React.useMemo(
-    () =>
-      utterancesResponse?.utterances.map((utterance) => ({
-        id: utterance.index,
-        ...utterance,
-      })) ?? [],
-    [utterancesResponse]
-  );
-
   const searchString = constructSearchString(pipeline);
+
+  const importProposedActions = (file: File) => {
+    const fileReader = new FileReader();
+    fileReader.onload = ({ target }) => {
+      if (target) {
+        const result = target.result as string;
+        const [header, ...rows] = result.trimEnd().split(/\r?\n/);
+        if (rows.length === 0) {
+          raiseErrorToast("There are no records in the CSV file.");
+          return;
+        }
+        if (header !== `${config.columns.persistent_id},proposed_action`) {
+          raiseErrorToast(
+            `The CSV file must have column headers ${config.columns.persistent_id} and proposed_action, in that order.`
+          );
+          return;
+        }
+
+        const body = rows.map((row) => {
+          const [persistentId, dataAction] = row.split(",");
+          return { persistentId, dataAction } as UtterancePatch;
+        });
+        updateDataAction({
+          ignoreNotFound: true,
+          body,
+          ...getUtterancesQueryState,
+        });
+      }
+    };
+    fileReader.readAsText(file);
+  };
+
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={`/${jobId}/dataset_splits/${datasetSplitName}/utterances/${props.row.id}${searchString}`}
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/utterances/${props.row.index}${searchString}`}
     >
       <GridRow {...props} />
     </Link>
@@ -377,22 +446,65 @@ const UtterancesTable: React.FC<Props> = ({
       <div className={classes.gridHeaderActions}>
         <Description
           text="Explore utterances and propose actions. Click on a row to inspect the utterance details."
-          link="/exploration-space/utterance-table/"
+          link="user-guide/exploration-space/utterance-table/"
         />
-        <Button
-          className={classes.exportButton}
-          onClick={() =>
-            downloadDatasetSplit({
-              jobId,
-              datasetSplitName,
-              ...filters,
-              ...pipeline,
-            })
-          }
-          startIcon={<GetApp />}
-        >
-          Export
-        </Button>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Button component="label" startIcon={<UploadIcon />}>
+            Import
+            <input
+              hidden
+              accept=".csv"
+              type="file"
+              onChange={({ target: { files } }) => {
+                if (files?.length) {
+                  importProposedActions(files[0]);
+                }
+              }}
+            />
+          </Button>
+          <Button
+            id="export-button"
+            aria-controls="export-menu"
+            aria-haspopup="true"
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            startIcon={<GetApp />}
+            endIcon={<ArrowDropDown />}
+          >
+            Export
+          </Button>
+          <Menu
+            id="export-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+          >
+            <MenuItem
+              onClick={() => {
+                downloadDatasetSplit({
+                  jobId,
+                  datasetSplitName,
+                  ...filters,
+                  ...pipeline,
+                });
+                setAnchorEl(null);
+              }}
+            >
+              Export utterances
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                downloadUtteranceProposedActions({
+                  jobId,
+                  datasetSplitName,
+                });
+                setAnchorEl(null);
+              }}
+            >
+              Export proposed actions
+            </MenuItem>
+          </Menu>
+        </Box>
       </div>
       <Table
         pagination
@@ -416,9 +528,9 @@ const UtterancesTable: React.FC<Props> = ({
         checkboxSelection
         disableColumnMenu
         onSelectionModelChange={(newSelection) => {
-          setSelectedIds(newSelection as number[]);
+          setSelectedPersistentIds(newSelection as number[]);
         }}
-        selectionModel={selectedIds}
+        selectionModel={selectedPersistentIds}
         components={{
           Footer: UtterancesTableFooter,
           Row: RowLink,
@@ -428,7 +540,7 @@ const UtterancesTable: React.FC<Props> = ({
             onClick: (e: React.MouseEvent) => e.stopPropagation(),
           },
           footer: {
-            selectedIds,
+            selectedPersistentIds,
             allDataActions: datasetInfo?.dataActions || [],
             getUtterancesQueryState,
           },

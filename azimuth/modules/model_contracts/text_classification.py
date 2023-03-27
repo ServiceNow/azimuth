@@ -150,8 +150,7 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
 
         Args:
             model_out: Model's output following one of our conventions.
-                Can be an array, tensor, output of HF pipeline
-                 or transformers.ModelOutput.
+                Can be an array, tensor, output of HF pipeline or transformers.ModelOutput.
 
         Returns:
             Array as probabilities.
@@ -227,7 +226,7 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         return json_output
 
     def get_postprocessed_output(
-        self, input_batch: Dataset, pipeline_output
+        self, input_batch: Dataset, model_output
     ) -> Tuple[
         PostProcessingIO, PostProcessingIO, List[PreprocessingStep], List[PostprocessingStep]
     ]:
@@ -235,19 +234,19 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
 
         Args:
             input_batch: Model input
-            pipeline_output: Output of the model.
+            model_output: Output of the model.
 
         Returns:
             Raw and postprocessed output.
         """
-        if isinstance(pipeline_output, PipelineOutputProtocol):
+        if isinstance(model_output, PipelineOutputProtocol):
             # User is following our contract, we can work with it.
             # Constructing PostProcessingIO object so indexing works.
 
-            if isinstance(pipeline_output, PipelineOutputProtocolV2):
+            if isinstance(model_output, PipelineOutputProtocolV2):
                 preprocessing_steps = [
                     PreprocessingStep(class_name=step["class_name"], text=step["text"])
-                    for step in pipeline_output.preprocessing_steps
+                    for step in model_output.preprocessing_steps
                 ]
                 postprocessing_steps = [
                     PostprocessingStep(
@@ -259,7 +258,7 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
                             logits=cast(PostProcessingIO, step["output"]).logits,
                         ),
                     )
-                    for step in pipeline_output.postprocessing_steps
+                    for step in model_output.postprocessing_steps
                 ]
             else:
                 preprocessing_steps, postprocessing_steps = [], []
@@ -267,15 +266,15 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             return (
                 PostProcessingIO(
                     texts=input_batch[self.config.columns.text_input],
-                    probs=pipeline_output.model_output.probs,
-                    preds=pipeline_output.model_output.preds,
-                    logits=pipeline_output.model_output.logits,
+                    probs=model_output.model_output.probs,
+                    preds=model_output.model_output.preds,
+                    logits=model_output.model_output.logits,
                 ),
                 PostProcessingIO(
                     texts=input_batch[self.config.columns.text_input],
-                    probs=pipeline_output.postprocessor_output.probs,
-                    preds=pipeline_output.postprocessor_output.preds,
-                    logits=pipeline_output.postprocessor_output.logits,
+                    probs=model_output.postprocessor_output.probs,
+                    preds=model_output.postprocessor_output.preds,
+                    logits=model_output.postprocessor_output.logits,
                 ),
                 preprocessing_steps,
                 postprocessing_steps,
@@ -284,7 +283,7 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
         rejection_class_idx = self.get_dataset_split_manager().rejection_class_idx
         rejection_class_threshold = self.get_threshold()
 
-        probs = self.extract_probs_from_output(pipeline_output)
+        probs = self.extract_probs_from_output(model_output)
         logits = (
             np.log(probs + EPSILON)
             if np.allclose(probs.sum(-1), 1.0)
@@ -302,32 +301,8 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             threshold=rejection_class_threshold,
             rejection_class_idx=rejection_class_idx,
         )
-        postprocessed_output = postprocessed_steps[-1].output
+        postprocessed_output = (
+            postprocessed_steps[-1].output if postprocessed_steps else model_out_formatted
+        )
         # Preprocessing steps are not supported at the moment for HF pipelines
         return model_out_formatted, postprocessed_output, [], postprocessed_steps
-
-    def empty_saliency_from_batch(self, batch) -> List[SaliencyResponse]:
-        """Return dummy output to not break API consumers.
-
-        Args:
-            batch: Utterances.
-
-        Returns:
-            Saliencies of 0.
-
-        """
-        records: List[SaliencyResponse] = []
-        tokenizer = self.artifact_manager.get_tokenizer()
-        for utterance in batch[self.config.columns.text_input]:
-            token_ids = tokenizer(utterance)["input_ids"]
-            tokens = tokenizer.convert_ids_to_tokens(token_ids)
-            tokens = [
-                token for token in tokens if token not in [tokenizer.cls_token, tokenizer.sep_token]
-            ]
-
-            json_output = SaliencyResponse(
-                saliency=[0.0] * len(tokens),
-                tokens=tokens,
-            )
-            records.append(json_output)
-        return records

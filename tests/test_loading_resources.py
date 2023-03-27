@@ -3,11 +3,11 @@
 # in the root directory of this source tree.
 import string
 from dataclasses import dataclass
-from typing import Callable, List
+from typing import Callable, Dict, List
 
 import numpy as np
 import torch
-from datasets import ClassLabel, Dataset, DatasetDict, Features, load_dataset
+from datasets import Dataset, DatasetDict, load_dataset
 from scipy.special import softmax
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -22,6 +22,7 @@ from transformers import (
 
 from azimuth.config import AzimuthConfig
 from azimuth.utils.ml.seeding import RandomContext
+from azimuth_shr.loading_resources import align_labels
 
 _CACHE_DIR = "/tmp/azimuth_test_models"
 _MAX_DATASET_LEN = 42
@@ -54,14 +55,18 @@ def load_hf_text_classif_pipeline(checkpoint_path: str, azimuth_config: AzimuthC
     )
 
 
-def load_sst2_dataset(train: bool = True, max_dataset_len: int = _MAX_DATASET_LEN) -> DatasetDict:
+def load_sst2_dataset(
+    train: bool = True, eval: bool = True, max_dataset_len: int = _MAX_DATASET_LEN
+) -> DatasetDict:
     datasets = load_dataset("glue", "sst2")
-    datasets["validation"] = datasets["validation"].rename_column("sentence", "utterance")
-    # Test has no label
-    ds = {"validation": datasets["validation"].select(np.arange(max_dataset_len))}
+    ds = {}
+    if eval:
+        # Test set has no label
+        datasets["validation"] = datasets["validation"].rename_column("sentence", "utterance")
+        ds["validation"] = datasets["validation"].select(np.arange(max_dataset_len))
     if train:
         datasets["train"] = datasets["train"].rename_column("sentence", "utterance")
-        ds.update({"train": datasets["train"].select(np.arange(max_dataset_len))})
+        ds["train"] = datasets["train"].select(np.arange(max_dataset_len))
     return DatasetDict(ds)
 
 
@@ -69,20 +74,14 @@ def load_intent_data(train_path, test_path, python_loader) -> Dataset:
     return load_dataset(python_loader, data_files={"train": train_path, "test": test_path})
 
 
-def load_file_dataset(*args, azimuth_config, **kwargs):
+def load_file_dataset(data_files: Dict[str, str], azimuth_config) -> DatasetDict:
     # Load a file dataset and cast the label column as a ClassLabel.
-    ds_dict = load_dataset(*args, **kwargs)
-    features: Features = [v.features for v in ds_dict.values()][0]
-    if not isinstance(features[azimuth_config.columns.label], ClassLabel):
-        # Get all classes from both set and apply the same mapping to every dataset.
-        classes = sorted(
-            list(set(sum([ds[azimuth_config.columns.label] for ds in ds_dict.values()], [])))
-        )
-        ds_dict = ds_dict.class_encode_column(azimuth_config.columns.label)
-        ds_dict = ds_dict.align_labels_with_mapping(
-            {class_name: i for i, class_name in enumerate(classes)}, azimuth_config.columns.label
-        )
-    return ds_dict
+    # Train and test need to be loaded separately because they don't always share the same columns.
+    # Train sometimes doesn't have predictions. HF will complain if we load both together.
+    ds_dict = load_dataset("csv", data_files={"train": data_files["train"]})
+    ds_dict_test = load_dataset("csv", data_files={"test": data_files["test"]})
+    ds_dict.update(ds_dict_test)
+    return align_labels(ds_dict, azimuth_config)
 
 
 def load_CLINC150_data(full_path, python_loader) -> Dataset:

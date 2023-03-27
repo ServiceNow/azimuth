@@ -4,15 +4,19 @@
 
 import argparse
 import os
+from datetime import datetime, timezone
 from enum import Enum
 from os.path import join as pjoin
 from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
-from pydantic import BaseModel, BaseSettings, Extra, Field, root_validator, validator
+from jsonlines import jsonlines
+from pydantic import BaseSettings, Extra, Field, root_validator, validator
 
-from azimuth.types import AliasModel, SupportedModelContract
+from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
+from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
+from azimuth.utils.openapi import fix_union_types, make_all_properties_required
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
@@ -63,8 +67,17 @@ config_defaults_per_language: Dict[SupportedLanguage, LanguageDefaultValues] = {
 
 
 def parse_args():
+    """Parse CLI args.
+
+    Returns: argparse Namespace
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_path", default="/config/config.json")
+    parser.add_argument("config_path", default=None, nargs="?")
+    parser.add_argument(
+        "--load-config-history",
+        action="store_true",
+        help="Load the last config from history, or if empty, default to config_path.",
+    )
     parser.add_argument("--port", default=8091, help="Port to serve the API.")
     parser.add_argument("--debug", action="store_true")
     return parser.parse_args()
@@ -74,21 +87,34 @@ class AzimuthValidationError(Exception):
     pass
 
 
-# Mypy does not like a variable named kwargs.
-class CustomObject(BaseModel):  # type: ignore
-    class_name: str = Field(..., title="Class name to load.")
+class AzimuthBaseSettings(BaseSettings):
+    class Config:
+        @staticmethod
+        def schema_extra(schema):
+            fix_union_types(schema)
+            make_all_properties_required(schema)
+
+
+class CustomObject(AzimuthBaseSettings):
+    class_name: str = Field(
+        ...,
+        title="Class name to load.",
+        description="Name of the function or class that is located in `remote`."
+        "`args` and `kwargs` will be sent to the function/class.",
+    )
     args: List[Any] = []
     kwargs: Dict[str, Any] = {}
     remote: Optional[str] = Field(
         None,
-        description="Relative path to class. `class_name` needs to be accessible from this path.",
+        description="Absolute path to class. `class_name` needs to be accessible from this path.",
+        nullable=True,
     )
 
 
 CustomObject.update_forward_refs()
 
 
-class MetricDefinition(CustomObject):  # type: ignore
+class MetricDefinition(CustomObject):
     additional_kwargs: Dict = Field(
         default_factory=dict,
         title="Additional kwargs",
@@ -96,11 +122,11 @@ class MetricDefinition(CustomObject):  # type: ignore
     )
 
 
-class TemperatureScaling(CustomObject, BaseSettings):
+class TemperatureScaling(CustomObject):
     class_name: Literal[
         "azimuth.utils.ml.postprocessing.TemperatureScaling"
     ] = "azimuth.utils.ml.postprocessing.TemperatureScaling"
-    temperature: float = Field(1, env="TEMP")
+    temperature: float = Field(1, ge=0, env="TEMP")
 
     @root_validator()
     def check_temps(cls, values):
@@ -112,11 +138,11 @@ class TemperatureScaling(CustomObject, BaseSettings):
         return values
 
 
-class ThresholdConfig(BaseSettings, CustomObject):
+class ThresholdConfig(CustomObject):
     class_name: Literal[
         "azimuth.utils.ml.postprocessing.Thresholding"
     ] = "azimuth.utils.ml.postprocessing.Thresholding"
-    threshold: float = Field(0.5, env="TH")
+    threshold: float = Field(0.5, ge=0, le=1, env="TH")
 
     @root_validator()
     def check_threshold(cls, values):
@@ -127,8 +153,8 @@ class ThresholdConfig(BaseSettings, CustomObject):
         return values
 
 
-class PipelineDefinition(BaseSettings):
-    name: str
+class PipelineDefinition(AzimuthBaseSettings):
+    name: str = Field(..., exclude_from_cache=True)
     model: CustomObject
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
@@ -139,7 +165,7 @@ class PipelineDefinition(BaseSettings):
         if self.postprocessors is None:
             return None
         thresholding = next(
-            iter([post for post in self.postprocessors if isinstance(post, ThresholdConfig)]), None
+            (post for post in self.postprocessors if isinstance(post, ThresholdConfig)), None
         )
         if thresholding:
             return thresholding.threshold
@@ -150,52 +176,51 @@ class PipelineDefinition(BaseSettings):
         if self.postprocessors is None:
             return None
         temp_scaling = next(
-            iter([post for post in self.postprocessors if isinstance(post, TemperatureScaling)]),
-            None,
+            (post for post in self.postprocessors if isinstance(post, TemperatureScaling)), None
         )
         if temp_scaling:
             return temp_scaling.temperature
         return None
 
 
-class DatasetWarningsOptions(BaseModel):
-    min_num_per_class: int = 20
-    max_delta_class_imbalance: float = 0.5
-    max_delta_representation: float = 0.05
-    max_delta_mean_tokens: float = 3.0
-    max_delta_std_tokens: float = 3.0
+class DatasetWarningsOptions(AzimuthBaseSettings):
+    min_num_per_class: int = Field(20, ge=1)
+    max_delta_class_imbalance: float = Field(0.5, ge=0, le=1)
+    max_delta_representation: float = Field(0.05, ge=0, le=1)
+    max_delta_mean_words: float = Field(3, ge=0)
+    max_delta_std_words: float = Field(3, ge=0)
 
 
-class SyntaxOptions(BaseModel):
-    short_sentence_max_token: int = 3
-    long_sentence_min_token: int = 16
+class SyntaxOptions(AzimuthBaseSettings):
+    short_utterance_max_word: int = Field(3, ge=1)
+    long_utterance_min_word: int = Field(12, ge=1)
     spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
     subj_tags: List[str] = []  # Language-based dynamic default value
     obj_tags: List[str] = []  # Language-based dynamic default value
 
 
-class NeutralTokenOptions(BaseModel):
+class NeutralTokenOptions(AzimuthBaseSettings):
     threshold: float = 1
     suffix_list: List[str] = []  # Language-based default value
     prefix_list: List[str] = []  # Language-based default value
 
 
-class PunctuationTestOptions(BaseModel):
+class PunctuationTestOptions(AzimuthBaseSettings):
     threshold: float = 1
 
 
-class FuzzyMatchingTestOptions(BaseModel):
+class FuzzyMatchingTestOptions(AzimuthBaseSettings):
     threshold: float = 1
 
 
-class TypoTestOptions(BaseModel):
+class TypoTestOptions(AzimuthBaseSettings):
     threshold: float = 1
     # Ex: if nb_typos_per_utterance = 2, this will create both tests with 1 typo and 2 typos per
     # utterance.
     nb_typos_per_utterance: int = 1
 
 
-class BehavioralTestingOptions(BaseModel):
+class BehavioralTestingOptions(AzimuthBaseSettings):
     neutral_token: NeutralTokenOptions = NeutralTokenOptions()
     punctuation: PunctuationTestOptions = PunctuationTestOptions()
     fuzzy_matching: FuzzyMatchingTestOptions = FuzzyMatchingTestOptions()
@@ -205,20 +230,24 @@ class BehavioralTestingOptions(BaseModel):
     seed: int = 300
 
 
-class SimilarityOptions(BaseModel):
-    faiss_encoder: str = ""  # Language-based dynamic default value
-    # Threshold to use when finding conflicting neighbors.
-    conflicting_neighbors_threshold: float = 0.9
-    # Threshold to determine whether there are close neighbors.
-    no_close_threshold: float = 0.5
+class SimilarityOptions(AzimuthBaseSettings):
+    faiss_encoder: str = Field("", description="Language-based dynamic default value.")
+    conflicting_neighbors_threshold: float = Field(
+        0.9, ge=0, le=1, description="Threshold to use when finding conflicting neighbors."
+    )
+    no_close_threshold: float = Field(
+        0.5, ge=-1, le=1, description="Threshold to determine whether there are close neighbors."
+    )
 
 
-class UncertaintyOptions(BaseModel):
-    iterations: int = 1  # Number of MC sampling to do. 1 disables BMA.
-    high_epistemic_threshold: float = 0.1  # Threshold to determine high epistemic items.
+class UncertaintyOptions(AzimuthBaseSettings):
+    iterations: int = Field(1, ge=1, description="Number of MC sampling to do. 1 disables BMA.")
+    high_epistemic_threshold: float = Field(
+        0.1, ge=0, description="Threshold to determine high epistemic items."
+    )
 
 
-class ColumnConfiguration(BaseModel):
+class ColumnConfiguration(AzimuthBaseSettings):
     # Column for the preprocessed text input
     text_input: str = "utterance"
     # Column for the raw text input
@@ -227,19 +256,19 @@ class ColumnConfiguration(BaseModel):
     label: str = "label"
     # Optional column to specify whether an example has failed preprocessing.
     failed_parsing_reason: str = "failed_parsing_reason"
+    # Unique identifier for every example
+    persistent_id: str = DatasetColumn.row_idx
 
 
-class ProjectConfig(BaseSettings):
+class ProjectConfig(AzimuthBaseSettings):
     # Name of the current project.
-    name: str = Field("New project", env="NAME")
+    name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
-    dataset: CustomObject
-    # Which model_contract the application is using.
-    model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification
+    dataset: Optional[CustomObject] = None
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
-    rejection_class: Optional[str] = "REJECTION_CLASS"
+    rejection_class: Optional[str] = Field("REJECTION_CLASS", nullable=True)
 
     def copy(self: T, *, validate: bool = True, **kwargs: Any) -> T:
         copy: T = super().copy(**kwargs)
@@ -249,52 +278,85 @@ class ProjectConfig(BaseSettings):
             )
         return copy
 
-    def to_hash(self):
-        return md5_hash(self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True))
+    def get_project_hash(self):
+        return md5_hash(
+            self.dict(
+                include=ProjectConfig.__fields__.keys(),
+                exclude=exclude_fields_from_cache(self),
+                by_alias=True,
+            )
+        )
 
 
-class CommonFieldsConfig(ProjectConfig, extra=Extra.ignore):
+class ArtifactsConfig(AzimuthBaseSettings, extra=Extra.ignore):
+    artifact_path: str = Field(
+        "cache",
+        description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
+        exclude_from_cache=True,
+    )
+
+    def get_config_history_path(self):
+        return f"{self.artifact_path}/config_history.jsonl"
+
+
+class CommonFieldsConfig(ArtifactsConfig, ProjectConfig, extra=Extra.ignore):
     """Fields that can be modified without affecting caching."""
 
-    # Where to store artifacts. (HDF5 files,  HF datasets, Dask config)
-    artifact_path: str = "/cache"
     # Batch size to use during inference.
-    batch_size: int = 32
+    batch_size: int = Field(32, exclude_from_cache=True)
     # Will use CUDA and will need GPUs if set to True.
     # If "auto" we check if CUDA is available.
-    use_cuda: Union[Literal["auto"], bool] = "auto"
+    use_cuda: Union[Literal["auto"], bool] = Field("auto", exclude_from_cache=True)
     # Memory of the dask cluster. Regular is 6GB, Large is 12GB.
     # For bigger models, large might be needed.
-    large_dask_cluster: bool = False
+    large_dask_cluster: bool = Field(False, exclude_from_cache=True)
     # Disable configuration changes
-    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG")
+    read_only_config: bool = Field(False, exclude_from_cache=True)
 
-    def get_artifact_path(self) -> str:
+    def get_project_path(self) -> str:
         """Generate a path for caching.
 
-        The path contains the project name, the task and a subset of a hash of the project config.
+        The path contains the project name and a subset of a hash of the project config.
         Additional fields in the config won't result in a different hash.
 
         Returns:
             Path to a folder where it is safe to store data.
         """
-        md5 = md5_hash(
-            ProjectConfig(
-                **self.dict(include=ProjectConfig.__fields__.keys(), by_alias=True)
-            ).dict()
-        )
-        path = pjoin(self.artifact_path, f"{self.name}_{self.model_contract}_{md5[:5]}")
+        path = pjoin(self.artifact_path, f"{self.name}_{self.get_project_hash()[:5]}")
         os.makedirs(path, exist_ok=True)
         return path
 
 
 class ModelContractConfig(CommonFieldsConfig):
+    # Which model_contract the application is using.
+    model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification
     # Model object definition.
-    pipelines: Optional[List[PipelineDefinition]] = None
+    pipelines: Optional[List[PipelineDefinition]] = Field(None, nullable=True)
     # Uncertainty configuration
     uncertainty: UncertaintyOptions = UncertaintyOptions()
     # Layer name where to calculate the gradients, normally the word embeddings layer.
-    saliency_layer: Optional[str] = None
+    saliency_layer: Optional[str] = Field(None, nullable=True)
+
+    @validator("pipelines", pre=True)
+    def check_pipeline_names(cls, pipeline_definitions):
+        # We support both [] and None (null in JSON), and we standardize it to None.
+        if not pipeline_definitions:
+            return None
+        pipeline_definitions = [
+            pipeline_def.dict() if isinstance(pipeline_def, PipelineDefinition) else pipeline_def
+            for pipeline_def in pipeline_definitions
+        ]
+        for pipeline_idx, pipeline_def in enumerate(pipeline_definitions):
+            if "name" not in pipeline_def or pipeline_def["name"] == "":
+                # Default value is the project name + idx.
+                pipeline_def["name"] = f"Pipeline_{pipeline_idx}"
+        pipeline_names = set(pipeline_def["name"] for pipeline_def in pipeline_definitions)
+        if len(pipeline_definitions) != len(pipeline_names):
+            raise ValueError(f"Duplicated pipeline names {pipeline_names}.")
+        return pipeline_definitions
+
+
+class MetricsConfig(ModelContractConfig):
     # Custom HuggingFace metrics
     metrics: Dict[str, MetricDefinition] = {
         "Accuracy": MetricDefinition(
@@ -317,23 +379,6 @@ class ModelContractConfig(CommonFieldsConfig):
         ),
     }
 
-    @validator("pipelines", pre=True)
-    def check_pipeline_names(cls, pipeline_definitions):
-        if pipeline_definitions is None:
-            return pipeline_definitions
-        pipeline_definitions = [
-            pipeline_def.dict() if isinstance(pipeline_def, PipelineDefinition) else pipeline_def
-            for pipeline_def in pipeline_definitions
-        ]
-        for pipeline_idx, pipeline_def in enumerate(pipeline_definitions):
-            if "name" not in pipeline_def or pipeline_def["name"] == "":
-                # Default value is the project name + idx.
-                pipeline_def["name"] = f"Pipeline_{pipeline_idx}"
-        pipeline_names = set(pipeline_def["name"] for pipeline_def in pipeline_definitions)
-        if len(pipeline_definitions) != len(pipeline_names):
-            raise ValueError(f"Duplicated pipeline names {pipeline_names}.")
-        return pipeline_definitions
-
 
 class LanguageConfig(CommonFieldsConfig):
     # Language config sets multiple config values; see `config_defaults_per_language` for details
@@ -345,31 +390,39 @@ class LanguageConfig(CommonFieldsConfig):
 class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
     behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-        BehavioralTestingOptions(), env="BEHAVIORAL_TESTING"
+        BehavioralTestingOptions(), nullable=True
     )
 
 
 class SimilarityConfig(CommonFieldsConfig):
     # Similarity configuration to define the encoder and the similarity threshold.
-    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env="SIMILARITY")
+    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), nullable=True)
 
 
-class DatasetWarningConfig(CommonFieldsConfig):
+class SyntaxConfig(CommonFieldsConfig):
+    # Syntax configuration to change thresholds that determine short and long utterances.
+    syntax: SyntaxOptions = SyntaxOptions()
+
+
+class DatasetWarningConfig(SyntaxConfig):
     # Dataset warnings configuration to change thresholds that trigger warnings
     dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
 
 
-class SyntaxConfig(CommonFieldsConfig):
-    # Syntax configuration to change thresholds that determine short and long sentences.
-    syntax: SyntaxOptions = SyntaxOptions()
+class TopWordsConfig(SyntaxConfig, ModelContractConfig):
+    pass
+
+
+class MetricsPerFilterConfig(
+    PerturbationTestingConfig, SimilarityConfig, SyntaxConfig, LanguageConfig, MetricsConfig
+):
+    pass
 
 
 class AzimuthConfig(
-    PerturbationTestingConfig,
-    SimilarityConfig,
+    MetricsPerFilterConfig,
+    TopWordsConfig,
     DatasetWarningConfig,
-    SyntaxConfig,
-    LanguageConfig,
     extra=Extra.forbid,
 ):
     # Reminder: If a module depends on an attribute in AzimuthConfig, the module will be forced to
@@ -378,63 +431,93 @@ class AzimuthConfig(
     @root_validator()
     def dynamic_language_config_values(cls, values):
         defaults = config_defaults_per_language[values["language"]]
-        if values["behavioral_testing"]:
-            neutral_token = values["behavioral_testing"].neutral_token
+        if behavioral_testing := values.get("behavioral_testing"):
+            neutral_token = behavioral_testing.neutral_token
             neutral_token.prefix_list = neutral_token.prefix_list or defaults.prefix_list
             neutral_token.suffix_list = neutral_token.suffix_list or defaults.suffix_list
-        syntax = values["syntax"]
-        syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
-        syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
-        syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
-        if values["similarity"]:
-            similarity = values["similarity"]
+        if syntax := values.get("syntax"):
+            syntax.spacy_model = syntax.spacy_model or defaults.spacy_model
+            syntax.subj_tags = syntax.subj_tags or defaults.subj_tags
+            syntax.obj_tags = syntax.obj_tags or defaults.obj_tags
+        if similarity := values.get("similarity"):
             similarity.faiss_encoder = similarity.faiss_encoder or defaults.faiss_encoder
         return values
 
+    @classmethod
+    def load(cls, config_path: Optional[str], load_config_history: bool) -> "AzimuthConfig":
+        # Loading config from config_path if specified, or else from environment variables only.
+        cfg = ArtifactsConfig.parse_file(config_path) if config_path else ArtifactsConfig()
 
-def load_azimuth_config(config_path: str) -> AzimuthConfig:
-    """
-    Load the configuration from a file or make a pre-built one from a folder.
+        if load_config_history:
+            config_history_path = cfg.get_config_history_path()
+            last_config = cls.load_last_from_config_history(config_history_path)
+            if last_config:
+                log.info(f"Loading latest config from {config_history_path}.")
+                return last_config
 
-    Args:
-        config_path: Path to a json file or a directory with the prediction files.
+            log.info("Empty or invalid config history.")
 
-    Returns:
-        The loaded config.
+        return cls.parse_file(config_path) if config_path else cls()
 
-    Raises:
-        If the file does not exist or the prediction file are not present.
-    """
-    log.info("-------------Loading Config--------------")
-    if not os.path.isfile(config_path):
-        raise EnvironmentError(f"{config_path} does not exists!")
+    @classmethod
+    def load_last_from_config_history(cls, config_history_path: str) -> Optional["AzimuthConfig"]:
+        try:
+            with jsonlines.open(config_history_path, mode="r") as config_history:
+                *_, last_config = config_history
+        except (FileNotFoundError, ValueError):
+            return None
+        else:
+            return AzimuthConfigHistory.parse_obj(last_config).config
 
-    cfg = AzimuthConfig.parse_file(config_path)
+    def log_info(self):
+        log.info(f"Config loaded for {self.name} with {self.model_contract} as a model contract.")
 
-    log.info(f"Config loaded for {cfg.name} with {cfg.model_contract} as a model contract.")
-
-    remote_mention = "" if not cfg.dataset.remote else f"from {cfg.dataset.remote} "
-    log.info(
-        f"Dataset will be loaded with {cfg.dataset.class_name} "
-        + remote_mention
-        + f"with the following args and kwargs: {cfg.dataset.args} {cfg.dataset.kwargs}."
-    )
-    if cfg.pipelines:
-        for pipeline_idx, pipeline in enumerate(cfg.pipelines):
-            remote_pipeline = cfg.pipelines[pipeline_idx].model.remote
-            remote_mention = "" if not remote_pipeline else f"from {remote_pipeline} "
+        if self.dataset:
+            remote_mention = "" if not self.dataset.remote else f"from {self.dataset.remote} "
             log.info(
-                f"Pipeline {pipeline_idx} "
-                f"will be loaded with {cfg.pipelines[pipeline_idx].model.class_name} "
+                f"Dataset will be loaded with {self.dataset.class_name} "
                 + remote_mention
-                + f"with the following args: {cfg.pipelines[pipeline_idx].model.kwargs}. "
-                f"Processors are set to {cfg.pipelines[pipeline_idx].postprocessors}."
+                + f"with the following args and kwargs: {self.dataset.args} {self.dataset.kwargs}."
             )
 
-    not_default_config_values = cfg.dict(
-        exclude_defaults=True, exclude={"name", "model_contract", "dataset", "pipelines"}
-    )
-    log.info(f"The following additional fields were set: {not_default_config_values}")
+        if self.pipelines:
+            for pipeline_idx, pipeline in enumerate(self.pipelines):
+                remote_pipeline = self.pipelines[pipeline_idx].model.remote
+                remote_mention = "" if not remote_pipeline else f"from {remote_pipeline} "
+                log.info(
+                    f"Pipeline {pipeline_idx} "
+                    f"will be loaded with {self.pipelines[pipeline_idx].model.class_name} "
+                    + remote_mention
+                    + f"with the following args: {self.pipelines[pipeline_idx].model.kwargs}. "
+                    f"Processors are set to {self.pipelines[pipeline_idx].postprocessors}."
+                )
+
+        not_default_config_values = self.dict(
+            exclude_defaults=True,
+            exclude={"name", "model_contract", "dataset", "pipelines"},
+            exclude_unset=True,
+        )
+        log.info(f"The following additional fields were set: {not_default_config_values}")
+
+    def save(self):
+        """Append config to config_history.jsonl to retrieve past configs."""
+        if self == self.load_last_from_config_history(self.get_config_history_path()):
+            return
+        # TODO https://stackoverflow.com/questions/2333872/
+        #  how-to-make-file-creation-an-atomic-operation
+        with jsonlines.open(self.get_config_history_path(), mode="a") as f:
+            f.write(AzimuthConfigHistory(config=self).dict())
+
+
+class AzimuthConfigHistory(AzimuthBaseSettings):
+    config: AzimuthConfig
+    created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)))
+
+
+def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:
+    log.info("-------------Loading Config--------------")
+    cfg = AzimuthConfig.load(config_path, load_config_history)
+    cfg.log_info()
     log.info("-------------Config loaded--------------")
 
     return cfg

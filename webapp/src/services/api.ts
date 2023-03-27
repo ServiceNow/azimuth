@@ -1,9 +1,12 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AzimuthConfig, DataAction, DataActionResponse } from "types/api";
-import { Tags } from "types/models";
-import { GetUtterancesQueryState, fetchApi, TypedResponse } from "utils/api";
-import { DATA_ACTION_NONE_VALUE } from "utils/const";
+import { AzimuthConfig, UtterancePatch } from "types/api";
+import {
+  fetchApi,
+  GetUtterancesQueryState,
+  PatchUtterancesQueryState,
+  TypedResponse,
+} from "utils/api";
 import { raiseSuccessToast } from "utils/helpers";
 
 const responseToData =
@@ -20,34 +23,11 @@ const responseToData =
     }
   };
 
-const getDataActions = (
-  ids: number[],
-  newValue: DataAction,
-  allDataActions: string[]
-) => {
-  const newTagsMap: { [id: number]: Tags } = {};
-  ids.forEach((id) => {
-    const allFalse = allDataActions.reduce(
-      (tags: Record<string, boolean>, tag) => ({
-        ...tags,
-        [tag]: false,
-      }),
-      {}
-    );
-    const newTags: Tags =
-      newValue === DATA_ACTION_NONE_VALUE
-        ? allFalse
-        : { ...allFalse, [newValue]: true };
-    newTagsMap[id] = newTags;
-  });
-
-  return newTagsMap;
-};
-
 const tagTypes = [
   "DatasetInfo",
   "ConfidenceHistogram",
   "Config",
+  "DefaultConfig",
   "Metrics",
   "OutcomeCountPerThreshold",
   "OutcomeCountPerFilter",
@@ -65,8 +45,6 @@ const tagTypes = [
   "ClassOverlapPlot",
   "ClassOverlap",
 ] as const;
-
-type Tag = typeof tagTypes[number];
 
 export const api = createApi({
   baseQuery: fakeBaseQuery<{ message: string }>(),
@@ -156,7 +134,7 @@ export const api = createApi({
       providesTags: () => [{ type: "DatasetWarnings" }],
       queryFn: responseToData(
         fetchApi({ path: "/dataset_warnings", method: "get" }),
-        "Something went wrong fetching dataset class distribution analysis"
+        "Something went wrong fetching dataset warnings"
       ),
     }),
     getUtterances: build.query({
@@ -203,7 +181,7 @@ export const api = createApi({
       providesTags: () => [{ type: "ClassOverlap" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_overlap",
+          path: "/dataset_splits/{dataset_split_name}/class_overlap",
           method: "get",
         }),
         "Something went wrong fetching class overlap"
@@ -213,47 +191,48 @@ export const api = createApi({
       providesTags: () => [{ type: "ClassOverlapPlot" }],
       queryFn: responseToData(
         fetchApi({
-          path: "/class_overlap/plot",
+          path: "/dataset_splits/{dataset_split_name}/class_overlap/plot",
           method: "get",
         }),
-        "Something went wrong fetching spectral clustering class overlap data"
+        "Something went wrong fetching class overlap plot"
       ),
     }),
     updateDataActions: build.mutation<
-      DataActionResponse,
-      {
-        ids: number[];
-        newValue: DataAction;
-        allDataActions: string[];
-      } & GetUtterancesQueryState
+      UtterancePatch[],
+      PatchUtterancesQueryState & Omit<GetUtterancesQueryState, "body">
     >({
-      queryFn: async ({
-        jobId,
-        datasetSplitName,
-        ids,
-        newValue,
-        allDataActions,
-      }) =>
+      queryFn: async ({ jobId, datasetSplitName, ignoreNotFound, body }) =>
         responseToData(
-          fetchApi({ path: "/tags", method: "post" }),
-          "Something went wrong updating the resolution"
-        )({
-          jobId,
-          body: {
-            datasetSplitName,
-            dataActions: getDataActions(ids, newValue, allDataActions),
-          },
-        }),
-      invalidatesTags: () => ["OutcomeCountPerFilter", "Utterances"],
+          fetchApi({
+            path: "/dataset_splits/{dataset_split_name}/utterances",
+            method: "patch",
+          }),
+          "Something went wrong updating proposed actions"
+        )({ jobId, datasetSplitName, ignoreNotFound, body }),
+      invalidatesTags: () => [
+        "ConfidenceHistogram",
+        "ConfusionMatrix",
+        "Metrics",
+        "MetricsPerFilter",
+        "OutcomeCountPerFilter",
+        "TopWords",
+        "UtteranceCountPerFilter",
+        "Utterances",
+      ],
       async onQueryStarted(
-        { ids, newValue, allDataActions, ...args },
+        { ignoreNotFound, body, ...args },
         { dispatch, queryFulfilled }
       ) {
         const patchResult = dispatch(
           api.util.updateQueryData("getUtterances", args, (draft) => {
             draft.utterances.forEach((utterance) => {
-              if (ids.includes(utterance.index)) {
-                utterance.dataAction = newValue;
+              const found = body.find(
+                // Support persistent ids that can be either strings or numbers.
+                // eslint-disable-next-line eqeqeq
+                ({ persistentId }) => persistentId == utterance.persistentId
+              );
+              if (found) {
+                utterance.dataAction = found.dataAction;
               }
             });
           })
@@ -289,8 +268,15 @@ export const api = createApi({
     getConfig: build.query({
       providesTags: [{ type: "Config" }],
       queryFn: responseToData(
-        fetchApi({ path: "/admin/config", method: "get" }),
+        fetchApi({ path: "/config", method: "get" }),
         "Something went wrong fetching config"
+      ),
+    }),
+    getDefaultConfig: build.query({
+      providesTags: [{ type: "DefaultConfig" }],
+      queryFn: responseToData(
+        fetchApi({ path: "/config/default", method: "get" }),
+        "Something went wrong fetching default config"
       ),
     }),
     updateConfig: build.mutation<
@@ -298,24 +284,12 @@ export const api = createApi({
       { jobId: string; body: Partial<AzimuthConfig> }
     >({
       queryFn: responseToData(
-        fetchApi({ path: "/admin/config", method: "patch" }),
+        fetchApi({ path: "/config", method: "patch" }),
         "Something went wrong updating config"
       ),
-      invalidatesTags: (...[, , { body: partialConfig }]) => {
-        const tags = new Set<Tag>();
-        // Invalidate DatasetInfo only after the query is fulfilled,
-        // otherwise the response is not up to date or even fails.
-        if ("behavioral_testing" in partialConfig) {
-          tags.add("Status");
-          tags.add("PerturbationTestingSummary");
-          tags.add("PerturbedUtterances");
-        }
-        if ("similarity" in partialConfig) {
-          tags.add("Status");
-          tags.add("SimilarUtterances");
-        }
-        return [...tags];
-      },
+      // We invalidate Status first, so StatusCheck stops rendering the app if
+      // necessary. We await queryFulfilled before invalidating the other tags.
+      invalidatesTags: () => ["Status"],
       async onQueryStarted(
         { jobId, body: partialConfig },
         { dispatch, queryFulfilled }
@@ -327,9 +301,20 @@ export const api = createApi({
         );
         const patchDatasetInfo = dispatch(
           api.util.updateQueryData("getDatasetInfo", { jobId }, (draft) => {
+            if (partialConfig.name !== undefined) {
+              draft.projectName = partialConfig.name;
+            }
+            if (partialConfig.model_contract !== undefined) {
+              draft.modelContract = partialConfig.model_contract;
+            }
             if ("behavioral_testing" in partialConfig) {
               draft.perturbationTestingAvailable = Boolean(
                 partialConfig.behavioral_testing
+              );
+            }
+            if ("pipelines" in partialConfig) {
+              draft.predictionAvailable = Boolean(
+                partialConfig.pipelines?.length
               );
             }
             if ("similarity" in partialConfig) {
@@ -351,7 +336,11 @@ export const api = createApi({
               Object.assign(draft, data);
             })
           );
-          dispatch(api.util.invalidateTags(["DatasetInfo"]));
+          dispatch(
+            api.util.invalidateTags(
+              tagTypes.filter((tag) => tag !== "Config" && tag !== "Status")
+            )
+          );
         } catch {
           patchConfig.undo();
           patchDatasetInfo.undo();
@@ -362,7 +351,7 @@ export const api = createApi({
       providesTags: () => [{ type: "Status" }],
       queryFn: responseToData(
         fetchApi({ path: "/status", method: "get" }),
-        "Something went wrong fetching the status"
+        "Something went wrong fetching status"
       ),
     }),
   }),
@@ -371,6 +360,7 @@ export const api = createApi({
 export const {
   getConfidenceHistogram: getConfidenceHistogramEndpoint,
   getConfig: getConfigEndpoint,
+  getDefaultConfig: getDefaultConfigEndpoint,
   getConfusionMatrix: getConfusionMatrixEndpoint,
   getDatasetInfo: getDatasetInfoEndpoint,
   getDatasetWarnings: getDatasetWarningsEndpoint,

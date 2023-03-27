@@ -1,11 +1,11 @@
 import { Box, Button, CircularProgress, MenuItem, Select } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { updateDataActionsEndpoint } from "services/api";
-import { DataAction } from "types/api";
+import { DataAction, UtterancePatch } from "types/api";
 import { GetUtterancesQueryState } from "utils/api";
 
 type Props = {
-  utteranceIds: number[];
+  persistentIds: UtterancePatch["persistentId"][];
   dataAction?: DataAction;
   confirmationButton?: boolean;
   allDataActions: string[];
@@ -13,21 +13,23 @@ type Props = {
 };
 
 const UtteranceDataAction: React.FC<Props> = ({
-  utteranceIds,
+  persistentIds,
   dataAction,
   confirmationButton,
   allDataActions,
   getUtterancesQueryState,
 }) => {
-  const [newDataAction, setNewDataAction] = useState<DataAction | "">("");
+  const [newDataAction, setNewDataAction] = React.useState<DataAction | "">("");
 
   const [updateDataAction] = updateDataActionsEndpoint.useMutation();
 
   const handleDataActionChange = (newValue: DataAction) => {
+    const body: UtterancePatch[] = persistentIds.map((persistentId) => ({
+      persistentId,
+      dataAction: newValue,
+    }));
     updateDataAction({
-      ids: utteranceIds,
-      newValue,
-      allDataActions,
+      body,
       ...getUtterancesQueryState,
     });
   };

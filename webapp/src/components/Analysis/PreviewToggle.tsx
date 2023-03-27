@@ -2,14 +2,15 @@ import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import React from "react";
 
 type Props = {
+  defaultOption?: number;
   options: {
     button: React.ReactElement<typeof ToggleButton>;
     content: React.ReactNode;
   }[];
 };
 
-const PreviewToggle: React.FC<Props> = ({ options }) => {
-  const [option, setOption] = React.useState(0);
+const PreviewToggle: React.FC<Props> = ({ defaultOption = 0, options }) => {
+  const [option, setOption] = React.useState(defaultOption);
 
   const handleOptionChange = (newValue: number | null) => {
     if (newValue !== null) {

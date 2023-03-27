@@ -68,3 +68,17 @@ export type Bin = {
   name: number;
   type: Outcome;
 };
+
+// Like Pick<Type, Keys>, but with the type of Values instead of the type of Keys.
+// The checks for undefined ensure we deal properly with optional properties.
+// For example,
+// PickByValue<{ a: string; b?: string; c: undefined; d?: undefined }, string>
+// should give
+// { a: string; b?: string }
+export type PickByValue<Type, Values> = {
+  [Key in keyof Type as Type[Key] extends undefined
+    ? never
+    : Type[Key] extends Values | undefined
+    ? Key
+    : never]: Type[Key];
+};

@@ -109,6 +109,7 @@ def test_expired_task(tiny_text_task_manager, tiny_text_config):
     _, expirable_task = tiny_text_task_manager.get_task(
         "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
+        mod_options=ModuleOptions(pipeline_index=0),
         last_update=current_update,
     )
     assert not not_expirable_task.done() and not expirable_task.done()
@@ -124,6 +125,7 @@ def test_expired_task(tiny_text_task_manager, tiny_text_config):
     _, expirable_task = tiny_text_task_manager.get_task(
         "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
+        mod_options=ModuleOptions(pipeline_index=0),
         last_update=current_update,
     )
     assert not_expirable_task.done() and expirable_task.done()
@@ -139,6 +141,7 @@ def test_expired_task(tiny_text_task_manager, tiny_text_config):
     _, expirable_task = tiny_text_task_manager.get_task(
         "ExpirableModule",
         dataset_split_name=DatasetSplitName.eval,
+        mod_options=ModuleOptions(pipeline_index=0),
         last_update=current_update,
     )
     assert not_expirable_task.done() and not expirable_task.done()

@@ -21,10 +21,8 @@ from azimuth.utils.validation import assert_not_none
 class OutcomesModule(DatasetResultModule[ModelContractConfig]):
     """Computes the outcome for each utterance in the dataset split."""
 
-    allowed_mod_options = DatasetResultModule.allowed_mod_options | {
-        "threshold",
-        "pipeline_index",
-    }
+    required_mod_options = {"pipeline_index"}
+    optional_mod_options = DatasetResultModule.optional_mod_options | {"threshold"}
 
     def _get_predictions(self, without_postprocessing: bool) -> ndarray:
         mod_options = self.mod_options.copy(deep=True)

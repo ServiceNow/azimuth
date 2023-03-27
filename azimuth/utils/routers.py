@@ -162,14 +162,14 @@ def get_custom_task_result(
 
 
 def require_pipeline_index(
-    pipeline_index: int = Query(..., title="Pipeline index"),
+    pipeline_index: int = Query(..., title="Pipeline index", ge=0),
     config: AzimuthConfig = Depends(get_config),
 ):
     return query_pipeline_index(pipeline_index, config)
 
 
 def query_pipeline_index(
-    pipeline_index: Optional[int] = Query(None, title="Pipeline index"),
+    pipeline_index: Optional[int] = Query(None, title="Pipeline index", ge=0),
     config: AzimuthConfig = Depends(get_config),
 ) -> Optional[int]:
     """Get and validate the pipeline index from query parameters.
@@ -189,7 +189,7 @@ def query_pipeline_index(
     elif config.pipelines is None:
         raise HTTPException(
             HTTP_400_BAD_REQUEST,
-            detail=f"Current config has no model specified,"
+            detail=f"Current config has no pipeline specified,"
             f" but pipeline index {pipeline_index} was requested.",
         )
     elif len(config.pipelines) < pipeline_index:
@@ -207,7 +207,7 @@ def require_available_model(
 ):
     if not predictions_available(config) or pipeline_index is None:
         raise HTTPException(
-            400, detail="This route requires a model, but none was provided in the configuration."
+            400, detail="This route requires a pipeline, but none was provided in the config."
         )
 
 
@@ -258,8 +258,8 @@ def require_application_ready(
 
 
 def get_pagination(
-    limit: Optional[int] = Query(None, title="Limit"),
-    offset: Optional[int] = Query(None, title="Offset"),
+    limit: Optional[int] = Query(None, title="Limit", ge=1),
+    offset: Optional[int] = Query(None, title="Offset", ge=0),
 ) -> Optional[PaginationParams]:
     """Get the pagination parameters if available.
 

@@ -9,6 +9,7 @@ import {
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { getOutcomeCountPerThresholdEndpoint } from "services/api";
+import { Outcome } from "types/api";
 import { QueryPipelineState } from "types/models";
 import { ALL_OUTCOMES, OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
@@ -37,10 +38,6 @@ const useStyles = makeStyles((theme) => ({
     gridColumn: "start / end",
     gridRow: "start / end",
     placeSelf: "center",
-    "p&": {
-      backgroundColor: theme.palette.background.paper,
-      padding: theme.spacing(),
-    },
   },
   xTitle: {
     gridRow: "title",
@@ -48,9 +45,9 @@ const useStyles = makeStyles((theme) => ({
   },
   xLabel: {
     gridRow: "label",
-    justifySelf: "center",
+    justifySelf: "right",
+    translate: "50%",
     marginTop: theme.spacing(1),
-    minWidth: 0,
   },
   yTitle: {
     gridColumn: "title",
@@ -58,20 +55,64 @@ const useStyles = makeStyles((theme) => ({
     transform: "rotate(180deg)",
     writingMode: "vertical-rl",
   },
-  majorGridLine: {
-    borderTop: `2px dashed ${theme.palette.common.black}`,
-    width: "100%",
-  },
-  minorGridLine: {
-    borderTop: `2px solid ${alpha(theme.palette.common.black, 0.2)}`,
-    width: "100%",
-  },
 }));
 
 type Props = {
   jobId: string;
   pipeline: Required<QueryPipelineState>;
 };
+
+const GridLine: React.FC<
+  ({ x: number; y?: never } | { x?: never; y: number }) & { dashed?: Boolean }
+> = ({ x, y, dashed }) => (
+  <Box
+    component="line"
+    strokeWidth={2}
+    vectorEffect="non-scaling-stroke"
+    x1={x ?? 0}
+    x2={x ?? 1}
+    y1={y ?? 0}
+    y2={y ?? 1}
+    sx={(theme) =>
+      dashed
+        ? { stroke: theme.palette.common.black, strokeDasharray: 5 }
+        : { stroke: alpha(theme.palette.common.black, 0.2) }
+    }
+  />
+);
+
+const Point: React.FC<{ x: number; y: number }> = ({ x, y }) => (
+  <Box
+    component="path"
+    d={`M${x},${y} Z`}
+    strokeLinecap="round"
+    strokeWidth={6}
+    vectorEffect="non-scaling-stroke"
+    sx={(theme) => ({ stroke: theme.palette.common.black })}
+  />
+);
+
+const Curve: React.FC<{
+  points: [number, number][];
+  outcome: Outcome;
+}> = ({ points, outcome }) => (
+  <>
+    <Box
+      component="polyline"
+      strokeWidth={2}
+      vectorEffect="non-scaling-stroke"
+      // Go from -1 to 2 so the side strokes are outside the viewBox
+      points={[[-1, 0], ...points, [2, 0]].join(" ")}
+      sx={(theme) => ({
+        fill: theme.palette[OUTCOME_COLOR[outcome]].main,
+        stroke: theme.palette.common.black,
+      })}
+    />
+    {points.map(([x, y], j) => (
+      <Point key={j} x={x} y={y} />
+    ))}
+  </>
+);
 
 const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
   const classes = useStyles();
@@ -83,7 +124,16 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
       ...pipeline,
     });
 
-  const xIntervals = data?.length || 1;
+  const xIntervals = (data?.outcomeCountPerThreshold.length || 2) - 1;
+
+  const [background, ...curves] = ALL_OUTCOMES;
+  const ys = data?.outcomeCountPerThreshold.map(({ outcomeCount }) =>
+    curves
+      // Relative to utterance count:
+      .map((outcome) => [(outcomeCount[outcome] ?? 0) / data.utteranceCount])
+      // Stack:
+      .reduceRight(([first, ...rest], [y]) => [y + first, first, ...rest])
+  );
 
   return (
     <Box
@@ -104,10 +154,8 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
         {ALL_OUTCOMES.map((outcome) => (
           <Box key={outcome} display="flex" gap={1} lineHeight={1}>
             <Box
-              sx={(theme) => ({
-                backgroundColor: theme.palette[OUTCOME_COLOR[outcome]].main,
-                width: theme.spacing(4),
-              })}
+              width={(theme) => theme.spacing(4)}
+              bgcolor={(theme) => theme.palette[OUTCOME_COLOR[outcome]].main}
             />
             {OUTCOME_PRETTY_NAMES[outcome]}
           </Box>
@@ -115,18 +163,72 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
       </Box>
       <Box
         display="grid"
-        gridTemplateColumns={`[title] auto [label] auto [start] repeat(${xIntervals}, [tick] 1fr) [end] auto`}
+        gridTemplateColumns={`[title] auto [label tick] auto [start] repeat(${xIntervals}, [tick] 1fr) [end] auto`}
         gridTemplateRows={`[start] repeat(${yIntervals}, [tick] 1fr) [tick end label] auto [title] auto`}
         height="100%"
+        marginTop={2}
+        minHeight={0}
         maxHeight={600}
         maxWidth={1000}
         width="100%"
       >
+        {data && ys && (
+          <Box
+            component="svg"
+            gridColumn="start / end"
+            gridRow="start / end"
+            width="100%"
+            height="100%"
+            viewBox="0 0 1 1"
+            preserveAspectRatio="none"
+            bgcolor={(theme) => theme.palette[OUTCOME_COLOR[background]].main}
+          >
+            {curves.map((outcome, i) => (
+              <Curve
+                key={outcome}
+                points={data.outcomeCountPerThreshold.map(
+                  ({ threshold }, j) => [threshold, ys[j][i]]
+                )}
+                outcome={outcome}
+              />
+            ))}
+            {data.outcomeCountPerThreshold.flatMap(({ threshold }, i) =>
+              threshold !== data.confidenceThreshold
+                ? [<GridLine key={i} x={threshold} />]
+                : []
+            )}
+            {/* Separate since the confidence threshold may fall not on a grid line */}
+            {data?.confidenceThreshold && (
+              <GridLine x={data.confidenceThreshold} dashed />
+            )}
+            {yTicks.map((y, i) => (
+              <GridLine key={i} y={1 - y} dashed={y in majorGridLines} />
+            ))}
+          </Box>
+        )}
+        {data?.confidenceThreshold && (
+          <Box
+            gridColumn="start / end"
+            gridRow="start / end"
+            position="relative"
+          >
+            <Typography
+              position="absolute"
+              left={`${data.confidenceThreshold * 100}%`}
+              bottom="100%"
+              whiteSpace="nowrap"
+            >
+              {`Current prediction threshold: ${
+                data.confidenceThreshold * 100
+              }%`}
+            </Typography>
+          </Box>
+        )}
         <Typography className={classNames(classes.title, classes.xTitle)}>
           Confidence Threshold
         </Typography>
         {data ? (
-          data.flatMap(({ outcomeCount, threshold }, i) => [
+          data.outcomeCountPerThreshold.map(({ threshold }, i) => (
             <Typography
               key={`x label ${i}`}
               variant="body2"
@@ -134,33 +236,13 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
               gridColumn={`${1 + i} tick`}
             >
               {formatRatioAsPercentageString(threshold, 0)}
-            </Typography>,
-            <Box
-              key={`column ${i}`}
-              display="flex"
-              flexDirection="column-reverse"
-              gridColumn={`${1 + i} tick`}
-              gridRow="start / end"
-              height="100%"
-              justifySelf="center"
-              width="80%"
-            >
-              {ALL_OUTCOMES.map((outcome) => (
-                <Box
-                  key={outcome}
-                  flex={outcomeCount[outcome] || 0}
-                  sx={(theme) => ({
-                    backgroundColor: theme.palette[OUTCOME_COLOR[outcome]].main,
-                  })}
-                />
-              ))}
-            </Box>,
-          ])
+            </Typography>
+          ))
         ) : (
           <Typography
             variant="body2"
             className={classes.xLabel}
-            sx={{ gridColumn: `1 tick` }}
+            gridColumn="1 tick"
           >
             {"\u200B" /* zero-width space to give the row the correct height */}
           </Typography>
@@ -180,22 +262,6 @@ const ThresholdPlot: React.FC<Props> = ({ jobId, pipeline }) => {
           >
             {formatRatioAsPercentageString(y, 0)}
           </Typography>,
-          <Box
-            key={`grid line ${i}`}
-            alignItems="center"
-            display="flex"
-            gridColumn="start / end"
-            gridRow={`${1 + i} tick`}
-            height={0}
-          >
-            <Box
-              className={
-                y in majorGridLines
-                  ? classes.majorGridLine
-                  : classes.minorGridLine
-              }
-            />
-          </Box>,
           y in majorGridLines && (
             <Box
               key={`y label right ${i}`}

@@ -14,6 +14,7 @@ import {
 } from "@mui/material/styles";
 import AppLayout from "components/AppLayout";
 import BasicLayout from "components/BasicLayout";
+import PageHeader from "components/PageHeader";
 import WarningsOverview from "pages/WarningsOverview";
 import UtteranceDetail from "pages/UtteranceDetail";
 import customTheme, { GlobalCss } from "styles/theme";
@@ -30,7 +31,6 @@ import PerturbationTestingSummary from "pages/PerturbationTestingSummary";
 import Threshold from "pages/Threshold";
 import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
-import Settings from "pages/Settings";
 import NotFound from "pages/NotFound";
 import ClassOverlap from "pages/ClassOverlap";
 import SmartTags from "pages/SmartTags";
@@ -78,23 +78,33 @@ export default class App extends React.Component<Props> {
                     <Route path="/:jobId">
                       <StatusCheck>
                         <PipelineCheck>
+                          <PageHeader />
                           <Switch>
                             <Route path="/:jobId" exact>
                               <BasicLayout maxWidth="md">
                                 <Dashboard />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/settings" exact>
-                              <BasicLayout>
-                                <Settings />
-                              </BasicLayout>
-                            </Route>
-                            <Route path="/:jobId/class_overlap" exact>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/class_overlap"
+                              exact
+                            >
                               <BasicLayout maxWidth="md">
                                 <ClassOverlap />
                               </BasicLayout>
                             </Route>
-                            <Route path="/:jobId/smart_tags" exact>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/pipeline_metrics"
+                              exact
+                            >
+                              <BasicLayout>
+                                <PerformanceAnalysis />
+                              </BasicLayout>
+                            </Route>
+                            <Route
+                              path="/:jobId/dataset_splits/:datasetSplitName/smart_tags"
+                              exact
+                            >
                               <BasicLayout>
                                 <SmartTags />
                               </BasicLayout>
@@ -135,11 +145,6 @@ export default class App extends React.Component<Props> {
                             >
                               <BasicLayout>
                                 <UtteranceDetail />
-                              </BasicLayout>
-                            </Route>
-                            <Route path="/:jobId/pipeline_metrics" exact>
-                              <BasicLayout>
-                                <PerformanceAnalysis />
                               </BasicLayout>
                             </Route>
                             <Route>

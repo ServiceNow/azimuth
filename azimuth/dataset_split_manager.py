@@ -4,7 +4,7 @@
 
 import os
 import time
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from copy import copy, deepcopy
 from dataclasses import asdict, dataclass
 from glob import glob
@@ -19,8 +19,9 @@ from datasets import ClassLabel, Dataset, concatenate_datasets
 from filelock import FileLock
 
 from azimuth.config import AzimuthConfig, AzimuthValidationError, CommonFieldsConfig
-from azimuth.types import DatasetColumn, DatasetSplitName
-from azimuth.types.tag import SmartTag, Tag
+from azimuth.types import DatasetColumn, DatasetFilters, DatasetSplitName
+from azimuth.types.tag import ALL_DATA_ACTIONS, Tag
+from azimuth.utils.dataset_operations import filter_dataset_split
 from azimuth.utils.validation import assert_not_none
 
 REJECTION_CLASS = "REJECTION_CLASS"
@@ -70,16 +71,16 @@ class DatasetSplitManager:
         self,
         name: DatasetSplitName,
         config: CommonFieldsConfig,
-        initial_tags: List[str],
-        initial_prediction_tags: Optional[List[str]] = None,
+        initial_tags: List[Tag],
+        initial_prediction_tags: Optional[List[Tag]] = None,
         dataset_split: Optional[Dataset] = None,
     ):
         self.name = name
         self._tags = initial_tags
         self._prediction_tags = initial_prediction_tags or []
         self.config = config
-        self._artifact_path = config.get_artifact_path()
-        self._hf_path = pjoin(self._artifact_path, "HF_datasets", self.name)
+        self._project_path = config.get_project_path()
+        self._hf_path = pjoin(self._project_path, "HF_datasets", self.name)
         self._base_dataset_path = pjoin(self._hf_path, "base_tables")
         os.makedirs(self._base_dataset_path, exist_ok=True)
         self._save_path = pjoin(self._base_dataset_path, "cache_ds.arrow")
@@ -94,9 +95,8 @@ class DatasetSplitManager:
             if dataset_split is None:
                 raise ValueError("No dataset_split cached, can't initialize.")
             log.info("Initializing tags", tags=initial_tags)
-            self._base_dataset_split, self._malformed_dataset = self._split_malformed(dataset_split)
-            self._base_dataset_split = self._init_dataset_split(
-                self._base_dataset_split, self._tags
+            self._base_dataset_split, self._malformed_dataset = self._load_base_dataset_split(
+                dataset_split
             )
             self._save_base_dataset_split()
         else:
@@ -153,6 +153,21 @@ class DatasetSplitManager:
             return ds, malformed
         return None
 
+    def _load_base_dataset_split(self, dataset_split) -> Tuple[Dataset, Dataset]:
+        base_dataset_split, malformed_dataset = self._split_malformed(dataset_split)
+
+        # Checking if a persistent id was provided.
+        persistent_id = self.config.columns.persistent_id
+        if persistent_id != DatasetColumn.row_idx:  # Default value
+            if persistent_id not in base_dataset_split.column_names:
+                raise ValueError(f"Persistent id named {persistent_id} not found in the dataset.")
+
+            all_persistent_ids = base_dataset_split[persistent_id]
+            if len(all_persistent_ids) > len(set(all_persistent_ids)):
+                raise ValueError(f"Persistent ids in {persistent_id} column need to be unique.")
+        base_dataset_split = self._init_dataset_split(base_dataset_split, self._tags)
+        return base_dataset_split, malformed_dataset
+
     def _save_base_dataset_split(self):
         # NOTE: We should not have the Index in `self.dataset_split`.
         with FileLock(self._file_lock):
@@ -196,16 +211,16 @@ class DatasetSplitManager:
         Returns:
             Local path to the csv.
         """
-        log.info("Saving dataset_split as csv.", path=self._artifact_path)
+        log.info("Saving dataset_split as csv.", path=self._project_path)
         file_label = time.strftime("%Y%m%d_%H%M%S", time.localtime())
         pt = pjoin(
-            self._artifact_path,
+            self._project_path,
             f"azimuth_export_{self.config.name}_{self.name}_{file_label}.csv",
         )
 
         order = [
             DatasetColumn.row_idx,
-            DatasetColumn.idx,
+            self.config.columns.persistent_id,
             self.config.columns.raw_text_input,
             self.config.columns.text_input,
             self.config.columns.label,
@@ -217,19 +232,18 @@ class DatasetSplitManager:
             DatasetColumn.postprocessed_outcome,
             DatasetColumn.pipeline_steps,
             DatasetColumn.confidence_bin_idx,
-            DatasetColumn.token_count,
+            DatasetColumn.word_count,
             DatasetColumn.neighbors_train,
             DatasetColumn.neighbors_eval,
             *self._tags,
         ]
-        order = [c for c in order if c in self.get_dataset_split(table_key).column_names]
+        available_columns = self.get_dataset_split(table_key).column_names
+        order = [c for c in order if c in available_columns]
 
-        # The following allows for new or extra columns to end up here automatically,
+        # This *available_columns allows for new or extra columns to end up here automatically,
         # instead of being lost if we were to hardcode the whole list.
-        omit = {*order, FEATURES, FEATURE_FAISS}
-        rest = [c for c in self.get_dataset_split(table_key).column_names if c not in omit]
-
-        columns = order + rest
+        # The dict.fromkeys() avoids duplicates.
+        columns = list(dict.fromkeys([*order, *available_columns]))
 
         # pd.to_csv() instead of HF version to avoid unintended type conversions (list to array)
         df = pd.DataFrame(self.get_dataset_split_with_class_names(table_key)).reindex(
@@ -248,84 +262,56 @@ class DatasetSplitManager:
         )
         return dataset_split
 
-    def _add_tags_to(
-        self, ds: Dataset, tags: Union[Dict[int, Dict[Tag, bool]], Dict[int, Dict[SmartTag, bool]]]
-    ):
-        """Update tags to the specified dataset split.
-
-        Args:
-            tags: Tags where each key is an index and the values are Tags to be updated.
-
-        """
-
-        def check_tags(tags_dict):
-            diff_key = set(tags_dict.keys()).difference(self._tags + self._prediction_tags)
-            if len(diff_key) > 0:
-                raise ValueError(f"Unknown tags: {diff_key}. Expected one of {self._tags}")
-            return tags_dict
-
-        ds = ds.map(lambda u, i: check_tags(tags.get(i, {})), with_indices=True, desc="Set Tag")
-        self._save_base_dataset_split()
-        return ds
+    def get_row_indices_from_persistent_id(self, persistent_ids: List[Union[int, str]]):
+        ds = self.get_dataset_split()
+        all_persistent_ids = ds[self.config.columns.persistent_id]
+        indices = [all_persistent_ids.index(persistent_id) for persistent_id in persistent_ids]
+        return indices
 
     def add_tags(
         self,
-        tags: Union[Dict[int, Dict[Tag, bool]], Dict[int, Dict[SmartTag, bool]]],
+        tags: Dict[int, Dict[Tag, bool]],
         table_key: Optional[PredictionTableKey] = None,
     ):
         """Add Tags to the dataset.
 
         Args:
-            tags: Tags where each key is an index and the values are Tags to be updated.
+            tags: Dict where the keys are the row_idx, and the values are tags to be updated.
             table_key: If tags are related to a table, which table is it.
-
         """
-        base_tags = {
-            k: {tag: value for tag, value in v.items() if tag in self._tags}
-            for k, v in tags.items()
-        }
-        predict_tags = {
-            k: {tag: value for tag, value in v.items() if tag in self._prediction_tags}
-            for k, v in tags.items()
-        }
-        if (
-            any(any(tag_values.values()) for tag_values in predict_tags.values())
-            and table_key is None
-        ):
-            raise ValueError(f"No table key supplied for pipeline tags {predict_tags}.")
-
-        # Find unknown tags
-        unknown_tag = {
-            k: {
-                tag: value
-                for tag, value in v.items()
-                if tag not in self._prediction_tags + self._tags
-            }
-            for k, v in tags.items()
-        }
-        unknown_tag = {k: v for k, v in unknown_tag.items() if len(v) > 0}
-        if len(unknown_tag) > 0:
-            raise ValueError(f"Unknown tags {unknown_tag}")
+        base_tags: Dict[int, Dict[Tag, bool]] = defaultdict(dict)
+        pred_tags: Dict[int, Dict[Tag, bool]] = defaultdict(dict)
+        for idx, tag_values in tags.items():
+            for tag, value in tag_values.items():
+                if tag in self._tags:
+                    base_tags[idx][tag] = value
+                elif tag in self._prediction_tags:
+                    if not table_key:
+                        raise ValueError(f"No table key supplied for prediction tags {pred_tags}.")
+                    pred_tags[idx][tag] = value
+                else:
+                    raise ValueError(f"Unknown tag {tag}")
 
         # Process base tags
         base_tags_present = any(len(tag_values) for tag_values in base_tags.values())
         if base_tags_present:
-            self._base_dataset_split = self._add_tags_to(self._base_dataset_split, tags=base_tags)
+            self._base_dataset_split = self._base_dataset_split.map(
+                lambda u, i: base_tags[i], with_indices=True, desc="Set base tag"
+            )
             self._save_base_dataset_split()
 
-        if table_key is not None:
-            # Process prediction table
+        # Process prediction tags
+        if table_key:
             non_null_table_key = assert_not_none(table_key)
-            table = self._get_prediction_table(table_key=non_null_table_key)
-            if table is None:
-                raise ValueError("Can't save tag in an uninitialize dataset.")
-            table = self._add_tags_to(table, tags=predict_tags)
-            self._prediction_tables[non_null_table_key] = table
+            pred_table = self._get_prediction_table(table_key=non_null_table_key)
+            self._prediction_tables[non_null_table_key] = pred_table.map(
+                lambda u, i: pred_tags[i], with_indices=True, desc="Set pipeline tag"
+            )
             self.save_prediction_table(non_null_table_key)
 
     def get_tags(
         self, indices: Optional[List[int]] = None, table_key: Optional[PredictionTableKey] = None
-    ) -> List[Dict[str, bool]]:
+    ) -> Dict[int, Dict[Tag, bool]]:
         """Get tags from the dataset split.
 
         Args:
@@ -333,17 +319,17 @@ class DatasetSplitManager:
             table_key: Predictions table to gather prediction tags.
 
         Returns:
-            List of records per index.
-
+            Value of tags per row_idx.
         """
+        ds = self.get_dataset_split(table_key)
         if indices is not None and len(indices) > 0:
-            ds = self.get_dataset_split(table_key).select(indices)
-        else:
-            ds = self.get_dataset_split(table_key)
+            ds = ds.select(indices)
         available_tags = self._tags if table_key is None else self._tags + self._prediction_tags
-        df = pd.DataFrame({t: ds[t] for t in available_tags})
-        tags: List[Dict[str, bool]] = df.to_dict(orient="records")
-        return tags
+
+        return {
+            row_idx: {tag: ds[tag][idx] for tag in available_tags}
+            for idx, row_idx in enumerate(ds["row_idx"])
+        }
 
     def class_distribution(self, labels_only=False):
         """Compute the class distribution for a dataset_split.
@@ -612,3 +598,35 @@ class DatasetSplitManager:
 
     def _get_new_version_path(self, directory):
         return pjoin(directory, f"version_{time.time()}.arrow")
+
+    def save_proposed_actions_to_csv(self) -> str:
+        """Save proposed actions to a csv file.
+
+        Returns:
+            Path to the csv file.
+        """
+        log.info("Saving proposed actions as csv.", path=self._project_path)
+        timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        path = pjoin(
+            self._project_path,
+            f"azimuth_export_{self.config.name}_{self.name}_proposed_actions_{timestamp}.csv",
+        )
+
+        ds_with_proposed_actions = filter_dataset_split(
+            self.get_dataset_split(),
+            filters=DatasetFilters(data_action=ALL_DATA_ACTIONS),
+            config=self.config,
+        )
+        persistent_id = self.config.columns.persistent_id
+        ds_with_proposed_actions = ds_with_proposed_actions.remove_columns(
+            list(set(ds_with_proposed_actions.column_names) - {*ALL_DATA_ACTIONS, persistent_id})
+        )
+
+        df: pd.DataFrame = ds_with_proposed_actions.to_pandas()
+        # Return column name with max value for each row.
+        df = df.set_index(persistent_id).idxmax(axis=1).reset_index()
+        df.columns = [persistent_id, "proposed_action"]
+        df.to_csv(path_or_buf=path, index=False)
+
+        log.info("Proposed Actions saved as CSV.", path=path)
+        return path

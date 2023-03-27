@@ -1,4 +1,4 @@
-import { Settings } from "@mui/icons-material";
+import { Settings as SettingsIcon } from "@mui/icons-material";
 import { Box, Breadcrumbs, IconButton, Link, Typography } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import useQueryState from "hooks/useQueryState";
@@ -14,6 +14,7 @@ import { DatasetSplitName } from "types/api";
 import { constructSearchString } from "utils/helpers";
 import HelpMenu from "components/HelpMenu";
 import PipelineSelect from "components/PipelineSelect";
+import Settings from "pages/Settings";
 
 const useStyles = makeStyles((theme) => ({
   jobHeader: {
@@ -79,7 +80,7 @@ const PageHeader = () => {
       })}`
     );
   };
-
+  const [configOpen, setConfigOpen] = React.useState(false);
   const dashboardPathname = `/${jobId}`;
 
   const isDashboard = location.pathname === dashboardPathname;
@@ -96,12 +97,16 @@ const PageHeader = () => {
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/class_overlap`,
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/class_overlap`,
           name: "Class Overlap",
         },
         {
-          pathname: `/${jobId}/pipeline_metrics`,
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/pipeline_metrics`,
           name: "Pipeline Metrics by Data Subpopulation",
+        },
+        {
+          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/smart_tags`,
+          name: "Smart Tag Analysis",
         },
         {
           pathname: `/${jobId}/settings`,
@@ -170,10 +175,9 @@ const PageHeader = () => {
               </>
             )}
             <IconButton
-              component={RouterLink}
               size="small"
               color="primary"
-              to={`/${jobId}/settings${searchString}`}
+              onClick={() => setConfigOpen(true)}
               sx={{
                 padding: 0,
                 "&:hover > svg": {
@@ -182,10 +186,11 @@ const PageHeader = () => {
                 },
               }}
             >
-              <Settings />
+              <SettingsIcon />
             </IconButton>
             <HelpMenu />
           </Box>
+          <Settings open={configOpen} onClose={() => setConfigOpen(false)} />
         </div>
       )}
     </div>

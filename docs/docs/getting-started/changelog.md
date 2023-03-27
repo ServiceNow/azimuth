@@ -1,6 +1,58 @@
 # Releases
 
-## [2.5.3] - 2022-02-16
+## [2.6.0] - 2023-03-27
+
+### Added
+- **Config history.**
+    - The initial config file and all subsequent changes are saved in the caching folder in a `config_history.jsonl` file.
+    - Preserve edits to the config executed via the API when relaunching Azimuth with the env var `LOAD_CONFIG_HISTORY=1`.
+    - See details in the [Getting Started](c-run.md#2-running-the-app) or the [Development](../development/launching.md#back-end) section.
+- **Persistent id.**
+    - Users can now specify a persistent id for each utterance that will persist through time.
+    - See how to specify it in the column section of the [Project Config](../reference/configuration/project.md#columns).
+    - It will be used for exporting/importing proposed actions (See below).
+    - If specified, it will be displayed when hovering on the index column in the utterance table, as detailed [here](../user-guide/exploration-space/utterance-table.md#index).
+- **Import/Export of proposed actions.**
+    - Proposed actions can be exported in a simple CSV file using the persistent id as the key.
+    - This allows to import back the proposed actions at any time, including with a new dataset version.
+    - See details in the [Utterance table](../user-guide/exploration-space/utterance-table.md#proposed-action) section.
+- **New interactions on the Exploration Space.**
+    - Link from confusion matrix cells and row/column labels to utterance table. Example provided [here](../user-guide/exploration-space/confusion-matrix.md#interaction).
+    - Users can now search for indices or persistent ids in the [utterance search box](../user-guide/exploration-space/index.md#filter-categories).
+- **Support for the training set only.**
+    - Azimuth can now launch with a training set only.
+    - Dataset warnings are now also available with just one split (training or evaluation).
+- **Better support for CSV files.** New helper function to load CSV files. Example provided [here](../reference/custom-objects/dataset.md#examples).
+
+### Changed
+- **Enhanced config page.** All fields from the config can now be modified from the [settings page](../user-guide/settings.md), allowing to restart some start-up tasks based on the requested changes.
+- **Syntax smart tags.**
+    - Syntax smart tags are now computed even if utterances have more than one sentence.
+    - For that reason, `short_sentence` and `long_sentence` were renamed to `short_utterance` and `long_utterance`. The default value for `long_utterance` was set to 12 words.
+    - See details in the [Syntax](../key-concepts/syntax-analysis.md) section.
+- **Improved visualizations.**
+    - Change the [outcome per threshold bar chart](../user-guide/post-processing-analysis.md) to an area chart, making the x-axis continuous, and add a vertical dashed line marking the current threshold.
+    - Add outcome option to the dropdown in [smart tag analysis](../user-guide/smart-tag-analysis.md) on the Dashboard, and display the analysis even when no pipeline is selected.
+    - [Word clouds](../user-guide/exploration-space/prediction-overview.md#word-clouds) now uses the language from the config to determine the stop words (it used to only support English).
+    - Show short/long utterances on the [word count histogram](../user-guide/dataset-warnings.md#length-mismatch) in dataset warnings.
+- **Performance improvements.** A few routes and caching logic were improved, making the app faster.
+
+### Deprecated/Breaking Changes
+- **Dependency Update.** Few libraries were updated to reduce security issues. These might cause breaking changes when loading user models and data.
+    - Bump `datasets` from 1.16.1 to 2.1.0
+    - Bump `tensorflow` from 2.8.0 to 2.11.0
+    - Bump `torch` from 1.9.0 to 1.13.1
+    - Bump `numpy` to 1.23.5
+
+### Fixed
+- Fix the Utterance Details page collapsing with extra long utterances.
+- Fix potential time-out issues for bigger datasets and models after start-up.
+- Fix browser history after navigating to the exploration page with no pipeline.
+
+### Known Issue
+- In the logs, the error message `distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.broadcast local=tcp://127.0.0.1:XXXXX remote=tcp://127.0.0.1:XXXXX>: Stream is closed.` might appear and result in some tasks being lost. In most cases, the lost tasks will be recomputed automatically without causing further errors. However, it might happen that other tasks fail because of missing columns. If that happens, simply kill and restart Azimuth. We are investigating the issue.
+
+## [2.5.3] - 2023-02-16
 
 ### Fixed
 - Support truncation for HF pipelines.

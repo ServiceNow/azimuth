@@ -55,19 +55,7 @@ def test_top_words_with_saliency(simple_text_config, apply_mocked_startup_task, 
     assert len(json_output.right) > 0 or len(json_output.errors) > 0
 
 
-def fake_no_saliency(indices):
-    records = []
-    for i in indices:
-        records.append(
-            TokensToWordsResponse(
-                saliency=16 * [0],  # 16 words
-                words=ALL_WORDS,
-            )
-        )
-    return records
-
-
-def test_top_words_without_saliency(monkeypatch, file_text_config_top1):
+def test_top_words_without_saliency(file_text_config_top1):
     save_predictions(file_text_config_top1)
 
     mod = TopWordsModule(
@@ -75,14 +63,15 @@ def test_top_words_without_saliency(monkeypatch, file_text_config_top1):
         config=file_text_config_top1,
         mod_options=ModuleOptions(top_x=16, pipeline_index=0),
     )
-
-    monkeypatch.setattr(mod, "get_words_saliencies", fake_no_saliency)
-    assert mod is not None
     [json_output] = mod.compute_on_dataset_split()
 
-    top_word_all = [top_words_result.word for top_words_result in json_output.all]
+    top_word_all = {top_words_result.word for top_words_result in json_output.all}
+    top_word_right = {top_words_result.word for top_words_result in json_output.right}
+    top_word_errors = {top_words_result.word for top_words_result in json_output.errors}
 
-    for word in ["fred", "name", "sky", "blue"]:
-        assert word in top_word_all
-    for word in ["i", "is", "the", "."]:
-        assert word not in top_word_all
+    assert {"phone", "potato", "pizza", "forest", "park", "turning"}.issubset(top_word_all)
+    assert {"to", "the", "not", "with", "on"}.isdisjoint(top_word_all)
+    assert {"phone", "potato", "pizza", "forest", "walk", "problem", "order"} == top_word_right
+    assert {"turning", "park"}.isdisjoint(top_word_right)
+    assert {"phone", "turning", "park"} == top_word_errors
+    assert {"potato", "pizza", "forest"}.isdisjoint(top_word_errors)

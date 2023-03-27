@@ -4,7 +4,7 @@ import BinColumn from "components/ConfidenceHistogram/BinColumn";
 import BinLabel from "components/ConfidenceHistogram/BinLabel";
 import BinThresholdMarker from "components/ConfidenceHistogram/BinThresholdMarker";
 import Loading from "components/Loading";
-import React, { useMemo } from "react";
+import React from "react";
 import {
   ConfidenceBinDetails,
   ConfidenceHistogramResponse,
@@ -33,7 +33,7 @@ const ConfidenceHistogram: React.FC<Props> = ({
   confidenceMax,
   filteredOutcomes,
 }) => {
-  const max = useMemo(() => {
+  const max = React.useMemo(() => {
     return data ? Math.max(...data.bins.flatMap(getBinHeights)) : 0;
   }, [data]);
 

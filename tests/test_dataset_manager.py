@@ -3,6 +3,7 @@
 # in the root directory of this source tree.
 
 import os
+import re
 from glob import glob
 from os.path import join as pjoin
 
@@ -15,6 +16,7 @@ from azimuth.config import AzimuthValidationError
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.types import DatasetColumn, DatasetSplitName
 from azimuth.types.tag import ALL_STANDARD_TAGS, ALL_TAGS
+from azimuth.utils.project import load_dataset_from_config
 from tests.test_loading_resources import load_sst2_dataset
 from tests.utils import generate_mocked_dm, get_table_key
 
@@ -32,42 +34,45 @@ def test_dataset_manager_tags(a_text_dataset, simple_text_config):
         initial_tags=tags,
         dataset_split=a_text_dataset,
     )
-    simple_table_key = get_table_key(simple_text_config)
-    assert os.path.exists(ds_mng._save_path)
-    assert all(t in ds_mng.get_dataset_split(simple_table_key).column_names for t in tags)
-    assert np.array(ds_mng.get_dataset_split(simple_table_key)["red"]).sum() == 0
 
-    # We can tags stuff!
+    assert os.path.exists(ds_mng._save_path)
+    assert all(t in ds_mng.get_dataset_split().column_names for t in tags)
+    assert not any(ds_mng.get_dataset_split()["red"])
+
+    # Utterances can be tagged
     tags_data = {1: {"red": True}, 2: {"red": True, "blue": True}}
-    ds_mng.add_tags(tags_data, simple_table_key)
-    assert np.array(ds_mng.get_dataset_split(simple_table_key)["red"]).sum() == 2
-    assert np.array(ds_mng.get_dataset_split(simple_table_key)["blue"]).sum() == 1
+    ds_mng.add_tags(tags_data)
+    assert sum(ds_mng.get_dataset_split()["red"]) == 2
+    assert sum(ds_mng.get_dataset_split()["blue"]) == 1
 
     # We can reload a dataset!
-    ds_mng2 = DatasetSplitManager(
+    ds_mng = DatasetSplitManager(
         DatasetSplitName.eval,
         config=simple_text_config,
         initial_tags=tags,
         dataset_split=a_text_dataset,
     )
-    assert np.array(ds_mng2.get_dataset_split(simple_table_key)["red"]).sum() == 2
-    assert np.array(ds_mng2.get_dataset_split(simple_table_key)["blue"]).sum() == 1
+    assert sum(ds_mng.get_dataset_split()["red"]) == 2
+    assert sum(ds_mng.get_dataset_split()["blue"]) == 1
 
     # We can't tag garbage
     tags_data = {4: {"red": True}, 5: {"red": True, "garbage": True}}
     with pytest.raises(ValueError):
         ds_mng.add_tags(tags_data)
-    assert "garbage" not in ds_mng.get_dataset_split(simple_table_key).column_names
+    assert "garbage" not in ds_mng.get_dataset_split().column_names
 
     # We can query all tags
-    tags_data = ds_mng.get_tags(table_key=None)
-    assert len(tags_data) == len(ds_mng2.get_dataset_split(simple_table_key))
+    tags_data = ds_mng.get_tags()
+    assert len(tags_data) == len(ds_mng.get_dataset_split())
     assert len(tags_data[0]) == len(tags)
+    assert not any(tags_data[0].values())
+    assert tags_data[1]["red"] and tags_data[2]["red"] and tags_data[2]["blue"]
 
     # We can query some tags
-    tags_data = ds_mng.get_tags(indices=[1, 2], table_key=None)
+    tags_data = ds_mng.get_tags(indices=[1, 2])
     assert len(tags_data) == 2
-    assert len(tags_data[0]) == len(tags)
+    assert len(tags_data[1]) == len(tags)
+    assert tags_data[1]["red"] and tags_data[2]["red"] and tags_data[2]["blue"]
 
 
 def test_dataset_manager_init(a_text_dataset, simple_text_config):
@@ -115,23 +120,21 @@ def test_class_distribution(a_text_dataset, simple_text_config):
 def test_to_csv(simple_text_config):
     dm = generate_mocked_dm(simple_text_config)
     dm.config.name = "newName"
-    pt = dm.save_csv(get_table_key(simple_text_config))
-    assert os.path.exists(pt)
+    path = dm.save_csv(get_table_key(simple_text_config))
+    assert os.path.exists(path)
 
-    name = os.path.basename(pt)
-    assert name.count("_") == 5  # azimuth_export_{name}_{dataset_split}_{date}_{time}.csv
-    splitted = name.split("_")
-    assert splitted[2] == "newName" and splitted[3] == "eval"
+    name = os.path.basename(path)
+    assert re.match(r"azimuth_export_newName_eval_\d{8}_\d{6}\.csv", name)
 
-    df = pd.read_csv(pt)
+    df = pd.read_csv(path)
     assert all(t in df.columns for t in ALL_TAGS)
 
     index = {c: i for i, c in enumerate(df.columns)}
     assert (
         index[DatasetColumn.row_idx]
-        < index[DatasetColumn.idx]
-        < index["utterance"]
-        < index["label"]
+        == index[simple_text_config.columns.persistent_id]  # By default persistent_id is row_idx
+        < index[simple_text_config.columns.text_input]
+        < index[simple_text_config.columns.label]
         < index[DatasetColumn.model_predictions]
         < index[DatasetColumn.postprocessed_prediction]
         < index[DatasetColumn.model_confidences]
@@ -172,9 +175,9 @@ def test_to_csv_no_model(simple_text_config):
     index = {c: i for i, c in enumerate(df.columns)}
     assert (
         index[DatasetColumn.row_idx]
-        < index[DatasetColumn.idx]
-        < index["utterance"]
-        < index["label"]
+        == index[simple_text_config.columns.persistent_id]  # By default persistent_id is row_idx
+        < index[simple_text_config.columns.text_input]
+        < index[simple_text_config.columns.label]
         < index[ALL_TAGS[0]]
     ), df.columns.tolist()
 
@@ -269,7 +272,7 @@ def test_multi_tables(a_text_dataset, simple_text_config):
     assert "is_potato" in dm.get_dataset_split(simple_table_key).column_names
 
     # Check that there are 2 tables created.
-    assert "HF_datasets" in os.listdir(dm._artifact_path)
+    assert "HF_datasets" in os.listdir(dm._project_path)
     assert len(os.listdir(os.path.join(dm._hf_path, "prediction_tables"))) == 2
 
     with pytest.raises(ValueError, match="Length mismatch"):
@@ -352,3 +355,103 @@ def test_rejection_class_check(simple_text_config, a_text_dataset):
             initial_tags=[],
             dataset_split=a_text_dataset,
         )
+
+
+def test_default_persistent_id(clinc_text_config):
+    dataset_split_name = DatasetSplitName.eval
+    ds = load_dataset_from_config(clinc_text_config)[dataset_split_name]
+    persistent_id = clinc_text_config.columns.persistent_id
+    assert persistent_id not in ds.column_names, f"{persistent_id} should not be in clinc dataset."
+    dm = DatasetSplitManager(
+        dataset_split_name,
+        clinc_text_config,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=ds,
+    )
+    assert (
+        persistent_id in dm.get_dataset_split().column_names
+    ), f"{persistent_id} should be in clinc dataset after DatasetSplitManager creation."
+
+
+def test_custom_persistent_id(simple_text_config, a_text_dataset):
+    simple_text_config_persistent_id = simple_text_config.copy()
+    simple_text_config_persistent_id.columns.persistent_id = "idx"
+    dm = DatasetSplitManager(
+        DatasetSplitName.eval,
+        simple_text_config_persistent_id,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=a_text_dataset,
+    )
+
+    assert (
+        simple_text_config_persistent_id.columns.persistent_id
+        in dm.get_dataset_split().column_names
+    )
+
+    simple_text_config_new_persistent_id = simple_text_config.copy()
+    simple_text_config_new_persistent_id.columns.persistent_id = "yukongold"
+    with pytest.raises(ValueError, match="not found in the dataset"):
+        DatasetSplitManager(
+            DatasetSplitName.eval,
+            simple_text_config_new_persistent_id,
+            initial_tags=ALL_STANDARD_TAGS,
+            dataset_split=a_text_dataset,
+        )
+
+    a_text_dataset_new_col = a_text_dataset.add_column(
+        name="yukongold", column=[1] * len(a_text_dataset)
+    )
+    with pytest.raises(ValueError, match="need to be unique"):
+        DatasetSplitManager(
+            DatasetSplitName.eval,
+            simple_text_config_new_persistent_id,
+            initial_tags=ALL_STANDARD_TAGS,
+            dataset_split=a_text_dataset_new_col,
+        )
+
+
+def test_convert_persistent_id_to_row_idx(a_text_dataset, simple_text_config):
+    simple_text_config_persistent_id = simple_text_config.copy()
+    # Set persistent_id as the utterance (str).
+    simple_text_config_persistent_id.columns.persistent_id = simple_text_config.columns.text_input
+    dm = DatasetSplitManager(
+        DatasetSplitName.eval,
+        simple_text_config_persistent_id,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=a_text_dataset,
+    )
+    ds = dm.get_dataset_split()
+
+    persistent_ids = list(reversed(ds[simple_text_config.columns.text_input]))
+    row_indices = dm.get_row_indices_from_persistent_id(persistent_ids)
+    assert row_indices == list(reversed(range(len(ds))))
+
+    random_rows = [10, 0]
+    persistent_ids = ds.select(random_rows)[simple_text_config.columns.text_input]
+    row_indices = dm.get_row_indices_from_persistent_id(persistent_ids)
+    assert row_indices == random_rows
+
+
+def test_export_proposed_actions(simple_text_config, a_text_dataset):
+    dm = DatasetSplitManager(
+        DatasetSplitName.eval,
+        simple_text_config,
+        initial_tags=ALL_STANDARD_TAGS,
+        dataset_split=a_text_dataset,
+    )
+
+    proposed_actions = {0: {"remove": True}, 2: {"relabel": True}}
+    dm.add_tags(proposed_actions)
+    path = dm.save_proposed_actions_to_csv()
+
+    name = os.path.basename(path)
+    assert re.match(
+        r"azimuth_export_sentiment-analysis_eval_proposed_actions_\d{8}_\d{6}\.csv", name
+    )
+
+    df = pd.read_csv(path)
+
+    assert len(df) == 2
+    assert list(df.columns) == [simple_text_config.columns.persistent_id, "proposed_action"]
+    assert list(df[simple_text_config.columns.persistent_id]) == [0, 2]
+    assert list(df["proposed_action"]) == ["remove", "relabel"]

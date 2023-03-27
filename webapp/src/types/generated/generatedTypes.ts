@@ -20,23 +20,23 @@ export interface paths {
     /** Get a failure rate per dataset split and per test as well. */
     get: operations["get_perturbation_testing_summary_perturbation_testing_summary_get"];
   };
-  "/admin/config": {
+  "/config/default": {
+    /** Get the default configuration */
+    get: operations["get_default_config_def_config_default_get"];
+  };
+  "/config": {
     /** Get the current configuration */
-    get: operations["get_config_def_admin_config_get"];
-    /** Update the config using a changeset. */
-    patch: operations["update_config_admin_config_patch"];
+    get: operations["get_config_def_config_get"];
+    /** Update the config. */
+    patch: operations["patch_config_config_patch"];
   };
-  "/class_overlap/plot": {
+  "/dataset_splits/{dataset_split_name}/class_overlap/plot": {
     /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
-    get: operations["get_class_overlap_plot_class_overlap_plot_get"];
+    get: operations["get_class_overlap_plot_dataset_splits__dataset_split_name__class_overlap_plot_get"];
   };
-  "/class_overlap": {
+  "/dataset_splits/{dataset_split_name}/class_overlap": {
     /** Get data for class overlap, confusion, and related utterance counts. */
-    get: operations["get_class_overlap_class_overlap_get"];
-  };
-  "/tags": {
-    /** Post new data_action tags */
-    post: operations["post_data_actions_tags_post"];
+    get: operations["get_class_overlap_dataset_splits__dataset_split_name__class_overlap_get"];
   };
   "/dataset_splits/{dataset_split_name}/confidence_histogram": {
     /** Get all confidence bins with their confidence and the outcome count */
@@ -69,6 +69,8 @@ export interface paths {
   "/dataset_splits/{dataset_split_name}/utterances": {
     /** Get a table view of the utterances according to filters. */
     get: operations["get_utterances_dataset_splits__dataset_split_name__utterances_get"];
+    /** Patch utterances, such as updating proposed actions. */
+    patch: operations["patch_utterances_dataset_splits__dataset_split_name__utterances_patch"];
   };
   "/dataset_splits/{dataset_split_name}/utterances/{index}/perturbed_utterances": {
     /** Get a perturbed utterances for a single utterance. */
@@ -81,6 +83,10 @@ export interface paths {
   "/export/dataset_splits/{dataset_split_name}/utterances": {
     /** Export the dataset_split to a CSV file and returns it. */
     get: operations["export_dataset_export_dataset_splits__dataset_split_name__utterances_get"];
+  };
+  "/export/dataset_splits/{dataset_split_name}/proposed_actions": {
+    /** Export proposed actions to a CSV file and returns it. */
+    get: operations["export_proposed_actions_export_dataset_splits__dataset_split_name__proposed_actions_get"];
   };
   "/export/perturbation_testing_summary": {
     /** Export the perturbation testing summary to a CSV file and returns it. */
@@ -120,32 +126,41 @@ export interface components {
     };
     /** Fields that can be modified without affecting caching. */
     AzimuthConfig: {
-      name?: string;
+      name: string;
       dataset: components["schemas"]["CustomObject"];
-      model_contract?: components["schemas"]["SupportedModelContract"];
-      columns?: components["schemas"]["ColumnConfiguration"];
-      rejection_class?: string;
-      artifact_path?: string;
-      batch_size?: number;
-      use_cuda?: Partial<"auto"> & Partial<boolean>;
-      large_dask_cluster?: boolean;
-      read_only_config?: boolean;
-      language?: components["schemas"]["SupportedLanguage"];
-      syntax?: components["schemas"]["SyntaxOptions"];
-      dataset_warnings?: components["schemas"]["DatasetWarningsOptions"];
-      similarity?: components["schemas"]["SimilarityOptions"];
-      pipelines?: components["schemas"]["PipelineDefinition"][];
-      uncertainty?: components["schemas"]["UncertaintyOptions"];
-      saliency_layer?: string;
-      metrics?: { [key: string]: components["schemas"]["MetricDefinition"] };
-      behavioral_testing?: components["schemas"]["BehavioralTestingOptions"];
+      columns: components["schemas"]["ColumnConfiguration"];
+      rejection_class: string | null;
+      /** Where to store artifacts (Azimuth config history, HDF5 files, HF datasets). */
+      artifact_path: string;
+      batch_size: number;
+      use_cuda: "auto" | boolean;
+      large_dask_cluster: boolean;
+      read_only_config: boolean;
+      syntax: components["schemas"]["SyntaxOptions"];
+      dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
+      model_contract: components["schemas"]["SupportedModelContract"];
+      pipelines: components["schemas"]["PipelineDefinition"][] | null;
+      uncertainty: components["schemas"]["UncertaintyOptions"];
+      saliency_layer: string | null;
+      metrics: { [key: string]: components["schemas"]["MetricDefinition"] };
+      language: components["schemas"]["SupportedLanguage"];
+      similarity: components["schemas"]["SimilarityOptions"] | null;
+      behavioral_testing:
+        | components["schemas"]["BehavioralTestingOptions"]
+        | null;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     BehavioralTestingOptions: {
-      neutral_token?: components["schemas"]["NeutralTokenOptions"];
-      punctuation?: components["schemas"]["PunctuationTestOptions"];
-      fuzzy_matching?: components["schemas"]["FuzzyMatchingTestOptions"];
-      typo?: components["schemas"]["TypoTestOptions"];
-      seed?: number;
+      neutral_token: components["schemas"]["NeutralTokenOptions"];
+      punctuation: components["schemas"]["PunctuationTestOptions"];
+      fuzzy_matching: components["schemas"]["FuzzyMatchingTestOptions"];
+      typo: components["schemas"]["TypoTestOptions"];
+      seed: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -175,11 +190,18 @@ export interface components {
     ClassOverlapTableResponse: {
       classPairs: components["schemas"]["ClassOverlapTableClassPair"][];
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     ColumnConfiguration: {
-      text_input?: string;
-      raw_text_input?: string;
-      label?: string;
-      failed_parsing_reason?: string;
+      text_input: string;
+      raw_text_input: string;
+      label: string;
+      failed_parsing_reason: string;
+      persistent_id: string;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -210,12 +232,19 @@ export interface components {
       reorderClasses: boolean;
       rejectionClass: string;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     CustomObject: {
+      /** Name of the function or class that is located in `remote`.`args` and `kwargs` will be sent to the function/class. */
       class_name: string;
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
+      remote: string | null;
     };
     /** An enumeration. */
     DataAction:
@@ -230,25 +259,6 @@ export interface components {
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
-    DataActionMapping: {
-      relabel: boolean;
-      augmentWithSimilar: boolean;
-      defineNewClass: boolean;
-      mergeClasses: boolean;
-      remove: boolean;
-      investigate: boolean;
-    };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
-    DataActionResponse: {
-      dataActions: components["schemas"]["DataActionMapping"][];
-    };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
     DatasetDistributionComparison: {
       name: string;
       alert: boolean;
@@ -259,7 +269,7 @@ export interface components {
      * that all fields are represented correctly.
      */
     DatasetDistributionComparisonValue: {
-      value: (Partial<number> & Partial<number>) | null;
+      value: (number | number) | null;
       alert: boolean;
     };
     /**
@@ -313,17 +323,29 @@ export interface components {
         [key: string]: components["schemas"]["PlotSpecification"];
       } | null;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     DatasetWarningsOptions: {
-      min_num_per_class?: number;
-      max_delta_class_imbalance?: number;
-      max_delta_representation?: number;
-      max_delta_mean_tokens?: number;
-      max_delta_std_tokens?: number;
+      min_num_per_class: number;
+      max_delta_class_imbalance: number;
+      max_delta_representation: number;
+      max_delta_mean_words: number;
+      max_delta_std_words: number;
     };
     /** An enumeration. */
     FormatType: "Integer" | "Percentage" | "Decimal";
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     FuzzyMatchingTestOptions: {
-      threshold?: number;
+      threshold: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -334,17 +356,24 @@ export interface components {
       utteranceCount: number;
       confidenceThreshold: number | null;
     };
-    HTTPValidationError: {
-      detail?: components["schemas"]["ValidationError"][];
+    HTTPExceptionModel: {
+      detail: string;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     MetricDefinition: {
+      /** Name of the function or class that is located in `remote`.`args` and `kwargs` will be sent to the function/class. */
       class_name: string;
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
+      remote: string | null;
       /** Keyword arguments supplied to `compute`. */
-      additional_kwargs?: { [key: string]: any };
+      additional_kwargs: { [key: string]: any };
     };
     MetricInfo: {
       description: string;
@@ -381,13 +410,11 @@ export interface components {
       behavioralTesting: components["schemas"]["MetricsPerFilterValue"][];
       pipelineComparison: components["schemas"]["MetricsPerFilterValue"][];
       uncertain: components["schemas"]["MetricsPerFilterValue"][];
-      prediction: components["schemas"]["MetricsPerFilterValue"][];
-      outcome: components["schemas"]["MetricsPerFilterValue"][];
       extremeLength: components["schemas"]["MetricsPerFilterValue"][];
       partialSyntax: components["schemas"]["MetricsPerFilterValue"][];
       dissimilar: components["schemas"]["MetricsPerFilterValue"][];
       label: components["schemas"]["MetricsPerFilterValue"][];
-      dataAction: components["schemas"]["MetricsPerFilterValue"][];
+      prediction: components["schemas"]["MetricsPerFilterValue"][];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -431,10 +458,16 @@ export interface components {
       tokens: string[];
       saliencies: number[];
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     NeutralTokenOptions: {
-      threshold?: number;
-      suffix_list?: string[];
-      prefix_list?: string[];
+      threshold: number;
+      suffix_list: string[];
+      prefix_list: string[];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -469,6 +502,15 @@ export interface components {
       utteranceCount: number;
       filterValue: string;
       outcomeCount: { [key: string]: number };
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    OutcomeCountPerThresholdResponse: {
+      outcomeCountPerThreshold: components["schemas"]["OutcomeCountPerThresholdValue"][];
+      confidenceThreshold: number | null;
+      utteranceCount: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -571,10 +613,12 @@ export interface components {
     PipelineDefinition: {
       name: string;
       model: components["schemas"]["CustomObject"];
-      postprocessors?:
-        | (Partial<components["schemas"]["TemperatureScaling"]> &
-            Partial<components["schemas"]["ThresholdConfig"]> &
-            Partial<components["schemas"]["CustomObject"]>)[]
+      postprocessors:
+        | (
+            | components["schemas"]["TemperatureScaling"]
+            | components["schemas"]["ThresholdConfig"]
+            | components["schemas"]["CustomObject"]
+          )[]
         | null;
     };
     /**
@@ -584,14 +628,6 @@ export interface components {
     PlotSpecification: {
       data: { [key: string]: any }[];
       layout: { [key: string]: any };
-    };
-    /**
-     * This model should be used as the base for any model that defines aliases to ensure
-     * that all fields are represented correctly.
-     */
-    PostDataActionRequest: {
-      datasetSplitName?: components["schemas"]["DatasetSplitName"];
-      dataActions: { [key: string]: { [key: string]: boolean } };
     };
     /** Class for saving the results in the dataset and the routes. */
     PostprocessingStepAPIResponse: {
@@ -619,8 +655,14 @@ export interface components {
       text: string;
       className: string;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     PunctuationTestOptions: {
-      threshold?: number;
+      threshold: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -635,6 +677,8 @@ export interface components {
      * that all fields are represented correctly.
      */
     SimilarUtterance: {
+      persistentId: number | string;
+      /** Row index created by Azimuth */
       index: number;
       utterance: string;
       label: string;
@@ -649,16 +693,25 @@ export interface components {
     SimilarUtterancesResponse: {
       utterances: components["schemas"]["SimilarUtterance"][];
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     SimilarityOptions: {
-      faiss_encoder?: string;
-      conflicting_neighbors_threshold?: number;
-      no_close_threshold?: number;
+      /** Language-based dynamic default value. */
+      faiss_encoder: string;
+      /** Threshold to use when finding conflicting neighbors. */
+      conflicting_neighbors_threshold: number;
+      /** Threshold to determine whether there are close neighbors. */
+      no_close_threshold: number;
     };
     /** An enumeration. */
     SmartTag:
       | "multiple_sentences"
-      | "long_sentence"
-      | "short_sentence"
+      | "long_utterance"
+      | "short_utterance"
       | "missing_subj"
       | "missing_obj"
       | "missing_verb"
@@ -691,12 +744,18 @@ export interface components {
       | "custom_text_classification";
     /** An enumeration. */
     SupportedSpacyModels: "" | "en_core_web_sm" | "fr_core_news_md";
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     SyntaxOptions: {
-      short_sentence_max_token?: number;
-      long_sentence_min_token?: number;
-      spacy_model?: components["schemas"]["SupportedSpacyModels"];
-      subj_tags?: string[];
-      obj_tags?: string[];
+      short_utterance_max_word: number;
+      long_utterance_min_word: number;
+      spacy_model: components["schemas"]["SupportedSpacyModels"];
+      subj_tags: string[];
+      obj_tags: string[];
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -705,12 +764,12 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     TemperatureScaling: {
-      class_name?: "azimuth.utils.ml.postprocessing.TemperatureScaling";
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
-      temperature?: number;
+      class_name: "azimuth.utils.ml.postprocessing.TemperatureScaling";
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
+      remote: string | null;
+      temperature: number;
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -719,12 +778,12 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     ThresholdConfig: {
-      class_name?: "azimuth.utils.ml.postprocessing.Thresholding";
-      args?: { [key: string]: any }[];
-      kwargs?: { [key: string]: any };
-      /** Relative path to class. `class_name` needs to be accessible from this path. */
-      remote?: string;
-      threshold?: number;
+      class_name: "azimuth.utils.ml.postprocessing.Thresholding";
+      args: { [key: string]: any }[];
+      kwargs: { [key: string]: any };
+      /** Absolute path to class. `class_name` needs to be accessible from this path. */
+      remote: string | null;
+      threshold: number;
     };
     /** An enumeration. */
     TopWordsImportanceCriteria: "salient" | "frequent";
@@ -746,19 +805,39 @@ export interface components {
       word: string;
       count: number;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     TypoTestOptions: {
-      threshold?: number;
-      nb_typos_per_utterance?: number;
+      threshold: number;
+      nb_typos_per_utterance: number;
     };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
     UncertaintyOptions: {
-      iterations?: number;
-      high_epistemic_threshold?: number;
+      /** Number of MC sampling to do. 1 disables BMA. */
+      iterations: number;
+      /** Threshold to determine high epistemic items. */
+      high_epistemic_threshold: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
      * that all fields are represented correctly.
      */
     Utterance: {
+      persistentId: number | string;
+      /** Row index created by Azimuth */
+      index: number;
+      utterance: string;
+      label: string;
+      dataAction: components["schemas"]["DataAction"];
       almostCorrect: string[];
       behavioralTesting: string[];
       pipelineComparison: string[];
@@ -766,13 +845,8 @@ export interface components {
       extremeLength: string[];
       partialSyntax: string[];
       dissimilar: string[];
-      /** Row index computed by Azimuth.. */
-      index: number;
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
-      dataAction: components["schemas"]["DataAction"];
-      label: string;
-      utterance: string;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -801,6 +875,14 @@ export interface components {
       utteranceCount: number;
       filterValue: string;
     };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    UtterancePatch: {
+      persistentId: number | string;
+      dataAction: components["schemas"]["DataAction"];
+    };
     /** An enumeration. */
     UtterancesSortableColumn:
       | "index"
@@ -808,11 +890,6 @@ export interface components {
       | "label"
       | "prediction"
       | "confidence";
-    ValidationError: {
-      loc: string[];
-      msg: string;
-      type: string;
-    };
   };
 }
 
@@ -826,6 +903,48 @@ export interface operations {
           "application/json": components["schemas"]["StatusResponse"];
         };
       };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
     };
   };
   /** Get the current dataset info */
@@ -835,6 +954,48 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["DatasetInfoResponse"];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -848,6 +1009,48 @@ export interface operations {
           "application/json": {
             [key: string]: components["schemas"]["MetricInfo"];
           };
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -866,27 +1069,163 @@ export interface operations {
           "application/json": components["schemas"]["PerturbationTestingSummary"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+    };
+  };
+  /** Get the default configuration */
+  get_default_config_def_config_default_get: {
+    parameters: {
+      query: {
+        language?: components["schemas"]["SupportedLanguage"];
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AzimuthConfig"];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
   };
   /** Get the current configuration */
-  get_config_def_admin_config_get: {
+  get_config_def_config_get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
           "application/json": components["schemas"]["AzimuthConfig"];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
   };
-  /** Update the config using a changeset. */
-  update_config_admin_config_patch: {
+  /** Update the config. */
+  patch_config_config_patch: {
     responses: {
       /** Successful Response */
       200: {
@@ -894,10 +1233,46 @@ export interface operations {
           "application/json": components["schemas"]["AzimuthConfig"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -908,8 +1283,11 @@ export interface operations {
     };
   };
   /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
-  get_class_overlap_plot_class_overlap_plot_get: {
+  get_class_overlap_plot_dataset_splits__dataset_split_name__class_overlap_plot_get: {
     parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
+      };
       query: {
         /** Whether to include overlap of a class with itself. */
         self_overlap?: boolean;
@@ -926,17 +1304,56 @@ export interface operations {
           "application/json": components["schemas"]["ClassOverlapPlotResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
   };
   /** Get data for class overlap, confusion, and related utterance counts. */
-  get_class_overlap_class_overlap_get: {
+  get_class_overlap_dataset_splits__dataset_split_name__class_overlap_get: {
     parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
+      };
       query: {
         pipeline_index?: number;
       };
@@ -948,38 +1365,47 @@ export interface operations {
           "application/json": components["schemas"]["ClassOverlapTableResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-    };
-  };
-  /** Post new data_action tags */
-  post_data_actions_tags_post: {
-    parameters: {
-      query: {
-        pipeline_index?: number;
-      };
-    };
-    responses: {
-      /** Successful Response */
-      200: {
+      /** Internal Server Error */
+      500: {
         content: {
-          "application/json": components["schemas"]["DataActionResponse"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Validation Error */
-      422: {
+      /** Service Unavailable */
+      503: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PostDataActionRequest"];
       };
     };
   };
@@ -1015,10 +1441,46 @@ export interface operations {
           "application/json": components["schemas"]["ConfidenceHistogramResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1030,6 +1492,48 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["DatasetWarningGroup"][];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1066,10 +1570,46 @@ export interface operations {
           "application/json": components["schemas"]["MetricsAPIResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1091,10 +1631,46 @@ export interface operations {
           "application/json": components["schemas"]["MetricsPerFilterAPIResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1113,13 +1689,49 @@ export interface operations {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["OutcomeCountPerThresholdValue"][];
+          "application/json": components["schemas"]["OutcomeCountPerThresholdResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1156,10 +1768,46 @@ export interface operations {
           "application/json": components["schemas"]["OutcomeCountPerFilterResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1194,10 +1842,46 @@ export interface operations {
           "application/json": components["schemas"]["UtteranceCountPerFilterResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1239,11 +1923,113 @@ export interface operations {
           "application/json": components["schemas"]["GetUtterancesResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+    };
+  };
+  /** Patch utterances, such as updating proposed actions. */
+  patch_utterances_dataset_splits__dataset_split_name__utterances_patch: {
+    parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
+      };
+      query: {
+        ignore_not_found?: boolean;
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UtterancePatch"][];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UtterancePatch"][];
       };
     };
   };
@@ -1265,10 +2051,46 @@ export interface operations {
           "application/json": components["schemas"]["PerturbedUtteranceWithClassNames"][];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1293,10 +2115,46 @@ export interface operations {
           "application/json": components["schemas"]["SimilarUtterancesResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1314,10 +2172,100 @@ export interface operations {
     responses: {
       /** Successful Response */
       200: unknown;
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+    };
+  };
+  /** Export proposed actions to a CSV file and returns it. */
+  export_proposed_actions_export_dataset_splits__dataset_split_name__proposed_actions_get: {
+    parameters: {
+      path: {
+        dataset_split_name: components["schemas"]["DatasetSplitName"];
+      };
+    };
+    responses: {
+      /** Successful Response */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1332,10 +2280,46 @@ export interface operations {
     responses: {
       /** Successful Response */
       200: unknown;
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1353,10 +2337,46 @@ export interface operations {
     responses: {
       /** Successful Response */
       200: unknown;
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1375,10 +2395,46 @@ export interface operations {
           "application/json": { [key: string]: any };
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1398,10 +2454,46 @@ export interface operations {
           "application/json": components["schemas"]["SaliencyResponse"][];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1438,10 +2530,46 @@ export interface operations {
           "application/json": components["schemas"]["TopWordsResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };
@@ -1480,10 +2608,46 @@ export interface operations {
           "application/json": components["schemas"]["ConfusionMatrixResponse"];
         };
       };
-      /** Validation Error */
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Internal Server Error */
+      500: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
     };

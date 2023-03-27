@@ -1,10 +1,10 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from multiprocessing import Lock
 from typing import Callable, Dict, Optional
 
 from datasets import DatasetDict
-from transformers import AutoTokenizer
 
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -39,9 +39,10 @@ class ArtifactManager:
 
     @classmethod
     def get_instance(cls):
-        if cls.instance is None:
-            cls.instance = cls()
-        return cls.instance
+        with Lock():
+            if cls.instance is None:
+                cls.instance = cls()
+            return cls.instance
 
     def get_dataset_split_manager(
         self, config: AzimuthConfig, name: DatasetSplitName
@@ -66,18 +67,18 @@ class ArtifactManager:
                 f"No '{name}' dataset in the supplied dataset(s). "
                 f"Found {tuple(dataset_dict.keys())}."
             )
-        config_key: Hash = config.to_hash()
-        if config_key not in self.dataset_split_managers_mapping:
-            self.dataset_split_managers_mapping[config_key] = {}
-        if name not in self.dataset_split_managers_mapping[config_key]:
-            self.dataset_split_managers_mapping[config_key][name] = DatasetSplitManager(
+        project_hash: Hash = config.get_project_hash()
+        if project_hash not in self.dataset_split_managers_mapping:
+            self.dataset_split_managers_mapping[project_hash] = {}
+        if name not in self.dataset_split_managers_mapping[project_hash]:
+            self.dataset_split_managers_mapping[project_hash][name] = DatasetSplitManager(
                 name=name,
                 config=config,
                 initial_tags=ALL_STANDARD_TAGS,
                 initial_prediction_tags=ALL_PREDICTION_TAGS,
                 dataset_split=dataset_dict[name],
             )
-        return self.dataset_split_managers_mapping[config_key][name]
+        return self.dataset_split_managers_mapping[project_hash][name]
 
     def get_dataset_dict(self, config) -> DatasetDict:
         """Save and get user-defined DatasetDict.
@@ -90,10 +91,10 @@ class ArtifactManager:
         Returns:
             DatasetDict associated with the config.
         """
-        config_key: Hash = config.to_hash()
-        if config_key not in self.dataset_dict_mapping:
-            self.dataset_dict_mapping[config_key] = load_dataset_from_config(config)
-        return self.dataset_dict_mapping[config_key]
+        project_hash: Hash = config.get_project_hash()
+        if project_hash not in self.dataset_dict_mapping:
+            self.dataset_dict_mapping[project_hash] = load_dataset_from_config(config)
+        return self.dataset_dict_mapping[project_hash]
 
     def get_model(self, config: AzimuthConfig, pipeline_idx: int):
         """Load the model according to the config and the pipeline_idx.
@@ -106,21 +107,16 @@ class ArtifactManager:
             Loaded model.
         """
 
-        config_key: Hash = config.to_hash()
-        if config_key not in self.models_mapping:
-            self.models_mapping[config_key] = {}
-        if pipeline_idx not in self.models_mapping[config_key]:
+        project_hash: Hash = config.get_project_hash()
+        if project_hash not in self.models_mapping:
+            self.models_mapping[project_hash] = {}
+        if pipeline_idx not in self.models_mapping[project_hash]:
             pipelines = assert_not_none(config.pipelines)
-            self.models_mapping[config_key][pipeline_idx] = load_custom_object(
+            self.models_mapping[project_hash][pipeline_idx] = load_custom_object(
                 assert_not_none(pipelines[pipeline_idx].model), azimuth_config=config
             )
 
-        return self.models_mapping[config_key][pipeline_idx]
-
-    def get_tokenizer(self):
-        if self.tokenizer is None:
-            self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-        return self.tokenizer
+        return self.models_mapping[project_hash][pipeline_idx]
 
     def get_metric(self, config, name: str, **kwargs):
         hash: Hash = md5_hash({"name": name, **kwargs})
@@ -130,4 +126,5 @@ class ArtifactManager:
 
     @classmethod
     def clear_cache(cls) -> None:
-        cls.instance = None
+        with Lock():
+            cls.instance = None

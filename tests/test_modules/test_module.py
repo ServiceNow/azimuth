@@ -20,10 +20,10 @@ def test_ds_loading(simple_text_config):
     assert isinstance(ds, Dataset)
     assert len(ds) >= 1
 
-    config_key = mod.config.to_hash()
-    assert len(mod.artifact_manager.dataset_split_managers_mapping[config_key]) == 1
+    project_hash = mod.config.get_project_hash()
+    assert len(mod.artifact_manager.dataset_split_managers_mapping[project_hash]) == 1
     mod.clear_cache()
-    assert mod.artifact_manager.dataset_split_managers_mapping.get(config_key) is None
+    assert mod.artifact_manager.dataset_split_managers_mapping.get(project_hash) is None
 
 
 def test_model_loading(simple_text_config):
@@ -34,8 +34,8 @@ def test_model_loading(simple_text_config):
             model_contract_method_name=SupportedMethod.Inputs, pipeline_index=0
         ),
     )
-    model = mod.get_model()
-    assert callable(model)
+    hf_pipeline = mod.get_model()
+    assert callable(hf_pipeline)
 
 
 def test_threshold(simple_text_config):
@@ -182,6 +182,17 @@ def test_validation_priority(simple_text_config):
     mod = Module(DatasetSplitName.eval, config=simple_text_config)
     ds = mod.get_dataset_split()
     assert ds["utterance"] == ["h", "i", "j"]
+
+
+def test_mod_options(tiny_text_config):
+    with pytest.raises(ValueError, match="Unexpected mod_options"):
+        IndexableModule(
+            DatasetSplitName.eval,
+            config=tiny_text_config,
+            mod_options=ModuleOptions(pipeline_index=0),
+        )
+    with pytest.raises(ValueError, match="HFTextClassificationModule requires"):
+        HFTextClassificationModule(DatasetSplitName.eval, config=tiny_text_config)
 
 
 if __name__ == "__main__":

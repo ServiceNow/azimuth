@@ -82,6 +82,8 @@ type Props = {
   jobId: string;
   pipeline: Required<QueryPipelineState>;
   availableDatasetSplits: AvailableDatasetSplits | undefined;
+  datasetSplitName: DatasetSplitName;
+  setDatasetSplitName: (name: DatasetSplitName) => void;
 };
 
 type Row = MetricsPerFilterValue & { id: number };
@@ -90,9 +92,9 @@ const PerformanceAnalysis: React.FC<Props> = ({
   jobId,
   pipeline,
   availableDatasetSplits,
+  datasetSplitName,
+  setDatasetSplitName,
 }) => {
-  const [selectedDatasetSplit, setSelectedDatasetSplit] =
-    React.useState<DatasetSplitName>("eval");
   const [selectedMetricPerFilterOption, setSelectedMetricPerFilterOption] =
     React.useState<FilterByViewOption>("label");
 
@@ -100,7 +102,7 @@ const PerformanceAnalysis: React.FC<Props> = ({
 
   const { data, isFetching, error } = getMetricsPerFilterEndpoint.useQuery({
     jobId,
-    datasetSplitName: selectedDatasetSplit,
+    datasetSplitName,
     ...pipeline,
   });
 
@@ -280,7 +282,7 @@ const PerformanceAnalysis: React.FC<Props> = ({
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={`/${jobId}/dataset_splits/${selectedDatasetSplit}/prediction_overview${constructSearchString(
+      to={`/${jobId}/dataset_splits/${datasetSplitName}/prediction_overview${constructSearchString(
         {
           ...(props.row.id !== OVERALL_ROW_ID && {
             [selectedMetricPerFilterOption]: [props.row.filterValue],
@@ -308,8 +310,8 @@ const PerformanceAnalysis: React.FC<Props> = ({
         <Box width={340}>
           <DatasetSplitToggler
             availableDatasetSplits={availableDatasetSplits}
-            value={selectedDatasetSplit}
-            onChange={setSelectedDatasetSplit}
+            value={datasetSplitName}
+            onChange={setDatasetSplitName}
           />
         </Box>
       </Box>

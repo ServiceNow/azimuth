@@ -1,9 +1,9 @@
 # Syntax Analysis Config
 
-:blue_circle: **Default value:** `SyntaxOptions()`
+🔵 **Default value:** `SyntaxOptions()`
 
 In the Syntax config, users can modify thresholds to determine what is considered a short
-or a long sentence, as well as select the spaCy model and the dependency tags used for certain
+or a long utterance, as well as select the spaCy model and the dependency tags used for certain
 syntax-related smart tags. More details are explained in
 [:material-link: Syntax Analysis](../../../key-concepts/syntax-analysis.md).
 
@@ -17,15 +17,15 @@ dependency tag lists will generally not need to be modified.
     from pydantic import BaseModel
 
     class SyntaxOptions(BaseModel):
-        short_sentence_max_token: int = 3 # (1)
-        long_sentence_min_token: int = 16 # (2)
+        short_utterance_max_word int = 3 # (1)
+        long_utterance_min_word: int = 12 # (2)
         spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default (3)
         subj_tags: List[str] = []  # Language-based default value (4)
         obj_tags: List[str] = []  # Language-based default value (5)
     ```
 
-    1. Maximum number of tokens for a sentence to be tagged as short (e.g <=3 for the default)
-    2. Minimum number of tokens for a sentence to be tagged as long (e.g >=16 for the default)
+    1. Maximum number of words for an utterance to be tagged as short (e.g <=3 for the default)
+    2. Minimum number of words for an utterance to be tagged as long (e.g >=12 for the default)
     3. spaCy model to use for syntax tagging.
     4. spaCy dependency tags used to determine whether a word is a subject (noun).
     5. spaCy dependency tags used to determine whether a word is an object (noun).
@@ -35,7 +35,7 @@ dependency tag lists will generally not need to be modified.
     ```json
     {
       "syntax": {
-        "short_sentence_max_token": 5
+        "short_utterance_max_word": 5
       }
     }
     ```

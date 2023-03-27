@@ -7,10 +7,12 @@ from typing import Any, List
 
 import numpy as np
 import pytest
+from datasets import ClassLabel
 
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.dataset_analysis.dataset_warnings import DatasetWarningsModule
 from azimuth.types import DatasetSplitName, ModuleOptions
+from tests.utils import generate_mocked_dm, get_tiny_text_config_one_ds_name
 
 
 @pytest.mark.parametrize("remove_one_class", [True, False])
@@ -74,29 +76,34 @@ def test_compute_on_dataset_split(
     assert len(class_repr.plots.overall.data) > 0
     assert class_repr.plots.overall.layout
 
-    # Token length portion
-    tokens = syntactic_warnings.warnings[0]
-    assert len(tokens.comparisons) == num_classes
-    assert tokens.columns == ["mean", "std"]
-    assert len(tokens.plots.overall.data) > 0
-    assert tokens.plots.overall.layout
-    assert all([len(p.data) > 0 for cls_name, p in tokens.plots.per_class.items()])
-    assert all([p.layout for p in tokens.plots.per_class.values()])
+    # Word Count warnings
+    word_count_warnings = syntactic_warnings.warnings[0]
+    assert len(word_count_warnings.comparisons) == num_classes
+    assert word_count_warnings.columns == ["mean", "std"]
+    assert len(word_count_warnings.plots.overall.data) > 0
+    assert word_count_warnings.plots.overall.layout
+    assert all([len(p.data) > 0 for cls_name, p in word_count_warnings.plots.per_class.items()])
+    assert all([p.layout for p in word_count_warnings.plots.per_class.values()])
 
 
 def add_rejection_class(mod, monkeypatch):
     # Adding a rejection class
-    eval_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.eval)
-    train_dm: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.train)
-    eval_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
-    train_dm._base_dataset_split.features["label"].names.append("NO_INTENT")  # Should be 2
-    eval_dm._base_dataset_split = eval_dm._base_dataset_split.map(
+    dms = {
+        DatasetSplitName.eval: mod.get_dataset_split_manager(DatasetSplitName.eval),
+        DatasetSplitName.train: mod.get_dataset_split_manager(DatasetSplitName.train),
+    }
+
+    existing_classes = dms[DatasetSplitName.eval].get_class_names(labels_only=True)
+    class_label = ClassLabel(num_classes=3, names=existing_classes + ["NO_INTENT"])
+    for dm in dms.values():
+        dm._base_dataset_split.features["label"] = class_label
+
+    dms[DatasetSplitName.eval]._base_dataset_split = dms[
+        DatasetSplitName.eval
+    ]._base_dataset_split.map(
         lambda u, i: {"label": 2 if i % 10 == 0 else u["label"]}, with_indices=True
     )
-    dms = {
-        DatasetSplitName.eval: eval_dm,
-        DatasetSplitName.train: train_dm,
-    }
+
     # Modifying the config reset the ArtifactManager, which we do not want.
     monkeypatch.setattr(mod, "get_dataset_split_manager", lambda s: dms[s])
     mod.config.rejection_class = "NO_INTENT"
@@ -107,6 +114,30 @@ def remove_one_cls(mod):
     eval_ds: DatasetSplitManager = mod.get_dataset_split_manager(DatasetSplitName.eval)
     augmented = deepcopy(eval_ds._base_dataset_split.filter(lambda u: u["label"] != 0))
     mod.get_dataset_split_manager(DatasetSplitName.eval)._base_dataset_split = augmented
+
+
+def test_dataset_warnings_with_one_ds(tiny_text_config_one_ds):
+    split, _ = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
+    generate_mocked_dm(tiny_text_config_one_ds, dataset_split_name=split)  # Needed for word count.
+
+    mod = DatasetWarningsModule(
+        dataset_split_name=DatasetSplitName.all,
+        config=tiny_text_config_one_ds,
+    )
+    output = mod.compute_on_dataset_split()[0].warning_groups
+
+    general_warnings = output[0]
+    assert len(general_warnings.warnings) == 2, "Only 2 general warnings with one dataset split"
+    assert all(
+        len(comparison.data) == 1
+        for warning in general_warnings.warnings
+        for comparison in warning.comparisons
+    ), "Only data for one split"
+
+    syntactic_warnings = output[1]
+    assert not any(
+        comparison.alert for comparison in syntactic_warnings.warnings[0].comparisons
+    ), "No alert with one split"
 
 
 def test_with_dataset_and_indices(simple_text_config):

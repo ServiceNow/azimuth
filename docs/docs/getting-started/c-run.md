@@ -105,8 +105,23 @@ dataset and model are available in `config/examples` (`CLINC` is also shown belo
     ```
     make launch
     ```
-4. The **app will be accessible** at `http://localhost:8080` after a few minutes of waiting. The
-   start-up tasks will start.
+4. The **app will be accessible** at http://localhost:8080 after a few minutes of waiting. The
+    start-up tasks will start. The back-end API will be accessible at http://localhost:8080/api/local/docs.
+
+After a successful start, Azimuth saves the provided config in its `config_history.jsonl` artifact. If you use the API to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
+```shell
+make LOAD_CONFIG_HISTORY=1 launch
+```
+In fact, it is possible to specify both `LOAD_CONFIG_HISTORY=1` and a `CFG_PATH` together, in which case Azimuth will automatically
+
+1. load the config from `CFG_PATH` when it first starts (if `config_history.jsonl` is empty); and
+2. load the config from `config_history.jsonl` from then on (if Azimuth is restarted).
+
+For example:
+```shell
+make CFG_PATH=/config/my_project/conf.json LOAD_CONFIG_HISTORY=1 launch
+```
+Although confusing, this enables you to stop and restart the docker container with the same command.
 
 ## Advanced Settings
 
@@ -132,6 +147,7 @@ They are the following:
 * You can specify the device on which to run Azimuth, with `DEVICE` being one of `auto`, `gpu` or `cpu`. If
   none is provided, `auto` will be used. Ex: `DEVICE=gpu`.
 * Specify `READ_ONLY_CONFIG=1` to lock the config once Azimuth is launched.
+* Specify `LOAD_CONFIG_HISTORY=1` to load the latest config from Azimuth's config history.
 
 !!! note "Config file prevails over environment variables"
 

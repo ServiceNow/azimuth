@@ -20,7 +20,7 @@ The top section shows the utterance details:
           be added as a 4th element at the top.
     * By clicking on the blue chevrons, the prediction results after each post-processing step can be viewed, including the model's output before any post-processing.
 * **Smart tags** (where applicable): An automatically computed tag highlighting a certain
-  characteristic of the utterance (e.g., long sentences, utterance is missing a verb, utterance
+  characteristic of the utterance (e.g., long utterances, utterance is missing a verb, utterance
   contains multiple sentences). For more information,
   see [Smart Tags](../../key-concepts/smart-tags.md).
 * **Proposed Action** (editable): You can add a proposed action to identify further steps required
@@ -38,7 +38,7 @@ see [:material-link: Similarity Analysis](../../key-concepts/similarity.md).
 * The toggle buttons control whether to search for similar utterances in the evaluation set or the
   training set.
 * Utterances that are similar but have different labels or predictions can indicate possible
-  problems with the dataset or the model. An :warning: icon indicates utterances that are **from a
+  problems with the dataset or the model. An ⚠ icon indicates utterances that are **from a
   different class** than the base utterance.
 * Clicking on the row of an utterance in the table will open the details page for that utterance.
 

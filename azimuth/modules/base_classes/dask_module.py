@@ -6,9 +6,10 @@ import abc
 import os
 import threading
 import time
+import uuid
 from functools import partial
 from os.path import join as pjoin
-from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TypeVar, cast
+from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, cast
 
 import structlog
 from datasets import Dataset
@@ -57,11 +58,13 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         self.future: Optional[Future] = None
         self.done_event: Optional[Event] = None
         # We cache the result in a HDF5 file and we have a FileLock.
-        self.cache_dir = pjoin(self.config.get_artifact_path(), self.__class__.__name__)
+        self.cache_dir = pjoin(self.config.get_project_path(), self.__class__.__name__)
         os.makedirs(self.cache_dir, exist_ok=True)
         self._cache_file = pjoin(self.cache_dir, f"{self.name}.h5")
         self._cache_lock = pjoin(self.cache_dir, f"{self.name}.h5.lock")
+        self._cache_effective_arguments = pjoin(self.cache_dir, f"{self.name}.json")
         self._status = "not_started"
+        self._time = time.time()  # Only used for expirable modules
 
     @property
     def name(self):
@@ -76,9 +79,8 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         raise NotImplementedError
 
     @property
-    def task_id(self) -> Tuple[str, int]:
-        indices_hash = hash(tuple(self.get_caching_indices()))
-        return self.name, indices_hash
+    def task_id(self) -> str:
+        return f"{self.name}_{hash(tuple(self.get_caching_indices()))}"
 
     def _get_config_scope(self, config) -> ConfigScope:
         """Get the current config scope from full/partial config."""
@@ -109,12 +111,13 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         deps = [d.done_event for d in dependencies] if dependencies is not None else []
         if not all(deps):
             raise ValueError("Can't wait for an unstarted Module.")
-        self.done_event = Event(name="-".join(map(str, self.task_id)), client=client)
+        self.done_event = Event(name=self.task_id, client=client)
         # pure=false to be sure that everything is rerun.
         self.future = client.submit(
             self._compute_on_dataset_split_with_deps,
             pure=False,
             dependencies=deps,
+            key=f"{self.task_id}_{uuid.uuid4()}",  # Unique identifier
         )
         # Tell that this future is used on which indices.
         self.future.indices = self.get_caching_indices()
@@ -126,6 +129,10 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         th.setDaemon(True)
         th.start()
         return self
+
+    def custom_query_task_id(self, custom_query):
+        # Using self.name as we don't have indices
+        return f"{self.name}_{hash(str(custom_query))}"
 
     def start_task(self, client: Client, custom_query: Dict[str, Any]) -> "DaskModule":
         """
@@ -140,9 +147,8 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         """
         log.info(f"Starting custom query {self.name}")
         # pure=false to be sure that everything is rerun.
-        # Using self.name as key as we don't have indices
         self.future = client.submit(
-            self.compute, custom_query, key=f"{self.name}_{hash(str(custom_query))}", pure=False
+            self.compute, custom_query, key=self.custom_query_task_id(custom_query), pure=False
         )
         # Tell that this future is for custom use only.
         self.future.is_custom = True

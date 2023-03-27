@@ -47,24 +47,25 @@ def filter_dataset_split(
         )
         if confidence_column in dataset_split.column_names:
             dataset_split = dataset_split.filter(
-                lambda x: filters.confidence_min
-                <= x[confidence_column][0]
-                <= filters.confidence_max
+                lambda x: filters.confidence_min <= x[0] <= filters.confidence_max,
+                input_columns=confidence_column,
             )
-    if (
-        len(filters.label) > 0
-        and config.columns.label in dataset_split.column_names
-        and dataset_split.num_rows != 0
-    ):
-        dataset_split = dataset_split.filter(lambda x: x[config.columns.label] in filters.label)
-    if (
-        filters.utterance is not None
-        and config.columns.text_input in dataset_split.column_names
-        and dataset_split.num_rows != 0
-    ):
-        by = clean_utterance(filters.utterance)
+    if len(filters.label) > 0 and dataset_split.num_rows != 0:
         dataset_split = dataset_split.filter(
-            lambda x: by in clean_utterance(x[config.columns.text_input])
+            lambda x: x in filters.label, input_columns=config.columns.label
+        )
+    if filters.utterance is not None and dataset_split.num_rows != 0:
+        cleaned_utterance = clean_utterance(filters.utterance)
+        # Filter in utterances or if string matches a known row_idx or persistent_id
+        dataset_split = dataset_split.filter(
+            lambda text, idx, persistent_id: cleaned_utterance in clean_utterance(text)
+            or filters.utterance == str(idx)
+            or filters.utterance == str(persistent_id),
+            input_columns=[
+                config.columns.text_input,
+                DatasetColumn.row_idx,
+                config.columns.persistent_id,
+            ],
         )
     if len(filters.prediction) > 0 and dataset_split.num_rows != 0:
         prediction_column = (
@@ -75,11 +76,13 @@ def filter_dataset_split(
         if prediction_column in dataset_split.column_names:
             if without_postprocessing:
                 dataset_split = dataset_split.filter(
-                    lambda x: x[DatasetColumn.model_predictions][0] in filters.prediction
+                    lambda x: x[0] in filters.prediction,
+                    input_columns=DatasetColumn.model_predictions,
                 )
             else:
                 dataset_split = dataset_split.filter(
-                    lambda x: x[DatasetColumn.postprocessed_prediction] in filters.prediction
+                    lambda x: x in filters.prediction,
+                    input_columns=DatasetColumn.postprocessed_prediction,
                 )
     if len(filters.data_action) > 0 and dataset_split.num_rows != 0:
         # We do OR for data_action tags.
@@ -97,7 +100,9 @@ def filter_dataset_split(
         )
         if outcome_column in dataset_split.column_names:
             # We do OR for outcomes.
-            dataset_split = dataset_split.filter(lambda x: x[outcome_column] in filters.outcome)
+            dataset_split = dataset_split.filter(
+                lambda x: x in filters.outcome, input_columns=outcome_column
+            )
     for key, tags_in_family in filters.smart_tags.items():
         # For each smart tag family, we do OR, but AND between families
         # If NO_SMART_TAGS, it is none of them.
@@ -110,7 +115,7 @@ def filter_dataset_split(
             dataset_split = dataset_split.filter(
                 lambda x: any(
                     (
-                        (not any(x[tag.value] for tag in SMART_TAGS_FAMILY_MAPPING[family]))
+                        (not any(x[tag] for tag in SMART_TAGS_FAMILY_MAPPING[family]))
                         if tag_f == SmartTag.no_smart_tag
                         else x[tag_f]
                     )
@@ -158,7 +163,7 @@ def get_confidences_from_ds(ds: Dataset, without_postprocessing: bool = False) -
 def get_outcomes_from_ds(ds: Dataset, without_postprocessing: bool = False) -> List[OutcomeName]:
     """Get outcomes, with or without postprocessing.
 
-        Args:
+    Args:
         ds: Dataset Split for which to get outcomes.
         without_postprocessing: Determine which column to use.
 

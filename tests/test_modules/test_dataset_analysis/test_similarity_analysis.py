@@ -10,7 +10,7 @@ from azimuth.dataset_split_manager import FEATURE_FAISS
 from azimuth.modules.dataset_analysis.similarity_analysis import NeighborsTaggingModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions
 from azimuth.types.tag import SmartTag
-from tests.utils import get_table_key
+from tests.utils import get_table_key, get_tiny_text_config_one_ds_name
 
 IDX = 3
 
@@ -69,3 +69,21 @@ def test_neighbors(simple_text_config, dask_client, monkeypatch):
         indices_subset
     ), f"Length of result ({len(res)}) does not match length of indices ({len(indices_subset)})"
     # Would currently fail on mod.save_result() because of indices (length) mismatch
+
+
+def test_neighbors_one_ds(tiny_text_config_one_ds, dask_client, monkeypatch):
+    monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    # Mock SentenceTransformer on all workers.
+    dask_client.run(
+        lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    )
+    tiny_text_config_one_ds.similarity.conflicting_neighbors_threshold = 0.1
+
+    ds_name, other_ds_name = get_tiny_text_config_one_ds_name(tiny_text_config_one_ds)
+    mod = NeighborsTaggingModule(ds_name, tiny_text_config_one_ds)
+    res = mod.compute_on_dataset_split()
+
+    assert not any([r.tags[f"conflicting_neighbors_{other_ds_name}"] for r in res])
+    assert not any([r.tags[f"no_close_{other_ds_name}"] for r in res])
+    assert not any([r.adds[f"neighbors_{other_ds_name}"] for r in res])
+    assert any([r.adds[f"neighbors_{ds_name}"] for r in res])

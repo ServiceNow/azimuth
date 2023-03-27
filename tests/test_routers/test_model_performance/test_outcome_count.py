@@ -3,7 +3,7 @@
 # in the root directory of this source tree.
 
 from fastapi import FastAPI
-from starlette.status import HTTP_200_OK
+from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from starlette.testclient import TestClient
 
 
@@ -11,10 +11,8 @@ def test_get_outcome_count_per_threshold(app: FastAPI) -> None:
     client = TestClient(app)
 
     resp = client.get("/dataset_splits/eval/outcome_count/per_threshold?pipeline_index=0")
-    assert resp.status_code == HTTP_200_OK, resp.text
-    data = resp.json()
-    # app does not have an editable postprocessing.
-    assert len(data) == 0
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == "Postprocessing is not editable"
 
 
 def test_get_outcome_count_per_filter(app: FastAPI) -> None:

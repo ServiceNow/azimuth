@@ -1,6 +1,6 @@
 # Behavioral Testing Config
 
-:blue_circle: **Default value:** `BehavioralTestingOptions()`
+🔵 **Default value:** `BehavioralTestingOptions()`
 
 **Environment Variable**: `BEHAVIORAL_TESTING`
 

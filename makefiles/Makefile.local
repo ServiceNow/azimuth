@@ -33,8 +33,6 @@ for config_path in all_local_configs:
     print(f"Replacing paths in {config_path}")
     with open(config_path, "r") as f:
         cfg = json.load(f)
-        if 'artifact_path' not in cfg:
-        	cfg['artifact_path'] = '/cache'
         cfg = replace_value(cfg)
         if "use_cuda" in cfg:
         	cfg["use_cuda"] = "auto"
@@ -50,11 +48,11 @@ local_configs:
 
 .PHONY: launch.local
 launch.local:
-	poetry run python runner.py ${CFG_PATH} ${if ${PORT},--port ${PORT}}
+	poetry run python runner.py ${CFG_PATH} ${if ${LOAD_CONFIG_HISTORY},--load-config-history} ${if ${PORT},--port ${PORT}} ${if ${DEBUG},--debug}
 
 .PHONY: clean
 clean:
 	mkdir -p ./cache
 	rm -rf ./cache/$(TARGET)*
-	rm -rf /tmp/azimuth_test_cache || true
+	rm -rf /tmp/azimuth_test_cache
 	find ./azimuth_shr -name 'cache' -exec rm -rf {} +

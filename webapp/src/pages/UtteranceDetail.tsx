@@ -23,6 +23,7 @@ import useQueryState from "hooks/useQueryState";
 import React from "react";
 import { useParams } from "react-router-dom";
 import {
+  getConfigEndpoint,
   getDatasetInfoEndpoint,
   getSimilarUtterancesEndpoint,
   getUtterancesEndpoint,
@@ -30,24 +31,26 @@ import {
 import { DatasetSplitName } from "types/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
+  FADE_OUT_SCROLL_Y,
   ID_TOOLTIP,
   OUTCOME_COLOR,
   SMART_TAG_FAMILIES,
 } from "utils/const";
 import { camelToTitleCase, formatRatioAsPercentageString } from "utils/format";
+import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
 import { isPipelineSelected } from "utils/helpers";
 
 const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
   similarity: (
     <Description
       text="Inspect the most similar utterances in the evaluation and training set, to see if they belong to the same base utterance class."
-      link="/exploration-space/utterance-details/#semantically-similar-utterances"
+      link="user-guide/exploration-space/utterance-details/#semantically-similar-utterances"
     />
   ),
   perturbedUtterances: (
     <Description
       text="Shown here are the result of the perturbation tests that were automatically run to test the model's robustness to minor variations."
-      link="/exploration-space/utterance-details/#behavioral-tests"
+      link="user-guide/exploration-space/utterance-details/#behavioral-tests"
     />
   ),
 };
@@ -105,6 +108,11 @@ export const UtteranceDetail = () => {
   // without the need for postprocessingSteps.length before it is loaded.
   const [postprocessingStepRaw, setPostprocessingStep] = React.useState(0);
 
+  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+
+  // If config was undefined, PipelineCheck would not even render the page.
+  if (config === undefined) return null;
+
   if (!utterance) {
     // utterance will be defined while utteranceIsFetching after changing the
     // dataAction tag, in which case we want to render the utterance.
@@ -160,7 +168,7 @@ export const UtteranceDetail = () => {
     <Box display="flex" flexDirection="column" gap={2} height="100%">
       <Description
         text="Inspect the details of all of the analyses that have been performed on this utterance."
-        link="/exploration-space/utterance-details/"
+        link="user-guide/exploration-space/utterance-details/"
       />
       <Paper
         variant="outlined"
@@ -188,7 +196,14 @@ export const UtteranceDetail = () => {
             Id
           </Typography>
         </Tooltip>
-        <Typography variant="body2">{utteranceId}</Typography>
+        <Tooltip
+          title={getUtteranceIdTooltip({
+            utterance: utterance,
+            persistentIdColumn: config.columns.persistent_id,
+          })}
+        >
+          <Typography variant="body2">{utteranceId}</Typography>
+        </Tooltip>
 
         <Box className="header">
           <Typography variant="subtitle2">Utterance</Typography>
@@ -203,15 +218,16 @@ export const UtteranceDetail = () => {
             />
           )}
         </Box>
-        <Box display="flex" alignItems="center">
-          <UtteranceSaliency
-            variant="subtitle1"
-            tooltip
-            utterance={preprocessingSteps[preprocessingStep].text}
-            modelSaliency={
-              preprocessingStep === 0 ? utterance.modelSaliency : null
-            }
-          />
+        <Box display="flex">
+          <Box maxHeight="13vh" {...FADE_OUT_SCROLL_Y}>
+            <UtteranceSaliency
+              tooltip
+              utterance={preprocessingSteps[preprocessingStep].text}
+              modelSaliency={
+                preprocessingStep === 0 ? utterance.modelSaliency : null
+              }
+            />
+          </Box>
           <CopyButton text={preprocessingSteps[preprocessingStep].text} />
         </Box>
 
@@ -290,7 +306,7 @@ export const UtteranceDetail = () => {
         </Typography>
         <Box>
           <UtteranceDataAction
-            utteranceIds={[index]}
+            persistentIds={[utterance.persistentId]}
             dataAction={utterance.dataAction}
             allDataActions={datasetInfo?.dataActions || []}
             getUtterancesQueryState={getUtterancesQueryState}
@@ -342,6 +358,7 @@ export const UtteranceDetail = () => {
             <SimilarUtterances
               baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
               baseUtterance={utterance}
+              persistentIdColumn={config.columns.persistent_id}
               pipeline={pipeline}
               utterances={similarUtterances?.utterances || []}
             />

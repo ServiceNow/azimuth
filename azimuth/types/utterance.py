@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import Field
 
@@ -37,22 +37,35 @@ class ModelSaliency(AliasModel):
     saliencies: List[float] = Field(..., title="Saliency")
 
 
-class Utterance(ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str], AliasModel):
-    index: int = Field(..., title="Index", description="Row index computed by Azimuth..")
+class UtterancePersistentId(AliasModel):
+    # Union[int, str] in this order so FastAPI tries to cast to int() first, then defaults to str().
+    persistent_id: Union[int, str] = Field(..., title="Persistent id")
+
+
+class UtterancePatch(UtterancePersistentId):
+    data_action: DataAction = Field(..., title="Data action tag")
+
+
+class BaseUtterance(UtterancePersistentId):
+    index: int = Field(..., title="Index", description="Row index created by Azimuth")
+    utterance: str = Field(..., title="Utterance")
+    label: str = Field(..., title="Label")
+
+
+class Utterance(
+    ValuePerDatasetSmartTag[str], ValuePerPipelineSmartTag[str], UtterancePatch, BaseUtterance
+):
     model_prediction: Optional[ModelPrediction] = Field(
         ..., title="Model prediction", nullable=True
     )
     model_saliency: Optional[ModelSaliency] = Field(..., title="Model saliency", nullable=True)
-    data_action: DataAction = Field(..., title="Data action tag")
-    label: str = Field(..., title="Label")
-    utterance: str = Field(..., title="Utterance")
 
 
 class GetUtterancesResponse(AliasModel):
     utterances: List[Utterance] = Field(..., title="Utterances")
     utterance_count: int = Field(..., title="Utterance count")
     confidence_threshold: Optional[float] = Field(
-        ..., title="Confidence threshold in selected pipeline (if any)", nullable=True
+        ..., title="Confidence threshold in the selected pipeline (if any)", nullable=True
     )
 
     class Config:

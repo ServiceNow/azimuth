@@ -15,19 +15,18 @@ The current list of supported smart tag, and their families, is detailed below.
 [:material-link: Syntax Analysis](syntax-analysis.md) gives more details on how the syntactic
 information is computed.
 
-* `multiple_sentences`: The number of sentences is above 1. All other syntactic smart tags will be
-  disabled when this is the case.
-* `long_sentence`: The number of tokens is greater than or equal to the defined threshold (default is 16).
-* `short_sentence`: The number of tokens is less than or equal to the defined threshold (default is 3).
+* `multiple_sentences`: The number of sentences is above 1.
+* `long_utterance`: The number of words is greater than or equal to the defined threshold (default is 12).
+* `short_utterance`: The number of words is less than or equal to the defined threshold (default is 3).
 
 ## Partial Syntax <svg width="1.4em" viewBox="0 0 24 24" style="vertical-align: bottom;"><path d="M12,22 A10,10 0,0,0 12,2 V4 A8,8 0,0,1 12,20 Z M6.593591825444028,20.412535328311815 A10,10 0,0,0 9.182674431585703,21.594929736144973 L9.746139545268562,19.67594378891598 A8,8 0,0,1 7.674873460355222,18.73002826264945 Z M2.9036800464548183,16.154150130018866 A10,10 0,0,0 4.442504256457418,18.54860733945285 L5.954003405165935,17.23888587156228 A8,8 0,0,1 4.722944037163854,15.323320104015094 Z M2.101785581190672,10.57685161726715 A10,10 0,0,0 2.101785581190674,13.423148382732851 L4.0814284649525385,13.138518706186282 A8,8 0,0,1 4.081428464952538,10.861481293813721 Z M4.442504256457417,5.45139266054715 A10,10 0,0,0 2.9036800464548165,7.845849869981135 L4.722944037163853,8.676679895984908 A8,8 0,0,1 5.954003405165933,6.76111412843772 Z M9.182674431585703,2.405070263855027 A10,10 0,0,0 6.593591825444026,3.5874646716881866 L7.6748734603552204,5.2699717373505495 A8,8 0,0,1 9.746139545268562,4.324056211084021 Z M8,7 H16 V9 H13 V17 H11 V9 H8 V7 Z" fill="currentColor"/></svg>
 
 [:material-link: Syntax Analysis](syntax-analysis.md) gives more details on how the syntactic
 information is computed.
 
-* `missing_subj`: The sentence is missing a subject.
-* `missing_verb`: The sentence is missing a verb.
-* `missing_obj`: The sentence is missing an object.
+* `missing_subj`: The utterance is missing a subject.
+* `missing_verb`: The utterance is missing a verb.
+* `missing_obj`: The utterance is missing an object.
 
 ## Dissimilar <svg width="1.4em" viewBox="0 0 24 24" style="vertical-align: bottom;"><path d="M12,2 A10,10 0,0,0 12,22 A10,10 0,0,0 12,2 Z M12,4 A8,8 0,0,1 12,20 Z" fill="currentColor"/></svg>
 

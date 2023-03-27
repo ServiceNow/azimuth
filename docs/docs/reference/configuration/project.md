@@ -13,7 +13,7 @@ Azimuth and details about the way it is handled by the app.
     from azimuth.config import ColumnConfiguration, CustomObject
 
     class ProjectConfig(BaseSettings):
-        name: str = Field("New project", env="NAME")
+        name: str = "New project"
         dataset: CustomObject
         columns: ColumnConfiguration = ColumnConfiguration()
         rejection_class: Optional[str] = "REJECTION_CLASS"
@@ -40,7 +40,7 @@ Azimuth and details about the way it is handled by the app.
 
 ## Name
 
-:yellow_circle: **Default value**: `New project`
+🟡 **Default value**: `New project`
 
 **Environment Variable**: `NAME`
 
@@ -49,7 +49,7 @@ model. Ex: `Banking77 Model v4`.
 
 ## Dataset
 
-:red_circle: **Mandatory field**
+🔴 **Mandatory field**
 
 To define which dataset to load in the application, Azimuth
 uses [:material-link: Custom Objects](../custom-objects/index.md).
@@ -67,13 +67,14 @@ explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
     from pydantic import BaseModel, Field
 
     class CustomObject(BaseModel):
-        class_name: str = Field(..., title="Class name to load")
+        class_name: str # (1)
         args: List[Union["CustomObject", Any]] = []
         kwargs: Dict[str, Union["CustomObject", Any]] = {}
-        remote: Optional[str] = None # (1)
+        remote: Optional[str] = None # (2)
     ```
 
-    1. Absolute path to `class_name`.
+    1. Name of the function or class that is located in `remote`. `args` and `kwargs` will be sent to the function/class.
+    2. Absolute path to class. `class_name` needs to be accessible from this path.
 
 === "Config Example with HF"
 
@@ -92,7 +93,7 @@ explained in [:material-link: Defining Dataset](../custom-objects/dataset.md).
 
 ## Columns
 
-:yellow_circle: **Default value**: `ColumnConfiguration()`
+🟡 **Default value**: `ColumnConfiguration()`
 
 All dataset column names are configurable. The mandatory columns and their descriptions are as
 follows:
@@ -101,6 +102,7 @@ follows:
 |------------|-----------|-------------------------------------------------------------------|
 | `text_input` | `utterance` | The preprocessed utterance.                                       |
 | `label`      | `label`     | The class label for the utterance, as type `datasets.ClassLabel`. |
+| `persistent_id` | `row_idx` | A unique identifier for each utterance, as type `datasets.Value("int16")` or `datasets.Value("string")`. |
 
 === "Class Definition"
 
@@ -112,12 +114,14 @@ follows:
         raw_text_input: str = "utterance_raw" # (2)
         label: str = "label" # (3)
         failed_parsing_reason: str = "failed_parsing_reason" # (4)
+        persistent_id: str = "row_idx" # (5)
     ```
 
     1. Column for the text input that will be send to the pipeline.
     2. Optional column for the raw text input (before any pre-processing). Unused at the moment.
     3. Features column for the label
     4. Optional column to specify whether an example has failed preprocessing. Unused at the moment.
+    5. Column with a unique identifier for every example that should be persisted if the dataset is modified, such as if new examples are added or if examples are modified or removed. It defaults to the Azimuth generated index.
 
 === "Config Example"
 
@@ -134,7 +138,7 @@ follows:
 
 ## Rejection class
 
-:yellow_circle: **Default value**: `REJECTION_CLASS`
+🟡 **Default value**: `REJECTION_CLASS`
 
 The field `rejection_class` requires the class to be present in the dataset. If your dataset doesn't
 have a rejection class, set the value to `null`. More details on the rejection class are available

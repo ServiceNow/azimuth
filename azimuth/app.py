@@ -6,15 +6,28 @@ from threading import Event
 from typing import Dict, Optional
 
 import structlog
+from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
-from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_422_UNPROCESSABLE_ENTITY,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_503_SERVICE_UNAVAILABLE,
+)
 
-from azimuth import startup
 from azimuth.config import AzimuthConfig, load_azimuth_config
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes import Module
+from azimuth.modules.base_classes import DaskModule
 from azimuth.modules.utilities.validation import ValidationModule
+from azimuth.startup import startup_tasks
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.utils.cluster import default_cluster
@@ -25,9 +38,45 @@ from azimuth.utils.validation import assert_not_none
 
 _dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]] = {}
 _task_manager: Optional[TaskManager] = None
-_startup_tasks: Optional[Dict[str, Module]] = None
+_startup_tasks: Optional[Dict[str, DaskModule]] = None
 _azimuth_config: Optional[AzimuthConfig] = None
 _ready_flag: Optional[Event] = None
+
+
+COMMON_HTTP_ERROR_CODES = (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    # The default handler for RequestValidationError was returning an HTTP_422_UNPROCESSABLE_ENTITY.
+    # We overwrite that handler with the following handle_validation_error(), which returns more
+    # conventional HTTP codes.
+    # This overwrites the default ValidationError response for 422 in the OpenAPI spec.
+    HTTP_422_UNPROCESSABLE_ENTITY,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+    HTTP_503_SERVICE_UNAVAILABLE,
+)
+
+
+class HTTPExceptionModel(BaseModel):
+    detail: str
+
+
+async def handle_validation_error(request: Request, exception: RequestValidationError):
+    return JSONResponse(
+        status_code=HTTP_404_NOT_FOUND  # for errors in paths, e.g., /dataset_splits/potato
+        if "path" in (error["loc"][0] for error in exception.errors())
+        else HTTP_400_BAD_REQUEST,  # for other errors like in query params, e.g., pipeline_index=-1
+        content={"detail": str(exception)},
+    )
+
+
+async def handle_internal_error(request: Request, exception: Exception):
+    # Don't expose this unexpected internal error as that could expose a security vulnerability.
+    return JSONResponse(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error"},
+    )
 
 
 def get_dataset_split_manager_mapping() -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
@@ -56,7 +105,7 @@ def get_task_manager() -> Optional[TaskManager]:
     return _task_manager
 
 
-def get_startup_tasks() -> Optional[Dict[str, Module]]:
+def get_startup_tasks() -> Optional[Dict[str, DaskModule]]:
     return _startup_tasks
 
 
@@ -73,11 +122,12 @@ def require_editable_config(config: AzimuthConfig = Depends(get_config)):
         raise HTTPException(HTTP_403_FORBIDDEN, detail="The Azimuth config is currently read-only.")
 
 
-def start_app(config_path, debug=False) -> FastAPI:
+def start_app(config_path: Optional[str], load_config_history: bool, debug: bool) -> FastAPI:
     """Launch the application's API.
 
     Args:
         config_path: path to the config
+        load_config_history: Load the last config from history, or if empty, default to config_path.
         debug: Debug flag
 
     Returns:
@@ -95,20 +145,22 @@ def start_app(config_path, debug=False) -> FastAPI:
 
     log.info("🔭 Azimuth starting 🔭")
 
-    azimuth_config = load_azimuth_config(config_path)
+    azimuth_config = load_azimuth_config(config_path, load_config_history)
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
-    initialize_managers(azimuth_config, local_cluster)
-    assert_not_none(_task_manager).client.run(set_logger_config, level)
+    run_startup_tasks(azimuth_config, local_cluster)
+    task_manager = assert_not_none(_task_manager)
+    task_manager.client.run(set_logger_config, level)
 
     app = create_app()
 
     log.info("All routes added to router.")
 
     if debug:
+        log.debug(f"See Dask dashboard at {task_manager.client.dashboard_link}.")
         for r in app.router.routes:
             log.debug("Route", methods=r.__dict__.get("methods"), path=r.__dict__["path"])
 
@@ -132,88 +184,106 @@ def create_app() -> FastAPI:
         description="Azimuth API",
         version="1.0",
         default_response_class=JSONResponseIgnoreNan,
+        responses={code: {"model": HTTPExceptionModel} for code in COMMON_HTTP_ERROR_CODES},
+        exception_handlers={
+            RequestValidationError: handle_validation_error,
+            HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
+        },
+        root_path=".",  # Tells Swagger UI and ReDoc to fetch the OpenAPI spec from ./openapi.json
+        # (relative) so it works through the front-end proxy.
     )
 
     # Setup routes
-    from azimuth.routers.v1.admin import router as admin_router
-    from azimuth.routers.v1.app import router as app_router
-    from azimuth.routers.v1.class_overlap import router as class_overlap_router
-    from azimuth.routers.v1.custom_utterances import router as custom_utterances_router
-    from azimuth.routers.v1.dataset_warnings import router as dataset_warnings_router
-    from azimuth.routers.v1.export import router as export_router
-    from azimuth.routers.v1.model_performance.confidence_histogram import (
+    from azimuth.routers.app import router as app_router
+    from azimuth.routers.class_overlap import router as class_overlap_router
+    from azimuth.routers.config import router as config_router
+    from azimuth.routers.custom_utterances import router as custom_utterances_router
+    from azimuth.routers.dataset_warnings import router as dataset_warnings_router
+    from azimuth.routers.export import router as export_router
+    from azimuth.routers.model_performance.confidence_histogram import (
         router as confidence_histogram_router,
     )
-    from azimuth.routers.v1.model_performance.confusion_matrix import (
+    from azimuth.routers.model_performance.confusion_matrix import (
         router as confusion_matrix_router,
     )
-    from azimuth.routers.v1.model_performance.metrics import router as metrics_router
-    from azimuth.routers.v1.model_performance.outcome_count import (
+    from azimuth.routers.model_performance.metrics import router as metrics_router
+    from azimuth.routers.model_performance.outcome_count import (
         router as outcome_count_router,
     )
-    from azimuth.routers.v1.model_performance.utterance_count import (
+    from azimuth.routers.model_performance.utterance_count import (
         router as utterance_count_router,
     )
-    from azimuth.routers.v1.tags import router as tags_router
-    from azimuth.routers.v1.top_words import router as top_words_router
-    from azimuth.routers.v1.utterances import router as utterances_router
+    from azimuth.routers.top_words import router as top_words_router
+    from azimuth.routers.utterances import router as utterances_router
     from azimuth.utils.routers import require_application_ready, require_available_model
 
     api_router = APIRouter()
-    api_router.include_router(app_router, prefix="")
-    api_router.include_router(admin_router, prefix="/admin")
+    api_router.include_router(app_router, prefix="", tags=["App"])
+    api_router.include_router(config_router, prefix="/config", tags=["Config"])
     api_router.include_router(
         class_overlap_router,
-        prefix="/class_overlap",
+        prefix="/dataset_splits/{dataset_split_name}/class_overlap",
+        tags=["Class Overlap"],
         dependencies=[Depends(require_application_ready)],
     )
-    api_router.include_router(tags_router, prefix="/tags", dependencies=[])
     api_router.include_router(
         confidence_histogram_router,
         prefix="/dataset_splits/{dataset_split_name}/confidence_histogram",
+        tags=["Confidence Histogram"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         dataset_warnings_router,
         prefix="/dataset_warnings",
+        tags=["Dataset Warnings"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         metrics_router,
         prefix="/dataset_splits/{dataset_split_name}/metrics",
+        tags=["Metrics"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         outcome_count_router,
         prefix="/dataset_splits/{dataset_split_name}/outcome_count",
+        tags=["Outcome Count"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         utterance_count_router,
         prefix="/dataset_splits/{dataset_split_name}/utterance_count",
+        tags=["Utterance Count"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         utterances_router,
         prefix="/dataset_splits/{dataset_split_name}/utterances",
+        tags=["Utterances"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
-        export_router, prefix="/export", dependencies=[Depends(require_application_ready)]
+        export_router,
+        prefix="/export",
+        tags=["Export"],
+        dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         custom_utterances_router,
         prefix="/custom_utterances",
+        tags=["Custom Utterances"],
         dependencies=[Depends(require_application_ready)],
     )
     api_router.include_router(
         top_words_router,
         prefix="/dataset_splits/{dataset_split_name}/top_words",
+        tags=["Top Words"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     api_router.include_router(
         confusion_matrix_router,
         prefix="/dataset_splits/{dataset_split_name}/confusion_matrix",
+        tags=["Confusion Matrix"],
         dependencies=[Depends(require_application_ready), Depends(require_available_model)],
     )
     app.include_router(api_router)
@@ -227,16 +297,15 @@ def create_app() -> FastAPI:
     return app
 
 
-def initialize_managers(azimuth_config, cluster):
-    """Initialize manager objects.
+def initialize_managers(azimuth_config: AzimuthConfig, cluster: SpecCluster):
+    """Initialize DatasetSplitManagers and TaskManagers.
 
-    Initialize DatasetSplitManagers, TaskManagers, start startup tasks.
 
     Args:
         azimuth_config: Configuration
         cluster: Dask cluster to use.
     """
-    global _task_manager, _dataset_split_managers, _startup_tasks, _azimuth_config, _ready_flag
+    global _task_manager, _dataset_split_managers, _azimuth_config
     _azimuth_config = azimuth_config
     if _task_manager is not None:
         task_history = _task_manager.current_tasks
@@ -248,13 +317,6 @@ def initialize_managers(azimuth_config, cluster):
     _task_manager.current_tasks = task_history
 
     _dataset_split_managers = load_dataset_split_managers_from_config(azimuth_config)
-    # Validate that everything is in order **before** the startup tasks.
-    if _dataset_split_managers.get(DatasetSplitName.train):
-        run_validation(DatasetSplitName.train, _task_manager, azimuth_config)
-    run_validation(DatasetSplitName.eval, _task_manager, azimuth_config)
-
-    _startup_tasks = startup.startup_tasks(_dataset_split_managers, _task_manager)
-    _ready_flag = Event()
 
 
 def run_validation(
@@ -288,3 +350,27 @@ def run_validation(
             run_validation_module(pipeline_index)
     task_manager.clear_worker_cache()
     task_manager.restart()
+
+
+def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
+    """Initialize managers, run validation and startup tasks.
+
+    Args:
+        azimuth_config: Config
+        cluster: Cluster
+
+    """
+    initialize_managers(azimuth_config, cluster)
+
+    task_manager = assert_not_none(get_task_manager())
+    # Validate that everything is in order **before** the startup tasks.
+    if _dataset_split_managers.get(DatasetSplitName.train):
+        run_validation(DatasetSplitName.train, task_manager, azimuth_config)
+    if _dataset_split_managers.get(DatasetSplitName.eval):
+        run_validation(DatasetSplitName.eval, task_manager, azimuth_config)
+
+    azimuth_config.save()  # Save only after the validation modules ran successfully
+
+    global _startup_tasks, _ready_flag
+    _startup_tasks = startup_tasks(_dataset_split_managers, task_manager)
+    _ready_flag = Event()

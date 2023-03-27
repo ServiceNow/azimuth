@@ -10,7 +10,7 @@ from datasets import Dataset
 
 from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod
-from azimuth.types.general.module_options import GradientCalculation
+from azimuth.types.general.module_arguments import GradientCalculation
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.saliency import find_word_embeddings_layer
 
@@ -28,10 +28,7 @@ def test_create_sentiment_pipeline(simple_text_config):
     # By default, use L2 gradient calculation
     assert task.gradient_calculation == GradientCalculation.L2
 
-    sa = task.get_model()
-
-    # As of Jan 6, 2021, fast tokenizers are not supported in pipelines
-    assert not sa.tokenizer.is_fast
+    _ = task.get_model()
 
     # Test a different gradient calculation option
     task = HFTextClassificationModule(
@@ -120,15 +117,16 @@ def test_rejection_class(simple_text_config):
         ),
     )
     out = cast(List[PredictionResponse], mod.compute_on_dataset_split())
-    # At least 1 out of the 10 predictions will have confidence < 0.99
-    assert set(k.postprocessed_output.preds[0] != k.model_output.preds[0] for k in out) == {True}
-    rejected_items = filter(
-        lambda k: k.postprocessed_output.preds[0] != k.model_output.preds[0], out
-    )
+
+    # At least 1 out of the 10 predictions will have confidence below the threshold.
+    rejected_items = [
+        item for item in out if item.postprocessed_output.preds[0] != item.model_output.preds[0]
+    ]
+    assert len(rejected_items) > 0
     assert all(
-        np.max(pred_response.model_output.probs[0]) <= simple_text_config.pipelines[0].threshold
-        for pred_response in rejected_items
-    )
+        np.max(pred_res.postprocessed_output.probs[0]) <= simple_text_config.pipelines[0].threshold
+        for pred_res in rejected_items
+    ), rejected_items
 
 
 def test_mc_dropout(simple_text_config):
@@ -184,9 +182,9 @@ def test_saliency(dask_client, simple_text_config):
         ),
     )
     out = cast(List[SaliencyResponse], mod.compute_on_dataset_split())
-    pipeline = mod.get_model()
+    hf_pipeline = mod.get_model()
     assert len(out) == 2
-    assert not any(any(tok == pipeline.tokenizer.pad_token for tok in rec.tokens) for rec in out)
+    assert not any(any(tok == hf_pipeline.tokenizer.pad_token for tok in rec.tokens) for rec in out)
 
 
 def test_custom_class_saliency(simple_text_config):
@@ -235,7 +233,9 @@ def test_load_CLINC150_dataset(clinc_text_config):
     task = HFTextClassificationModule(
         DatasetSplitName.train,
         clinc_text_config,
-        mod_options=ModuleOptions(model_contract_method_name=SupportedMethod.Predictions),
+        mod_options=ModuleOptions(
+            model_contract_method_name=SupportedMethod.Predictions, pipeline_index=0
+        ),
     )
 
     ds = task.get_dataset_split()

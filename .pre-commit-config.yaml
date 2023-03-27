@@ -52,7 +52,7 @@ repos:
         entry: poetry run flake8
         types: [ python ]
   - repo: https://github.com/pycqa/isort
-    rev: 5.8.0
+    rev: 5.12.0
     hooks:
       - id: isort
         name: isort
@@ -63,6 +63,6 @@ repos:
         name: mypy
         language: system
         verbose: true
-        entry: bash -c 'poetry run mypy "azimuth" || true' --
+        entry: poetry run mypy azimuth
         files: azimuth
         pass_filenames: false

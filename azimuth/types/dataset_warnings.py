@@ -11,6 +11,11 @@ from pydantic.types import StrictFloat, StrictInt
 from azimuth.types import AliasModel, PlotSpecification
 
 
+class Agg(str, Enum):
+    mean = "mean"
+    std = "std"
+
+
 class FormatType(str, Enum):
     Integer = "Integer"
     Percentage = "Percentage"

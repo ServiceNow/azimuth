@@ -6,7 +6,6 @@ import ConfusionMatrix from "components/ConfusionMatrix";
 import Controls from "components/Controls/Controls";
 import Description from "components/Description";
 import Metrics from "components/Metrics/Metrics";
-import PageHeader from "components/PageHeader";
 import TabPipelineRequired from "components/TabPipelineRequired";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
@@ -61,120 +60,122 @@ const Exploration = () => {
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
-  const setMainView = (mainView: MainView) => {
-    history.push(
-      `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}${searchString}`
-    );
-  };
+  const setMainView = React.useCallback(
+    (mainView: MainView) => {
+      history.push(
+        `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}${searchString}`
+      );
+    },
+    [history, jobId, datasetSplitName, searchString]
+  );
 
-  if (!isPipelineSelected(pipeline) && mainView !== "utterances") {
-    setMainView("utterances");
-  }
+  React.useEffect(() => {
+    if (!isPipelineSelected(pipeline) && mainView !== "utterances") {
+      setMainView("utterances");
+    }
+  }, [setMainView, mainView, pipeline]);
 
   return (
-    <>
-      <PageHeader />
-      <div className={classes.container}>
-        <div className={classes.layout}>
-          <Controls
-            confusionMatrix={confusionMatrix}
-            filters={filters}
-            pagination={pagination}
-            pipeline={pipeline}
-            postprocessing={postprocessing}
-            searchString={searchString}
-          />
-          <div className={classes.content}>
-            <Paper
-              variant="outlined"
-              sx={{
-                flex: 1,
-                minHeight: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: 4,
-                padding: 4,
-                paddingTop: 2.5,
-              }}
-            >
-              <Box borderBottom={1} borderColor="divider">
-                <Tabs
-                  indicatorColor="secondary"
-                  value={mainView}
-                  onChange={(_, value) => setMainView(value)}
-                >
-                  <TabPipelineRequired
-                    value="prediction_overview"
-                    label="Prediction Overview"
-                    pipeline={pipeline}
-                  />
-                  <TabPipelineRequired
-                    value="confusion_matrix"
-                    label="Confusion Matrix"
-                    pipeline={pipeline}
-                  />
-                  <Tab value="utterances" label="Utterance Table" />
-                </Tabs>
-              </Box>
-              {mainView === "prediction_overview" &&
-                isPipelineSelected(pipeline) && (
-                  <>
-                    <Description
-                      text="Analyze metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
-                      link="/exploration-space/prediction-overview/"
-                    />
-                    <Metrics
-                      jobId={jobId}
-                      datasetSplitName={datasetSplitName}
-                      filters={filters}
-                      pipeline={pipeline}
-                      postprocessing={postprocessing}
-                    />
-                    <ConfidenceHistogramTopWords
-                      baseUrl={baseUrl}
-                      confusionMatrix={confusionMatrix}
-                      filters={filters}
-                      pagination={pagination}
-                      pipeline={pipeline}
-                      postprocessing={postprocessing}
-                    />
-                  </>
-                )}
-              {mainView === "confusion_matrix" && isPipelineSelected(pipeline) && (
+    <div className={classes.container}>
+      <div className={classes.layout}>
+        <Controls
+          confusionMatrix={confusionMatrix}
+          filters={filters}
+          pagination={pagination}
+          pipeline={pipeline}
+          postprocessing={postprocessing}
+          searchString={searchString}
+        />
+        <div className={classes.content}>
+          <Paper
+            variant="outlined"
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+              padding: 4,
+              paddingTop: 2.5,
+            }}
+          >
+            <Box borderBottom={1} borderColor="divider">
+              <Tabs
+                indicatorColor="secondary"
+                value={mainView}
+                onChange={(_, value) => setMainView(value)}
+              >
+                <TabPipelineRequired
+                  value="prediction_overview"
+                  label="Prediction Overview"
+                  pipeline={pipeline}
+                />
+                <TabPipelineRequired
+                  value="confusion_matrix"
+                  label="Confusion Matrix"
+                  pipeline={pipeline}
+                />
+                <Tab value="utterances" label="Utterance Table" />
+              </Tabs>
+            </Box>
+            {mainView === "prediction_overview" &&
+              isPipelineSelected(pipeline) && (
                 <>
                   <Description
-                    text="Visualize the model confusion between each pair of intents."
-                    link="/exploration-space/confusion-matrix/"
+                    text="Analyze metrics for different data subpopulations, visualize the confidence distribution, and discover annotation artifacts."
+                    link="user-guide/exploration-space/#prediction-overview"
                   />
-                  <ConfusionMatrix
+                  <Metrics
                     jobId={jobId}
                     datasetSplitName={datasetSplitName}
-                    confusionMatrix={confusionMatrix}
                     filters={filters}
                     pipeline={pipeline}
-                    predictionFilters={filters.prediction}
-                    labelFilters={filters.label}
+                    postprocessing={postprocessing}
+                  />
+                  <ConfidenceHistogramTopWords
+                    baseUrl={baseUrl}
+                    confusionMatrix={confusionMatrix}
+                    filters={filters}
+                    pagination={pagination}
+                    pipeline={pipeline}
                     postprocessing={postprocessing}
                   />
                 </>
               )}
-              {mainView === "utterances" && (
-                <UtterancesTable
+            {mainView === "confusion_matrix" && isPipelineSelected(pipeline) && (
+              <>
+                <Description
+                  text="Visualize the model confusion between each pair of intents."
+                  link="user-guide/exploration-space/#confusion-matrix"
+                />
+                <ConfusionMatrix
                   jobId={jobId}
-                  datasetInfo={datasetInfo}
                   datasetSplitName={datasetSplitName}
                   confusionMatrix={confusionMatrix}
                   filters={filters}
-                  pagination={pagination}
                   pipeline={pipeline}
+                  predictionFilters={filters.prediction}
+                  labelFilters={filters.label}
                   postprocessing={postprocessing}
                 />
-              )}
-            </Paper>
-          </div>
+              </>
+            )}
+            {mainView === "utterances" && (
+              <UtterancesTable
+                jobId={jobId}
+                datasetInfo={datasetInfo}
+                datasetSplitName={datasetSplitName}
+                confusionMatrix={confusionMatrix}
+                filters={filters}
+                pagination={pagination}
+                pipeline={pipeline}
+                postprocessing={postprocessing}
+              />
+            )}
+          </Paper>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

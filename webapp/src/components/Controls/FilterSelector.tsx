@@ -232,9 +232,8 @@ const FilterSelector = <FilterValue extends string>({
           {options && (
             <motion.ul
               className={classes.options}
-              animate={{
-                maxHeight: numberVisible * 28,
-              }}
+              animate={{ maxHeight: numberVisible * 28 }}
+              initial={{ maxHeight: 0 }}
               transition={transition}
             >
               {options.map(renderOption)}
