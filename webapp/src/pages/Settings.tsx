@@ -344,8 +344,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
 
   const updatePartialConfig = React.useCallback(
     (update: Partial<AzimuthConfig>) =>
-      setPartialConfig({ ...partialConfig, ...update }),
-    [setPartialConfig, partialConfig]
+      setPartialConfig((partialConfig) => ({ ...partialConfig, ...update })),
+    [setPartialConfig]
   );
 
   React.useEffect(() => {
