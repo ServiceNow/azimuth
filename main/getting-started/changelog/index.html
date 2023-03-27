@@ -619,6 +619,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#known-issue" class="md-nav__link">
+    Known Issue
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2066,6 +2073,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#known-issue" class="md-nav__link">
+    Known Issue
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2473,6 +2487,10 @@
 <li>Fix the Utterance Details page collapsing with extra long utterances.</li>
 <li>Fix potential time-out issues for bigger datasets and models after start-up.</li>
 <li>Fix browser history after navigating to the exploration page with no pipeline.</li>
+</ul>
+<h3 id="known-issue">Known Issue</h3>
+<ul>
+<li>In the logs, the error message <code>distributed.comm.core.CommClosedError: in &lt;TCP (closed) ConnectionPool.broadcast local=tcp://127.0.0.1:XXXXX remote=tcp://127.0.0.1:XXXXX&gt;: Stream is closed.</code> might appear and result in some tasks being lost. In most cases, the lost tasks will be recomputed automatically without causing further errors. However, it might happen that other tasks fail because of missing columns. If that happens, simply kill and restart Azimuth. We are investigating the issue.</li>
 </ul>
 <h2 id="253-2023-02-16">[2.5.3] - 2023-02-16</h2>
 <h3 id="fixed_1">Fixed</h3>
