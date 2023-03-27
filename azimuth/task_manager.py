@@ -144,10 +144,7 @@ class TaskManager:
             )
             # Check if this task already exist.
             key = task.task_id
-            if key in self.current_tasks:
-                task = self.current_tasks[key]
-            else:
-                self.current_tasks[key] = task
+            task = self.current_tasks.setdefault(key, task)
 
             is_expired_uncached = isinstance(task, ExpirableMixin) and task.is_expired(last_update)
             if not task.done() or is_expired_uncached:
@@ -198,10 +195,7 @@ class TaskManager:
             )
             # Check if this task already exist.
             key = task.custom_query_task_id(custom_query)
-            if key in self.current_tasks:
-                task = self.current_tasks[key]
-            else:
-                self.current_tasks[key] = task
+            task = self.current_tasks.setdefault(key, task)
 
             # Always start task
             task.start_task(self.client, custom_query)

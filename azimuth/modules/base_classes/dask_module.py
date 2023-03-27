@@ -80,7 +80,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
 
     @property
     def task_id(self) -> str:
-        return "_".join(map(str, (self.name, hash(tuple(self.get_caching_indices())))))
+        return f"{self.name}_{hash(tuple(self.get_caching_indices()))}"
 
     def _get_config_scope(self, config) -> ConfigScope:
         """Get the current config scope from full/partial config."""
@@ -117,7 +117,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             self._compute_on_dataset_split_with_deps,
             pure=False,
             dependencies=deps,
-            key=self.task_id + "_" + str(uuid.uuid4()),  # Unique identifier
+            key=f"{self.task_id}_{uuid.uuid4()}",  # Unique identifier
         )
         # Tell that this future is used on which indices.
         self.future.indices = self.get_caching_indices()
