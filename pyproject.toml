@@ -83,6 +83,7 @@ types-simplejson = "^3.17.0"
 types-filelock = "^0.1.5"
 types-orjson = "^3.6.0"
 pyinstrument = "^4.3.0"
+bokeh = "<3"
 
 # Documentation
 mkdocs = "^1.2.3"
