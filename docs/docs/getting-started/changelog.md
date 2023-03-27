@@ -17,11 +17,11 @@
     - This allows to import back the proposed actions at any time, including with a new dataset version.
     - See details in the [Utterance table](../user-guide/exploration-space/utterance-table.md#proposed-action) section.
 - **New interactions on the Exploration Space.**
-     - Link from confusion matrix cells and row/column labels to utterance table. Example provided [here](../user-guide/exploration-space/confusion-matrix.md#interaction).
-     - Users can now search for indices or persistent ids in the [utterance search box](../user-guide/exploration-space/index.md#filter-categories).
+    - Link from confusion matrix cells and row/column labels to utterance table. Example provided [here](../user-guide/exploration-space/confusion-matrix.md#interaction).
+    - Users can now search for indices or persistent ids in the [utterance search box](../user-guide/exploration-space/index.md#filter-categories).
 - **Support for the training set only.**
-     - Azimuth can now launch with a training set only.
-     - Dataset warnings are now also available with just one split (training or evaluation).
+    - Azimuth can now launch with a training set only.
+    - Dataset warnings are now also available with just one split (training or evaluation).
 - **Better support for CSV files.** New helper function to load CSV files. Example provided [here](../reference/custom-objects/dataset.md#examples).
 
 ### Changed
