@@ -49,6 +49,9 @@
 - Fix potential time-out issues for bigger datasets and models after start-up.
 - Fix browser history after navigating to the exploration page with no pipeline.
 
+### Known Issue
+- In the logs, the error message `distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.broadcast local=tcp://127.0.0.1:XXXXX remote=tcp://127.0.0.1:XXXXX>: Stream is closed.` might appear and result in some tasks being lost. In most cases, the lost tasks will be recomputed automatically without causing further errors. However, it might happen that other tasks fail because of missing columns. If that happens, simply kill and restart Azimuth. We are investigating the issue.
+
 ## [2.5.3] - 2023-02-16
 
 ### Fixed
