@@ -243,6 +243,29 @@ const JSONField: React.FC<
 
   const adornments = array ? (["[", "]"] as const) : (["{", "}"] as const);
 
+  const handleChange = (newStringValue: string) => {
+    setStringValue(newStringValue);
+    // Update errorText if there is one, but wait for blur to add one.
+    if (errorText) {
+      try {
+        JSON.parse(adornments.join(newStringValue));
+        setErrorText("");
+      } catch (error) {
+        setErrorText((error as SyntaxError).message);
+      }
+    }
+  };
+
+  const handleBlur =
+    onChange &&
+    ((newStringValue: string) => {
+      try {
+        onChange(JSON.parse(adornments.join(newStringValue)));
+      } catch (error) {
+        setErrorText((error as SyntaxError).message);
+      }
+    });
+
   return (
     <TextField
       {...FIELD_COMMON_PROPS}
@@ -250,28 +273,8 @@ const JSONField: React.FC<
       value={stringValue}
       error={errorText !== ""}
       helperText={errorText}
-      onChange={(event) => {
-        setStringValue(event.target.value);
-        // Update errorText if there is one, but wait for blur to add one.
-        if (errorText) {
-          try {
-            JSON.parse(adornments.join(event.target.value));
-            setErrorText("");
-          } catch (error) {
-            setErrorText((error as SyntaxError).message);
-          }
-        }
-      }}
-      onBlur={
-        onChange &&
-        ((event) => {
-          try {
-            onChange(JSON.parse(adornments.join(event.target.value)));
-          } catch (error) {
-            setErrorText((error as SyntaxError).message);
-          }
-        })
-      }
+      onChange={(event) => handleChange(event.target.value)}
+      onBlur={handleBlur && ((event) => handleBlur(event.target.value))}
       InputProps={{
         startAdornment: (
           <Typography variant="inherit" alignSelf="start">
