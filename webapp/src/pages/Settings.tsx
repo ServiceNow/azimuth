@@ -1,12 +1,8 @@
 import { Close, Warning } from "@mui/icons-material";
 import {
-  Autocomplete,
-  autocompleteClasses,
   Box,
   Button,
   Checkbox,
-  Chip,
-  chipClasses,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -19,19 +15,19 @@ import {
   formGroupClasses,
   FormHelperText,
   IconButton,
-  InputAdornment,
   InputBaseComponentProps,
   inputClasses,
   inputLabelClasses,
-  MenuItem,
   Paper,
-  TextField,
-  TextFieldProps,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
 import Loading from "components/Loading";
+import JSONField from "components/Settings/JSONField";
+import NumberField from "components/Settings/NumberField";
+import StringArrayField from "components/Settings/StringArrayField";
+import StringField from "components/Settings/StringField";
 import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -129,198 +125,6 @@ const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) => [
   { ...array[index], ...update },
   ...array.slice(index + 1),
 ];
-
-type FieldProps<T> = { value: T; onChange?: (newValue: T) => void };
-
-const FIELD_COMMON_PROPS = {
-  size: "small",
-  variant: "standard",
-  InputLabelProps: { shrink: true },
-} as const;
-
-const StringField = <T extends string | null>({
-  value,
-  onChange,
-  nullable,
-  options,
-  ...props
-}: Omit<TextFieldProps, "onChange"> &
-  FieldProps<T> &
-  (null extends T
-    ? { nullable: true; options?: never }
-    : { nullable?: false } & (string extends T // so T is string, not a literal
-        ? { select?: false; options?: never }
-        : { select?: true; options: readonly NonNullable<T>[] }))) => (
-  <TextField
-    {...FIELD_COMMON_PROPS}
-    {...(nullable && { placeholder: "null" })}
-    select={Boolean(options)}
-    inputProps={{ sx: { textOverflow: "ellipsis" } }}
-    value={value ?? ""}
-    onChange={
-      onChange &&
-      (nullable
-        ? (event) => onChange(event.target.value as T)
-        : (event) => onChange((event.target.value || null) as T))
-    }
-    {...props}
-  >
-    {options?.map((option) => (
-      <MenuItem key={option} value={option}>
-        {option}
-      </MenuItem>
-    ))}
-  </TextField>
-);
-
-const NumberField: React.FC<
-  Omit<TextFieldProps, "onChange"> &
-    FieldProps<number> & { scale?: number; units?: string }
-> = ({ value, scale = 1, units, onChange, ...props }) => {
-  // Control value with a `string` (and not with a `number`) so that for example
-  // when hitting backspace at the end of `0.01`, you get `0.0` (and not `0`).
-  const [stringValue, setStringValue] = React.useState(String(value * scale));
-
-  React.useEffect(() => {
-    if (value !== Number(stringValue) / scale) {
-      setStringValue(String(value * scale));
-    }
-  }, [value, scale, stringValue]);
-
-  return (
-    <TextField
-      {...FIELD_COMMON_PROPS}
-      type="number"
-      title="" // Overwrite any default input validation tooltip
-      value={stringValue}
-      InputProps={{
-        sx: { maxWidth: "12ch" },
-        endAdornment: units && (
-          <InputAdornment position="end">{units}</InputAdornment>
-        ),
-      }}
-      onChange={(event) => {
-        setStringValue(event.target.value);
-        onChange && onChange(Number(event.target.value) / scale);
-      }}
-      {...props}
-    />
-  );
-};
-
-const StringArrayField: React.FC<
-  FieldProps<string[]> & { label?: string; units?: string; disabled: boolean }
-> = ({ value, onChange, label, units = label || "token", disabled }) => (
-  <Autocomplete
-    disableClearable
-    freeSolo
-    multiple
-    options={[]}
-    value={value}
-    disabled={disabled}
-    onChange={onChange && ((_, newValue) => onChange(newValue as string[]))}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        {...FIELD_COMMON_PROPS}
-        label={label}
-        FormHelperTextProps={{ sx: { fontWeight: "unset" } }}
-        helperText={
-          <>
-            Write a{/^[aeiou]/.test(units) && "n"} {units} and press enter
-          </>
-        }
-      />
-    )}
-    renderTags={(value, getTagProps) =>
-      value.map((option, index) => (
-        <Chip size="small" label={option} {...getTagProps({ index })} />
-      ))
-    }
-    sx={{
-      [`& .${autocompleteClasses.inputRoot}`]: {
-        gap: 0.5,
-        [`& .${autocompleteClasses.tag}`]: {
-          height: 20,
-          margin: 0,
-          [`& .${chipClasses.deleteIcon}`]: {
-            marginLeft: "-6px",
-            marginRight: "2px",
-          },
-        },
-      },
-    }}
-  />
-);
-
-const stringifyJSON = (value: unknown, spaces = 2) =>
-  JSON.stringify(value, null, spaces)
-    .slice(2, -2) // Remove enclosing brackets or braces, and newlines
-    .replace(new RegExp(`^ {${spaces}}`, "gm"), ""); // Unindent
-
-const JSONField: React.FC<
-  Omit<TextFieldProps, "onChange"> &
-    (
-      | ({ array: true } & FieldProps<any[]>)
-      | ({ array?: false } & FieldProps<Record<string, unknown>>)
-    )
-> = ({ value, onChange, array, ...props }) => {
-  const [stringValue, setStringValue] = React.useState(stringifyJSON(value));
-
-  React.useEffect(() => setStringValue(stringifyJSON(value)), [value]);
-
-  const [errorText, setErrorText] = React.useState("");
-
-  const adornments = array ? (["[", "]"] as const) : (["{", "}"] as const);
-
-  const handleChange = (newStringValue: string) => {
-    setStringValue(newStringValue);
-    // Update errorText if there is one, but wait for blur to add one.
-    if (errorText) {
-      try {
-        JSON.parse(adornments.join(newStringValue));
-        setErrorText("");
-      } catch (error) {
-        setErrorText((error as SyntaxError).message);
-      }
-    }
-  };
-
-  const handleBlur =
-    onChange &&
-    ((newStringValue: string) => {
-      try {
-        onChange(JSON.parse(adornments.join(newStringValue)));
-      } catch (error) {
-        setErrorText((error as SyntaxError).message);
-      }
-    });
-
-  return (
-    <TextField
-      {...FIELD_COMMON_PROPS}
-      multiline
-      value={stringValue}
-      error={errorText !== ""}
-      helperText={errorText}
-      onChange={(event) => handleChange(event.target.value)}
-      onBlur={handleBlur && ((event) => handleBlur(event.target.value))}
-      InputProps={{
-        startAdornment: (
-          <Typography variant="inherit" alignSelf="start">
-            {adornments[0]}&nbsp;
-          </Typography>
-        ),
-        endAdornment: (
-          <Typography variant="inherit" alignSelf="end">
-            &nbsp;{adornments[1]}
-          </Typography>
-        ),
-      }}
-      {...props}
-    />
-  );
-};
 
 type Props = {
   open: boolean;
