@@ -139,7 +139,7 @@ describe("PerturbationTestingPreview with Failure response", () => {
       // expected error message
       expect(
         screen.getByText(
-          "Something went wrong fetching behavioral testing summary"
+          /Something went wrong fetching behavioral testing summary/i
         )
       ).toBeVisible();
     });
