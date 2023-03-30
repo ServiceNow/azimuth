@@ -1,6 +1,6 @@
 import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AzimuthConfig, UtterancePatch } from "types/api";
+import { AzimuthConfig, HTTPExceptionModel, UtterancePatch } from "types/api";
 import {
   fetchApi,
   GetUtterancesQueryState,
@@ -18,8 +18,12 @@ const responseToData =
     try {
       const response = await responsePromise(arg);
       return { data: await response.json() };
-    } catch {
-      return { error: { message } };
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return { error: { message: message + "\n" + err.message } };
+      } else {
+        return { error: { message } };
+      }
     }
   };
 
