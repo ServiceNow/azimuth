@@ -15,7 +15,7 @@ import structlog
 from datasets import Dataset
 from distributed import Client, Event, Future, rejoin, secede
 
-from azimuth.config import CommonFieldsConfig
+from azimuth.config import CommonFieldsConfig, ModelContractConfig
 from azimuth.modules.base_classes.caching import HDF5CacheMixin
 from azimuth.types import DatasetSplitName, ModuleResponse
 from azimuth.utils.logs import TimerLogging
@@ -94,6 +94,11 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             scoped_config = base.__args__[0]
         return cast(ConfigScope, scoped_config.parse_obj(config.dict(by_alias=True)))
 
+    @property
+    def can_load_model(self) -> bool:
+        # TODO Not all modules that inherit from ModelContractConfig load the model. Smarter way?
+        return isinstance(self.config, ModelContractConfig)
+
     def start_task_on_dataset_split(
         self, client: Client, dependencies: List["DaskModule"] = None
     ) -> "DaskModule":
@@ -118,6 +123,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             pure=False,
             dependencies=deps,
             key=f"{self.task_id}_{uuid.uuid4()}",  # Unique identifier
+            workers=0 if self.can_load_model else 1,
         )
         # Tell that this future is used on which indices.
         self.future.indices = self.get_caching_indices()

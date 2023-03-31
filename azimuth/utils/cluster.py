@@ -40,7 +40,7 @@ def default_cluster(large=False) -> SpecCluster:
     tmp_file = pjoin(str(tempfile.mkdtemp()), "dask-worker-space")
     with dask.config.set({"distributed.worker.daemon": False}):
         cluster = distributed.LocalCluster(
-            n_workers=2,
+            n_workers=2,  # Assignment to workers is hard-coded, so it needs to stay 2.
             local_directory=tmp_file,
             threads_per_worker=1,
             memory_limit=memory_limit,  # "auto" doesnt work well.
