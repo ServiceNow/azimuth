@@ -103,7 +103,7 @@ class TaskManager:
         task_name: SupportedTask,
         dataset_split_name: DatasetSplitName,
         mod_options: Optional[ModuleOptions] = None,
-        last_update: int = -1,
+        last_update: float = -1,
         dependencies: Optional[List[DaskModule]] = None,
     ) -> Tuple[str, Optional[DaskModule]]:
         """Get the task `name` run on indices.

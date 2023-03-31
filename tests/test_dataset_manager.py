@@ -298,6 +298,7 @@ def test_caching(a_text_dataset, simple_text_config):
 
     assert len(glob(pjoin(pred_path, "version_*.arrow"))) == 0, "Some preds were cached at init?"
     assert len(glob(pjoin(dm1._save_path, "version_*.arrow"))) == 1, "Dataset not saved on disk"
+    initial_last_update = dm1.last_update
 
     dm1.add_column("pink", list(range(len(a_text_dataset))))
     assert (
@@ -306,6 +307,8 @@ def test_caching(a_text_dataset, simple_text_config):
     assert (
         len(glob(pjoin(dm1._save_path, "version_*.arrow"))) == 2
     ), "Dataset not saved on disk when added a column"
+    modified_last_update = dm1.last_update
+    assert initial_last_update < modified_last_update, "Last update should be updated."
 
     dm1.add_column_to_prediction_table(
         "apple", list(range(len(a_text_dataset))), table_key=simple_table_key
@@ -317,6 +320,7 @@ def test_caching(a_text_dataset, simple_text_config):
     assert (
         len(glob(pjoin(dm1._save_path, "version_*.arrow"))) == 2
     ), "New version of based dataset detected when adding prediction"
+    assert modified_last_update < dm1.last_update, "Last update should be updated."
 
     dm2 = DatasetSplitManager(
         DatasetSplitName.eval,

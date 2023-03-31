@@ -30,6 +30,7 @@ log = structlog.get_logger("DatasetSplitManager")
 
 FEATURES = "features"
 FEATURE_FAISS = "features_faiss"
+Time = float
 
 
 @dataclass(eq=True, frozen=True)  # Generates __hash__
@@ -88,21 +89,29 @@ class DatasetSplitManager:
         self._index_path = pjoin(self._base_dataset_path, "index.faiss")
         self._features_path = pjoin(self._base_dataset_path, "features.faiss.npy")
         self._file_lock = pjoin(self._hf_path, f"{name}.lock")
-        self.last_update = -1
         # Load the dataset_split from disk.
-        cached_dataset_split = self._load_dataset_split()
-        if cached_dataset_split is None:
+        self._base_dataset_split_last_update: Time = -1
+        cached_base_dataset_split = self._load_latest_base_dataset_split()
+        if cached_base_dataset_split is None:
             if dataset_split is None:
                 raise ValueError("No dataset_split cached, can't initialize.")
             log.info("Initializing tags", tags=initial_tags)
-            self._base_dataset_split, self._malformed_dataset = self._load_base_dataset_split(
+            self._base_dataset_split, self._malformed_dataset = self._process_base_dataset_split(
                 dataset_split
             )
             self._save_base_dataset_split()
         else:
-            self._base_dataset_split, self._malformed_dataset = cached_dataset_split
+            self._base_dataset_split, self._malformed_dataset = cached_base_dataset_split
         self._prediction_tables: Dict[PredictionTableKey, Dataset] = {}
+        self._prediction_tables_last_update: Dict[PredictionTableKey, Time] = defaultdict(int)
         self._validate_columns()
+
+    @property
+    def last_update(self) -> Time:
+        return max(
+            [self._base_dataset_split_last_update]
+            + list(self._prediction_tables_last_update.values())
+        )
 
     def get_dataset_split(self, table_key: Optional[PredictionTableKey] = None) -> Dataset:
         """Return a dataset_split concatenated with the config predictions.
@@ -113,6 +122,11 @@ class DatasetSplitManager:
         Returns:
             Dataset with predictions if available.
         """
+        current_last_update = self._base_dataset_split_last_update
+        newest_base_ds, last_update = self.load_latest_cache(self._save_path, current_last_update)
+        if newest_base_ds:
+            self._base_dataset_split = newest_base_ds
+            self._base_dataset_split_last_update = last_update
         if table_key is None:
             return self._base_dataset_split
         return self.dataset_split_with_predictions(table_key=table_key)
@@ -144,16 +158,16 @@ class DatasetSplitManager:
             DatasetColumn.postprocessed_prediction,
         }
 
-    def _load_dataset_split(self) -> Optional[Tuple[Dataset, Dataset]]:
+    def _load_latest_base_dataset_split(self) -> Optional[Tuple[Dataset, Dataset]]:
         if os.path.exists(self._save_path):
-            log.debug("Reloading base dataset_split.", path=self._save_path)
-            with FileLock(self._file_lock):
-                ds = self.load_cache(self._save_path)
-                malformed = self.load_cache(self._malformed_path)
-            return ds, malformed
+            current_update = self._base_dataset_split_last_update
+            base_ds, last_update = self.load_latest_cache(self._save_path, current_update)
+            malformed, _ = self.load_latest_cache(self._malformed_path, current_update)
+            self._base_dataset_split_last_update = last_update
+            return assert_not_none(base_ds), assert_not_none(malformed)
         return None
 
-    def _load_base_dataset_split(self, dataset_split) -> Tuple[Dataset, Dataset]:
+    def _process_base_dataset_split(self, dataset_split) -> Tuple[Dataset, Dataset]:
         base_dataset_split, malformed_dataset = self._split_malformed(dataset_split)
 
         # Checking if a persistent id was provided.
@@ -171,10 +185,13 @@ class DatasetSplitManager:
     def _save_base_dataset_split(self):
         # NOTE: We should not have the Index in `self.dataset_split`.
         with FileLock(self._file_lock):
-            self._base_dataset_split.save_to_disk(self._get_new_version_path(self._save_path))
-            self._malformed_dataset.save_to_disk(self._get_new_version_path(self._malformed_path))
-        self.last_update = time.time()
-        log.debug("Base dataset split saved.", path=self._save_path)
+            version_path, last_update = self._get_new_version_path(self._save_path)
+            self._base_dataset_split.save_to_disk(version_path)
+            self._malformed_dataset.save_to_disk(
+                self._get_new_version_path(self._malformed_path)[0]
+            )
+        self._base_dataset_split_last_update = last_update
+        log.debug("Base dataset split saved.", path=version_path)
 
     def get_dataset_split_with_class_names(
         self, table_key: Optional[PredictionTableKey] = None
@@ -476,37 +493,38 @@ class DatasetSplitManager:
             A table for this key, will create one if it doesn't exists.
         """
 
-        path = self._prediction_path(table_key=table_key)
-        if table_key not in self._prediction_tables and os.path.exists(path):
-            with FileLock(self._file_lock):
-                self._prediction_tables[table_key] = self.load_cache(path)
-        elif table_key not in self._prediction_tables:
+        pred_path = self._prediction_path(table_key=table_key)
+        if not os.path.exists(pred_path):
             empty_ds = Dataset.from_dict({"pred_row_idx": list(range(self.num_rows))})
             self._prediction_tables[table_key] = self._init_dataset_split(
                 empty_ds, self._prediction_tags
             ).remove_columns([DatasetColumn.row_idx])
             self.save_prediction_table(table_key)
+        else:
+            current_last_update = self._prediction_tables_last_update[table_key]
+            newest_pred_ds, last_update = self.load_latest_cache(pred_path, current_last_update)
+            if newest_pred_ds:
+                self._prediction_tables[table_key] = newest_pred_ds
+                self._prediction_tables_last_update[table_key] = last_update
         return self._prediction_tables[table_key]
 
-    def _prediction_path(self, table_key: PredictionTableKey):
+    def _prediction_path(self, table_key: PredictionTableKey) -> str:
         """Path to table file."""
         folder = pjoin(self._hf_path, "prediction_tables")
         table_name = "_".join(
             f"{k}={v:.2f}" if type(v) is float else f"{k}={v}" for k, v in asdict(table_key).items()
         )
         os.makedirs(folder, exist_ok=True)
-        pt = pjoin(
-            folder,
-            f"{table_name}_cache_ds.arrow",
-        )
-        return pt
+        return pjoin(folder, f"{table_name}_cache_ds.arrow")
 
     def save_prediction_table(self, table_key: PredictionTableKey):
         """Save the prediction to disk."""
         with FileLock(self._file_lock):
-            pt = self._prediction_path(table_key=table_key)
-            self._prediction_tables[table_key].save_to_disk(self._get_new_version_path(pt))
-        self.last_update = int(time.time())
+            pred_path = self._prediction_path(table_key=table_key)
+            version_path, last_update = self._get_new_version_path(pred_path)
+            self._prediction_tables[table_key].save_to_disk(version_path)
+        self._prediction_tables_last_update[table_key] = last_update
+        log.debug("Prediction dataset split saved.", path=version_path)
 
     def add_column_to_prediction_table(
         self, key: str, features: List[Any], table_key: PredictionTableKey, **kwargs
@@ -568,15 +586,20 @@ class DatasetSplitManager:
         if len(self._base_dataset_split) == 0:
             raise AzimuthValidationError(f"No rows found from dataset {self.name}")
 
-    def load_cache(self, folder: str) -> Dataset:
-        """
-        Load the latest cache.
+    def load_latest_cache(
+        self, folder: str, current_last_update: Time
+    ) -> Tuple[Optional[Dataset], Time]:
+        """Load the latest dataset saved in a given folder.
+
+        Notes:
+            Only load when the dataset is more recent than what is current saved in the DM.
 
         Args:
             folder: Where to look for.
+            current_last_update: Current version saved in the DM.
 
         Returns:
-            The cached dataset or the original.
+            The cached dataset, if more recent. Otherwise None.
 
         Raises:
             FileNotFoundError if no cache found.
@@ -591,13 +614,21 @@ class DatasetSplitManager:
             ),
             None,
         )
-        if cache_file:
-            log.debug(f"Loading latest cache: {cache_file.split('/')[-1]}")
-            return Dataset.load_from_disk(cache_file)
-        raise FileNotFoundError(f"No previously saved dataset in {folder}")
+        if not cache_file:
+            raise FileNotFoundError(f"No previously saved dataset in {folder}")
 
-    def _get_new_version_path(self, directory):
-        return pjoin(directory, f"version_{time.time()}.arrow")
+        last_update = float(cache_file.split("_")[-1][:-6])
+        if current_last_update >= last_update:
+            return None, -1
+
+        with FileLock(self._file_lock):
+            log.debug(f"{id(self)} Loading latest dataset in cache.", path=cache_file)
+            return Dataset.load_from_disk(cache_file), last_update
+
+    @staticmethod
+    def _get_new_version_path(directory) -> Tuple[str, Time]:
+        now = time.time()
+        return pjoin(directory, f"version_{now}.arrow"), now
 
     def save_proposed_actions_to_csv(self) -> str:
         """Save proposed actions to a csv file.

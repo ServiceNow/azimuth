@@ -15,6 +15,6 @@ class ExpirableMixin(abc.ABC):
 
     _time: float
 
-    def is_expired(self, compared_to: int):
+    def is_expired(self, compared_to: float):
         # Check if this Module results are expired.
         return self._time < compared_to
