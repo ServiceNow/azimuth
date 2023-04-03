@@ -5,7 +5,7 @@
 import os
 import time
 from os.path import join as pjoin
-from typing import Dict, Generator, List, Optional, cast
+from typing import Dict, Generator, List, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
@@ -155,7 +155,10 @@ def get_export_perturbed_set(
 
     output = list(
         make_utterance_level_result(
-            dataset_split_manager, task_result, pipeline_index=pipeline_index_not_null
+            dataset_split_manager,
+            task_result,
+            pipeline_index=pipeline_index_not_null,
+            config=config,
         )
     )
     with open(path, "w") as f:
@@ -164,7 +167,10 @@ def get_export_perturbed_set(
 
 
 def make_utterance_level_result(
-    dm: DatasetSplitManager, results: List[List[PerturbedUtteranceResult]], pipeline_index: int
+    dm: DatasetSplitManager,
+    results: List[List[PerturbedUtteranceResult]],
+    pipeline_index: int,
+    config: AzimuthConfig,
 ) -> Generator[Dict, None, None]:
     """Massage perturbation testing results for the frontend.
 
@@ -172,12 +178,12 @@ def make_utterance_level_result(
         dm: Current DatasetSplitManager.
         results: Output of Perturbation Testing.
         pipeline_index: Index of the pipeline that made the results.
+        config: Azimuth config
 
     Returns:
         Generator that yield json-able object for the frontend.
 
     """
-    config = cast(AzimuthConfig, dm.config)
     for idx, (utterance, test_results) in enumerate(
         zip(
             dm.get_dataset_split(

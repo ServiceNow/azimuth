@@ -1,9 +1,10 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from multiprocessing import Lock
-from typing import Callable, Dict, Optional
+from collections import defaultdict
+from typing import Callable, Dict
 
+import structlog
 from datasets import DatasetDict
 
 from azimuth.config import AzimuthConfig
@@ -18,6 +19,50 @@ from azimuth.utils.validation import assert_not_none
 Hash = int
 
 
+log = structlog.get_logger()
+
+
+class Singleton:
+    """
+    A non-thread-safe helper class to ease implementing singletons.
+    This should be used as a decorator -- not a metaclass -- to the
+    class that should be a singleton.
+
+    To get the singleton instance, use the `instance` method. Trying
+    to use `__call__` will result in a `TypeError` being raised.
+
+    Args:
+        decorated: Decorated class
+    """
+
+    def __init__(self, decorated):
+        self._decorated = decorated
+
+    def instance(self):
+        """
+        Returns the singleton instance. Upon its first call, it creates a
+        new instance of the decorated class and calls its `__init__` method.
+        On all subsequent calls, the already created instance is returned.
+
+        Returns:
+            Instance of the decorated class
+        """
+        try:
+            return self._instance
+        except AttributeError:
+            self._instance = self._decorated()
+            return self._instance
+
+    def __call__(self):
+        raise TypeError("Singletons must be accessed through `instance()`.")
+
+    def clear_instance(self):
+        """For test purposes only"""
+        if hasattr(self, "_instance"):
+            delattr(self, "_instance")
+
+
+@Singleton
 class ArtifactManager:
     """This class is a singleton which holds different artifacts.
 
@@ -25,24 +70,15 @@ class ArtifactManager:
     need to be reloaded many times for a same module.
     """
 
-    instance: Optional["ArtifactManager"] = None
-
     def __init__(self):
         # The keys of the dict are a hash of the config.
         self.dataset_dict_mapping: Dict[Hash, DatasetDict] = {}
         self.dataset_split_managers_mapping: Dict[
             Hash, Dict[DatasetSplitName, DatasetSplitManager]
-        ] = {}
-        self.models_mapping: Dict[Hash, Dict[int, Callable]] = {}
-        self.tokenizer = None
+        ] = defaultdict(dict)
+        self.models_mapping: Dict[Hash, Dict[int, Callable]] = defaultdict(dict)
         self.metrics = {}
-
-    @classmethod
-    def get_instance(cls):
-        with Lock():
-            if cls.instance is None:
-                cls.instance = cls()
-            return cls.instance
+        log.debug(f"Creating new Artifact Manager {id(self)}.")
 
     def get_dataset_split_manager(
         self, config: AzimuthConfig, name: DatasetSplitName
@@ -68,8 +104,6 @@ class ArtifactManager:
                 f"Found {tuple(dataset_dict.keys())}."
             )
         project_hash: Hash = config.get_project_hash()
-        if project_hash not in self.dataset_split_managers_mapping:
-            self.dataset_split_managers_mapping[project_hash] = {}
         if name not in self.dataset_split_managers_mapping[project_hash]:
             self.dataset_split_managers_mapping[project_hash][name] = DatasetSplitManager(
                 name=name,
@@ -78,6 +112,7 @@ class ArtifactManager:
                 initial_prediction_tags=ALL_PREDICTION_TAGS,
                 dataset_split=dataset_dict[name],
             )
+            log.debug(f"New {name} DM in Artifact Manager {id(self)}")
         return self.dataset_split_managers_mapping[project_hash][name]
 
     def get_dataset_dict(self, config) -> DatasetDict:
@@ -106,25 +141,23 @@ class ArtifactManager:
         Returns:
             Loaded model.
         """
-
-        project_hash: Hash = config.get_project_hash()
-        if project_hash not in self.models_mapping:
-            self.models_mapping[project_hash] = {}
-        if pipeline_idx not in self.models_mapping[project_hash]:
+        model_contract_hash: Hash = config.get_model_contract_hash()
+        if pipeline_idx not in self.models_mapping[model_contract_hash]:
+            log.debug(f"Loading pipeline {pipeline_idx}.")
             pipelines = assert_not_none(config.pipelines)
-            self.models_mapping[project_hash][pipeline_idx] = load_custom_object(
+            self.models_mapping[model_contract_hash][pipeline_idx] = load_custom_object(
                 assert_not_none(pipelines[pipeline_idx].model), azimuth_config=config
             )
 
-        return self.models_mapping[project_hash][pipeline_idx]
+        return self.models_mapping[model_contract_hash][pipeline_idx]
 
     def get_metric(self, config, name: str, **kwargs):
-        hash: Hash = md5_hash({"name": name, **kwargs})
-        if hash not in self.metrics:
-            self.metrics[hash] = load_custom_object(config.metrics[name], **kwargs)
-        return self.metrics[hash]
+        metric_hash: Hash = md5_hash({"name": name, **kwargs})
+        if metric_hash not in self.metrics:
+            self.metrics[metric_hash] = load_custom_object(config.metrics[name], **kwargs)
+        return self.metrics[metric_hash]
 
     @classmethod
-    def clear_cache(cls) -> None:
-        with Lock():
-            cls.instance = None
+    def instance(cls):
+        # Implemented in decorator
+        raise NotImplementedError

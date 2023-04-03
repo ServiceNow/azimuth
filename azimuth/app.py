@@ -25,14 +25,13 @@ from starlette.status import (
 
 from azimuth.config import AzimuthConfig, load_azimuth_config
 from azimuth.dataset_split_manager import DatasetSplitManager
-from azimuth.modules.base_classes import DaskModule
+from azimuth.modules.base_classes import ArtifactManager, DaskModule
 from azimuth.startup import startup_tasks
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
 from azimuth.utils.logs import set_logger_config
-from azimuth.utils.project import load_dataset_split_managers_from_config
 from azimuth.utils.validation import assert_not_none
 
 _dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]] = {}
@@ -296,6 +295,32 @@ def create_app() -> FastAPI:
     return app
 
 
+def load_dataset_split_managers_from_config(
+    azimuth_config: AzimuthConfig,
+) -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
+    """
+    Load all dataset splits for the application.
+
+    Args:
+        azimuth_config: Azimuth Configuration.
+
+    Returns:
+        For all DatasetSplitName, None or a dataset_split manager.
+
+    """
+    artifact_manager = ArtifactManager.instance()
+    dataset = artifact_manager.get_dataset_dict(azimuth_config)
+
+    return {
+        dataset_split_name: None
+        if dataset_split_name not in dataset
+        else artifact_manager.get_dataset_split_manager(
+            azimuth_config, DatasetSplitName[dataset_split_name]
+        )
+        for dataset_split_name in [DatasetSplitName.eval, DatasetSplitName.train]
+    }
+
+
 def initialize_managers(azimuth_config: AzimuthConfig, cluster: SpecCluster):
     """Initialize DatasetSplitManagers and TaskManagers.
 
@@ -346,7 +371,6 @@ def run_validation(
     else:
         for pipeline_index in range(len(config.pipelines)):
             run_validation_module(pipeline_index)
-    task_manager.clear_worker_cache()
 
 
 def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):

@@ -256,7 +256,6 @@ def test_structured_output_text_classification(simple_text_config, model_contrac
     )
 
     preds = cast(List[PredictionResponse], mod.compute_on_dataset_split())
-    mod.clear_cache()
 
     ####
     # Postprocessing

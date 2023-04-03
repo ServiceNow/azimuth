@@ -153,8 +153,6 @@ def on_end(fut: Future, module: DaskModule, dm: DatasetSplitManager, task_manage
         # Task is done, save the result.
         if isinstance(module, DatasetResultModule):
             module.save_result(module.result(), dm)
-            # We only need to clear cache when the dataset is modified.
-            task_manager.clear_worker_cache()
     else:
         log.exception("Error in", module=module, fut=fut, exc_info=fut.exception())
 

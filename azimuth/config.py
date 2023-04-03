@@ -358,6 +358,15 @@ class ModelContractConfig(CommonFieldsConfig):
             raise ValueError(f"Duplicated pipeline names {pipeline_names}.")
         return pipeline_definitions
 
+    def get_model_contract_hash(self):
+        return md5_hash(
+            self.dict(
+                include=ModelContractConfig.__fields__.keys()
+                - CommonFieldsConfig.__fields__.keys(),
+                by_alias=True,
+            )
+        )
+
 
 class MetricsConfig(ModelContractConfig):
     # Custom HuggingFace metrics

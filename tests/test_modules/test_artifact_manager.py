@@ -6,7 +6,7 @@ from azimuth.types import DatasetSplitName
 
 
 def test_artifact_manager(simple_text_config, file_text_config_top1):
-    am = ArtifactManager.get_instance()
+    am = ArtifactManager.instance()
 
     # ArtifactManager is empty
     assert len(am.dataset_dict_mapping) == 0
@@ -27,9 +27,8 @@ def test_artifact_manager(simple_text_config, file_text_config_top1):
         ].num_rows
     )
 
-    am.clear_cache()
-    new_am = ArtifactManager.get_instance()
-    assert len(new_am.dataset_dict_mapping) == 0
+    new_am = ArtifactManager.instance()
+    assert id(am) == id(new_am)
 
 
 def test_artifact_manager_from_module(simple_text_config, file_text_config_top1):
@@ -57,8 +56,3 @@ def test_artifact_manager_from_module(simple_text_config, file_text_config_top1)
     dm_mapping = mod.artifact_manager.dataset_split_managers_mapping
     assert len(dm_mapping) == 2
     assert len(dm_mapping[mod3.config.get_project_hash()]) == 1
-
-    # Clear cache in first module
-    mod.clear_cache()
-    # Assess the third module has a cleaned cache too
-    assert len(mod3.artifact_manager.dataset_split_managers_mapping) == 0

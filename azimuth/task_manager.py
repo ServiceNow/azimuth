@@ -7,7 +7,7 @@ import structlog
 from distributed import Client, SpecCluster
 
 from azimuth.config import AzimuthConfig
-from azimuth.modules.base_classes import ArtifactManager, DaskModule, ExpirableMixin
+from azimuth.modules.base_classes import DaskModule, ExpirableMixin
 from azimuth.modules.task_mapping import model_contract_methods, modules
 from azimuth.types import (
     DatasetSplitName,
@@ -66,7 +66,6 @@ class TaskManager:
                     mod.future.cancel()
                 except Exception:
                     pass
-        self.clear_worker_cache()
         self.client.close()
 
     def register_task(self, name, cls):
@@ -212,9 +211,6 @@ class TaskManager:
             "config": self.config.dict(),
             **self.get_all_tasks_status(task=None),
         }
-
-    def clear_worker_cache(self):
-        self.client.run(ArtifactManager.clear_cache)
 
     def restart(self):
         log.info("Cluster restarted to free memory.")

@@ -98,8 +98,6 @@ def patch_config(
                 HTTP_500_INTERNAL_SERVER_ERROR, detail="Error when loading the new config."
             )
 
-    # Clear workers so that they load the correct config.
-    task_manager.clear_worker_cache()
     return new_config
 
 

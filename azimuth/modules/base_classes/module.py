@@ -79,7 +79,7 @@ class Module(DaskModule[ConfigScope]):
     def artifact_manager(self):
         """This is set as a property so the Module always have access to the current version of
         the ArtifactManager on the worker."""
-        return ArtifactManager.get_instance()
+        return ArtifactManager.instance()
 
     @property
     def available_dataset_splits(self) -> Set[DatasetSplitName]:
@@ -215,6 +215,3 @@ class Module(DaskModule[ConfigScope]):
         pipeline_index = assert_not_none(self.mod_options.pipeline_index)
         current_pipeline = pipelines[pipeline_index]
         return current_pipeline
-
-    def clear_cache(self):
-        self.artifact_manager.clear_cache()

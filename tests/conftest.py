@@ -32,7 +32,7 @@ from tests.utils import (
 @pytest.fixture(autouse=True, scope="function")
 def cleanup_class():
     yield
-    ArtifactManager.clear_cache()
+    ArtifactManager.clear_instance()
 
 
 def kill_scheduler(dask_scheduler=None):
@@ -42,7 +42,7 @@ def kill_scheduler(dask_scheduler=None):
 def cleanup_workers():
     import gc
 
-    ArtifactManager.clear_cache()
+    ArtifactManager.clear_instance()
     gc.collect()
 
 
