@@ -251,12 +251,16 @@ def startup_tasks(
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
-    # Start a thread to monitor the status.
-    th = threading.Thread(
-        target=wait_for_startup, args=(mods, task_manager), name=START_UP_THREAD_NAME
-    )
-    th.setDaemon(True)
-    th.start()
+    startup_ready = all(m.done() for m in mods.values())
+    if startup_ready:
+        log.info("Loading the application from cache. It should be accessible now.")
+    else:
+        # Start a thread to monitor the status.
+        th = threading.Thread(
+            target=wait_for_startup, args=(mods, task_manager), name=START_UP_THREAD_NAME
+        )
+        th.setDaemon(True)
+        th.start()
 
     return mods
 
@@ -346,4 +350,3 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     task_manager.restart()
     # After restarting, it is safe to unlock the task manager.
     task_manager.unlock()
-    log.info("Cluster restarted to free memory.")

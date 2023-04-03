@@ -1,6 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+import time
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import structlog
@@ -217,6 +218,8 @@ class TaskManager:
         self.client.run(ArtifactManager.clear_cache)
 
     def restart(self):
-        # Clear futures to free memory.
+        log.info("Cluster restarted to free memory.")
         for task_name, module in self.current_tasks.items():
             module.future = None
+        self.client.restart()
+        time.sleep(2)  # Without that, the test routers fail because some tasks can't get scheduled.
