@@ -28,7 +28,7 @@ from azimuth.types.tag import DataAction, SmartTag, SmartTagFamily
 from azimuth.utils.project import predictions_available
 
 
-def get_last_update(dataset_split_managers: List[Optional[DatasetSplitManager]]) -> int:
+def get_last_update(dataset_split_managers: List[Optional[DatasetSplitManager]]) -> float:
     last_update = max([dsm.last_update if dsm else -1 for dsm in dataset_split_managers])
 
     return last_update
@@ -97,7 +97,7 @@ def get_standard_task_result(
     dataset_split_name: DatasetSplitName,
     task_manager: TaskManager,
     mod_options: Optional[ModuleOptions] = None,
-    last_update: int = -1,
+    last_update: float = -1,
 ):
     """Generate the task object and get the result for standard tasks.
 
