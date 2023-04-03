@@ -78,16 +78,19 @@ def patch_config(
         )
 
     try:
+        log.info(f"Validating config change with {partial_config}.")
         new_config = update_config(old_config=config, partial_config=partial_config)
         if attribute_changed_in_config("large_dask_cluster", partial_config, config):
             cluster = default_cluster(partial_config["large_dask_cluster"])
         else:
             cluster = task_manager.cluster
         run_startup_tasks(new_config, cluster)
+        log.info(f"Config successfully updated with {partial_config}.")
     except Exception as e:
         log.error("Rollback config update due to error", exc_info=e)
         new_config = config
         initialize_managers(new_config, task_manager.cluster)
+        log.info("Config update cancelled.")
         if isinstance(e, (AzimuthValidationError, ValidationError)):
             raise HTTPException(HTTP_400_BAD_REQUEST, detail=str(e))
         else:
