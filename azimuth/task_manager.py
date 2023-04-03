@@ -217,6 +217,7 @@ class TaskManager:
         self.client.run(ArtifactManager.clear_cache)
 
     def restart(self):
-        # Clear futures to free memory.
+        log.info("Cluster restarted to free memory.")
         for task_name, module in self.current_tasks.items():
             module.future = None
+        self.client.restart()
