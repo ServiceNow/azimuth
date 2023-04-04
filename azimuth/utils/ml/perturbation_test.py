@@ -18,7 +18,7 @@ from azimuth.types.perturbation_testing import (
 
 @dataclass
 class PerturbationTest:
-    """Test in PerturbationTestingModule to create different perturbations on the dataset_split."""
+    """Used in PerturbationTestingModule to create different perturbations on the dataset_split."""
 
     name: PerturbationTestName
     family: PerturbationTestFamily
