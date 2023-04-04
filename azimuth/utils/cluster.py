@@ -36,7 +36,7 @@ def default_cluster(large=False) -> SpecCluster:
 
     # Start the cluster locally
     memory_limit = "12GB" if large else "6GB"
-    log.info(f"Starting cluster locally with {memory_limit} of memory!")
+    log.info(f"Starting cluster with 2 workers of {memory_limit} of memory!")
     tmp_file = pjoin(str(tempfile.mkdtemp()), "dask-worker-space")
     with dask.config.set({"distributed.worker.daemon": False}):
         cluster = distributed.LocalCluster(
