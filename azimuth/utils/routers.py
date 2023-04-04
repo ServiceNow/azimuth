@@ -50,7 +50,7 @@ def build_named_dataset_filters(
     outcome: List[OutcomeName] = Query([], title="Outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
 ) -> NamedDatasetFilters:
-    """Build the named filter component used by many tasks. Intended as a FastAPI endpoint dependency.
+    """Build the named filter component. Intended as a FastAPI endpoint dependency.
 
     Args:
         confidence_min: The desired minimum confidence

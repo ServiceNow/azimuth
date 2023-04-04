@@ -177,14 +177,12 @@ class Module(DaskModule[ConfigScope]):
             self.config, ModelContractConfig
         ):
             return None
-        use_bma = self.mod_options.use_bma
-        table_key = PredictionTableKey(
+        return PredictionTableKey(
             temperature=self.get_pipeline_definition().temperature,
             threshold=self.get_threshold(),
-            use_bma=use_bma,
+            use_bma=self.mod_options.use_bma,
             pipeline_index=self.mod_options.pipeline_index,
         )
-        return table_key
 
     def get_threshold(self) -> Optional[float]:
         # The default is None so we have to handle it this way.
@@ -205,15 +203,13 @@ class Module(DaskModule[ConfigScope]):
         # TODO: Could use single dispatch instead?
         if not isinstance(self.config, ModelContractConfig):
             raise ValueError(
-                "This Module does not have access to the pipeline"
-                " as it does not use ModelContractScope."
+                "This module doesn't have access to pipelines as it doesn't use ModelContractConfig"
             )
         if self.config.pipelines is None:
             raise ValueError("No pipelines configured.")
         if self.mod_options.pipeline_index is None:
             raise ValueError(
-                f"`pipeline_index` is None, expected one"
-                f" of {np.arange(len(self.config.pipelines))}"
+                f"`pipeline_index` is None, expected one of {np.arange(len(self.config.pipelines))}"
             )
         pipelines = assert_not_none(self.config.pipelines)
         pipeline_index = assert_not_none(self.mod_options.pipeline_index)
