@@ -76,6 +76,7 @@ class DatasetResultModule(IndexableModule[ConfigScope], ABC):
 class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
     required_mod_options: Set[str] = {"pipeline_index", "model_contract_method_name"}
     optional_mod_options: Set[str] = DatasetResultModule.optional_mod_options | {"threshold"}
+    can_load_model = True
 
     def compute(self, batch: Dataset) -> List[ModuleResponse]:
         my_func = self.route_request(assert_not_none(self.model_contract_method_name))

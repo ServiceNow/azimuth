@@ -37,6 +37,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
     """
 
     allowed_splits = {DatasetSplitName.train, DatasetSplitName.eval}
+    can_load_model: bool = False
 
     def __init__(
         self,
@@ -118,6 +119,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             pure=False,
             dependencies=deps,
             key=f"{self.task_id}_{uuid.uuid4()}",  # Unique identifier
+            workers=0 if self.can_load_model else None,
         )
         # Tell that this future is used on which indices.
         self.future.indices = self.get_caching_indices()

@@ -33,6 +33,7 @@ class TopWordsModule(FilterableModule[TopWordsConfig]):
         "th_importance",
         "force_no_saliency",
     }
+    can_load_model = True
 
     @staticmethod
     def count_words(list_of_words: List[str], top_x: int) -> List[TopWordsResult]:

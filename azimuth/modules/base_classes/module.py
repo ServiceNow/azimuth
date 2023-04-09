@@ -164,6 +164,8 @@ class Module(DaskModule[ConfigScope]):
         Raises:
             ValueError if no valid pipeline exists.
         """
+        if not self.can_load_model:
+            raise ValueError("This module cannot load the model. Set can_load_model to True.")
         _ = self.get_pipeline_definition()  # Validate current pipeline exists
         return self.artifact_manager.get_model(self.config, self.mod_options.pipeline_index)
 
