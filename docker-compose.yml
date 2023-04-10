@@ -14,9 +14,9 @@ services:
       - "BEHAVIORAL_TESTING"
       - "SIMILARITY"
     volumes:
-    - ./config:/config
-    - ./azimuth_shr:/azimuth_shr
-    - ./cache:/cache
+      - ./config:/config
+      - ./azimuth_shr:/azimuth_shr
+      - ./cache:/cache
   web:
     image: "${REGISTRY}/azimuth-app:${FRONTEND_VERSION}"
     command:
