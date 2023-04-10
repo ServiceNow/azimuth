@@ -8,9 +8,11 @@ export const GlobalCss = withStyles({
     ".Toastify__toast--success": {
       color: "#293E40",
       background: "#b0e2ce",
+      whiteSpace: "pre-wrap",
     },
     ".Toastify__toast--error": {
       background: "#c93c36",
+      whiteSpace: "pre-wrap",
     },
   },
 })(() => null);
