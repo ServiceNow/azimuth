@@ -21,9 +21,9 @@ app.use(
   "/api/local",
   createProxyMiddleware({
     pathRewrite: { "^/api/[^/]+/": "/" },
-    target: process.env.REACT_APP_BACKEND_PORT
-      ? `http://host.docker.internal:${process.env.REACT_APP_BACKEND_PORT}`
-      : "http://host.docker.internal:8091",
+    target: `http://${
+      process.env.REACT_APP_BACKEND_HOSTNAME || "host.docker.internal"
+    }:${process.env.REACT_APP_BACKEND_PORT || 8091}`,
     changeOrigin: true,
   })
 );

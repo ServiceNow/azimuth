@@ -24,7 +24,6 @@ services:
       - ./server.js
     environment:
       - "PORT=8080"
+      - "REACT_APP_BACKEND_HOSTNAME=backend"
     ports:
       - "8080:8080"
-    links:
-      - backend:host.docker.internal
