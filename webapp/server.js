@@ -20,9 +20,7 @@ app.use(cors(corsConfig));
 app.use(
   "/api/local",
   createProxyMiddleware({
-    pathRewrite: {
-      "^/api/[^/]+/": "/", // rewrite path
-    },
+    pathRewrite: { "^/api/[^/]+/": "/" },
     target: process.env.REACT_APP_BACKEND_PORT
       ? `http://host.docker.internal:${process.env.REACT_APP_BACKEND_PORT}`
       : "http://host.docker.internal:8091",
