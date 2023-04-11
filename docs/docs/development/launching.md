@@ -55,9 +55,9 @@ It will just take longer, and does not allow for fast debugging.
         The following instructions are inspired from [those](https://gist.github.com/iandanforth/f3ac42b0963bcbfdf56bb446e9f40a33).
         ```shell
         brew install xz
-        pyenv uninstall 3.8.9  # If you already had it - otherwise directly go to the steps
-        pyenv install 3.8.9  # Reinstall (now with the lzma lib available)
-        pyenv local 3.8.9  # Set this version to always run in this directory
+        pyenv uninstall 3.9.11  # If you already had it - otherwise directly go to the steps
+        pyenv install 3.9.11  # Reinstall (now with the lzma lib available)
+        pyenv local 3.9.11  # Set this version to always run in this directory
         ```
 
 From this point, the back end will launch and compute the start-up task.
