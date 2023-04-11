@@ -155,11 +155,7 @@ class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
                 #    It is less burdensome to just reload it.
                 fn = load_custom_object(post, **kwargs)
                 output = fn(output)
-                # When updating to python 3.9, use .removeprefix()
-                prefix = f"{PostprocessingStep.__module__}."
-                class_name = post.class_name
-                if class_name.startswith(prefix):
-                    class_name = class_name[len(prefix) :]
+                class_name = post.class_name.removeprefix(f"{PostprocessingStep.__module__}.")
 
                 postprocessing_steps.append(
                     PostprocessingStep(
