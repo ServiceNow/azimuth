@@ -215,9 +215,12 @@ class FuzzyMatchingTestOptions(AzimuthBaseSettings):
 
 class TypoTestOptions(AzimuthBaseSettings):
     threshold: float = Field(1, ge=1)
-    # Ex: if nb_typos_per_utterance = 2, this will create both tests with 1 typo and 2 typos per
-    # utterance.
-    nb_typos_per_utterance: int = Field(1, ge=1)
+    nb_typos_per_utterance: int = Field(
+        1,
+        ge=1,
+        description="For example, the value 2 would create both tests with 1 typo and with 2 typos "
+        "per utterance.",
+    )
 
 
 class BehavioralTestingOptions(AzimuthBaseSettings):
