@@ -8,8 +8,7 @@ import pytest
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 
-import azimuth.app as me_app
-from azimuth.app import get_ready_flag
+from azimuth.app import get_ready_flag, get_startup_tasks, get_task_manager, start_app
 from azimuth.config import AzimuthConfig
 from tests.utils import DATASET_CFG, SIMPLE_PERTURBATION_TESTING_CONFIG
 
@@ -24,7 +23,7 @@ def mock_ready_flag_false():
 
 def create_test_app(config) -> FastAPI:
     json.dump(config.dict(by_alias=True), open("/tmp/config.json", "w"))
-    return me_app.start_app("/tmp/config.json", load_config_history=False, debug=False)
+    return start_app("/tmp/config.json", load_config_history=False, debug=False)
 
 
 FAST_TEST_CFG = {
@@ -44,7 +43,7 @@ def wait_for_startup_after(app):
     while resp.json()["startupTasksReady"] is not True:
         time.sleep(1)
         resp = client.get("/status")
-    task_manager = me_app.get_task_manager()
+    task_manager = get_task_manager()
     while task_manager.is_locked:
         time.sleep(1)
 
@@ -70,7 +69,7 @@ def app() -> FastAPI:
     while resp.json()["startupTasksReady"] is not True:
         time.sleep(1)
         resp = client.get("/status")
-    task_manager = me_app.get_task_manager()
+    task_manager = get_task_manager()
     while task_manager.is_locked:
         time.sleep(1)
     yield _app
@@ -79,7 +78,7 @@ def app() -> FastAPI:
 @pytest.fixture(scope="function")
 def app_not_started(app) -> FastAPI:
 
-    startup_tasks = me_app.get_startup_tasks()
+    startup_tasks = get_startup_tasks()
 
     class ModuleThatWillNeverEnd:
         def status(self):
