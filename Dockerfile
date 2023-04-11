@@ -4,7 +4,7 @@ FROM pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime as build_gpu
 # Copy binaries from other images here
 RUN pip install --upgrade pip
 
-FROM python:3.8 as build_cpu
+FROM python:3.9 as build_cpu
 # NOOP step on CPU
 FROM build_${DEVICE}
 
