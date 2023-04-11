@@ -200,24 +200,27 @@ class SyntaxOptions(AzimuthBaseSettings):
 
 
 class NeutralTokenOptions(AzimuthBaseSettings):
-    threshold: float = 1
+    threshold: float = Field(1, ge=0, le=1)
     suffix_list: List[str] = []  # Language-based default value
     prefix_list: List[str] = []  # Language-based default value
 
 
 class PunctuationTestOptions(AzimuthBaseSettings):
-    threshold: float = 1
+    threshold: float = Field(1, ge=0, le=1)
 
 
 class FuzzyMatchingTestOptions(AzimuthBaseSettings):
-    threshold: float = 1
+    threshold: float = Field(1, ge=0, le=1)
 
 
 class TypoTestOptions(AzimuthBaseSettings):
-    threshold: float = 1
-    # Ex: if nb_typos_per_utterance = 2, this will create both tests with 1 typo and 2 typos per
-    # utterance.
-    nb_typos_per_utterance: int = 1
+    threshold: float = Field(1, ge=0, le=1)
+    nb_typos_per_utterance: int = Field(
+        1,
+        ge=1,
+        description="For example, the value 2 would create both tests with 1 typo and with 2 typos "
+        "per utterance.",
+    )
 
 
 class BehavioralTestingOptions(AzimuthBaseSettings):
