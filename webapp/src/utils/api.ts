@@ -89,9 +89,18 @@ export const fetchApi =
     // fetch() might throw if the user is offline, or some unlikely networking error occurs, such a DNS lookup failure.
     // Let's also throw if the status is not OK, so it's uniform.
     if (!response.ok) {
-      const { detail: errorMessage } =
-        (await response.json()) as HTTPExceptionModel;
-      throw Error(errorMessage);
+      const httpExceptionModelCodes: number[] = [
+        400, 401, 403, 404, 422, 500, 503,
+      ];
+      if (httpExceptionModelCodes.includes(response.status)) {
+        const { detail: errorMessage } =
+          (await response.json()) as HTTPExceptionModel;
+        throw Error(errorMessage);
+      } else {
+        throw Error(
+          `Failed to load resource: the server responded with a status of ${response.status} + ${response.statusText}. `
+        );
+      }
     }
     return response;
   };
