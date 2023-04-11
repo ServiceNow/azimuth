@@ -813,6 +813,7 @@ export interface components {
      */
     TypoTestOptions: {
       threshold: number;
+      /** For example, the value 2 would create both tests with 1 typo and with 2 typos per utterance. */
       nb_typos_per_utterance: number;
     };
     /**
