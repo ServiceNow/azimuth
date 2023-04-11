@@ -8,6 +8,9 @@ export const GlobalCss = withStyles({
     ".Toastify__toast-container": {
       left: "1em",
       width: "auto",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-end",
     },
     ".Toastify__toast--success": {
       color: "#293E40",
