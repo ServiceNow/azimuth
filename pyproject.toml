@@ -11,7 +11,7 @@ packages = [{ include = "azimuth/" },]
 
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.10"
+python = ">=3.9,<3.10"
 
 # Scientific
 pandas = ">=1.0.5,<2,!=1.1.0"
@@ -106,7 +106,7 @@ filter_files = true
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
-python_version = 3.8
+python_version = 3.9
 show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true
