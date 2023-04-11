@@ -74,6 +74,7 @@ const FIELDS: Record<
   long_utterance_min_word: { ...INT, units: "words" },
   temperature: FLOAT,
   threshold: PERCENTAGE,
+  nb_typos_per_utterance: INT,
   seed: INT,
 };
 
@@ -1015,7 +1016,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                             },
                           })
                         }
-                        {...INT}
+                        {...FIELDS[objField]}
                       />
                     )}
                   </React.Fragment>
