@@ -15,6 +15,49 @@ import HelpMenu from "components/HelpMenu";
 import PipelineSelect from "components/PipelineSelect";
 import Settings from "pages/Settings";
 
+const BREADCRUMBS = [
+  {
+    pathname: /^\/[^/]+/,
+    name: "Dashboard",
+  },
+  {
+    pathname: /^\/[^/]+\/behavioral_testing_summary/,
+    name: "Behavioral Testing Summary",
+  },
+  {
+    pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/class_overlap/,
+    name: "Class Overlap",
+  },
+  {
+    pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/pipeline_metrics/,
+    name: "Pipeline Metrics by Data Subpopulation",
+  },
+  {
+    pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/smart_tags/,
+    name: "Smart Tag Analysis",
+  },
+  {
+    pathname: /^\/[^/]+\/settings/,
+    name: "Settings",
+  },
+  {
+    pathname: /^\/[^/]+\/thresholds/,
+    name: "Threshold Comparison",
+  },
+  {
+    pathname: /^\/[^/]+\/dataset_warnings/,
+    name: "Dataset Warnings",
+  },
+  {
+    pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/[^/]+/,
+    name: "Exploration",
+  },
+  {
+    pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/utterances\/[^/]+/,
+    name: "Utterance Details",
+  },
+];
+
 const useStyles = makeStyles((theme) => ({
   jobHeader: {
     display: "flex",
@@ -74,69 +117,26 @@ const PageHeader = () => {
 
   const isDashboard = location.pathname === dashboardPathname;
 
-  const subrouteBreadcrumbs = React.useMemo(
-    () =>
-      [
-        {
-          pathname: /^\/[^/]+/,
-          name: "Dashboard",
-        },
-        {
-          pathname: /^\/[^/]+\/behavioral_testing_summary/,
-          name: "Behavioral Testing Summary",
-        },
-        {
-          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/class_overlap/,
-          name: "Class Overlap",
-        },
-        {
-          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/pipeline_metrics/,
-          name: "Pipeline Metrics by Data Subpopulation",
-        },
-        {
-          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/smart_tags/,
-          name: "Smart Tag Analysis",
-        },
-        {
-          pathname: /^\/[^/]+\/settings/,
-          name: "Settings",
-        },
-        {
-          pathname: /^\/[^/]+\/thresholds/,
-          name: "Threshold Comparison",
-        },
-        {
-          pathname: /^\/[^/]+\/dataset_warnings/,
-          name: "Dataset Warnings",
-        },
-        {
-          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/[^/]+/,
-          name: "Exploration",
-        },
-        {
-          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/utterances\/[^/]+/,
-          name: "Utterance Details",
-        },
-      ].flatMap(({ pathname, name }) => {
-        const match = location.pathname.match(pathname);
-        return match == null ? (
-          []
-        ) : match[0] === location.pathname ? (
-          <Typography variant="body1" key={name}>
-            {name}
-          </Typography>
-        ) : (
-          <Link
-            component={RouterLink}
-            key={name}
-            to={`${match[0]}${searchString}`}
-          >
-            {name}
-          </Link>
-        );
-      }),
-    [location.pathname, searchString]
-  );
+  const subrouteBreadcrumbs = React.useMemo(() => {
+    return BREADCRUMBS.flatMap(({ pathname, name }) => {
+      const match = location.pathname.match(pathname);
+      return match == null ? (
+        []
+      ) : match[0] === location.pathname ? (
+        <Typography variant="body1" key={name}>
+          {name}
+        </Typography>
+      ) : (
+        <Link
+          component={RouterLink}
+          key={name}
+          to={`${match[0]}${searchString}`}
+        >
+          {name}
+        </Link>
+      );
+    });
+  }, [location.pathname, searchString]);
 
   return (
     <div>
