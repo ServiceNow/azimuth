@@ -326,10 +326,7 @@ class DatasetSplitManager:
             ds = ds.select(indices)
         available_tags = self._tags if table_key is None else self._tags + self._prediction_tags
 
-        return {
-            row_idx: {tag: ds[tag][idx] for tag in available_tags}
-            for idx, row_idx in enumerate(ds["row_idx"])
-        }
+        return {row[DatasetColumn.row_idx]: {tag: row[tag] for tag in available_tags} for row in ds}
 
     def class_distribution(self, labels_only=False):
         """Compute the class distribution for a dataset_split.
