@@ -59,7 +59,7 @@ class ValidationModule(AggregationModule[ModelContractConfig]):
 
         if can_load_model and can_load_dataset and model_has_correct_type:
             ds_object = assert_not_none(dataset)
-            batch = ds_object.select(range(0, min(10, len(ds_object))))
+            batch = ds_object.select(range(0, min(2, len(ds_object))))
             can_make_prediction = (
                 exception_gatherer.try_calling_function(self._validate_prediction, batch=batch)
                 is not None
