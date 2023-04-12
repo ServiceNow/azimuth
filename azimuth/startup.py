@@ -35,7 +35,7 @@ log = structlog.get_logger()
 
 @dataclass
 class Startup:
-    name: str
+    name: str  # TODO Improve: A name cannot be a substring of any other names.
     module: SupportedTask
     mod_options: Dict = field(default_factory=dict)
     # The names of other start-up tasks to wait for.
@@ -107,17 +107,17 @@ SALIENCY_TASKS = [
 ]
 
 BASE_PREDICTION_TASKS = [
-    Startup("prediction", SupportedMethod.Predictions, run_on_all_pipelines=True),
+    Startup("predictions", SupportedMethod.Predictions, run_on_all_pipelines=True),
     Startup(
-        "outcome",
+        "outcomes",
         SupportedModule.Outcome,
-        dependency_names=["prediction"],
+        dependency_names=["predictions"],
         run_on_all_pipelines=True,
     ),
     Startup(
         "confidence_bins",
         SupportedModule.ConfidenceBinIndex,
-        dependency_names=["prediction"],
+        dependency_names=["predictions"],
         run_on_all_pipelines=True,
     ),
 ]
@@ -127,8 +127,8 @@ LAST_TASKS = [
         "metrics_by_filter",
         SupportedModule.MetricsPerFilter,
         dependency_names=[
-            "prediction",
-            "outcome",
+            "predictions",
+            "outcomes",
             "prediction_comparison",
             "perturbation_testing",
             "neighbors_tags",
