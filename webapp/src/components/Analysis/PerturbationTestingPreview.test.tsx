@@ -50,20 +50,20 @@ describe("PerturbationTestingPreview", () => {
     renderPerturbationTestingPreview({ train: true, eval: true });
     await waitFor(() => {
       // Verify if the actual response data from API is visibly displayed on the toggle
-      expect(screen.getByText(/14.0%/i)).toBeVisible();
+      expect(screen.getByText("14.0%")).toBeVisible();
       expect(screen.getByText("Failure rate - Evaluation Set")).toBeVisible();
-      expect(screen.getByText(/16.0%/i)).toBeVisible();
+      expect(screen.getByText("16.0%")).toBeVisible();
       expect(screen.getByText("Failure rate - Training Set")).toBeVisible();
 
       // styling should be applied for the selected toggle as expected
-      expect(screen.getByText(/14.0%/)).toHaveStyle(
+      expect(screen.getByText("14.0%")).toHaveStyle(
         "font-size: 3.75rem; color: rgb(237, 108, 2)"
       );
 
       // verify with some random unexpected values to not have been displayed.
-      expect(screen.queryByText(/17.0%/i)).toBeNull();
+      expect(screen.queryByText("17.0%")).toBeNull();
       expect(screen.queryByText("some random text")).toBeNull();
-      expect(screen.queryByText(/26.0%/i)).toBeNull();
+      expect(screen.queryByText("26.0%")).toBeNull();
     });
   });
 
@@ -139,7 +139,7 @@ describe("PerturbationTestingPreview with Failure response", () => {
       // expected error message
       expect(
         screen.getByText(
-          "Something went wrong fetching behavioral testing summary"
+          /Something went wrong fetching behavioral testing summary/
         )
       ).toBeVisible();
     });

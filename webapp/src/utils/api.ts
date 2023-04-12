@@ -1,5 +1,8 @@
+import { HTTPExceptionModel } from "types/api";
 import { paths } from "types/generated/generatedTypes";
 import { constructApiSearchString } from "./helpers";
+
+const HTTP_EXCEPTION_STATUS_CODES = [400, 401, 403, 404, 422, 500, 503];
 
 type CamelCase<SnakeCase> = SnakeCase extends `${infer FirstWord}_${infer Rest}`
   ? `${FirstWord}${Capitalize<CamelCase<Rest>>}`
@@ -88,7 +91,12 @@ export const fetchApi =
     // fetch() might throw if the user is offline, or some unlikely networking error occurs, such a DNS lookup failure.
     // Let's also throw if the status is not OK, so it's uniform.
     if (!response.ok) {
-      throw Error(`${response.status} : ${response.statusText}`);
+      if (HTTP_EXCEPTION_STATUS_CODES.includes(response.status)) {
+        const { detail } = (await response.json()) as HTTPExceptionModel;
+        throw Error(detail);
+      } else {
+        throw Error(`${response.status} ${response.statusText}`);
+      }
     }
     return response;
   };
