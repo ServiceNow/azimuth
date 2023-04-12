@@ -462,7 +462,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           onClick={() => {
             updateConfig({ jobId, body: partialConfig })
               .unwrap()
-              .then(handleClose);
+              .then(
+                handleClose,
+                () => {} // Avoid the uncaught error log.
+              );
           }}
         >
           Apply and close
