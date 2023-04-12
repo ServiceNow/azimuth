@@ -10,10 +10,8 @@ from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
-from azimuth.modules.task_execution import get_task_result
 from azimuth.types import DatasetColumn, SupportedMethod
 from azimuth.types.outcomes import OutcomeName, OutcomeResponse
-from azimuth.types.task import PredictionResponse
 from azimuth.utils.ml.model_performance import compute_outcome
 from azimuth.utils.validation import assert_not_none
 
@@ -33,9 +31,7 @@ class OutcomesModule(DatasetResultModule[ModelContractConfig]):
             config=self.config,
             mod_options=mod_options,
         )
-        pred_result = get_task_result(
-            task_module=prediction_task, result_type=List[PredictionResponse]
-        )
+        pred_result = prediction_task.compute_on_dataset_split()
 
         predictions = np.zeros(len(mod_options.indices))
         for idx, pred in enumerate(pred_result):
