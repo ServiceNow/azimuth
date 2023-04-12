@@ -108,7 +108,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
 
         """
         log.info(f"Starting {self.name}")
-        deps = [d.done_event for d in dependencies] if dependencies is not None else []
+        deps = [d.done_event for d in dependencies] if dependencies else []
         if not all(deps):
             raise ValueError("Can't wait for an unstarted Module.")
         self.done_event = Event(name=self.task_id, client=client)
@@ -165,7 +165,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             Result of `self.compute_on_dataset_split`.
 
         """
-        if dependencies is not None:
+        if dependencies:
             secede()
             for event in dependencies:
                 try:
