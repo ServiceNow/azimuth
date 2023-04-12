@@ -18,9 +18,8 @@ const responseToData =
     try {
       const response = await responsePromise(arg);
       return { data: await response.json() };
-    } catch (err) {
-      const error = err as Error;
-      return { error: { message: message + error.message } };
+    } catch (error) {
+      return { error: { message: `${message}\n${error}` } };
     }
   };
 
