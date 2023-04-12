@@ -26,10 +26,9 @@ from starlette.status import (
 from azimuth.config import AzimuthConfig, load_azimuth_config
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DaskModule
-from azimuth.modules.utilities.validation import ValidationModule
 from azimuth.startup import startup_tasks
 from azimuth.task_manager import TaskManager
-from azimuth.types import DatasetSplitName, ModuleOptions
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
 from azimuth.utils.logs import set_logger_config
@@ -334,14 +333,11 @@ def run_validation(
     """
 
     def run_validation_module(pipeline_index=None):
-        validation_module = ValidationModule(
-            config=config,
+        _, task = task_manager.get_task(
+            task_name=SupportedModule.Validation,
             dataset_split_name=dataset_split,
             mod_options=ModuleOptions(pipeline_index=pipeline_index),
         )
-        validation_module.start_task_on_dataset_split(task_manager.client)
-        # Will raise exceptions as needed.
-        validation_module.result()
 
     if config.pipelines is None:
         run_validation_module()
