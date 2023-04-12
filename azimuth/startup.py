@@ -120,6 +120,9 @@ BASE_PREDICTION_TASKS = [
         dependency_names=["prediction"],
         run_on_all_pipelines=True,
     ),
+]
+
+LAST_TASKS = [
     Startup(
         "metrics_by_filter",
         SupportedModule.MetricsPerFilter,
@@ -133,7 +136,7 @@ BASE_PREDICTION_TASKS = [
             "syntax_tags",
         ],
         run_on_all_pipelines=True,
-    ),
+    )
 ]
 
 
@@ -230,9 +233,13 @@ def startup_tasks(
 
     """
     config = task_manager.config
+    # The order in start_up_tasks matters; a task needs to be added after its dependencies.
+    # TODO Refactor so the startup can be robust to the order in start_up_tasks.
     start_up_tasks = [
         Startup("syntax_tags", SupportedModule.SyntaxTagging),
     ]
+    if similarity_available(config):
+        start_up_tasks += SIMILARITY_TASKS
     if predictions_available(config):
         start_up_tasks += BASE_PREDICTION_TASKS
         if perturbation_testing_available(config):
@@ -246,8 +253,7 @@ def startup_tasks(
             start_up_tasks += POSTPROCESSING_TASKS
         if saliency_available(config):
             start_up_tasks += SALIENCY_TASKS
-    if similarity_available(config):
-        start_up_tasks += SIMILARITY_TASKS
+        start_up_tasks += LAST_TASKS
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
