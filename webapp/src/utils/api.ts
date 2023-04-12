@@ -90,13 +90,10 @@ export const fetchApi =
     // Let's also throw if the status is not OK, so it's uniform.
     if (!response.ok) {
       try {
-        const { detail: errorMessage } =
-          (await response.json()) as HTTPExceptionModel;
-        throw Error(errorMessage);
+        const { detail } = (await response.json()) as HTTPExceptionModel;
+        throw Error(detail);
       } catch {
-        throw Error(
-          `Failed to load resource: the server responded with a status of ${response.status} + ${response.statusText}. `
-        );
+        throw Error(`${response.status} ${response.statusText}`);
       }
     }
     return response;
