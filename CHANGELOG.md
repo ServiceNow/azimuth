@@ -19,5 +19,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Fix config modal closing unexpectedly on unsuccessful config update.
 
 ### Security
