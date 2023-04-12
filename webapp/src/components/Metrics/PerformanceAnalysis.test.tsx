@@ -134,7 +134,7 @@ describe("MetricsPerFilterAPIWithFailureResponse", () => {
     await waitFor(() => {
       // expected error message
       expect(
-        screen.getByText(/Something went wrong fetching metrics per filter/i)
+        screen.getByText(/Something went wrong fetching metrics per filter/)
       ).toBeVisible();
     });
   });
