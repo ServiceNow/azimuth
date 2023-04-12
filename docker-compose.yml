@@ -14,9 +14,9 @@ services:
       - "BEHAVIORAL_TESTING"
       - "SIMILARITY"
     volumes:
-    - ./config:/config
-    - ./azimuth_shr:/azimuth_shr
-    - ./cache:/cache
+      - ./config:/config
+      - ./azimuth_shr:/azimuth_shr
+      - ./cache:/cache
   web:
     image: "${REGISTRY}/azimuth-app:${FRONTEND_VERSION}"
     command:
@@ -24,7 +24,6 @@ services:
       - ./server.js
     environment:
       - "PORT=8080"
+      - "REACT_APP_BACKEND_HOSTNAME=backend"
     ports:
       - "8080:8080"
-    links:
-      - backend:host.docker.internal
