@@ -1,5 +1,5 @@
 # Taken from https://github.com/samuelcolvin/pydantic/pull/3946/files
-# When we update pydantic to v1.10 or higher, we can remove this file and use their create_model()
+# TODO When we update pydantic >= v1.10, we can remove this file and use their create_model()
 
 import warnings
 from types import prepare_class, resolve_bases

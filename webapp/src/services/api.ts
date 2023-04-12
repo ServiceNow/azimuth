@@ -18,8 +18,8 @@ const responseToData =
     try {
       const response = await responsePromise(arg);
       return { data: await response.json() };
-    } catch {
-      return { error: { message } };
+    } catch (error) {
+      return { error: { message: `${message}\n${(error as Error).message}` } };
     }
   };
 
@@ -289,7 +289,9 @@ export const api = createApi({
       ),
       // We invalidate Status first, so StatusCheck stops rendering the app if
       // necessary. We await queryFulfilled before invalidating the other tags.
-      invalidatesTags: () => ["Status"],
+      // We don't invalidate Status if the update fails, as StatusCheck would stop
+      // rendering the app while fetching Status and the config dialog would close.
+      invalidatesTags: (_, error) => (error ? [] : ["Status"]),
       async onQueryStarted(
         { jobId, body: partialConfig },
         { dispatch, queryFulfilled }

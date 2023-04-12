@@ -77,6 +77,6 @@ describe("ClassOverlapTable", () => {
       // Wait for the API data to be loaded before verifying that there is no "See more" button.
       expect(screen.getAllByRole("row")[1]).toHaveClass("MuiDataGrid-row");
     });
-    expect(screen.queryByText(/See more/i)).toBeNull();
+    expect(screen.queryByText(/See more/)).toBeNull();
   });
 });

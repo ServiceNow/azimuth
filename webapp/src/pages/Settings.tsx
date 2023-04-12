@@ -68,6 +68,8 @@ const FIELDS: Record<
   max_delta_std_words: { ...FLOAT, units: "words" },
   short_utterance_max_word: { ...INT, units: "words" },
   long_utterance_min_word: { ...INT, units: "words" },
+  threshold: PERCENTAGE,
+  nb_typos_per_utterance: INT,
   seed: INT,
 };
 
@@ -299,7 +301,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           onClick={() => {
             updateConfig({ jobId, body: partialConfig })
               .unwrap()
-              .then(handleClose);
+              .then(
+                handleClose,
+                () => {} // Avoid the uncaught error log.
+              );
           }}
         >
           Apply and close
@@ -767,7 +772,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                             [field]: { ...value, [objField]: newValue },
                           })
                         }
-                        {...INT}
+                        {...FIELDS[objField]}
                       />
                     )}
                   </React.Fragment>

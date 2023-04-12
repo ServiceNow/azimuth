@@ -320,6 +320,7 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
         task_manager: Current TaskManager.
 
     """
+    start_time = time.time()
     task_manager.lock()  # Lock the TaskManager to prevent new tasks.
     while not all(m.done() for m in startup_mods.values()):
         time.sleep(30)  # We wait to not spam the user with logs.
@@ -333,6 +334,7 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
             log.info(f"{status} ({len(modules)}): {', '.join(modules)}")
 
     log.info("Startup task completed. The application should be accessible now.")
+    log.debug(f"Startup took {time.time() - start_time}.")
 
     if errored_modules := [
         name for name, module in startup_mods.items() if module.status() == "error"
