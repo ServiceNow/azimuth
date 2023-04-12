@@ -10,7 +10,6 @@ import {
   useParams,
 } from "react-router-dom";
 import { getConfigEndpoint, getDatasetInfoEndpoint } from "services/api";
-import { DatasetSplitName } from "types/api";
 import { constructSearchString } from "utils/helpers";
 import HelpMenu from "components/HelpMenu";
 import PipelineSelect from "components/PipelineSelect";
@@ -32,17 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 const PageHeader = () => {
   const classes = useStyles();
-  const {
-    jobId,
-    utteranceId,
-    datasetSplitName,
-    mainView = "utterances",
-  } = useParams<{
-    jobId: string;
-    utteranceId?: string;
-    datasetSplitName?: DatasetSplitName;
-    mainView?: string;
-  }>();
+  const { jobId } = useParams<{ jobId: string }>();
 
   const { data: config } = getConfigEndpoint.useQuery(
     { jobId },
@@ -89,70 +78,64 @@ const PageHeader = () => {
     () =>
       [
         {
-          pathname: `/${jobId}`,
+          pathname: /^\/[^/]+/,
           name: "Dashboard",
         },
         {
-          pathname: `/${jobId}/behavioral_testing_summary`,
+          pathname: /^\/[^/]+\/behavioral_testing_summary/,
           name: "Behavioral Testing Summary",
         },
         {
-          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/class_overlap`,
+          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/class_overlap/,
           name: "Class Overlap",
         },
         {
-          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/pipeline_metrics`,
+          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/pipeline_metrics/,
           name: "Pipeline Metrics by Data Subpopulation",
         },
         {
-          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/smart_tags`,
+          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/smart_tags/,
           name: "Smart Tag Analysis",
         },
         {
-          pathname: `/${jobId}/settings`,
+          pathname: /^\/[^/]+\/settings/,
           name: "Settings",
         },
         {
-          pathname: `/${jobId}/thresholds`,
+          pathname: /^\/[^/]+\/thresholds/,
           name: "Threshold Comparison",
         },
         {
-          pathname: `/${jobId}/dataset_warnings`,
+          pathname: /^\/[^/]+\/dataset_warnings/,
           name: "Dataset Warnings",
         },
         {
-          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/${mainView}`,
+          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/[^/]+/,
           name: "Exploration",
         },
         {
-          pathname: `/${jobId}/dataset_splits/${datasetSplitName}/utterances/${utteranceId}`,
+          pathname: /^\/[^/]+\/dataset_splits\/[^/]+\/utterances\/[^/]+/,
           name: "Utterance Details",
         },
-      ]
-        .filter(({ pathname }) => location.pathname.includes(pathname))
-        .map(({ pathname, name }) =>
-          pathname === location.pathname ? (
-            <Typography variant="body1" key={name}>
-              {name}
-            </Typography>
-          ) : (
-            <Link
-              component={RouterLink}
-              key={name}
-              to={`${pathname}${searchString}`}
-            >
-              {name}
-            </Link>
-          )
-        ),
-    [
-      jobId,
-      utteranceId,
-      datasetSplitName,
-      mainView,
-      location.pathname,
-      searchString,
-    ]
+      ].flatMap(({ pathname, name }) => {
+        const match = location.pathname.match(pathname);
+        return match == null ? (
+          []
+        ) : match[0] === location.pathname ? (
+          <Typography variant="body1" key={name}>
+            {name}
+          </Typography>
+        ) : (
+          <Link
+            component={RouterLink}
+            key={name}
+            to={`${match[0]}${searchString}`}
+          >
+            {name}
+          </Link>
+        );
+      }),
+    [location.pathname, searchString]
   );
 
   return (
