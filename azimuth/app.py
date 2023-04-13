@@ -338,6 +338,8 @@ def run_validation(
             dataset_split_name=dataset_split,
             mod_options=ModuleOptions(pipeline_index=pipeline_index),
         )
+        # Will raise exceptions as needed.
+        task.result()
 
     if config.pipelines is None:
         run_validation_module()
