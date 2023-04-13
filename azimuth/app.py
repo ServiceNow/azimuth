@@ -9,7 +9,7 @@ import structlog
 from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -61,7 +61,7 @@ class HTTPExceptionModel(BaseModel):
     detail: str
 
 
-async def handle_validation_error(request: Request, exception: RequestValidationError):
+async def handle_validation_error(request: Request, exception: ValidationError):
     return JSONResponse(
         status_code=HTTP_404_NOT_FOUND  # for errors in paths, e.g., /dataset_splits/potato
         if "path" in (error["loc"][0] for error in exception.errors())
@@ -185,6 +185,8 @@ def create_app() -> FastAPI:
         default_response_class=JSONResponseIgnoreNan,
         responses={code: {"model": HTTPExceptionModel} for code in COMMON_HTTP_ERROR_CODES},
         exception_handlers={
+            ValidationError: handle_validation_error,  # for PATCH "/config",
+            # where we call old_config.copy(update=partial_config, deep=True) ourselves.
             RequestValidationError: handle_validation_error,
             HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
         },
