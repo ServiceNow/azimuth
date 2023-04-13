@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Meaningful error messages in the error toasts.
 
 ### Changed
 
