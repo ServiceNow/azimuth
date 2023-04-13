@@ -117,10 +117,10 @@ def test_get_utterances_pagination(app: FastAPI):
     assert resp["utteranceCount"] == UTTERANCE_COUNT
 
     resp = client.get("/dataset_splits/eval/utterances?limit=3")
-    assert resp.status_code == 400
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
 
     resp = client.get("/dataset_splits/eval/utterances?offset=3")
-    assert resp.status_code == 400
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
 
 
 def test_get_utterances_filtering_and_indexing(app: FastAPI):

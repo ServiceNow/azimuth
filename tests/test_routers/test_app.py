@@ -13,7 +13,7 @@ def test_openapi(app: FastAPI):
     # Check that we can generate the openapi.json
     client = TestClient(app)
     resp = client.get("/openapi.json")
-    assert resp.status_code == 200
+    assert resp.status_code == HTTP_200_OK, resp.text
 
 
 def test_get_status(app: FastAPI) -> None:
