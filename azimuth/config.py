@@ -448,10 +448,9 @@ class AzimuthConfig(
 
     @classmethod
     def load(cls, config_path: Optional[str], load_config_history: bool) -> "AzimuthConfig":
-        # Loading config from config_path if specified, or else from environment variables only.
-        cfg = ArtifactsConfig.parse_file(config_path) if config_path else ArtifactsConfig()
-
         if load_config_history:
+            # Load artifact_path from config_path if specified, or else from env var ARTIFACT_PATH.
+            cfg = ArtifactsConfig.parse_file(config_path) if config_path else ArtifactsConfig()
             config_history_path = cfg.get_config_history_path()
             last_config = cls.load_last_from_config_history(config_history_path)
             if last_config:
@@ -460,6 +459,7 @@ class AzimuthConfig(
 
             log.info("Empty or invalid config history.")
 
+        # Load config from config_path if specified, or else from env vars only.
         return cls.parse_file(config_path) if config_path else cls()
 
     @classmethod
