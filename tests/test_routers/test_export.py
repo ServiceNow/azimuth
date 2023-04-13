@@ -18,10 +18,17 @@ def test_get_export(app: FastAPI) -> None:
 
 def test_get_report(app: FastAPI) -> None:
     client = TestClient(app)
+
     resp = client.get("/export/perturbation_testing_summary")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == "query parameter pipeline_index: field required"
+
     resp = client.get("/export/perturbation_testing_summary?pipeline_index=-10")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == (
+        "query parameter pipeline_index=-10: ensure this value is greater than or equal to 0"
+    )
+
     resp = client.get("/export/perturbation_testing_summary?pipeline_index=0")
     assert resp.status_code == HTTP_200_OK, resp.text
     assert resp.headers["content-type"] == "text/csv; charset=utf-8"

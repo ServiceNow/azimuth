@@ -8,6 +8,8 @@ from starlette.status import (
 from starlette.testclient import TestClient
 
 from azimuth.config import SupportedLanguage, config_defaults_per_language
+from azimuth.types import SupportedModelContract
+from tests.utils import get_enum_validation_error_msg
 
 
 def test_get_default_config(app: FastAPI):
@@ -254,6 +256,9 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     # Config Validation Error
     resp = client.patch("/config", json={"model_contract": "potato"})
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == (
+        f"AzimuthConfig['model_contract']: {get_enum_validation_error_msg(SupportedModelContract)}"
+    )
     get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
 
