@@ -9,8 +9,6 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import torch
 from datasets import Dataset
-from filelock import FileLock
-from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
 from azimuth.config import SimilarityConfig, SimilarityOptions
@@ -28,13 +26,14 @@ NUM_NEIGHBORS = 20
 class FAISSModule(IndexableModule[SimilarityConfig]):
     """Compute the FAISS features for a dataset split."""
 
+    can_load_encoder = True
+
     def __init__(
         self,
         dataset_split_name: DatasetSplitName,
         config: SimilarityConfig,
         mod_options: Optional[ModuleOptions] = None,
     ):
-        self.encoder = None
         super().__init__(dataset_split_name, config, mod_options)
 
     def get_encoder_name_or_path(self):
@@ -45,10 +44,7 @@ class FAISSModule(IndexableModule[SimilarityConfig]):
         return model_name_or_path
 
     def get_encoder(self):
-        if self.encoder is None:
-            with FileLock(os.path.join(self.cache_dir, "st.lock")):
-                self.encoder = SentenceTransformer(self.get_encoder_name_or_path())
-        return self.encoder
+        return self.artifact_manager.get_encoder(self.get_encoder_name_or_path())
 
     def compute_on_dataset_split(self) -> List[FAISSResponse]:  # type: ignore
         ds = self.get_dataset_split()

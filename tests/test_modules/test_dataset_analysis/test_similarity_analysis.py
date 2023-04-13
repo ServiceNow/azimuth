@@ -5,7 +5,7 @@
 import numpy as np
 from sklearn.preprocessing import normalize
 
-import azimuth.modules.dataset_analysis.similarity_analysis as faiss_mod
+import azimuth.modules.base_classes.artifact_manager as artifact_manager
 from azimuth.app import load_dataset_split_managers_from_config
 from azimuth.dataset_split_manager import FEATURE_FAISS
 from azimuth.modules.dataset_analysis.similarity_analysis import NeighborsTaggingModule
@@ -25,10 +25,10 @@ class MockedTransformer:
 
 
 def test_neighbors(simple_text_config, dask_client, monkeypatch):
-    monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    monkeypatch.setattr(artifact_manager, "SentenceTransformer", MockedTransformer)
     # Mock SentenceTransformer on all workers.
     dask_client.run(
-        lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+        lambda: monkeypatch.setattr(artifact_manager, "SentenceTransformer", MockedTransformer)
     )
     simple_text_config.similarity.conflicting_neighbors_threshold = 0.1
     simple_table_key = get_table_key(simple_text_config)
@@ -73,10 +73,10 @@ def test_neighbors(simple_text_config, dask_client, monkeypatch):
 
 
 def test_neighbors_one_ds(tiny_text_config_one_ds, dask_client, monkeypatch):
-    monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    monkeypatch.setattr(artifact_manager, "SentenceTransformer", MockedTransformer)
     # Mock SentenceTransformer on all workers.
     dask_client.run(
-        lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+        lambda: monkeypatch.setattr(artifact_manager, "SentenceTransformer", MockedTransformer)
     )
     tiny_text_config_one_ds.similarity.conflicting_neighbors_threshold = 0.1
 

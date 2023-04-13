@@ -5,7 +5,7 @@
 import numpy as np
 from sklearn.preprocessing import normalize
 
-import azimuth.modules.dataset_analysis.similarity_analysis as faiss_mod
+import azimuth.modules.base_classes.artifact_manager as artifact_manager
 from azimuth.modules.dataset_analysis.class_overlap import ClassOverlapModule
 from azimuth.types import DatasetSplitName
 from azimuth.types.class_overlap import ClassOverlapResponse
@@ -20,10 +20,10 @@ class MockedTransformer:
 
 
 def test_incomplete_class_set(clinc_text_config, dask_client, monkeypatch):
-    monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+    monkeypatch.setattr(artifact_manager, "SentenceTransformer", MockedTransformer)
     # Mock SentenceTransformer on all workers.
     dask_client.run(
-        lambda: monkeypatch.setattr(faiss_mod, "SentenceTransformer", MockedTransformer)
+        lambda: monkeypatch.setattr(artifact_manager, "SentenceTransformer", MockedTransformer)
     )
     mod = ClassOverlapModule(dataset_split_name=DatasetSplitName.train, config=clinc_text_config)
     result: ClassOverlapResponse = mod.compute_on_dataset_split()

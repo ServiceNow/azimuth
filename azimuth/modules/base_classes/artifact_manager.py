@@ -6,6 +6,7 @@ from typing import Callable, Dict
 
 import structlog
 from datasets import DatasetDict
+from sentence_transformers import SentenceTransformer
 
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
@@ -79,6 +80,7 @@ class ArtifactManager:
         ] = defaultdict(dict)
         self.models_mapping: Dict[Hash, Dict[int, Callable]] = defaultdict(dict)
         self.metrics = {}
+        self.encoder = None
         log.debug(f"Creating new Artifact Manager {id(self)}.")
 
     def get_dataset_split_manager(
@@ -157,6 +159,11 @@ class ArtifactManager:
         if metric_hash not in self.metrics:
             self.metrics[metric_hash] = load_custom_object(config.metrics[name], **kwargs)
         return self.metrics[metric_hash]
+
+    def get_encoder(self, encoder_name_or_path):
+        if self.encoder is None:
+            self.encoder = SentenceTransformer(encoder_name_or_path)
+        return self.encoder
 
     @classmethod
     def instance(cls):
