@@ -38,6 +38,7 @@ def get_task_result(task_module: Module, result_type: Type[U]) -> U:
             )
             return cast(U, result)
     result_from_future = cast(U, safe_get(task_module))
+    task_module.clear()
     return result_from_future
 
 
