@@ -322,12 +322,18 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     """
     start_time = time.time()
     task_manager.lock()  # Lock the TaskManager to prevent new tasks.
+    last_per_status: Dict[str, List[str]] = {}
     while not all(m.done() for m in startup_mods.values()):
-        time.sleep(30)  # We wait to not spam the user with logs.
+        time.sleep(0.1)  # to let the CPU do other stuff.
         per_status = defaultdict(list)
         for name, mod in startup_mods.items():
             status = "saving" if mod.status() == "finished" and not mod.done() else mod.status()
             per_status[status].append(name)
+
+        if per_status == last_per_status:
+            continue  # to avoid spamming the user with logs.
+        last_per_status = per_status
+
         log.info(f"Startup tasks statuses: {len(per_status['finished'])}/{len(startup_mods)}")
         for status, modules in per_status.items():
             log.info(f"{status} ({len(modules)}): {', '.join(modules)}")
