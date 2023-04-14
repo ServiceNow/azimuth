@@ -17,7 +17,7 @@ from azimuth.modules.model_performance import (
     outcome_count,
 )
 from azimuth.modules.pipeline_comparison import prediction_comparison
-from azimuth.modules.utilities import validation
+from azimuth.modules.validation import validation
 from azimuth.modules.word_analysis import tokens_to_words, top_words
 from azimuth.types import SupportedMethod, SupportedModule
 
