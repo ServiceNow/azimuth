@@ -217,6 +217,10 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             self._store_data_in_cache(fut.result(), fut.indices)
             log.info(f"{self.name} completed and stored in cache", status=fut.status)
 
+    def clear(self):
+        """Useful to make sure the task is not kept in memory."""
+        self.future = None
+
     def _wait_for_completion(self):
         """Internal function that loop till completion and then set `self.done_event`."""
         while not self.done(allow_cache=False):

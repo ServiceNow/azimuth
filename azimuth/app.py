@@ -349,7 +349,6 @@ def run_validation(
         for pipeline_index in range(len(config.pipelines)):
             run_validation_module(pipeline_index)
     task_manager.clear_worker_cache()
-    task_manager.restart()
 
 
 def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):

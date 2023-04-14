@@ -123,12 +123,10 @@ def get_standard_task_result(
     )
 
     if not task:
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND, detail=f"Aggregation not found {task_name}"
-        )
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=f"Task not found {task_name}")
 
     task_result = task.result()
-
+    task.clear()
     return task_result
 
 
