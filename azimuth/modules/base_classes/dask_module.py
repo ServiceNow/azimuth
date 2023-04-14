@@ -212,7 +212,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         elif fut.status == "lost":
             log.warning(f"Future is lost in {self.name}! Retrying")
             fut.retry()
-        elif fut.status == "finished" and not self.future.is_custom:
+        elif fut.status == "finished" and not fut.is_custom:
             # Store the result in cache
             self._store_data_in_cache(fut.result(), fut.indices)
             log.info(f"{self.name} completed and stored in cache", status=fut.status)
