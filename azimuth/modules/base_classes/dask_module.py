@@ -233,6 +233,9 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         if self.done_event is not None:
             self.done_event.wait()
 
+    def should_be_started(self):
+        return self.status() not in {"pending", "finished"} and not self.done()
+
     def status(self):
         """Return the status of the future.
 
