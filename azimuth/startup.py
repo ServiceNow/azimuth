@@ -338,9 +338,15 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
                 continue
             last_per_status = per_status
 
-            log.info(f"Startup tasks statuses: {len(per_status['finished'])}/{len(startup_mods)}")
-            for status, modules in per_status.items():
-                log.info(f"{status} ({len(modules)}): {', '.join(modules)}")
+            logs = [
+                f"Startup tasks statuses: {len(per_status['finished'])}/{len(startup_mods)}",
+                *(
+                    f"{status} ({len(per_status[status])}): {', '.join(per_status[status])}"
+                    for status in ("not_started", "pending", "lost", "error", "saving", "finished")
+                    if status in per_status
+                ),
+            ]
+            log.info("\n\t".join(logs))
 
     thread_log_progress = threading.Thread(target=log_progress)
     thread_log_progress.start()
