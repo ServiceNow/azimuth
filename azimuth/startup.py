@@ -326,7 +326,7 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     done = False
 
     def log_progress():
-        last_per_status: Dict[str, List[str]] = {}
+        last_per_status = None
         while not done:
             time.sleep(5)  # to avoid spamming the user with logs.
             per_status = defaultdict(list)
@@ -371,5 +371,3 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     # After restarting, it is safe to unlock the task manager.
     task_manager.unlock()
     log.info("Cluster restarted to free memory.")
-
-    thread_log_progress.join()
