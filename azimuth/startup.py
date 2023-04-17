@@ -35,7 +35,7 @@ log = structlog.get_logger()
 
 @dataclass
 class Startup:
-    name: str
+    name: str  # TODO Improve: A name cannot be a substring of any other names.
     module: SupportedTask
     mod_options: Dict = field(default_factory=dict)
     # The names of other start-up tasks to wait for.
@@ -107,25 +107,28 @@ SALIENCY_TASKS = [
 ]
 
 BASE_PREDICTION_TASKS = [
-    Startup("prediction", SupportedMethod.Predictions, run_on_all_pipelines=True),
+    Startup("predictions", SupportedMethod.Predictions, run_on_all_pipelines=True),
     Startup(
-        "outcome",
+        "outcomes",
         SupportedModule.Outcome,
-        dependency_names=["prediction"],
+        dependency_names=["predictions"],
         run_on_all_pipelines=True,
     ),
     Startup(
         "confidence_bins",
         SupportedModule.ConfidenceBinIndex,
-        dependency_names=["prediction"],
+        dependency_names=["predictions"],
         run_on_all_pipelines=True,
     ),
+]
+
+PER_FILTER_TASKS = [
     Startup(
         "metrics_by_filter",
         SupportedModule.MetricsPerFilter,
         dependency_names=[
-            "prediction",
-            "outcome",
+            "predictions",
+            "outcomes",
             "prediction_comparison",
             "perturbation_testing",
             "neighbors_tags",
@@ -133,7 +136,7 @@ BASE_PREDICTION_TASKS = [
             "syntax_tags",
         ],
         run_on_all_pipelines=True,
-    ),
+    )
 ]
 
 
@@ -230,9 +233,13 @@ def startup_tasks(
 
     """
     config = task_manager.config
+    # The order in start_up_tasks matters; a task needs to be added after its dependencies.
+    # TODO Refactor so the startup can be robust to the order in start_up_tasks.
     start_up_tasks = [
         Startup("syntax_tags", SupportedModule.SyntaxTagging),
     ]
+    if similarity_available(config):
+        start_up_tasks += SIMILARITY_TASKS
     if predictions_available(config):
         start_up_tasks += BASE_PREDICTION_TASKS
         if perturbation_testing_available(config):
@@ -246,8 +253,7 @@ def startup_tasks(
             start_up_tasks += POSTPROCESSING_TASKS
         if saliency_available(config):
             start_up_tasks += SALIENCY_TASKS
-    if similarity_available(config):
-        start_up_tasks += SIMILARITY_TASKS
+        start_up_tasks += PER_FILTER_TASKS
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
