@@ -601,20 +601,17 @@ class DatasetSplitManager:
         Raises:
             FileNotFoundError if no cache found.
         """
-        cache_file = next(
-            iter(
-                sorted(
-                    glob(f"{folder}/version*.arrow"),
-                    key=lambda file_path: float(file_path.split("_")[-1][:-6]),
-                    reverse=True,
-                )
-            ),
-            None,
-        )
-        if not cache_file:
+
+        def get_time_from_file_name(file_path):
+            return float(file_path.split("_")[-1][:-6])
+
+        try:
+            cache_files = glob(f"{folder}/version*.arrow")
+            cache_file = next(iter(sorted(cache_files, key=get_time_from_file_name, reverse=True)))
+        except StopIteration:
             raise FileNotFoundError(f"No previously saved dataset in {folder}")
 
-        last_update = float(cache_file.split("_")[-1][:-6])
+        last_update = get_time_from_file_name(cache_file)
         if current_last_update >= last_update:
             return None, -1
 
