@@ -348,7 +348,7 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
             ]
             log.info("\n\t".join(logs))
 
-    thread_log_progress = threading.Thread(target=log_progress)
+    thread_log_progress = threading.Thread(target=log_progress, daemon=True)
     thread_log_progress.start()
     for mod in startup_mods.values():
         mod.result()
