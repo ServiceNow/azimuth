@@ -122,7 +122,7 @@ BASE_PREDICTION_TASKS = [
     ),
 ]
 
-LAST_TASKS = [
+PER_FILTER_TASKS = [
     Startup(
         "metrics_by_filter",
         SupportedModule.MetricsPerFilter,
@@ -253,7 +253,7 @@ def startup_tasks(
             start_up_tasks += POSTPROCESSING_TASKS
         if saliency_available(config):
             start_up_tasks += SALIENCY_TASKS
-        start_up_tasks += LAST_TASKS
+        start_up_tasks += PER_FILTER_TASKS
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
