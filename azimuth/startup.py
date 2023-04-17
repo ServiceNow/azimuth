@@ -328,16 +328,38 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     """
     start_time = time.time()
     task_manager.lock()  # Lock the TaskManager to prevent new tasks.
-    while not all(m.done() for m in startup_mods.values()):
-        time.sleep(30)  # We wait to not spam the user with logs.
-        is_done = {k: v.done() for k, v in startup_mods.items()}
-        per_status = defaultdict(list)
-        for name, mod in startup_mods.items():
-            status = "saving" if mod.status() == "finished" and not mod.done() else mod.status()
-            per_status[status].append(name)
-        log.info(f"Startup tasks statuses: {sum(is_done.values())}/{len(is_done)}")
-        for status, modules in per_status.items():
-            log.info(f"{status} ({len(modules)}): {', '.join(modules)}")
+
+    done = False
+
+    def log_progress():
+        last_per_status = None
+        while not done:
+            time.sleep(5)  # to avoid spamming the user with logs.
+            per_status = defaultdict(list)
+            for name, mod in startup_mods.items():
+                status = "saving" if mod.status() == "finished" and not mod.done() else mod.status()
+                per_status[status].append(name)
+
+            if per_status == last_per_status:
+                continue
+            last_per_status = per_status
+
+            logs = [
+                f"Startup tasks statuses: {len(per_status['finished'])}/{len(startup_mods)}",
+                *(
+                    f"{status} ({len(per_status[status])}): {', '.join(per_status[status])}"
+                    for status in ("not_started", "pending", "lost", "error", "saving", "finished")
+                    if status in per_status
+                ),
+            ]
+            log.info("\n\t".join(logs))
+
+    thread_log_progress = threading.Thread(target=log_progress, daemon=True)
+    thread_log_progress.start()
+    for mod in startup_mods.values():
+        mod.result()
+
+    done = True
 
     log.info("Startup task completed. The application should be accessible now.")
     log.debug(f"Startup took {time.time() - start_time}.")
