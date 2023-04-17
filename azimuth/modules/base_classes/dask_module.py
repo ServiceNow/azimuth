@@ -237,7 +237,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         """Return the status of the future.
 
         Returns:
-            One of {'not_started', 'pending', 'lost', 'error', 'done'}.
+            One of {'not_started', 'pending', 'lost', 'error', 'finished'}.
             If the task was not launched, `not_started` will be returned by default.
         """
         if self.future:
