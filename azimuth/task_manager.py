@@ -146,8 +146,8 @@ class TaskManager:
             key = task.task_id
             task = self.current_tasks.setdefault(key, task)
 
-            is_expired_uncached = isinstance(task, ExpirableMixin) and task.is_expired(last_update)
-            if not task.done() or is_expired_uncached:
+            is_expired = isinstance(task, ExpirableMixin) and task.is_expired(last_update)
+            if task.should_be_started() or is_expired:
                 if dependencies is not None:
                     dependencies = [d for d in dependencies if not d.done()]
                 task.start_task_on_dataset_split(self.client, dependencies=dependencies)
