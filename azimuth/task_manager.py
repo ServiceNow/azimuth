@@ -213,7 +213,7 @@ class TaskManager:
         }
 
     def restart(self):
-        log.info("Cluster restarted to free memory.")
         for task_name, module in self.current_tasks.items():
             module.future = None
         self.client.restart()
+        log.info("Cluster restarted to free memory.")

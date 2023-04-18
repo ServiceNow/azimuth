@@ -67,7 +67,8 @@ class ArtifactManager:
     """This class is a singleton which holds different artifacts.
 
     Artifacts include dataset_split_managers, datasets and models for each config, so they don't
-    need to be reloaded many times for a same module.
+    need to be reloaded many times for a same module. Inspired from
+    https://stackoverflow.com/questions/31875/is-there-a-simple-elegant-way-to-define-singletons.
     """
 
     def __init__(self):

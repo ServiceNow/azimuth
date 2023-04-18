@@ -359,6 +359,7 @@ class ModelContractConfig(CommonFieldsConfig):
         return pipeline_definitions
 
     def get_model_contract_hash(self):
+        """Hash for fields related to model contract only (excluding fields from the parents)."""
         return md5_hash(
             self.dict(
                 include=ModelContractConfig.__fields__.keys()
