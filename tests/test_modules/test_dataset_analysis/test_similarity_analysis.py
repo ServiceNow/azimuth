@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.preprocessing import normalize
 
 import azimuth.modules.dataset_analysis.similarity_analysis as faiss_mod
+from azimuth.app import load_dataset_split_managers_from_config
 from azimuth.dataset_split_manager import FEATURE_FAISS
 from azimuth.modules.dataset_analysis.similarity_analysis import NeighborsTaggingModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions
@@ -53,10 +54,10 @@ def test_neighbors(simple_text_config, dask_client, monkeypatch):
     assert any(mod.get_dataset_split()[SmartTag.conflicting_neighbors_eval])
     assert "neighbors_eval" in mod.get_dataset_split().column_names
     assert "no_close_train" in mod.get_dataset_split().column_names
-    mod.clear_cache()
 
     # Reloading the dataset_split, FAISS is still there.
-    ds = mod.get_dataset_split_manager().dataset_split_with_index(simple_table_key)
+    dm = load_dataset_split_managers_from_config(simple_text_config)[DatasetSplitName.eval]
+    ds = dm.dataset_split_with_index(simple_table_key)
     _ = ds.get_nearest_examples(FEATURE_FAISS, embd, k=5)
 
     # Confirm that module works with subset of indices
