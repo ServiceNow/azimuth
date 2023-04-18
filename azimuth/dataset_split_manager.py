@@ -103,14 +103,13 @@ class DatasetSplitManager:
         else:
             self._base_dataset_split, self._malformed_dataset = cached_base_dataset_split
         self._prediction_tables: Dict[PredictionTableKey, Dataset] = {}
-        self._prediction_tables_last_update: Dict[PredictionTableKey, Time] = defaultdict(int)
+        self._prediction_tables_last_update: Dict[PredictionTableKey, Time] = defaultdict(float)
         self._validate_columns()
 
     @property
     def last_update(self) -> Time:
         return max(
-            [self._base_dataset_split_last_update]
-            + list(self._prediction_tables_last_update.values())
+            (self._base_dataset_split_last_update, *self._prediction_tables_last_update.values())
         )
 
     def get_dataset_split(self, table_key: Optional[PredictionTableKey] = None) -> Dataset:
@@ -123,9 +122,9 @@ class DatasetSplitManager:
             Dataset with predictions if available.
         """
         current_last_update = self._base_dataset_split_last_update
-        newest_base_ds, last_update = self.load_latest_cache(self._save_path, current_last_update)
-        if newest_base_ds:
-            self._base_dataset_split = newest_base_ds
+        latest_base_ds, last_update = self.load_latest_cache(self._save_path, current_last_update)
+        if latest_base_ds:
+            self._base_dataset_split = latest_base_ds
             self._base_dataset_split_last_update = last_update
         if table_key is None:
             return self._base_dataset_split
@@ -187,9 +186,8 @@ class DatasetSplitManager:
         with FileLock(self._file_lock):
             version_path, last_update = self._get_new_version_path(self._save_path)
             self._base_dataset_split.save_to_disk(version_path)
-            self._malformed_dataset.save_to_disk(
-                self._get_new_version_path(self._malformed_path)[0]
-            )
+            malformed, _ = self._get_new_version_path(self._malformed_path)
+            self._malformed_dataset.save_to_disk(malformed)
         self._base_dataset_split_last_update = last_update
         log.debug("Base dataset split saved.", path=version_path)
 
@@ -491,18 +489,18 @@ class DatasetSplitManager:
         """
 
         pred_path = self._prediction_path(table_key=table_key)
-        if not os.path.exists(pred_path):
-            empty_ds = Dataset.from_dict({"pred_row_idx": list(range(self.num_rows))})
-            self._prediction_tables[table_key] = self._init_dataset_split(
-                empty_ds, self._prediction_tags
-            ).remove_columns([DatasetColumn.row_idx])
-            self.save_prediction_table(table_key)
-        else:
+        if os.path.exists(pred_path):
             current_last_update = self._prediction_tables_last_update[table_key]
             newest_pred_ds, last_update = self.load_latest_cache(pred_path, current_last_update)
             if newest_pred_ds:
                 self._prediction_tables[table_key] = newest_pred_ds
                 self._prediction_tables_last_update[table_key] = last_update
+        else:
+            empty_ds = Dataset.from_dict({"pred_row_idx": list(range(self.num_rows))})
+            self._prediction_tables[table_key] = self._init_dataset_split(
+                empty_ds, self._prediction_tags
+            ).remove_columns([DatasetColumn.row_idx])
+            self.save_prediction_table(table_key)
         return self._prediction_tables[table_key]
 
     def _prediction_path(self, table_key: PredictionTableKey) -> str:
