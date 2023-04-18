@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Dict, Optional
+from typing import Dict
 
 import structlog
 from datasets import DatasetDict
@@ -12,9 +12,7 @@ from azimuth.config import (
     PerturbationTestingConfig,
     SimilarityConfig,
 )
-from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.types import DatasetSplitName, SupportedModelContract
-from azimuth.types.tag import ALL_PREDICTION_TAGS, ALL_STANDARD_TAGS
 from azimuth.utils.object_loader import load_custom_object
 
 log = structlog.get_logger()
@@ -57,38 +55,6 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
 
 def update_config(old_config: AzimuthConfig, partial_config: Dict) -> AzimuthConfig:
     return old_config.copy(update=partial_config, deep=True)
-
-
-def load_dataset_split_managers_from_config(
-    azimuth_config: AzimuthConfig,
-) -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
-    """
-    Load all dataset splits for the application.
-
-    Args:
-        azimuth_config: Azimuth Configuration.
-
-    Returns:
-        For all DatasetSplitName, None or a dataset_split manager.
-
-    """
-    dataset = load_dataset_from_config(azimuth_config)
-
-    def make_dataset_split_manager(name: DatasetSplitName):
-        return DatasetSplitManager(
-            name=name,
-            config=azimuth_config,
-            initial_tags=ALL_STANDARD_TAGS,
-            initial_prediction_tags=ALL_PREDICTION_TAGS,
-            dataset_split=dataset[name],
-        )
-
-    return {
-        dataset_split_name: None
-        if dataset_split_name not in dataset
-        else make_dataset_split_manager(DatasetSplitName[dataset_split_name])
-        for dataset_split_name in [DatasetSplitName.eval, DatasetSplitName.train]
-    }
 
 
 def predictions_available(config: ModelContractConfig) -> bool:

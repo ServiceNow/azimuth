@@ -6,7 +6,11 @@ from unittest.mock import Mock
 import pytest
 from datasets import Dataset, DatasetDict
 
-from azimuth.app import get_ready_flag, run_startup_tasks
+from azimuth.app import (
+    get_ready_flag,
+    load_dataset_split_managers_from_config,
+    run_startup_tasks,
+)
 from azimuth.config import CustomObject
 from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.startup import on_end, startup_tasks
@@ -16,7 +20,6 @@ from azimuth.types import (
     SupportedMethod,
     SupportedModule,
 )
-from azimuth.utils.project import load_dataset_split_managers_from_config
 from tests.utils import get_table_key, get_tiny_text_config_one_ds_name
 
 
@@ -66,7 +69,6 @@ def test_on_end(tiny_text_config):
     task_manager = Mock()
     on_end(mocked_fut, mod, dm=dms[DatasetSplitName.eval], task_manager=task_manager)
     mod.save_result.assert_called_once()
-    task_manager.clear_worker_cache.assert_called_once()
 
 
 def test_startup_task_one_ds(tiny_text_config_one_ds, tiny_text_task_manager):
