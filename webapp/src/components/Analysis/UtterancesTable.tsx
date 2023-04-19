@@ -222,34 +222,18 @@ const UtterancesTable: React.FC<Props> = ({
         })
       : "";
 
-  const handlePageChange = (page: number) => {
-    const q = constructSearchString({
-      ...confusionMatrix,
-      ...filters,
-      ...pagination,
-      ...pipeline,
-      ...postprocessing,
-      page: page + 1,
-    });
-    history.push(`/${jobId}/dataset_splits/${datasetSplitName}/utterances${q}`);
-  };
+  const handlePageChange = (page: number) =>
+    history.push(getUpdatedLocation({ page: page + 1 }));
 
   const handleSortModelChange = ([model]:
     | GridSortItem[]
     | [GridSortItem]
     | []) =>
     history.push(
-      `/${jobId}/dataset_splits/${datasetSplitName}/utterances${constructSearchString(
-        {
-          ...confusionMatrix,
-          ...filters,
-          ...pagination,
-          ...pipeline,
-          ...postprocessing,
-          sort: model?.field as UtterancesSortableColumn | undefined,
-          descending: model?.sort === "desc" || undefined,
-        }
-      )}`
+      getUpdatedLocation({
+        sort: model?.field as UtterancesSortableColumn | undefined,
+        descending: model?.sort === "desc" || undefined,
+      })
     );
 
   const toCloseDetails = getUpdatedLocation({ details: undefined });
