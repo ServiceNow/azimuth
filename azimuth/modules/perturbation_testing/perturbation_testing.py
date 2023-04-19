@@ -10,6 +10,7 @@ from datasets import Dataset
 from azimuth.config import PerturbationTestingConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.types import (
     DatasetColumn,
@@ -58,7 +59,7 @@ class PerturbationTestingModule(DatasetResultModule[PerturbationTestingConfig]):
     """
 
     required_mod_options = {"pipeline_index"}
-    can_load_model = True
+    worker = Worker.model
 
     def __init__(
         self,

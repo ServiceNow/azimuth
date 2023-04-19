@@ -9,6 +9,7 @@ import spacy
 
 from azimuth.config import TopWordsConfig
 from azimuth.modules.base_classes import FilterableModule
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.modules.task_execution import get_task_result
 from azimuth.modules.word_analysis.tokens_to_words import TokensToWordsModule
 from azimuth.types import ModuleOptions
@@ -33,7 +34,7 @@ class TopWordsModule(FilterableModule[TopWordsConfig]):
         "th_importance",
         "force_no_saliency",
     }
-    can_load_model = True
+    worker = Worker.model
 
     @staticmethod
     def count_words(list_of_words: List[str], top_x: int) -> List[TopWordsResult]:

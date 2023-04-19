@@ -16,6 +16,7 @@ from tqdm import tqdm
 from azimuth.config import SimilarityConfig, SimilarityOptions
 from azimuth.dataset_split_manager import FEATURE_FAISS, DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule, IndexableModule
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.modules.task_execution import get_task_result
 from azimuth.types import Array, DatasetColumn, DatasetSplitName, ModuleOptions
 from azimuth.types.similarity_analysis import FAISSResponse
@@ -28,7 +29,7 @@ NUM_NEIGHBORS = 20
 class FAISSModule(IndexableModule[SimilarityConfig]):
     """Compute the FAISS features for a dataset split."""
 
-    can_load_encoder = True
+    worker = Worker.encoder
 
     def __init__(
         self,
@@ -47,6 +48,8 @@ class FAISSModule(IndexableModule[SimilarityConfig]):
         return model_name_or_path
 
     def get_encoder(self):
+        if self.worker != Worker.encoder:
+            raise RuntimeError("This module cannot load the encoder. Modify self.worker.")
         if self.encoder is None:
             with FileLock(os.path.join(self.cache_dir, "st.lock")):
                 self.encoder = SentenceTransformer(self.get_encoder_name_or_path())

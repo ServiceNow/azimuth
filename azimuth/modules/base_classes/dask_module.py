@@ -7,6 +7,7 @@ import os
 import threading
 import time
 import uuid
+from enum import IntEnum
 from functools import partial
 from os.path import join as pjoin
 from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, cast
@@ -25,6 +26,11 @@ log = structlog.get_logger()
 ConfigScope = TypeVar("ConfigScope", bound=CommonFieldsConfig)
 
 
+class Worker(IntEnum):
+    model = 0
+    encoder = 1
+
+
 class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
     """Abstract class that define an item of work to be computed on the cluster.
 
@@ -37,8 +43,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
     """
 
     allowed_splits = {DatasetSplitName.train, DatasetSplitName.eval}
-    can_load_model: bool = False
-    can_load_encoder: bool = False
+    worker: Optional[Worker] = None
 
     def __init__(
         self,
@@ -120,7 +125,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             pure=False,
             dependencies=deps,
             key=f"{self.task_id}_{uuid.uuid4()}",  # Unique identifier
-            workers=0 if self.can_load_model else 1 if self.can_load_encoder else None,
+            workers=self.worker,
         )
         # Tell that this future is used on which indices.
         self.future.indices = self.get_caching_indices()
