@@ -28,7 +28,7 @@ ConfigScope = TypeVar("ConfigScope", bound=CommonFieldsConfig)
 
 class Worker(IntEnum):
     model = 0
-    encoder = 1
+    encoder = 0
 
 
 class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
