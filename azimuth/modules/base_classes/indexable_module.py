@@ -12,6 +12,7 @@ from datasets import Dataset
 from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import ConfigScope, Module
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.types import (
     DatasetColumn,
     DatasetSplitName,
@@ -76,6 +77,7 @@ class DatasetResultModule(IndexableModule[ConfigScope], ABC):
 class ModelContractModule(DatasetResultModule[ModelContractConfig], abc.ABC):
     required_mod_options: Set[str] = {"pipeline_index", "model_contract_method_name"}
     optional_mod_options: Set[str] = DatasetResultModule.optional_mod_options | {"threshold"}
+    worker = Worker.model
 
     def compute(self, batch: Dataset) -> List[ModuleResponse]:
         my_func = self.route_request(assert_not_none(self.model_contract_method_name))
