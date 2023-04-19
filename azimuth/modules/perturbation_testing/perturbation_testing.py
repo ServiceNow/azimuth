@@ -59,6 +59,8 @@ class PerturbationTestingModule(DatasetResultModule[PerturbationTestingConfig]):
     """
 
     required_mod_options = {"pipeline_index"}
+    # This module doesn't call self.get_model() but requires the model (predict_task.compute(batch))
+    # TODO Find a more robust way to determine when modules require models.
     worker = Worker.model
 
     def __init__(
