@@ -9,10 +9,8 @@ import structlog
 from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
@@ -31,6 +29,10 @@ from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
+from azimuth.utils.exception_handlers import (
+    handle_internal_error,
+    handle_validation_error,
+)
 from azimuth.utils.logs import set_logger_config
 from azimuth.utils.validation import assert_not_none
 
@@ -58,23 +60,6 @@ COMMON_HTTP_ERROR_CODES = (
 
 class HTTPExceptionModel(BaseModel):
     detail: str
-
-
-async def handle_validation_error(request: Request, exception: RequestValidationError):
-    return JSONResponse(
-        status_code=HTTP_404_NOT_FOUND  # for errors in paths, e.g., /dataset_splits/potato
-        if "path" in (error["loc"][0] for error in exception.errors())
-        else HTTP_400_BAD_REQUEST,  # for other errors like in query params, e.g., pipeline_index=-1
-        content={"detail": str(exception)},
-    )
-
-
-async def handle_internal_error(request: Request, exception: Exception):
-    # Don't expose this unexpected internal error as that could expose a security vulnerability.
-    return JSONResponse(
-        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Internal server error"},
-    )
 
 
 def get_dataset_split_manager_mapping() -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
@@ -184,6 +169,8 @@ def create_app() -> FastAPI:
         default_response_class=JSONResponseIgnoreNan,
         responses={code: {"model": HTTPExceptionModel} for code in COMMON_HTTP_ERROR_CODES},
         exception_handlers={
+            ValidationError: handle_validation_error,  # for PATCH "/config",
+            # where we call old_config.copy(update=partial_config, deep=True) ourselves.
             RequestValidationError: handle_validation_error,
             HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
         },

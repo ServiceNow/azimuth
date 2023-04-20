@@ -1,8 +1,15 @@
 from fastapi import FastAPI
 from jsonlines import jsonlines
+from starlette.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 from starlette.testclient import TestClient
 
 from azimuth.config import SupportedLanguage, config_defaults_per_language
+from azimuth.types import SupportedModelContract
+from tests.utils import get_enum_validation_error_msg
 
 
 def test_get_default_config(app: FastAPI):
@@ -234,11 +241,11 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     with jsonlines.open(jsonl_file_path, "r") as reader:
         initial_config_count = len(list(reader))
 
-    res = client.patch(
+    resp = client.patch(
         "/config",
         json={"model_contract": "file_based_text_classification", "pipelines": None},
     )
-    assert res.json()["model_contract"] == "file_based_text_classification"
+    assert resp.json()["model_contract"] == "file_based_text_classification"
     get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
     assert not get_config["pipelines"]
@@ -247,13 +254,16 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     assert new_config_count == initial_config_count + 1
 
     # Config Validation Error
-    res = client.patch("/config", json={"model_contract": "potato"})
-    assert res.status_code == 400
+    resp = client.patch("/config", json={"model_contract": "potato"})
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == (
+        f"AzimuthConfig['model_contract']: {get_enum_validation_error_msg(SupportedModelContract)}"
+    )
     get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
 
     # Validation Module Error
-    res = client.patch(
+    resp = client.patch(
         "/config",
         json={
             "pipelines": [
@@ -261,13 +271,13 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
             ]
         },
     )
-    assert res.status_code == 500
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
     get_config = client.get("/config").json()
     assert not get_config["pipelines"]
 
     # Empty update
-    res = client.patch("/config", json={})
-    assert res.status_code == 200
+    resp = client.patch("/config", json={})
+    assert resp.status_code == HTTP_200_OK, resp.text
     assert get_config == client.get("/config").json()
 
     with jsonlines.open(jsonl_file_path, "r") as reader:
