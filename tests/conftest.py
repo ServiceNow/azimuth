@@ -32,7 +32,7 @@ from tests.utils import (
 @pytest.fixture(autouse=True, scope="function")
 def cleanup_class():
     yield
-    ArtifactManager.clear_cache()
+    ArtifactManager.clear_instance()
 
 
 def kill_scheduler(dask_scheduler=None):
@@ -42,7 +42,7 @@ def kill_scheduler(dask_scheduler=None):
 def cleanup_workers():
     import gc
 
-    ArtifactManager.clear_cache()
+    ArtifactManager.clear_instance()
     gc.collect()
 
 
@@ -212,8 +212,8 @@ def clinc_text_config(tmp_path):
         pipelines=[PIPELINE_CFG],
         artifact_path=str(tmp_path),
     )
-    clinc_text_config.pipelines[0].postprocessors[0].temperature = 1
-    clinc_text_config.pipelines[0].postprocessors[0].kwargs["temperature"] = 1
+    clinc_text_config.pipelines[0].postprocessors[0].temperature = 1.0
+    clinc_text_config.pipelines[0].postprocessors[0].kwargs["temperature"] = 1.0
     clinc_text_config.pipelines[0].postprocessors[-1].threshold = 0.5
     clinc_text_config.pipelines[0].postprocessors[-1].kwargs["threshold"] = 0.5
     return clinc_text_config

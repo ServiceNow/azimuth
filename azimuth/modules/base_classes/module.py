@@ -10,6 +10,7 @@ from tqdm import tqdm
 from azimuth.config import ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.types.general.module_arguments import ModuleEffectiveArguments
 from azimuth.utils.conversion import md5_hash
@@ -79,7 +80,7 @@ class Module(DaskModule[ConfigScope]):
     def artifact_manager(self):
         """This is set as a property so the Module always have access to the current version of
         the ArtifactManager on the worker."""
-        return ArtifactManager.get_instance()
+        return ArtifactManager.instance()
 
     @property
     def available_dataset_splits(self) -> Set[DatasetSplitName]:
@@ -164,6 +165,8 @@ class Module(DaskModule[ConfigScope]):
         Raises:
             ValueError if no valid pipeline exists.
         """
+        if self.worker != Worker.model:
+            raise RuntimeError("This module cannot load the model. Modify self.worker.")
         _ = self.get_pipeline_definition()  # Validate current pipeline exists
         return self.artifact_manager.get_model(self.config, self.mod_options.pipeline_index)
 
@@ -215,6 +218,3 @@ class Module(DaskModule[ConfigScope]):
         pipeline_index = assert_not_none(self.mod_options.pipeline_index)
         current_pipeline = pipelines[pipeline_index]
         return current_pipeline
-
-    def clear_cache(self):
-        self.artifact_manager.clear_cache()

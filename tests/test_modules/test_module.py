@@ -22,8 +22,6 @@ def test_ds_loading(simple_text_config):
 
     project_hash = mod.config.get_project_hash()
     assert len(mod.artifact_manager.dataset_split_managers_mapping[project_hash]) == 1
-    mod.clear_cache()
-    assert mod.artifact_manager.dataset_split_managers_mapping.get(project_hash) is None
 
 
 def test_model_loading(simple_text_config):
@@ -165,21 +163,23 @@ def my_dataset_fn(valid):
 
 
 def test_validation_priority(simple_text_config):
-    simple_text_config.dataset = CustomObject(
+    new_simple_text_config = simple_text_config.copy(deep=True)
+    new_simple_text_config.dataset = CustomObject(
         class_name="tests.test_modules.test_module.my_dataset_fn", kwargs={"valid": True}
     )
     mod = IndexableModule(
-        DatasetSplitName.eval, config=simple_text_config, mod_options=ModuleOptions(indices=[0, 1])
+        DatasetSplitName.eval,
+        config=new_simple_text_config,
+        mod_options=ModuleOptions(indices=[0, 1]),
     )
     ds = mod.get_dataset_split()
     assert ds["utterance"] == ["d", "e"]
 
     # Otherwise, we take validation
-    simple_text_config.dataset = CustomObject(
+    new_simple_text_config.dataset = CustomObject(
         class_name="tests.test_modules.test_module.my_dataset_fn", kwargs={"valid": False}
     )
-    mod.clear_cache()
-    mod = Module(DatasetSplitName.eval, config=simple_text_config)
+    mod = Module(DatasetSplitName.eval, config=new_simple_text_config)
     ds = mod.get_dataset_split()
     assert ds["utterance"] == ["h", "i", "j"]
 

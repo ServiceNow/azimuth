@@ -153,8 +153,6 @@ def on_end(fut: Future, module: DaskModule, dm: DatasetSplitManager, task_manage
         # Task is done, save the result.
         if isinstance(module, DatasetResultModule):
             module.save_result(module.result(), dm)
-            # We only need to clear cache when the dataset is modified.
-            task_manager.clear_worker_cache()
     else:
         log.exception("Error in", module=module, fut=fut, exc_info=fut.exception())
 
@@ -257,12 +255,16 @@ def startup_tasks(
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
-    # Start a thread to monitor the status.
-    th = threading.Thread(
-        target=wait_for_startup, args=(mods, task_manager), name=START_UP_THREAD_NAME
-    )
-    th.setDaemon(True)
-    th.start()
+    startup_ready = all(m.done() for m in mods.values())
+    if startup_ready:
+        log.info("Loading the application from cache. It should be accessible now.")
+    else:
+        # Start a thread to monitor the status.
+        th = threading.Thread(
+            target=wait_for_startup, args=(mods, task_manager), name=START_UP_THREAD_NAME
+        )
+        th.setDaemon(True)
+        th.start()
 
     return mods
 
@@ -328,16 +330,38 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     """
     start_time = time.time()
     task_manager.lock()  # Lock the TaskManager to prevent new tasks.
-    while not all(m.done() for m in startup_mods.values()):
-        time.sleep(30)  # We wait to not spam the user with logs.
-        is_done = {k: v.done() for k, v in startup_mods.items()}
-        per_status = defaultdict(list)
-        for name, mod in startup_mods.items():
-            status = "saving" if mod.status() == "finished" and not mod.done() else mod.status()
-            per_status[status].append(name)
-        log.info(f"Startup tasks statuses: {sum(is_done.values())}/{len(is_done)}")
-        for status, modules in per_status.items():
-            log.info(f"{status} ({len(modules)}): {', '.join(modules)}")
+
+    done = False
+
+    def log_progress():
+        last_per_status = None
+        while not done:
+            time.sleep(5)  # to avoid spamming the user with logs.
+            per_status = defaultdict(list)
+            for name, mod in startup_mods.items():
+                status = "saving" if mod.status() == "finished" and not mod.done() else mod.status()
+                per_status[status].append(name)
+
+            if per_status == last_per_status:
+                continue
+            last_per_status = per_status
+
+            logs = [
+                f"Startup tasks statuses: {len(per_status['finished'])}/{len(startup_mods)}",
+                *(
+                    f"{status} ({len(per_status[status])}): {', '.join(per_status[status])}"
+                    for status in ("not_started", "pending", "lost", "error", "saving", "finished")
+                    if status in per_status
+                ),
+            ]
+            log.info("\n\t".join(logs))
+
+    thread_log_progress = threading.Thread(target=log_progress, daemon=True)
+    thread_log_progress.start()
+    for mod in startup_mods.values():
+        mod.result()
+
+    done = True
 
     log.info("Startup task completed. The application should be accessible now.")
     log.debug(f"Startup took {time.time() - start_time}.")
@@ -354,4 +378,3 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     task_manager.restart()
     # After restarting, it is safe to unlock the task manager.
     task_manager.unlock()
-    log.info("Cluster restarted to free memory.")
