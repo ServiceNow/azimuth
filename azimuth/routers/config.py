@@ -91,8 +91,10 @@ def patch_config(
         new_config = config
         initialize_managers(new_config, task_manager.cluster)
         log.info("Config update cancelled.")
-        if isinstance(e, (AzimuthValidationError, ValidationError)):
+        if isinstance(e, AzimuthValidationError):
             raise HTTPException(HTTP_400_BAD_REQUEST, detail=str(e))
+        if isinstance(e, ValidationError):
+            raise
         else:
             raise HTTPException(
                 HTTP_500_INTERNAL_SERVER_ERROR, detail="Error when loading the new config."

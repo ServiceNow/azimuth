@@ -1,7 +1,9 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from enum import Enum
 from pathlib import Path
+from typing import Type
 
 import numpy as np
 
@@ -201,3 +203,8 @@ def get_tiny_text_config_one_ds_name(config):
         DatasetSplitName.train if ds_name == DatasetSplitName.eval else DatasetSplitName.eval
     )
     return ds_name, other_ds_name
+
+
+def get_enum_validation_error_msg(enum: Type[Enum]):
+    permitted = ", ".join(repr(v.value) for v in enum)
+    return f"value is not a valid enumeration member; permitted: {permitted}"

@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Meaningful error messages in the error toasts.
 
 ### Changed
 
@@ -19,5 +20,7 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Fix config modal closing unexpectedly on unsuccessful config update.
+- Fix breadcrumbs not showing up (regression in 2.6.0).
 
 ### Security

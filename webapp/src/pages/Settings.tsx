@@ -1,25 +1,25 @@
-import {Close, Warning} from "@mui/icons-material";
+import { Close, Warning } from "@mui/icons-material";
 import {
-    Box,
-    Button,
-    Checkbox,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    FormControl,
-    FormControlLabel,
-    formControlLabelClasses,
-    FormGroup,
-    formGroupClasses,
-    FormHelperText,
-    IconButton,
-    InputBaseComponentProps,
-    inputClasses,
-    inputLabelClasses,
-    Paper,
-    Typography,
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  formControlLabelClasses,
+  FormGroup,
+  formGroupClasses,
+  FormHelperText,
+  IconButton,
+  InputBaseComponentProps,
+  inputClasses,
+  inputLabelClasses,
+  Paper,
+  Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
@@ -30,17 +30,21 @@ import StringArrayField from "components/Settings/StringArrayField";
 import StringField from "components/Settings/StringField";
 import _ from "lodash";
 import React from "react";
-import {useParams} from "react-router-dom";
-import {getConfigEndpoint, getDefaultConfigEndpoint, updateConfigEndpoint,} from "services/api";
+import { useParams } from "react-router-dom";
 import {
-    AzimuthConfig,
-    PipelineDefinition,
-    SupportedLanguage,
-    SupportedModelContract,
-    SupportedSpacyModels,
+  getConfigEndpoint,
+  getDefaultConfigEndpoint,
+  updateConfigEndpoint,
+} from "services/api";
+import {
+  AzimuthConfig,
+  PipelineDefinition,
+  SupportedLanguage,
+  SupportedModelContract,
+  SupportedSpacyModels,
 } from "types/api";
-import {PickByValue} from "types/models";
-import {UNKNOWN_ERROR} from "utils/const";
+import { PickByValue } from "types/models";
+import { UNKNOWN_ERROR } from "utils/const";
 
 const CONFIG_UPDATE_MESSAGE =
   "Please wait while the config changes are validated.";
@@ -64,7 +68,6 @@ const FIELDS: Record<
   max_delta_std_words: { ...FLOAT, units: "words" },
   short_utterance_max_word: { ...INT, units: "words" },
   long_utterance_min_word: { ...INT, units: "words" },
-  temperature: FLOAT,
   threshold: PERCENTAGE,
   nb_typos_per_utterance: INT,
   seed: INT,
