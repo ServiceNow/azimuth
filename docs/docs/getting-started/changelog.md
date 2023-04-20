@@ -1,5 +1,23 @@
 # Releases
 
+## [2.6.1] - 2023-04-20
+
+### Changed
+- All tasks that might use a GPU (when `use_cuda` is enabled) will be queued on the same Dask worker, so no two tasks try to use the GPU memory at the same time. This is especially useful if the environment has a single GPU and the model takes up all its memory.
+
+### Modified
+- General speed improvements.
+
+### Deprecated/Breaking Changes
+- The repo now needs `python>=3.9` when used without Docker.
+
+## Fixed
+- Fix intermittent issue where tasks could get lost during the startup (`distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.broadcast local=tcp://127.0.0.1:XXXXX remote=tcp://127.0.0.1:XXXXX>: Stream is closed.`).
+- Fix config modal closing unexpectedly on unsuccessful config update.
+- Fix the `OutcomeCountPerFilter` module that was too slow (regression in 2.6.0).
+- Fix breadcrumbs not showing up (regression in 2.6.0).
+- Fix validation on the number pickers from the behavioral testing config section.
+
 ## [2.6.0] - 2023-03-27
 
 ### Added
