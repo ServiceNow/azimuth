@@ -11,8 +11,6 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
@@ -31,6 +29,10 @@ from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
+from azimuth.utils.exception_handlers import (
+    handle_internal_error,
+    handle_validation_error,
+)
 from azimuth.utils.logs import set_logger_config
 from azimuth.utils.project import load_dataset_split_managers_from_config
 from azimuth.utils.validation import assert_not_none
@@ -59,52 +61,6 @@ COMMON_HTTP_ERROR_CODES = (
 
 class HTTPExceptionModel(BaseModel):
     detail: str
-
-
-async def handle_validation_error(request: Request, exception: ValidationError):
-    """Handle ValidationError.
-
-    Args:
-        request: Request
-        exception: ValidationError
-
-    Returns:
-        A JSONResponse with the appropriate error status code and content.
-    """
-
-    def pretty(location):
-        """Get a pretty representation of the error's location.
-
-        Args:
-            location: e.g. ["query", "outcome", 0] or ["uncertainty", "iterations"]
-
-        Returns:
-            e.g. "query parameter outcome=potato" or "AzimuthConfig['uncertainty']['iterations']"
-        """
-        if exception.model.__name__ == "Request" and location[0] in {"path", "query"}:
-            param_type, param, *index = location
-            params = getattr(request, f"{param_type}_params")
-            value = params.getlist(param)[index[0]] if index else params.get(param)
-            return f"{param_type} parameter {param}{'' if value is None else f'={value}'}"
-
-        return exception.model.__name__ + "".join(f"[{repr(p)}]" for p in location)
-
-    detail = "\n".join(dict.fromkeys(f'{pretty(e["loc"])}: {e["msg"]}' for e in exception.errors()))
-
-    return JSONResponse(
-        status_code=HTTP_404_NOT_FOUND  # for errors in paths, e.g., /dataset_splits/potato
-        if "path" in (error["loc"][0] for error in exception.errors())
-        else HTTP_400_BAD_REQUEST,  # for other errors like in query params, e.g., pipeline_index=-1
-        content={"detail": detail},
-    )
-
-
-async def handle_internal_error(request: Request, exception: Exception):
-    # Don't expose this unexpected internal error as that could expose a security vulnerability.
-    return JSONResponse(
-        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Internal server error"},
-    )
 
 
 def get_dataset_split_manager_mapping() -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
