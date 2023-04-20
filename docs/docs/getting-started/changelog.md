@@ -1,5 +1,22 @@
 # Releases
 
+## [2.6.1] - 2023-04-19
+
+### Added
+- If the user only has 1 GPU in the environment, it can be assigned to worker 0.
+
+### Modified
+- General speed improvements.
+
+### Deprecated/Breaking Changes
+- The repo now needs `python>=3.9` when used without Docker.
+
+## Fixed
+- Fix intermittent issue where tasks could get lost during the startup (`distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.broadcast local=tcp://127.0.0.1:XXXXX remote=tcp://127.0.0.1:XXXXX>: Stream is closed.`).
+- Fix config modal closing unexpectedly on unsuccessful config update.
+- Fix the `OutcomeCountPerFilter` module that was too slow (regression in 2.6.0).
+- Fix breadcrumbs not showing up (regression in 2.6.0).
+
 ## [2.6.0] - 2023-03-27
 
 ### Added
