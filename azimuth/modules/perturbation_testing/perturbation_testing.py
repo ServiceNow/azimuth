@@ -10,6 +10,7 @@ from datasets import Dataset
 from azimuth.config import PerturbationTestingConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.types import (
     DatasetColumn,
@@ -58,6 +59,9 @@ class PerturbationTestingModule(DatasetResultModule[PerturbationTestingConfig]):
     """
 
     required_mod_options = {"pipeline_index"}
+    # This module doesn't call self.get_model() but requires the model (predict_task.compute(batch))
+    # TODO Find a more robust way to determine when modules require models.
+    worker = Worker.model
 
     def __init__(
         self,

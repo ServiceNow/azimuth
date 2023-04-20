@@ -1,7 +1,7 @@
 import pytest
 
 from azimuth.config import CustomObject
-from azimuth.modules.utilities.validation import ValidationModule
+from azimuth.modules.validation.validation import ValidationModule
 from azimuth.types import DatasetSplitName, ModuleOptions
 from azimuth.utils.logs import MultipleExceptions
 

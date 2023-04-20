@@ -26,8 +26,7 @@ def get_task_result(task_module: Module, result_type: Type[U]) -> U:
     Returns:
         The result of the Module.
     """
-    if not task_module.done():
-        # We schedule the task
+    if task_module.should_be_started():
         try:
             task_module.start_task_on_dataset_split(get_client())
         except Exception:
@@ -38,6 +37,7 @@ def get_task_result(task_module: Module, result_type: Type[U]) -> U:
             )
             return cast(U, result)
     result_from_future = cast(U, safe_get(task_module))
+    task_module.clear()
     return result_from_future
 
 

@@ -200,24 +200,27 @@ class SyntaxOptions(AzimuthBaseSettings):
 
 
 class NeutralTokenOptions(AzimuthBaseSettings):
-    threshold: float = 1
+    threshold: float = Field(1, ge=0, le=1)
     suffix_list: List[str] = []  # Language-based default value
     prefix_list: List[str] = []  # Language-based default value
 
 
 class PunctuationTestOptions(AzimuthBaseSettings):
-    threshold: float = 1
+    threshold: float = Field(1, ge=0, le=1)
 
 
 class FuzzyMatchingTestOptions(AzimuthBaseSettings):
-    threshold: float = 1
+    threshold: float = Field(1, ge=0, le=1)
 
 
 class TypoTestOptions(AzimuthBaseSettings):
-    threshold: float = 1
-    # Ex: if nb_typos_per_utterance = 2, this will create both tests with 1 typo and 2 typos per
-    # utterance.
-    nb_typos_per_utterance: int = 1
+    threshold: float = Field(1, ge=0, le=1)
+    nb_typos_per_utterance: int = Field(
+        1,
+        ge=1,
+        description="For example, the value 2 would create both tests with 1 typo and with 2 typos "
+        "per utterance.",
+    )
 
 
 class BehavioralTestingOptions(AzimuthBaseSettings):
@@ -355,6 +358,16 @@ class ModelContractConfig(CommonFieldsConfig):
             raise ValueError(f"Duplicated pipeline names {pipeline_names}.")
         return pipeline_definitions
 
+    def get_model_contract_hash(self):
+        """Hash for fields related to model contract only (excluding fields from the parents)."""
+        return md5_hash(
+            self.dict(
+                include=ModelContractConfig.__fields__.keys()
+                - CommonFieldsConfig.__fields__.keys(),
+                by_alias=True,
+            )
+        )
+
 
 class MetricsConfig(ModelContractConfig):
     # Custom HuggingFace metrics
@@ -445,10 +458,9 @@ class AzimuthConfig(
 
     @classmethod
     def load(cls, config_path: Optional[str], load_config_history: bool) -> "AzimuthConfig":
-        # Loading config from config_path if specified, or else from environment variables only.
-        cfg = ArtifactsConfig.parse_file(config_path) if config_path else ArtifactsConfig()
-
         if load_config_history:
+            # Load artifact_path from config_path if specified, or else from env var ARTIFACT_PATH.
+            cfg = ArtifactsConfig.parse_file(config_path) if config_path else ArtifactsConfig()
             config_history_path = cfg.get_config_history_path()
             last_config = cls.load_last_from_config_history(config_history_path)
             if last_config:
@@ -457,6 +469,7 @@ class AzimuthConfig(
 
             log.info("Empty or invalid config history.")
 
+        # Load config from config_path if specified, or else from env vars only.
         return cls.parse_file(config_path) if config_path else cls()
 
     @classmethod

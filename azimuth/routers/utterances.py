@@ -229,7 +229,6 @@ def patch_utterances(
     utterances: List[UtterancePatch] = Body(...),
     config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
-    task_manager: TaskManager = Depends(get_task_manager),
     ignore_not_found: bool = Query(False),
 ) -> List[UtterancePatch]:
     if ignore_not_found:
@@ -250,7 +249,6 @@ def patch_utterances(
 
     dataset_split_manager.add_tags(data_actions)
 
-    task_manager.clear_worker_cache()
     updated_tags = dataset_split_manager.get_tags(row_indices)
 
     return [

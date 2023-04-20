@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "azimuth"
-version = "2.6.0"
+version = "2.6.1"
 description = "Azimuth provides a unified error analysis experience to data scientists."
 readme = "README.md"
 authors = ["Azimuth team <azimuth-team@servicenow.com>"]
@@ -11,7 +11,7 @@ packages = [{ include = "azimuth/" },]
 
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.10"
+python = ">=3.9,<3.10"
 
 # Scientific
 pandas = ">=1.0.5,<2,!=1.1.0"
@@ -88,6 +88,7 @@ bokeh = "<3"
 # Documentation
 mkdocs = "^1.2.3"
 mkdocs-material = "^8.1.7"
+memory-profiler = "^0.61.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -106,7 +107,7 @@ filter_files = true
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
-python_version = 3.8
+python_version = 3.9
 show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true

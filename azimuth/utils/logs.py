@@ -34,6 +34,7 @@ def set_logger_config(level=logging.INFO):
             add_log_level,
             add_caller_info,
             order_keys,
+            add_pid_thread,
             BetterConsoleRenderer(),
         ],
         context_class=structlog.threadlocal.wrap_dict(dict),

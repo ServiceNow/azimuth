@@ -11,4 +11,4 @@ from azimuth.modules.base_classes import ArtifactManager
 def cleanup_class():
     yield
     # Code that will run after your test, for example:
-    ArtifactManager.clear_cache()
+    ArtifactManager.clear_instance()

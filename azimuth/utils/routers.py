@@ -28,7 +28,7 @@ from azimuth.types.tag import DataAction, SmartTag, SmartTagFamily
 from azimuth.utils.project import predictions_available
 
 
-def get_last_update(dataset_split_managers: List[Optional[DatasetSplitManager]]) -> int:
+def get_last_update(dataset_split_managers: List[Optional[DatasetSplitManager]]) -> float:
     last_update = max([dsm.last_update if dsm else -1 for dsm in dataset_split_managers])
 
     return last_update
@@ -50,7 +50,7 @@ def build_named_dataset_filters(
     outcome: List[OutcomeName] = Query([], title="Outcomes"),
     utterance: Optional[str] = Query(None, title="Utterance"),
 ) -> NamedDatasetFilters:
-    """Build the named filter component used by many tasks. Intended as a FastAPI endpoint dependency.
+    """Build the named filter component. Intended as a FastAPI endpoint dependency.
 
     Args:
         confidence_min: The desired minimum confidence
@@ -97,7 +97,7 @@ def get_standard_task_result(
     dataset_split_name: DatasetSplitName,
     task_manager: TaskManager,
     mod_options: Optional[ModuleOptions] = None,
-    last_update: int = -1,
+    last_update: float = -1,
 ):
     """Generate the task object and get the result for standard tasks.
 
@@ -123,12 +123,10 @@ def get_standard_task_result(
     )
 
     if not task:
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND, detail=f"Aggregation not found {task_name}"
-        )
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=f"Task not found {task_name}")
 
     task_result = task.result()
-
+    task.clear()
     return task_result
 
 

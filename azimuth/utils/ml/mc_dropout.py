@@ -4,7 +4,7 @@
 import warnings
 from typing import Optional
 
-# structlog warning issue tracked in BaaL #192
+# TODO structlog warning issue tracked in BaaL #192
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     from baal.bayesian import Dropout

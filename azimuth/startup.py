@@ -35,7 +35,7 @@ log = structlog.get_logger()
 
 @dataclass
 class Startup:
-    name: str
+    name: str  # TODO Improve: A name cannot be a substring of any other names.
     module: SupportedTask
     mod_options: Dict = field(default_factory=dict)
     # The names of other start-up tasks to wait for.
@@ -107,25 +107,28 @@ SALIENCY_TASKS = [
 ]
 
 BASE_PREDICTION_TASKS = [
-    Startup("prediction", SupportedMethod.Predictions, run_on_all_pipelines=True),
+    Startup("predictions", SupportedMethod.Predictions, run_on_all_pipelines=True),
     Startup(
-        "outcome",
+        "outcomes",
         SupportedModule.Outcome,
-        dependency_names=["prediction"],
+        dependency_names=["predictions"],
         run_on_all_pipelines=True,
     ),
     Startup(
         "confidence_bins",
         SupportedModule.ConfidenceBinIndex,
-        dependency_names=["prediction"],
+        dependency_names=["predictions"],
         run_on_all_pipelines=True,
     ),
+]
+
+PER_FILTER_TASKS = [
     Startup(
         "metrics_by_filter",
         SupportedModule.MetricsPerFilter,
         dependency_names=[
-            "prediction",
-            "outcome",
+            "predictions",
+            "outcomes",
             "prediction_comparison",
             "perturbation_testing",
             "neighbors_tags",
@@ -133,7 +136,7 @@ BASE_PREDICTION_TASKS = [
             "syntax_tags",
         ],
         run_on_all_pipelines=True,
-    ),
+    )
 ]
 
 
@@ -150,8 +153,6 @@ def on_end(fut: Future, module: DaskModule, dm: DatasetSplitManager, task_manage
         # Task is done, save the result.
         if isinstance(module, DatasetResultModule):
             module.save_result(module.result(), dm)
-            # We only need to clear cache when the dataset is modified.
-            task_manager.clear_worker_cache()
     else:
         log.exception("Error in", module=module, fut=fut, exc_info=fut.exception())
 
@@ -230,9 +231,13 @@ def startup_tasks(
 
     """
     config = task_manager.config
+    # The order in start_up_tasks matters; a task needs to be added after its dependencies.
+    # TODO Refactor so the startup can be robust to the order in start_up_tasks.
     start_up_tasks = [
         Startup("syntax_tags", SupportedModule.SyntaxTagging),
     ]
+    if similarity_available(config):
+        start_up_tasks += SIMILARITY_TASKS
     if predictions_available(config):
         start_up_tasks += BASE_PREDICTION_TASKS
         if perturbation_testing_available(config):
@@ -246,17 +251,20 @@ def startup_tasks(
             start_up_tasks += POSTPROCESSING_TASKS
         if saliency_available(config):
             start_up_tasks += SALIENCY_TASKS
-    if similarity_available(config):
-        start_up_tasks += SIMILARITY_TASKS
+        start_up_tasks += PER_FILTER_TASKS
 
     mods = start_tasks_for_dms(config, dataset_split_managers, task_manager, start_up_tasks)
 
-    # Start a thread to monitor the status.
-    th = threading.Thread(
-        target=wait_for_startup, args=(mods, task_manager), name=START_UP_THREAD_NAME
-    )
-    th.setDaemon(True)
-    th.start()
+    startup_ready = all(m.done() for m in mods.values())
+    if startup_ready:
+        log.info("Loading the application from cache. It should be accessible now.")
+    else:
+        # Start a thread to monitor the status.
+        th = threading.Thread(
+            target=wait_for_startup, args=(mods, task_manager), name=START_UP_THREAD_NAME
+        )
+        th.setDaemon(True)
+        th.start()
 
     return mods
 
@@ -320,19 +328,43 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
         task_manager: Current TaskManager.
 
     """
+    start_time = time.time()
     task_manager.lock()  # Lock the TaskManager to prevent new tasks.
-    while not all(m.done() for m in startup_mods.values()):
-        time.sleep(30)  # We wait to not spam the user with logs.
-        is_done = {k: v.done() for k, v in startup_mods.items()}
-        per_status = defaultdict(list)
-        for name, mod in startup_mods.items():
-            status = "saving" if mod.status() == "finished" and not mod.done() else mod.status()
-            per_status[status].append(name)
-        log.info(f"Startup tasks statuses: {sum(is_done.values())}/{len(is_done)}")
-        for status, modules in per_status.items():
-            log.info(f"{status} ({len(modules)}): {', '.join(modules)}")
+
+    done = False
+
+    def log_progress():
+        last_per_status = None
+        while not done:
+            time.sleep(5)  # to avoid spamming the user with logs.
+            per_status = defaultdict(list)
+            for name, mod in startup_mods.items():
+                status = "saving" if mod.status() == "finished" and not mod.done() else mod.status()
+                per_status[status].append(name)
+
+            if per_status == last_per_status:
+                continue
+            last_per_status = per_status
+
+            logs = [
+                f"Startup tasks statuses: {len(per_status['finished'])}/{len(startup_mods)}",
+                *(
+                    f"{status} ({len(per_status[status])}): {', '.join(per_status[status])}"
+                    for status in ("not_started", "pending", "lost", "error", "saving", "finished")
+                    if status in per_status
+                ),
+            ]
+            log.info("\n\t".join(logs))
+
+    thread_log_progress = threading.Thread(target=log_progress, daemon=True)
+    thread_log_progress.start()
+    for mod in startup_mods.values():
+        mod.result()
+
+    done = True
 
     log.info("Startup task completed. The application should be accessible now.")
+    log.debug(f"Startup took {time.time() - start_time}.")
 
     if errored_modules := [
         name for name, module in startup_mods.items() if module.status() == "error"
@@ -346,4 +378,3 @@ def wait_for_startup(startup_mods: Dict[str, DaskModule], task_manager: TaskMana
     task_manager.restart()
     # After restarting, it is safe to unlock the task manager.
     task_manager.unlock()
-    log.info("Cluster restarted to free memory.")

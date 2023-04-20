@@ -8,7 +8,7 @@ import pytest
 
 from azimuth.config import SyntaxConfig
 from azimuth.modules.base_classes import AggregationModule, FilterableModule, Module
-from azimuth.task_manager import TaskManager, TaskManagerLockedException
+from azimuth.task_manager import TaskManagerLockedException
 from azimuth.types import (
     DatasetSplitName,
     ModuleOptions,
@@ -61,29 +61,6 @@ def get_module_data(simple_text_config):
         len(mod.artifact_manager.dataset_split_managers_mapping) > 0,
         len(mod.artifact_manager.models_mapping) > 0,
     )
-
-
-def test_clearing_cache(tiny_text_config):
-    task_manager = TaskManager(tiny_text_config)
-
-    key, mod = task_manager.get_task(
-        SupportedMethod.Predictions,
-        dataset_split_name=DatasetSplitName.eval,
-        mod_options=ModuleOptions(pipeline_index=0, indices=[0, 1]),
-    )
-    assert mod is not None
-    # The task can be awaited
-    mod.result()
-
-    # The cache is populated somewhere
-    cached = task_manager.client.run(get_module_data, tiny_text_config)
-    assert any([m and d for m, d in cached.values()])
-
-    task_manager.clear_worker_cache()
-
-    # The cache is cleared somewhere
-    cached = task_manager.client.run(get_module_data, tiny_text_config)
-    assert not any([m and d for m, d in cached.values()])
 
 
 def test_expired_task(tiny_text_task_manager, tiny_text_config):

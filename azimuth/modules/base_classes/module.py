@@ -10,6 +10,7 @@ from tqdm import tqdm
 from azimuth.config import ModelContractConfig, PipelineDefinition
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.base_classes import ArtifactManager, ConfigScope, DaskModule
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.types.general.module_arguments import ModuleEffectiveArguments
 from azimuth.utils.conversion import md5_hash
@@ -79,7 +80,7 @@ class Module(DaskModule[ConfigScope]):
     def artifact_manager(self):
         """This is set as a property so the Module always have access to the current version of
         the ArtifactManager on the worker."""
-        return ArtifactManager.get_instance()
+        return ArtifactManager.instance()
 
     @property
     def available_dataset_splits(self) -> Set[DatasetSplitName]:
@@ -164,6 +165,8 @@ class Module(DaskModule[ConfigScope]):
         Raises:
             ValueError if no valid pipeline exists.
         """
+        if self.worker != Worker.model:
+            raise RuntimeError("This module cannot load the model. Modify self.worker.")
         _ = self.get_pipeline_definition()  # Validate current pipeline exists
         return self.artifact_manager.get_model(self.config, self.mod_options.pipeline_index)
 
@@ -177,14 +180,12 @@ class Module(DaskModule[ConfigScope]):
             self.config, ModelContractConfig
         ):
             return None
-        use_bma = self.mod_options.use_bma
-        table_key = PredictionTableKey(
+        return PredictionTableKey(
             temperature=self.get_pipeline_definition().temperature,
             threshold=self.get_threshold(),
-            use_bma=use_bma,
+            use_bma=self.mod_options.use_bma,
             pipeline_index=self.mod_options.pipeline_index,
         )
-        return table_key
 
     def get_threshold(self) -> Optional[float]:
         # The default is None so we have to handle it this way.
@@ -205,20 +206,15 @@ class Module(DaskModule[ConfigScope]):
         # TODO: Could use single dispatch instead?
         if not isinstance(self.config, ModelContractConfig):
             raise ValueError(
-                "This Module does not have access to the pipeline"
-                " as it does not use ModelContractScope."
+                "This module doesn't have access to pipelines as it doesn't use ModelContractConfig"
             )
         if self.config.pipelines is None:
             raise ValueError("No pipelines configured.")
         if self.mod_options.pipeline_index is None:
             raise ValueError(
-                f"`pipeline_index` is None, expected one"
-                f" of {np.arange(len(self.config.pipelines))}"
+                f"`pipeline_index` is None, expected one of {np.arange(len(self.config.pipelines))}"
             )
         pipelines = assert_not_none(self.config.pipelines)
         pipeline_index = assert_not_none(self.mod_options.pipeline_index)
         current_pipeline = pipelines[pipeline_index]
         return current_pipeline
-
-    def clear_cache(self):
-        self.artifact_manager.clear_cache()

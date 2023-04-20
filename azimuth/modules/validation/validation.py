@@ -9,6 +9,7 @@ from transformers import TextClassificationPipeline
 
 from azimuth.config import ModelContractConfig
 from azimuth.modules.base_classes import AggregationModule
+from azimuth.modules.base_classes.dask_module import Worker
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.types import ModuleOptions, SupportedMethod, SupportedModelContract
 from azimuth.types.validation import ValidationResponse
@@ -36,6 +37,7 @@ class ExceptionGatherer:
 
 class ValidationModule(AggregationModule[ModelContractConfig]):
     optional_mod_options = {"pipeline_index"}
+    worker = Worker.model
 
     def compute_on_dataset_split(self) -> List[ValidationResponse]:  # type: ignore
         cuda_available = torch.cuda.is_available()
@@ -59,7 +61,7 @@ class ValidationModule(AggregationModule[ModelContractConfig]):
 
         if can_load_model and can_load_dataset and model_has_correct_type:
             ds_object = assert_not_none(dataset)
-            batch = ds_object.select(range(0, min(10, len(ds_object))))
+            batch = ds_object.select(range(0, min(2, len(ds_object))))
             can_make_prediction = (
                 exception_gatherer.try_calling_function(self._validate_prediction, batch=batch)
                 is not None

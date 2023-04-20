@@ -7,6 +7,7 @@ import os
 import threading
 import time
 import uuid
+from enum import IntEnum
 from functools import partial
 from os.path import join as pjoin
 from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, cast
@@ -25,6 +26,11 @@ log = structlog.get_logger()
 ConfigScope = TypeVar("ConfigScope", bound=CommonFieldsConfig)
 
 
+class Worker(IntEnum):
+    model = 0
+    encoder = 0
+
+
 class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
     """Abstract class that define an item of work to be computed on the cluster.
 
@@ -37,6 +43,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
     """
 
     allowed_splits = {DatasetSplitName.train, DatasetSplitName.eval}
+    worker: Optional[Worker] = None
 
     def __init__(
         self,
@@ -108,7 +115,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
 
         """
         log.info(f"Starting {self.name}")
-        deps = [d.done_event for d in dependencies] if dependencies is not None else []
+        deps = [d.done_event for d in dependencies] if dependencies else []
         if not all(deps):
             raise ValueError("Can't wait for an unstarted Module.")
         self.done_event = Event(name=self.task_id, client=client)
@@ -118,6 +125,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             pure=False,
             dependencies=deps,
             key=f"{self.task_id}_{uuid.uuid4()}",  # Unique identifier
+            workers=self.worker,
         )
         # Tell that this future is used on which indices.
         self.future.indices = self.get_caching_indices()
@@ -148,7 +156,11 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         log.info(f"Starting custom query {self.name}")
         # pure=false to be sure that everything is rerun.
         self.future = client.submit(
-            self.compute, custom_query, key=self.custom_query_task_id(custom_query), pure=False
+            self.compute,
+            custom_query,
+            key=self.custom_query_task_id(custom_query),
+            pure=False,
+            workers=self.worker,
         )
         # Tell that this future is for custom use only.
         self.future.is_custom = True
@@ -165,7 +177,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             Result of `self.compute_on_dataset_split`.
 
         """
-        if dependencies is not None:
+        if dependencies:
             secede()
             for event in dependencies:
                 try:
@@ -212,10 +224,14 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         elif fut.status == "lost":
             log.warning(f"Future is lost in {self.name}! Retrying")
             fut.retry()
-        elif fut.status == "finished" and not self.future.is_custom:
+        elif fut.status == "finished" and not fut.is_custom:
             # Store the result in cache
             self._store_data_in_cache(fut.result(), fut.indices)
             log.info(f"{self.name} completed and stored in cache", status=fut.status)
+
+    def clear(self):
+        """Useful to make sure the task is not kept in memory."""
+        self.future = None
 
     def _wait_for_completion(self):
         """Internal function that loop till completion and then set `self.done_event`."""
@@ -229,11 +245,14 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
         if self.done_event is not None:
             self.done_event.wait()
 
+    def should_be_started(self):
+        return self.status() not in {"pending", "finished"} and not self.done()
+
     def status(self):
         """Return the status of the future.
 
         Returns:
-            One of {'not_started', 'pending', 'lost', 'error', 'done'}.
+            One of {'not_started', 'pending', 'lost', 'error', 'finished'}.
             If the task was not launched, `not_started` will be returned by default.
         """
         if self.future:
