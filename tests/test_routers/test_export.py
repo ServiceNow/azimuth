@@ -21,11 +21,11 @@ def test_get_report(app: FastAPI) -> None:
 
     resp = client.get("/export/perturbation_testing_summary")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
-    assert resp.json()["detail"] == "query parameter pipeline_index: field required"
+    assert resp.text == "query parameter pipeline_index: field required"
 
     resp = client.get("/export/perturbation_testing_summary?pipeline_index=-10")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
-    assert resp.json()["detail"] == (
+    assert resp.text == (
         "query parameter pipeline_index=-10: ensure this value is greater than or equal to 0"
     )
 

@@ -12,7 +12,7 @@ def test_get_outcome_count_per_threshold(app: FastAPI) -> None:
 
     resp = client.get("/dataset_splits/eval/outcome_count/per_threshold?pipeline_index=0")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
-    assert resp.json()["detail"] == "Postprocessing is not editable"
+    assert resp.text == "Postprocessing is not editable"
 
 
 def test_get_outcome_count_per_filter(app: FastAPI) -> None:

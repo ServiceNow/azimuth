@@ -9,7 +9,7 @@ import structlog
 from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
@@ -30,7 +30,7 @@ from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
 from azimuth.utils.exception_handlers import (
-    handle_internal_error,
+    handle_http_exception,
     handle_validation_error,
 )
 from azimuth.utils.logs import set_logger_config
@@ -56,10 +56,6 @@ COMMON_HTTP_ERROR_CODES = (
     HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_503_SERVICE_UNAVAILABLE,
 )
-
-
-class HTTPExceptionModel(BaseModel):
-    detail: str
 
 
 def get_dataset_split_manager_mapping() -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
@@ -167,12 +163,15 @@ def create_app() -> FastAPI:
         description="Azimuth API",
         version="1.0",
         default_response_class=JSONResponseIgnoreNan,
-        responses={code: {"model": HTTPExceptionModel} for code in COMMON_HTTP_ERROR_CODES},
+        responses={
+            code: {"content": {"text/plain": {"schema": {"type": "string"}}}}
+            for code in COMMON_HTTP_ERROR_CODES
+        },
         exception_handlers={
+            HTTPException: handle_http_exception,
             ValidationError: handle_validation_error,  # for PATCH "/config",
             # where we call old_config.copy(update=partial_config, deep=True) ourselves.
             RequestValidationError: handle_validation_error,
-            HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
         },
         root_path=".",  # Tells Swagger UI and ReDoc to fetch the OpenAPI spec from ./openapi.json
         # (relative) so it works through the front-end proxy.

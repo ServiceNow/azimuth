@@ -78,7 +78,7 @@ def test_validation_error(app: FastAPI):
 
     resp = client.get("/dataset_splits/c/utterances?outcome=a&outcome=b&sort=d&pipeline_index=0")
     assert resp.status_code == HTTP_404_NOT_FOUND, resp.text
-    assert resp.json()["detail"] == (
+    assert resp.text == (
         f"query parameter outcome=a: {get_enum_validation_error_msg(OutcomeName)}\n"
         f"query parameter outcome=b: {get_enum_validation_error_msg(OutcomeName)}\n"
         f"path parameter dataset_split_name=c: {get_enum_validation_error_msg(DatasetSplitName)}\n"

@@ -106,15 +106,11 @@ def test_get_utterances_pagination(app: FastAPI):
 
     resp = client.get("/dataset_splits/eval/utterances?limit=0&offset=0")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
-    assert resp.json()["detail"] == (
-        "query parameter limit=0: ensure this value is greater than or equal to 1"
-    )
+    assert resp.text == "query parameter limit=0: ensure this value is greater than or equal to 1"
 
     resp = client.get("/dataset_splits/eval/utterances?limit=10&offset=-1")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
-    assert resp.json()["detail"] == (
-        "query parameter offset=-1: ensure this value is greater than or equal to 0"
-    )
+    assert resp.text == "query parameter offset=-1: ensure this value is greater than or equal to 0"
 
     resp = client.get("/dataset_splits/eval/utterances?limit=10&offset=10").json()
     assert len(resp["utterances"]) == 10
@@ -214,7 +210,7 @@ def test_patch_utterances(app: FastAPI) -> None:
     request = [{"dataAction": "potato"}]
     resp = client.patch("/dataset_splits/eval/utterances", json=request)
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
-    assert resp.json()["detail"] == (
+    assert resp.text == (
         "Request['body'][0]['persistentId']: field required\n"
         f"Request['body'][0]['dataAction']: {get_enum_validation_error_msg(DataAction)}"
     )

@@ -256,7 +256,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     # Config Validation Error
     resp = client.patch("/config", json={"model_contract": "potato"})
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
-    assert resp.json()["detail"] == (
+    assert resp.text == (
         f"AzimuthConfig['model_contract']: {get_enum_validation_error_msg(SupportedModelContract)}"
     )
     get_config = client.get("/config").json()
