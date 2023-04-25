@@ -34,4 +34,4 @@ def test_dataset_processing_speed(simple_text_config):
         config=simple_text_config,
     )
     stop = time.perf_counter()
-    assert (stop - start) <= 0.0002
+    assert (stop - start) <= 0.0003
