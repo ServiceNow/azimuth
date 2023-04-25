@@ -54,7 +54,7 @@ export const parseSearchString = (searchString: string) => {
       reorderClasses: (s) => s === null && undefined,
     }),
     details: convertSearchParams<QueryDetailsState>(q, {
-      details: convertNumber,
+      detailsForPageItem: convertNumber,
     }),
     filters: convertSearchParams<QueryFilterState>(q, {
       confidenceMin: convertNumber,

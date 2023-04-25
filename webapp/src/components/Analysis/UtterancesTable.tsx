@@ -162,6 +162,7 @@ const UtterancesTable: React.FC<Props> = ({
 
   const { page = 1, sort, descending } = pagination;
   const offset = (page - 1) * PAGE_SIZE;
+  const { detailsForPageItem } = details;
 
   const getUtterancesQueryState = {
     jobId,
@@ -217,7 +218,7 @@ const UtterancesTable: React.FC<Props> = ({
   const getToDetails = (i: number) =>
     0 <= i && i < utterancesResponse!.utteranceCount
       ? getUpdatedLocation({
-          details: i % PAGE_SIZE,
+          detailsForPageItem: i % PAGE_SIZE,
           page: Math.floor(i / PAGE_SIZE) + 1,
         })
       : "";
@@ -236,7 +237,7 @@ const UtterancesTable: React.FC<Props> = ({
       })
     );
 
-  const toCloseDetails = getUpdatedLocation({ details: undefined });
+  const toCloseDetails = getUpdatedLocation({ detailsForPageItem: undefined });
 
   const handleCloseDetails = () => history.push(toCloseDetails);
 
@@ -469,7 +470,7 @@ const UtterancesTable: React.FC<Props> = ({
   const RowLink = (props: RowProps<Row>) => (
     <Link
       style={{ color: "unset", textDecoration: "unset" }}
-      to={getUpdatedLocation({ details: props.index })}
+      to={getUpdatedLocation({ detailsForPageItem: props.index })}
     >
       <GridRow {...props} />
     </Link>
@@ -582,7 +583,7 @@ const UtterancesTable: React.FC<Props> = ({
         }}
       />
       <Dialog
-        open={details.details !== undefined}
+        open={detailsForPageItem !== undefined}
         onClose={handleCloseDetails}
         maxWidth="xl"
         fullWidth
@@ -597,13 +598,13 @@ const UtterancesTable: React.FC<Props> = ({
           >
             {!isFetching &&
               utterancesResponse &&
-              details.details !== undefined &&
-              details.details in utterancesResponse.utterances && (
+              detailsForPageItem !== undefined &&
+              detailsForPageItem in utterancesResponse.utterances && (
                 <IconButton
                   size="small"
                   component={Link}
                   to={`/${jobId}/dataset_splits/${datasetSplitName}/utterances/${
-                    utterancesResponse.utterances[details.details].index
+                    utterancesResponse.utterances[detailsForPageItem].index
                   }${constructSearchString(pipeline)}`}
                 >
                   <Fullscreen />
@@ -615,26 +616,26 @@ const UtterancesTable: React.FC<Props> = ({
           </Box>
         </DialogTitle>
         <DialogContent>
-          {details.details !== undefined &&
+          {detailsForPageItem !== undefined &&
             (isFetching ? (
               <Loading />
             ) : utterancesResponse === undefined ? (
               <DialogContentText>
                 {error?.message || UNKNOWN_ERROR}
               </DialogContentText>
-            ) : !(details.details in utterancesResponse.utterances) ? (
+            ) : !(detailsForPageItem in utterancesResponse.utterances) ? (
               <DialogContentText>Invalid URL</DialogContentText>
             ) : (
               <UtteranceDetails
                 jobId={jobId}
-                index={utterancesResponse.utterances[details.details].index}
+                index={utterancesResponse.utterances[detailsForPageItem].index}
                 datasetSplitName={datasetSplitName}
                 getUtterancesQueryState={getUtterancesQueryState}
-                utterance={utterancesResponse.utterances[details.details]}
+                utterance={utterancesResponse.utterances[detailsForPageItem]}
                 confidenceThreshold={utterancesResponse.confidenceThreshold}
                 arrows={{
-                  toPrevious: getToDetails(offset + details.details - 1),
-                  toNext: getToDetails(offset + details.details + 1),
+                  toPrevious: getToDetails(offset + detailsForPageItem - 1),
+                  toNext: getToDetails(offset + detailsForPageItem + 1),
                 }}
               />
             ))}

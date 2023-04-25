@@ -12,7 +12,7 @@ export type QueryClassOverlapState = {
 };
 
 export type QueryDetailsState = {
-  details?: number;
+  detailsForPageItem?: number;
 };
 
 export type QueryArrayFiltersState = {
