@@ -1,5 +1,7 @@
+import { ArrowBackIosNew, ArrowForwardIos } from "@mui/icons-material";
 import {
   Box,
+  IconButton,
   Paper,
   Stack,
   Tab,
@@ -7,11 +9,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import noData from "assets/void.svg";
 import DatasetSplitToggler from "components/Controls/DatasetSplitToggler";
 import CopyButton from "components/CopyButton";
 import Description from "components/Description";
-import Loading from "components/Loading";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import Steps from "components/Steps";
 import TabPipelineRequired from "components/TabPipelineRequired";
@@ -21,14 +21,14 @@ import UtteranceDataAction from "components/Utterance/UtteranceDataAction";
 import UtteranceSaliency from "components/Utterance/UtteranceSaliency";
 import useQueryState from "hooks/useQueryState";
 import React from "react";
-import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   getConfigEndpoint,
   getDatasetInfoEndpoint,
   getSimilarUtterancesEndpoint,
-  getUtterancesEndpoint,
 } from "services/api";
-import { DatasetSplitName } from "types/api";
+import { DatasetSplitName, Utterance } from "types/api";
+import { GetUtterancesQueryState } from "utils/api";
 import {
   DATASET_SMART_TAG_FAMILIES,
   FADE_OUT_SCROLL_Y,
@@ -39,6 +39,7 @@ import {
 import { camelToTitleCase, formatRatioAsPercentageString } from "utils/format";
 import { getUtteranceIdTooltip } from "utils/getUtteranceIdTooltip";
 import { isPipelineSelected } from "utils/helpers";
+import NoMaxWidthTooltip from "./NoMaxWidthTooltip";
 
 const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
   similarity: (
@@ -55,13 +56,23 @@ const UTTERANCE_DETAIL_TAB_DESCRIPTION = {
   ),
 };
 
-export const UtteranceDetail = () => {
-  const { jobId, utteranceId, datasetSplitName } = useParams<{
-    jobId: string;
-    utteranceId: string;
-    datasetSplitName: DatasetSplitName;
-  }>();
-  const index = Number(utteranceId);
+const UtteranceDetails: React.FC<{
+  jobId: string;
+  index: number;
+  datasetSplitName: DatasetSplitName;
+  getUtterancesQueryState: GetUtterancesQueryState;
+  utterance: Utterance;
+  confidenceThreshold: number | null;
+  arrows?: { toPrevious: string; toNext: string };
+}> = ({
+  jobId,
+  index,
+  datasetSplitName,
+  getUtterancesQueryState,
+  utterance,
+  confidenceThreshold,
+  arrows,
+}) => {
   const { pipeline } = useQueryState();
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
@@ -74,31 +85,20 @@ export const UtteranceDetail = () => {
     setView("similarity");
   }
 
-  const getUtterancesQueryState = {
-    jobId,
-    datasetSplitName,
-    indices: [index],
-    ...pipeline,
-  };
-
-  const { data: utterancesResponse, isFetching: utteranceIsFetching } =
-    getUtterancesEndpoint.useQuery(getUtterancesQueryState);
-
-  const utterance = utterancesResponse?.utterances[0];
-
   const [neighborsDatasetSplitName, setNeighborsDatasetSplitName] =
     React.useState<DatasetSplitName>(datasetSplitName);
 
-  const { data: similarUtterances } = getSimilarUtterancesEndpoint.useQuery(
-    {
-      jobId,
-      datasetSplitName,
-      index,
-      neighborsDatasetSplitName,
-      ...pipeline,
-    },
-    { skip: view !== "similarity" }
-  );
+  const { data: similarUtterances, isFetching: isFetchingSimilarUtterances } =
+    getSimilarUtterancesEndpoint.useQuery(
+      {
+        jobId,
+        datasetSplitName,
+        index,
+        neighborsDatasetSplitName,
+        ...pipeline,
+      },
+      { skip: view !== "similarity" }
+    );
 
   // Raw states will be capped to the number of steps later. This is necessary
   // when selecting a different pipeline with a different number of steps.
@@ -108,25 +108,34 @@ export const UtteranceDetail = () => {
   // without the need for postprocessingSteps.length before it is loaded.
   const [postprocessingStepRaw, setPostprocessingStep] = React.useState(0);
 
+  const refPrevious = React.useRef<HTMLAnchorElement>(null);
+  const refNext = React.useRef<HTMLAnchorElement>(null);
+
+  React.useEffect(() => {
+    if (!arrows) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "ArrowUp":
+        case "ArrowLeft":
+          arrows.toPrevious && refPrevious.current?.click();
+          break;
+        case "ArrowDown":
+        case "ArrowRight":
+          arrows.toNext && refNext.current?.click();
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [arrows, refPrevious, refNext]);
+
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
 
   // If config was undefined, PipelineCheck would not even render the page.
   if (config === undefined) return null;
-
-  if (!utterance) {
-    // utterance will be defined while utteranceIsFetching after changing the
-    // dataAction tag, in which case we want to render the utterance.
-    if (utteranceIsFetching) {
-      return <Loading />;
-    }
-
-    return (
-      <Box alignItems="center" display="grid" justifyItems="center">
-        <img src={noData} height="100%" width="50%" alt="Utterance not found" />
-        <Typography variant="h3">Utterance not found.</Typography>
-      </Box>
-    );
-  }
 
   const smartTagFamilies = isPipelineSelected(pipeline)
     ? SMART_TAG_FAMILIES
@@ -176,11 +185,11 @@ export const UtteranceDetail = () => {
           alignItems: "center",
           display: "grid",
           gridAutoFlow: "column",
-          gridTemplateColumns: `auto minmax(0, 2fr) ${
+          gridTemplateColumns: `auto auto minmax(0, 2fr) ${
             isPipelineSelected(pipeline) ? "auto minmax(0, 1fr)" : ""
           }`,
           gridTemplateRows: "repeat(2, auto)",
-          padding: 4,
+          paddingY: 4,
           rowGap: 2,
           "& > *": {
             paddingX: 2,
@@ -191,6 +200,23 @@ export const UtteranceDetail = () => {
           },
         }}
       >
+        <Box gridRow={2}>
+          {arrows && (
+            <NoMaxWidthTooltip
+              title="Previous utterance in the list. You may also use the keyboard arrows."
+              placement="bottom-start"
+            >
+              <IconButton
+                component={Link}
+                ref={refPrevious}
+                disabled={arrows.toPrevious === ""}
+                to={arrows.toPrevious}
+              >
+                <ArrowBackIosNew />
+              </IconButton>
+            </NoMaxWidthTooltip>
+          )}
+        </Box>
         <Tooltip title={ID_TOOLTIP}>
           <Typography variant="subtitle2" className="header">
             Id
@@ -202,7 +228,7 @@ export const UtteranceDetail = () => {
             persistentIdColumn: config.columns.persistent_id,
           })}
         >
-          <Typography variant="body2">{utteranceId}</Typography>
+          <Typography variant="body2">{utterance.index}</Typography>
         </Tooltip>
 
         <Box className="header">
@@ -268,9 +294,9 @@ export const UtteranceDetail = () => {
                 <Typography variant="body2">
                   <span>{output.prediction}</span>
                   {isPipelineSelected(pipeline) &&
-                    utterancesResponse?.confidenceThreshold !== null &&
+                    confidenceThreshold !== null &&
                     ` (< ${formatRatioAsPercentageString(
-                      utterancesResponse.confidenceThreshold
+                      confidenceThreshold
                     )})`}
                 </Typography>
               )}
@@ -311,6 +337,23 @@ export const UtteranceDetail = () => {
             allDataActions={datasetInfo?.dataActions || []}
             getUtterancesQueryState={getUtterancesQueryState}
           />
+        </Box>
+        <Box gridRow={2}>
+          {arrows && (
+            <NoMaxWidthTooltip
+              title="Next utterance in the list. You may also use the keyboard arrows."
+              placement="bottom-end"
+            >
+              <IconButton
+                component={Link}
+                ref={refNext}
+                disabled={arrows.toNext === ""}
+                to={arrows.toNext}
+              >
+                <ArrowForwardIos />
+              </IconButton>
+            </NoMaxWidthTooltip>
+          )}
         </Box>
       </Paper>
       <Paper
@@ -361,6 +404,7 @@ export const UtteranceDetail = () => {
               persistentIdColumn={config.columns.persistent_id}
               pipeline={pipeline}
               utterances={similarUtterances?.utterances || []}
+              loading={isFetchingSimilarUtterances}
             />
           )}
           {view === "perturbedUtterances" && isPipelineSelected(pipeline) && (
@@ -368,7 +412,7 @@ export const UtteranceDetail = () => {
               jobId={jobId}
               datasetSplitName={datasetSplitName}
               pipelineIndex={pipeline.pipelineIndex}
-              index={Number(utteranceId)}
+              index={utterance.index}
             />
           )}
         </Box>
@@ -377,4 +421,4 @@ export const UtteranceDetail = () => {
   );
 };
 
-export default UtteranceDetail;
+export default React.memo(UtteranceDetails);

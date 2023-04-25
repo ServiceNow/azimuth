@@ -14,6 +14,7 @@ Released changes are shown in the
 - Meaningful error messages in the error toasts.
 
 ### Changed
+- When clicking on an utterance from the Exploration space's Utterance Table, the Utterance Details now open in a modal on top of the table. This preserves the filter context and allows for going through the utterances one by one, using some new arrow buttons or keyboard arrows.
 
 ### Deprecated/Breaking Changes
 
