@@ -17,7 +17,6 @@ from starlette.status import (
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY,
-    HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_503_SERVICE_UNAVAILABLE,
 )
 
@@ -29,10 +28,7 @@ from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
-from azimuth.utils.exception_handlers import (
-    handle_internal_error,
-    handle_validation_error,
-)
+from azimuth.utils.exception_handlers import handle_validation_error
 from azimuth.utils.logs import set_logger_config
 from azimuth.utils.validation import assert_not_none
 
@@ -53,7 +49,6 @@ COMMON_HTTP_ERROR_CODES = (
     # conventional HTTP codes.
     # This overwrites the default ValidationError response for 422 in the OpenAPI spec.
     HTTP_422_UNPROCESSABLE_ENTITY,
-    HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_503_SERVICE_UNAVAILABLE,
 )
 
@@ -172,7 +167,6 @@ def create_app() -> FastAPI:
             ValidationError: handle_validation_error,  # for PATCH "/config",
             # where we call old_config.copy(update=partial_config, deep=True) ourselves.
             RequestValidationError: handle_validation_error,
-            HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
         },
         root_path=".",  # Tells Swagger UI and ReDoc to fetch the OpenAPI spec from ./openapi.json
         # (relative) so it works through the front-end proxy.
