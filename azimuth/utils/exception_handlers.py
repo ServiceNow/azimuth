@@ -1,11 +1,7 @@
 from pydantic import ValidationError
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from starlette.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
-    HTTP_500_INTERNAL_SERVER_ERROR,
-)
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
 
 async def handle_validation_error(request: Request, exception: ValidationError):
@@ -43,12 +39,4 @@ async def handle_validation_error(request: Request, exception: ValidationError):
         if "path" in (error["loc"][0] for error in exception.errors())
         else HTTP_400_BAD_REQUEST,  # for other errors like in query params, e.g., pipeline_index=-1
         content={"detail": detail},
-    )
-
-
-async def handle_internal_error(request: Request, exception: Exception):
-    # Don't expose this unexpected internal error as that could expose a security vulnerability.
-    return JSONResponse(
-        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Internal server error"},
     )

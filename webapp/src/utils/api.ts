@@ -2,7 +2,7 @@ import { HTTPExceptionModel } from "types/api";
 import { paths } from "types/generated/generatedTypes";
 import { constructApiSearchString } from "./helpers";
 
-const HTTP_EXCEPTION_STATUS_CODES = [400, 401, 403, 404, 422, 500, 503];
+const HTTP_EXCEPTION_STATUS_CODES = [400, 401, 403, 404, 422, 503];
 
 type CamelCase<SnakeCase> = SnakeCase extends `${infer FirstWord}_${infer Rest}`
   ? `${FirstWord}${Capitalize<CamelCase<Rest>>}`

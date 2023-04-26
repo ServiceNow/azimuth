@@ -934,12 +934,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -983,12 +977,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -1038,12 +1026,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -1100,12 +1082,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1158,12 +1134,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1211,12 +1181,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1260,12 +1224,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -1335,12 +1293,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1392,12 +1344,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -1472,12 +1418,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1521,12 +1461,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -1601,12 +1535,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1662,12 +1590,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1719,12 +1641,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -1799,12 +1715,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -1869,12 +1779,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -1954,12 +1858,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -2011,12 +1909,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -2082,12 +1974,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -2146,12 +2032,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -2199,12 +2079,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -2257,12 +2131,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -2307,12 +2175,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -2364,12 +2226,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -2426,12 +2282,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -2481,12 +2331,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
@@ -2561,12 +2405,6 @@ export interface operations {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
       };
-      /** Internal Server Error */
-      500: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
       /** Service Unavailable */
       503: {
         content: {
@@ -2635,12 +2473,6 @@ export interface operations {
       };
       /** Unprocessable Entity */
       422: {
-        content: {
-          "application/json": components["schemas"]["HTTPExceptionModel"];
-        };
-      };
-      /** Internal Server Error */
-      500: {
         content: {
           "application/json": components["schemas"]["HTTPExceptionModel"];
         };
