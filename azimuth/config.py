@@ -11,12 +11,12 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
 from jsonlines import jsonlines
-from pydantic import BaseSettings, Extra, Field, root_validator, validator
+from pydantic import Extra, Field, root_validator, validator
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
-from azimuth.utils.openapi import fix_union_types, make_all_properties_required
+from azimuth.utils.openapi import AzimuthBaseSettings
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
@@ -85,14 +85,6 @@ def parse_args():
 
 class AzimuthValidationError(Exception):
     pass
-
-
-class AzimuthBaseSettings(BaseSettings):
-    class Config:
-        @staticmethod
-        def schema_extra(schema):
-            fix_union_types(schema)
-            make_all_properties_required(schema)
 
 
 class CustomObject(AzimuthBaseSettings):
