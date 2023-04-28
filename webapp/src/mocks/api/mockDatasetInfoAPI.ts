@@ -37,8 +37,7 @@ export const getDatasetInfoAPIResponse = rest.get(
         "pipeline_disagreement",
         "NO_SMART_TAGS",
       ],
-      evalClassDistribution: [428, 444, 0],
-      trainClassDistribution: [458, 542, 0],
+      utteranceCountPerDatasetSplit: { train: 1000, eval: 872 },
       startupTasks: {
         syntax_tags_eval: "finished",
         syntax_tags_train: "finished",
