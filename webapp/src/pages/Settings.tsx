@@ -263,10 +263,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <Button
           variant="contained"
           disabled={isEmptyPartialConfig || isUpdatingConfig}
-          onClick={() => {
-            setPartialConfig({});
-            setLanguage(undefined);
-          }}
+          onClick={handleDiscard}
         >
           Discard
         </Button>
