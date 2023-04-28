@@ -893,6 +893,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         name="Project Configuration"
         description="View the fields that define the dataset to load in Azimuth."
         link="reference/configuration/project/"
+        defaultExpanded
       >
         {getProjectConfigSection()}
       </AccordionLayout>
