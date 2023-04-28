@@ -23,8 +23,8 @@ const StringField = <T extends string | null>({
     onChange={
       onChange &&
       (nullable
-        ? (event) => onChange(event.target.value as T)
-        : (event) => onChange((event.target.value || null) as T))
+        ? (event) => onChange((event.target.value || null) as T)
+        : (event) => onChange(event.target.value as T))
     }
     {...props}
   >
