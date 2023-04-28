@@ -259,7 +259,7 @@ class ProjectConfig(AzimuthBaseSettings):
     # Name of the current project.
     name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
-    dataset: Optional[CustomObject] = None
+    dataset: Optional[CustomObject] = Field(None, nullable=True)
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.

@@ -231,6 +231,10 @@ def startup_tasks(
 
     """
     config = task_manager.config
+
+    if config.dataset is None:
+        return {}
+
     # The order in start_up_tasks matters; a task needs to be added after its dependencies.
     # TODO Refactor so the startup can be robust to the order in start_up_tasks.
     start_up_tasks = [

@@ -42,6 +42,7 @@ def get_default_config_def(
     language: SupportedLanguage = Query(AzimuthConfig.__fields__["language"].default),
 ) -> AzimuthConfig:
     return AzimuthConfig(
+        dataset=CustomObject(class_name=REQUIRED),
         language=language,
         pipelines=[PipelineDefinition(name=REQUIRED, model=CustomObject(class_name=REQUIRED))],
     )

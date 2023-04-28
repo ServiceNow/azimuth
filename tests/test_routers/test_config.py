@@ -18,7 +18,7 @@ def test_get_default_config(app: FastAPI):
 
     assert res == {
         "name": "New project",
-        "dataset": None,
+        "dataset": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
         "model_contract": "hf_text_classification",
         "columns": {
             "text_input": "utterance",

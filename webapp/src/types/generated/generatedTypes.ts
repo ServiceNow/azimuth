@@ -127,7 +127,7 @@ export interface components {
     /** Fields that can be modified without affecting caching. */
     AzimuthConfig: {
       name: string;
-      dataset: components["schemas"]["CustomObject"];
+      dataset: components["schemas"]["CustomObject"] | null;
       columns: components["schemas"]["ColumnConfiguration"];
       rejection_class: string | null;
       /** Where to store artifacts (Azimuth config history, HDF5 files, HF datasets). */
