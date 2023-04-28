@@ -204,7 +204,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   }, [defaultConfig, resultingConfig, updatePartialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
-  if (config === undefined) return null;
+  if (config === undefined || !open) return null;
 
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
