@@ -459,7 +459,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 <React.Fragment key={column}>
                   <Typography variant="body2">{column}:</Typography>
                   <StringField
-                    label={column}
                     value={resultingConfig.columns[column]}
                     disabled={isUpdatingConfig}
                     onChange={(newValue) =>
