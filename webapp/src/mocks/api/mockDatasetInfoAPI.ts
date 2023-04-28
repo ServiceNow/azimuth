@@ -8,7 +8,6 @@ export const getDatasetInfoAPIResponse = rest.get(
   (req, res, ctx) => {
     const datasetInfoResponse: DatasetInfoResponse = {
       projectName: "Sentiment Analysis",
-      classNames: ["negative", "positive", "REJECTION_CLASS"],
       dataActions: [
         "relabel",
         "augment_with_similar",

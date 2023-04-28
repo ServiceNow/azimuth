@@ -23,7 +23,6 @@ class AvailableDatasetSplits(AliasModel):
 
 class DatasetInfoResponse(AliasModel):
     project_name: str = Field(..., title="Name of the project")
-    class_names: List[str] = Field(..., title="Class names")
     data_actions: List[DataAction] = Field(..., title="Data action tags")
     smart_tags: List[SmartTag] = Field(..., title="Smart tags")
     eval_class_distribution: List[int] = Field(..., title="Evaluation set class distribution")

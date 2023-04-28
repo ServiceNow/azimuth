@@ -278,7 +278,6 @@ export interface components {
      */
     DatasetInfoResponse: {
       projectName: string;
-      classNames: string[];
       dataActions: components["schemas"]["DataAction"][];
       smartTags: components["schemas"]["SmartTag"][];
       evalClassDistribution: number[];

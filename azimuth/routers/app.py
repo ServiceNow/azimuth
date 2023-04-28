@@ -44,7 +44,6 @@ from azimuth.utils.routers import (
     require_available_model,
     require_pipeline_index,
 )
-from azimuth.utils.validation import assert_not_none
 
 router = APIRouter()
 
@@ -88,11 +87,9 @@ def get_dataset_info(
 ):
     eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
     training_dm = dataset_split_managers.get(DatasetSplitName.train)
-    dm = assert_not_none(eval_dm or training_dm)
 
     return DatasetInfoResponse(
         project_name=config.name,
-        class_names=dm.get_class_names(),
         data_actions=ALL_DATA_ACTION_FILTERS,
         smart_tags=ALL_SMART_TAG_FILTERS,
         eval_class_distribution=eval_dm.class_distribution().tolist()

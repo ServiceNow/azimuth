@@ -43,7 +43,6 @@ def test_get_dataset_info(app: FastAPI) -> None:
 
     assert data == {
         "availableDatasetSplits": {"eval": True, "train": True},
-        "classNames": ["negative", "positive", "REJECTION_CLASS"],
         "modelContract": "custom_text_classification",
         "perturbationTestingAvailable": True,
         "postprocessingEditable": [False],
