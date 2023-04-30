@@ -26,7 +26,6 @@ from azimuth.modules.base_classes import ArtifactManager, DaskModule
 from azimuth.startup import startup_tasks
 from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
-from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
 from azimuth.utils.exception_handlers import handle_validation_error
 from azimuth.utils.logs import set_logger_config
@@ -127,9 +126,7 @@ def start_app(config_path: Optional[str], load_config_history: bool, debug: bool
     if azimuth_config.dataset is None:
         raise ValueError("No dataset has been specified in the config.")
 
-    local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
-
-    run_startup_tasks(azimuth_config, local_cluster)
+    run_startup_tasks(azimuth_config)
     task_manager = assert_not_none(_task_manager)
     task_manager.client.run(set_logger_config, level)
 
@@ -302,25 +299,20 @@ def load_dataset_split_managers_from_config(
     }
 
 
-def initialize_managers(azimuth_config: AzimuthConfig, cluster: SpecCluster):
-    """Initialize DatasetSplitManagers and TaskManagers.
-
+def initialize_managers_and_config(
+    azimuth_config: AzimuthConfig, cluster: Optional[SpecCluster] = None
+):
+    """Initialize DatasetSplitManagers and Config.
 
     Args:
-        azimuth_config: Configuration
-        cluster: Dask cluster to use.
+        azimuth_config: Config
+        cluster: Dask cluster to use, if different than default.
     """
     global _task_manager, _dataset_split_managers, _azimuth_config
+    if not _task_manager:
+        _task_manager = TaskManager(cluster, azimuth_config.large_dask_cluster)
+
     _azimuth_config = azimuth_config
-    if _task_manager is not None:
-        task_history = _task_manager.current_tasks
-    else:
-        task_history = {}
-
-    _task_manager = TaskManager(azimuth_config, cluster=cluster)
-
-    _task_manager.current_tasks = task_history
-
     _dataset_split_managers = load_dataset_split_managers_from_config(azimuth_config)
 
 
@@ -342,6 +334,7 @@ def run_validation(
         _, task = task_manager.get_task(
             task_name=SupportedModule.Validation,
             dataset_split_name=dataset_split,
+            config=config,
             mod_options=ModuleOptions(pipeline_index=pipeline_index),
         )
         # Will raise exceptions as needed.
@@ -354,15 +347,14 @@ def run_validation(
             run_validation_module(pipeline_index)
 
 
-def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
+def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: Optional[SpecCluster] = None):
     """Initialize managers, run validation and startup tasks.
 
     Args:
         azimuth_config: Config
-        cluster: Cluster
-
+        cluster: Dask cluster to use, if different than default.
     """
-    initialize_managers(azimuth_config, cluster)
+    initialize_managers_and_config(azimuth_config, cluster)
 
     task_manager = assert_not_none(get_task_manager())
     # Validate that everything is in order **before** the startup tasks.
@@ -374,5 +366,5 @@ def run_startup_tasks(azimuth_config: AzimuthConfig, cluster: SpecCluster):
     azimuth_config.save()  # Save only after the validation modules ran successfully
 
     global _startup_tasks, _ready_flag
-    _startup_tasks = startup_tasks(_dataset_split_managers, task_manager)
+    _startup_tasks = startup_tasks(_dataset_split_managers, task_manager, azimuth_config)
     _ready_flag = Event()

@@ -160,6 +160,7 @@ def on_end(fut: Future, module: DaskModule, dm: DatasetSplitManager, task_manage
 def make_startup_tasks(
     dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]],
     task_manager: TaskManager,
+    config: AzimuthConfig,
     supported_module: SupportedTask,
     mod_options: Dict,
     dependencies: List[DaskModule],
@@ -172,6 +173,7 @@ def make_startup_tasks(
     Args:
         dataset_split_managers: loaded dataset_split_managers.
         task_manager: Initialized task managers.
+        config: Config.
         supported_module: A Module to instantiate.
         mod_options: Special kwargs for the Module.
         dependencies: Which modules to include as dependency.
@@ -196,6 +198,7 @@ def make_startup_tasks(
         _, maybe_task = task_manager.get_task(
             task_name=supported_module,
             dataset_split_name=dataset_split_name,
+            config=config,
             dependencies=dependencies,
             mod_options=ModuleOptions(pipeline_index=pipeline_index, **mod_options),
         )
@@ -219,18 +222,19 @@ def get_modules(module_objects: Dict[str, DaskModule], deps_name: List[str]):
 def startup_tasks(
     dataset_split_managers: Dict[DatasetSplitName, Optional[DatasetSplitManager]],
     task_manager: TaskManager,
+    config: AzimuthConfig,
 ) -> Dict[str, DaskModule]:
     """Create and launch all startup tasks.
 
     Args:
         dataset_split_managers: Dataset Managers.
         task_manager: Task Manager.
+        config: Config.
 
     Returns:
         Modules with their names.
 
     """
-    config = task_manager.config
     # The order in start_up_tasks matters; a task needs to be added after its dependencies.
     # TODO Refactor so the startup can be robust to the order in start_up_tasks.
     start_up_tasks = [
@@ -304,7 +308,8 @@ def start_tasks_for_dms(
                     for k, v in make_startup_tasks(
                         dataset_split_managers,
                         task_manager,
-                        startup.module,
+                        config=config,
+                        supported_module=startup.module,
                         mod_options=startup.mod_options,
                         dependencies=dep_mods,
                         pipeline_index=pipeline_index,

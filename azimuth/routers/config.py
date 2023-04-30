@@ -11,7 +11,7 @@ from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERRO
 from azimuth.app import (
     get_config,
     get_task_manager,
-    initialize_managers,
+    initialize_managers_and_config,
     require_editable_config,
     run_startup_tasks,
 )
@@ -89,7 +89,7 @@ def patch_config(
     except Exception as e:
         log.error("Rollback config update due to error", exc_info=e)
         new_config = config
-        initialize_managers(new_config, task_manager.cluster)
+        initialize_managers_and_config(new_config, task_manager.cluster)
         log.info("Config update cancelled.")
         if isinstance(e, AzimuthValidationError):
             raise HTTPException(HTTP_400_BAD_REQUEST, detail=str(e))

@@ -134,8 +134,8 @@ def tiny_text_config_no_postprocessor(tiny_text_config) -> AzimuthConfig:
 
 
 @pytest.fixture
-def tiny_text_task_manager(tiny_text_config, dask_client):
-    task_manager = TaskManager(tiny_text_config, cluster=dask_client.cluster)
+def task_manager(dask_client):
+    task_manager = TaskManager(cluster=dask_client.cluster)
 
     yield task_manager
 

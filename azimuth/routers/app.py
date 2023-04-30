@@ -165,6 +165,7 @@ def get_perturbation_testing_summary(
             SupportedModule.PerturbationTestingMerged,
             dataset_split_name=DatasetSplitName.all,
             task_manager=task_manager,
+            config=config,
             last_update=last_update,
             mod_options=ModuleOptions(pipeline_index=pipeline_index),
         )[0]
@@ -180,6 +181,7 @@ def get_perturbation_testing_summary(
         SupportedModule.PerturbationTestingSummary,
         dataset_split_name=DatasetSplitName.all,
         task_manager=task_manager,
+        config=config,
         mod_options=ModuleOptions(pipeline_index=pipeline_index),
     )[0]
     return PerturbationTestingSummary(

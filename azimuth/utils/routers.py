@@ -96,6 +96,7 @@ def get_standard_task_result(
     task_name: SupportedTask,
     dataset_split_name: DatasetSplitName,
     task_manager: TaskManager,
+    config: AzimuthConfig,
     mod_options: Optional[ModuleOptions] = None,
     last_update: float = -1,
 ):
@@ -105,6 +106,7 @@ def get_standard_task_result(
         task_name: The task name e.g. ConfidenceHistogram
         dataset_split_name: e.g. DatasetSplitName.eval
         task_manager: The task manager
+        config: Config
         mod_options: Module options to pass to the task launcher
         last_update: The last known update for this dataset_split, to know if we need to recompute.
 
@@ -118,6 +120,7 @@ def get_standard_task_result(
     _, task = task_manager.get_task(
         task_name=task_name,
         dataset_split_name=dataset_split_name,
+        config=config,
         mod_options=mod_options,
         last_update=last_update,
     )
@@ -133,6 +136,7 @@ def get_standard_task_result(
 def get_custom_task_result(
     task_name: SupportedTask,
     task_manager: TaskManager,
+    config: AzimuthConfig,
     custom_query: Dict[str, Any],
     mod_options: Optional[ModuleOptions] = None,
 ):
@@ -141,6 +145,7 @@ def get_custom_task_result(
     Args:
         task_name: The task name e.g. ConfidenceHistogram
         task_manager: The task manager
+        config: Config
         custom_query: A dictionary specifying the custom query
         mod_options: Options to pass to the task launcher
 
@@ -151,7 +156,10 @@ def get_custom_task_result(
         HTTPException when the requested module doesn't exist.
     """
     _, task = task_manager.get_custom_task(
-        task_name=task_name, custom_query=custom_query, mod_options=mod_options
+        task_name=task_name,
+        config=config,
+        custom_query=custom_query,
+        mod_options=mod_options,
     )
     if not task:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Aggregation not found")

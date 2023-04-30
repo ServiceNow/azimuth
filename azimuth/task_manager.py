@@ -28,14 +28,12 @@ class TaskManager:
     """The Task Manager responsibility is to start tasks and scale the Cluster as needed.
 
     Args:
-        config: The application configuration.
-        cluster: Dask cluster to use, we will spawn a default one if not provided.
-
+        cluster: Dask cluster to use, if different than default.
+        large_dask_cluster: Specify a large default dask cluster.
     """
 
-    def __init__(self, config: AzimuthConfig, cluster: Optional[SpecCluster] = None):
-        self.config = config
-        self.cluster = cluster or default_cluster(large=config.large_dask_cluster)
+    def __init__(self, cluster: Optional[SpecCluster] = None, large_dask_cluster: bool = False):
+        self.cluster = cluster or default_cluster(large=large_dask_cluster)
         self.client = Client(cluster)
         self.tasks: Dict[str, type] = {}
         self.current_tasks: Dict[str, DaskModule] = {}
@@ -101,6 +99,7 @@ class TaskManager:
         self,
         task_name: SupportedTask,
         dataset_split_name: DatasetSplitName,
+        config: AzimuthConfig,
         mod_options: Optional[ModuleOptions] = None,
         last_update: float = -1,
         dependencies: Optional[List[DaskModule]] = None,
@@ -112,6 +111,7 @@ class TaskManager:
         Args:
             task_name: Name of the task.
             dataset_split_name: Which dataset split to use.
+            config: Config.
             mod_options: Options for the module.
             last_update: Last known update of the dataset_split.
             dependencies: Which Modules should complete before this one.
@@ -138,7 +138,7 @@ class TaskManager:
 
             task: DaskModule = task_cls(
                 dataset_split_name=dataset_split_name,
-                config=self.config.copy(deep=True),
+                config=config.copy(deep=True),
                 mod_options=mod_options,
             )
             # Check if this task already exist.
@@ -160,6 +160,7 @@ class TaskManager:
         self,
         task_name: SupportedTask,
         custom_query: Dict[str, Any],
+        config: AzimuthConfig,
         mod_options: Optional[ModuleOptions] = None,
     ) -> Tuple[str, Optional[DaskModule]]:
         """Get the task `name` run on a custom query.
@@ -169,6 +170,7 @@ class TaskManager:
         Args:
             task_name: Name of the task.
             custom_query: Query fed to the Module.
+            config: Config.
             mod_options: Options for the module.
 
         Returns:
@@ -189,7 +191,7 @@ class TaskManager:
             # We found the task, we can instantiate it.
             task: DaskModule = task_cls(
                 dataset_split_name=DatasetSplitName.eval,  # Placeholder
-                config=self.config.copy(deep=True),
+                config=config.copy(deep=True),
                 mod_options=mod_options,
             )
             # Check if this task already exist.
@@ -208,7 +210,6 @@ class TaskManager:
         cluster = (self.cluster.workers,)
         return {
             "cluster": cluster,
-            "config": self.config.dict(),
             **self.get_all_tasks_status(task=None),
         }
 

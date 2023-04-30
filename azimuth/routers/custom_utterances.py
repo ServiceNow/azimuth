@@ -95,11 +95,13 @@ def get_saliency(
     utterances: List[str] = Query([], title="Utterances"),
     pipeline_index: int = Depends(require_pipeline_index),
     task_manager: TaskManager = Depends(get_task_manager),
+    config: AzimuthConfig = Depends(get_config),
 ) -> List[SaliencyResponse]:
     task_result: List[SaliencyResponse] = get_custom_task_result(
         SupportedMethod.Saliency,
         task_manager=task_manager,
-        custom_query={task_manager.config.columns.text_input: utterances},
+        config=config,
+        custom_query={config.columns.text_input: utterances},
         mod_options=ModuleOptions(pipeline_index=pipeline_index),
     )
 

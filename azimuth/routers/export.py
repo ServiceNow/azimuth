@@ -108,6 +108,7 @@ def get_export_perturbation_testing_summary(
         SupportedModule.PerturbationTestingSummary,
         DatasetSplitName.all,
         task_manager=task_manager,
+        config=config,
         last_update=last_update,
         mod_options=ModuleOptions(pipeline_index=pipeline_index),
     )[0].all_tests_summary
@@ -150,6 +151,7 @@ def get_export_perturbed_set(
         SupportedModule.PerturbationTesting,
         dataset_split_name,
         task_manager,
+        config=config,
         mod_options=ModuleOptions(pipeline_index=pipeline_index_not_null),
     )
 

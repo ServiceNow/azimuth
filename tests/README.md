@@ -72,5 +72,4 @@ Some tests need to test other model contracts than `hf_text_classification`, or 
 ### Task Manager and Dask Client
 
 * If your test needs a Dask Client, you can add the fixture `dask_client`.
-* If your test needs a TaskManager (most don't), `tiny_text_task_manager` is set up to work with
-  the `tiny_text_config`. Use both for the tests.
+* If your test needs a TaskManager (most don't), you can use `task_manager`.
