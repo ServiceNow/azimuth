@@ -16,12 +16,34 @@ const NumberField: React.FC<
     }
   }, [value, scale, stringValue]);
 
+  const helperText = React.useMemo(() => {
+    if (props.inputProps === undefined) {
+      return;
+    }
+
+    let prop;
+    if (value * scale < props.inputProps.min) {
+      prop = "min";
+    } else if (value * scale > props.inputProps.max) {
+      prop = "max";
+    } else {
+      return;
+    }
+
+    const limit = props.inputProps[prop];
+    return `Set ${prop}imum ${limit}${
+      units ? ` ${limit === 1 ? units.replace(/s$/, "") : units}` : ""
+    }`;
+  }, [props.inputProps, scale, units, value]);
+
   return (
     <TextField
       {...FIELD_COMMON_PROPS}
       type="number"
       title="" // Overwrite any default input validation tooltip
       value={stringValue}
+      error={helperText !== undefined}
+      helperText={helperText}
       InputProps={{
         sx: { maxWidth: "12ch" },
         endAdornment: units && (

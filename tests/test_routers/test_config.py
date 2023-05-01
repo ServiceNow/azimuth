@@ -18,7 +18,7 @@ def test_get_default_config(app: FastAPI):
 
     assert res == {
         "name": "New project",
-        "dataset": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
+        "dataset": {"class_name": "", "args": [], "kwargs": {}, "remote": None},
         "model_contract": "hf_text_classification",
         "columns": {
             "text_input": "utterance",
@@ -55,8 +55,8 @@ def test_get_default_config(app: FastAPI):
         },
         "pipelines": [
             {
-                "name": "required",
-                "model": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
+                "name": "Pipeline_0",
+                "model": {"class_name": "", "args": [], "kwargs": {}, "remote": None},
                 "postprocessors": [
                     {
                         "class_name": "azimuth.utils.ml.postprocessing.Thresholding",

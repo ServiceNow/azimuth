@@ -29,7 +29,7 @@ from azimuth.utils.project import update_config
 log = structlog.get_logger(__name__)
 router = APIRouter()
 
-REQUIRED = "required"
+REQUIRED = ""
 
 
 @router.get(
