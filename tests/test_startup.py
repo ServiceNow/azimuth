@@ -6,20 +6,11 @@ from unittest.mock import Mock
 import pytest
 from datasets import Dataset, DatasetDict
 
-from azimuth.app import (
-    get_ready_flag,
-    load_dataset_split_managers_from_config,
-    run_startup_tasks,
-)
+from azimuth.app import get_ready_flag, load_dataset_split_managers_from_config, run_startup_tasks
 from azimuth.config import CustomObject
 from azimuth.modules.model_contracts import HFTextClassificationModule
 from azimuth.startup import on_end, startup_tasks
-from azimuth.types import (
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-    SupportedModule,
-)
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod, SupportedModule
 from tests.utils import get_table_key, get_tiny_text_config_one_ds_name
 
 

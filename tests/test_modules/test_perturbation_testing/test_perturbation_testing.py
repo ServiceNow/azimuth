@@ -3,9 +3,7 @@
 # in the root directory of this source tree.
 import re
 
-from azimuth.modules.perturbation_testing.perturbation_testing import (
-    PerturbationTestingModule,
-)
+from azimuth.modules.perturbation_testing.perturbation_testing import PerturbationTestingModule
 from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions
 from azimuth.types.perturbation_testing import (
     PerturbationTestClass,

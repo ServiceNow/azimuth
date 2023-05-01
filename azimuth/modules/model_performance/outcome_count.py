@@ -21,11 +21,7 @@ from azimuth.types.model_performance import (
     OutcomeCountPerThresholdValue,
 )
 from azimuth.types.outcomes import ALL_OUTCOMES, OutcomeName
-from azimuth.types.tag import (
-    ALL_DATA_ACTION_FILTERS,
-    SMART_TAGS_FAMILY_MAPPING,
-    SmartTag,
-)
+from azimuth.types.tag import ALL_DATA_ACTION_FILTERS, SMART_TAGS_FAMILY_MAPPING, SmartTag
 from azimuth.utils.dataset_operations import get_outcomes_from_ds
 from azimuth.utils.ml.model_performance import (
     sorted_by_utterance_count,

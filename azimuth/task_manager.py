@@ -9,12 +9,7 @@ from distributed import Client, SpecCluster
 from azimuth.config import AzimuthConfig
 from azimuth.modules.base_classes import DaskModule, ExpirableMixin
 from azimuth.modules.task_mapping import model_contract_methods, modules
-from azimuth.types import (
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-    SupportedTask,
-)
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod, SupportedTask
 from azimuth.utils.cluster import default_cluster
 
 log = structlog.get_logger()

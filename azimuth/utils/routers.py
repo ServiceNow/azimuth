@@ -5,11 +5,7 @@ from threading import Event
 from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, HTTPException, Query
-from starlette.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
-    HTTP_503_SERVICE_UNAVAILABLE,
-)
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, HTTP_503_SERVICE_UNAVAILABLE
 
 from azimuth.app import get_config, get_ready_flag, get_startup_tasks, get_task_manager
 from azimuth.config import AzimuthConfig

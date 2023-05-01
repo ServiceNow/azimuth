@@ -2,12 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from azimuth.types import (
-    DatasetFilters,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedModule,
-)
+from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.routers import get_custom_task_result, get_standard_task_result
 
 standard_task_result = "task_result"

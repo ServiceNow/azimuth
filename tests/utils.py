@@ -7,20 +7,11 @@ from typing import Type
 
 import numpy as np
 
-from azimuth.config import (
-    BehavioralTestingOptions,
-    NeutralTokenOptions,
-    TypoTestOptions,
-)
+from azimuth.config import BehavioralTestingOptions, NeutralTokenOptions, TypoTestOptions
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.modules.model_performance.outcomes import OutcomesModule
-from azimuth.types import (
-    DatasetColumn,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-)
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
     ALL_PREDICTION_TAGS,

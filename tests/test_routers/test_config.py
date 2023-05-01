@@ -1,10 +1,6 @@
 from fastapi import FastAPI
 from jsonlines import jsonlines
-from starlette.status import (
-    HTTP_200_OK,
-    HTTP_400_BAD_REQUEST,
-    HTTP_500_INTERNAL_SERVER_ERROR,
-)
+from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from starlette.testclient import TestClient
 
 from azimuth.config import SupportedLanguage, config_defaults_per_language

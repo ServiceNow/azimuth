@@ -13,12 +13,7 @@ from azimuth.modules.model_contracts import (
     CustomTextClassificationModule,
     HFTextClassificationModule,
 )
-from azimuth.types import (
-    DatasetColumn,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-)
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO

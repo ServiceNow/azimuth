@@ -7,10 +7,7 @@ from typing import List, Optional, Union
 from pydantic import Field
 
 from azimuth.types import AliasModel
-from azimuth.types.model_performance import (
-    ValuePerDatasetSmartTag,
-    ValuePerPipelineSmartTag,
-)
+from azimuth.types.model_performance import ValuePerDatasetSmartTag, ValuePerPipelineSmartTag
 from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import DataAction
 from azimuth.utils.ml.postprocessing import PostprocessingStepAPIResponse
