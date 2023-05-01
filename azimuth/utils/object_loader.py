@@ -111,13 +111,11 @@ def load_class(kwargs, reject, value, force_kwargs=False):
         object, the loaded object.
     """
     func = load_obj(value.class_name)
-    if inspect.isclass(func):
-        if has_init(func):
-            varnames = func.__init__.__code__.co_varnames
-        else:
-            varnames = []
-    else:
-        varnames = func.__code__.co_varnames
+    varnames = (
+        (func.__init__.__code__.co_varnames if has_init(func) else [])
+        if inspect.isclass(func)
+        else func.__code__.co_varnames
+    )
 
     not_present = {k: v for k, v in kwargs.items() if k not in varnames}
 
@@ -134,7 +132,5 @@ def load_class(kwargs, reject, value, force_kwargs=False):
 
 def load_obj(cls):
     """Get the function object and load the required modules."""
-    splitted = cls.split(".")
-    mod, cls = ".".join(splitted[:-1]), splitted[-1]
-    func = getattr(importlib.import_module(mod), cls)
-    return func
+    mod, cls = cls.rsplit(".", 1)
+    return getattr(importlib.import_module(mod), cls)
