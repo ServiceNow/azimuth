@@ -10,7 +10,7 @@ import sys
 
 import structlog
 
-from azimuth.config import CustomObject
+from azimuth.config import AzimuthValidationError, CustomObject
 
 log = structlog.get_logger(__file__)
 
@@ -53,7 +53,7 @@ def install(remote: str):
             subprocess.check_call([sys.executable, "-m", "pip", "install", remote])
         except subprocess.CalledProcessError:
             # Was probably a misspecified folder
-            raise FileNotFoundError(f"Can't find {remote} locally or on Pypi.")
+            raise AzimuthValidationError(f"Can't find remote {repr(remote)} locally or on Pypi.")
     importlib.invalidate_caches()
 
 
@@ -110,7 +110,11 @@ def load_class(kwargs, reject, value, force_kwargs=False):
     Returns:
         object, the loaded object.
     """
-    func = load_obj(value.class_name)
+    try:
+        func = load_obj(value.class_name)
+    except (ModuleNotFoundError, AttributeError) as e:
+        raise AzimuthValidationError(f"Invalid class_name {repr(value.class_name)}: {e}")
+
     varnames = (
         (func.__init__.__code__.co_varnames if has_init(func) else [])
         if inspect.isclass(func)
@@ -127,7 +131,12 @@ def load_class(kwargs, reject, value, force_kwargs=False):
     if reject is not None:
         kwargs_ins = {k: v for k, v in kwargs.items() if k not in reject}
     kwargs_ins = {k: load_args(v, kwargs) for k, v in kwargs_ins.items()}
-    return func(*value.args, **kwargs_ins)
+
+    try:
+        obj = func(*value.args, **kwargs_ins)
+    except Exception as e:
+        raise AzimuthValidationError(e)
+    return obj
 
 
 def load_obj(cls):
