@@ -120,8 +120,8 @@ class TemperatureScaling(CustomObject):
     ] = "azimuth.utils.ml.postprocessing.TemperatureScaling"
     temperature: float = Field(1, ge=0, env="TEMP")
 
-    @root_validator()
-    def check_temps(cls, values):
+    @root_validator
+    def _check_temps(cls, values):
         kwargs = values.get("kwargs", {})
         if "temperature" not in kwargs:
             kwargs["temperature"] = values.get("temperature", 1)
@@ -136,8 +136,8 @@ class ThresholdConfig(CustomObject):
     ] = "azimuth.utils.ml.postprocessing.Thresholding"
     threshold: float = Field(0.5, ge=0, le=1, env="TH")
 
-    @root_validator()
-    def check_threshold(cls, values):
+    @root_validator
+    def _check_threshold(cls, values):
         kwargs = values.get("kwargs", {})
         if "threshold" not in kwargs:
             kwargs["threshold"] = values.get("threshold", 0.5)
@@ -333,7 +333,7 @@ class ModelContractConfig(CommonFieldsConfig):
     saliency_layer: Optional[str] = Field(None, nullable=True)
 
     @validator("pipelines", pre=True)
-    def check_pipeline_names(cls, pipeline_definitions):
+    def _check_pipeline_names(cls, pipeline_definitions):
         # We support both [] and None (null in JSON), and we standardize it to None.
         if not pipeline_definitions:
             return None
@@ -433,8 +433,8 @@ class AzimuthConfig(
     # Reminder: If a module depends on an attribute in AzimuthConfig, the module will be forced to
     # include all other configs in its scope.
 
-    @root_validator()
-    def dynamic_language_config_values(cls, values):
+    @root_validator
+    def _dynamic_language_config_values(cls, values):
         defaults = config_defaults_per_language[values["language"]]
         if behavioral_testing := values.get("behavioral_testing"):
             neutral_token = behavioral_testing.neutral_token
