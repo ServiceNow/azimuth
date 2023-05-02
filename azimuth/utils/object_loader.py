@@ -81,9 +81,9 @@ def load_custom_object(
     return load_class(kwargs, reject, value, force_kwargs=force_kwargs)
 
 
-def has_init(func):
-    # Is overloaded
-    return func.__init__ != object.__init__
+def get_class_init_varnames(cls):
+    # We check if func.__init__ is overloaded, otherwise func.__init__ has no attribute __code__.
+    return cls.__init__.__code__.co_varnames if cls.__init__ != object.__init__ else []
 
 
 def load_args(v, kwargs):
@@ -115,11 +115,7 @@ def load_class(kwargs, reject, value, force_kwargs=False):
     except (ModuleNotFoundError, AttributeError) as e:
         raise AzimuthValidationError(f"Invalid class_name {repr(value.class_name)}: {e}")
 
-    varnames = (
-        (func.__init__.__code__.co_varnames if has_init(func) else [])
-        if inspect.isclass(func)
-        else func.__code__.co_varnames
-    )
+    varnames = get_class_init_varnames(func) if inspect.isclass(func) else func.__code__.co_varnames
 
     not_present = {k: v for k, v in kwargs.items() if k not in varnames}
 
