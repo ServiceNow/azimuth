@@ -9,10 +9,7 @@ from typing import List
 import nlpaug.augmenter.char as nac
 
 from azimuth.config import PerturbationTestingConfig
-from azimuth.types.perturbation_testing import (
-    PerturbationType,
-    PerturbedUtteranceDetails,
-)
+from azimuth.types.perturbation_testing import PerturbationType, PerturbedUtteranceDetails
 from azimuth.utils.ml.third_parties.contractions import ContractionExpansions
 from azimuth.utils.validation import assert_not_none
 

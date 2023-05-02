@@ -1,9 +1,7 @@
 import pytest
 
 from azimuth.dataset_split_manager import PredictionTableKey
-from azimuth.modules.pipeline_comparison.prediction_comparison import (
-    PredictionComparisonModule,
-)
+from azimuth.modules.pipeline_comparison.prediction_comparison import PredictionComparisonModule
 from azimuth.types import DatasetSplitName
 from azimuth.types.pipeline_comparison import PredictionComparisonResponse
 from azimuth.types.tag import SmartTag

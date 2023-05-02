@@ -1,12 +1,7 @@
 import time
 
 from azimuth.modules.model_contracts import HFTextClassificationModule
-from azimuth.types import (
-    DatasetFilters,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-)
+from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.utils.dataset_operations import filter_dataset_split
 
 
