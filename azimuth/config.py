@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
 from jsonlines import jsonlines
-from pydantic import Extra, Field, root_validator, validator
+from pydantic import Extra, Field, ValidationError, root_validator, validator
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
@@ -474,6 +474,19 @@ class AzimuthConfig(
         else:
             return AzimuthConfigHistory.parse_obj(last_config).config
 
+    def get_config_history(self) -> List["AzimuthConfigHistoryWithHash"]:
+        config_history = []
+        try:
+            with jsonlines.open(self.get_config_history_path(), mode="r") as reader:
+                for item in reader:
+                    try:
+                        config_history.append(AzimuthConfigHistoryWithHash.parse_obj(item))
+                    except ValidationError:
+                        pass
+        except (FileNotFoundError, ValueError):
+            pass
+        return config_history
+
     def log_info(self):
         log.info(f"Config loaded for {self.name} with {self.model_contract} as a model contract.")
 
@@ -517,6 +530,14 @@ class AzimuthConfig(
 class AzimuthConfigHistory(AzimuthBaseSettings):
     config: AzimuthConfig
     created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)))
+
+
+class AzimuthConfigHistoryWithHash(AzimuthConfigHistory):
+    hash: str = ""
+
+    @root_validator(skip_on_failure=True)
+    def _set_hash(cls, values):
+        return {**values, "hash": md5_hash(values["config"].dict())}
 
 
 def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:

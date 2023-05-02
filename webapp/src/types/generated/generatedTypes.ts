@@ -22,7 +22,11 @@ export interface paths {
   };
   "/config/default": {
     /** Get the default configuration */
-    get: operations["get_default_config_def_config_default_get"];
+    get: operations["get_config_default_config_default_get"];
+  };
+  "/config/history": {
+    /** Get the history of the configuration */
+    get: operations["get_config_history_config_history_get"];
   };
   "/config": {
     /** Get the current configuration */
@@ -148,6 +152,17 @@ export interface components {
       behavioral_testing:
         | components["schemas"]["BehavioralTestingOptions"]
         | null;
+    };
+    /**
+     * Base class for settings, allowing values to be overridden by environment variables.
+     *
+     * This is useful in production for secrets you do not wish to save in code, it plays nicely with docker(-compose),
+     * Heroku and any 12 factor app design.
+     */
+    AzimuthConfigHistoryWithHash: {
+      config: components["schemas"]["AzimuthConfig"];
+      created_on: string;
+      hash: string;
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -1091,7 +1106,7 @@ export interface operations {
     };
   };
   /** Get the default configuration */
-  get_default_config_def_config_default_get: {
+  get_config_default_config_default_get: {
     parameters: {
       query: {
         language?: components["schemas"]["SupportedLanguage"];
@@ -1102,6 +1117,53 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["AzimuthConfig"];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+    };
+  };
+  /** Get the history of the configuration */
+  get_config_history_config_history_get: {
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AzimuthConfigHistoryWithHash"][];
         };
       };
       /** Bad Request */

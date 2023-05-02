@@ -3,7 +3,7 @@
 # in the root directory of this source tree.
 from enum import Enum
 from pathlib import Path
-from typing import Type
+from typing import List, Type
 
 import numpy as np
 
@@ -199,3 +199,7 @@ def get_tiny_text_config_one_ds_name(config):
 def get_enum_validation_error_msg(enum: Type[Enum]):
     permitted = ", ".join(repr(v.value) for v in enum)
     return f"value is not a valid enumeration member; permitted: {permitted}"
+
+
+def is_sorted(numbers: List[float], descending=False):
+    return all(a >= b if descending else a <= b for a, b in zip(numbers[:-1], numbers[1:]))
