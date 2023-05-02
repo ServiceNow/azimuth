@@ -1,5 +1,11 @@
-import { Close, Warning } from "@mui/icons-material";
 import {
+  AddCircleOutline,
+  Close,
+  DeleteForever,
+  Warning,
+} from "@mui/icons-material";
+import {
+  Autocomplete,
   Box,
   Button,
   Checkbox,
@@ -8,6 +14,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControl,
   FormControlLabel,
   formControlLabelClasses,
@@ -19,6 +26,8 @@ import {
   inputClasses,
   inputLabelClasses,
   Paper,
+  TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
@@ -28,6 +37,7 @@ import JSONField from "components/Settings/JSONField";
 import NumberField from "components/Settings/NumberField";
 import StringArrayField from "components/Settings/StringArrayField";
 import StringField from "components/Settings/StringField";
+import { FIELD_COMMON_PROPS, FieldProps } from "components/Settings/utils";
 import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -92,6 +102,11 @@ const SUPPORTED_SPACY_MODELS: SupportedSpacyModels[] = [
   "fr_core_news_md",
 ];
 const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
+const POSTPROCESSORS_CLASS_NAMES: string[] = [
+  "azimuth.utils.ml.postprocessing.TemperatureScaling",
+  "azimuth.utils.ml.postprocessing.Thresholding",
+];
+
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
@@ -108,6 +123,21 @@ const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
   <Box display="grid" gap={4} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
     {children}
   </Box>
+);
+
+const CustomValueField: React.FC<
+  FieldProps<string> & { label: string; options: string[]; disabled: boolean }
+> = ({ value, onChange, label, options, disabled }) => (
+  <Autocomplete
+    freeSolo
+    options={options}
+    value={value}
+    disabled={disabled}
+    onChange={onChange && ((_, newValue) => onChange(newValue as string))}
+    renderInput={(params) => (
+      <TextField {...params} {...FIELD_COMMON_PROPS} label={label} />
+    )}
+  />
 );
 
 const displaySectionTitle = (section: string) => (
@@ -147,6 +177,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   >({});
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
+
+  const isCustomPostprocessorClassName = (class_name: string) =>
+    !POSTPROCESSORS_CLASS_NAMES.includes(class_name);
 
   const handleDiscard = () => {
     setPartialConfig({});
@@ -362,6 +395,64 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       ),
     });
 
+  const displayPipelineAddSection = (pipelineIndex: number) => (
+    <Divider sx={{ position: "relative", height: 2 }}>
+      <Tooltip title="Add pipeline">
+        <IconButton
+          sx={{
+            bottom: 25,
+            marginTop: 2,
+            padding: 0,
+          }}
+          aria-label="add-pipeline"
+          disabled={isUpdatingConfig}
+          onClick={() =>
+            updatePartialConfig({
+              pipelines: [
+                ...resultingConfig.pipelines!.slice(0, pipelineIndex + 1),
+                ...defaultConfig.pipelines!,
+                ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
+              ],
+            })
+          }
+        >
+          <AddCircleOutline />
+        </IconButton>
+      </Tooltip>
+    </Divider>
+  );
+
+  const displayPostprocessorAddSection = (
+    pipelineIndex: number,
+    postprocessorIndex: number,
+    postprocessor: PipelineDefinition["postprocessors"]
+  ) => (
+    <Divider textAlign="left" sx={{ position: "relative", height: 2 }}>
+      <Tooltip title="Add postprocessor">
+        <IconButton
+          sx={{
+            bottom: 25,
+            marginTop: 2,
+            padding: 0,
+          }}
+          aria-label="add-postprocessor"
+          disabled={isUpdatingConfig}
+          onClick={() =>
+            updatePipeline(pipelineIndex, {
+              postprocessors: [
+                ...postprocessor!.slice(0, postprocessorIndex + 1),
+                ...defaultConfig.pipelines![0].postprocessors!,
+                ...postprocessor!.slice(postprocessorIndex + 1),
+              ],
+            })
+          }
+        >
+          <AddCircleOutline />
+        </IconButton>
+      </Tooltip>
+    </Divider>
+  );
+
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
     section: string = field
@@ -561,14 +652,39 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <>
           {displaySectionTitle("Pipelines")}
           <FormGroup sx={{ gap: 2 }}>
+            {displayPipelineAddSection(-1)}
             {resultingConfig.pipelines.map((pipeline, pipelineIndex) => (
-              <Paper
+              <Box
                 key={pipelineIndex}
-                variant="outlined"
-                sx={{ display: "flex", flexDirection: "column", paddingX: 2 }}
+                sx={{ display: "flex", flexDirection: "column" }}
               >
                 <FormControl>
-                  {displaySectionTitle("General")}
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    {displaySectionTitle("General")}
+                    <IconButton
+                      aria-label="delete"
+                      disabled={isUpdatingConfig}
+                      onClick={() =>
+                        updatePartialConfig({
+                          pipelines: [
+                            ...resultingConfig.pipelines!.slice(
+                              0,
+                              pipelineIndex
+                            ),
+                            ...resultingConfig.pipelines!.slice(
+                              pipelineIndex + 1
+                            ),
+                          ],
+                        })
+                      }
+                    >
+                      <DeleteForever fontSize="large" />
+                    </IconButton>
+                  </Box>
                   <FormGroup>
                     <Columns columns={2}>
                       <StringField
@@ -622,69 +738,192 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       />
                     </Columns>
                   </FormGroup>
-                </FormControl>
-                <FormControl>
-                  {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
-                  <FormGroup sx={{ gap: 2 }}>
-                    {(
-                      pipeline.postprocessors ??
-                      defaultConfig.pipelines![0].postprocessors
-                    )?.map((postprocessor, index) => (
-                      <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
-                        <Columns columns={2}>
-                          <StringField
-                            label="class_name"
-                            value={postprocessor.class_name}
-                            disabled={
-                              resultingConfig.pipelines![pipelineIndex]
-                                .postprocessors === null || isUpdatingConfig
-                            }
-                            onChange={(class_name) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                class_name,
-                              })
-                            }
-                          />
-                          {"temperature" in postprocessor && (
-                            <NumberField
-                              label="temperature"
-                              value={postprocessor.temperature}
-                              disabled={
-                                resultingConfig.pipelines![pipelineIndex]
-                                  .postprocessors === null || isUpdatingConfig
-                              }
-                              onChange={(temperature) =>
-                                updatePostprocessor(pipelineIndex, index, {
-                                  temperature,
-                                  kwargs: { temperature },
-                                })
-                              }
-                              {...FLOAT}
-                            />
+                  <FormControl>
+                    {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        paddingTop: 3,
+                        paddingBottom: 1,
+                        marginBottom: 3,
+                        width: "100%",
+                      }}
+                    >
+                      <FormGroup
+                        sx={{
+                          gap: 2,
+                        }}
+                      >
+                        {pipeline.postprocessors &&
+                          displayPostprocessorAddSection(
+                            pipelineIndex,
+                            -1,
+                            pipeline.postprocessors
                           )}
-                          {"threshold" in postprocessor && (
-                            <NumberField
-                              label="threshold"
-                              value={postprocessor.threshold}
-                              disabled={
-                                resultingConfig.pipelines![pipelineIndex]
-                                  .postprocessors === null || isUpdatingConfig
-                              }
-                              onChange={(threshold) =>
-                                updatePostprocessor(pipelineIndex, index, {
-                                  threshold,
-                                  kwargs: { threshold },
-                                })
-                              }
-                              {...PERCENTAGE}
-                            />
-                          )}
-                        </Columns>
-                      </Paper>
-                    ))}
-                  </FormGroup>
+                        {(
+                          pipeline.postprocessors ??
+                          defaultConfig.pipelines![0].postprocessors
+                        )?.map((postprocessor, index) => (
+                          <>
+                            <Columns columns={2}>
+                              <CustomValueField
+                                label="class_name"
+                                options={POSTPROCESSORS_CLASS_NAMES}
+                                value={postprocessor.class_name}
+                                disabled={
+                                  resultingConfig.pipelines![pipelineIndex]
+                                    .postprocessors === null || isUpdatingConfig
+                                }
+                                onChange={(class_name) =>
+                                  updatePostprocessor(pipelineIndex, index, {
+                                    class_name,
+                                  })
+                                }
+                              />
+                              {isCustomPostprocessorClassName(
+                                postprocessor.class_name
+                              ) ? (
+                                <>
+                                  <StringField
+                                    label="remote"
+                                    nullable
+                                    value={postprocessor.remote}
+                                    disabled={isUpdatingConfig}
+                                    onChange={(remote) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          remote,
+                                        }
+                                      )
+                                    }
+                                  />
+                                  <JSONField
+                                    array
+                                    label="args"
+                                    value={postprocessor.args}
+                                    disabled={isUpdatingConfig}
+                                    onChange={(args) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          args,
+                                        }
+                                      )
+                                    }
+                                  />
+                                  <JSONField
+                                    label="kwargs"
+                                    value={postprocessor.kwargs}
+                                    disabled={isUpdatingConfig}
+                                    onChange={(kwargs) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          kwargs,
+                                        }
+                                      )
+                                    }
+                                  />
+                                </>
+                              ) : (
+                                (postprocessor.class_name?.includes(
+                                  "Temperature"
+                                ) && (
+                                  <NumberField
+                                    label="temperature"
+                                    value={
+                                      "temperature" in postprocessor
+                                        ? postprocessor.temperature
+                                        : 0.5
+                                    }
+                                    disabled={
+                                      resultingConfig.pipelines![pipelineIndex]
+                                        .postprocessors === null ||
+                                      isUpdatingConfig
+                                    }
+                                    onChange={(temperature) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          temperature,
+                                          kwargs: { temperature },
+                                        }
+                                      )
+                                    }
+                                    {...FLOAT}
+                                  />
+                                )) ||
+                                (postprocessor.class_name?.includes(
+                                  "Threshold"
+                                ) && (
+                                  <NumberField
+                                    label="threshold"
+                                    value={
+                                      "threshold" in postprocessor
+                                        ? postprocessor.threshold
+                                        : 0.5
+                                    }
+                                    disabled={
+                                      resultingConfig.pipelines![pipelineIndex]
+                                        .postprocessors === null ||
+                                      isUpdatingConfig
+                                    }
+                                    onChange={(threshold) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          threshold,
+                                          kwargs: { threshold },
+                                        }
+                                      )
+                                    }
+                                    {...PERCENTAGE}
+                                  />
+                                ))
+                              )}
+                              <IconButton
+                                sx={{
+                                  position: "absolute",
+                                  right: 20,
+                                }}
+                                aria-label="delete"
+                                disabled={isUpdatingConfig}
+                                onClick={() =>
+                                  updatePipeline(pipelineIndex, {
+                                    postprocessors: [
+                                      ...resultingConfig.pipelines![
+                                        pipelineIndex
+                                      ].postprocessors!.slice(0, index),
+                                      ...resultingConfig.pipelines![
+                                        pipelineIndex
+                                      ].postprocessors!.slice(index + 1),
+                                    ],
+                                  })
+                                }
+                              >
+                                <DeleteForever fontSize="large" />
+                              </IconButton>
+                            </Columns>
+                            {pipeline.postprocessors &&
+                              displayPostprocessorAddSection(
+                                pipelineIndex,
+                                index,
+                                pipeline.postprocessors
+                              )}
+                          </>
+                        ))}
+                      </FormGroup>
+                    </Paper>
+                  </FormControl>
                 </FormControl>
-              </Paper>
+                {displayPipelineAddSection(pipelineIndex)}
+              </Box>
             ))}
           </FormGroup>
         </>
