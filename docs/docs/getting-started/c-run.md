@@ -138,9 +138,7 @@ No matter where you launch the app from, you can always configure some options t
 variables. They are all redundant with the config attributes, so you can set them in either place.
 They are the following:
 
-* Specify the threshold of your model by passing `TH` (ex: `TH=0.6` or `NaN` if there is no
-  threshold) in the command. If multiple pipelines are defined, the threshold will apply to all.
-* Similarly, pass `TEMP=Y` (ex: `TEMP=3`) to set the temperature of the model.
+* Specify where to save/load the cache with `ARTIFACT_PATH=/path/to/cache/folder`.
 * Disable behavioral tests and similarity by passing respectively `BEHAVIORAL_TESTING=null` and
   `SIMILARITY=null`.
 * Specify the name of the project, passing `NAME`.

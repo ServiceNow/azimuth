@@ -93,12 +93,14 @@ class CustomObject(AzimuthBaseSettings):
         title="Class name to load.",
         description="Name of the function or class that is located in `remote`."
         "`args` and `kwargs` will be sent to the function/class.",
+        env=[],
     )
-    args: List[Any] = []
-    kwargs: Dict[str, Any] = {}
+    args: List[Any] = Field([], env=[])
+    kwargs: Dict[str, Any] = Field({}, env=[])
     remote: Optional[str] = Field(
         None,
         description="Absolute path to class. `class_name` needs to be accessible from this path.",
+        env=[],
         nullable=True,
     )
 
@@ -111,14 +113,15 @@ class MetricDefinition(CustomObject):
         default_factory=dict,
         title="Additional kwargs",
         description="Keyword arguments supplied to `compute`.",
+        env=[],
     )
 
 
 class TemperatureScaling(CustomObject):
-    class_name: Literal[
-        "azimuth.utils.ml.postprocessing.TemperatureScaling"
-    ] = "azimuth.utils.ml.postprocessing.TemperatureScaling"
-    temperature: float = Field(1, ge=0, env="TEMP")
+    class_name: Literal["azimuth.utils.ml.postprocessing.TemperatureScaling"] = Field(
+        "azimuth.utils.ml.postprocessing.TemperatureScaling", env=[]
+    )
+    temperature: float = Field(1, ge=0, env=[])
 
     @root_validator
     def _check_temps(cls, values):
@@ -131,10 +134,10 @@ class TemperatureScaling(CustomObject):
 
 
 class ThresholdConfig(CustomObject):
-    class_name: Literal[
-        "azimuth.utils.ml.postprocessing.Thresholding"
-    ] = "azimuth.utils.ml.postprocessing.Thresholding"
-    threshold: float = Field(0.5, ge=0, le=1, env="TH")
+    class_name: Literal["azimuth.utils.ml.postprocessing.Thresholding"] = Field(
+        "azimuth.utils.ml.postprocessing.Thresholding", env=[]
+    )
+    threshold: float = Field(0.5, ge=0, le=1, env=[])
 
     @root_validator
     def _check_threshold(cls, values):
@@ -146,11 +149,11 @@ class ThresholdConfig(CustomObject):
 
 
 class PipelineDefinition(AzimuthBaseSettings):
-    name: str = Field(..., exclude_from_cache=True)
-    model: CustomObject
+    name: str = Field(..., env=[], exclude_from_cache=True)
+    model: CustomObject = Field(..., env=[])
     postprocessors: Optional[
         List[Union[TemperatureScaling, ThresholdConfig, CustomObject]]
-    ] = Field([ThresholdConfig(threshold=0.5)], nullable=True)
+    ] = Field([ThresholdConfig(threshold=0.5)], env=[], nullable=True)
 
     @property
     def threshold(self) -> Optional[float]:
@@ -176,101 +179,108 @@ class PipelineDefinition(AzimuthBaseSettings):
 
 
 class DatasetWarningsOptions(AzimuthBaseSettings):
-    min_num_per_class: int = Field(20, ge=1)
-    max_delta_class_imbalance: float = Field(0.5, ge=0, le=1)
-    max_delta_representation: float = Field(0.05, ge=0, le=1)
-    max_delta_mean_words: float = Field(3, ge=0)
-    max_delta_std_words: float = Field(3, ge=0)
+    min_num_per_class: int = Field(20, ge=1, env=[])
+    max_delta_class_imbalance: float = Field(0.5, ge=0, le=1, env=[])
+    max_delta_representation: float = Field(0.05, ge=0, le=1, env=[])
+    max_delta_mean_words: float = Field(3, ge=0, env=[])
+    max_delta_std_words: float = Field(3, ge=0, env=[])
 
 
 class SyntaxOptions(AzimuthBaseSettings):
-    short_utterance_max_word: int = Field(3, ge=1)
-    long_utterance_min_word: int = Field(12, ge=1)
-    spacy_model: SupportedSpacyModels = SupportedSpacyModels.use_default  # Language-based default
-    subj_tags: List[str] = []  # Language-based dynamic default value
-    obj_tags: List[str] = []  # Language-based dynamic default value
+    short_utterance_max_word: int = Field(3, ge=1, env=[])
+    long_utterance_min_word: int = Field(12, ge=1, env=[])
+    # Language-based dynamic default values:
+    spacy_model: SupportedSpacyModels = Field(SupportedSpacyModels.use_default, env=[])
+    subj_tags: List[str] = Field([], env=[])
+    obj_tags: List[str] = Field([], env=[])
 
 
 class NeutralTokenOptions(AzimuthBaseSettings):
-    threshold: float = Field(1, ge=0, le=1)
-    suffix_list: List[str] = []  # Language-based default value
-    prefix_list: List[str] = []  # Language-based default value
+    threshold: float = Field(1, ge=0, le=1, env=[])
+    # Language-based dynamic default values:
+    suffix_list: List[str] = Field([], env=[])
+    prefix_list: List[str] = Field([], env=[])
 
 
 class PunctuationTestOptions(AzimuthBaseSettings):
-    threshold: float = Field(1, ge=0, le=1)
+    threshold: float = Field(1, ge=0, le=1, env=[])
 
 
 class FuzzyMatchingTestOptions(AzimuthBaseSettings):
-    threshold: float = Field(1, ge=0, le=1)
+    threshold: float = Field(1, ge=0, le=1, env=[])
 
 
 class TypoTestOptions(AzimuthBaseSettings):
-    threshold: float = Field(1, ge=0, le=1)
+    threshold: float = Field(1, ge=0, le=1, env=[])
     nb_typos_per_utterance: int = Field(
         1,
         ge=1,
         description="For example, the value 2 would create both tests with 1 typo and with 2 typos "
         "per utterance.",
+        env=[],
     )
 
 
 class BehavioralTestingOptions(AzimuthBaseSettings):
-    neutral_token: NeutralTokenOptions = NeutralTokenOptions()
-    punctuation: PunctuationTestOptions = PunctuationTestOptions()
-    fuzzy_matching: FuzzyMatchingTestOptions = FuzzyMatchingTestOptions()
-    typo: TypoTestOptions = TypoTestOptions()
+    neutral_token: NeutralTokenOptions = Field(NeutralTokenOptions(), env=[])
+    punctuation: PunctuationTestOptions = Field(PunctuationTestOptions(), env=[])
+    fuzzy_matching: FuzzyMatchingTestOptions = Field(FuzzyMatchingTestOptions(), env=[])
+    typo: TypoTestOptions = Field(TypoTestOptions(), env=[])
 
     # should be accessible via UI
-    seed: int = 300
+    seed: int = Field(300, env=[])
 
 
 class SimilarityOptions(AzimuthBaseSettings):
-    faiss_encoder: str = Field("", description="Language-based dynamic default value.")
+    faiss_encoder: str = Field("", description="Language-based dynamic default value.", env=[])
     conflicting_neighbors_threshold: float = Field(
-        0.9, ge=0, le=1, description="Threshold to use when finding conflicting neighbors."
+        0.9, ge=0, le=1, description="Threshold to use when finding conflicting neighbors.", env=[]
     )
     no_close_threshold: float = Field(
-        0.5, ge=-1, le=1, description="Threshold to determine whether there are close neighbors."
+        0.5,
+        ge=-1,
+        le=1,
+        description="Threshold to determine whether there are close neighbors.",
+        env=[],
     )
 
 
 class UncertaintyOptions(AzimuthBaseSettings):
-    iterations: int = Field(1, ge=1, description="Number of MC sampling to do. 1 disables BMA.")
+    iterations: int = Field(
+        1, ge=1, description="Number of MC sampling to do. 1 disables BMA.", env=[]
+    )
     high_epistemic_threshold: float = Field(
-        0.1, ge=0, description="Threshold to determine high epistemic items."
+        0.1, ge=0, description="Threshold to determine high epistemic items.", env=[]
     )
 
 
 class ColumnConfiguration(AzimuthBaseSettings):
     # Column for the preprocessed text input
-    text_input: str = "utterance"
+    text_input: str = Field("utterance", env=[])
     # Column for the raw text input
-    raw_text_input: str = "utterance_raw"
+    raw_text_input: str = Field("utterance_raw", env=[])
     # Features column for the label
-    label: str = "label"
+    label: str = Field("label", env=[])
     # Optional column to specify whether an example has failed preprocessing.
-    failed_parsing_reason: str = "failed_parsing_reason"
+    failed_parsing_reason: str = Field("failed_parsing_reason", env=[])
     # Unique identifier for every example
-    persistent_id: str = DatasetColumn.row_idx
+    persistent_id: str = Field(DatasetColumn.row_idx, env=[])
 
 
 class ProjectConfig(AzimuthBaseSettings):
     # Name of the current project.
-    name: str = Field("New project", exclude_from_cache=True)
+    name: str = Field("New project", env="NAME", exclude_from_cache=True)
     # Dataset object definition.
-    dataset: Optional[CustomObject] = None
+    dataset: Optional[CustomObject] = Field(None, env=[])
     # Column names config in dataset
-    columns: ColumnConfiguration = ColumnConfiguration()
+    columns: ColumnConfiguration = Field(ColumnConfiguration(), env=[])
     # Name of the rejection class.
-    rejection_class: Optional[str] = Field("REJECTION_CLASS", nullable=True)
+    rejection_class: Optional[str] = Field("REJECTION_CLASS", env=[], nullable=True)
 
     def copy(self: T, *, validate: bool = True, **kwargs: Any) -> T:
         copy: T = super().copy(**kwargs)
         if validate:
-            return self.validate(
-                dict(copy._iter(to_dict=False, by_alias=False, exclude_unset=True))
-            )
+            return self.validate(dict(copy._iter(to_dict=False, by_alias=True, exclude_unset=True)))
         return copy
 
     def get_project_hash(self):
@@ -286,6 +296,7 @@ class ArtifactsConfig(AzimuthBaseSettings, extra=Extra.ignore):
     artifact_path: str = Field(
         "cache",
         description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
+        env="ARTIFACT_PATH",
         exclude_from_cache=True,
     )
 
@@ -297,15 +308,15 @@ class CommonFieldsConfig(ArtifactsConfig, ProjectConfig, extra=Extra.ignore):
     """Fields that can be modified without affecting caching."""
 
     # Batch size to use during inference.
-    batch_size: int = Field(32, exclude_from_cache=True)
+    batch_size: int = Field(32, env=[], exclude_from_cache=True)
     # Will use CUDA and will need GPUs if set to True.
     # If "auto" we check if CUDA is available.
-    use_cuda: Union[Literal["auto"], bool] = Field("auto", exclude_from_cache=True)
+    use_cuda: Union[Literal["auto"], bool] = Field("auto", env=[], exclude_from_cache=True)
     # Memory of the dask cluster. Regular is 6GB, Large is 12GB.
     # For bigger models, large might be needed.
-    large_dask_cluster: bool = Field(False, exclude_from_cache=True)
+    large_dask_cluster: bool = Field(False, env=[], exclude_from_cache=True)
     # Disable configuration changes
-    read_only_config: bool = Field(False, exclude_from_cache=True)
+    read_only_config: bool = Field(False, env="READ_ONLY_CONFIG", exclude_from_cache=True)
 
     def get_project_path(self) -> str:
         """Generate a path for caching.
@@ -323,13 +334,15 @@ class CommonFieldsConfig(ArtifactsConfig, ProjectConfig, extra=Extra.ignore):
 
 class ModelContractConfig(CommonFieldsConfig):
     # Which model_contract the application is using.
-    model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification
+    model_contract: SupportedModelContract = Field(
+        SupportedModelContract.hf_text_classification, env=[]
+    )
     # Model object definition.
-    pipelines: Optional[List[PipelineDefinition]] = Field(None, nullable=True)
+    pipelines: Optional[List[PipelineDefinition]] = Field(None, env=[], nullable=True)
     # Uncertainty configuration
-    uncertainty: UncertaintyOptions = UncertaintyOptions()
+    uncertainty: UncertaintyOptions = Field(UncertaintyOptions(), env=[])
     # Layer name where to calculate the gradients, normally the word embeddings layer.
-    saliency_layer: Optional[str] = Field(None, nullable=True)
+    saliency_layer: Optional[str] = Field(None, env=[], nullable=True)
 
     @validator("pipelines", pre=True)
     def _check_pipeline_names(cls, pipeline_definitions):
@@ -361,26 +374,29 @@ class ModelContractConfig(CommonFieldsConfig):
 
 class MetricsConfig(ModelContractConfig):
     # Custom HuggingFace metrics
-    metrics: Dict[str, MetricDefinition] = {
-        "Accuracy": MetricDefinition(
-            class_name="datasets.load_metric", kwargs={"path": "accuracy"}
-        ),
-        "Precision": MetricDefinition(
-            class_name="datasets.load_metric",
-            kwargs={"path": "precision"},
-            additional_kwargs={"average": "weighted"},
-        ),
-        "Recall": MetricDefinition(
-            class_name="datasets.load_metric",
-            kwargs={"path": "recall"},
-            additional_kwargs={"average": "weighted"},
-        ),
-        "F1": MetricDefinition(
-            class_name="datasets.load_metric",
-            kwargs={"path": "f1"},
-            additional_kwargs={"average": "weighted"},
-        ),
-    }
+    metrics: Dict[str, MetricDefinition] = Field(
+        {
+            "Accuracy": MetricDefinition(
+                class_name="datasets.load_metric", kwargs={"path": "accuracy"}
+            ),
+            "Precision": MetricDefinition(
+                class_name="datasets.load_metric",
+                kwargs={"path": "precision"},
+                additional_kwargs={"average": "weighted"},
+            ),
+            "Recall": MetricDefinition(
+                class_name="datasets.load_metric",
+                kwargs={"path": "recall"},
+                additional_kwargs={"average": "weighted"},
+            ),
+            "F1": MetricDefinition(
+                class_name="datasets.load_metric",
+                kwargs={"path": "f1"},
+                additional_kwargs={"average": "weighted"},
+            ),
+        },
+        env=[],
+    )
 
 
 class LanguageConfig(CommonFieldsConfig):
@@ -393,23 +409,23 @@ class LanguageConfig(CommonFieldsConfig):
 class PerturbationTestingConfig(ModelContractConfig):
     # Perturbation Testing configuration to define which test and with which params to run.
     behavioral_testing: Optional[BehavioralTestingOptions] = Field(
-        BehavioralTestingOptions(), nullable=True
+        BehavioralTestingOptions(), env=[], nullable=True
     )
 
 
 class SimilarityConfig(CommonFieldsConfig):
     # Similarity configuration to define the encoder and the similarity threshold.
-    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), nullable=True)
+    similarity: Optional[SimilarityOptions] = Field(SimilarityOptions(), env=[], nullable=True)
 
 
 class SyntaxConfig(CommonFieldsConfig):
     # Syntax configuration to change thresholds that determine short and long utterances.
-    syntax: SyntaxOptions = SyntaxOptions()
+    syntax: SyntaxOptions = Field(SyntaxOptions(), env=[])
 
 
 class DatasetWarningConfig(SyntaxConfig):
     # Dataset warnings configuration to change thresholds that trigger warnings
-    dataset_warnings: DatasetWarningsOptions = DatasetWarningsOptions()
+    dataset_warnings: DatasetWarningsOptions = Field(DatasetWarningsOptions(), env=[])
 
 
 class TopWordsConfig(SyntaxConfig, ModelContractConfig):
@@ -526,12 +542,12 @@ class AzimuthConfig(
 
 
 class AzimuthConfigHistory(AzimuthBaseSettings):
-    config: AzimuthConfig
-    created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)))
+    config: AzimuthConfig = Field(..., env=[])
+    created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)), env=[])
 
 
 class AzimuthConfigHistoryWithHash(AzimuthConfigHistory):
-    hash: str = ""
+    hash: str = Field("", env=[])
 
     @root_validator(skip_on_failure=True)
     def _set_hash(cls, values):
