@@ -72,7 +72,7 @@ class TaskManager:
         for route, tasks in root_routes.items():
             for name, task in tasks.items():
                 page_name = f"{route}/{name}"
-                log.info(f"Registering new task in {route}.", name=page_name, clss=task)
+                log.debug(f"Registering new task in {route}.", name=page_name, clss=task)
                 self.register_task(name, task)
 
     def get_all_tasks_status(self, task: Optional[str] = None) -> Dict[str, str]:
