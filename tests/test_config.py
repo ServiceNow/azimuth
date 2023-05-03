@@ -267,9 +267,18 @@ def test_load_from_config_history(tiny_text_config):
     # With a config history, the loaded config is the last one from the config history.
     tiny_text_config.save()
     os.environ["ARTIFACT_PATH"] = tiny_text_config.artifact_path
+
     cfg = load_azimuth_config(config_path=None, load_config_history=True)
     assert cfg == tiny_text_config
+
+    # The environment variables don't affect the config history
+    os.environ["NAME"] = "Potato"
+    cfg = load_azimuth_config(config_path=None, load_config_history=True)
+    assert cfg == tiny_text_config
+    assert cfg != "Potato"
+
     del os.environ["ARTIFACT_PATH"]
+    del os.environ["NAME"]
 
 
 def test_config_history_with_hash():
