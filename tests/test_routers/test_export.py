@@ -14,6 +14,7 @@ def test_get_export(app: FastAPI) -> None:
     assert resp.headers["content-type"] == "text/csv; charset=utf-8"
     assert int(resp.headers["content-length"]) > 0
     assert "azimuth_export_sentiment-analysis_eval" in resp.headers["content-disposition"]
+    assert resp.text.startswith("row_idx,utterance,label")  # snake_case
 
 
 def test_get_report(app: FastAPI) -> None:
@@ -35,6 +36,7 @@ def test_get_report(app: FastAPI) -> None:
     assert int(resp.headers["content-length"]) > 0
     assert "behavioral_testing_summary" in resp.headers["content-disposition"]
     assert ".csv" in resp.headers["content-disposition"]
+    assert resp.text.startswith("name,description,family,perturbation_type")  # snake_case
 
 
 def test_get_utterances(app: FastAPI) -> None:
@@ -63,3 +65,4 @@ def test_get_proposed_actions(app: FastAPI) -> None:
     assert int(resp.headers["content-length"]) > 0
     assert "proposed_actions" in resp.headers["content-disposition"]
     assert ".csv" in resp.headers["content-disposition"]
+    assert resp.text.startswith("row_idx,proposed_action")  # snake_case
