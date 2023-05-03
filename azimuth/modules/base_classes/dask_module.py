@@ -99,7 +99,7 @@ class DaskModule(HDF5CacheMixin, Generic[ConfigScope]):
             scoped_config = config.__class__
         else:
             scoped_config = base.__args__[0]
-        return cast(ConfigScope, scoped_config.parse_obj(config.dict(by_alias=True)))
+        return cast(ConfigScope, scoped_config.parse_obj(config.dict()))
 
     def start_task_on_dataset_split(
         self, client: Client, dependencies: List["DaskModule"] = None

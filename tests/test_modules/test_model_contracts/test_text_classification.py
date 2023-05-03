@@ -210,7 +210,7 @@ def test_temperature_scaling(simple_text_config):
     for temp in [1, 10]:
         cfg = AzimuthConfig(
             **{
-                **simple_text_config.dict(by_alias=True),
+                **simple_text_config.dict(),
                 "pipelines": [
                     PipelineDefinition(
                         name="MyModel",
