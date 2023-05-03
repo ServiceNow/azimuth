@@ -254,9 +254,9 @@ def test_update_config(tiny_text_config, monkeypatch, dask_client):
     assert len(all_configs) == 2
     assert all_configs[-1]["config"] == new_config
 
-    assert datetime.fromisoformat(all_configs[-1]["created_on"]) > datetime.fromisoformat(
-        all_configs[0]["created_on"]
-    ), "Second config should be created on after the first one."
+    assert datetime.fromisoformat(all_configs[-1]["createdOn"]) > datetime.fromisoformat(
+        all_configs[0]["createdOn"]
+    ), "Second config should be created after the first one."
 
 
 def test_load_from_config_history(tiny_text_config):

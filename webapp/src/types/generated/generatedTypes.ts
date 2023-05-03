@@ -133,23 +133,23 @@ export interface components {
       name: string;
       dataset: components["schemas"]["CustomObject"];
       columns: components["schemas"]["ColumnConfiguration"];
-      rejection_class: string | null;
+      rejectionClass: string | null;
       /** Where to store artifacts (Azimuth config history, HDF5 files, HF datasets). */
-      artifact_path: string;
-      batch_size: number;
-      use_cuda: "auto" | boolean;
-      large_dask_cluster: boolean;
-      read_only_config: boolean;
+      artifactPath: string;
+      batchSize: number;
+      useCuda: "auto" | boolean;
+      largeDaskCluster: boolean;
+      readOnlyConfig: boolean;
       syntax: components["schemas"]["SyntaxOptions"];
-      dataset_warnings: components["schemas"]["DatasetWarningsOptions"];
-      model_contract: components["schemas"]["SupportedModelContract"];
+      datasetWarnings: components["schemas"]["DatasetWarningsOptions"];
+      modelContract: components["schemas"]["SupportedModelContract"];
       pipelines: components["schemas"]["PipelineDefinition"][] | null;
       uncertainty: components["schemas"]["UncertaintyOptions"];
-      saliency_layer: string | null;
+      saliencyLayer: string | null;
       metrics: { [key: string]: components["schemas"]["MetricDefinition"] };
       language: components["schemas"]["SupportedLanguage"];
       similarity: components["schemas"]["SimilarityOptions"] | null;
-      behavioral_testing:
+      behavioralTesting:
         | components["schemas"]["BehavioralTestingOptions"]
         | null;
     };
@@ -161,7 +161,7 @@ export interface components {
      */
     AzimuthConfigHistoryWithHash: {
       config: components["schemas"]["AzimuthConfig"];
-      created_on: string;
+      createdOn: string;
       hash: string;
     };
     /**
@@ -171,9 +171,9 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     BehavioralTestingOptions: {
-      neutral_token: components["schemas"]["NeutralTokenOptions"];
+      neutralToken: components["schemas"]["NeutralTokenOptions"];
       punctuation: components["schemas"]["PunctuationTestOptions"];
-      fuzzy_matching: components["schemas"]["FuzzyMatchingTestOptions"];
+      fuzzyMatching: components["schemas"]["FuzzyMatchingTestOptions"];
       typo: components["schemas"]["TypoTestOptions"];
       seed: number;
     };
@@ -212,11 +212,11 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     ColumnConfiguration: {
-      text_input: string;
-      raw_text_input: string;
+      textInput: string;
+      rawTextInput: string;
       label: string;
-      failed_parsing_reason: string;
-      persistent_id: string;
+      failedParsingReason: string;
+      persistentId: string;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -255,7 +255,7 @@ export interface components {
      */
     CustomObject: {
       /** Name of the function or class that is located in `remote`.`args` and `kwargs` will be sent to the function/class. */
-      class_name: string;
+      className: string;
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
       /** Absolute path to class. `class_name` needs to be accessible from this path. */
@@ -345,11 +345,11 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     DatasetWarningsOptions: {
-      min_num_per_class: number;
-      max_delta_class_imbalance: number;
-      max_delta_representation: number;
-      max_delta_mean_words: number;
-      max_delta_std_words: number;
+      minNumPerClass: number;
+      maxDeltaClassImbalance: number;
+      maxDeltaRepresentation: number;
+      maxDeltaMeanWords: number;
+      maxDeltaStdWords: number;
     };
     /** An enumeration. */
     FormatType: "Integer" | "Percentage" | "Decimal";
@@ -382,13 +382,13 @@ export interface components {
      */
     MetricDefinition: {
       /** Name of the function or class that is located in `remote`.`args` and `kwargs` will be sent to the function/class. */
-      class_name: string;
+      className: string;
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
       /** Absolute path to class. `class_name` needs to be accessible from this path. */
       remote: string | null;
       /** Keyword arguments supplied to `compute`. */
-      additional_kwargs: { [key: string]: any };
+      additionalKwargs: { [key: string]: any };
     };
     MetricInfo: {
       description: string;
@@ -481,8 +481,8 @@ export interface components {
      */
     NeutralTokenOptions: {
       threshold: number;
-      suffix_list: string[];
-      prefix_list: string[];
+      suffixList: string[];
+      prefixList: string[];
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure
@@ -716,11 +716,11 @@ export interface components {
      */
     SimilarityOptions: {
       /** Language-based dynamic default value. */
-      faiss_encoder: string;
+      faissEncoder: string;
       /** Threshold to use when finding conflicting neighbors. */
-      conflicting_neighbors_threshold: number;
+      conflictingNeighborsThreshold: number;
       /** Threshold to determine whether there are close neighbors. */
-      no_close_threshold: number;
+      noCloseThreshold: number;
     };
     /** An enumeration. */
     SmartTag:
@@ -766,11 +766,11 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     SyntaxOptions: {
-      short_utterance_max_word: number;
-      long_utterance_min_word: number;
-      spacy_model: components["schemas"]["SupportedSpacyModels"];
-      subj_tags: string[];
-      obj_tags: string[];
+      shortUtteranceMaxWord: number;
+      longUtteranceMinWord: number;
+      spacyModel: components["schemas"]["SupportedSpacyModels"];
+      subjTags: string[];
+      objTags: string[];
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -779,7 +779,7 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     TemperatureScaling: {
-      class_name: "azimuth.utils.ml.postprocessing.TemperatureScaling";
+      className: "azimuth.utils.ml.postprocessing.TemperatureScaling";
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
       /** Absolute path to class. `class_name` needs to be accessible from this path. */
@@ -793,7 +793,7 @@ export interface components {
      * Heroku and any 12 factor app design.
      */
     ThresholdConfig: {
-      class_name: "azimuth.utils.ml.postprocessing.Thresholding";
+      className: "azimuth.utils.ml.postprocessing.Thresholding";
       args: { [key: string]: any }[];
       kwargs: { [key: string]: any };
       /** Absolute path to class. `class_name` needs to be accessible from this path. */
@@ -829,7 +829,7 @@ export interface components {
     TypoTestOptions: {
       threshold: number;
       /** For example, the value 2 would create both tests with 1 typo and with 2 typos per utterance. */
-      nb_typos_per_utterance: number;
+      nbTyposPerUtterance: number;
     };
     /**
      * Base class for settings, allowing values to be overridden by environment variables.
@@ -841,7 +841,7 @@ export interface components {
       /** Number of MC sampling to do. 1 disables BMA. */
       iterations: number;
       /** Threshold to determine high epistemic items. */
-      high_epistemic_threshold: number;
+      highEpistemicThreshold: number;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure

@@ -9,22 +9,8 @@ import orjson
 from pydantic import BaseModel, Extra, Field
 
 from azimuth.utils.conversion import orjson_dumps
-from azimuth.utils.openapi import fix_union_types
+from azimuth.utils.openapi import fix_union_types, to_camel_case
 from azimuth.utils.pydantic_utils import create_model
-
-
-def to_camel_case(string: str) -> str:
-    """Takes a snake_case string and transforms it to camelCase.
-
-    Args:
-        string: The snake_case string to transform.
-
-    Returns: The camelCase result.
-    """
-    words = string.split("_")
-    for idx in range(1, len(words)):
-        words[idx] = words[idx].capitalize()
-    return "".join(words)
 
 
 class AliasModel(BaseModel):

@@ -225,7 +225,7 @@ const UtteranceDetails: React.FC<{
         <Tooltip
           title={getUtteranceIdTooltip({
             utterance: utterance,
-            persistentIdColumn: config.columns.persistent_id,
+            persistentIdColumn: config.columns.persistentId,
           })}
         >
           <Typography variant="body2">{utterance.index}</Typography>
@@ -401,7 +401,7 @@ const UtteranceDetails: React.FC<{
             <SimilarUtterances
               baseUrl={`/${jobId}/dataset_splits/${neighborsDatasetSplitName}/utterances`}
               baseUtterance={utterance}
-              persistentIdColumn={config.columns.persistent_id}
+              persistentIdColumn={config.columns.persistentId}
               pipeline={pipeline}
               utterances={similarUtterances?.utterances || []}
               loading={isFetchingSimilarUtterances}

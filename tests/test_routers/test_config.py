@@ -14,47 +14,47 @@ def test_get_default_config(app: FastAPI):
     assert res == {
         "name": "New project",
         "dataset": None,
-        "model_contract": "hf_text_classification",
+        "modelContract": "hf_text_classification",
         "columns": {
-            "text_input": "utterance",
-            "raw_text_input": "utterance_raw",
+            "textInput": "utterance",
+            "rawTextInput": "utterance_raw",
             "label": "label",
-            "failed_parsing_reason": "failed_parsing_reason",
-            "persistent_id": "row_idx",
+            "failedParsingReason": "failed_parsing_reason",
+            "persistentId": "row_idx",
         },
-        "rejection_class": "REJECTION_CLASS",
-        "artifact_path": "cache",
-        "batch_size": 32,
-        "use_cuda": "auto",
-        "large_dask_cluster": False,
-        "read_only_config": False,
+        "rejectionClass": "REJECTION_CLASS",
+        "artifactPath": "cache",
+        "batchSize": 32,
+        "useCuda": "auto",
+        "largeDaskCluster": False,
+        "readOnlyConfig": False,
         "language": "en",
         "syntax": {
-            "short_utterance_max_word": 3,
-            "long_utterance_min_word": 12,
-            "spacy_model": "en_core_web_sm",
-            "subj_tags": ["nsubj", "nsubjpass"],
-            "obj_tags": ["dobj", "pobj", "obj"],
+            "shortUtteranceMaxWord": 3,
+            "longUtteranceMinWord": 12,
+            "spacyModel": "en_core_web_sm",
+            "subjTags": ["nsubj", "nsubjpass"],
+            "objTags": ["dobj", "pobj", "obj"],
         },
-        "dataset_warnings": {
-            "min_num_per_class": 20,
-            "max_delta_class_imbalance": 0.5,
-            "max_delta_representation": 0.05,
-            "max_delta_mean_words": 3.0,
-            "max_delta_std_words": 3.0,
+        "datasetWarnings": {
+            "minNumPerClass": 20,
+            "maxDeltaClassImbalance": 0.5,
+            "maxDeltaRepresentation": 0.05,
+            "maxDeltaMeanWords": 3.0,
+            "maxDeltaStdWords": 3.0,
         },
         "similarity": {
-            "faiss_encoder": "all-MiniLM-L12-v2",
-            "conflicting_neighbors_threshold": 0.9,
-            "no_close_threshold": 0.5,
+            "faissEncoder": "all-MiniLM-L12-v2",
+            "conflictingNeighborsThreshold": 0.9,
+            "noCloseThreshold": 0.5,
         },
         "pipelines": [
             {
                 "name": "required",
-                "model": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
+                "model": {"className": "required", "args": [], "kwargs": {}, "remote": None},
                 "postprocessors": [
                     {
-                        "class_name": "azimuth.utils.ml.postprocessing.Thresholding",
+                        "className": "azimuth.utils.ml.postprocessing.Thresholding",
                         "args": [],
                         "kwargs": {"threshold": 0.5},
                         "remote": None,
@@ -63,47 +63,47 @@ def test_get_default_config(app: FastAPI):
                 ],
             }
         ],
-        "uncertainty": {"iterations": 1, "high_epistemic_threshold": 0.1},
-        "saliency_layer": None,
-        "behavioral_testing": {
-            "neutral_token": {
+        "uncertainty": {"iterations": 1, "highEpistemicThreshold": 0.1},
+        "saliencyLayer": None,
+        "behavioralTesting": {
+            "neutralToken": {
                 "threshold": 1.0,
-                "suffix_list": ["pls", "please", "thank you", "appreciated"],
-                "prefix_list": ["pls", "please", "hello", "greetings"],
+                "suffixList": ["pls", "please", "thank you", "appreciated"],
+                "prefixList": ["pls", "please", "hello", "greetings"],
             },
             "punctuation": {"threshold": 1.0},
-            "fuzzy_matching": {"threshold": 1.0},
-            "typo": {"threshold": 1.0, "nb_typos_per_utterance": 1},
+            "fuzzyMatching": {"threshold": 1.0},
+            "typo": {"threshold": 1.0, "nbTyposPerUtterance": 1},
             "seed": 300,
         },
         "metrics": {
             "Accuracy": {
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "args": [],
                 "kwargs": {"path": "accuracy"},
                 "remote": None,
-                "additional_kwargs": {},
+                "additionalKwargs": {},
             },
             "Precision": {
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "args": [],
                 "kwargs": {"path": "precision"},
                 "remote": None,
-                "additional_kwargs": {"average": "weighted"},
+                "additionalKwargs": {"average": "weighted"},
             },
             "Recall": {
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "args": [],
                 "kwargs": {"path": "recall"},
                 "remote": None,
-                "additional_kwargs": {"average": "weighted"},
+                "additionalKwargs": {"average": "weighted"},
             },
             "F1": {
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "args": [],
                 "kwargs": {"path": "f1"},
                 "remote": None,
-                "additional_kwargs": {"average": "weighted"},
+                "additionalKwargs": {"average": "weighted"},
             },
         },
     }
@@ -115,12 +115,12 @@ def test_get_default_config_french(app: FastAPI):
 
     defaults = config_defaults_per_language[SupportedLanguage.fr]
     assert res["language"] == "fr"
-    assert res["behavioral_testing"]["neutral_token"]["prefix_list"] == defaults.prefix_list
-    assert res["behavioral_testing"]["neutral_token"]["suffix_list"] == defaults.suffix_list
-    assert res["syntax"]["spacy_model"] == defaults.spacy_model
-    assert res["syntax"]["subj_tags"] == defaults.subj_tags
-    assert res["syntax"]["obj_tags"] == defaults.obj_tags
-    assert res["similarity"]["faiss_encoder"] == defaults.faiss_encoder
+    assert res["behavioralTesting"]["neutralToken"]["prefixList"] == defaults.prefix_list
+    assert res["behavioralTesting"]["neutralToken"]["suffixList"] == defaults.suffix_list
+    assert res["syntax"]["spacyModel"] == defaults.spacy_model
+    assert res["syntax"]["subjTags"] == defaults.subj_tags
+    assert res["syntax"]["objTags"] == defaults.obj_tags
+    assert res["similarity"]["faissEncoder"] == defaults.faiss_encoder
 
 
 def test_get_config_history(app: FastAPI):
@@ -130,7 +130,7 @@ def test_get_config_history(app: FastAPI):
 
     history = resp.json()
     assert len(history) >= 1
-    assert is_sorted([item["created_on"] for item in history])
+    assert is_sorted([item["createdOn"] for item in history])
     # The hash has 128 bits and is represented as a string of hex characters (4 bits each).
     assert all(len(item["hash"]) == 128 / 4 for item in history)
 
@@ -140,78 +140,78 @@ def test_get_config(app: FastAPI):
     res = client.get("/config").json()
 
     assert res == {
-        "artifact_path": "/tmp/azimuth_test_cache",
-        "batch_size": 16,
-        "behavioral_testing": {
-            "fuzzy_matching": {"threshold": 1.0},
-            "neutral_token": {
-                "prefix_list": ["pls", "hello"],
-                "suffix_list": ["pls", "thanks"],
+        "artifactPath": "/tmp/azimuth_test_cache",
+        "batchSize": 16,
+        "behavioralTesting": {
+            "fuzzyMatching": {"threshold": 1.0},
+            "neutralToken": {
+                "prefixList": ["pls", "hello"],
+                "suffixList": ["pls", "thanks"],
                 "threshold": 1.0,
             },
             "punctuation": {"threshold": 1.0},
             "seed": 300,
-            "typo": {"nb_typos_per_utterance": 1, "threshold": 0.005},
+            "typo": {"nbTyposPerUtterance": 1, "threshold": 0.005},
         },
         "columns": {
-            "failed_parsing_reason": "failed_parsing_reason",
+            "failedParsingReason": "failed_parsing_reason",
             "label": "label",
-            "persistent_id": "row_idx",
-            "raw_text_input": "utterance_raw",
-            "text_input": "utterance",
+            "persistentId": "row_idx",
+            "rawTextInput": "utterance_raw",
+            "textInput": "utterance",
         },
         "dataset": {
             "args": [],
-            "class_name": "tests.test_loading_resources.load_sst2_dataset",
+            "className": "tests.test_loading_resources.load_sst2_dataset",
             "kwargs": {},
             "remote": None,
         },
-        "dataset_warnings": {
-            "max_delta_mean_words": 3.0,
-            "max_delta_representation": 0.05,
-            "max_delta_std_words": 3.0,
-            "min_num_per_class": 20,
-            "max_delta_class_imbalance": 0.5,
+        "datasetWarnings": {
+            "maxDeltaMeanWords": 3.0,
+            "maxDeltaRepresentation": 0.05,
+            "maxDeltaStdWords": 3.0,
+            "minNumPerClass": 20,
+            "maxDeltaClassImbalance": 0.5,
         },
         "language": "en",
-        "large_dask_cluster": False,
+        "largeDaskCluster": False,
         "metrics": {
             "Accuracy": {
-                "additional_kwargs": {},
+                "additionalKwargs": {},
                 "args": [],
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "kwargs": {"path": "accuracy"},
                 "remote": None,
             },
             "F1": {
-                "additional_kwargs": {"average": "weighted"},
+                "additionalKwargs": {"average": "weighted"},
                 "args": [],
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "kwargs": {"path": "f1"},
                 "remote": None,
             },
             "Precision": {
-                "additional_kwargs": {"average": "weighted"},
+                "additionalKwargs": {"average": "weighted"},
                 "args": [],
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "kwargs": {"path": "precision"},
                 "remote": None,
             },
             "Recall": {
-                "additional_kwargs": {"average": "weighted"},
+                "additionalKwargs": {"average": "weighted"},
                 "args": [],
-                "class_name": "datasets.load_metric",
+                "className": "datasets.load_metric",
                 "kwargs": {"path": "recall"},
                 "remote": None,
             },
         },
-        "model_contract": "custom_text_classification",
+        "modelContract": "custom_text_classification",
         "name": "sentiment-analysis",
         "pipelines": [
             {
                 "model": {
                     "args": [],
-                    "class_name": "tests.test_loading_resources.config_structured_output",
+                    "className": "tests.test_loading_resources.config_structured_output",
                     "kwargs": {"num_classes": 2, "threshold": 0.4},
                     "remote": None,
                 },
@@ -219,60 +219,59 @@ def test_get_config(app: FastAPI):
                 "postprocessors": None,
             }
         ],
-        "rejection_class": None,
-        "saliency_layer": "distilbert.embeddings.word_embeddings",
+        "rejectionClass": None,
+        "saliencyLayer": "distilbert.embeddings.word_embeddings",
         "similarity": {
-            "faiss_encoder": "all-MiniLM-L12-v2",
-            "conflicting_neighbors_threshold": 0.9,
-            "no_close_threshold": 0.5,
+            "faissEncoder": "all-MiniLM-L12-v2",
+            "conflictingNeighborsThreshold": 0.9,
+            "noCloseThreshold": 0.5,
         },
         "syntax": {
-            "long_utterance_min_word": 12,
-            "short_utterance_max_word": 3,
-            "spacy_model": "en_core_web_sm",
-            "subj_tags": ["nsubj", "nsubjpass"],
-            "obj_tags": ["dobj", "pobj", "obj"],
+            "longUtteranceMinWord": 12,
+            "shortUtteranceMaxWord": 3,
+            "spacyModel": "en_core_web_sm",
+            "subjTags": ["nsubj", "nsubjpass"],
+            "objTags": ["dobj", "pobj", "obj"],
         },
-        "uncertainty": {"high_epistemic_threshold": 0.1, "iterations": 1},
-        "use_cuda": False,
-        "read_only_config": False,
+        "uncertainty": {"highEpistemicThreshold": 0.1, "iterations": 1},
+        "useCuda": False,
+        "readOnlyConfig": False,
     }
 
 
 def test_update_config(app: FastAPI, wait_for_startup_after):
     client = TestClient(app)
     initial_config = client.get("/config").json()
-    initial_contract = initial_config["model_contract"]
+    initial_contract = initial_config["modelContract"]
     initial_pipelines = initial_config["pipelines"]
     initial_config_count = len(client.get("/config/history").json())
 
     resp = client.patch(
         "/config",
-        json={"model_contract": "file_based_text_classification", "pipelines": None},
+        # TODO camelCase
+        json={"modelContract": "file_based_text_classification", "pipelines": None},
     )
-    assert resp.json()["model_contract"] == "file_based_text_classification"
+    assert resp.json().get("modelContract") == "file_based_text_classification", resp.json()
     get_config = client.get("/config").json()
-    assert get_config["model_contract"] == "file_based_text_classification"
+    assert get_config["modelContract"] == "file_based_text_classification"
     assert not get_config["pipelines"]
     new_config_count = len(client.get("/config/history").json())
     assert new_config_count == initial_config_count + 1
 
     # Config Validation Error
-    resp = client.patch("/config", json={"model_contract": "potato"})
+    resp = client.patch("/config", json={"modelContract": "potato"})
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
     assert resp.json()["detail"] == (
-        f"AzimuthConfig['model_contract']: {get_enum_validation_error_msg(SupportedModelContract)}"
+        f"AzimuthConfig['modelContract']: {get_enum_validation_error_msg(SupportedModelContract)}"
     )
     get_config = client.get("/config").json()
-    assert get_config["model_contract"] == "file_based_text_classification"
+    assert get_config["modelContract"] == "file_based_text_classification"
 
     # Validation Module Error
     resp = client.patch(
         "/config",
         json={
-            "pipelines": [
-                {"model": {"class_name": "tests.test_loading_resources.load_intent_data"}}
-            ]
+            "pipelines": [{"model": {"className": "tests.test_loading_resources.load_intent_data"}}]
         },
     )
     assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
@@ -286,12 +285,12 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
 
     loaded_configs = client.get("/config/history").json()
     assert len(loaded_configs) == new_config_count, "No config should have been saved since."
-    assert loaded_configs[-1]["config"]["model_contract"] == "file_based_text_classification"
+    assert loaded_configs[-1]["config"]["modelContract"] == "file_based_text_classification"
     assert not loaded_configs[-1]["config"]["pipelines"]
 
     # Revert config change
     _ = client.patch(
-        "/config", json={"model_contract": initial_contract, "pipelines": initial_pipelines}
+        "/config", json={"modelContract": initial_contract, "pipelines": initial_pipelines}
     )
 
     loaded_configs = client.get("/config/history").json()

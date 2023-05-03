@@ -306,12 +306,12 @@ export const api = createApi({
             if (partialConfig.name !== undefined) {
               draft.projectName = partialConfig.name;
             }
-            if (partialConfig.model_contract !== undefined) {
-              draft.modelContract = partialConfig.model_contract;
+            if (partialConfig.modelContract !== undefined) {
+              draft.modelContract = partialConfig.modelContract;
             }
-            if ("behavioral_testing" in partialConfig) {
+            if ("behavioralTesting" in partialConfig) {
               draft.perturbationTestingAvailable = Boolean(
-                partialConfig.behavioral_testing
+                partialConfig.behavioralTesting
               );
             }
             if ("pipelines" in partialConfig) {

@@ -58,18 +58,18 @@ const FIELDS: Record<
   { scale?: number; units?: string; inputProps: InputBaseComponentProps }
 > = {
   iterations: INT,
-  high_epistemic_threshold: FLOAT,
-  conflicting_neighbors_threshold: PERCENTAGE,
-  no_close_threshold: COSINE_SIMILARITY,
-  min_num_per_class: { ...INT, units: "samples" },
-  max_delta_class_imbalance: PERCENTAGE,
-  max_delta_representation: PERCENTAGE,
-  max_delta_mean_words: { ...FLOAT, units: "words" },
-  max_delta_std_words: { ...FLOAT, units: "words" },
-  short_utterance_max_word: { ...INT, units: "words" },
-  long_utterance_min_word: { ...INT, units: "words" },
+  highEpistemicThreshold: FLOAT,
+  conflictingNeighborsThreshold: PERCENTAGE,
+  noCloseThreshold: COSINE_SIMILARITY,
+  minNumPerClass: { ...INT, units: "samples" },
+  maxDeltaClassImbalance: PERCENTAGE,
+  maxDeltaRepresentation: PERCENTAGE,
+  maxDeltaMeanWords: { ...FLOAT, units: "words" },
+  maxDeltaStdWords: { ...FLOAT, units: "words" },
+  shortUtteranceMaxWord: { ...INT, units: "words" },
+  longUtteranceMinWord: { ...INT, units: "words" },
   threshold: PERCENTAGE,
-  nb_typos_per_utterance: INT,
+  nbTyposPerUtterance: INT,
   seed: INT,
 };
 
@@ -78,7 +78,7 @@ type SubConfigKeys = keyof PickByValue<
   { [key: string]: unknown } | null
 >;
 
-const COLUMNS = ["text_input", "label", "persistent_id"] as const;
+const COLUMNS = ["textInput", "label", "persistentId"] as const;
 const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
 const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
@@ -95,9 +95,9 @@ const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
-  "behavioral_testing",
+  "behavioralTesting",
   "similarity",
-  "dataset_warnings",
+  "datasetWarnings",
   "syntax",
   "pipelines",
   "uncertainty",
@@ -181,22 +181,22 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         language: defaultConfig.language,
         syntax: {
           ...resultingConfig.syntax,
-          spacy_model: defaultConfig.syntax.spacy_model,
-          subj_tags: defaultConfig.syntax.subj_tags,
-          obj_tags: defaultConfig.syntax.obj_tags,
+          spacyModel: defaultConfig.syntax.spacyModel,
+          subjTags: defaultConfig.syntax.subjTags,
+          objTags: defaultConfig.syntax.objTags,
         },
         similarity: resultingConfig.similarity && {
           ...resultingConfig.similarity,
-          faiss_encoder: defaultConfig.similarity!.faiss_encoder,
+          faissEncoder: defaultConfig.similarity!.faissEncoder,
         },
-        behavioral_testing: resultingConfig.behavioral_testing && {
-          ...resultingConfig.behavioral_testing,
-          neutral_token: {
-            ...resultingConfig.behavioral_testing.neutral_token,
-            suffix_list:
-              defaultConfig.behavioral_testing!.neutral_token.suffix_list,
-            prefix_list:
-              defaultConfig.behavioral_testing!.neutral_token.prefix_list,
+        behavioralTesting: resultingConfig.behavioralTesting && {
+          ...resultingConfig.behavioralTesting,
+          neutralToken: {
+            ...resultingConfig.behavioralTesting.neutralToken,
+            suffixList:
+              defaultConfig.behavioralTesting!.neutralToken.suffixList,
+            prefixList:
+              defaultConfig.behavioralTesting!.neutralToken.prefixList,
           },
         },
       });
@@ -415,13 +415,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         ? {
             ...resultingConfig.metrics,
             [metricName]: {
-              class_name: "datasets.load_metric",
+              className: "datasets.load_metric",
               args: [],
               kwargs: {
                 path: metricName.toLowerCase(),
               },
               remote: null,
-              additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
+              additionalKwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
                 metricName
               )
                 ? { average: "weighted" }
@@ -444,12 +444,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             onChange={(name) => updatePartialConfig({ name })}
           />
           <StringField
-            label="rejection_class"
+            label="rejectionClass"
             nullable
-            value={resultingConfig.rejection_class}
+            value={resultingConfig.rejectionClass}
             disabled={isUpdatingConfig}
-            onChange={(rejection_class) =>
-              updatePartialConfig({ rejection_class })
+            onChange={(rejectionClass) =>
+              updatePartialConfig({ rejectionClass })
             }
           />
           <Box display="flex" flexDirection="column">
@@ -476,12 +476,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       <FormGroup>
         <Columns columns={2}>
           <StringField
-            label="class_name"
-            value={resultingConfig.dataset.class_name}
+            label="className"
+            value={resultingConfig.dataset.className}
             disabled={isUpdatingConfig}
-            onChange={(class_name) =>
-              updateSubConfig("dataset", { class_name })
-            }
+            onChange={(className) => updateSubConfig("dataset", { className })}
           />
           <StringField
             label="remote"
@@ -513,22 +511,18 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       <FormGroup>
         <Columns columns={4}>
           <StringField
-            label="model_contract"
+            label="modelContract"
             options={SUPPORTED_MODEL_CONTRACTS}
-            value={resultingConfig.model_contract}
+            value={resultingConfig.modelContract}
             disabled={isUpdatingConfig}
-            onChange={(model_contract) =>
-              updatePartialConfig({ model_contract })
-            }
+            onChange={(modelContract) => updatePartialConfig({ modelContract })}
           />
           <StringField
-            label="saliency_layer"
+            label="saliencyLayer"
             nullable
-            value={resultingConfig.saliency_layer}
+            value={resultingConfig.saliencyLayer}
             disabled={isUpdatingConfig}
-            onChange={(saliency_layer) =>
-              updatePartialConfig({ saliency_layer })
-            }
+            onChange={(saliencyLayer) => updatePartialConfig({ saliencyLayer })}
           />
           <Box display="flex" flexDirection="column">
             <Typography variant="caption">uncertainty</Typography>
@@ -584,11 +578,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <FormGroup>
                     <Columns columns={2}>
                       <StringField
-                        label="class_name"
-                        value={pipeline.model.class_name}
+                        label="className"
+                        value={pipeline.model.className}
                         disabled={isUpdatingConfig}
-                        onChange={(class_name) =>
-                          updateModel(pipelineIndex, { class_name })
+                        onChange={(className) =>
+                          updateModel(pipelineIndex, { className })
                         }
                       />
                       <StringField
@@ -630,15 +624,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       <Paper key={index} variant="outlined" sx={{ padding: 2 }}>
                         <Columns columns={2}>
                           <StringField
-                            label="class_name"
-                            value={postprocessor.class_name}
+                            label="className"
+                            value={postprocessor.className}
                             disabled={
                               resultingConfig.pipelines![pipelineIndex]
                                 .postprocessors === null || isUpdatingConfig
                             }
-                            onChange={(class_name) =>
+                            onChange={(className) =>
                               updatePostprocessor(pipelineIndex, index, {
-                                class_name,
+                                className,
                               })
                             }
                           />
@@ -740,7 +734,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               display="flex"
               flexDirection="column"
-              {...(field === "neutral_token" && {
+              {...(field === "neutralToken" && {
                 sx: { gridColumnEnd: "span 2" },
               })}
             >
@@ -779,15 +773,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 ))}
               </KeyValuePairs>
             </Box>
-          ) : config === "syntax" && field === "spacy_model" ? (
+          ) : config === "syntax" && field === "spacyModel" ? (
             <StringField
               key={field}
               label={field}
               options={SUPPORTED_SPACY_MODELS}
-              value={resultingConfig.syntax.spacy_model}
+              value={resultingConfig.syntax.spacyModel}
               disabled={isUpdatingConfig}
-              onChange={(spacy_model) =>
-                updateSubConfig("syntax", { spacy_model })
+              onChange={(spacyModel) =>
+                updateSubConfig("syntax", { spacyModel })
               }
             />
           ) : (
@@ -813,26 +807,26 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       <FormGroup>
         <Columns columns={4}>
           <StringField
-            label="artifact_path"
-            value={resultingConfig.artifact_path}
+            label="artifactPath"
+            value={resultingConfig.artifactPath}
             InputProps={{ readOnly: true, disableUnderline: true }}
           />
           <NumberField
-            label="batch_size"
-            value={resultingConfig.batch_size}
+            label="batchSize"
+            value={resultingConfig.batchSize}
             disabled={isUpdatingConfig}
-            onChange={(batch_size) => updatePartialConfig({ batch_size })}
+            onChange={(batchSize) => updatePartialConfig({ batchSize })}
             {...INT}
           />
           <StringField
-            label="use_cuda"
+            label="useCuda"
             options={USE_CUDA_OPTIONS}
             className="fixedWidthInput"
-            value={String(resultingConfig.use_cuda) as UseCUDAOption}
+            value={String(resultingConfig.useCuda) as UseCUDAOption}
             disabled={isUpdatingConfig}
-            onChange={(use_cuda) =>
+            onChange={(useCuda) =>
               updatePartialConfig({
-                use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
+                useCuda: useCuda === "auto" ? "auto" : useCuda === "true",
               })
             }
           />
@@ -840,14 +834,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             control={
               <Checkbox
                 size="small"
-                checked={resultingConfig.large_dask_cluster}
+                checked={resultingConfig.largeDaskCluster}
                 disabled={isUpdatingConfig}
-                onChange={(...[, large_dask_cluster]) =>
-                  updatePartialConfig({ large_dask_cluster })
+                onChange={(...[, largeDaskCluster]) =>
+                  updatePartialConfig({ largeDaskCluster })
                 }
               />
             }
-            label="large_dask_cluster"
+            label="largeDaskCluster"
           />
         </Columns>
       </FormGroup>
@@ -881,13 +875,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("General")}
       {displayAnalysesCustomizationGeneralSection()}
       {displaySectionTitle("Dataset Warnings")}
-      {getAnalysesCustomization("dataset_warnings")}
+      {getAnalysesCustomization("datasetWarnings")}
       {displaySectionTitle("Syntax")}
       {getAnalysesCustomization("syntax")}
       {displayToggleSectionTitle("similarity", "Similarity")}
       {getAnalysesCustomization("similarity")}
-      {displayToggleSectionTitle("behavioral_testing", "Behavioral Testing")}
-      {getAnalysesCustomization("behavioral_testing")}
+      {displayToggleSectionTitle("behavioralTesting", "Behavioral Testing")}
+      {getAnalysesCustomization("behavioralTesting")}
     </>
   );
 

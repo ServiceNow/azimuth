@@ -9,48 +9,47 @@ export const getConfigAPIResponse = rest.get(
     const azimuthConfigResponse: AzimuthConfig = {
       name: "Sentiment Analysis",
       dataset: {
-        class_name: "loading_resources.load_sst2_dataset",
+        className: "loading_resources.load_sst2_dataset",
         args: [],
         kwargs: {},
         remote: "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/azimuth_shr",
       },
       columns: {
-        text_input: "utterance",
-        raw_text_input: "utterance_raw",
+        textInput: "utterance",
+        rawTextInput: "utterance_raw",
         label: "label",
-        failed_parsing_reason: "failed_parsing_reason",
-        persistent_id: "row_idx",
+        failedParsingReason: "failed_parsing_reason",
+        persistentId: "row_idx",
       },
-      rejection_class: null,
-      artifact_path: "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/cache",
-      batch_size: 32,
-      use_cuda: "auto",
-      large_dask_cluster: false,
-      read_only_config: false,
-      dataset_warnings: {
-        min_num_per_class: 20,
-        max_delta_class_imbalance: 0.5,
-        max_delta_representation: 0.05,
-        max_delta_mean_words: 3.0,
-        max_delta_std_words: 3.0,
+      rejectionClass: null,
+      artifactPath: "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/cache",
+      batchSize: 32,
+      useCuda: "auto",
+      largeDaskCluster: false,
+      readOnlyConfig: false,
+      datasetWarnings: {
+        minNumPerClass: 20,
+        maxDeltaClassImbalance: 0.5,
+        maxDeltaRepresentation: 0.05,
+        maxDeltaMeanWords: 3.0,
+        maxDeltaStdWords: 3.0,
       },
-      model_contract: "hf_text_classification",
+      modelContract: "hf_text_classification",
       pipelines: [
         {
           name: "Pipeline_0",
           model: {
-            class_name: "loading_resources.load_hf_text_classif_pipeline",
+            className: "loading_resources.load_hf_text_classif_pipeline",
             args: [],
             kwargs: {
-              checkpoint_path:
-                "distilbert-base-uncased-finetuned-sst-2-english",
+              checkpointPath: "distilbert-base-uncased-finetuned-sst-2-english",
             },
             remote:
               "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/azimuth_shr",
           },
           postprocessors: [
             {
-              class_name: "azimuth.utils.ml.postprocessing.Thresholding",
+              className: "azimuth.utils.ml.postprocessing.Thresholding",
               args: [],
               kwargs: { threshold: 0.5 },
               remote: null,
@@ -59,60 +58,60 @@ export const getConfigAPIResponse = rest.get(
           ],
         },
       ],
-      uncertainty: { iterations: 1, high_epistemic_threshold: 0.1 },
-      saliency_layer: "distilbert.embeddings.word_embeddings",
+      uncertainty: { iterations: 1, highEpistemicThreshold: 0.1 },
+      saliencyLayer: "distilbert.embeddings.word_embeddings",
       syntax: {
-        short_utterance_max_word: 3,
-        long_utterance_min_word: 12,
-        spacy_model: "en_core_web_sm",
-        subj_tags: ["nsubj", "nsubjpass"],
-        obj_tags: ["dobj", "pobj", "obj"],
+        shortUtteranceMaxWord: 3,
+        longUtteranceMinWord: 12,
+        spacyModel: "en_core_web_sm",
+        subjTags: ["nsubj", "nsubjpass"],
+        objTags: ["dobj", "pobj", "obj"],
       },
       metrics: {
         Accuracy: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "accuracy" },
           remote: null,
-          additional_kwargs: {},
+          additionalKwargs: {},
         },
         Precision: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "precision" },
           remote: null,
-          additional_kwargs: { average: "weighted" },
+          additionalKwargs: { average: "weighted" },
         },
         Recall: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "recall" },
           remote: null,
-          additional_kwargs: { average: "weighted" },
+          additionalKwargs: { average: "weighted" },
         },
         F1: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "f1" },
           remote: null,
-          additional_kwargs: { average: "weighted" },
+          additionalKwargs: { average: "weighted" },
         },
       },
       language: "en",
       similarity: {
-        faiss_encoder: "all-MiniLM-L12-v2",
-        conflicting_neighbors_threshold: 0.9,
-        no_close_threshold: 0.5,
+        faissEncoder: "all-MiniLM-L12-v2",
+        conflictingNeighborsThreshold: 0.9,
+        noCloseThreshold: 0.5,
       },
-      behavioral_testing: {
-        neutral_token: {
+      behavioralTesting: {
+        neutralToken: {
           threshold: 1.0,
-          suffix_list: ["pls", "please", "thank you", "appreciated"],
-          prefix_list: ["pls", "please", "hello", "greetings"],
+          suffixList: ["pls", "please", "thank you", "appreciated"],
+          prefixList: ["pls", "please", "hello", "greetings"],
         },
         punctuation: { threshold: 1.0 },
-        fuzzy_matching: { threshold: 1.0 },
-        typo: { threshold: 1.0, nb_typos_per_utterance: 1 },
+        fuzzyMatching: { threshold: 1.0 },
+        typo: { threshold: 1.0, nbTyposPerUtterance: 1 },
         seed: 300,
       },
     };
@@ -126,48 +125,47 @@ export const getConfigMultipipelineAPIResponse = rest.get(
     const azimuthConfigMultipipelineResponse: AzimuthConfig = {
       name: "Sentiment Analysis",
       dataset: {
-        class_name: "loading_resources.load_sst2_dataset",
+        className: "loading_resources.load_sst2_dataset",
         args: [],
         kwargs: {},
         remote: "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/azimuth_shr",
       },
       columns: {
-        text_input: "utterance",
-        raw_text_input: "utterance_raw",
+        textInput: "utterance",
+        rawTextInput: "utterance_raw",
         label: "label",
-        failed_parsing_reason: "failed_parsing_reason",
-        persistent_id: "row_idx",
+        failedParsingReason: "failed_parsing_reason",
+        persistentId: "row_idx",
       },
-      rejection_class: null,
-      artifact_path: "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/cache",
-      batch_size: 32,
-      use_cuda: "auto",
-      large_dask_cluster: false,
-      read_only_config: false,
-      dataset_warnings: {
-        min_num_per_class: 20,
-        max_delta_class_imbalance: 0.5,
-        max_delta_representation: 0.05,
-        max_delta_mean_words: 3.0,
-        max_delta_std_words: 3.0,
+      rejectionClass: null,
+      artifactPath: "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/cache",
+      batchSize: 32,
+      useCuda: "auto",
+      largeDaskCluster: false,
+      readOnlyConfig: false,
+      datasetWarnings: {
+        minNumPerClass: 20,
+        maxDeltaClassImbalance: 0.5,
+        maxDeltaRepresentation: 0.05,
+        maxDeltaMeanWords: 3.0,
+        maxDeltaStdWords: 3.0,
       },
-      model_contract: "hf_text_classification",
+      modelContract: "hf_text_classification",
       pipelines: [
         {
           name: "Pipeline_0",
           model: {
-            class_name: "loading_resources.load_hf_text_classif_pipeline",
+            className: "loading_resources.load_hf_text_classif_pipeline",
             args: [],
             kwargs: {
-              checkpoint_path:
-                "distilbert-base-uncased-finetuned-sst-2-english",
+              checkpointPath: "distilbert-base-uncased-finetuned-sst-2-english",
             },
             remote:
               "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/azimuth_shr",
           },
           postprocessors: [
             {
-              class_name: "azimuth.utils.ml.postprocessing.Thresholding",
+              className: "azimuth.utils.ml.postprocessing.Thresholding",
               args: [],
               kwargs: { threshold: 0.5 },
               remote: null,
@@ -178,18 +176,17 @@ export const getConfigMultipipelineAPIResponse = rest.get(
         {
           name: "Pipeline_1",
           model: {
-            class_name: "loading_resources.load_hf_text_classif_pipeline",
+            className: "loading_resources.load_hf_text_classif_pipeline",
             args: [],
             kwargs: {
-              checkpoint_path:
-                "distilbert-base-uncased-finetuned-sst-2-english",
+              checkpointPath: "distilbert-base-uncased-finetuned-sst-2-english",
             },
             remote:
               "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/azimuth_shr",
           },
           postprocessors: [
             {
-              class_name: "azimuth.utils.ml.postprocessing.Thresholding",
+              className: "azimuth.utils.ml.postprocessing.Thresholding",
               args: [],
               kwargs: { threshold: 0.5 },
               remote: null,
@@ -200,18 +197,17 @@ export const getConfigMultipipelineAPIResponse = rest.get(
         {
           name: "Pipeline_2",
           model: {
-            class_name: "loading_resources.load_hf_text_classif_pipeline",
+            className: "loading_resources.load_hf_text_classif_pipeline",
             args: [],
             kwargs: {
-              checkpoint_path:
-                "distilbert-base-uncased-finetuned-sst-2-english",
+              checkpointPath: "distilbert-base-uncased-finetuned-sst-2-english",
             },
             remote:
               "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/azimuth_shr",
           },
           postprocessors: [
             {
-              class_name: "azimuth.utils.ml.postprocessing.Thresholding",
+              className: "azimuth.utils.ml.postprocessing.Thresholding",
               args: [],
               kwargs: { threshold: 0.5 },
               remote: null,
@@ -222,18 +218,17 @@ export const getConfigMultipipelineAPIResponse = rest.get(
         {
           name: "Pipeline_3",
           model: {
-            class_name: "loading_resources.load_hf_text_classif_pipeline",
+            className: "loading_resources.load_hf_text_classif_pipeline",
             args: [],
             kwargs: {
-              checkpoint_path:
-                "distilbert-base-uncased-finetuned-sst-2-english",
+              checkpointPath: "distilbert-base-uncased-finetuned-sst-2-english",
             },
             remote:
               "/Users/nandhini.babu/OpenSource-Azimuth/azimuth/azimuth_shr",
           },
           postprocessors: [
             {
-              class_name: "azimuth.utils.ml.postprocessing.Thresholding",
+              className: "azimuth.utils.ml.postprocessing.Thresholding",
               args: [],
               kwargs: { threshold: 0.5 },
               remote: null,
@@ -242,60 +237,60 @@ export const getConfigMultipipelineAPIResponse = rest.get(
           ],
         },
       ],
-      uncertainty: { iterations: 1, high_epistemic_threshold: 0.1 },
-      saliency_layer: "distilbert.embeddings.word_embeddings",
+      uncertainty: { iterations: 1, highEpistemicThreshold: 0.1 },
+      saliencyLayer: "distilbert.embeddings.word_embeddings",
       syntax: {
-        short_utterance_max_word: 3,
-        long_utterance_min_word: 12,
-        spacy_model: "en_core_web_sm",
-        subj_tags: ["nsubj", "nsubjpass"],
-        obj_tags: ["dobj", "pobj", "obj"],
+        shortUtteranceMaxWord: 3,
+        longUtteranceMinWord: 12,
+        spacyModel: "en_core_web_sm",
+        subjTags: ["nsubj", "nsubjpass"],
+        objTags: ["dobj", "pobj", "obj"],
       },
       metrics: {
         Accuracy: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "accuracy" },
           remote: null,
-          additional_kwargs: {},
+          additionalKwargs: {},
         },
         Precision: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "precision" },
           remote: null,
-          additional_kwargs: { average: "weighted" },
+          additionalKwargs: { average: "weighted" },
         },
         Recall: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "recall" },
           remote: null,
-          additional_kwargs: { average: "weighted" },
+          additionalKwargs: { average: "weighted" },
         },
         F1: {
-          class_name: "datasets.load_metric",
+          className: "datasets.load_metric",
           args: [],
           kwargs: { path: "f1" },
           remote: null,
-          additional_kwargs: { average: "weighted" },
+          additionalKwargs: { average: "weighted" },
         },
       },
       language: "en",
       similarity: {
-        faiss_encoder: "all-MiniLM-L12-v2",
-        conflicting_neighbors_threshold: 0.9,
-        no_close_threshold: 0.5,
+        faissEncoder: "all-MiniLM-L12-v2",
+        conflictingNeighborsThreshold: 0.9,
+        noCloseThreshold: 0.5,
       },
-      behavioral_testing: {
-        neutral_token: {
+      behavioralTesting: {
+        neutralToken: {
           threshold: 1.0,
-          suffix_list: ["pls", "please", "thank you", "appreciated"],
-          prefix_list: ["pls", "please", "hello", "greetings"],
+          suffixList: ["pls", "please", "thank you", "appreciated"],
+          prefixList: ["pls", "please", "hello", "greetings"],
         },
         punctuation: { threshold: 1.0 },
-        fuzzy_matching: { threshold: 1.0 },
-        typo: { threshold: 1.0, nb_typos_per_utterance: 1 },
+        fuzzyMatching: { threshold: 1.0 },
+        typo: { threshold: 1.0, nbTyposPerUtterance: 1 },
         seed: 300,
       },
     };

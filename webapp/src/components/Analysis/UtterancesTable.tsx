@@ -262,7 +262,7 @@ const UtterancesTable: React.FC<Props> = ({
       autoWidth
       title={getUtteranceIdTooltip({
         utterance: row,
-        persistentIdColumn: config.columns.persistent_id,
+        persistentIdColumn: config.columns.persistentId,
       })}
     >
       {value}
@@ -446,9 +446,9 @@ const UtterancesTable: React.FC<Props> = ({
           raiseErrorToast("There are no records in the CSV file.");
           return;
         }
-        if (header !== `${config.columns.persistent_id},proposed_action`) {
+        if (header !== `${config.columns.persistentId},proposed_action`) {
           raiseErrorToast(
-            `The CSV file must have column headers ${config.columns.persistent_id} and proposed_action, in that order.`
+            `The CSV file must have column headers ${config.columns.persistentId} and proposed_action, in that order.`
           );
           return;
         }
