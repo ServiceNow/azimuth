@@ -2,7 +2,7 @@
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import numpy as np
 import orjson
@@ -31,12 +31,6 @@ class AliasModel(BaseModel):
     """This model should be used as the base for any model that defines aliases to ensure
     that all fields are represented correctly.
     """
-
-    def dict(self, *, by_alias: bool = False, **kwargs: Any) -> Dict[str, Any]:
-        return super().dict(by_alias=True, **kwargs)
-
-    def no_alias_dict(self, **kwargs: Any) -> Dict[str, Any]:
-        return super().dict(by_alias=False, **kwargs)
 
     @classmethod
     def with_fields(cls, name, *bases, **field_definitions):

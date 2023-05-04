@@ -58,7 +58,7 @@ def test_pipeline_steps(simple_text_config):
     )
     for order, class_name in enumerate(("TemperatureScaling", "Thresholding")):
         assert (
-            ds[DatasetColumn.pipeline_steps][0]["postprocessing_steps"][order]["className"]
+            ds[DatasetColumn.pipeline_steps][0]["postprocessing_steps"][order]["class_name"]
             == class_name
         )
     # The prediction of the last pipeline step should be the same as the postprocessed prediction.

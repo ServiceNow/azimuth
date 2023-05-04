@@ -108,7 +108,7 @@ class HDF5CacheMixin(CachingMechanism):
 
         # Save all that affects caching so it can be used for identification and debugging.
         with open(os.path.join(self._cache_effective_arguments), "w") as f:
-            json.dump(self.get_effective_arguments().no_alias_dict(), f, indent=2)
+            json.dump(self.get_effective_arguments().dict(), f, indent=2)
 
     @retry(stop_max_attempt_number=5, wait_fixed=0.5)
     def _check_cache_internal(self, indices: Optional[List[int]]):

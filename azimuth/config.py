@@ -278,7 +278,6 @@ class ProjectConfig(AzimuthBaseSettings):
             self.dict(
                 include=ProjectConfig.__fields__.keys(),
                 exclude=exclude_fields_from_cache(self),
-                by_alias=True,
             )
         )
 
@@ -356,7 +355,6 @@ class ModelContractConfig(CommonFieldsConfig):
             self.dict(
                 include=ModelContractConfig.__fields__.keys()
                 - CommonFieldsConfig.__fields__.keys(),
-                by_alias=True,
             )
         )
 
