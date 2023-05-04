@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from azimuth.config import (
     AzimuthConfig,
+    AzimuthConfigHistoryWithHash,
     PipelineDefinition,
     SupportedLanguage,
     TemperatureScaling,
@@ -269,3 +270,22 @@ def test_load_from_config_history(tiny_text_config):
     cfg = load_azimuth_config(config_path=None, load_config_history=True)
     assert cfg == tiny_text_config
     del os.environ["ARTIFACT_PATH"]
+
+
+def test_config_history_with_hash():
+    default_config = AzimuthConfigHistoryWithHash(config={})
+
+    specified_hash_ignored = AzimuthConfigHistoryWithHash(config={}, hash="Potato")
+    assert specified_hash_ignored.hash == default_config.hash
+
+    specified_default_value = AzimuthConfigHistoryWithHash(config={"name": "New project"})
+    assert specified_default_value.hash == default_config.hash
+
+    specified_different_value = AzimuthConfigHistoryWithHash(config={"name": "Potato"})
+    assert specified_different_value.hash != default_config.hash
+
+    # Make sure the hash doesn't cause an extra exception if the config has a validation error.
+    with pytest.raises(
+        ValidationError, match="1 validation error for AzimuthConfigHistoryWithHash\nconfig -> name"
+    ):
+        AzimuthConfigHistoryWithHash(config={"name": None})

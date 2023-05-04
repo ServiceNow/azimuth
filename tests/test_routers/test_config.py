@@ -1,11 +1,10 @@
 from fastapi import FastAPI
-from jsonlines import jsonlines
 from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from starlette.testclient import TestClient
 
 from azimuth.config import SupportedLanguage, config_defaults_per_language
 from azimuth.types import SupportedModelContract
-from tests.utils import get_enum_validation_error_msg
+from tests.utils import get_enum_validation_error_msg, is_sorted
 
 
 def test_get_default_config(app: FastAPI):
@@ -124,6 +123,18 @@ def test_get_default_config_french(app: FastAPI):
     assert res["similarity"]["faiss_encoder"] == defaults.faiss_encoder
 
 
+def test_get_config_history(app: FastAPI):
+    client = TestClient(app)
+    resp = client.get("/config/history")
+    assert resp.status_code == HTTP_200_OK, resp.text
+
+    history = resp.json()
+    assert len(history) >= 1
+    assert is_sorted([item["created_on"] for item in history])
+    # The hash has 128 bits and is represented as a string of hex characters (4 bits each).
+    assert all(len(item["hash"]) == 128 / 4 for item in history)
+
+
 def test_get_config(app: FastAPI):
     client = TestClient(app)
     res = client.get("/config").json()
@@ -233,9 +244,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     initial_config = client.get("/config").json()
     initial_contract = initial_config["model_contract"]
     initial_pipelines = initial_config["pipelines"]
-    jsonl_file_path = f"{initial_config['artifact_path']}/config_history.jsonl"
-    with jsonlines.open(jsonl_file_path, "r") as reader:
-        initial_config_count = len(list(reader))
+    initial_config_count = len(client.get("/config/history").json())
 
     resp = client.patch(
         "/config",
@@ -245,8 +254,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
     assert not get_config["pipelines"]
-    with jsonlines.open(jsonl_file_path, "r") as reader:
-        new_config_count = len(list(reader))
+    new_config_count = len(client.get("/config/history").json())
     assert new_config_count == initial_config_count + 1
 
     # Config Validation Error
@@ -276,8 +284,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     assert resp.status_code == HTTP_200_OK, resp.text
     assert get_config == client.get("/config").json()
 
-    with jsonlines.open(jsonl_file_path, "r") as reader:
-        loaded_configs = list(reader)
+    loaded_configs = client.get("/config/history").json()
     assert len(loaded_configs) == new_config_count, "No config should have been saved since."
     assert loaded_configs[-1]["config"]["model_contract"] == "file_based_text_classification"
     assert not loaded_configs[-1]["config"]["pipelines"]
@@ -286,3 +293,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     _ = client.patch(
         "/config", json={"model_contract": initial_contract, "pipelines": initial_pipelines}
     )
+
+    loaded_configs = client.get("/config/history").json()
+    assert loaded_configs[-1]["config"] == loaded_configs[initial_config_count - 1]["config"]
+    assert loaded_configs[-1]["hash"] == loaded_configs[initial_config_count - 1]["hash"]

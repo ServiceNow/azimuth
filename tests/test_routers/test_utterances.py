@@ -1,14 +1,13 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import List
 
 from fastapi import FastAPI
 from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from starlette.testclient import TestClient
 
 from azimuth.types.tag import DataAction
-from tests.utils import get_enum_validation_error_msg
+from tests.utils import get_enum_validation_error_msg, is_sorted
 
 UTTERANCE_COUNT = 42
 
@@ -34,10 +33,6 @@ def test_get_similar(app: FastAPI) -> None:
         "=train"
     ).json()["utterances"]
     assert len(resp) == 2
-
-
-def is_sorted(numbers: List[float], descending=False):
-    return all(a >= b if descending else a <= b for a, b in zip(numbers[:-1], numbers[1:]))
 
 
 def test_get_utterances(app: FastAPI):
