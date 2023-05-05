@@ -13,7 +13,7 @@ def test_get_default_config(app: FastAPI):
 
     assert res == {
         "name": "New project",
-        "dataset": None,
+        "dataset": {"class_name": "", "args": [], "kwargs": {}, "remote": None},
         "model_contract": "hf_text_classification",
         "columns": {
             "text_input": "utterance",
@@ -50,8 +50,8 @@ def test_get_default_config(app: FastAPI):
         },
         "pipelines": [
             {
-                "name": "required",
-                "model": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
+                "name": "Pipeline_0",
+                "model": {"class_name": "", "args": [], "kwargs": {}, "remote": None},
                 "postprocessors": [
                     {
                         "class_name": "azimuth.utils.ml.postprocessing.Thresholding",
@@ -267,6 +267,24 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     assert get_config["model_contract"] == "file_based_text_classification"
 
     # Validation Module Error
+    # TODO assert error detail
+    #  Should be 400, but during tests, AzimuthValidationError gets wrapped in a MultipleExceptions
+
+    resp = client.patch(
+        "/config", json={"pipelines": [{"model": {"class_name": "", "remote": "lol"}}]}
+    )
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+    # TODO assert resp.json()["detail"] == "Can't find remote 'lol' locally or on Pypi."
+
+    resp = client.patch("/config", json={"pipelines": [{"model": {"class_name": "potato.hair"}}]})
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+
+    resp = client.patch(
+        "/config",
+        json={"pipelines": [{"model": {"class_name": "tests.test_loading_resources.hair"}}]},
+    )
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+
     resp = client.patch(
         "/config",
         json={
@@ -276,6 +294,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
         },
     )
     assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+
     get_config = client.get("/config").json()
     assert not get_config["pipelines"]
 

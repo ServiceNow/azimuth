@@ -112,7 +112,15 @@ const PageHeader = () => {
       })}`
     );
   };
+
   const [configOpen, setConfigOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (config?.dataset === null) {
+      setConfigOpen(true);
+    }
+  }, [config]);
+
   const dashboardPathname = `/${jobId}`;
 
   const isDashboard = location.pathname === dashboardPathname;

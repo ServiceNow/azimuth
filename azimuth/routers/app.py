@@ -24,6 +24,7 @@ from azimuth.types.app import (
     DatasetInfoResponse,
     PerturbationTestingSummary,
     StatusResponse,
+    UtteranceCountPerDatasetSplit,
 )
 from azimuth.types.perturbation_testing import (
     PerturbationTestingMergedResponse,
@@ -44,7 +45,6 @@ from azimuth.utils.routers import (
     require_available_model,
     require_pipeline_index,
 )
-from azimuth.utils.validation import assert_not_none
 
 router = APIRouter()
 
@@ -88,25 +88,20 @@ def get_dataset_info(
 ):
     eval_dm = dataset_split_managers.get(DatasetSplitName.eval)
     training_dm = dataset_split_managers.get(DatasetSplitName.train)
-    dm = assert_not_none(eval_dm or training_dm)
 
     return DatasetInfoResponse(
         project_name=config.name,
-        class_names=dm.get_class_names(),
         data_actions=ALL_DATA_ACTION_FILTERS,
         smart_tags=ALL_SMART_TAG_FILTERS,
-        eval_class_distribution=eval_dm.class_distribution().tolist()
-        if eval_dm is not None
-        else [],
-        train_class_distribution=training_dm.class_distribution().tolist()
-        if training_dm is not None
-        else [],
         startup_tasks={k: v.status() for k, v in startup_tasks.items()},
         model_contract=config.model_contract,
         prediction_available=predictions_available(config),
         perturbation_testing_available=perturbation_testing_available(config),
         available_dataset_splits=AvailableDatasetSplits(
             eval=eval_dm is not None, train=training_dm is not None
+        ),
+        utterance_count_per_dataset_split=UtteranceCountPerDatasetSplit(
+            eval=eval_dm and eval_dm.num_rows, train=training_dm and training_dm.num_rows
         ),
         similarity_available=similarity_available(config),
         postprocessing_editable=None

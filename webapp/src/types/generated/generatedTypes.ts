@@ -131,7 +131,7 @@ export interface components {
     /** Fields that can be modified without affecting caching. */
     AzimuthConfig: {
       name: string;
-      dataset: components["schemas"]["CustomObject"];
+      dataset: components["schemas"]["CustomObject"] | null;
       columns: components["schemas"]["ColumnConfiguration"];
       rejection_class: string | null;
       /** Where to store artifacts (Azimuth config history, HDF5 files, HF datasets). */
@@ -293,16 +293,14 @@ export interface components {
      */
     DatasetInfoResponse: {
       projectName: string;
-      classNames: string[];
       dataActions: components["schemas"]["DataAction"][];
       smartTags: components["schemas"]["SmartTag"][];
-      evalClassDistribution: number[];
-      trainClassDistribution: number[];
       startupTasks: { [key: string]: any };
       modelContract: components["schemas"]["SupportedModelContract"];
       predictionAvailable: boolean;
       perturbationTestingAvailable: boolean;
       availableDatasetSplits: components["schemas"]["AvailableDatasetSplits"];
+      utteranceCountPerDatasetSplit: components["schemas"]["UtteranceCountPerDatasetSplit"];
       similarityAvailable: boolean;
       postprocessingEditable: boolean[] | null;
     };
@@ -863,6 +861,14 @@ export interface components {
       dissimilar: string[];
       modelPrediction: components["schemas"]["ModelPrediction"] | null;
       modelSaliency: components["schemas"]["ModelSaliency"] | null;
+    };
+    /**
+     * This model should be used as the base for any model that defines aliases to ensure
+     * that all fields are represented correctly.
+     */
+    UtteranceCountPerDatasetSplit: {
+      train: number | null;
+      eval: number | null;
     };
     /**
      * This model should be used as the base for any model that defines aliases to ensure

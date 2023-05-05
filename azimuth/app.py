@@ -124,8 +124,6 @@ def start_app(config_path: Optional[str], load_config_history: bool, debug: bool
     log.info("🔭 Azimuth starting 🔭")
 
     azimuth_config = load_azimuth_config(config_path, load_config_history)
-    if azimuth_config.dataset is None:
-        raise ValueError("No dataset has been specified in the config.")
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 

@@ -21,13 +21,15 @@ class AvailableDatasetSplits(AliasModel):
     eval: bool
 
 
+class UtteranceCountPerDatasetSplit(AliasModel):
+    train: Optional[int] = Field(..., nullable=True)
+    eval: Optional[int] = Field(..., nullable=True)
+
+
 class DatasetInfoResponse(AliasModel):
     project_name: str = Field(..., title="Name of the project")
-    class_names: List[str] = Field(..., title="Class names")
     data_actions: List[DataAction] = Field(..., title="Data action tags")
     smart_tags: List[SmartTag] = Field(..., title="Smart tags")
-    eval_class_distribution: List[int] = Field(..., title="Evaluation set class distribution")
-    train_class_distribution: List[int] = Field(..., title="Training set class distribution")
     startup_tasks: Dict[str, Any] = Field(..., title="Startup tasks status")
     model_contract: SupportedModelContract = Field(..., title="Model Contract in the config.")
     prediction_available: bool = Field(..., title="Indicator if prediction values are available.")
@@ -36,6 +38,9 @@ class DatasetInfoResponse(AliasModel):
     )
     available_dataset_splits: AvailableDatasetSplits = Field(
         ..., title="Which dataset splits are available."
+    )
+    utterance_count_per_dataset_split: UtteranceCountPerDatasetSplit = Field(
+        ..., title="Utterance count per dataset split."
     )
     similarity_available: bool = Field(..., title="Indicator if similarities are available.")
     postprocessing_editable: Optional[List[bool]] = Field(

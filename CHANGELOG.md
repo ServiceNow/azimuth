@@ -12,6 +12,7 @@ Released changes are shown in the
 
 ### Added
 - Meaningful error messages in the error toasts.
+- Support for no dataset at startup, in which case Azimuth will wait until the user sets it up via the config UI.
 
 ### Changed
 - When clicking on an utterance from the Exploration space's Utterance Table, the Utterance Details now open in a modal on top of the table. This preserves the filter context and allows for going through the utterances one by one, using some new arrow buttons or keyboard arrows.

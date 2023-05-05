@@ -30,7 +30,7 @@ from azimuth.utils.project import update_config
 log = structlog.get_logger(__name__)
 router = APIRouter()
 
-REQUIRED = "required"
+REQUIRED = ""
 
 
 @router.get(
@@ -43,6 +43,7 @@ def get_config_default(
     language: SupportedLanguage = Query(AzimuthConfig.__fields__["language"].default),
 ) -> AzimuthConfig:
     return AzimuthConfig(
+        dataset=CustomObject(class_name=REQUIRED),
         language=language,
         pipelines=[PipelineDefinition(name=REQUIRED, model=CustomObject(class_name=REQUIRED))],
     )

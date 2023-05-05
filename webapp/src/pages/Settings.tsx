@@ -176,6 +176,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   );
 
   React.useEffect(() => {
+    if (defaultConfig && resultingConfig.dataset === null) {
+      updatePartialConfig({ dataset: defaultConfig.dataset });
+    }
     if (defaultConfig && defaultConfig.language !== resultingConfig.language) {
       updatePartialConfig({
         language: defaultConfig.language,
@@ -204,7 +207,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   }, [defaultConfig, resultingConfig, updatePartialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
-  if (config === undefined) return null;
+  if (config === undefined || !open) return null;
 
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
@@ -263,10 +266,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <Button
           variant="contained"
           disabled={isEmptyPartialConfig || isUpdatingConfig}
-          onClick={() => {
-            setPartialConfig({});
-            setLanguage(undefined);
-          }}
+          onClick={handleDiscard}
         >
           Discard
         </Button>
@@ -459,7 +459,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 <React.Fragment key={column}>
                   <Typography variant="body2">{column}:</Typography>
                   <StringField
-                    label={column}
                     value={resultingConfig.columns[column]}
                     disabled={isUpdatingConfig}
                     onChange={(newValue) =>
@@ -472,39 +471,43 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           </Box>
         </Columns>
       </FormGroup>
-      {displaySectionTitle("Dataset")}
-      <FormGroup>
-        <Columns columns={2}>
-          <StringField
-            label="class_name"
-            value={resultingConfig.dataset.class_name}
-            disabled={isUpdatingConfig}
-            onChange={(class_name) =>
-              updateSubConfig("dataset", { class_name })
-            }
-          />
-          <StringField
-            label="remote"
-            nullable
-            value={resultingConfig.dataset.remote}
-            disabled={isUpdatingConfig}
-            onChange={(remote) => updateSubConfig("dataset", { remote })}
-          />
-          <JSONField
-            array
-            label="args"
-            value={resultingConfig.dataset.args}
-            disabled={isUpdatingConfig}
-            onChange={(args) => updateSubConfig("dataset", { args })}
-          />
-          <JSONField
-            label="kwargs"
-            value={resultingConfig.dataset.kwargs}
-            disabled={isUpdatingConfig}
-            onChange={(kwargs) => updateSubConfig("dataset", { kwargs })}
-          />
-        </Columns>
-      </FormGroup>
+      {resultingConfig.dataset && (
+        <>
+          {displaySectionTitle("Dataset")}
+          <FormGroup>
+            <Columns columns={2}>
+              <StringField
+                label="class_name"
+                value={resultingConfig.dataset!.class_name}
+                disabled={isUpdatingConfig}
+                onChange={(class_name) =>
+                  updateSubConfig("dataset", { class_name })
+                }
+              />
+              <StringField
+                label="remote"
+                nullable
+                value={resultingConfig.dataset!.remote}
+                disabled={isUpdatingConfig}
+                onChange={(remote) => updateSubConfig("dataset", { remote })}
+              />
+              <JSONField
+                array
+                label="args"
+                value={resultingConfig.dataset!.args}
+                disabled={isUpdatingConfig}
+                onChange={(args) => updateSubConfig("dataset", { args })}
+              />
+              <JSONField
+                label="kwargs"
+                value={resultingConfig.dataset!.kwargs}
+                disabled={isUpdatingConfig}
+                onChange={(kwargs) => updateSubConfig("dataset", { kwargs })}
+              />
+            </Columns>
+          </FormGroup>
+        </>
+      )}
     </>
   );
   const getModelContractConfigSection = () => (
@@ -897,6 +900,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         name="Project Configuration"
         description="View the fields that define the dataset to load in Azimuth."
         link="reference/configuration/project/"
+        defaultExpanded
       >
         {getProjectConfigSection()}
       </AccordionLayout>

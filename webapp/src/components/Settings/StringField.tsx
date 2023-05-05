@@ -20,11 +20,13 @@ const StringField = <T extends string | null>({
     select={Boolean(options)}
     inputProps={{ sx: { textOverflow: "ellipsis" } }}
     value={value ?? ""}
+    error={value === ""}
+    helperText={value === "" ? "Set a value" : undefined}
     onChange={
       onChange &&
       (nullable
-        ? (event) => onChange(event.target.value as T)
-        : (event) => onChange((event.target.value || null) as T))
+        ? (event) => onChange((event.target.value || null) as T)
+        : (event) => onChange(event.target.value as T))
     }
     {...props}
   >

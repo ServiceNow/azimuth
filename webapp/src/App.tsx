@@ -172,7 +172,7 @@ export default class App extends React.Component<Props> {
                   </Switch>
                 </ErrorBoundary>
               </AppLayout>
-              <ToastContainer />
+              <ToastContainer autoClose={10_000} />
             </ThemeProvider>
           </StyledEngineProvider>
         </Router>

@@ -32,7 +32,7 @@ def load_dataset_from_config(azimuth_config: AzimuthConfig) -> DatasetDict:
 
     """
     if azimuth_config.dataset is None:
-        raise ValueError("No dataset configured.")
+        return DatasetDict()
 
     dataset_in_config: DatasetDict = load_custom_object(
         azimuth_config.dataset, azimuth_config=azimuth_config
