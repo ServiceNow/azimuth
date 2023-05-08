@@ -343,6 +343,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     );
   }
 
+  const parseClassName = (class_name: string) =>
+    class_name.toLowerCase().includes("temperature")
+      ? "temperature"
+      : class_name.toLowerCase().includes("threshold")
+      ? "threshold"
+      : undefined;
+
   const updateSubConfig = <Key extends SubConfigKeys>(
     key: Key,
     update: Partial<AzimuthConfig[Key]>
@@ -753,11 +760,46 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                                       .postprocessors === null ||
                                     isUpdatingConfig
                                   }
-                                  onChange={(class_name) =>
+                                  onChange={(class_name) => {
+                                    const previousClassName = parseClassName(
+                                      postprocessor.class_name
+                                    );
+                                    const updatedClassName =
+                                      parseClassName(class_name);
+                                    const defaultPostProcessorValue =
+                                      (updatedClassName === "temperature" &&
+                                        1) ||
+                                      (updatedClassName === "threshold" && 0.5);
                                     updatePostprocessor(pipelineIndex, index, {
                                       class_name,
-                                    })
-                                  }
+                                      ...(!isCustomPostprocessorClassName(
+                                        class_name
+                                      ) &&
+                                        updatedClassName && {
+                                          [updatedClassName]:
+                                            defaultPostProcessorValue,
+                                          kwargs: {
+                                            [updatedClassName]:
+                                              defaultPostProcessorValue,
+                                          },
+                                        }),
+                                      ...(isCustomPostprocessorClassName(
+                                        class_name
+                                      ) &&
+                                        previousClassName && {
+                                          kwargs: {
+                                            [previousClassName]: undefined,
+                                          },
+                                          [previousClassName]: undefined,
+                                        }),
+                                      ...(!isCustomPostprocessorClassName(
+                                        postprocessor.class_name
+                                      ) &&
+                                        previousClassName && {
+                                          [previousClassName]: undefined,
+                                        }),
+                                    });
+                                  }}
                                 />
                                 {isCustomPostprocessorClassName(
                                   postprocessor.class_name
@@ -817,7 +859,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                                       value={
                                         "temperature" in postprocessor
                                           ? postprocessor.temperature
-                                          : 0.5
+                                          : 1
                                       }
                                       disabled={
                                         resultingConfig.pipelines![
@@ -877,7 +919,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                                   aria-label="delete"
                                   disabled={
                                     isUpdatingConfig ||
-                                    Boolean(pipeline.postprocessors)
+                                    pipeline.postprocessors == null
                                   }
                                   onClick={() =>
                                     updatePipeline(pipelineIndex, {
