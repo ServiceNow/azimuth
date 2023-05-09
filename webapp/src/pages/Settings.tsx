@@ -344,7 +344,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   }
 
   const parseClassName = (class_name: string) =>
-    class_name.toLowerCase().includes("temperature")
+    class_name && class_name.toLowerCase().includes("temperature")
       ? "temperature"
       : class_name.toLowerCase().includes("threshold")
       ? "threshold"
@@ -732,222 +732,213 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         />
                       </Columns>
                     </FormGroup>
-                    <FormControl>
-                      {displayPostprocessorToggleSection(
-                        pipelineIndex,
-                        pipeline
-                      )}
-                      <Paper variant="outlined">
-                        {pipeline.postprocessors &&
-                          displayPostprocessorAddSection(
-                            pipelineIndex,
-                            -1,
-                            pipeline.postprocessors
-                          )}
-                        {(
-                          pipeline.postprocessors ??
-                          defaultConfig.pipelines![0].postprocessors
-                        )?.map((postprocessor, index) => (
-                          <React.Fragment key={index}>
-                            <FormGroup sx={{ marginTop: 2 }}>
-                              <Columns columns={2}>
-                                <AutocompleteStringField
-                                  label="class_name"
-                                  options={POSTPROCESSORS_CLASS_NAMES}
-                                  value={postprocessor.class_name}
-                                  disabled={
-                                    resultingConfig.pipelines![pipelineIndex]
-                                      .postprocessors === null ||
-                                    isUpdatingConfig
-                                  }
-                                  onChange={(class_name) => {
-                                    const previousClassName = parseClassName(
-                                      postprocessor.class_name
-                                    );
-                                    const updatedClassName =
-                                      parseClassName(class_name);
-                                    const defaultPostProcessorValue =
-                                      (updatedClassName === "temperature" &&
-                                        1) ||
-                                      (updatedClassName === "threshold" && 0.5);
-                                    updatePostprocessor(pipelineIndex, index, {
-                                      class_name,
-                                      ...(!isCustomPostprocessorClassName(
-                                        class_name
-                                      ) &&
-                                        updatedClassName && {
+                    {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
+                    <Paper variant="outlined">
+                      {pipeline.postprocessors &&
+                        displayPostprocessorAddSection(
+                          pipelineIndex,
+                          -1,
+                          pipeline.postprocessors
+                        )}
+                      {(
+                        pipeline.postprocessors ??
+                        defaultConfig.pipelines![0].postprocessors
+                      )?.map((postprocessor, index) => (
+                        <React.Fragment key={index}>
+                          <FormGroup sx={{ marginTop: 2 }}>
+                            <Columns columns={2}>
+                              <AutocompleteStringField
+                                label="class_name"
+                                options={POSTPROCESSORS_CLASS_NAMES}
+                                value={postprocessor.class_name}
+                                disabled={
+                                  resultingConfig.pipelines![pipelineIndex]
+                                    .postprocessors === null || isUpdatingConfig
+                                }
+                                onChange={(class_name) => {
+                                  const previousClassName = parseClassName(
+                                    postprocessor.class_name
+                                  );
+                                  const updatedClassName =
+                                    parseClassName(class_name);
+                                  const defaultPostProcessorValue =
+                                    (updatedClassName === "temperature" && 1) ||
+                                    (updatedClassName === "threshold" && 0.5);
+                                  updatePostprocessor(pipelineIndex, index, {
+                                    class_name,
+                                    ...(!isCustomPostprocessorClassName(
+                                      class_name
+                                    ) &&
+                                      updatedClassName && {
+                                        [updatedClassName]:
+                                          defaultPostProcessorValue,
+                                        kwargs: {
                                           [updatedClassName]:
                                             defaultPostProcessorValue,
-                                          kwargs: {
-                                            [updatedClassName]:
-                                              defaultPostProcessorValue,
-                                          },
-                                        }),
-                                      ...(isCustomPostprocessorClassName(
-                                        class_name
-                                      ) &&
-                                        previousClassName && {
-                                          kwargs: {
-                                            [previousClassName]: undefined,
-                                          },
+                                        },
+                                      }),
+                                    ...(isCustomPostprocessorClassName(
+                                      class_name
+                                    ) &&
+                                      previousClassName && {
+                                        kwargs: {
                                           [previousClassName]: undefined,
-                                        }),
-                                      ...(!isCustomPostprocessorClassName(
-                                        postprocessor.class_name
-                                      ) &&
-                                        previousClassName && {
-                                          [previousClassName]: undefined,
-                                        }),
-                                    });
-                                  }}
-                                />
-                                {isCustomPostprocessorClassName(
-                                  postprocessor.class_name
-                                ) ? (
-                                  <>
-                                    <StringField
-                                      label="remote"
-                                      nullable
-                                      value={postprocessor.remote}
-                                      disabled={isUpdatingConfig}
-                                      onChange={(remote) =>
-                                        updatePostprocessor(
-                                          pipelineIndex,
-                                          index,
-                                          {
-                                            remote,
-                                          }
-                                        )
-                                      }
-                                    />
-                                    <JSONField
-                                      array
-                                      label="args"
-                                      value={postprocessor.args}
-                                      disabled={isUpdatingConfig}
-                                      onChange={(args) =>
-                                        updatePostprocessor(
-                                          pipelineIndex,
-                                          index,
-                                          {
-                                            args,
-                                          }
-                                        )
-                                      }
-                                    />
-                                    <JSONField
-                                      label="kwargs"
-                                      value={postprocessor.kwargs}
-                                      disabled={isUpdatingConfig}
-                                      onChange={(kwargs) =>
-                                        updatePostprocessor(
-                                          pipelineIndex,
-                                          index,
-                                          {
-                                            kwargs,
-                                          }
-                                        )
-                                      }
-                                    />
-                                  </>
-                                ) : (
-                                  (postprocessor.class_name?.includes(
-                                    "Temperature"
-                                  ) && (
-                                    <NumberField
-                                      label="temperature"
-                                      value={
-                                        "temperature" in postprocessor
-                                          ? postprocessor.temperature
-                                          : 1
-                                      }
-                                      disabled={
-                                        resultingConfig.pipelines![
-                                          pipelineIndex
-                                        ].postprocessors === null ||
-                                        isUpdatingConfig
-                                      }
-                                      onChange={(temperature) =>
-                                        updatePostprocessor(
-                                          pipelineIndex,
-                                          index,
-                                          {
-                                            temperature,
-                                            kwargs: { temperature },
-                                          }
-                                        )
-                                      }
-                                      {...FLOAT}
-                                    />
-                                  )) ||
-                                  (postprocessor.class_name?.includes(
-                                    "Threshold"
-                                  ) && (
-                                    <NumberField
-                                      label="threshold"
-                                      value={
-                                        "threshold" in postprocessor
-                                          ? postprocessor.threshold
-                                          : 0.5
-                                      }
-                                      disabled={
-                                        resultingConfig.pipelines![
-                                          pipelineIndex
-                                        ].postprocessors === null ||
-                                        isUpdatingConfig
-                                      }
-                                      onChange={(threshold) =>
-                                        updatePostprocessor(
-                                          pipelineIndex,
-                                          index,
-                                          {
-                                            threshold,
-                                            kwargs: { threshold },
-                                          }
-                                        )
-                                      }
-                                      {...PERCENTAGE}
-                                    />
-                                  ))
-                                )}
-                                <IconButton
-                                  sx={{
-                                    position: "absolute",
-                                    right: 20,
-                                    color: (theme) => theme.palette.grey[400],
-                                  }}
-                                  aria-label="delete"
-                                  disabled={
-                                    isUpdatingConfig ||
-                                    pipeline.postprocessors == null
-                                  }
-                                  onClick={() =>
-                                    updatePipeline(pipelineIndex, {
-                                      postprocessors: [
-                                        ...resultingConfig.pipelines![
-                                          pipelineIndex
-                                        ].postprocessors!.slice(0, index),
-                                        ...resultingConfig.pipelines![
-                                          pipelineIndex
-                                        ].postprocessors!.slice(index + 1),
-                                      ],
-                                    })
-                                  }
-                                >
-                                  <DeleteForever fontSize="large" />
-                                </IconButton>
-                              </Columns>
-                            </FormGroup>
-                            {pipeline.postprocessors &&
-                              displayPostprocessorAddSection(
-                                pipelineIndex,
-                                index,
-                                pipeline.postprocessors
+                                        },
+                                        [previousClassName]: undefined,
+                                      }),
+                                    ...(!isCustomPostprocessorClassName(
+                                      postprocessor.class_name
+                                    ) &&
+                                      previousClassName && {
+                                        [previousClassName]: undefined,
+                                      }),
+                                  });
+                                }}
+                              />
+                              {isCustomPostprocessorClassName(
+                                postprocessor.class_name
+                              ) ? (
+                                <>
+                                  <StringField
+                                    label="remote"
+                                    nullable
+                                    value={postprocessor.remote}
+                                    disabled={isUpdatingConfig}
+                                    onChange={(remote) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          remote,
+                                        }
+                                      )
+                                    }
+                                  />
+                                  <JSONField
+                                    array
+                                    label="args"
+                                    value={postprocessor.args}
+                                    disabled={isUpdatingConfig}
+                                    onChange={(args) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          args,
+                                        }
+                                      )
+                                    }
+                                  />
+                                  <JSONField
+                                    label="kwargs"
+                                    value={postprocessor.kwargs}
+                                    disabled={isUpdatingConfig}
+                                    onChange={(kwargs) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          kwargs,
+                                        }
+                                      )
+                                    }
+                                  />
+                                </>
+                              ) : (
+                                (postprocessor.class_name?.includes(
+                                  "Temperature"
+                                ) && (
+                                  <NumberField
+                                    label="temperature"
+                                    value={
+                                      "temperature" in postprocessor
+                                        ? postprocessor.temperature
+                                        : 1
+                                    }
+                                    disabled={
+                                      resultingConfig.pipelines![pipelineIndex]
+                                        .postprocessors === null ||
+                                      isUpdatingConfig
+                                    }
+                                    onChange={(temperature) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          temperature,
+                                          kwargs: { temperature },
+                                        }
+                                      )
+                                    }
+                                    {...FLOAT}
+                                  />
+                                )) ||
+                                (postprocessor.class_name?.includes(
+                                  "Threshold"
+                                ) && (
+                                  <NumberField
+                                    label="threshold"
+                                    value={
+                                      "threshold" in postprocessor
+                                        ? postprocessor.threshold
+                                        : 0.5
+                                    }
+                                    disabled={
+                                      resultingConfig.pipelines![pipelineIndex]
+                                        .postprocessors === null ||
+                                      isUpdatingConfig
+                                    }
+                                    onChange={(threshold) =>
+                                      updatePostprocessor(
+                                        pipelineIndex,
+                                        index,
+                                        {
+                                          threshold,
+                                          kwargs: { threshold },
+                                        }
+                                      )
+                                    }
+                                    {...PERCENTAGE}
+                                  />
+                                ))
                               )}
-                          </React.Fragment>
-                        ))}
-                      </Paper>
-                    </FormControl>
+                              <IconButton
+                                sx={{
+                                  position: "absolute",
+                                  right: 20,
+                                  color: (theme) => theme.palette.grey[400],
+                                }}
+                                aria-label="delete"
+                                disabled={
+                                  isUpdatingConfig ||
+                                  pipeline.postprocessors == null
+                                }
+                                onClick={() =>
+                                  updatePipeline(pipelineIndex, {
+                                    postprocessors: [
+                                      ...resultingConfig.pipelines![
+                                        pipelineIndex
+                                      ].postprocessors!.slice(0, index),
+                                      ...resultingConfig.pipelines![
+                                        pipelineIndex
+                                      ].postprocessors!.slice(index + 1),
+                                    ],
+                                  })
+                                }
+                              >
+                                <DeleteForever fontSize="large" />
+                              </IconButton>
+                            </Columns>
+                          </FormGroup>
+                          {pipeline.postprocessors &&
+                            displayPostprocessorAddSection(
+                              pipelineIndex,
+                              index,
+                              pipeline.postprocessors
+                            )}
+                        </React.Fragment>
+                      ))}
+                    </Paper>
                   </FormControl>
                 </FormGroup>
                 {displayPipelineAddSection(pipelineIndex)}

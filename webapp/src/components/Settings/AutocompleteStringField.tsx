@@ -6,7 +6,10 @@ const AutocompleteStringField: React.FC<
   FieldProps<string> & { label: string; options: string[]; disabled: boolean }
 > = ({ value, onChange, label, options, disabled }) => (
   <Autocomplete
+    autoSelect
     freeSolo
+    disableClearable
+    isOptionEqualToValue={() => false}
     options={options}
     value={value}
     disabled={disabled}
