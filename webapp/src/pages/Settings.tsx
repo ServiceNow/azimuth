@@ -745,34 +745,39 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         defaultConfig.pipelines![0].postprocessors
                       )?.map((postprocessor, index) => (
                         <React.Fragment key={index}>
-                          <IconButton
-                            sx={{
-                              padding: 0,
-                              position: "absolute",
-                              right: 10,
-                              color: (theme) => theme.palette.grey[400],
-                            }}
-                            size="small"
-                            aria-label="delete"
-                            disabled={
-                              isUpdatingConfig ||
-                              pipeline.postprocessors == null
-                            }
-                            onClick={() =>
-                              updatePipeline(pipelineIndex, {
-                                postprocessors: [
-                                  ...resultingConfig.pipelines![
-                                    pipelineIndex
-                                  ].postprocessors!.slice(0, index),
-                                  ...resultingConfig.pipelines![
-                                    pipelineIndex
-                                  ].postprocessors!.slice(index + 1),
-                                ],
-                              })
-                            }
+                          <Box
+                            display="flex"
+                            justifyContent="flex-end"
+                            alignItems="center"
+                            padding={1}
+                            maxHeight={0}
                           >
-                            <DeleteForever fontSize="large" />
-                          </IconButton>
+                            <IconButton
+                              sx={{
+                                color: (theme) => theme.palette.grey[400],
+                              }}
+                              size="small"
+                              aria-label="delete"
+                              disabled={
+                                isUpdatingConfig ||
+                                pipeline.postprocessors == null
+                              }
+                              onClick={() =>
+                                updatePipeline(pipelineIndex, {
+                                  postprocessors: [
+                                    ...resultingConfig.pipelines![
+                                      pipelineIndex
+                                    ].postprocessors!.slice(0, index),
+                                    ...resultingConfig.pipelines![
+                                      pipelineIndex
+                                    ].postprocessors!.slice(index + 1),
+                                  ],
+                                })
+                              }
+                            >
+                              <DeleteForever fontSize="large" />
+                            </IconButton>
+                          </Box>
                           <FormGroup sx={{ marginTop: 2 }}>
                             <Columns columns={2}>
                               <AutocompleteStringField
