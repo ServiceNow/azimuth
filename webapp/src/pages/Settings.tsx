@@ -1,4 +1,4 @@
-import { Close, Warning } from "@mui/icons-material";
+import { AddCircle, Close, DeleteForever, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControl,
   FormControlLabel,
   formControlLabelClasses,
@@ -19,11 +20,13 @@ import {
   inputClasses,
   inputLabelClasses,
   Paper,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
 import Loading from "components/Loading";
+import AutocompleteStringField from "components/Settings/AutocompleteStringField";
 import JSONField from "components/Settings/JSONField";
 import NumberField from "components/Settings/NumberField";
 import StringArrayField from "components/Settings/StringArrayField";
@@ -38,6 +41,7 @@ import {
 } from "services/api";
 import {
   AzimuthConfig,
+  MetricDefinition,
   PipelineDefinition,
   SupportedLanguage,
   SupportedModelContract,
@@ -146,6 +150,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     Partial<AzimuthConfig>
   >({});
 
+  const [showMetricTemplate, setShowMetricTemplate] =
+    React.useState<boolean>(false);
+
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
 
   const handleDiscard = () => {
@@ -159,7 +166,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   };
 
   const resultingConfig = Object.assign({}, config, partialConfig);
-
+  console.log("resultingConfig", resultingConfig);
   const {
     data: defaultConfig,
     isLoading,
@@ -349,6 +356,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       model: { ...resultingConfig.pipelines![pipelineIndex].model, ...update },
     });
 
+  const updateMetric = (
+    metricName: string,
+    update: Partial<MetricDefinition>
+  ) =>
+    updateSubConfig("metrics", {
+      [metricName]: { ...resultingConfig.metrics[metricName], ...update },
+    });
+
   const updatePostprocessor = (
     pipelineIndex: number,
     postprocessorIndex: number,
@@ -409,26 +424,24 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
+  const handleCustomMetricUpdate = (metricName: string) => {
     updatePartialConfig({
-      metrics: checked
-        ? {
-            ...resultingConfig.metrics,
-            [metricName]: {
-              class_name: "datasets.load_metric",
-              args: [],
-              kwargs: {
-                path: metricName.toLowerCase(),
-              },
-              remote: null,
-              additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
-                metricName
-              )
-                ? { average: "weighted" }
-                : {},
-            },
-          }
-        : _.omit(resultingConfig.metrics, metricName),
+      metrics: {
+        ...resultingConfig.metrics,
+        [metricName]: {
+          class_name: "datasets.load_metric",
+          args: [],
+          kwargs: {
+            path: metricName.toLowerCase(),
+          },
+          remote: null,
+          additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
+            metricName
+          )
+            ? { average: "weighted" }
+            : {},
+        },
+      },
     });
   };
 
@@ -689,25 +702,132 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           </FormGroup>
         </>
       )}
-      {displaySectionTitle("Metrics")}
-      <FormGroup>
-        {CUSTOM_METRICS.map((metricName, index) => (
-          <FormControlLabel
-            key={index}
-            control={
-              <Checkbox
-                size="small"
-                checked={Boolean(resultingConfig.metrics[metricName])}
-                disabled={isUpdatingConfig}
-                onChange={(...[, checked]) =>
-                  handleCustomMetricUpdate(checked, metricName)
-                }
-              />
+      <Box display="flex" alignItems="center" padding={0}>
+        {displaySectionTitle("Metrics")}
+        <Tooltip title="Add metric">
+          <IconButton
+            size="small"
+            sx={{ color: (theme) => theme.palette.grey[400] }}
+            aria-label="add-metric"
+            disabled={isUpdatingConfig}
+            onClick={() =>
+              updateMetric("", {
+                class_name: "datasets.load_metric",
+                args: [],
+                kwargs: {},
+                additional_kwargs: {},
+                remote: null,
+              })
             }
-            label={<Typography variant="body2">{metricName}</Typography>}
+          >
+            <AddCircle />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Paper variant="outlined" sx={{ margin: 2 }}>
+        {Object.entries(resultingConfig.metrics ?? defaultConfig.metrics).map(
+          ([metricName, metric], index) => (
+            <React.Fragment key={index}>
+              <FormGroup>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  {metricName ? (
+                    displaySectionTitle(metricName)
+                  ) : (
+                    <Box sx={{ paddingY: 2, width: 250 }}>
+                      <AutocompleteStringField
+                        label="name"
+                        value={metricName}
+                        options={CUSTOM_METRICS.filter(
+                          (metric) => !resultingConfig.metrics[metric]
+                        )}
+                        disabled={isUpdatingConfig}
+                        onChange={(value: string) =>
+                          resultingConfig.metrics[value] ??
+                          (value && handleCustomMetricUpdate(value))
+                        }
+                      />
+                    </Box>
+                  )}
+                  <IconButton
+                    sx={{
+                      color: (theme) => theme.palette.grey[400],
+                    }}
+                    size="small"
+                    aria-label="delete"
+                    disabled={isUpdatingConfig}
+                    onClick={() =>
+                      updatePartialConfig({
+                        metrics: _.omit(resultingConfig.metrics, metricName),
+                      })
+                    }
+                  >
+                    <DeleteForever fontSize="large" />
+                  </IconButton>
+                </Box>
+
+                <Columns columns={2}>
+                  <StringField
+                    label="remote"
+                    nullable
+                    value={metric.remote}
+                    disabled={isUpdatingConfig}
+                    onChange={(remote) => updateMetric(metricName, { remote })}
+                  />
+                  <JSONField
+                    array
+                    label="args"
+                    value={metric.args}
+                    disabled={isUpdatingConfig}
+                    onChange={(args) => updateMetric(metricName, { args })}
+                  />
+                  <JSONField
+                    label="kwargs"
+                    value={metric.kwargs}
+                    disabled={isUpdatingConfig}
+                    onChange={(kwargs) => updateMetric(metricName, { kwargs })}
+                  />
+                  <JSONField
+                    label="additional_kwargs"
+                    value={metric.additional_kwargs}
+                    disabled={isUpdatingConfig}
+                    onChange={(additional_kwargs) =>
+                      updateMetric(metricName, { additional_kwargs })
+                    }
+                  />
+                </Columns>
+              </FormGroup>
+              <Divider sx={{ paddingY: 1 }} />
+            </React.Fragment>
+          )
+        )}
+      </Paper>
+      {/* <Divider sx={{ paddingY: 1 }}>
+        <IconButton
+          sx={{ color: (theme) => theme.palette.grey[400] }}
+          aria-label="add-postprolkcessor"
+          disabled={isUpdatingConfig}
+        >
+          <AddCircle />
+        </IconButton>
+      </Divider> */}
+
+      {/* <FormGroup sx={{ gap: 2 }}>
+        <Columns columns={5}>
+          <AutocompleteStringField
+            label="Metric"
+            value=""
+            options={CUSTOM_METRICS.filter(
+              (metric) => !resultingConfig.metrics[metric]
+            )}
+            disabled={isUpdatingConfig}
+            onChange={(metricName) => handleCustomMetricUpdate(metricName)}
           />
-        ))}
-      </FormGroup>
+        </Columns>
+      </FormGroup> */}
     </>
   );
 
