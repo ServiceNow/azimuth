@@ -132,6 +132,15 @@ const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) => [
   ...array.slice(index + 1),
 ];
 
+const renameProp = (
+  oldProp: string,
+  newProp: string,
+  { [oldProp]: old, ...others }
+) => ({
+  [newProp]: old,
+  ...others,
+});
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -150,14 +159,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     Partial<AzimuthConfig>
   >({});
 
-  const [showMetricTemplate, setShowMetricTemplate] =
-    React.useState<boolean>(false);
+  const [errorText, setErrorText] = React.useState<string>();
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
 
   const handleDiscard = () => {
     setPartialConfig({});
     setLanguage(undefined);
+    setErrorText(undefined);
   };
 
   const handleClose = () => {
@@ -166,7 +175,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   };
 
   const resultingConfig = Object.assign({}, config, partialConfig);
-  console.log("resultingConfig", resultingConfig);
+
   const {
     data: defaultConfig,
     isLoading,
@@ -424,26 +433,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const handleCustomMetricUpdate = (metricName: string) => {
-    updatePartialConfig({
-      metrics: {
-        ...resultingConfig.metrics,
-        [metricName]: {
-          class_name: "datasets.load_metric",
-          args: [],
-          kwargs: {
-            path: metricName.toLowerCase(),
-          },
-          remote: null,
-          additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
-            metricName
-          )
-            ? { average: "weighted" }
-            : {},
-        },
-      },
-    });
-  };
+  const validateMetrics = (metricName: string) =>
+    (Boolean(metricName) &&
+      setErrorText("custom metric name cannot be null")) ||
+    (Boolean(resultingConfig.metrics[metricName]) &&
+      setErrorText(`Custom metric - ${metricName} already exists`));
 
   const getProjectConfigSection = () => (
     <>
@@ -702,8 +696,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           </FormGroup>
         </>
       )}
-      <Box display="flex" alignItems="center" padding={0}>
-        {displaySectionTitle("Metrics")}
+    </>
+  );
+
+  const getMetricSection = () => (
+    <>
+      <Box display="flex" justifyContent="center">
         <Tooltip title="Add metric">
           <IconButton
             size="small"
@@ -742,13 +740,22 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         label="name"
                         value={metricName}
                         options={CUSTOM_METRICS.filter(
-                          (metric) => !resultingConfig.metrics[metric]
+                          (name) => !resultingConfig.metrics[name]
                         )}
                         disabled={isUpdatingConfig}
-                        onChange={(value: string) =>
-                          resultingConfig.metrics[value] ??
-                          (value && handleCustomMetricUpdate(value))
-                        }
+                        errorMessage={errorText}
+                        onChange={(newName: string) => {
+                          validateMetrics(newName);
+                          resultingConfig.metrics[newName] ??
+                            (newName &&
+                              updatePartialConfig({
+                                metrics: renameProp(
+                                  "",
+                                  newName,
+                                  resultingConfig.metrics
+                                ),
+                              }));
+                        }}
                       />
                     </Box>
                   )}
@@ -805,29 +812,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           )
         )}
       </Paper>
-      {/* <Divider sx={{ paddingY: 1 }}>
-        <IconButton
-          sx={{ color: (theme) => theme.palette.grey[400] }}
-          aria-label="add-postprolkcessor"
-          disabled={isUpdatingConfig}
-        >
-          <AddCircle />
-        </IconButton>
-      </Divider> */}
-
-      {/* <FormGroup sx={{ gap: 2 }}>
-        <Columns columns={5}>
-          <AutocompleteStringField
-            label="Metric"
-            value=""
-            options={CUSTOM_METRICS.filter(
-              (metric) => !resultingConfig.metrics[metric]
-            )}
-            disabled={isUpdatingConfig}
-            onChange={(metricName) => handleCustomMetricUpdate(metricName)}
-          />
-        </Columns>
-      </FormGroup> */}
     </>
   );
 
@@ -1030,6 +1014,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         link="reference/configuration/model_contract/"
       >
         {getModelContractConfigSection()}
+      </AccordionLayout>
+      <AccordionLayout
+        name="Metrics"
+        description="Add, update and delete ML custom metrics"
+        link="reference/configuration/model_contract/#metrics"
+      >
+        {getMetricSection()}
       </AccordionLayout>
       <AccordionLayout
         name="Common Fields Configuration"

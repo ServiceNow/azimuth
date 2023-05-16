@@ -7,8 +7,9 @@ const AutocompleteStringField: React.FC<
     label: string;
     options: string[];
     disabled: boolean;
+    errorMessage?: string;
   }
-> = ({ value, onChange, label, options, disabled }) => (
+> = ({ value, onChange, label, options, disabled, errorMessage }) => (
   <Autocomplete
     autoSelect
     freeSolo
@@ -19,7 +20,14 @@ const AutocompleteStringField: React.FC<
     disabled={disabled}
     onChange={onChange && ((_, newValue) => onChange(newValue as string))}
     renderInput={(params) => (
-      <TextField {...params} {...FIELD_COMMON_PROPS} label={label} />
+      <TextField
+        autoFocus
+        {...params}
+        {...FIELD_COMMON_PROPS}
+        label={label}
+        error={errorMessage !== null}
+        helperText={errorMessage}
+      />
     )}
   />
 );
