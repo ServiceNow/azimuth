@@ -1,6 +1,13 @@
-import { Autocomplete, TextField, TextFieldProps } from "@mui/material";
+import {
+  Autocomplete,
+  TextField,
+  TextFieldProps,
+  createFilterOptions,
+} from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
+
+const filterOptions = createFilterOptions<string>();
 
 const AutocompleteStringField: React.FC<
   Omit<TextFieldProps, "onChange"> & FieldProps<string> & { options: string[] }
@@ -10,6 +17,15 @@ const AutocompleteStringField: React.FC<
     disableClearable
     isOptionEqualToValue={() => false}
     options={options}
+    filterOptions={(options, params) => {
+      const filtered = filterOptions(options, params);
+
+      if (params.inputValue !== "" && !options.includes(params.inputValue)) {
+        filtered.push(params.inputValue);
+      }
+
+      return filtered;
+    }}
     value={value}
     disabled={disabled}
     onChange={onChange && ((_, newValue) => onChange(newValue as string))}
