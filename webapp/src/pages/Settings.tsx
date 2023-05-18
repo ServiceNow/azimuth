@@ -483,7 +483,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           onChange={(...[, checked]) =>
             updatePipeline(pipelineIndex, {
               postprocessors: checked
-                ? config.pipelines![pipelineIndex].postprocessors ??
+                ? config.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
                   defaultConfig.pipelines![0].postprocessors
                 : null,
             })
