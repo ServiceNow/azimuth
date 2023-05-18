@@ -784,6 +784,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                                 label="class_name"
                                 options={POSTPROCESSORS_CLASS_NAMES}
                                 value={postprocessor.class_name}
+                                autoFocus
                                 disabled={
                                   resultingConfig.pipelines![pipelineIndex]
                                     .postprocessors === null || isUpdatingConfig

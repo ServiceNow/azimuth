@@ -1,10 +1,10 @@
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField, TextFieldProps } from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
 
 const AutocompleteStringField: React.FC<
-  FieldProps<string> & { label: string; options: string[]; disabled: boolean }
-> = ({ value, onChange, label, options, disabled }) => (
+  Omit<TextFieldProps, "onChange"> & FieldProps<string> & { options: string[] }
+> = ({ value, onChange, options, disabled, ...props }) => (
   <Autocomplete
     freeSolo
     disableClearable
@@ -27,7 +27,7 @@ const AutocompleteStringField: React.FC<
       <TextField
         {...params}
         {...FIELD_COMMON_PROPS}
-        label={label}
+        {...props}
         {...(value === "" && { error: true, helperText: "Set a value" })}
       />
     )}
