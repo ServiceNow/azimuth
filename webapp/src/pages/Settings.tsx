@@ -578,262 +578,210 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           </Box>
         </Columns>
       </FormGroup>
-      <>
-        <>
-          {displaySectionTitle("Pipelines")}
-          <>
-            <EditableArray
-              array={resultingConfig.pipelines ?? []}
-              disabled={isUpdatingConfig}
-              title="pipeline"
-              newItem={defaultConfig.pipelines![0]}
-              onChange={(pipelines) => updatePartialConfig({ pipelines })}
-              renderItem={(pipeline, pipelineIndex) => (
-                <FormGroup>
-                  <FormControl>
-                    {displaySectionTitle("General")}
-                    <FormGroup>
-                      <Columns columns={2}>
-                        <StringField
-                          label="name"
-                          value={pipeline.name}
-                          disabled={isUpdatingConfig}
-                          onChange={(name) =>
-                            updatePipeline(pipelineIndex, { name })
-                          }
-                        />
-                      </Columns>
-                    </FormGroup>
-                    {displaySectionTitle("Model")}
-                    <FormGroup>
-                      <Columns columns={2}>
-                        <StringField
-                          label="class_name"
-                          value={pipeline.model.class_name}
-                          disabled={isUpdatingConfig}
-                          onChange={(class_name) =>
-                            updateModel(pipelineIndex, { class_name })
-                          }
-                        />
-                        <StringField
-                          label="remote"
-                          nullable
-                          value={pipeline.model.remote}
-                          disabled={isUpdatingConfig}
-                          onChange={(remote) =>
-                            updateModel(pipelineIndex, { remote })
-                          }
-                        />
-                        <JSONField
-                          array
-                          label="args"
-                          value={pipeline.model.args}
-                          disabled={isUpdatingConfig}
-                          onChange={(args) =>
-                            updateModel(pipelineIndex, { args })
-                          }
-                        />
-                        <JSONField
-                          label="kwargs"
-                          value={pipeline.model.kwargs}
-                          disabled={isUpdatingConfig}
-                          onChange={(kwargs) =>
-                            updateModel(pipelineIndex, { kwargs })
-                          }
-                        />
-                      </Columns>
-                    </FormGroup>
-                    {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
-                    <>
-                      <EditableArray
-                        array={
-                          pipeline.postprocessors ??
-                          defaultConfig.pipelines![0].postprocessors!
-                        }
+      {displaySectionTitle("Pipelines")}
+      <EditableArray
+        array={resultingConfig.pipelines ?? []}
+        disabled={isUpdatingConfig}
+        title="pipeline"
+        newItem={defaultConfig.pipelines![0]}
+        onChange={(pipelines) => updatePartialConfig({ pipelines })}
+        renderItem={(pipeline, pipelineIndex) => (
+          <FormGroup>
+            <FormControl>
+              {displaySectionTitle("General")}
+              <FormGroup>
+                <Columns columns={2}>
+                  <StringField
+                    label="name"
+                    value={pipeline.name}
+                    disabled={isUpdatingConfig}
+                    onChange={(name) => updatePipeline(pipelineIndex, { name })}
+                  />
+                </Columns>
+              </FormGroup>
+              {displaySectionTitle("Model")}
+              <FormGroup>
+                <Columns columns={2}>
+                  <StringField
+                    label="class_name"
+                    value={pipeline.model.class_name}
+                    disabled={isUpdatingConfig}
+                    onChange={(class_name) =>
+                      updateModel(pipelineIndex, { class_name })
+                    }
+                  />
+                  <StringField
+                    label="remote"
+                    nullable
+                    value={pipeline.model.remote}
+                    disabled={isUpdatingConfig}
+                    onChange={(remote) =>
+                      updateModel(pipelineIndex, { remote })
+                    }
+                  />
+                  <JSONField
+                    array
+                    label="args"
+                    value={pipeline.model.args}
+                    disabled={isUpdatingConfig}
+                    onChange={(args) => updateModel(pipelineIndex, { args })}
+                  />
+                  <JSONField
+                    label="kwargs"
+                    value={pipeline.model.kwargs}
+                    disabled={isUpdatingConfig}
+                    onChange={(kwargs) =>
+                      updateModel(pipelineIndex, { kwargs })
+                    }
+                  />
+                </Columns>
+              </FormGroup>
+              {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
+              <EditableArray
+                array={
+                  pipeline.postprocessors ??
+                  defaultConfig.pipelines![0].postprocessors!
+                }
+                disabled={isUpdatingConfig || pipeline.postprocessors === null}
+                title="post-processor"
+                newItem={{ class_name: "", args: [], kwargs: {}, remote: null }}
+                onChange={(postprocessors) =>
+                  updatePipeline(pipelineIndex, { postprocessors })
+                }
+                renderItem={(postprocessor, index) => (
+                  <FormGroup sx={{ marginTop: 2 }}>
+                    <Columns columns={2}>
+                      <AutocompleteStringField
+                        label="class_name"
+                        options={POSTPROCESSORS_CLASS_NAMES}
+                        value={postprocessor.class_name}
+                        autoFocus
                         disabled={
-                          isUpdatingConfig || pipeline.postprocessors === null
+                          resultingConfig.pipelines![pipelineIndex]
+                            .postprocessors === null || isUpdatingConfig
                         }
-                        title="post-processor"
-                        newItem={{
-                          class_name: "",
-                          args: [],
-                          kwargs: {},
-                          remote: null,
+                        onChange={(class_name) => {
+                          const previousClassName = parseClassName(
+                            postprocessor.class_name
+                          );
+                          const updatedClassName = parseClassName(class_name);
+                          const defaultPostProcessorValue =
+                            (updatedClassName === "temperature" && 1) ||
+                            (updatedClassName === "threshold" && 0.5);
+                          updatePostprocessor(pipelineIndex, index, {
+                            class_name,
+                            ...(!isCustomPostprocessorClassName(class_name) &&
+                              updatedClassName && {
+                                [updatedClassName]: defaultPostProcessorValue,
+                                kwargs: {
+                                  [updatedClassName]: defaultPostProcessorValue,
+                                },
+                              }),
+                            ...(isCustomPostprocessorClassName(class_name) &&
+                              previousClassName && {
+                                kwargs: {
+                                  [previousClassName]: undefined,
+                                },
+                                [previousClassName]: undefined,
+                              }),
+                            ...(!isCustomPostprocessorClassName(
+                              postprocessor.class_name
+                            ) &&
+                              previousClassName && {
+                                [previousClassName]: undefined,
+                              }),
+                          });
                         }}
-                        onChange={(postprocessors) =>
-                          updatePipeline(pipelineIndex, { postprocessors })
-                        }
-                        renderItem={(postprocessor, index) => (
-                          <FormGroup sx={{ marginTop: 2 }}>
-                            <Columns columns={2}>
-                              <AutocompleteStringField
-                                label="class_name"
-                                options={POSTPROCESSORS_CLASS_NAMES}
-                                value={postprocessor.class_name}
-                                autoFocus
-                                disabled={
-                                  resultingConfig.pipelines![pipelineIndex]
-                                    .postprocessors === null || isUpdatingConfig
-                                }
-                                onChange={(class_name) => {
-                                  const previousClassName = parseClassName(
-                                    postprocessor.class_name
-                                  );
-                                  const updatedClassName =
-                                    parseClassName(class_name);
-                                  const defaultPostProcessorValue =
-                                    (updatedClassName === "temperature" && 1) ||
-                                    (updatedClassName === "threshold" && 0.5);
-                                  updatePostprocessor(pipelineIndex, index, {
-                                    class_name,
-                                    ...(!isCustomPostprocessorClassName(
-                                      class_name
-                                    ) &&
-                                      updatedClassName && {
-                                        [updatedClassName]:
-                                          defaultPostProcessorValue,
-                                        kwargs: {
-                                          [updatedClassName]:
-                                            defaultPostProcessorValue,
-                                        },
-                                      }),
-                                    ...(isCustomPostprocessorClassName(
-                                      class_name
-                                    ) &&
-                                      previousClassName && {
-                                        kwargs: {
-                                          [previousClassName]: undefined,
-                                        },
-                                        [previousClassName]: undefined,
-                                      }),
-                                    ...(!isCustomPostprocessorClassName(
-                                      postprocessor.class_name
-                                    ) &&
-                                      previousClassName && {
-                                        [previousClassName]: undefined,
-                                      }),
-                                  });
-                                }}
-                              />
-                              {isCustomPostprocessorClassName(
-                                postprocessor.class_name
-                              ) ? (
-                                <>
-                                  <StringField
-                                    label="remote"
-                                    nullable
-                                    value={postprocessor.remote}
-                                    disabled={isUpdatingConfig}
-                                    onChange={(remote) =>
-                                      updatePostprocessor(
-                                        pipelineIndex,
-                                        index,
-                                        {
-                                          remote,
-                                        }
-                                      )
-                                    }
-                                  />
-                                  <JSONField
-                                    array
-                                    label="args"
-                                    value={postprocessor.args}
-                                    disabled={isUpdatingConfig}
-                                    onChange={(args) =>
-                                      updatePostprocessor(
-                                        pipelineIndex,
-                                        index,
-                                        {
-                                          args,
-                                        }
-                                      )
-                                    }
-                                  />
-                                  <JSONField
-                                    label="kwargs"
-                                    value={postprocessor.kwargs}
-                                    disabled={isUpdatingConfig}
-                                    onChange={(kwargs) =>
-                                      updatePostprocessor(
-                                        pipelineIndex,
-                                        index,
-                                        {
-                                          kwargs,
-                                        }
-                                      )
-                                    }
-                                  />
-                                </>
-                              ) : (
-                                (postprocessor.class_name?.includes(
-                                  "Temperature"
-                                ) && (
-                                  <NumberField
-                                    label="temperature"
-                                    value={
-                                      "temperature" in postprocessor
-                                        ? postprocessor.temperature
-                                        : 1
-                                    }
-                                    disabled={
-                                      resultingConfig.pipelines![pipelineIndex]
-                                        .postprocessors === null ||
-                                      isUpdatingConfig
-                                    }
-                                    onChange={(temperature) =>
-                                      updatePostprocessor(
-                                        pipelineIndex,
-                                        index,
-                                        {
-                                          temperature,
-                                          kwargs: { temperature },
-                                        }
-                                      )
-                                    }
-                                    {...FLOAT}
-                                  />
-                                )) ||
-                                (postprocessor.class_name?.includes(
-                                  "Threshold"
-                                ) && (
-                                  <NumberField
-                                    label="threshold"
-                                    value={
-                                      "threshold" in postprocessor
-                                        ? postprocessor.threshold
-                                        : 0.5
-                                    }
-                                    disabled={
-                                      resultingConfig.pipelines![pipelineIndex]
-                                        .postprocessors === null ||
-                                      isUpdatingConfig
-                                    }
-                                    onChange={(threshold) =>
-                                      updatePostprocessor(
-                                        pipelineIndex,
-                                        index,
-                                        {
-                                          threshold,
-                                          kwargs: { threshold },
-                                        }
-                                      )
-                                    }
-                                    {...PERCENTAGE}
-                                  />
-                                ))
-                              )}
-                            </Columns>
-                          </FormGroup>
-                        )}
                       />
-                    </>
-                  </FormControl>
-                </FormGroup>
-              )}
-            />
-          </>
-        </>
-      </>
+                      {isCustomPostprocessorClassName(
+                        postprocessor.class_name
+                      ) ? (
+                        <>
+                          <StringField
+                            label="remote"
+                            nullable
+                            value={postprocessor.remote}
+                            disabled={isUpdatingConfig}
+                            onChange={(remote) =>
+                              updatePostprocessor(pipelineIndex, index, {
+                                remote,
+                              })
+                            }
+                          />
+                          <JSONField
+                            array
+                            label="args"
+                            value={postprocessor.args}
+                            disabled={isUpdatingConfig}
+                            onChange={(args) =>
+                              updatePostprocessor(pipelineIndex, index, {
+                                args,
+                              })
+                            }
+                          />
+                          <JSONField
+                            label="kwargs"
+                            value={postprocessor.kwargs}
+                            disabled={isUpdatingConfig}
+                            onChange={(kwargs) =>
+                              updatePostprocessor(pipelineIndex, index, {
+                                kwargs,
+                              })
+                            }
+                          />
+                        </>
+                      ) : (
+                        (postprocessor.class_name?.includes("Temperature") && (
+                          <NumberField
+                            label="temperature"
+                            value={
+                              "temperature" in postprocessor
+                                ? postprocessor.temperature
+                                : 1
+                            }
+                            disabled={
+                              resultingConfig.pipelines![pipelineIndex]
+                                .postprocessors === null || isUpdatingConfig
+                            }
+                            onChange={(temperature) =>
+                              updatePostprocessor(pipelineIndex, index, {
+                                temperature,
+                                kwargs: { temperature },
+                              })
+                            }
+                            {...FLOAT}
+                          />
+                        )) ||
+                        (postprocessor.class_name?.includes("Threshold") && (
+                          <NumberField
+                            label="threshold"
+                            value={
+                              "threshold" in postprocessor
+                                ? postprocessor.threshold
+                                : 0.5
+                            }
+                            disabled={
+                              resultingConfig.pipelines![pipelineIndex]
+                                .postprocessors === null || isUpdatingConfig
+                            }
+                            onChange={(threshold) =>
+                              updatePostprocessor(pipelineIndex, index, {
+                                threshold,
+                                kwargs: { threshold },
+                              })
+                            }
+                            {...PERCENTAGE}
+                          />
+                        ))
+                      )}
+                    </Columns>
+                  </FormGroup>
+                )}
+              />
+            </FormControl>
+          </FormGroup>
+        )}
+      />
       {displaySectionTitle("Metrics")}
       <FormGroup>
         {CUSTOM_METRICS.map((metricName, index) => (
