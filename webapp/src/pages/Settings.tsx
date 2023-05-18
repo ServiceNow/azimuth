@@ -1,4 +1,4 @@
-import { AddCircle, Close, DeleteForever, Warning } from "@mui/icons-material";
+import { Close, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -8,8 +8,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
-  dividerClasses,
   FormControl,
   FormControlLabel,
   formControlLabelClasses,
@@ -20,18 +18,18 @@ import {
   InputBaseComponentProps,
   inputClasses,
   inputLabelClasses,
-  Paper,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
 import Loading from "components/Loading";
 import AutocompleteStringField from "components/Settings/AutocompleteStringField";
+import EditableArray from "components/Settings/EditableArray";
 import JSONField from "components/Settings/JSONField";
 import NumberField from "components/Settings/NumberField";
 import StringArrayField from "components/Settings/StringArrayField";
 import StringField from "components/Settings/StringField";
+import { splicedArray } from "components/Settings/utils";
 import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
@@ -138,11 +136,8 @@ const KeyValuePairs: React.FC = ({ children }) => (
   </Box>
 );
 
-const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) => [
-  ...array.slice(0, index),
-  { ...array[index], ...update },
-  ...array.slice(index + 1),
-];
+const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) =>
+  splicedArray(array, index, 1, { ...array[index], ...update });
 
 type Props = {
   open: boolean;
@@ -388,66 +383,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       ),
     });
 
-  const displayPipelineAddSection = (pipelineIndex: number) => (
-    <Divider
-      sx={{
-        "&::before": { width: (theme) => theme.spacing(2) },
-        [`& .${dividerClasses.wrapper}`]: { padding: 0 },
-      }}
-    >
-      <Tooltip title="Add pipeline">
-        <IconButton
-          sx={{ color: (theme) => theme.palette.grey[400] }}
-          aria-label="add-pipeline"
-          disabled={isUpdatingConfig}
-          onClick={() =>
-            updatePartialConfig({
-              pipelines: [
-                ...resultingConfig.pipelines!.slice(0, pipelineIndex + 1),
-                defaultConfig.pipelines![0],
-                ...resultingConfig.pipelines!.slice(pipelineIndex + 1),
-              ],
-            })
-          }
-        >
-          <AddCircle />
-        </IconButton>
-      </Tooltip>
-    </Divider>
-  );
-
-  const displayPostprocessorAddSection = (
-    pipelineIndex: number,
-    postprocessorIndex: number,
-    postprocessor: PipelineDefinition["postprocessors"]
-  ) => (
-    <Divider
-      sx={{
-        "&::before": { width: (theme) => theme.spacing(2) },
-        [`& .${dividerClasses.wrapper}`]: { padding: 0 },
-      }}
-    >
-      <Tooltip title="Add postprocessor">
-        <IconButton
-          sx={{ color: (theme) => theme.palette.grey[400] }}
-          aria-label="add-postprocessor"
-          disabled={isUpdatingConfig}
-          onClick={() =>
-            updatePipeline(pipelineIndex, {
-              postprocessors: [
-                ...postprocessor!.slice(0, postprocessorIndex + 1),
-                { class_name: "", args: [], kwargs: {}, remote: null },
-                ...postprocessor!.slice(postprocessorIndex + 1),
-              ],
-            })
-          }
-        >
-          <AddCircle />
-        </IconButton>
-      </Tooltip>
-    </Divider>
-  );
-
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
     section: string = field
@@ -643,42 +578,20 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           </Box>
         </Columns>
       </FormGroup>
-      {resultingConfig.pipelines?.length && (
+      <>
         <>
           {displaySectionTitle("Pipelines")}
-          <Paper variant="outlined" sx={{ marginBottom: 2 }}>
-            {displayPipelineAddSection(-1)}
-            {resultingConfig.pipelines.map((pipeline, pipelineIndex) => (
-              <React.Fragment key={pipelineIndex}>
+          <>
+            <EditableArray
+              array={resultingConfig.pipelines ?? []}
+              disabled={isUpdatingConfig}
+              title="pipeline"
+              newItem={defaultConfig.pipelines![0]}
+              onChange={(pipelines) => updatePartialConfig({ pipelines })}
+              renderItem={(pipeline, pipelineIndex) => (
                 <FormGroup>
                   <FormControl>
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      {displaySectionTitle("General")}
-                      <IconButton
-                        sx={{ color: (theme) => theme.palette.grey[400] }}
-                        aria-label="delete"
-                        disabled={isUpdatingConfig}
-                        onClick={() =>
-                          updatePartialConfig({
-                            pipelines: [
-                              ...resultingConfig.pipelines!.slice(
-                                0,
-                                pipelineIndex
-                              ),
-                              ...resultingConfig.pipelines!.slice(
-                                pipelineIndex + 1
-                              ),
-                            ],
-                          })
-                        }
-                      >
-                        <DeleteForever fontSize="large" />
-                      </IconButton>
-                    </Box>
+                    {displaySectionTitle("General")}
                     <FormGroup>
                       <Columns columns={2}>
                         <StringField
@@ -691,8 +604,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         />
                       </Columns>
                     </FormGroup>
-                  </FormControl>
-                  <FormControl>
                     {displaySectionTitle("Model")}
                     <FormGroup>
                       <Columns columns={2}>
@@ -733,51 +644,26 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       </Columns>
                     </FormGroup>
                     {displayPostprocessorToggleSection(pipelineIndex, pipeline)}
-                    <Paper variant="outlined">
-                      {pipeline.postprocessors &&
-                        displayPostprocessorAddSection(
-                          pipelineIndex,
-                          -1,
-                          pipeline.postprocessors
-                        )}
-                      {(
-                        pipeline.postprocessors ??
-                        defaultConfig.pipelines![0].postprocessors
-                      )?.map((postprocessor, index) => (
-                        <React.Fragment key={index}>
-                          <Box
-                            display="flex"
-                            justifyContent="flex-end"
-                            alignItems="center"
-                            margin={2}
-                            maxHeight={0}
-                          >
-                            <IconButton
-                              sx={{
-                                color: (theme) => theme.palette.grey[400],
-                              }}
-                              size="small"
-                              aria-label="delete"
-                              disabled={
-                                isUpdatingConfig ||
-                                pipeline.postprocessors == null
-                              }
-                              onClick={() =>
-                                updatePipeline(pipelineIndex, {
-                                  postprocessors: [
-                                    ...resultingConfig.pipelines![
-                                      pipelineIndex
-                                    ].postprocessors!.slice(0, index),
-                                    ...resultingConfig.pipelines![
-                                      pipelineIndex
-                                    ].postprocessors!.slice(index + 1),
-                                  ],
-                                })
-                              }
-                            >
-                              <DeleteForever fontSize="large" />
-                            </IconButton>
-                          </Box>
+                    <>
+                      <EditableArray
+                        array={
+                          pipeline.postprocessors ??
+                          defaultConfig.pipelines![0].postprocessors!
+                        }
+                        disabled={
+                          isUpdatingConfig || pipeline.postprocessors === null
+                        }
+                        title="post-processor"
+                        newItem={{
+                          class_name: "",
+                          args: [],
+                          kwargs: {},
+                          remote: null,
+                        }}
+                        onChange={(postprocessors) =>
+                          updatePipeline(pipelineIndex, { postprocessors })
+                        }
+                        renderItem={(postprocessor, index) => (
                           <FormGroup sx={{ marginTop: 2 }}>
                             <Columns columns={2}>
                               <AutocompleteStringField
@@ -938,23 +824,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                               )}
                             </Columns>
                           </FormGroup>
-                          {pipeline.postprocessors &&
-                            displayPostprocessorAddSection(
-                              pipelineIndex,
-                              index,
-                              pipeline.postprocessors
-                            )}
-                        </React.Fragment>
-                      ))}
-                    </Paper>
+                        )}
+                      />
+                    </>
                   </FormControl>
                 </FormGroup>
-                {displayPipelineAddSection(pipelineIndex)}
-              </React.Fragment>
-            ))}
-          </Paper>
+              )}
+            />
+          </>
         </>
-      )}
+      </>
       {displaySectionTitle("Metrics")}
       <FormGroup>
         {CUSTOM_METRICS.map((metricName, index) => (
