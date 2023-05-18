@@ -749,7 +749,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                             display="flex"
                             justifyContent="flex-end"
                             alignItems="center"
-                            padding={1}
+                            margin={2}
                             maxHeight={0}
                           >
                             <IconButton
