@@ -24,7 +24,12 @@ const AutocompleteStringField: React.FC<
       })
     }
     renderInput={(params) => (
-      <TextField {...params} {...FIELD_COMMON_PROPS} label={label} />
+      <TextField
+        {...params}
+        {...FIELD_COMMON_PROPS}
+        label={label}
+        {...(value === "" && { error: true, helperText: "Set a value" })}
+      />
     )}
   />
 );
