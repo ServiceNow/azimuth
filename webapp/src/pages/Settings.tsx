@@ -372,6 +372,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       ),
     });
 
+  const getDefaultPostprocessors = (pipelineIndex: number) =>
+    config.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
+    defaultConfig.pipelines![0].postprocessors!;
+
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
     section: string = field
@@ -407,8 +411,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           onChange={(...[, checked]) =>
             updatePipeline(pipelineIndex, {
               postprocessors: checked
-                ? config.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
-                  defaultConfig.pipelines![0].postprocessors
+                ? getDefaultPostprocessors(pipelineIndex)
                 : null,
             })
           }
@@ -629,7 +632,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               <EditableArray
                 array={
                   pipeline.postprocessors ??
-                  defaultConfig.pipelines![0].postprocessors!
+                  getDefaultPostprocessors(pipelineIndex)
                 }
                 disabled={isUpdatingConfig || pipeline.postprocessors === null}
                 title="post-processor"
