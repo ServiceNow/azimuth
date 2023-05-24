@@ -96,16 +96,6 @@ const SUPPORTED_SPACY_MODELS: SupportedSpacyModels[] = [
   "fr_core_news_md",
 ];
 const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
-
-type Postprocessor = TemperatureScaling | ThresholdConfig;
-
-type PostprocessorClassName = Postprocessor["class_name"];
-
-const POSTPROCESSORS_CLASS_NAMES: PostprocessorClassName[] = [
-  "azimuth.utils.ml.postprocessing.TemperatureScaling",
-  "azimuth.utils.ml.postprocessing.Thresholding",
-];
-
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
@@ -117,6 +107,15 @@ const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
   "uncertainty",
   "metrics",
 ];
+
+type KnownPostprocessor = TemperatureScaling | ThresholdConfig;
+
+const KNOWN_POSTPROCESSORS: {
+  [T in KnownPostprocessor as T["class_name"]]: Partial<T>;
+} = {
+  "azimuth.utils.ml.postprocessing.TemperatureScaling": { temperature: 1 },
+  "azimuth.utils.ml.postprocessing.Thresholding": { threshold: 0.5 },
+};
 
 const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
   <Box display="grid" gap={4} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
@@ -158,9 +157,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   >({});
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
-
-  const isCustomPostprocessorClassName = (class_name: string) =>
-    !POSTPROCESSORS_CLASS_NAMES.includes(class_name as PostprocessorClassName);
 
   const handleDiscard = () => {
     setPartialConfig({});
@@ -337,13 +333,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       </Box>
     );
   }
-
-  const parseClassName = (class_name: string) =>
-    class_name && class_name.toLowerCase().includes("temperature")
-      ? "temperature"
-      : class_name.toLowerCase().includes("threshold")
-      ? "threshold"
-      : undefined;
 
   const updateSubConfig = <Key extends SubConfigKeys>(
     key: Key,
@@ -653,49 +642,35 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     <Columns columns={2}>
                       <AutocompleteStringField
                         label="class_name"
-                        options={POSTPROCESSORS_CLASS_NAMES}
+                        options={Object.keys(KNOWN_POSTPROCESSORS)}
                         value={postprocessor.class_name}
                         autoFocus
                         disabled={
-                          resultingConfig.pipelines![pipelineIndex]
-                            .postprocessors === null || isUpdatingConfig
+                          isUpdatingConfig || pipeline.postprocessors === null
                         }
-                        onChange={(class_name) => {
-                          const previousClassName = parseClassName(
-                            postprocessor.class_name
-                          );
-                          const updatedClassName = parseClassName(class_name);
-                          const defaultPostProcessorValue =
-                            (updatedClassName === "temperature" && 1) ||
-                            (updatedClassName === "threshold" && 0.5);
-                          updatePostprocessor(pipelineIndex, index, {
-                            class_name,
-                            ...(!isCustomPostprocessorClassName(class_name) &&
-                              updatedClassName && {
-                                [updatedClassName]: defaultPostProcessorValue,
-                                kwargs: {
-                                  [updatedClassName]: defaultPostProcessorValue,
-                                },
-                              }),
-                            ...(isCustomPostprocessorClassName(class_name) &&
-                              previousClassName && {
-                                kwargs: {
-                                  [previousClassName]: undefined,
-                                },
-                                [previousClassName]: undefined,
-                              }),
-                            ...(!isCustomPostprocessorClassName(
-                              postprocessor.class_name
-                            ) &&
-                              previousClassName && {
-                                [previousClassName]: undefined,
-                              }),
-                          });
-                        }}
+                        onChange={(class_name) =>
+                          updatePipeline(pipelineIndex, {
+                            postprocessors: splicedArray(
+                              pipeline.postprocessors!,
+                              index,
+                              1,
+                              {
+                                args: [],
+                                kwargs: {},
+                                remote: null,
+                                ...(KNOWN_POSTPROCESSORS[
+                                  class_name as keyof typeof KNOWN_POSTPROCESSORS
+                                ] ||
+                                  postprocessor.class_name in
+                                    KNOWN_POSTPROCESSORS || // true spreads nothing
+                                  postprocessor),
+                                class_name,
+                              }
+                            ),
+                          })
+                        }
                       />
-                      {isCustomPostprocessorClassName(
-                        postprocessor.class_name
-                      ) ? (
+                      {!(postprocessor.class_name in KNOWN_POSTPROCESSORS) && (
                         <>
                           <StringField
                             label="remote"
@@ -730,49 +705,38 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                             }
                           />
                         </>
-                      ) : (
-                        (postprocessor.class_name?.includes("Temperature") && (
-                          <NumberField
-                            label="temperature"
-                            value={
-                              "temperature" in postprocessor
-                                ? postprocessor.temperature
-                                : 1
-                            }
-                            disabled={
-                              resultingConfig.pipelines![pipelineIndex]
-                                .postprocessors === null || isUpdatingConfig
-                            }
-                            onChange={(temperature) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                temperature,
-                                kwargs: { temperature },
-                              })
-                            }
-                            {...FLOAT}
-                          />
-                        )) ||
-                        (postprocessor.class_name?.includes("Threshold") && (
-                          <NumberField
-                            label="threshold"
-                            value={
-                              "threshold" in postprocessor
-                                ? postprocessor.threshold
-                                : 0.5
-                            }
-                            disabled={
-                              resultingConfig.pipelines![pipelineIndex]
-                                .postprocessors === null || isUpdatingConfig
-                            }
-                            onChange={(threshold) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                threshold,
-                                kwargs: { threshold },
-                              })
-                            }
-                            {...PERCENTAGE}
-                          />
-                        ))
+                      )}
+                      {"temperature" in postprocessor && (
+                        <NumberField
+                          label="temperature"
+                          value={postprocessor.temperature}
+                          disabled={
+                            isUpdatingConfig || pipeline.postprocessors === null
+                          }
+                          onChange={(temperature) =>
+                            updatePostprocessor(pipelineIndex, index, {
+                              temperature,
+                              kwargs: { temperature },
+                            })
+                          }
+                          {...FLOAT}
+                        />
+                      )}
+                      {"threshold" in postprocessor && (
+                        <NumberField
+                          label="threshold"
+                          value={postprocessor.threshold}
+                          disabled={
+                            isUpdatingConfig || pipeline.postprocessors === null
+                          }
+                          onChange={(threshold) =>
+                            updatePostprocessor(pipelineIndex, index, {
+                              threshold,
+                              kwargs: { threshold },
+                            })
+                          }
+                          {...PERCENTAGE}
+                        />
                       )}
                     </Columns>
                   </FormGroup>
