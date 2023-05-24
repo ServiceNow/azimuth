@@ -61,10 +61,10 @@ const EditableArray = <T,>({
   title: string;
   newItem: T;
   onChange: (array: T[]) => void;
-  renderItem: (item: T, index: number) => React.ReactNode;
+  renderItem: (item: T, index: number, array: T[]) => React.ReactNode;
 }) => (
   <Paper variant="outlined" sx={{ marginBottom: 2 }}>
-    {array.map((item, index) => (
+    {array.map((item, index, array) => (
       <React.Fragment key={index}>
         <EditableArrayDivider
           disabled={disabled}
@@ -72,7 +72,7 @@ const EditableArray = <T,>({
           onAdd={() => onChange(splicedArray(array, index, 0, newItem))}
           onRemove={() => onChange(splicedArray(array, index, 1))}
         />
-        {renderItem(item, index)}
+        {renderItem(item, index, array)}
       </React.Fragment>
     ))}
     <EditableArrayDivider

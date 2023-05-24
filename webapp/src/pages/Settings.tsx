@@ -640,7 +640,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 onChange={(postprocessors) =>
                   updatePipeline(pipelineIndex, { postprocessors })
                 }
-                renderItem={(postprocessor, index) => (
+                renderItem={(postprocessor, index, postprocessors) => (
                   <FormGroup sx={{ marginTop: 2 }}>
                     <Columns columns={2}>
                       <AutocompleteStringField
@@ -654,7 +654,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         onChange={(class_name) =>
                           updatePipeline(pipelineIndex, {
                             postprocessors: splicedArray(
-                              pipeline.postprocessors!,
+                              postprocessors,
                               index,
                               1,
                               {
