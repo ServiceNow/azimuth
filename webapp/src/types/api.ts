@@ -77,6 +77,8 @@ export type SupportedModelContract =
   components["schemas"]["SupportedModelContract"];
 export type SupportedSpacyModels =
   components["schemas"]["SupportedSpacyModels"];
+export type TemperatureScaling = components["schemas"]["TemperatureScaling"];
+export type ThresholdConfig = components["schemas"]["ThresholdConfig"];
 export type TopWordsResponse = components["schemas"]["TopWordsResponse"];
 export type TopWordsResult = components["schemas"]["TopWordsResult"];
 export type Utterance = components["schemas"]["Utterance"];
