@@ -27,6 +27,7 @@ export interface CountPerFilterResponse
 }
 export type CountPerFilterValue = Partial<OutcomeCountPerFilterValue> &
   UtteranceCountPerFilterValue;
+export type CustomObject = components["schemas"]["CustomObject"];
 export type DataAction = components["schemas"]["DataAction"];
 export type DatasetDistributionComparison =
   components["schemas"]["DatasetDistributionComparison"];

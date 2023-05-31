@@ -40,6 +40,7 @@ import {
 } from "services/api";
 import {
   AzimuthConfig,
+  CustomObject,
   PipelineDefinition,
   SupportedLanguage,
   SupportedModelContract,
@@ -137,6 +138,44 @@ const KeyValuePairs: React.FC = ({ children }) => (
 
 const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) =>
   splicedArray(array, index, 1, { ...array[index], ...update });
+
+const CustomObjectFields: React.FC<{
+  excludeClassName?: boolean;
+  disabled: boolean;
+  value: CustomObject;
+  onChange: (update: Partial<CustomObject>) => void;
+}> = ({ excludeClassName, disabled, value, onChange }) => (
+  <>
+    {!excludeClassName && (
+      <StringField
+        label="class_name"
+        value={value.class_name}
+        disabled={disabled}
+        onChange={(class_name) => onChange({ class_name })}
+      />
+    )}
+    <StringField
+      label="remote"
+      nullable
+      value={value.remote}
+      disabled={disabled}
+      onChange={(remote) => onChange({ remote })}
+    />
+    <JSONField
+      array
+      label="args"
+      value={value.args}
+      disabled={disabled}
+      onChange={(args) => onChange({ args })}
+    />
+    <JSONField
+      label="kwargs"
+      value={value.kwargs}
+      disabled={disabled}
+      onChange={(kwargs) => onChange({ kwargs })}
+    />
+  </>
+);
 
 type Props = {
   open: boolean;
@@ -489,33 +528,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           {displaySectionTitle("Dataset")}
           <FormGroup>
             <Columns columns={2}>
-              <StringField
-                label="class_name"
-                value={resultingConfig.dataset!.class_name}
+              <CustomObjectFields
                 disabled={isUpdatingConfig}
-                onChange={(class_name) =>
-                  updateSubConfig("dataset", { class_name })
-                }
-              />
-              <StringField
-                label="remote"
-                nullable
-                value={resultingConfig.dataset!.remote}
-                disabled={isUpdatingConfig}
-                onChange={(remote) => updateSubConfig("dataset", { remote })}
-              />
-              <JSONField
-                array
-                label="args"
-                value={resultingConfig.dataset!.args}
-                disabled={isUpdatingConfig}
-                onChange={(args) => updateSubConfig("dataset", { args })}
-              />
-              <JSONField
-                label="kwargs"
-                value={resultingConfig.dataset!.kwargs}
-                disabled={isUpdatingConfig}
-                onChange={(kwargs) => updateSubConfig("dataset", { kwargs })}
+                value={resultingConfig.dataset}
+                onChange={(update) => updateSubConfig("dataset", update)}
               />
             </Columns>
           </FormGroup>
@@ -674,40 +690,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         }
                       />
                       {!(postprocessor.class_name in KNOWN_POSTPROCESSORS) && (
-                        <>
-                          <StringField
-                            label="remote"
-                            nullable
-                            value={postprocessor.remote}
-                            disabled={isUpdatingConfig}
-                            onChange={(remote) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                remote,
-                              })
-                            }
-                          />
-                          <JSONField
-                            array
-                            label="args"
-                            value={postprocessor.args}
-                            disabled={isUpdatingConfig}
-                            onChange={(args) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                args,
-                              })
-                            }
-                          />
-                          <JSONField
-                            label="kwargs"
-                            value={postprocessor.kwargs}
-                            disabled={isUpdatingConfig}
-                            onChange={(kwargs) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                kwargs,
-                              })
-                            }
-                          />
-                        </>
+                        <CustomObjectFields
+                          excludeClassName
+                          disabled={isUpdatingConfig}
+                          value={postprocessor}
+                          onChange={(update) =>
+                            updatePostprocessor(pipelineIndex, index, update)
+                          }
+                        />
                       )}
                       {"temperature" in postprocessor && (
                         <NumberField
