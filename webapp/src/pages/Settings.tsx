@@ -30,7 +30,6 @@ import NumberField from "components/Settings/NumberField";
 import StringArrayField from "components/Settings/StringArrayField";
 import StringField from "components/Settings/StringField";
 import { splicedArray } from "components/Settings/utils";
-import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -41,6 +40,7 @@ import {
 import {
   AzimuthConfig,
   CustomObject,
+  MetricDefinition,
   PipelineDefinition,
   SupportedLanguage,
   SupportedModelContract,
@@ -84,8 +84,6 @@ type SubConfigKeys = keyof PickByValue<
 >;
 
 const COLUMNS = ["text_input", "label", "persistent_id"] as const;
-const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
-const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
 const SUPPORTED_MODEL_CONTRACTS: SupportedModelContract[] = [
   "hf_text_classification",
@@ -116,6 +114,14 @@ const KNOWN_POSTPROCESSORS: {
 } = {
   "azimuth.utils.ml.postprocessing.TemperatureScaling": { temperature: 1 },
   "azimuth.utils.ml.postprocessing.Thresholding": { threshold: 0.5 },
+};
+
+type Metric = MetricDefinition & { name: string };
+
+const isErrorMetrics = (metrics: Metric[]) => {
+  const names = new Set(metrics.map(({ name }) => name));
+  const classNames = new Set(metrics.map(({ class_name }) => class_name));
+  return names.size < metrics.length || names.has("") || classNames.has("");
 };
 
 const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
@@ -225,6 +231,30 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     (update: Partial<AzimuthConfig>) =>
       setPartialConfig((partialConfig) => ({ ...partialConfig, ...update })),
     [setPartialConfig]
+  );
+
+  // Since `resultingConfig.metrics` is an object with names as keys, it doesn't
+  // support duplicate names. So, we track the state of the metrics in this array.
+  // `setMetrics()` also updates `resultingConfig.metrics` if names are unique.
+  // TODO Update `metrics` when `partialConfig.metrics` changes. That will be
+  // necessary if it becomes possible to update partialConfig.metrics by means
+  // other than `setMetrics()`, for example selecting an old config from history.
+  const [metrics, setMetricsDoNotUseDirectly] = React.useState(() =>
+    Object.entries(resultingConfig.metrics).map(([name, m]) => ({ name, ...m }))
+  );
+
+  const setMetrics = React.useCallback(
+    (newMetrics: Metric[]) => {
+      setMetricsDoNotUseDirectly(newMetrics);
+      if (!isErrorMetrics(newMetrics)) {
+        updatePartialConfig({
+          metrics: Object.fromEntries(
+            newMetrics.map(({ name, ...metric }) => [name, metric])
+          ),
+        });
+      }
+    },
+    [updatePartialConfig]
   );
 
   React.useEffect(() => {
@@ -349,7 +379,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         </Box>
         <Button
           variant="contained"
-          disabled={isEmptyPartialConfig || isUpdatingConfig}
+          disabled={
+            isEmptyPartialConfig || isUpdatingConfig || isErrorMetrics(metrics)
+          }
           onClick={() => {
             updateConfig({ jobId, body: partialConfig })
               .unwrap()
@@ -418,6 +450,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     config.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
     defaultConfig.pipelines![0].postprocessors!;
 
+  const updateMetric = (metricIndex: number, update: Partial<Metric>) =>
+    setMetrics(updateArrayAt(metrics, metricIndex, update));
+
   const displayToggleSectionTitle = (
     field: keyof AzimuthConfig,
     section: string = field
@@ -463,29 +498,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       labelPlacement="start"
     />
   );
-
-  const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
-    updatePartialConfig({
-      metrics: checked
-        ? {
-            ...resultingConfig.metrics,
-            [metricName]: {
-              class_name: "datasets.load_metric",
-              args: [],
-              kwargs: {
-                path: metricName.toLowerCase(),
-              },
-              remote: null,
-              additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
-                metricName
-              )
-                ? { average: "weighted" }
-                : {},
-            },
-          }
-        : _.omit(resultingConfig.metrics, metricName),
-    });
-  };
 
   const getProjectConfigSection = () => (
     <>
@@ -743,24 +755,55 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         )}
       />
       {displaySectionTitle("Metrics")}
-      <FormGroup>
-        {CUSTOM_METRICS.map((metricName, index) => (
-          <FormControlLabel
-            key={index}
-            control={
-              <Checkbox
-                size="small"
-                checked={Boolean(resultingConfig.metrics[metricName])}
+      <EditableArray
+        array={metrics}
+        disabled={isUpdatingConfig}
+        title="metric"
+        newItem={{
+          name: "",
+          class_name: "",
+          args: [],
+          kwargs: {},
+          remote: null,
+          additional_kwargs: {},
+        }}
+        onChange={setMetrics}
+        renderItem={(metric, index) => (
+          <FormGroup sx={{ marginTop: 2 }}>
+            <Columns columns={3}>
+              <AutocompleteStringField
+                label="name"
+                options={Object.keys(defaultConfig.metrics)}
+                value={metric.name}
+                {...(splicedArray(metrics, index, 1).some(
+                  ({ name }) => name === metric.name
+                ) && {
+                  error: true,
+                  helperText: "Set a value that is unique across all metrics",
+                })}
+                autoFocus
                 disabled={isUpdatingConfig}
-                onChange={(...[, checked]) =>
-                  handleCustomMetricUpdate(checked, metricName)
+                onChange={(name) =>
+                  updateMetric(index, { name, ...defaultConfig.metrics[name] })
                 }
               />
-            }
-            label={<Typography variant="body2">{metricName}</Typography>}
-          />
-        ))}
-      </FormGroup>
+              <CustomObjectFields
+                disabled={isUpdatingConfig}
+                value={metric}
+                onChange={(update) => updateMetric(index, update)}
+              />
+              <JSONField
+                label="additional_kwargs"
+                value={metric.additional_kwargs}
+                disabled={isUpdatingConfig}
+                onChange={(additional_kwargs) =>
+                  updateMetric(index, { additional_kwargs })
+                }
+              />
+            </Columns>
+          </FormGroup>
+        )}
+      />
     </>
   );
 

@@ -44,6 +44,7 @@ export type FormatType = components["schemas"]["FormatType"];
 export type GetUtterancesResponse =
   components["schemas"]["GetUtterancesResponse"];
 export type HTTPExceptionModel = components["schemas"]["HTTPExceptionModel"];
+export type MetricDefinition = components["schemas"]["MetricDefinition"];
 export type MetricInfo = components["schemas"]["MetricInfo"];
 export type MetricsPerFilterAPIResponse =
   components["schemas"]["MetricsPerFilterAPIResponse"];
