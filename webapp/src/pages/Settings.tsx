@@ -207,7 +207,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     onClose();
   };
 
-  const resultingConfig = Object.assign({}, config, partialConfig);
+  const resultingConfig = React.useMemo(
+    () => Object.assign({}, config, partialConfig),
+    [config, partialConfig]
+  );
 
   const {
     data: defaultConfig,
