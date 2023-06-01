@@ -44,7 +44,7 @@ const AutocompleteStringField: React.FC<
         {...params}
         {...FIELD_COMMON_PROPS}
         {...props}
-        {...(value === "" && { error: true, helperText: "Set a value" })}
+        {...(value.trim() === "" && { error: true, helperText: "Set a value" })}
       />
     )}
   />

@@ -17,18 +17,16 @@ const PipelineCheck: React.FC<Props> = ({ children }) => {
 
   const { data: config } = getConfigEndpoint.useQuery({ jobId });
 
-  if (!isPipelineSelected(pipeline)) {
-    // No need to check
-    return <>{children}</>;
-  }
-
   if (!config) {
+    // Even if there is no pipeline selected, we wait for the config to load so
+    // that all pages can assume that the config is loaded.
     return <Loading />;
   }
 
-  return config.pipelines &&
-    pipeline.pipelineIndex >= 0 &&
-    pipeline.pipelineIndex < config.pipelines.length ? (
+  return !isPipelineSelected(pipeline) ||
+    (config.pipelines &&
+      pipeline.pipelineIndex >= 0 &&
+      pipeline.pipelineIndex < config.pipelines.length) ? (
     <>{children}</>
   ) : (
     <Redirect to={location.pathname} />

@@ -24,13 +24,13 @@ import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
 import Loading from "components/Loading";
 import AutocompleteStringField from "components/Settings/AutocompleteStringField";
+import CustomObjectFields from "components/Settings/CustomObjectFields";
 import EditableArray from "components/Settings/EditableArray";
 import JSONField from "components/Settings/JSONField";
 import NumberField from "components/Settings/NumberField";
 import StringArrayField from "components/Settings/StringArrayField";
 import StringField from "components/Settings/StringField";
 import { splicedArray } from "components/Settings/utils";
-import _ from "lodash";
 import React from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -40,6 +40,7 @@ import {
 } from "services/api";
 import {
   AzimuthConfig,
+  MetricDefinition,
   PipelineDefinition,
   SupportedLanguage,
   SupportedModelContract,
@@ -49,6 +50,10 @@ import {
 } from "types/api";
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
+
+type MetricState = MetricDefinition & { name: string };
+
+type ConfigState = Omit<AzimuthConfig, "metrics"> & { metrics: MetricState[] };
 
 const CONFIG_UPDATE_MESSAGE =
   "Please wait while the config changes are validated.";
@@ -78,13 +83,11 @@ const FIELDS: Record<
 };
 
 type SubConfigKeys = keyof PickByValue<
-  AzimuthConfig,
+  ConfigState,
   { [key: string]: unknown } | null
 >;
 
 const COLUMNS = ["text_input", "label", "persistent_id"] as const;
-const CUSTOM_METRICS: string[] = ["Accuracy", "Precision", "Recall", "F1"];
-const ADDITIONAL_KWARGS_CUSTOM_METRICS = ["Precision", "Recall", "F1"];
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "fr"];
 const SUPPORTED_MODEL_CONTRACTS: SupportedModelContract[] = [
   "hf_text_classification",
@@ -98,7 +101,7 @@ const SUPPORTED_SPACY_MODELS: SupportedSpacyModels[] = [
 const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
-const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
+const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof ConfigState)[] = [
   "behavioral_testing",
   "similarity",
   "dataset_warnings",
@@ -148,12 +151,21 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
   >();
-  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+  const { data: azimuthConfig } = getConfigEndpoint.useQuery({ jobId });
+  const config = React.useMemo(() => {
+    if (azimuthConfig === undefined) return undefined;
+    const { metrics, ...rest } = azimuthConfig;
+    return {
+      metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
+      ...rest,
+    };
+  }, [azimuthConfig]);
+
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
-    Partial<AzimuthConfig>
+    Partial<ConfigState>
   >({});
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
@@ -168,7 +180,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     onClose();
   };
 
-  const resultingConfig = Object.assign({}, config, partialConfig);
+  const resultingConfig = React.useMemo(
+    () => Object.assign({}, config, partialConfig),
+    [config, partialConfig]
+  );
 
   const {
     data: defaultConfig,
@@ -180,7 +195,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   });
 
   const updatePartialConfig = React.useCallback(
-    (update: Partial<AzimuthConfig>) =>
+    (update: Partial<ConfigState>) =>
       setPartialConfig((partialConfig) => ({ ...partialConfig, ...update })),
     [setPartialConfig]
   );
@@ -217,7 +232,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   }, [defaultConfig, resultingConfig, updatePartialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
-  if (config === undefined || !open) return null;
+  if (azimuthConfig === undefined || !open) return null;
+
+  const metricsNames = new Set(
+    resultingConfig.metrics.map(({ name }) => name.trim())
+  );
+  const hasErrors =
+    resultingConfig.dataset?.class_name.trim() === "" ||
+    metricsNames.size < resultingConfig.metrics.length ||
+    metricsNames.has("") ||
+    resultingConfig.metrics.some(({ class_name }) => class_name.trim() === "");
 
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
@@ -307,9 +331,17 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         </Box>
         <Button
           variant="contained"
-          disabled={isEmptyPartialConfig || isUpdatingConfig}
+          disabled={isEmptyPartialConfig || isUpdatingConfig || hasErrors}
           onClick={() => {
-            updateConfig({ jobId, body: partialConfig })
+            updateConfig({
+              jobId,
+              body: {
+                ...partialConfig,
+                metrics: Object.fromEntries(
+                  resultingConfig.metrics.map(({ name, ...m }) => [name, m])
+                ),
+              },
+            })
               .unwrap()
               .then(
                 handleClose,
@@ -336,7 +368,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
 
   const updateSubConfig = <Key extends SubConfigKeys>(
     key: Key,
-    update: Partial<AzimuthConfig[Key]>
+    update: Partial<ConfigState[Key]>
   ) => updatePartialConfig({ [key]: { ...resultingConfig[key], ...update } });
 
   const updatePipeline = (
@@ -373,11 +405,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     });
 
   const getDefaultPostprocessors = (pipelineIndex: number) =>
-    config.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
+    azimuthConfig.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
     defaultConfig.pipelines![0].postprocessors!;
 
+  const updateMetric = (metricIndex: number, update: Partial<MetricState>) =>
+    updatePartialConfig({
+      metrics: updateArrayAt(resultingConfig.metrics, metricIndex, update),
+    });
+
   const displayToggleSectionTitle = (
-    field: keyof AzimuthConfig,
+    field: keyof ConfigState,
     section: string = field
   ) => (
     <FormControlLabel
@@ -421,29 +458,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       labelPlacement="start"
     />
   );
-
-  const handleCustomMetricUpdate = (checked: boolean, metricName: string) => {
-    updatePartialConfig({
-      metrics: checked
-        ? {
-            ...resultingConfig.metrics,
-            [metricName]: {
-              class_name: "datasets.load_metric",
-              args: [],
-              kwargs: {
-                path: metricName.toLowerCase(),
-              },
-              remote: null,
-              additional_kwargs: ADDITIONAL_KWARGS_CUSTOM_METRICS.includes(
-                metricName
-              )
-                ? { average: "weighted" }
-                : {},
-            },
-          }
-        : _.omit(resultingConfig.metrics, metricName),
-    });
-  };
 
   const getProjectConfigSection = () => (
     <>
@@ -489,33 +503,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           {displaySectionTitle("Dataset")}
           <FormGroup>
             <Columns columns={2}>
-              <StringField
-                label="class_name"
-                value={resultingConfig.dataset!.class_name}
+              <CustomObjectFields
                 disabled={isUpdatingConfig}
-                onChange={(class_name) =>
-                  updateSubConfig("dataset", { class_name })
-                }
-              />
-              <StringField
-                label="remote"
-                nullable
-                value={resultingConfig.dataset!.remote}
-                disabled={isUpdatingConfig}
-                onChange={(remote) => updateSubConfig("dataset", { remote })}
-              />
-              <JSONField
-                array
-                label="args"
-                value={resultingConfig.dataset!.args}
-                disabled={isUpdatingConfig}
-                onChange={(args) => updateSubConfig("dataset", { args })}
-              />
-              <JSONField
-                label="kwargs"
-                value={resultingConfig.dataset!.kwargs}
-                disabled={isUpdatingConfig}
-                onChange={(kwargs) => updateSubConfig("dataset", { kwargs })}
+                value={resultingConfig.dataset}
+                onChange={(update) => updateSubConfig("dataset", update)}
               />
             </Columns>
           </FormGroup>
@@ -523,6 +514,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       )}
     </>
   );
+
   const getModelContractConfigSection = () => (
     <>
       {displaySectionTitle("General")}
@@ -674,40 +666,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         }
                       />
                       {!(postprocessor.class_name in KNOWN_POSTPROCESSORS) && (
-                        <>
-                          <StringField
-                            label="remote"
-                            nullable
-                            value={postprocessor.remote}
-                            disabled={isUpdatingConfig}
-                            onChange={(remote) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                remote,
-                              })
-                            }
-                          />
-                          <JSONField
-                            array
-                            label="args"
-                            value={postprocessor.args}
-                            disabled={isUpdatingConfig}
-                            onChange={(args) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                args,
-                              })
-                            }
-                          />
-                          <JSONField
-                            label="kwargs"
-                            value={postprocessor.kwargs}
-                            disabled={isUpdatingConfig}
-                            onChange={(kwargs) =>
-                              updatePostprocessor(pipelineIndex, index, {
-                                kwargs,
-                              })
-                            }
-                          />
-                        </>
+                        <CustomObjectFields
+                          excludeClassName
+                          disabled={isUpdatingConfig}
+                          value={postprocessor}
+                          onChange={(update) =>
+                            updatePostprocessor(pipelineIndex, index, update)
+                          }
+                        />
                       )}
                       {"temperature" in postprocessor && (
                         <NumberField
@@ -750,24 +716,55 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         )}
       />
       {displaySectionTitle("Metrics")}
-      <FormGroup>
-        {CUSTOM_METRICS.map((metricName, index) => (
-          <FormControlLabel
-            key={index}
-            control={
-              <Checkbox
-                size="small"
-                checked={Boolean(resultingConfig.metrics[metricName])}
+      <EditableArray
+        array={resultingConfig.metrics}
+        disabled={isUpdatingConfig}
+        title="metric"
+        newItem={{
+          name: "",
+          class_name: "",
+          args: [],
+          kwargs: {},
+          remote: null,
+          additional_kwargs: {},
+        }}
+        onChange={(metrics) => updatePartialConfig({ metrics })}
+        renderItem={(metric, index) => (
+          <FormGroup sx={{ marginTop: 2 }}>
+            <Columns columns={3}>
+              <AutocompleteStringField
+                label="name"
+                options={Object.keys(defaultConfig.metrics)}
+                value={metric.name}
+                {...(splicedArray(resultingConfig.metrics, index, 1).some(
+                  ({ name }) => name.trim() === metric.name.trim()
+                ) && {
+                  error: true,
+                  helperText: "Set a value that is unique across all metrics",
+                })}
+                autoFocus
                 disabled={isUpdatingConfig}
-                onChange={(...[, checked]) =>
-                  handleCustomMetricUpdate(checked, metricName)
+                onChange={(name) =>
+                  updateMetric(index, { name, ...defaultConfig.metrics[name] })
                 }
               />
-            }
-            label={<Typography variant="body2">{metricName}</Typography>}
-          />
-        ))}
-      </FormGroup>
+              <CustomObjectFields
+                disabled={isUpdatingConfig}
+                value={metric}
+                onChange={(update) => updateMetric(index, update)}
+              />
+              <JSONField
+                label="additional_kwargs"
+                value={metric.additional_kwargs}
+                disabled={isUpdatingConfig}
+                onChange={(additional_kwargs) =>
+                  updateMetric(index, { additional_kwargs })
+                }
+              />
+            </Columns>
+          </FormGroup>
+        )}
+      />
     </>
   );
 
