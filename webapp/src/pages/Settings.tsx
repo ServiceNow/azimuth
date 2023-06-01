@@ -51,6 +51,10 @@ import {
 import { PickByValue } from "types/models";
 import { UNKNOWN_ERROR } from "utils/const";
 
+type MetricState = MetricDefinition & { name: string };
+
+type ConfigState = Omit<AzimuthConfig, "metrics"> & { metrics: MetricState[] };
+
 const CONFIG_UPDATE_MESSAGE =
   "Please wait while the config changes are validated.";
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
@@ -79,7 +83,7 @@ const FIELDS: Record<
 };
 
 type SubConfigKeys = keyof PickByValue<
-  AzimuthConfig,
+  ConfigState,
   { [key: string]: unknown } | null
 >;
 
@@ -97,7 +101,7 @@ const SUPPORTED_SPACY_MODELS: SupportedSpacyModels[] = [
 const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
-const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof AzimuthConfig)[] = [
+const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof ConfigState)[] = [
   "behavioral_testing",
   "similarity",
   "dataset_warnings",
@@ -115,8 +119,6 @@ const KNOWN_POSTPROCESSORS: {
   "azimuth.utils.ml.postprocessing.TemperatureScaling": { temperature: 1 },
   "azimuth.utils.ml.postprocessing.Thresholding": { threshold: 0.5 },
 };
-
-type Metric = MetricDefinition & { name: string };
 
 const isErrorMetrics = (metrics: Metric[]) => {
   const names = new Set(metrics.map(({ name }) => name));
@@ -155,12 +157,21 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   const [language, setLanguage] = React.useState<
     SupportedLanguage | undefined
   >();
-  const { data: config } = getConfigEndpoint.useQuery({ jobId });
+  const { data: azimuthConfig } = getConfigEndpoint.useQuery({ jobId });
+  const config = React.useMemo(() => {
+    if (azimuthConfig === undefined) return undefined;
+    const { metrics, ...rest } = azimuthConfig;
+    return {
+      metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
+      ...rest,
+    };
+  }, [azimuthConfig]);
+
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
 
   const [partialConfig, setPartialConfig] = React.useState<
-    Partial<AzimuthConfig>
+    Partial<ConfigState>
   >({});
 
   const isEmptyPartialConfig = Object.keys(partialConfig).length === 0;
@@ -190,33 +201,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   });
 
   const updatePartialConfig = React.useCallback(
-    (update: Partial<AzimuthConfig>) =>
+    (update: Partial<ConfigState>) =>
       setPartialConfig((partialConfig) => ({ ...partialConfig, ...update })),
     [setPartialConfig]
-  );
-
-  // Since `resultingConfig.metrics` is an object with names as keys, it doesn't
-  // support duplicate names. So, we track the state of the metrics in this array.
-  // `setMetrics()` also updates `resultingConfig.metrics` if names are unique.
-  // TODO Update `metrics` when `partialConfig.metrics` changes. That will be
-  // necessary if it becomes possible to update partialConfig.metrics by means
-  // other than `setMetrics()`, for example selecting an old config from history.
-  const [metrics, setMetricsDoNotUseDirectly] = React.useState(() =>
-    Object.entries(resultingConfig.metrics).map(([name, m]) => ({ name, ...m }))
-  );
-
-  const setMetrics = React.useCallback(
-    (newMetrics: Metric[]) => {
-      setMetricsDoNotUseDirectly(newMetrics);
-      if (!isErrorMetrics(newMetrics)) {
-        updatePartialConfig({
-          metrics: Object.fromEntries(
-            newMetrics.map(({ name, ...metric }) => [name, metric])
-          ),
-        });
-      }
-    },
-    [updatePartialConfig]
   );
 
   React.useEffect(() => {
@@ -251,7 +238,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   }, [defaultConfig, resultingConfig, updatePartialConfig]);
 
   // If config was undefined, PipelineCheck would not even render the page.
-  if (config === undefined || !open) return null;
+  if (azimuthConfig === undefined || !open) return null;
 
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
@@ -342,10 +329,20 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <Button
           variant="contained"
           disabled={
-            isEmptyPartialConfig || isUpdatingConfig || isErrorMetrics(metrics)
+            isEmptyPartialConfig ||
+            isUpdatingConfig ||
+            isErrorMetrics(resultingConfig.metrics)
           }
           onClick={() => {
-            updateConfig({ jobId, body: partialConfig })
+            updateConfig({
+              jobId,
+              body: {
+                ...partialConfig,
+                metrics: Object.fromEntries(
+                  resultingConfig.metrics.map(({ name, ...m }) => [name, m])
+                ),
+              },
+            })
               .unwrap()
               .then(
                 handleClose,
@@ -372,7 +369,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
 
   const updateSubConfig = <Key extends SubConfigKeys>(
     key: Key,
-    update: Partial<AzimuthConfig[Key]>
+    update: Partial<ConfigState[Key]>
   ) => updatePartialConfig({ [key]: { ...resultingConfig[key], ...update } });
 
   const updatePipeline = (
@@ -409,14 +406,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     });
 
   const getDefaultPostprocessors = (pipelineIndex: number) =>
-    config.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
+    azimuthConfig.pipelines?.[pipelineIndex]?.postprocessors ?? // TODO pipelineIndex might not correspond if the user added or removed pipelines
     defaultConfig.pipelines![0].postprocessors!;
 
-  const updateMetric = (metricIndex: number, update: Partial<Metric>) =>
-    setMetrics(updateArrayAt(metrics, metricIndex, update));
+  const updateMetric = (metricIndex: number, update: Partial<MetricState>) =>
+    updatePartialConfig({
+      metrics: updateArrayAt(resultingConfig.metrics, metricIndex, update),
+    });
 
   const displayToggleSectionTitle = (
-    field: keyof AzimuthConfig,
+    field: keyof ConfigState,
     section: string = field
   ) => (
     <FormControlLabel
@@ -516,6 +515,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       )}
     </>
   );
+
   const getModelContractConfigSection = () => (
     <>
       {displaySectionTitle("General")}
@@ -718,7 +718,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       />
       {displaySectionTitle("Metrics")}
       <EditableArray
-        array={metrics}
+        array={resultingConfig.metrics}
         disabled={isUpdatingConfig}
         title="metric"
         newItem={{
@@ -729,7 +729,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           remote: null,
           additional_kwargs: {},
         }}
-        onChange={setMetrics}
+        onChange={(metrics) => updatePartialConfig({ metrics })}
         renderItem={(metric, index) => (
           <FormGroup sx={{ marginTop: 2 }}>
             <Columns columns={3}>
@@ -737,7 +737,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 label="name"
                 options={Object.keys(defaultConfig.metrics)}
                 value={metric.name}
-                {...(splicedArray(metrics, index, 1).some(
+                {...(splicedArray(resultingConfig.metrics, index, 1).some(
                   ({ name }) => name === metric.name
                 ) && {
                   error: true,
