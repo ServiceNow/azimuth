@@ -120,12 +120,6 @@ const KNOWN_POSTPROCESSORS: {
   "azimuth.utils.ml.postprocessing.Thresholding": { threshold: 0.5 },
 };
 
-const isErrorMetrics = (metrics: Metric[]) => {
-  const names = new Set(metrics.map(({ name }) => name));
-  const classNames = new Set(metrics.map(({ class_name }) => class_name));
-  return names.size < metrics.length || names.has("") || classNames.has("");
-};
-
 const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
   <Box display="grid" gap={4} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
     {children}
@@ -240,6 +234,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   // If config was undefined, PipelineCheck would not even render the page.
   if (azimuthConfig === undefined || !open) return null;
 
+  const metricsNames = new Set(
+    resultingConfig.metrics.map(({ name }) => name.trim())
+  );
+  const hasErrors =
+    resultingConfig.dataset?.class_name.trim() === "" ||
+    metricsNames.size < resultingConfig.metrics.length ||
+    metricsNames.has("") ||
+    resultingConfig.metrics.some(({ class_name }) => class_name.trim() === "");
+
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
       aria-labelledby="config-dialog-title"
@@ -328,11 +331,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         </Box>
         <Button
           variant="contained"
-          disabled={
-            isEmptyPartialConfig ||
-            isUpdatingConfig ||
-            isErrorMetrics(resultingConfig.metrics)
-          }
+          disabled={isEmptyPartialConfig || isUpdatingConfig || hasErrors}
           onClick={() => {
             updateConfig({
               jobId,
@@ -738,7 +737,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 options={Object.keys(defaultConfig.metrics)}
                 value={metric.name}
                 {...(splicedArray(resultingConfig.metrics, index, 1).some(
-                  ({ name }) => name === metric.name
+                  ({ name }) => name.trim() === metric.name.trim()
                 ) && {
                   error: true,
                   helperText: "Set a value that is unique across all metrics",
