@@ -61,3 +61,7 @@ launch:
 push:
 	docker push $(REGISTRY)/$(IMAGE):$(TAG)_$(DEVICE)$(TAG_EXT)
 	docker push $(REGISTRY)/$(IMAGE)-app:$(TAG)$(TAG_EXT)
+
+.PHONY: docs_serve
+docs_serve:
+	cd docs && mkdocs serve
