@@ -1,6 +1,6 @@
 # Releases
 
-## [2.6.2] - 2023-06-12
+## [2.7.0] - 2023-06-12
 
 ### Added
 - Support for no dataset at startup, in which case the UI will prompt the user to configure Azimuth from the config UI.
