@@ -32,7 +32,7 @@ use cases.
         dataset and model are available in `config/examples`. For example: `config/examples/clinc_oos/conf.json` for `CLINC`.
     2. In `config`, copy `config/examples/clinc_oos/conf.json` to a new folder with your project
         name. For example: `config/my_project/conf.json`.
-    3. Set `CFG_PATH=/config/my_project/conf.json` with the **location of the config**.
+    3. Run `export CFG_PATH=/config/my_project/conf.json` with the **location of the config**.
         * The initial `/` is required as your local config folder will be mounted on the Docker
           container at the root.
     4. Edit this new config as described in step 5, then proceed with step 3.
