@@ -16,23 +16,33 @@ the [:material-link: Configuration](../reference/configuration/index.md) details
 and [:material-link: Custom Objects](../reference/custom-objects/index.md) to launch more complex
 use cases.
 
-## 1. Prepare the Config File
+## Configure and Run Azimuth
 
 !!! tip "Run our demo first"
 
     You haven't run our demo yet? You might want to verify your setup before feeding your own model
     and dataset. Go back to [B. Learn Basics](b-basics.md).
 
-**Start from an existing config ** and **edit** the relevant fields to adapt it to your dataset and
-models. Examples with a [HuggingFace (HF)](http://www.huggingface.co)
-dataset and model are available in `config/examples`. For example: `config/examples/clinc_oos/conf.json` for `CLINC`.
-
 1. Put your model checkpoint (results
    of [`.save_pretained()`](https://huggingface.co/docs/transformers/main_classes/model#transformers.PreTrainedModel.save_pretrained))
    under the folder `azimuth_shr`.
-2. In `config`, copy `config/examples/clinc_oos/conf.json` to a new folder with your project
-   name. For example: `config/my_project/conf.json`.
-3. Edit the config:
+2. **Optional** - Configure Azimuth with a config file. If you don't, the UI will simply prompt you to configure Azimuth from the config UI.
+    1. **Start from an existing config ** and **edit** the relevant fields to adapt it to your dataset and
+        models. Examples with a [HuggingFace (HF)](http://www.huggingface.co)
+        dataset and model are available in `config/examples`. For example: `config/examples/clinc_oos/conf.json` for `CLINC`.
+    2. In `config`, copy `config/examples/clinc_oos/conf.json` to a new folder with your project
+        name. For example: `config/my_project/conf.json`.
+    3. Set `CFG_PATH=/config/my_project/conf.json` with the **location of the config**.
+        * The initial `/` is required as your local config folder will be mounted on the Docker
+          container at the root.
+    4. Edit this new config as described in step 5, then proceed with step 3.
+3. From the `azimuth` **root directory**, run the following **command**:
+    ```
+    make launch
+    ```
+4. The **app will be accessible** at [localhost:8080](http://localhost:8080) after a few minutes.
+    The back-end API will be accessible at [localhost:8080/api/local/docs](http://localhost:8080/api/local/docs).
+5. If necessary, edit the config:
     1. `name`: set your project name.
     2. `dataset.args`: specify the args required to load your dataset
        with [`datasets.load_dataset`](https://huggingface.co/docs/datasets/loading).
@@ -95,18 +105,7 @@ dataset and model are available in `config/examples`. For example: `config/examp
 10. `kwargs` to send to the class. Only `checkpoint_path` if you use the class above.
 11. Name of the layer on which to compute saliency maps.
 
-## 2. Running the App
-
-1. In the terminal, go to the `azimuth` **root directory**.
-2. Set `CFG_PATH=/config/my_project/conf.json` with the **location of the config**.
-    * The initial `/` is required as your local config folder will be mounted on the Docker
-      container at the root.
-3. Execute the following **command**:
-    ```
-    make launch
-    ```
-4. The **app will be accessible** at [localhost:8080](http://localhost:8080) after a few minutes of waiting. The
-    start-up tasks will start. The back-end API will be accessible at [localhost:8080/api/local/docs](http://localhost:8080/api/local/docs).
+## About the Config History
 
 After a successful start, Azimuth saves the provided config in its `config_history.jsonl` artifact. If you use the API to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
 ```shell
