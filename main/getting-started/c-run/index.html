@@ -541,15 +541,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-prepare-the-config-file" class="md-nav__link">
-    1. Prepare the Config File
+  <a href="#configure-and-run-azimuth" class="md-nav__link">
+    Configure and Run Azimuth
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-running-the-app" class="md-nav__link">
-    2. Running the App
+  <a href="#about-the-config-history" class="md-nav__link">
+    About the Config History
   </a>
   
 </li>
@@ -571,7 +571,7 @@
         
           <li class="md-nav__item">
   <a href="#environment-variables" class="md-nav__link">
-    Environment variables
+    Environment Variables
   </a>
   
 </li>
@@ -1719,15 +1719,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-prepare-the-config-file" class="md-nav__link">
-    1. Prepare the Config File
+  <a href="#configure-and-run-azimuth" class="md-nav__link">
+    Configure and Run Azimuth
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-running-the-app" class="md-nav__link">
-    2. Running the App
+  <a href="#about-the-config-history" class="md-nav__link">
+    About the Config History
   </a>
   
 </li>
@@ -1749,7 +1749,7 @@
         
           <li class="md-nav__item">
   <a href="#environment-variables" class="md-nav__link">
-    Environment variables
+    Environment Variables
   </a>
   
 </li>
@@ -1792,30 +1792,44 @@ with this scenario. However, you will quickly need to learn about
 the <a href="../../reference/configuration/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Configuration</a> details
 and <a href="../../reference/custom-objects/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Custom Objects</a> to launch more complex
 use cases.</p>
-<h2 id="1-prepare-the-config-file">1. Prepare the Config File</h2>
+<h2 id="configure-and-run-azimuth">Configure and Run Azimuth</h2>
 <div class="admonition tip">
 <p class="admonition-title">Run our demo first</p>
 <p>You haven't run our demo yet? You might want to verify your setup before feeding your own model
 and dataset. Go back to <a href="../b-basics/">B. Learn Basics</a>.</p>
 </div>
-<p><strong>Start from an existing config </strong> and <strong>edit</strong> the relevant fields to adapt it to your dataset and
-models. Examples with an <a href="http://www.huggingface.co">HuggingFace (<abbr title="HuggingFace">HF</abbr>)</a>
-dataset and model are available in <code>config/examples</code> (<code>CLINC</code> is also shown below).</p>
 <ol>
 <li>Put your model checkpoint (results
-   of <a href="https://huggingface.co/docs/transformers/main_classes/model#transformers.PreTrainedModel.save_pretrained">.save_pretained()</a>)
+   of <a href="https://huggingface.co/docs/transformers/main_classes/model#transformers.PreTrainedModel.save_pretrained"><code>.save_pretained()</code></a>)
    under the folder <code>azimuth_shr</code>.</li>
+<li><strong>Optional</strong> - Configure Azimuth with a config file. If you don't, the UI will simply prompt you to configure Azimuth from the config UI.<ol>
+<li><strong>Start from an existing config </strong> and <strong>edit</strong> the relevant fields to adapt it to your dataset and
+    models. Examples with a <a href="http://www.huggingface.co">HuggingFace (<abbr title="HuggingFace">HF</abbr>)</a>
+    dataset and model are available in <code>config/examples</code>. For example: <code>config/examples/clinc_oos/conf.json</code> for <code>CLINC</code>.</li>
 <li>In <code>config</code>, copy <code>config/examples/clinc_oos/conf.json</code> to a new folder with your project
-   name. Ex: <code>config/my_project/conf.json</code>.</li>
+    name. For example: <code>config/my_project/conf.json</code>.</li>
+<li>Run <code>export CFG_PATH=/config/my_project/conf.json</code> with the <strong>location of the config</strong>.<ul>
+<li>The initial <code>/</code> is required as your local config folder will be mounted on the Docker
+  container at the root.</li>
+</ul>
+</li>
+<li>Edit this new config as described in step 5, then proceed with step 3.</li>
+</ol>
+</li>
+<li>From the <code>azimuth</code> <strong>root directory</strong>, run the following <strong>command</strong>:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>make launch
+</code></pre></div></li>
+<li>The <strong>app will be accessible</strong> at <a href="http://localhost:8080">localhost:8080</a> after a few minutes.
+    The back-end <abbr title="Application Programming Interface">API</abbr> will be accessible at <a href="http://localhost:8080/api/local/docs">localhost:8080/api/local/docs</a>.</li>
 <li>
-<p>Edit the config:</p>
+<p>If necessary, edit the config:</p>
 <ol>
-<li><code>name</code>: put your project name.</li>
+<li><code>name</code>: set your project name.</li>
 <li><code>dataset.args</code>: specify the args required to load your dataset
    with <a href="https://huggingface.co/docs/datasets/loading"><code>datasets.load_dataset</code></a>.</li>
 <li>Edit <code>columns</code> and <code>rejection_class</code> based on the dataset.</li>
-<li><code>pipelines.models.kwargs.checkpoint_path</code>: put your own checkpoint path to your model. The
-   path should start with <code>/azimuth_shr</code>, since this folder will be mounted on Docker.</li>
+<li><code>pipelines.models.kwargs.checkpoint_path</code>: set your own checkpoint path to your model. The
+   path should start with <code>/azimuth_shr</code>, since this folder will be mounted on the Docker container.</li>
 <li>Edit the <code>saliency_layer</code> so it is the name of the input layer of the model. It should be set
    to <code>null</code> if your model is not from PyTorch or without a word-embedding layer.</li>
 </ol>
@@ -1831,35 +1845,35 @@ dataset and model are available in <code>config/examples</code> (<code>CLINC</co
 </div>
 </li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p p-Indicator">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s">&quot;name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;CLINC150&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (1)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="s">&quot;dataset&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;datasets.load_dataset&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (2)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="s">&quot;args&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (3)</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="s">&quot;clinc_oos&quot;</span><span class="p p-Indicator">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="s">&quot;imbalanced&quot;</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p p-Indicator">]</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p p-Indicator">},</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="s">&quot;columns&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (4)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="s">&quot;text_input&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;text&quot;</span><span class="p p-Indicator">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="s">&quot;label&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;intent&quot;</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p p-Indicator">},</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="s">&quot;rejection_class&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;oos&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (5)</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="s">&quot;model_contract&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;hf_text_classification&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (6)</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="s">&quot;pipelines&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (7)</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p p-Indicator">{</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">      </span><span class="s">&quot;model&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">        </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;loading_resources.load_hf_text_classif_pipeline&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (8)</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">        </span><span class="s">&quot;remote&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;/azimuth_shr&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (9)</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="s">&quot;kwargs&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (10)</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">          </span><span class="s">&quot;checkpoint_path&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;transformersbook/</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">                              </span><span class="s">distilbert-base-uncased-distilled-clinc&quot;</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span><span class="p p-Indicator">}</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">      </span><span class="p p-Indicator">}</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="p p-Indicator">}</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">  </span><span class="p p-Indicator">],</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">  </span><span class="s">&quot;saliency_layer&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;distilbert.embeddings.word_embeddings&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (11)</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="p p-Indicator">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p p-Indicator">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="s">&quot;name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;CLINC150&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (1)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="s">&quot;dataset&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;datasets.load_dataset&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (2)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="s">&quot;args&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (3)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="s">&quot;clinc_oos&quot;</span><span class="p p-Indicator">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="s">&quot;imbalanced&quot;</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="p p-Indicator">]</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="p p-Indicator">},</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="s">&quot;columns&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (4)</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="s">&quot;text_input&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;text&quot;</span><span class="p p-Indicator">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="s">&quot;label&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;intent&quot;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="p p-Indicator">},</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="s">&quot;rejection_class&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;oos&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (5)</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">  </span><span class="s">&quot;model_contract&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;hf_text_classification&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (6)</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="s">&quot;pipelines&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="c1"># (7)</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="p p-Indicator">{</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">      </span><span class="s">&quot;model&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">        </span><span class="s">&quot;class_name&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;loading_resources.load_hf_text_classif_pipeline&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (8)</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">        </span><span class="s">&quot;remote&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;/azimuth_shr&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (9)</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">        </span><span class="s">&quot;kwargs&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="c1"># (10)</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">          </span><span class="s">&quot;checkpoint_path&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;transformersbook/</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">                              </span><span class="s">distilbert-base-uncased-distilled-clinc&quot;</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">        </span><span class="p p-Indicator">}</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">      </span><span class="p p-Indicator">}</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">    </span><span class="p p-Indicator">}</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">  </span><span class="p p-Indicator">],</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">  </span><span class="s">&quot;saliency_layer&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;distilbert.embeddings.word_embeddings&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="c1"># (11)</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="p p-Indicator">}</span>
 </code></pre></div>
 <ol>
 <li>Name for your project. Shown in the application to identify your config.</li>
@@ -1874,20 +1888,7 @@ dataset and model are available in <code>config/examples</code> (<code>CLINC</co
 <li><code>kwargs</code> to send to the class. Only <code>checkpoint_path</code> if you use the class above.</li>
 <li>Name of the layer on which to compute saliency maps.</li>
 </ol>
-<h2 id="2-running-the-app">2. Running the App</h2>
-<ol>
-<li>In the terminal, go to the <code>azimuth</code> <strong>root directory</strong>.</li>
-<li>Set <code>CFG_PATH=/config/my_project/conf.json</code> with the <strong>location of the config</strong>.<ul>
-<li>The initial <code>/</code> is required as your local config folder will be mounted on the Docker
-  container at the root.</li>
-</ul>
-</li>
-<li>Execute the following <strong>command</strong>:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make launch
-</code></pre></div></li>
-<li>The <strong>app will be accessible</strong> at http://localhost:8080 after a few minutes of waiting. The
-    start-up tasks will start. The back-end <abbr title="Application Programming Interface">API</abbr> will be accessible at http://localhost:8080/api/local/docs.</li>
-</ol>
+<h2 id="about-the-config-history">About the Config History</h2>
 <p>After a successful start, Azimuth saves the provided config in its <code>config_history.jsonl</code> artifact. If you use the <abbr title="Application Programming Interface">API</abbr> to edit the config, the edits are saved there. If you restart Azimuth (for example after shutting it down for the night), you can resume where you left off with:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span><span class="nv">LOAD_CONFIG_HISTORY</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>launch
 </code></pre></div>
@@ -1906,7 +1907,7 @@ Although confusing, this enables you to stop and restart the docker container wi
 Configuration</strong></a> reference details all additional fields that
 can be set, such as changing how behavioral tests are executed, the similarity analysis encoder, the
 batch size and so on.</p>
-<h3 id="environment-variables">Environment variables</h3>
+<h3 id="environment-variables">Environment Variables</h3>
 <p>No matter where you launch the app from, you can always configure some options through environment
 variables. They are all redundant with the config attributes, so you can set them in either place.
 They are the following:</p>

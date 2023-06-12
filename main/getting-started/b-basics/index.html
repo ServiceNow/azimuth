@@ -534,8 +534,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-config-file" class="md-nav__link">
-    The Config File
+  <a href="#the-config" class="md-nav__link">
+    The Config
   </a>
   
 </li>
@@ -1713,8 +1713,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-config-file" class="md-nav__link">
-    The Config File
+  <a href="#the-config" class="md-nav__link">
+    The Config
   </a>
   
 </li>
@@ -1786,12 +1786,14 @@ exists:</p>
 <p><code>config</code> and <code>azimuth_shr</code> are two folders where you will put different artifacts before you
 can run Azimuth on your dataset and models. They get mounted automatically on the Docker image.</p>
 </div>
-<h2 id="the-config-file">The Config File</h2>
-<p>The Azimuth config file contains all the information to launch and customize Azimuth. It specifies
+<h2 id="the-config">The Config</h2>
+<p>The Azimuth config contains all the information to launch and customize Azimuth. It specifies
 which dataset and pipelines to load in the app, as well as other variables that allow for
 customization of the app. Most fields have default values and don't need to be explicitly defined in
 each config. The <a href="../../reference/configuration/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> Configuration</a> reference
 details all available fields.</p>
+<p>When launching Azimuth, you may give the launcher a JSON config file.
+If you don't, the UI will simply prompt you to configure Azimuth from the config UI.</p>
 <p>Different configuration examples are provided in the repo under <code>config/examples</code>, leveraging
 pretrained models from <a href="https://huggingface.co">HuggingFace</a>. The next
 step, <a href="../c-run/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8v2m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5Z"/></svg></span> C. Run on Your Use Case</a>, will detail how to adapt an existing config to create your own.</p>
