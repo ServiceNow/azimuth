@@ -1,6 +1,6 @@
 ARG DEVICE=cpu
 
-FROM pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime as build_gpu
+FROM pytorch/pytorch:1.13.0-cuda11.6-cudnn8-runtime as build_gpu
 # Copy binaries from other images here
 RUN pip install --upgrade pip
 
