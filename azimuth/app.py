@@ -9,17 +9,14 @@ import structlog
 from distributed import SpecCluster
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY,
-    HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_503_SERVICE_UNAVAILABLE,
 )
 
@@ -31,6 +28,7 @@ from azimuth.task_manager import TaskManager
 from azimuth.types import DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.utils.cluster import default_cluster
 from azimuth.utils.conversion import JSONResponseIgnoreNan
+from azimuth.utils.exception_handlers import handle_validation_error
 from azimuth.utils.logs import set_logger_config
 from azimuth.utils.validation import assert_not_none
 
@@ -51,30 +49,12 @@ COMMON_HTTP_ERROR_CODES = (
     # conventional HTTP codes.
     # This overwrites the default ValidationError response for 422 in the OpenAPI spec.
     HTTP_422_UNPROCESSABLE_ENTITY,
-    HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_503_SERVICE_UNAVAILABLE,
 )
 
 
 class HTTPExceptionModel(BaseModel):
     detail: str
-
-
-async def handle_validation_error(request: Request, exception: RequestValidationError):
-    return JSONResponse(
-        status_code=HTTP_404_NOT_FOUND  # for errors in paths, e.g., /dataset_splits/potato
-        if "path" in (error["loc"][0] for error in exception.errors())
-        else HTTP_400_BAD_REQUEST,  # for other errors like in query params, e.g., pipeline_index=-1
-        content={"detail": str(exception)},
-    )
-
-
-async def handle_internal_error(request: Request, exception: Exception):
-    # Don't expose this unexpected internal error as that could expose a security vulnerability.
-    return JSONResponse(
-        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Internal server error"},
-    )
 
 
 def get_dataset_split_manager_mapping() -> Dict[DatasetSplitName, Optional[DatasetSplitManager]]:
@@ -144,8 +124,6 @@ def start_app(config_path: Optional[str], load_config_history: bool, debug: bool
     log.info("🔭 Azimuth starting 🔭")
 
     azimuth_config = load_azimuth_config(config_path, load_config_history)
-    if azimuth_config.dataset is None:
-        raise ValueError("No dataset has been specified in the config.")
 
     local_cluster = default_cluster(large=azimuth_config.large_dask_cluster)
 
@@ -184,8 +162,9 @@ def create_app() -> FastAPI:
         default_response_class=JSONResponseIgnoreNan,
         responses={code: {"model": HTTPExceptionModel} for code in COMMON_HTTP_ERROR_CODES},
         exception_handlers={
+            ValidationError: handle_validation_error,  # for PATCH "/config",
+            # where we call old_config.copy(update=partial_config, deep=True) ourselves.
             RequestValidationError: handle_validation_error,
-            HTTP_500_INTERNAL_SERVER_ERROR: handle_internal_error,
         },
         root_path=".",  # Tells Swagger UI and ReDoc to fetch the OpenAPI spec from ./openapi.json
         # (relative) so it works through the front-end proxy.
@@ -201,16 +180,10 @@ def create_app() -> FastAPI:
     from azimuth.routers.model_performance.confidence_histogram import (
         router as confidence_histogram_router,
     )
-    from azimuth.routers.model_performance.confusion_matrix import (
-        router as confusion_matrix_router,
-    )
+    from azimuth.routers.model_performance.confusion_matrix import router as confusion_matrix_router
     from azimuth.routers.model_performance.metrics import router as metrics_router
-    from azimuth.routers.model_performance.outcome_count import (
-        router as outcome_count_router,
-    )
-    from azimuth.routers.model_performance.utterance_count import (
-        router as utterance_count_router,
-    )
+    from azimuth.routers.model_performance.outcome_count import router as outcome_count_router
+    from azimuth.routers.model_performance.utterance_count import router as utterance_count_router
     from azimuth.routers.top_words import router as top_words_router
     from azimuth.routers.utterances import router as utterances_router
     from azimuth.utils.routers import require_application_ready, require_available_model

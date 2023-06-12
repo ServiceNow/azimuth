@@ -2,6 +2,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
   AccordionDetails,
+  AccordionProps,
   AccordionSummary,
   Box,
   Divider,
@@ -10,7 +11,7 @@ import {
 import Description from "components/Description";
 import React from "react";
 
-type Props = {
+type Props = AccordionProps & {
   name: string;
   description: string;
   link: string;
@@ -22,8 +23,9 @@ const AccordionLayout: React.FC<Props> = ({
   description,
   link,
   children,
+  ...props
 }) => (
-  <Accordion>
+  <Accordion {...props}>
     <AccordionSummary expandIcon={<ExpandMoreIcon />} id={name}>
       <Typography fontWeight="bold" width="20%" flexShrink={0}>
         {name}

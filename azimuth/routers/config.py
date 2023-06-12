@@ -1,7 +1,7 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import structlog
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
@@ -17,6 +17,7 @@ from azimuth.app import (
 )
 from azimuth.config import (
     AzimuthConfig,
+    AzimuthConfigHistoryWithHash,
     AzimuthValidationError,
     CustomObject,
     PipelineDefinition,
@@ -29,7 +30,7 @@ from azimuth.utils.project import update_config
 log = structlog.get_logger(__name__)
 router = APIRouter()
 
-REQUIRED = "required"
+REQUIRED = ""
 
 
 @router.get(
@@ -38,13 +39,26 @@ REQUIRED = "required"
     description="Get the default configuration",
     response_model=AzimuthConfig,
 )
-def get_default_config_def(
+def get_config_default(
     language: SupportedLanguage = Query(AzimuthConfig.__fields__["language"].default),
 ) -> AzimuthConfig:
     return AzimuthConfig(
+        dataset=CustomObject(class_name=REQUIRED),
         language=language,
         pipelines=[PipelineDefinition(name=REQUIRED, model=CustomObject(class_name=REQUIRED))],
     )
+
+
+@router.get(
+    "/history",
+    summary="Get configuration history",
+    description="Get the history of the configuration",
+    response_model=List[AzimuthConfigHistoryWithHash],
+)
+def get_config_history(
+    config: AzimuthConfig = Depends(get_config),
+) -> List[AzimuthConfigHistoryWithHash]:
+    return config.get_config_history()
 
 
 @router.get(
@@ -91,8 +105,10 @@ def patch_config(
         new_config = config
         initialize_managers(new_config, task_manager.cluster)
         log.info("Config update cancelled.")
-        if isinstance(e, (AzimuthValidationError, ValidationError)):
+        if isinstance(e, AzimuthValidationError):
             raise HTTPException(HTTP_400_BAD_REQUEST, detail=str(e))
+        if isinstance(e, ValidationError):
+            raise
         else:
             raise HTTPException(
                 HTTP_500_INTERNAL_SERVER_ERROR, detail="Error when loading the new config."

@@ -11,12 +11,12 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar, Union
 
 import structlog
 from jsonlines import jsonlines
-from pydantic import BaseSettings, Extra, Field, root_validator, validator
+from pydantic import Extra, Field, ValidationError, root_validator, validator
 
 from azimuth.types import AliasModel, DatasetColumn, SupportedModelContract
 from azimuth.utils.conversion import md5_hash
 from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
-from azimuth.utils.openapi import fix_union_types, make_all_properties_required
+from azimuth.utils.openapi import AzimuthBaseSettings
 
 log = structlog.get_logger(__file__)
 T = TypeVar("T", bound="ProjectConfig")
@@ -87,14 +87,6 @@ class AzimuthValidationError(Exception):
     pass
 
 
-class AzimuthBaseSettings(BaseSettings):
-    class Config:
-        @staticmethod
-        def schema_extra(schema):
-            fix_union_types(schema)
-            make_all_properties_required(schema)
-
-
 class CustomObject(AzimuthBaseSettings):
     class_name: str = Field(
         ...,
@@ -128,8 +120,8 @@ class TemperatureScaling(CustomObject):
     ] = "azimuth.utils.ml.postprocessing.TemperatureScaling"
     temperature: float = Field(1, ge=0, env="TEMP")
 
-    @root_validator()
-    def check_temps(cls, values):
+    @root_validator
+    def _check_temps(cls, values):
         kwargs = values.get("kwargs", {})
         if "temperature" not in kwargs:
             kwargs["temperature"] = values.get("temperature", 1)
@@ -144,8 +136,8 @@ class ThresholdConfig(CustomObject):
     ] = "azimuth.utils.ml.postprocessing.Thresholding"
     threshold: float = Field(0.5, ge=0, le=1, env="TH")
 
-    @root_validator()
-    def check_threshold(cls, values):
+    @root_validator
+    def _check_threshold(cls, values):
         kwargs = values.get("kwargs", {})
         if "threshold" not in kwargs:
             kwargs["threshold"] = values.get("threshold", 0.5)
@@ -267,7 +259,7 @@ class ProjectConfig(AzimuthBaseSettings):
     # Name of the current project.
     name: str = Field("New project", exclude_from_cache=True)
     # Dataset object definition.
-    dataset: Optional[CustomObject] = None
+    dataset: Optional[CustomObject] = Field(None, nullable=True)
     # Column names config in dataset
     columns: ColumnConfiguration = ColumnConfiguration()
     # Name of the rejection class.
@@ -286,7 +278,6 @@ class ProjectConfig(AzimuthBaseSettings):
             self.dict(
                 include=ProjectConfig.__fields__.keys(),
                 exclude=exclude_fields_from_cache(self),
-                by_alias=True,
             )
         )
 
@@ -341,7 +332,7 @@ class ModelContractConfig(CommonFieldsConfig):
     saliency_layer: Optional[str] = Field(None, nullable=True)
 
     @validator("pipelines", pre=True)
-    def check_pipeline_names(cls, pipeline_definitions):
+    def _check_pipeline_names(cls, pipeline_definitions):
         # We support both [] and None (null in JSON), and we standardize it to None.
         if not pipeline_definitions:
             return None
@@ -364,7 +355,6 @@ class ModelContractConfig(CommonFieldsConfig):
             self.dict(
                 include=ModelContractConfig.__fields__.keys()
                 - CommonFieldsConfig.__fields__.keys(),
-                by_alias=True,
             )
         )
 
@@ -441,8 +431,8 @@ class AzimuthConfig(
     # Reminder: If a module depends on an attribute in AzimuthConfig, the module will be forced to
     # include all other configs in its scope.
 
-    @root_validator()
-    def dynamic_language_config_values(cls, values):
+    @root_validator
+    def _dynamic_language_config_values(cls, values):
         defaults = config_defaults_per_language[values["language"]]
         if behavioral_testing := values.get("behavioral_testing"):
             neutral_token = behavioral_testing.neutral_token
@@ -481,6 +471,19 @@ class AzimuthConfig(
             return None
         else:
             return AzimuthConfigHistory.parse_obj(last_config).config
+
+    def get_config_history(self) -> List["AzimuthConfigHistoryWithHash"]:
+        config_history = []
+        try:
+            with jsonlines.open(self.get_config_history_path(), mode="r") as reader:
+                for item in reader:
+                    try:
+                        config_history.append(AzimuthConfigHistoryWithHash.parse_obj(item))
+                    except ValidationError:
+                        pass
+        except (FileNotFoundError, ValueError):
+            pass
+        return config_history
 
     def log_info(self):
         log.info(f"Config loaded for {self.name} with {self.model_contract} as a model contract.")
@@ -525,6 +528,14 @@ class AzimuthConfig(
 class AzimuthConfigHistory(AzimuthBaseSettings):
     config: AzimuthConfig
     created_on: str = Field(default_factory=lambda: str(datetime.now(timezone.utc)))
+
+
+class AzimuthConfigHistoryWithHash(AzimuthConfigHistory):
+    hash: str = ""
+
+    @root_validator(skip_on_failure=True)
+    def _set_hash(cls, values):
+        return {**values, "hash": md5_hash(values["config"].dict())}
 
 
 def load_azimuth_config(config_path: Optional[str], load_config_history: bool) -> AzimuthConfig:

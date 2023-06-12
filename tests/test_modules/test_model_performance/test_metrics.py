@@ -9,10 +9,7 @@ import numpy as np
 import pytest
 
 from azimuth.config import MetricDefinition
-from azimuth.modules.model_performance.metrics import (
-    MetricsModule,
-    MetricsPerFilterModule,
-)
+from azimuth.modules.model_performance.metrics import MetricsModule, MetricsPerFilterModule
 from azimuth.modules.model_performance.outcome_count import (
     OutcomeCountPerFilterModule,
     OutcomeCountPerThresholdModule,

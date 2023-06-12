@@ -37,13 +37,16 @@ azimuth  # Root directory
     `config` and `azimuth_shr` are two folders where you will put different artifacts before you
     can run Azimuth on your dataset and models. They get mounted automatically on the Docker image.
 
-## The Config File
+## The Config
 
-The Azimuth config file contains all the information to launch and customize Azimuth. It specifies
+The Azimuth config contains all the information to launch and customize Azimuth. It specifies
 which dataset and pipelines to load in the app, as well as other variables that allow for
 customization of the app. Most fields have default values and don't need to be explicitly defined in
 each config. The [:material-link: Configuration](../reference/configuration/index.md) reference
 details all available fields.
+
+When launching Azimuth, you may give the launcher a JSON config file.
+If you don't, the UI will simply prompt you to configure Azimuth from the config UI.
 
 Different configuration examples are provided in the repo under `config/examples`, leveraging
 pretrained models from [HuggingFace](https://huggingface.co). The next

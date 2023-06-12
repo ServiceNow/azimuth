@@ -30,10 +30,7 @@ from azimuth.types.perturbation_testing import (
     PerturbedUtteranceResult,
     PerturbedUtteranceWithClassNames,
 )
-from azimuth.types.similarity_analysis import (
-    SimilarUtterance,
-    SimilarUtterancesResponse,
-)
+from azimuth.types.similarity_analysis import SimilarUtterance, SimilarUtterancesResponse
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
     DATASET_SMART_TAG_FAMILIES,

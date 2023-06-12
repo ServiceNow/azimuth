@@ -14,12 +14,7 @@ from azimuth.config import AzimuthConfig
 from azimuth.modules.base_classes import DatasetResultModule
 from azimuth.modules.model_performance.metrics import MetricsPerFilterModule
 from azimuth.task_manager import TaskManager
-from azimuth.types import (
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-    SupportedModule,
-)
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod, SupportedModule
 
 CFG_FILE = "../local_configs/development/clinc/conf.json"
 MODULE = MetricsPerFilterModule

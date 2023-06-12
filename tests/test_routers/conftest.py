@@ -22,7 +22,7 @@ def mock_ready_flag_false():
 
 
 def create_test_app(config) -> FastAPI:
-    json.dump(config.dict(by_alias=True), open("/tmp/config.json", "w"))
+    json.dump(config.dict(), open("/tmp/config.json", "w"))
     return start_app("/tmp/config.json", load_config_history=False, debug=False)
 
 

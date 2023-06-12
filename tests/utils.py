@@ -1,24 +1,17 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
+from enum import Enum
 from pathlib import Path
+from typing import List, Type
 
 import numpy as np
 
-from azimuth.config import (
-    BehavioralTestingOptions,
-    NeutralTokenOptions,
-    TypoTestOptions,
-)
+from azimuth.config import BehavioralTestingOptions, NeutralTokenOptions, TypoTestOptions
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.modules.model_contract_task_mapping import model_contract_task_mapping
 from azimuth.modules.model_performance.outcomes import OutcomesModule
-from azimuth.types import (
-    DatasetColumn,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-)
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.types.tag import (
     ALL_DATA_ACTIONS,
     ALL_PREDICTION_TAGS,
@@ -201,3 +194,12 @@ def get_tiny_text_config_one_ds_name(config):
         DatasetSplitName.train if ds_name == DatasetSplitName.eval else DatasetSplitName.eval
     )
     return ds_name, other_ds_name
+
+
+def get_enum_validation_error_msg(enum: Type[Enum]):
+    permitted = ", ".join(repr(v.value) for v in enum)
+    return f"value is not a valid enumeration member; permitted: {permitted}"
+
+
+def is_sorted(numbers: List[float], descending=False):
+    return all(a >= b if descending else a <= b for a, b in zip(numbers[:-1], numbers[1:]))

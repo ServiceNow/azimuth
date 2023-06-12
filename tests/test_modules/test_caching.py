@@ -20,12 +20,7 @@ from azimuth.modules.base_classes import (
 from azimuth.modules.base_classes.caching import HDF5FileOpenerWithRetry
 from azimuth.modules.model_performance.confusion_matrix import ConfusionMatrixModule
 from azimuth.modules.task_execution import get_task_result
-from azimuth.types import (
-    DatasetFilters,
-    DatasetSplitName,
-    ModuleOptions,
-    ModuleResponse,
-)
+from azimuth.types import DatasetFilters, DatasetSplitName, ModuleOptions, ModuleResponse
 from azimuth.types.model_performance import ConfusionMatrixResponse
 from azimuth.utils.exclude_fields_from_cache import exclude_fields_from_cache
 from tests.utils import save_outcomes, save_predictions

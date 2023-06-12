@@ -11,6 +11,10 @@ export type QueryClassOverlapState = {
   overlapThreshold?: number;
 };
 
+export type QueryDetailsState = {
+  detailsForPageItem?: number;
+};
+
 export type QueryArrayFiltersState = {
   label?: string[];
   prediction?: string[];
@@ -51,6 +55,7 @@ export type QueryConfusionMatrixState = {
 };
 
 export type QueryState = QueryClassOverlapState &
+  QueryDetailsState &
   QueryFilterState &
   QueryPaginationState &
   QueryPipelineState &

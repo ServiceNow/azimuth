@@ -1,5 +1,7 @@
 from typing import Dict
 
+from pydantic import BaseSettings
+
 
 def fix_union_types(schema: Dict):
     """Replace oneOf with anyOf, which openapi-typescript understands better."""
@@ -15,3 +17,11 @@ def make_all_properties_required(schema: Dict):
     """pydantic considers fields with default values to be optional, but when the API returns an
     object, all the default values are set, so the fields are always present."""
     schema["required"] = list(schema["properties"].keys())
+
+
+class AzimuthBaseSettings(BaseSettings):
+    class Config:
+        @staticmethod
+        def schema_extra(schema):
+            fix_union_types(schema)
+            make_all_properties_required(schema)

@@ -1,11 +1,13 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import List
 
 from fastapi import FastAPI
 from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from starlette.testclient import TestClient
+
+from azimuth.types.tag import DataAction
+from tests.utils import get_enum_validation_error_msg, is_sorted
 
 UTTERANCE_COUNT = 42
 
@@ -31,10 +33,6 @@ def test_get_similar(app: FastAPI) -> None:
         "=train"
     ).json()["utterances"]
     assert len(resp) == 2
-
-
-def is_sorted(numbers: List[float], descending=False):
-    return all(a >= b if descending else a <= b for a, b in zip(numbers[:-1], numbers[1:]))
 
 
 def test_get_utterances(app: FastAPI):
@@ -103,9 +101,15 @@ def test_get_utterances_pagination(app: FastAPI):
 
     resp = client.get("/dataset_splits/eval/utterances?limit=0&offset=0")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == (
+        "query parameter limit=0: ensure this value is greater than or equal to 1"
+    )
 
     resp = client.get("/dataset_splits/eval/utterances?limit=10&offset=-1")
     assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == (
+        "query parameter offset=-1: ensure this value is greater than or equal to 0"
+    )
 
     resp = client.get("/dataset_splits/eval/utterances?limit=10&offset=10").json()
     assert len(resp["utterances"]) == 10
@@ -117,10 +121,10 @@ def test_get_utterances_pagination(app: FastAPI):
     assert resp["utteranceCount"] == UTTERANCE_COUNT
 
     resp = client.get("/dataset_splits/eval/utterances?limit=3")
-    assert resp.status_code == 400
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
 
     resp = client.get("/dataset_splits/eval/utterances?offset=3")
-    assert resp.status_code == 400
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
 
 
 def test_get_utterances_filtering_and_indexing(app: FastAPI):
@@ -201,6 +205,14 @@ def test_perturbed_utterances(app: FastAPI, monkeypatch):
 
 def test_patch_utterances(app: FastAPI) -> None:
     client = TestClient(app)
+
+    request = [{"dataAction": "potato"}]
+    resp = client.patch("/dataset_splits/eval/utterances", json=request)
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == (
+        "Request['body'][0]['persistentId']: field required\n"
+        f"Request['body'][0]['dataAction']: {get_enum_validation_error_msg(DataAction)}"
+    )
 
     request = [{"persistentId": 0, "dataAction": "remove"}]
     resp = client.patch("/dataset_splits/eval/utterances", json=request)

@@ -49,7 +49,21 @@ const Dashboard = () => {
 
   const firstAvailableDatasetSplit = DATASET_SPLIT_NAMES.find(
     (datasetSplitName) => datasetInfo.availableDatasetSplits[datasetSplitName]
-  )!;
+  );
+
+  if (firstAvailableDatasetSplit === undefined) {
+    return (
+      <Box
+        width="100%"
+        height="100%"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Typography>Please set up a dataset</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box display="flex" flexDirection="column" gap={2}>

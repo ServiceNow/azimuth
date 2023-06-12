@@ -3,17 +3,21 @@
 # in the root directory of this source tree.
 
 from fastapi import FastAPI
-from starlette.status import HTTP_200_OK
+from starlette.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from starlette.testclient import TestClient
 
+from azimuth.routers.utterances import UtterancesSortableColumn
+from azimuth.types import DatasetSplitName
+from azimuth.types.outcomes import OutcomeName
 from azimuth.types.tag import ALL_DATA_ACTION_FILTERS, ALL_SMART_TAG_FILTERS
+from tests.utils import get_enum_validation_error_msg
 
 
 def test_openapi(app: FastAPI):
     # Check that we can generate the openapi.json
     client = TestClient(app)
     resp = client.get("/openapi.json")
-    assert resp.status_code == 200
+    assert resp.status_code == HTTP_200_OK, resp.text
 
 
 def test_get_status(app: FastAPI) -> None:
@@ -39,7 +43,7 @@ def test_get_dataset_info(app: FastAPI) -> None:
 
     assert data == {
         "availableDatasetSplits": {"eval": True, "train": True},
-        "classNames": ["negative", "positive", "REJECTION_CLASS"],
+        "utteranceCountPerDatasetSplit": {"eval": 42, "train": 42},
         "modelContract": "custom_text_classification",
         "perturbationTestingAvailable": True,
         "postprocessingEditable": [False],
@@ -48,8 +52,6 @@ def test_get_dataset_info(app: FastAPI) -> None:
         "dataActions": ALL_DATA_ACTION_FILTERS,
         "similarityAvailable": True,
         "smartTags": ALL_SMART_TAG_FILTERS,
-        "evalClassDistribution": [22, 20, 0],
-        "trainClassDistribution": [23, 19, 0],
     }
 
 
@@ -67,3 +69,16 @@ def test_custom_metrics_definition(app: FastAPI):
 
     assert not {"Precision", "Recall"}.difference(resp.keys())
     assert all(v["description"] != "" for v in resp.values())
+
+
+def test_validation_error(app: FastAPI):
+    client = TestClient(app)
+
+    resp = client.get("/dataset_splits/c/utterances?outcome=a&outcome=b&sort=d&pipeline_index=0")
+    assert resp.status_code == HTTP_404_NOT_FOUND, resp.text
+    assert resp.json()["detail"] == (
+        f"query parameter outcome=a: {get_enum_validation_error_msg(OutcomeName)}\n"
+        f"query parameter outcome=b: {get_enum_validation_error_msg(OutcomeName)}\n"
+        f"path parameter dataset_split_name=c: {get_enum_validation_error_msg(DatasetSplitName)}\n"
+        f"query parameter sort=d: {get_enum_validation_error_msg(UtterancesSortableColumn)}"
+    )

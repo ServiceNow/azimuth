@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "azimuth"
-version = "2.6.1"
+version = "2.7.0"
 description = "Azimuth provides a unified error analysis experience to data scientists."
 readme = "README.md"
 authors = ["Azimuth team <azimuth-team@servicenow.com>"]
@@ -96,6 +96,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 env = ["DASK_DISTRIBUTED__WORKER__DAEMON=False"]
+filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.black]
 line-length = 100
@@ -104,6 +105,7 @@ line-length = 100
 profile = "black"
 skip = ["__init__.py"]
 filter_files = true
+line_length = 100
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]

@@ -13,12 +13,7 @@ from azimuth.modules.model_contracts import (
     CustomTextClassificationModule,
     HFTextClassificationModule,
 )
-from azimuth.types import (
-    DatasetColumn,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-)
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, SupportedMethod
 from azimuth.types.tag import SmartTag
 from azimuth.types.task import PredictionResponse
 from azimuth.utils.ml.postprocessing import PostProcessingIO
@@ -63,7 +58,7 @@ def test_pipeline_steps(simple_text_config):
     )
     for order, class_name in enumerate(("TemperatureScaling", "Thresholding")):
         assert (
-            ds[DatasetColumn.pipeline_steps][0]["postprocessing_steps"][order]["className"]
+            ds[DatasetColumn.pipeline_steps][0]["postprocessing_steps"][order]["class_name"]
             == class_name
         )
     # The prediction of the last pipeline step should be the same as the postprocessed prediction.

@@ -36,6 +36,7 @@ type Props = {
   baseUtterance: Utterance;
   persistentIdColumn: string;
   pipeline: QueryPipelineState;
+  loading: boolean;
   utterances: SimilarUtterance[];
 };
 
@@ -44,6 +45,7 @@ const SimilarUtterances: React.FC<Props> = ({
   baseUtterance,
   persistentIdColumn,
   pipeline,
+  loading,
   utterances,
 }) => {
   const classes = useStyles();
@@ -169,6 +171,7 @@ const SimilarUtterances: React.FC<Props> = ({
 
   return (
     <Table
+      loading={loading}
       rows={rows}
       columns={columns}
       columnVisibilityModel={

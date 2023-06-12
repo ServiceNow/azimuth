@@ -9,12 +9,7 @@ from azimuth.app import get_dataset_split_manager, get_task_manager
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.model_performance.metrics import MetricsModule
 from azimuth.task_manager import TaskManager
-from azimuth.types import (
-    DatasetSplitName,
-    ModuleOptions,
-    NamedDatasetFilters,
-    SupportedModule,
-)
+from azimuth.types import DatasetSplitName, ModuleOptions, NamedDatasetFilters, SupportedModule
 from azimuth.types.model_performance import (
     MetricsAPIResponse,
     MetricsModuleResponse,

@@ -33,7 +33,7 @@ class Module(DaskModule[ConfigScope]):
     ):
         mod_options = mod_options or ModuleOptions()
         self.mod_options = mod_options
-        defined_mod_options = set(self.mod_options.no_alias_dict(exclude_defaults=True).keys())
+        defined_mod_options = set(self.mod_options.dict(exclude_defaults=True).keys())
         if not self.required_mod_options.issubset(defined_mod_options):
             raise ValueError(f"{self.__class__.__name__} requires {self.required_mod_options}.")
         if diff := (defined_mod_options - self.required_mod_options - self.optional_mod_options):

@@ -9,12 +9,7 @@ import pytest
 from azimuth.config import SyntaxConfig
 from azimuth.modules.base_classes import AggregationModule, FilterableModule, Module
 from azimuth.task_manager import TaskManagerLockedException
-from azimuth.types import (
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-    SupportedModule,
-)
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod, SupportedModule
 
 
 def test_get_all_task(tiny_text_task_manager):

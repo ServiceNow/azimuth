@@ -21,12 +21,7 @@ from azimuth.app import (
 from azimuth.config import AzimuthConfig
 from azimuth.dataset_split_manager import DatasetSplitManager, PredictionTableKey
 from azimuth.task_manager import TaskManager
-from azimuth.types import (
-    DatasetColumn,
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedModule,
-)
+from azimuth.types import DatasetColumn, DatasetSplitName, ModuleOptions, SupportedModule
 from azimuth.types.perturbation_testing import (
     PerturbationTestSummary,
     PerturbedUtteranceDetailedResult,
@@ -113,7 +108,7 @@ def get_export_perturbation_testing_summary(
     )[0].all_tests_summary
 
     df = pd.DataFrame.from_records([t.dict() for t in task_result])
-    df["example"] = df["example"].apply(lambda i: i["perturbedUtterance"])
+    df["example"] = df["example"].apply(lambda i: i["perturbed_utterance"])
     file_label = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 
     filename = f"azimuth_export_behavioral_testing_summary_{config.name}_{file_label}.csv"

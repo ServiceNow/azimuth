@@ -10,7 +10,7 @@ import sys
 
 import structlog
 
-from azimuth.config import CustomObject
+from azimuth.config import AzimuthValidationError, CustomObject
 
 log = structlog.get_logger(__file__)
 
@@ -53,7 +53,7 @@ def install(remote: str):
             subprocess.check_call([sys.executable, "-m", "pip", "install", remote])
         except subprocess.CalledProcessError:
             # Was probably a misspecified folder
-            raise FileNotFoundError(f"Can't find {remote} locally or on Pypi.")
+            raise AzimuthValidationError(f"Can't find remote {repr(remote)} locally or on Pypi.")
     importlib.invalidate_caches()
 
 
@@ -81,9 +81,9 @@ def load_custom_object(
     return load_class(kwargs, reject, value, force_kwargs=force_kwargs)
 
 
-def has_init(func):
-    # Is overloaded
-    return func.__init__ != object.__init__
+def get_class_init_varnames(cls):
+    # We check if func.__init__ is overloaded, otherwise func.__init__ has no attribute __code__.
+    return cls.__init__.__code__.co_varnames if cls.__init__ != object.__init__ else []
 
 
 def load_args(v, kwargs):
@@ -110,14 +110,12 @@ def load_class(kwargs, reject, value, force_kwargs=False):
     Returns:
         object, the loaded object.
     """
-    func = load_obj(value.class_name)
-    if inspect.isclass(func):
-        if has_init(func):
-            varnames = func.__init__.__code__.co_varnames
-        else:
-            varnames = []
-    else:
-        varnames = func.__code__.co_varnames
+    try:
+        func = load_obj(value.class_name)
+    except (ModuleNotFoundError, AttributeError) as e:
+        raise AzimuthValidationError(f"Invalid class_name {repr(value.class_name)}: {e}")
+
+    varnames = get_class_init_varnames(func) if inspect.isclass(func) else func.__code__.co_varnames
 
     not_present = {k: v for k, v in kwargs.items() if k not in varnames}
 
@@ -129,12 +127,15 @@ def load_class(kwargs, reject, value, force_kwargs=False):
     if reject is not None:
         kwargs_ins = {k: v for k, v in kwargs.items() if k not in reject}
     kwargs_ins = {k: load_args(v, kwargs) for k, v in kwargs_ins.items()}
-    return func(*value.args, **kwargs_ins)
+
+    try:
+        obj = func(*value.args, **kwargs_ins)
+    except Exception as e:
+        raise AzimuthValidationError(e)
+    return obj
 
 
 def load_obj(cls):
     """Get the function object and load the required modules."""
-    splitted = cls.split(".")
-    mod, cls = ".".join(splitted[:-1]), splitted[-1]
-    func = getattr(importlib.import_module(mod), cls)
-    return func
+    mod, cls = cls.rsplit(".", 1)
+    return getattr(importlib.import_module(mod), cls)

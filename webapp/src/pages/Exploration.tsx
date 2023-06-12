@@ -49,6 +49,7 @@ const Exploration = () => {
 
   const {
     confusionMatrix,
+    details,
     filters,
     pagination,
     pipeline,
@@ -166,6 +167,7 @@ const Exploration = () => {
                 datasetInfo={datasetInfo}
                 datasetSplitName={datasetSplitName}
                 confusionMatrix={confusionMatrix}
+                details={details}
                 filters={filters}
                 pagination={pagination}
                 pipeline={pipeline}

@@ -14,9 +14,7 @@ from tqdm import tqdm
 
 from azimuth.config import MetricsConfig, MetricsPerFilterConfig
 from azimuth.modules.base_classes import AggregationModule, FilterableModule
-from azimuth.modules.model_performance.confidence_binning import (
-    ConfidenceHistogramModule,
-)
+from azimuth.modules.model_performance.confidence_binning import ConfidenceHistogramModule
 from azimuth.plots.ece import make_ece_figure
 from azimuth.types import DatasetColumn, DatasetFilters
 from azimuth.types.model_performance import (

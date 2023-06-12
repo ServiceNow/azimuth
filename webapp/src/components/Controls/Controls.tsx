@@ -103,9 +103,8 @@ const Controls: React.FC<Props> = ({
 
   const { data: datasetInfo } = getDatasetInfoEndpoint.useQuery({ jobId });
 
-  const totalUtterances = datasetInfo?.[
-    `${datasetSplitName}ClassDistribution`
-  ].reduce((a, b) => a + b);
+  const totalUtterances =
+    datasetInfo?.utteranceCountPerDatasetSplit[datasetSplitName];
 
   const handleCollapseFilters = () => {
     setIsCollapsed(!isCollapsed);

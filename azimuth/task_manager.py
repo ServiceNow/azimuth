@@ -9,12 +9,7 @@ from distributed import Client, SpecCluster
 from azimuth.config import AzimuthConfig
 from azimuth.modules.base_classes import DaskModule, ExpirableMixin
 from azimuth.modules.task_mapping import model_contract_methods, modules
-from azimuth.types import (
-    DatasetSplitName,
-    ModuleOptions,
-    SupportedMethod,
-    SupportedTask,
-)
+from azimuth.types import DatasetSplitName, ModuleOptions, SupportedMethod, SupportedTask
 from azimuth.utils.cluster import default_cluster
 
 log = structlog.get_logger()
@@ -77,7 +72,7 @@ class TaskManager:
         for route, tasks in root_routes.items():
             for name, task in tasks.items():
                 page_name = f"{route}/{name}"
-                log.info(f"Registering new task in {route}.", name=page_name, clss=task)
+                log.debug(f"Registering new task in {route}.", name=page_name, clss=task)
                 self.register_task(name, task)
 
     def get_all_tasks_status(self, task: Optional[str] = None) -> Dict[str, str]:

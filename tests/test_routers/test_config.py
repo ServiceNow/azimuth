@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from jsonlines import jsonlines
+from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from starlette.testclient import TestClient
 
 from azimuth.config import SupportedLanguage, config_defaults_per_language
+from azimuth.types import SupportedModelContract
+from tests.utils import get_enum_validation_error_msg, is_sorted
 
 
 def test_get_default_config(app: FastAPI):
@@ -11,7 +13,7 @@ def test_get_default_config(app: FastAPI):
 
     assert res == {
         "name": "New project",
-        "dataset": None,
+        "dataset": {"class_name": "", "args": [], "kwargs": {}, "remote": None},
         "model_contract": "hf_text_classification",
         "columns": {
             "text_input": "utterance",
@@ -48,8 +50,8 @@ def test_get_default_config(app: FastAPI):
         },
         "pipelines": [
             {
-                "name": "required",
-                "model": {"class_name": "required", "args": [], "kwargs": {}, "remote": None},
+                "name": "Pipeline_0",
+                "model": {"class_name": "", "args": [], "kwargs": {}, "remote": None},
                 "postprocessors": [
                     {
                         "class_name": "azimuth.utils.ml.postprocessing.Thresholding",
@@ -119,6 +121,18 @@ def test_get_default_config_french(app: FastAPI):
     assert res["syntax"]["subj_tags"] == defaults.subj_tags
     assert res["syntax"]["obj_tags"] == defaults.obj_tags
     assert res["similarity"]["faiss_encoder"] == defaults.faiss_encoder
+
+
+def test_get_config_history(app: FastAPI):
+    client = TestClient(app)
+    resp = client.get("/config/history")
+    assert resp.status_code == HTTP_200_OK, resp.text
+
+    history = resp.json()
+    assert len(history) >= 1
+    assert is_sorted([item["created_on"] for item in history])
+    # The hash has 128 bits and is represented as a string of hex characters (4 bits each).
+    assert all(len(item["hash"]) == 128 / 4 for item in history)
 
 
 def test_get_config(app: FastAPI):
@@ -230,30 +244,48 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     initial_config = client.get("/config").json()
     initial_contract = initial_config["model_contract"]
     initial_pipelines = initial_config["pipelines"]
-    jsonl_file_path = f"{initial_config['artifact_path']}/config_history.jsonl"
-    with jsonlines.open(jsonl_file_path, "r") as reader:
-        initial_config_count = len(list(reader))
+    initial_config_count = len(client.get("/config/history").json())
 
-    res = client.patch(
+    resp = client.patch(
         "/config",
         json={"model_contract": "file_based_text_classification", "pipelines": None},
     )
-    assert res.json()["model_contract"] == "file_based_text_classification"
+    assert resp.json()["model_contract"] == "file_based_text_classification"
     get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
     assert not get_config["pipelines"]
-    with jsonlines.open(jsonl_file_path, "r") as reader:
-        new_config_count = len(list(reader))
+    new_config_count = len(client.get("/config/history").json())
     assert new_config_count == initial_config_count + 1
 
     # Config Validation Error
-    res = client.patch("/config", json={"model_contract": "potato"})
-    assert res.status_code == 400
+    resp = client.patch("/config", json={"model_contract": "potato"})
+    assert resp.status_code == HTTP_400_BAD_REQUEST, resp.text
+    assert resp.json()["detail"] == (
+        f"AzimuthConfig['model_contract']: {get_enum_validation_error_msg(SupportedModelContract)}"
+    )
     get_config = client.get("/config").json()
     assert get_config["model_contract"] == "file_based_text_classification"
 
     # Validation Module Error
-    res = client.patch(
+    # TODO assert error detail
+    #  Should be 400, but during tests, AzimuthValidationError gets wrapped in a MultipleExceptions
+
+    resp = client.patch(
+        "/config", json={"pipelines": [{"model": {"class_name": "", "remote": "lol"}}]}
+    )
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+    # TODO assert resp.json()["detail"] == "Can't find remote 'lol' locally or on Pypi."
+
+    resp = client.patch("/config", json={"pipelines": [{"model": {"class_name": "potato.hair"}}]})
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+
+    resp = client.patch(
+        "/config",
+        json={"pipelines": [{"model": {"class_name": "tests.test_loading_resources.hair"}}]},
+    )
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+
+    resp = client.patch(
         "/config",
         json={
             "pipelines": [
@@ -261,17 +293,17 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
             ]
         },
     )
-    assert res.status_code == 500
+    assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR, resp.text
+
     get_config = client.get("/config").json()
     assert not get_config["pipelines"]
 
     # Empty update
-    res = client.patch("/config", json={})
-    assert res.status_code == 200
+    resp = client.patch("/config", json={})
+    assert resp.status_code == HTTP_200_OK, resp.text
     assert get_config == client.get("/config").json()
 
-    with jsonlines.open(jsonl_file_path, "r") as reader:
-        loaded_configs = list(reader)
+    loaded_configs = client.get("/config/history").json()
     assert len(loaded_configs) == new_config_count, "No config should have been saved since."
     assert loaded_configs[-1]["config"]["model_contract"] == "file_based_text_classification"
     assert not loaded_configs[-1]["config"]["pipelines"]
@@ -280,3 +312,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     _ = client.patch(
         "/config", json={"model_contract": initial_contract, "pipelines": initial_pipelines}
     )
+
+    loaded_configs = client.get("/config/history").json()
+    assert loaded_configs[-1]["config"] == loaded_configs[initial_config_count - 1]["config"]
+    assert loaded_configs[-1]["hash"] == loaded_configs[initial_config_count - 1]["hash"]

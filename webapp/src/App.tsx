@@ -1,11 +1,3 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Redirect,
-  Route,
-  Switch,
-  useParams,
-} from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import {
   StyledEngineProvider,
@@ -14,26 +6,34 @@ import {
 } from "@mui/material/styles";
 import AppLayout from "components/AppLayout";
 import BasicLayout from "components/BasicLayout";
-import PageHeader from "components/PageHeader";
-import WarningsOverview from "pages/WarningsOverview";
-import UtteranceDetail from "pages/UtteranceDetail";
-import customTheme, { GlobalCss } from "styles/theme";
 import ErrorBoundary from "components/ErrorBoundary";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
-import StatusCheck from "components/StatusCheck";
+import PageHeader from "components/PageHeader";
 import PipelineCheck from "components/PipelineCheck";
-import store from "store";
-import { Provider } from "react-redux";
+import StatusCheck from "components/StatusCheck";
+import ClassOverlap from "pages/ClassOverlap";
 import Dashboard from "pages/Dashboard";
-import PerformanceAnalysis from "pages/PerformanceAnalysis";
-import PerturbationTestingSummary from "pages/PerturbationTestingSummary";
-import Threshold from "pages/Threshold";
-import { DatasetSplitName } from "types/api";
 import Exploration from "pages/Exploration";
 import NotFound from "pages/NotFound";
-import ClassOverlap from "pages/ClassOverlap";
+import PerformanceAnalysis from "pages/PerformanceAnalysis";
+import PerturbationTestingSummary from "pages/PerturbationTestingSummary";
 import SmartTags from "pages/SmartTags";
+import Threshold from "pages/Threshold";
+import UtteranceDetails from "pages/UtteranceDetails";
+import WarningsOverview from "pages/WarningsOverview";
+import React from "react";
+import { Provider } from "react-redux";
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+  useParams,
+} from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import store from "store";
+import customTheme, { GlobalCss } from "styles/theme";
+import { DatasetSplitName } from "types/api";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -144,7 +144,7 @@ export default class App extends React.Component<Props> {
                               exact
                             >
                               <BasicLayout>
-                                <UtteranceDetail />
+                                <UtteranceDetails />
                               </BasicLayout>
                             </Route>
                             <Route>
@@ -172,7 +172,7 @@ export default class App extends React.Component<Props> {
                   </Switch>
                 </ErrorBoundary>
               </AppLayout>
-              <ToastContainer />
+              <ToastContainer autoClose={10_000} />
             </ThemeProvider>
           </StyledEngineProvider>
         </Router>

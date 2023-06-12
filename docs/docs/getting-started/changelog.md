@@ -1,5 +1,15 @@
 # Releases
 
+## [2.7.0] - 2023-06-12
+
+### Added
+- Support for no dataset at startup, in which case the UI will prompt the user to configure Azimuth from the config UI.
+- Support for customizing, adding, and removing some pipelines, postprocessors, and metrics from the config UI.
+- Meaningful error messages in the error toasts.
+
+### Changed
+- When clicking on an utterance from the Exploration space's Utterance Table, the Utterance Details now open in a modal on top of the table. This preserves the context of the filtering and sorting and allows for going through the utterances one by one, using some new arrow buttons or keyboard arrows.
+
 ## [2.6.1] - 2023-04-20
 
 ### Changed

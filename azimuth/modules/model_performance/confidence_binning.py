@@ -11,15 +11,9 @@ from azimuth.config import ModelContractConfig
 from azimuth.dataset_split_manager import DatasetSplitManager
 from azimuth.modules.base_classes import DatasetResultModule, FilterableModule
 from azimuth.types import DatasetColumn
-from azimuth.types.model_performance import (
-    ConfidenceBinDetails,
-    ConfidenceHistogramResponse,
-)
+from azimuth.types.model_performance import ConfidenceBinDetails, ConfidenceHistogramResponse
 from azimuth.types.outcomes import ALL_OUTCOMES, OutcomeName
-from azimuth.utils.dataset_operations import (
-    get_confidences_from_ds,
-    get_outcomes_from_ds,
-)
+from azimuth.utils.dataset_operations import get_confidences_from_ds, get_outcomes_from_ds
 from azimuth.utils.validation import assert_not_none
 
 CONFIDENCE_BINS_COUNT = 20
