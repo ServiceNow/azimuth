@@ -55,6 +55,24 @@ type MetricState = MetricDefinition & { name: string };
 
 type ConfigState = Omit<AzimuthConfig, "metrics"> & { metrics: MetricState[] };
 
+const azimuthConfigToConfigState = ({
+  metrics,
+  ...rest
+}: AzimuthConfig): ConfigState => ({
+  ...rest,
+  metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
+});
+
+const configStateToAzimuthConfig = ({
+  metrics,
+  ...rest
+}: Partial<ConfigState>): Partial<AzimuthConfig> => ({
+  ...rest,
+  ...(metrics && {
+    metrics: Object.fromEntries(metrics.map(({ name, ...m }) => [name, m])),
+  }),
+});
+
 const CONFIG_UPDATE_MESSAGE =
   "Please wait while the config changes are validated.";
 const PERCENTAGE = { scale: 100, units: "%", inputProps: { min: 0, max: 100 } };
@@ -152,14 +170,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     SupportedLanguage | undefined
   >();
   const { data: azimuthConfig } = getConfigEndpoint.useQuery({ jobId });
-  const config = React.useMemo(() => {
-    if (azimuthConfig === undefined) return undefined;
-    const { metrics, ...rest } = azimuthConfig;
-    return {
-      metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
-      ...rest,
-    };
-  }, [azimuthConfig]);
+  const config = React.useMemo(
+    () => azimuthConfig && azimuthConfigToConfigState(azimuthConfig),
+    [azimuthConfig]
+  );
 
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
@@ -335,12 +349,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           onClick={() => {
             updateConfig({
               jobId,
-              body: {
-                ...partialConfig,
-                metrics: Object.fromEntries(
-                  resultingConfig.metrics.map(({ name, ...m }) => [name, m])
-                ),
-              },
+              body: configStateToAzimuthConfig(partialConfig),
             })
               .unwrap()
               .then(
