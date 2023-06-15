@@ -20,6 +20,8 @@ const FileInputButton: React.FC<
           };
           fileReader.readAsText(target.files[0]);
         }
+        // Reset input so that the same file can be selected again.
+        target.value = "";
       }}
     />
   </Button>
