@@ -34,6 +34,10 @@ export interface paths {
     /** Update the config. */
     patch: operations["patch_config_config_patch"];
   };
+  "/config/validate": {
+    /** Validate the given partial config update and return the complete config that would result if this update was applied. */
+    patch: operations["validate_config_config_validate_patch"];
+  };
   "/dataset_splits/{dataset_split_name}/class_overlap/plot": {
     /** Get a plot of class overlap using Spectral clustering and Monte-Carlo sampling (currently set to all samples). */
     get: operations["get_class_overlap_plot_dataset_splits__dataset_split_name__class_overlap_plot_get"];
@@ -1259,6 +1263,58 @@ export interface operations {
   };
   /** Update the config. */
   patch_config_config_patch: {
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AzimuthConfig"];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Unprocessable Entity */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+      /** Service Unavailable */
+      503: {
+        content: {
+          "application/json": components["schemas"]["HTTPExceptionModel"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": { [key: string]: any };
+      };
+    };
+  };
+  /** Validate the given partial config update and return the complete config that would result if this update was applied. */
+  validate_config_config_validate_patch: {
     responses: {
       /** Successful Response */
       200: {
