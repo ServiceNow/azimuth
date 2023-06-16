@@ -78,6 +78,25 @@ def get_config_def(
 
 
 @router.patch(
+    "/validate",
+    summary="Validate config",
+    description="Validate the given partial config update and return the complete config that would"
+    " result if this update was applied.",
+    response_model=AzimuthConfig,
+    dependencies=[Depends(require_editable_config)],
+)
+def validate_config(
+    config: AzimuthConfig = Depends(get_config),
+    partial_config: Dict = Body(...),
+) -> AzimuthConfig:
+    new_config = update_config(old_config=config, partial_config=partial_config)
+
+    assert_permission_to_update_config(old_config=config, new_config=new_config)
+
+    return new_config
+
+
+@router.patch(
     "",
     summary="Update config",
     description="Update the config.",
