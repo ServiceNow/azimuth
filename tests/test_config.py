@@ -8,6 +8,7 @@ from jsonlines import jsonlines
 from pydantic import ValidationError
 
 from azimuth.config import (
+    ArtifactsConfig,
     AzimuthConfig,
     AzimuthConfigHistoryWithHash,
     PipelineDefinition,
@@ -289,3 +290,10 @@ def test_config_history_with_hash():
         ValidationError, match="1 validation error for AzimuthConfigHistoryWithHash\nconfig -> name"
     ):
         AzimuthConfigHistoryWithHash(config={"name": None})
+
+
+def test_artifact_path_equality():
+    # This is important since we forbid updating the config if the artifact_path differs.
+    default = ArtifactsConfig()
+    assert ArtifactsConfig(artifact_path="cache/../cache") == default
+    assert ArtifactsConfig(artifact_path=f"{os.getcwd()}/cache") == default

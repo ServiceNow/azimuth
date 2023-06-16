@@ -1,11 +1,16 @@
 # Copyright ServiceNow, Inc. 2021 – 2022
 # This source code is licensed under the Apache 2.0 license found in the LICENSE file
 # in the root directory of this source tree.
-from typing import Any, Dict, List
+import os
+from typing import Dict, List
 
 import structlog
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 
 from azimuth.app import (
     get_config,
@@ -87,11 +92,7 @@ def patch_config(
     log.info(f"Validating config change with {partial_config}.")
     new_config = update_config(old_config=config, partial_config=partial_config)
 
-    if attribute_changed_in_config("artifact_path", partial_config, config):
-        raise HTTPException(
-            HTTP_400_BAD_REQUEST,
-            detail="Cannot edit artifact_path, otherwise config history would become inconsistent.",
-        )
+    assert_permission_to_update_config(old_config=config, new_config=new_config)
 
     if new_config.large_dask_cluster != config.large_dask_cluster:
         cluster = default_cluster(new_config.large_dask_cluster)
@@ -116,7 +117,9 @@ def patch_config(
     return new_config
 
 
-def attribute_changed_in_config(
-    attribute: str, partial_config: Dict[str, Any], config: AzimuthConfig
-) -> bool:
-    return attribute in partial_config and partial_config[attribute] != getattr(config, attribute)
+def assert_permission_to_update_config(*, old_config: AzimuthConfig, new_config: AzimuthConfig):
+    if old_config.artifact_path != new_config.artifact_path:
+        raise HTTPException(
+            HTTP_403_FORBIDDEN,
+            detail="Cannot edit artifact_path, otherwise config history would become inconsistent.",
+        )

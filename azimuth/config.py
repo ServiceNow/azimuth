@@ -284,10 +284,14 @@ class ProjectConfig(AzimuthBaseSettings):
 
 class ArtifactsConfig(AzimuthBaseSettings, extra=Extra.ignore):
     artifact_path: str = Field(
-        "cache",
+        default_factory=lambda: os.path.abspath("cache"),
         description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
         exclude_from_cache=True,
     )
+
+    @validator("artifact_path")
+    def validate_artifact_path(cls, artifact_path):
+        return os.path.abspath(artifact_path)
 
     def get_config_history_path(self):
         return f"{self.artifact_path}/config_history.jsonl"
