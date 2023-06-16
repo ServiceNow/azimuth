@@ -242,8 +242,6 @@ def test_get_config(app: FastAPI):
 def test_update_config(app: FastAPI, wait_for_startup_after):
     client = TestClient(app)
     initial_config = client.get("/config").json()
-    initial_contract = initial_config["model_contract"]
-    initial_pipelines = initial_config["pipelines"]
     initial_config_count = len(client.get("/config/history").json())
 
     resp = client.patch(
@@ -309,9 +307,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     assert not loaded_configs[-1]["config"]["pipelines"]
 
     # Revert config change
-    _ = client.patch(
-        "/config", json={"model_contract": initial_contract, "pipelines": initial_pipelines}
-    )
+    _ = client.patch("/config", json=initial_config)
 
     loaded_configs = client.get("/config/history").json()
     assert loaded_configs[-1]["config"] == loaded_configs[initial_config_count - 1]["config"]

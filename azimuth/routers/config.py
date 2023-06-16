@@ -5,7 +5,6 @@ from typing import Any, Dict, List
 
 import structlog
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
-from pydantic import ValidationError
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 
 from azimuth.app import (
@@ -85,19 +84,21 @@ def patch_config(
     config: AzimuthConfig = Depends(get_config),
     partial_config: Dict = Body(...),
 ) -> AzimuthConfig:
+    log.info(f"Validating config change with {partial_config}.")
+    new_config = update_config(old_config=config, partial_config=partial_config)
+
     if attribute_changed_in_config("artifact_path", partial_config, config):
         raise HTTPException(
             HTTP_400_BAD_REQUEST,
             detail="Cannot edit artifact_path, otherwise config history would become inconsistent.",
         )
 
+    if new_config.large_dask_cluster != config.large_dask_cluster:
+        cluster = default_cluster(new_config.large_dask_cluster)
+    else:
+        cluster = task_manager.cluster
+
     try:
-        log.info(f"Validating config change with {partial_config}.")
-        new_config = update_config(old_config=config, partial_config=partial_config)
-        if attribute_changed_in_config("large_dask_cluster", partial_config, config):
-            cluster = default_cluster(partial_config["large_dask_cluster"])
-        else:
-            cluster = task_manager.cluster
         run_startup_tasks(new_config, cluster)
         log.info(f"Config successfully updated with {partial_config}.")
     except Exception as e:
@@ -107,8 +108,6 @@ def patch_config(
         log.info("Config update cancelled.")
         if isinstance(e, AzimuthValidationError):
             raise HTTPException(HTTP_400_BAD_REQUEST, detail=str(e))
-        if isinstance(e, ValidationError):
-            raise
         else:
             raise HTTPException(
                 HTTP_500_INTERNAL_SERVER_ERROR, detail="Error when loading the new config."
