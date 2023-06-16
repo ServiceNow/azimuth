@@ -120,13 +120,19 @@ const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof ConfigState)[] = [
+  "dataset",
+  "columns",
+  "rejection_class",
   "behavioral_testing",
   "similarity",
   "dataset_warnings",
   "syntax",
+  "model_contract",
   "pipelines",
   "uncertainty",
+  "saliency_layer",
   "metrics",
+  "language",
 ];
 
 type KnownPostprocessor = TemperatureScaling | ThresholdConfig;
