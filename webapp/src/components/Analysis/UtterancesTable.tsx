@@ -1,13 +1,13 @@
 import {
   ArrowDropDown,
   Close,
+  Download,
   Fullscreen,
-  GetApp,
   SvgIconComponent,
+  Upload,
 } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import MultilineChartIcon from "@mui/icons-material/MultilineChart";
-import UploadIcon from "@mui/icons-material/Upload";
 import {
   Box,
   Button,
@@ -480,7 +480,7 @@ const UtterancesTable: React.FC<Props> = ({
         <Box display="flex" alignItems="center" gap={2}>
           <FileInputButton
             accept=".csv"
-            startIcon={<UploadIcon />}
+            startIcon={<Upload />}
             onFileRead={importProposedActions}
           >
             Import
@@ -490,7 +490,7 @@ const UtterancesTable: React.FC<Props> = ({
             aria-controls="export-menu"
             aria-haspopup="true"
             onClick={(event) => setAnchorEl(event.currentTarget)}
-            startIcon={<GetApp />}
+            startIcon={<Download />}
             endIcon={<ArrowDropDown />}
           >
             Export
