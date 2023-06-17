@@ -1,4 +1,4 @@
-import { Close, Upload, Warning } from "@mui/icons-material";
+import { Close, Download, Upload, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -51,6 +51,7 @@ import {
   ThresholdConfig,
 } from "types/api";
 import { PickByValue } from "types/models";
+import { downloadBlob } from "utils/api";
 import { UNKNOWN_ERROR } from "utils/const";
 import { raiseErrorToast } from "utils/helpers";
 
@@ -287,6 +288,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     }
   };
 
+  const handleDownload = () => {
+    const azimuthConfig = configStateToAzimuthConfig(resultingConfig);
+    const text = JSON.stringify(azimuthConfig, null, 2);
+    const blob = new Blob([text], { type: "application/json" });
+    downloadBlob(blob, "config.json");
+  };
+
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
       aria-labelledby="config-dialog-title"
@@ -307,6 +315,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           >
             Import JSON config file
           </FileInputButton>
+          <Button
+            disabled={areInputsDisabled}
+            startIcon={<Download />}
+            onClick={handleDownload}
+          >
+            Export JSON config file
+          </Button>
           <IconButton
             size="small"
             color="primary"
