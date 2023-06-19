@@ -278,7 +278,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       validateConfig({ jobId, body })
         .unwrap()
         .then((config) => setPartialConfig(azimuthConfigToConfigState(config)))
-        .catch(() => {}); // Avoid the uncaught error log.
+        .catch(() => {}); // Avoid the uncaught error log. Toast already raised by `rtkQueryErrorInterceptor` middleware.
     } catch (error) {
       raiseErrorToast(
         `Something went wrong parsing JSON file\n${
@@ -404,7 +404,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             })
               .unwrap()
               .then(handleClose)
-              .catch(() => {}); // Avoid the uncaught error log.
+              .catch(() => {}); // Avoid the uncaught error log. Toast already raised by `rtkQueryErrorInterceptor` middleware.
           }}
         >
           Apply and close
