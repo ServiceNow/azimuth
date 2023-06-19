@@ -1,4 +1,4 @@
-import { ArrowDropDown, GetApp } from "@mui/icons-material";
+import { ArrowDropDown, Download } from "@mui/icons-material";
 import { Button, Menu, MenuItem } from "@mui/material";
 import React from "react";
 import { QueryPipelineState } from "types/models";
@@ -42,7 +42,7 @@ const PerturbationTestingExporter: React.FC<Props> = ({ jobId, pipeline }) => {
         aria-controls="perturbation-testing-exporter-menu"
         aria-haspopup="true"
         onClick={handleClick}
-        startIcon={<GetApp />}
+        startIcon={<Download />}
         endIcon={<ArrowDropDown />}
       >
         Export

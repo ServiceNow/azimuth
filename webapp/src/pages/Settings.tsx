@@ -1,4 +1,4 @@
-import { Close, Warning } from "@mui/icons-material";
+import { Close, Download, Upload, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
+import FileInputButton from "components/FileInputButton";
 import Loading from "components/Loading";
 import AutocompleteStringField from "components/Settings/AutocompleteStringField";
 import CustomObjectFields from "components/Settings/CustomObjectFields";
@@ -37,6 +38,7 @@ import {
   getConfigEndpoint,
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
+  validateConfigEndpoint,
 } from "services/api";
 import {
   AzimuthConfig,
@@ -49,11 +51,31 @@ import {
   ThresholdConfig,
 } from "types/api";
 import { PickByValue } from "types/models";
+import { downloadBlob } from "utils/api";
 import { UNKNOWN_ERROR } from "utils/const";
+import { raiseErrorToast } from "utils/helpers";
 
 type MetricState = MetricDefinition & { name: string };
 
 type ConfigState = Omit<AzimuthConfig, "metrics"> & { metrics: MetricState[] };
+
+const azimuthConfigToConfigState = ({
+  metrics,
+  ...rest
+}: AzimuthConfig): ConfigState => ({
+  ...rest,
+  metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
+});
+
+const configStateToAzimuthConfig = ({
+  metrics,
+  ...rest
+}: Partial<ConfigState>): Partial<AzimuthConfig> => ({
+  ...rest,
+  ...(metrics && {
+    metrics: Object.fromEntries(metrics.map(({ name, ...m }) => [name, m])),
+  }),
+});
 
 const CONFIG_UPDATE_MESSAGE =
   "Please wait while the config changes are validated.";
@@ -102,13 +124,19 @@ const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof ConfigState)[] = [
+  "dataset",
+  "columns",
+  "rejection_class",
   "behavioral_testing",
   "similarity",
   "dataset_warnings",
   "syntax",
+  "model_contract",
   "pipelines",
   "uncertainty",
+  "saliency_layer",
   "metrics",
+  "language",
 ];
 
 type KnownPostprocessor = TemperatureScaling | ThresholdConfig;
@@ -152,17 +180,18 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     SupportedLanguage | undefined
   >();
   const { data: azimuthConfig } = getConfigEndpoint.useQuery({ jobId });
-  const config = React.useMemo(() => {
-    if (azimuthConfig === undefined) return undefined;
-    const { metrics, ...rest } = azimuthConfig;
-    return {
-      metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
-      ...rest,
-    };
-  }, [azimuthConfig]);
+  const config = React.useMemo(
+    () => azimuthConfig && azimuthConfigToConfigState(azimuthConfig),
+    [azimuthConfig]
+  );
+
+  const [validateConfig, { isLoading: isValidatingConfig }] =
+    validateConfigEndpoint.useMutation();
 
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
+
+  const areInputsDisabled = isValidatingConfig || isUpdatingConfig;
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<ConfigState>
@@ -243,6 +272,29 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     metricsNames.has("") ||
     resultingConfig.metrics.some(({ class_name }) => class_name.trim() === "");
 
+  const handleFileRead = (text: string) => {
+    try {
+      const body = JSON.parse(text);
+      validateConfig({ jobId, body })
+        .unwrap()
+        .then((config) => setPartialConfig(azimuthConfigToConfigState(config)))
+        .catch(() => {}); // Avoid the uncaught error log. Toast already raised by `rtkQueryErrorInterceptor` middleware.
+    } catch (error) {
+      raiseErrorToast(
+        `Something went wrong parsing JSON file\n${
+          (error as SyntaxError).message
+        }`
+      );
+    }
+  };
+
+  const handleDownload = () => {
+    const azimuthConfig = configStateToAzimuthConfig(resultingConfig);
+    const text = JSON.stringify(azimuthConfig, null, 2);
+    const blob = new Blob([text], { type: "application/json" });
+    downloadBlob(blob, "config.json");
+  };
+
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
       aria-labelledby="config-dialog-title"
@@ -251,16 +303,29 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       open={open}
     >
       <DialogTitle id="config-dialog-title">
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1">
-            View and edit certain fields from your config file. Once your
-            changes are saved, expect some delays for recomputing the affected
-            tasks.
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography variant="inherit" flex={1}>
+            Configuration
           </Typography>
+          <FileInputButton
+            accept=".json"
+            disabled={areInputsDisabled}
+            startIcon={<Upload />}
+            onFileRead={handleFileRead}
+          >
+            Import JSON config file
+          </FileInputButton>
+          <Button
+            disabled={areInputsDisabled}
+            startIcon={<Download />}
+            onClick={handleDownload}
+          >
+            Export JSON config file
+          </Button>
           <IconButton
             size="small"
             color="primary"
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onClick={() => {
               if (
                 isEmptyPartialConfig ||
@@ -299,7 +364,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       <DialogActions>
         <Button
           variant="contained"
-          disabled={isEmptyPartialConfig || isUpdatingConfig}
+          disabled={areInputsDisabled || isEmptyPartialConfig}
           onClick={handleDiscard}
         >
           Discard
@@ -331,22 +396,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         </Box>
         <Button
           variant="contained"
-          disabled={isEmptyPartialConfig || isUpdatingConfig || hasErrors}
+          disabled={areInputsDisabled || isEmptyPartialConfig || hasErrors}
           onClick={() => {
             updateConfig({
               jobId,
-              body: {
-                ...partialConfig,
-                metrics: Object.fromEntries(
-                  resultingConfig.metrics.map(({ name, ...m }) => [name, m])
-                ),
-              },
+              body: configStateToAzimuthConfig(partialConfig),
             })
               .unwrap()
-              .then(
-                handleClose,
-                () => {} // Avoid the uncaught error log.
-              );
+              .then(handleClose)
+              .catch(() => {}); // Avoid the uncaught error log. Toast already raised by `rtkQueryErrorInterceptor` middleware.
           }}
         >
           Apply and close
@@ -422,7 +480,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <Checkbox
           size="small"
           checked={Boolean(resultingConfig[field])}
-          disabled={isUpdatingConfig}
+          disabled={areInputsDisabled}
           onChange={(...[, checked]) =>
             updatePartialConfig({
               [field]: checked ? defaultConfig[field] : null,
@@ -444,7 +502,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <Checkbox
           size="small"
           checked={Boolean(pipeline.postprocessors)}
-          disabled={isUpdatingConfig}
+          disabled={areInputsDisabled}
           onChange={(...[, checked]) =>
             updatePipeline(pipelineIndex, {
               postprocessors: checked
@@ -467,14 +525,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <StringField
             label="name"
             value={resultingConfig.name}
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onChange={(name) => updatePartialConfig({ name })}
           />
           <StringField
             label="rejection_class"
             nullable
             value={resultingConfig.rejection_class}
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onChange={(rejection_class) =>
               updatePartialConfig({ rejection_class })
             }
@@ -487,7 +545,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <Typography variant="body2">{column}:</Typography>
                   <StringField
                     value={resultingConfig.columns[column]}
-                    disabled={isUpdatingConfig}
+                    disabled={areInputsDisabled}
                     onChange={(newValue) =>
                       updateSubConfig("columns", { [column]: newValue })
                     }
@@ -504,7 +562,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <FormGroup>
             <Columns columns={2}>
               <CustomObjectFields
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 value={resultingConfig.dataset}
                 onChange={(update) => updateSubConfig("dataset", update)}
               />
@@ -524,7 +582,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="model_contract"
             options={SUPPORTED_MODEL_CONTRACTS}
             value={resultingConfig.model_contract}
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onChange={(model_contract) =>
               updatePartialConfig({ model_contract })
             }
@@ -533,7 +591,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="saliency_layer"
             nullable
             value={resultingConfig.saliency_layer}
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onChange={(saliency_layer) =>
               updatePartialConfig({ saliency_layer })
             }
@@ -548,7 +606,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     <NumberField
                       value={value}
                       disabled={
-                        resultingConfig.uncertainty === null || isUpdatingConfig
+                        areInputsDisabled ||
+                        resultingConfig.uncertainty === null
                       }
                       onChange={(newValue) =>
                         updateSubConfig("uncertainty", { [field]: newValue })
@@ -565,7 +624,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("Pipelines")}
       <EditableArray
         array={resultingConfig.pipelines ?? []}
-        disabled={isUpdatingConfig}
+        disabled={areInputsDisabled}
         title="pipeline"
         newItem={defaultConfig.pipelines![0]}
         onChange={(pipelines) => updatePartialConfig({ pipelines })}
@@ -578,7 +637,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <StringField
                     label="name"
                     value={pipeline.name}
-                    disabled={isUpdatingConfig}
+                    disabled={areInputsDisabled}
                     onChange={(name) => updatePipeline(pipelineIndex, { name })}
                   />
                 </Columns>
@@ -589,7 +648,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <StringField
                     label="class_name"
                     value={pipeline.model.class_name}
-                    disabled={isUpdatingConfig}
+                    disabled={areInputsDisabled}
                     onChange={(class_name) =>
                       updateModel(pipelineIndex, { class_name })
                     }
@@ -598,7 +657,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     label="remote"
                     nullable
                     value={pipeline.model.remote}
-                    disabled={isUpdatingConfig}
+                    disabled={areInputsDisabled}
                     onChange={(remote) =>
                       updateModel(pipelineIndex, { remote })
                     }
@@ -607,13 +666,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     array
                     label="args"
                     value={pipeline.model.args}
-                    disabled={isUpdatingConfig}
+                    disabled={areInputsDisabled}
                     onChange={(args) => updateModel(pipelineIndex, { args })}
                   />
                   <JSONField
                     label="kwargs"
                     value={pipeline.model.kwargs}
-                    disabled={isUpdatingConfig}
+                    disabled={areInputsDisabled}
                     onChange={(kwargs) =>
                       updateModel(pipelineIndex, { kwargs })
                     }
@@ -626,7 +685,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   pipeline.postprocessors ??
                   getDefaultPostprocessors(pipelineIndex)
                 }
-                disabled={isUpdatingConfig || pipeline.postprocessors === null}
+                disabled={areInputsDisabled || pipeline.postprocessors === null}
                 title="post-processor"
                 newItem={{ class_name: "", args: [], kwargs: {}, remote: null }}
                 onChange={(postprocessors) =>
@@ -641,7 +700,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         value={postprocessor.class_name}
                         autoFocus
                         disabled={
-                          isUpdatingConfig || pipeline.postprocessors === null
+                          areInputsDisabled || pipeline.postprocessors === null
                         }
                         onChange={(class_name) =>
                           updatePipeline(pipelineIndex, {
@@ -668,7 +727,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       {!(postprocessor.class_name in KNOWN_POSTPROCESSORS) && (
                         <CustomObjectFields
                           excludeClassName
-                          disabled={isUpdatingConfig}
+                          disabled={areInputsDisabled}
                           value={postprocessor}
                           onChange={(update) =>
                             updatePostprocessor(pipelineIndex, index, update)
@@ -680,7 +739,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                           label="temperature"
                           value={postprocessor.temperature}
                           disabled={
-                            isUpdatingConfig || pipeline.postprocessors === null
+                            areInputsDisabled ||
+                            pipeline.postprocessors === null
                           }
                           onChange={(temperature) =>
                             updatePostprocessor(pipelineIndex, index, {
@@ -696,7 +756,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                           label="threshold"
                           value={postprocessor.threshold}
                           disabled={
-                            isUpdatingConfig || pipeline.postprocessors === null
+                            areInputsDisabled ||
+                            pipeline.postprocessors === null
                           }
                           onChange={(threshold) =>
                             updatePostprocessor(pipelineIndex, index, {
@@ -718,7 +779,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("Metrics")}
       <EditableArray
         array={resultingConfig.metrics}
-        disabled={isUpdatingConfig}
+        disabled={areInputsDisabled}
         title="metric"
         newItem={{
           name: "",
@@ -743,20 +804,20 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   helperText: "Set a value that is unique across all metrics",
                 })}
                 autoFocus
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 onChange={(name) =>
                   updateMetric(index, { name, ...defaultConfig.metrics[name] })
                 }
               />
               <CustomObjectFields
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 value={metric}
                 onChange={(update) => updateMetric(index, update)}
               />
               <JSONField
                 label="additional_kwargs"
                 value={metric.additional_kwargs}
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 onChange={(additional_kwargs) =>
                   updateMetric(index, { additional_kwargs })
                 }
@@ -779,7 +840,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
-              disabled={resultingConfig[config] === null || isUpdatingConfig}
+              disabled={areInputsDisabled || resultingConfig[config] === null}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
               }
@@ -790,7 +851,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
-              disabled={resultingConfig[config] === null || isUpdatingConfig}
+              disabled={areInputsDisabled || resultingConfig[config] === null}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
               }
@@ -813,7 +874,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       <StringArrayField
                         value={objValue}
                         disabled={
-                          resultingConfig[config] === null || isUpdatingConfig
+                          areInputsDisabled || resultingConfig[config] === null
                         }
                         onChange={(newValue) =>
                           updateSubConfig(config, {
@@ -825,7 +886,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       <NumberField
                         value={objValue as number}
                         disabled={
-                          resultingConfig[config] === null || isUpdatingConfig
+                          areInputsDisabled || resultingConfig[config] === null
                         }
                         onChange={(newValue) =>
                           updateSubConfig(config, {
@@ -845,7 +906,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               label={field}
               options={SUPPORTED_SPACY_MODELS}
               value={resultingConfig.syntax.spacy_model}
-              disabled={isUpdatingConfig}
+              disabled={areInputsDisabled}
               onChange={(spacy_model) =>
                 updateSubConfig("syntax", { spacy_model })
               }
@@ -856,7 +917,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 key={field}
                 label={field}
                 value={value}
-                disabled={resultingConfig[config] === null || isUpdatingConfig}
+                disabled={areInputsDisabled || resultingConfig[config] === null}
                 onChange={(newValue) =>
                   updateSubConfig(config, { [field]: newValue })
                 }
@@ -880,7 +941,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <NumberField
             label="batch_size"
             value={resultingConfig.batch_size}
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onChange={(batch_size) => updatePartialConfig({ batch_size })}
             {...INT}
           />
@@ -889,7 +950,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             options={USE_CUDA_OPTIONS}
             className="fixedWidthInput"
             value={String(resultingConfig.use_cuda) as UseCUDAOption}
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onChange={(use_cuda) =>
               updatePartialConfig({
                 use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
@@ -901,7 +962,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               <Checkbox
                 size="small"
                 checked={resultingConfig.large_dask_cluster}
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 onChange={(...[, large_dask_cluster]) =>
                   updatePartialConfig({ large_dask_cluster })
                 }
@@ -922,7 +983,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           options={SUPPORTED_LANGUAGES}
           sx={{ width: "6ch" }}
           value={language ?? resultingConfig.language}
-          disabled={isUpdatingConfig}
+          disabled={areInputsDisabled}
           onChange={(newValue) => setLanguage(newValue)}
         />
         <Box display="flex" gap={1}>

@@ -134,7 +134,7 @@ const downloadFileFromApi =
     downloadBlob(blob, filename);
   };
 
-async function downloadBlob(blob: Blob, filename?: string) {
+export async function downloadBlob(blob: Blob, filename?: string) {
   const downloadUrl = window.URL.createObjectURL(blob);
 
   const link = document.createElement("a");

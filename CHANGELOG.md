@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+- Two buttons in the config UI to import/export a JSON config file.
 
 ### Changed
 
