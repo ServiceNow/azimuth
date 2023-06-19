@@ -33,6 +33,7 @@ import CopyButton from "components/CopyButton";
 import Description from "components/Description";
 import OutcomeIcon from "components/Icons/OutcomeIcon";
 import TargetIcon from "components/Icons/Target";
+import FileInputButton from "components/FileInputButton";
 import Loading from "components/Loading";
 import SmartTagFamilyBadge from "components/SmartTagFamilyBadge";
 import { Column, RowProps, Table } from "components/Table";
@@ -436,35 +437,28 @@ const UtterancesTable: React.FC<Props> = ({
     },
   ];
 
-  const importProposedActions = (file: File) => {
-    const fileReader = new FileReader();
-    fileReader.onload = ({ target }) => {
-      if (target) {
-        const result = target.result as string;
-        const [header, ...rows] = result.trimEnd().split(/\r?\n/);
-        if (rows.length === 0) {
-          raiseErrorToast("There are no records in the CSV file.");
-          return;
-        }
-        if (header !== `${config.columns.persistent_id},proposed_action`) {
-          raiseErrorToast(
-            `The CSV file must have column headers ${config.columns.persistent_id} and proposed_action, in that order.`
-          );
-          return;
-        }
+  const importProposedActions = (text: string) => {
+    const [header, ...rows] = text.trimEnd().split(/\r?\n/);
+    if (rows.length === 0) {
+      raiseErrorToast("There are no records in the CSV file.");
+      return;
+    }
+    if (header !== `${config.columns.persistent_id},proposed_action`) {
+      raiseErrorToast(
+        `The CSV file must have column headers ${config.columns.persistent_id} and proposed_action, in that order.`
+      );
+      return;
+    }
 
-        const body = rows.map((row) => {
-          const [persistentId, dataAction] = row.split(",");
-          return { persistentId, dataAction } as UtterancePatch;
-        });
-        updateDataAction({
-          ignoreNotFound: true,
-          body,
-          ...getUtterancesQueryState,
-        });
-      }
-    };
-    fileReader.readAsText(file);
+    const body = rows.map((row) => {
+      const [persistentId, dataAction] = row.split(",");
+      return { persistentId, dataAction } as UtterancePatch;
+    });
+    updateDataAction({
+      ignoreNotFound: true,
+      body,
+      ...getUtterancesQueryState,
+    });
   };
 
   const RowLink = (props: RowProps<Row>) => (
@@ -484,19 +478,13 @@ const UtterancesTable: React.FC<Props> = ({
           link="user-guide/exploration-space/utterance-table/"
         />
         <Box display="flex" alignItems="center" gap={2}>
-          <Button component="label" startIcon={<UploadIcon />}>
+          <FileInputButton
+            accept=".csv"
+            startIcon={<UploadIcon />}
+            onFileRead={importProposedActions}
+          >
             Import
-            <input
-              hidden
-              accept=".csv"
-              type="file"
-              onChange={({ target: { files } }) => {
-                if (files?.length) {
-                  importProposedActions(files[0]);
-                }
-              }}
-            />
-          </Button>
+          </FileInputButton>
           <Button
             id="export-button"
             aria-controls="export-menu"
