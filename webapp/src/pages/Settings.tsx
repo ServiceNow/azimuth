@@ -968,6 +968,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             />
           }
           label="large_dask_cluster"
+          sx={{ justifySelf: "start" }} // Make hit box tight on the component.
         />
       </Columns>
     </FormGroup>
