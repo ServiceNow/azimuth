@@ -930,49 +930,47 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   );
 
   const getCommonFieldsConfigSection = () => (
-    <Box marginTop={2}>
-      <FormGroup>
-        <Columns columns={4}>
-          <StringField
-            label="artifact_path"
-            value={resultingConfig.artifact_path}
-            InputProps={{ readOnly: true, disableUnderline: true }}
-          />
-          <NumberField
-            label="batch_size"
-            value={resultingConfig.batch_size}
-            disabled={areInputsDisabled}
-            onChange={(batch_size) => updatePartialConfig({ batch_size })}
-            {...INT}
-          />
-          <StringField
-            label="use_cuda"
-            options={USE_CUDA_OPTIONS}
-            className="fixedWidthInput"
-            value={String(resultingConfig.use_cuda) as UseCUDAOption}
-            disabled={areInputsDisabled}
-            onChange={(use_cuda) =>
-              updatePartialConfig({
-                use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
-              })
-            }
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={resultingConfig.large_dask_cluster}
-                disabled={areInputsDisabled}
-                onChange={(...[, large_dask_cluster]) =>
-                  updatePartialConfig({ large_dask_cluster })
-                }
-              />
-            }
-            label="large_dask_cluster"
-          />
-        </Columns>
-      </FormGroup>
-    </Box>
+    <FormGroup sx={{ marginTop: 2 }}>
+      <Columns columns={4}>
+        <StringField
+          label="artifact_path"
+          value={resultingConfig.artifact_path}
+          InputProps={{ readOnly: true, disableUnderline: true }}
+        />
+        <NumberField
+          label="batch_size"
+          value={resultingConfig.batch_size}
+          disabled={areInputsDisabled}
+          onChange={(batch_size) => updatePartialConfig({ batch_size })}
+          {...INT}
+        />
+        <StringField
+          label="use_cuda"
+          options={USE_CUDA_OPTIONS}
+          className="fixedWidthInput"
+          value={String(resultingConfig.use_cuda) as UseCUDAOption}
+          disabled={areInputsDisabled}
+          onChange={(use_cuda) =>
+            updatePartialConfig({
+              use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
+            })
+          }
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={resultingConfig.large_dask_cluster}
+              disabled={areInputsDisabled}
+              onChange={(...[, large_dask_cluster]) =>
+                updatePartialConfig({ large_dask_cluster })
+              }
+            />
+          }
+          label="large_dask_cluster"
+        />
+      </Columns>
+    </FormGroup>
   );
 
   const displayAnalysesCustomizationGeneralSection = () => (
