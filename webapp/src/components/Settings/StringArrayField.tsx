@@ -24,7 +24,6 @@ const StringArrayField: React.FC<
         {...params}
         {...FIELD_COMMON_PROPS}
         label={label}
-        FormHelperTextProps={{ sx: { fontWeight: "unset" } }}
         helperText={
           <>
             Write a{/^[aeiou]/.test(units) && "n"} {units} and press enter
