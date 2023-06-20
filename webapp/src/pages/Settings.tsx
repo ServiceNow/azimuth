@@ -517,7 +517,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const getProjectConfigSection = () => (
+  const projectConfigSection = (
     <>
       {displaySectionTitle("General")}
       <FormGroup>
@@ -573,7 +573,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </>
   );
 
-  const getModelContractConfigSection = () => (
+  const modelContractConfigSection = (
     <>
       {displaySectionTitle("General")}
       <FormGroup>
@@ -929,7 +929,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
-  const getCommonFieldsConfigSection = () => (
+  const commonFieldsConfigSection = (
     <FormGroup sx={{ marginTop: 2 }}>
       <Columns columns={4}>
         <StringField
@@ -973,7 +973,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
-  const displayAnalysesCustomizationGeneralSection = () => (
+  const analysesCustomizationGeneralSection = (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
         <StringField
@@ -995,10 +995,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
-  const getAnalysesCustomizationSection = () => (
+  const analysesCustomizationSection = (
     <>
       {displaySectionTitle("General")}
-      {displayAnalysesCustomizationGeneralSection()}
+      {analysesCustomizationGeneralSection}
       {displaySectionTitle("Dataset Warnings")}
       {getAnalysesCustomization("dataset_warnings")}
       {displaySectionTitle("Syntax")}
@@ -1018,28 +1018,28 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         link="reference/configuration/project/"
         defaultExpanded
       >
-        {getProjectConfigSection()}
+        {projectConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Model Contract Configuration"
         description="View and edit some fields that define the ML pipelines and the metrics."
         link="reference/configuration/model_contract/"
       >
-        {getModelContractConfigSection()}
+        {modelContractConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Common Fields Configuration"
         description="View and edit generic fields that can be adapted based on the user's machine."
         link="reference/configuration/common/"
       >
-        {getCommonFieldsConfigSection()}
+        {commonFieldsConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Analyses Customization"
         description="Enable or disable some analyses and edit corresponding thresholds."
         link="reference/configuration/analyses/"
       >
-        {getAnalysesCustomizationSection()}
+        {analysesCustomizationSection}
       </AccordionLayout>
     </>
   );
