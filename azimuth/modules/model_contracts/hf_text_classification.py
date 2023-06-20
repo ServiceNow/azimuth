@@ -16,6 +16,7 @@ from azimuth.types.general.module_arguments import GradientCalculation
 from azimuth.types.task import PredictionResponse, SaliencyResponse
 from azimuth.utils.ml.mc_dropout import MCDropout
 from azimuth.utils.ml.saliency import (
+    find_word_embeddings_layer,
     get_saliency,
     register_embedding_gradient_hook,
     register_embedding_list_hook,
@@ -127,6 +128,7 @@ class HFTextClassificationModule(TextClassificationModule):
             raise ValueError("This method should not be called when saliency_layer is not defined.")
 
         hf_pipeline = self.get_model()
+        hf_model = hf_pipeline.model
 
         inputs = hf_pipeline.tokenizer(
             batch[self.config.columns.text_input],
@@ -140,18 +142,19 @@ class HFTextClassificationModule(TextClassificationModule):
         inputs["input_ids"] = inputs["input_ids"].to(hf_pipeline.device)
         inputs["attention_mask"] = inputs["attention_mask"].to(hf_pipeline.device)
 
-        logits = hf_pipeline.model(**inputs)[0]
+        logits = hf_model(**inputs)[0]
         output = torch.softmax(logits, dim=1).detach().cpu().numpy()
         prediction = output.argmax(-1)
 
+        embedding_layer = (
+            hf_model.base_model.get_input_embeddings()
+            if self.saliency_layer == "auto"
+            else find_word_embeddings_layer(hf_model, self.saliency_layer)
+        )
         embeddings_list: List[np.ndarray] = []
-        handle = register_embedding_list_hook(
-            hf_pipeline.model, embeddings_list, self.saliency_layer
-        )
+        handle = register_embedding_list_hook(embeddings_list, embedding_layer)
         embeddings_gradients: List[np.ndarray] = []
-        hook = register_embedding_gradient_hook(
-            hf_pipeline.model, embeddings_gradients, self.saliency_layer
-        )
+        hook = register_embedding_gradient_hook(embeddings_gradients, embedding_layer)
 
         filter_class = self.mod_options.filter_class
         selected_classes = (
@@ -162,8 +165,8 @@ class HFTextClassificationModule(TextClassificationModule):
         )
 
         # Do backward pass to compute gradients
-        hf_pipeline.model.zero_grad()
-        _loss = hf_pipeline.model(**inputs)[0]  # loss is at index 0 when passing labels
+        hf_model.zero_grad()
+        _loss = hf_model(**inputs)[0]  # loss is at index 0 when passing labels
         _loss.backward()
         handle.remove()
         hook.remove()

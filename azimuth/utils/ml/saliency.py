@@ -5,6 +5,7 @@ from typing import Any, List
 
 import numpy as np
 import structlog
+from torch.nn import Embedding
 
 from azimuth.types.general.module_arguments import GradientCalculation
 
@@ -36,14 +37,13 @@ def find_word_embeddings_layer(model: Any, layer_name: str) -> Any:
 
 
 def register_embedding_list_hook(
-    model: Any, embeddings_list: List[np.ndarray], layer_name: str
+    embeddings_list: List[np.ndarray], embedding_layer: Embedding
 ) -> Any:
     """Register hook to get the embedding values from model.
 
     Args:
-        model: Model.
         embeddings_list: Variable to save values.
-        layer_name: Name of the embedding layer.
+        embedding_layer: Embedding layer on which to compute the saliency map.
 
     Returns:
         Hook.
@@ -52,21 +52,17 @@ def register_embedding_list_hook(
     def forward_hook(module, inputs, output):
         embeddings_list.append(output.detach().cpu().clone().numpy())
 
-    embedding_layer = find_word_embeddings_layer(model, layer_name)
-    handle = embedding_layer.register_forward_hook(forward_hook)
-
-    return handle
+    return embedding_layer.register_forward_hook(forward_hook)
 
 
 def register_embedding_gradient_hook(
-    model: Any, embeddings_gradients: List[np.ndarray], layer_name: str
+    embeddings_gradients: List[np.ndarray], embedding_layer: Embedding
 ) -> Any:
     """Register hook to get the gradient values from the embedding layer.
 
     Args:
-        model: Model.
         embeddings_gradients: Variable to save values.
-        layer_name: Name of the embedding layer.
+        embedding_layer: Embedding layer on which to compute the saliency map.
 
     Returns:
         Hook.
@@ -76,10 +72,7 @@ def register_embedding_gradient_hook(
     def hook_layers(module, grad_in, grad_out):
         embeddings_gradients.append(grad_out[0].detach().cpu().clone().numpy())
 
-    embedding_layer = find_word_embeddings_layer(model, layer_name)
-    hook = embedding_layer.register_full_backward_hook(hook_layers)
-
-    return hook
+    return embedding_layer.register_full_backward_hook(hook_layers)
 
 
 def get_saliency(

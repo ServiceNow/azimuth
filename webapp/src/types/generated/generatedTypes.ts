@@ -149,7 +149,7 @@ export interface components {
       model_contract: components["schemas"]["SupportedModelContract"];
       pipelines: components["schemas"]["PipelineDefinition"][] | null;
       uncertainty: components["schemas"]["UncertaintyOptions"];
-      saliency_layer: string | null;
+      saliency_layer: ("auto" | string) | null;
       metrics: { [key: string]: components["schemas"]["MetricDefinition"] };
       language: components["schemas"]["SupportedLanguage"];
       similarity: components["schemas"]["SimilarityOptions"] | null;

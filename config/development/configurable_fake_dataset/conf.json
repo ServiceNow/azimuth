@@ -21,6 +21,5 @@
   "behavioral_testing": null,
   "similarity": null,
   "rejection_class": null,
-  "saliency_layer": "distilbert.embeddings.word_embeddings",
   "model_contract": "custom_text_classification"
 }
