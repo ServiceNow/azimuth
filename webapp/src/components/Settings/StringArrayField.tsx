@@ -35,7 +35,7 @@ const StringArrayField: React.FC<
         label={label}
         helperText={
           <>
-            Write a{/^[aeiou]/.test(units) && "n"} {units} and press enter
+            Write a{/^[aeio]/.test(units) && "n"} {units} and press enter
           </>
         }
         {...props}
