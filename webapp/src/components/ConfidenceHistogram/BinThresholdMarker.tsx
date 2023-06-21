@@ -1,4 +1,4 @@
-import { Typography, alpha, Box } from "@mui/material";
+import { Box, Typography, alpha } from "@mui/material";
 
 type Props = {
   threshold: number;

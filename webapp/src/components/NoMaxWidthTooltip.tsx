@@ -1,4 +1,4 @@
-import { TooltipProps, Tooltip, tooltipClasses, styled } from "@mui/material";
+import { Tooltip, TooltipProps, styled, tooltipClasses } from "@mui/material";
 
 // From https://mui.com/material-ui/react-tooltip/#variable-width
 const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
