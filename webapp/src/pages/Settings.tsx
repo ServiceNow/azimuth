@@ -517,7 +517,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const getProjectConfigSection = () => (
+  const projectConfigSection = (
     <>
       {displaySectionTitle("General")}
       <FormGroup>
@@ -573,7 +573,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </>
   );
 
-  const getModelContractConfigSection = () => (
+  const modelContractConfigSection = (
     <>
       {displaySectionTitle("General")}
       <FormGroup>
@@ -929,53 +929,52 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
-  const getCommonFieldsConfigSection = () => (
-    <Box marginTop={2}>
-      <FormGroup>
-        <Columns columns={4}>
-          <StringField
-            label="artifact_path"
-            value={resultingConfig.artifact_path}
-            InputProps={{ readOnly: true, disableUnderline: true }}
-          />
-          <NumberField
-            label="batch_size"
-            value={resultingConfig.batch_size}
-            disabled={areInputsDisabled}
-            onChange={(batch_size) => updatePartialConfig({ batch_size })}
-            {...INT}
-          />
-          <StringField
-            label="use_cuda"
-            options={USE_CUDA_OPTIONS}
-            className="fixedWidthInput"
-            value={String(resultingConfig.use_cuda) as UseCUDAOption}
-            disabled={areInputsDisabled}
-            onChange={(use_cuda) =>
-              updatePartialConfig({
-                use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
-              })
-            }
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={resultingConfig.large_dask_cluster}
-                disabled={areInputsDisabled}
-                onChange={(...[, large_dask_cluster]) =>
-                  updatePartialConfig({ large_dask_cluster })
-                }
-              />
-            }
-            label="large_dask_cluster"
-          />
-        </Columns>
-      </FormGroup>
-    </Box>
+  const commonFieldsConfigSection = (
+    <FormGroup sx={{ marginTop: 2 }}>
+      <Columns columns={4}>
+        <StringField
+          label="artifact_path"
+          value={resultingConfig.artifact_path}
+          InputProps={{ readOnly: true, disableUnderline: true }}
+        />
+        <NumberField
+          label="batch_size"
+          value={resultingConfig.batch_size}
+          disabled={areInputsDisabled}
+          onChange={(batch_size) => updatePartialConfig({ batch_size })}
+          {...INT}
+        />
+        <StringField
+          label="use_cuda"
+          options={USE_CUDA_OPTIONS}
+          className="fixedWidthInput"
+          value={String(resultingConfig.use_cuda) as UseCUDAOption}
+          disabled={areInputsDisabled}
+          onChange={(use_cuda) =>
+            updatePartialConfig({
+              use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
+            })
+          }
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={resultingConfig.large_dask_cluster}
+              disabled={areInputsDisabled}
+              onChange={(...[, large_dask_cluster]) =>
+                updatePartialConfig({ large_dask_cluster })
+              }
+            />
+          }
+          label="large_dask_cluster"
+          sx={{ justifySelf: "start" }} // Make hit box tight on the component.
+        />
+      </Columns>
+    </FormGroup>
   );
 
-  const displayAnalysesCustomizationGeneralSection = () => (
+  const analysesCustomizationGeneralSection = (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
         <StringField
@@ -997,10 +996,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
-  const getAnalysesCustomizationSection = () => (
+  const analysesCustomizationSection = (
     <>
       {displaySectionTitle("General")}
-      {displayAnalysesCustomizationGeneralSection()}
+      {analysesCustomizationGeneralSection}
       {displaySectionTitle("Dataset Warnings")}
       {getAnalysesCustomization("dataset_warnings")}
       {displaySectionTitle("Syntax")}
@@ -1020,28 +1019,28 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         link="reference/configuration/project/"
         defaultExpanded
       >
-        {getProjectConfigSection()}
+        {projectConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Model Contract Configuration"
         description="View and edit some fields that define the ML pipelines and the metrics."
         link="reference/configuration/model_contract/"
       >
-        {getModelContractConfigSection()}
+        {modelContractConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Common Fields Configuration"
         description="View and edit generic fields that can be adapted based on the user's machine."
         link="reference/configuration/common/"
       >
-        {getCommonFieldsConfigSection()}
+        {commonFieldsConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Analyses Customization"
         description="Enable or disable some analyses and edit corresponding thresholds."
         link="reference/configuration/analyses/"
       >
-        {getAnalysesCustomizationSection()}
+        {analysesCustomizationSection}
       </AccordionLayout>
     </>
   );

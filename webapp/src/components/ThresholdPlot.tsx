@@ -1,10 +1,10 @@
 import { Info } from "@mui/icons-material";
 import {
-  alpha,
   Box,
   CircularProgress,
   Tooltip,
   Typography,
+  alpha,
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import React from "react";

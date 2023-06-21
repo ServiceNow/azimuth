@@ -1,7 +1,8 @@
 import {
   Autocomplete,
-  TextField,
   Chip,
+  TextField,
+  TextFieldProps,
   autocompleteClasses,
   chipClasses,
 } from "@mui/material";
@@ -9,9 +10,17 @@ import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
 
 const StringArrayField: React.FC<
-  FieldProps<string[]> & { label?: string; units?: string; disabled: boolean }
-> = ({ value, onChange, label, units = label || "token", disabled }) => (
-  <Autocomplete
+  Omit<TextFieldProps, "onChange"> &
+    FieldProps<string[]> & { label?: string; units?: string }
+> = ({
+  value,
+  onChange,
+  label,
+  units = label || "token",
+  disabled,
+  ...props
+}) => (
+  <Autocomplete<string, true, true, true>
     disableClearable
     freeSolo
     multiple
@@ -24,12 +33,12 @@ const StringArrayField: React.FC<
         {...params}
         {...FIELD_COMMON_PROPS}
         label={label}
-        FormHelperTextProps={{ sx: { fontWeight: "unset" } }}
         helperText={
           <>
-            Write a{/^[aeiou]/.test(units) && "n"} {units} and press enter
+            Write a{/^[aeio]/.test(units) && "n"} {units} and press enter
           </>
         }
+        {...props}
       />
     )}
     renderTags={(value, getTagProps) =>
