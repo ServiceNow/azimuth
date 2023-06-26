@@ -1,4 +1,4 @@
-import { Close, Download, Upload, Warning } from "@mui/icons-material";
+import { Close, Download, Restore, Upload, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -18,11 +18,14 @@ import {
   InputBaseComponentProps,
   inputClasses,
   inputLabelClasses,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
 import FileInputButton from "components/FileInputButton";
+import HashChip from "components/HashChip";
 import Loading from "components/Loading";
 import AutocompleteStringField from "components/Settings/AutocompleteStringField";
 import CustomObjectFields from "components/Settings/CustomObjectFields";
@@ -36,6 +39,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import {
   getConfigEndpoint,
+  getConfigHistoryEndpoint,
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
   validateConfigEndpoint,
@@ -53,6 +57,7 @@ import {
 import { PickByValue } from "types/models";
 import { downloadBlob } from "utils/api";
 import { UNKNOWN_ERROR } from "utils/const";
+import { formatDateISO } from "utils/format";
 import { raiseErrorToast } from "utils/helpers";
 
 type MetricState = MetricDefinition & { name: string };
@@ -223,6 +228,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     language: language ?? resultingConfig.language,
   });
 
+  const { data: configHistory } = getConfigHistoryEndpoint.useQuery({ jobId });
+
+  const [configHistoryAnchor, setConfigHistoryAnchor] =
+    React.useState<null | HTMLElement>(null);
+
   const updatePartialConfig = React.useCallback(
     (update: Partial<ConfigState>) =>
       setPartialConfig((partialConfig) => ({ ...partialConfig, ...update })),
@@ -307,6 +317,42 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <Typography variant="inherit" flex={1}>
             Configuration
           </Typography>
+          {configHistory?.length && (
+            <>
+              <Button
+                disabled={areInputsDisabled}
+                startIcon={<Restore />}
+                onClick={(event) => setConfigHistoryAnchor(event.currentTarget)}
+              >
+                Load previous config
+              </Button>
+              <Menu
+                anchorEl={configHistoryAnchor}
+                open={Boolean(configHistoryAnchor)}
+                onClick={() => setConfigHistoryAnchor(null)}
+              >
+                {configHistory.map(({ config, created_on, hash }, index) => (
+                  <MenuItem
+                    key={index}
+                    sx={{ gap: 2 }}
+                    onClick={() => {
+                      setConfigHistoryAnchor(null);
+                      setPartialConfig(azimuthConfigToConfigState(config));
+                    }}
+                  >
+                    <Typography flex={1}>{config.name}</Typography>
+                    <HashChip hash={hash.slice(0, 3)} />
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: "Monospace" }}
+                    >
+                      {formatDateISO(new Date(created_on))}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
+          )}
           <FileInputButton
             accept=".json"
             disabled={areInputsDisabled}
