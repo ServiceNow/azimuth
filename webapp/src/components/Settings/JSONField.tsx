@@ -35,15 +35,13 @@ const JSONField: React.FC<
     }
   };
 
-  const handleBlur =
-    onChange &&
-    ((newStringValue: string) => {
-      try {
-        onChange(JSON.parse(adornments.join(newStringValue)));
-      } catch (error) {
-        setErrorText((error as SyntaxError).message);
-      }
-    });
+  const handleBlur = (newStringValue: string) => {
+    try {
+      onChange(JSON.parse(adornments.join(newStringValue)));
+    } catch (error) {
+      setErrorText((error as SyntaxError).message);
+    }
+  };
 
   return (
     <TextField
@@ -53,7 +51,7 @@ const JSONField: React.FC<
       error={errorText !== ""}
       helperText={errorText}
       onChange={(event) => handleChange(event.target.value)}
-      onBlur={handleBlur && ((event) => handleBlur(event.target.value))}
+      onBlur={(event) => handleBlur(event.target.value)}
       InputProps={{
         startAdornment: (
           <Typography variant="inherit" alignSelf="start">

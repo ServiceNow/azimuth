@@ -1,4 +1,4 @@
-export type FieldProps<T> = { value: T; onChange?: (newValue: T) => void };
+export type FieldProps<T> = { value: T; onChange: (newValue: T) => void };
 
 export const FIELD_COMMON_PROPS = {
   size: "small",

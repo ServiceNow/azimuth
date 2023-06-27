@@ -23,10 +23,9 @@ const StringField = <T extends string | null>({
     required={!nullable && !options}
     {...(value?.trim() === "" && { error: true, helperText: "Set a value" })}
     onChange={
-      onChange &&
-      (nullable
+      nullable
         ? (event) => onChange((event.target.value || null) as T)
-        : (event) => onChange(event.target.value as T))
+        : (event) => onChange(event.target.value as T)
     }
     {...props}
   >

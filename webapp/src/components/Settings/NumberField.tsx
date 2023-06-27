@@ -52,7 +52,7 @@ const NumberField: React.FC<
       }}
       onChange={(event) => {
         setStringValue(event.target.value);
-        onChange && onChange(Number(event.target.value) / scale);
+        onChange(Number(event.target.value) / scale);
       }}
       {...props}
     />

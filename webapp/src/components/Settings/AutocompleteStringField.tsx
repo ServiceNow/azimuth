@@ -28,17 +28,14 @@ const AutocompleteStringField: React.FC<
     }}
     value={value}
     disabled={disabled}
-    onChange={onChange && ((_, newValue) => onChange(newValue as string))}
+    onChange={(_, newValue) => onChange(newValue as string)}
     // The autoSelect prop would normally cause onChange when onBlur happens,
     // except it doesn't work when the input is empty, so we do it manually.
-    onBlur={
-      onChange &&
-      ((event: React.FocusEvent<HTMLInputElement>) => {
-        if (event.target.value !== value) {
-          onChange(event.target.value);
-        }
-      })
-    }
+    onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
+      if (event.target.value !== value) {
+        onChange(event.target.value);
+      }
+    }}
     renderInput={(params) => (
       <TextField
         {...params}

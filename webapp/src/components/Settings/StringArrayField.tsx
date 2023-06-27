@@ -27,7 +27,7 @@ const StringArrayField: React.FC<
     options={[]}
     value={value}
     disabled={disabled}
-    onChange={onChange && ((_, newValue) => onChange(newValue as string[]))}
+    onChange={(_, newValue) => onChange(newValue as string[])}
     renderInput={(params) => (
       <TextField
         {...params}

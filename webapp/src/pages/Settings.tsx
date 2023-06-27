@@ -1000,6 +1000,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           label="artifact_path"
           value={resultingConfig.artifact_path}
           InputProps={{ readOnly: true, disableUnderline: true }}
+          onChange={() => {}}
         />
         <NumberField
           label="batch_size"
