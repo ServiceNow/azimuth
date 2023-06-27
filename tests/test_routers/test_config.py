@@ -71,7 +71,7 @@ def test_get_default_config(app: FastAPI):
             }
         ],
         "uncertainty": {"iterations": 1, "high_epistemic_threshold": 0.1},
-        "saliency_layer": None,
+        "saliency_layer": "auto",
         "behavioral_testing": {
             "neutral_token": {
                 "threshold": 1.0,
@@ -227,7 +227,7 @@ def test_get_config(app: FastAPI):
             }
         ],
         "rejection_class": None,
-        "saliency_layer": "distilbert.embeddings.word_embeddings",
+        "saliency_layer": "auto",
         "similarity": {
             "faiss_encoder": "all-MiniLM-L12-v2",
             "conflicting_neighbors_threshold": 0.9,

@@ -43,7 +43,6 @@
       ]
     }
   ],
-  "saliency_layer": "distilbert.embeddings.word_embeddings",
   "batch_size": 128,
   "uncertainty": {
     "iterations": 20

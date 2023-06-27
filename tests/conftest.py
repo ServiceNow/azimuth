@@ -82,7 +82,6 @@ def simple_text_config(tmp_path):
         artifact_path=str(tmp_path),
         batch_size=10,
         model_contract="hf_text_classification",
-        saliency_layer="distilbert.embeddings.word_embeddings",
         rejection_class=None,
         behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
     )
@@ -156,7 +155,6 @@ def simple_text_config_french(tmp_path):
         artifact_path=str(tmp_path),
         batch_size=10,
         model_contract="hf_text_classification",
-        saliency_layer="distilbert.embeddings.word_embeddings",
         rejection_class=None,
         language=SupportedLanguage.fr,
     )

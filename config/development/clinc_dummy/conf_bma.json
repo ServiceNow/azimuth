@@ -19,7 +19,6 @@
       "full_path": "/azimuth_shr/files/clinc-demo/oos-eval/data/clinc_data_dummy.json"
     }
   },
-  "saliency_layer": "distilbert.embeddings.word_embeddings",
   "model_contract": "hf_text_classification",
   "rejection_class": "NO_INTENT",
   "uncertainty": {

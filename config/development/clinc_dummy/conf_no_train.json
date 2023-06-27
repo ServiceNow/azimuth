@@ -20,7 +20,6 @@
       "train": false
     }
   },
-  "saliency_layer": "distilbert.embeddings.word_embeddings",
   "model_contract": "hf_text_classification",
   "rejection_class": "NO_INTENT"
 }

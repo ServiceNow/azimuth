@@ -333,7 +333,7 @@ class ModelContractConfig(CommonFieldsConfig):
     # Uncertainty configuration
     uncertainty: UncertaintyOptions = UncertaintyOptions()
     # Layer name where to calculate the gradients, normally the word embeddings layer.
-    saliency_layer: Optional[str] = Field(None, nullable=True)
+    saliency_layer: Union[Literal["auto"], str, None] = Field("auto", nullable=True)
 
     @validator("pipelines", pre=True)
     def _check_pipeline_names(cls, pipeline_definitions):
