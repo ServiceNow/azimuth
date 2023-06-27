@@ -13,6 +13,7 @@ Released changes are shown in the
 ### Added
 - Two buttons in the config UI to import/export a JSON config file.
 - Drop-down menu to load a previous config.
+- For HF pipelines, the saliency layer is now automatically detected and no longer needs to be specified in the config. To disable saliency maps, the user can still specify `null`.
 
 ### Changed
 

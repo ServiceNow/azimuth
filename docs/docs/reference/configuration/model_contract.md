@@ -16,7 +16,7 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
         model_contract: SupportedModelContract = SupportedModelContract.hf_text_classification # (1)
         pipelines: Optional[List[PipelineDefinition]] = None # (2)
         uncertainty: UncertaintyOptions = UncertaintyOptions() # (3)
-        saliency_layer: Optional[str] = None # (4)
+        saliency_layer: Union[Literal["auto"], str, None] = "auto" # (4)
         metrics: Dict[str, MetricDefinition] = { # (5)
             "Precision": MetricDefinition(
                 class_name="datasets.load_metric",
@@ -40,7 +40,7 @@ Fields from this scope defines how Azimuth interacts with the ML pipelines and t
     2. List of pipelines. Can also be set to `null` to launch Azimuth with a dataset only.
     3. Enable uncertainty quantification.
     4. Layer name where to calculate the gradients, normally the word embeddings layer.
-       Only available for Pytorch models.
+       Only available for Pytorch models. Defaults to "auto", in which case the embedding layer will be detected automatically using `model.base_model.get_input_embeddings()`.
     5. HuggingFace Metrics.
 
 === "Config Example"
@@ -208,10 +208,11 @@ in [:material-link: Uncertainty Estimation](../../key-concepts/uncertainty.md).
 
 ## Saliency Layer
 
-🟡 **Default value**: `None`
+🟡 **Default value**: `auto`
 
 If using a Pytorch model, [:material-link: Saliency Maps](../../key-concepts/saliency.md) can be
-available. Specify the name of the embedding layer on which to compute them.
+available. Specify the name of the embedding layer on which to compute them. The default is set to "auto",
+in which case the embedding layer will be detected automatically using `model.base_model.get_input_embeddings()`.
 
 Example: `distilbert.embeddings.word_embeddings`.
 

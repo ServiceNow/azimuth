@@ -22,6 +22,5 @@
         }
       }
     }
-  ],
-  "saliency_layer": "roberta.embeddings.word_embeddings"
+  ]
 }

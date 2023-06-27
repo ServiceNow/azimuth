@@ -16,6 +16,5 @@
         }
       }
     }
-  ],
-  "saliency_layer": "distilbert.embeddings.word_embeddings"
+  ]
 }
