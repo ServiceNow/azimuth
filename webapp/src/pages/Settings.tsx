@@ -282,6 +282,24 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     metricsNames.has("") ||
     resultingConfig.metrics.some(({ class_name }) => class_name.trim() === "");
 
+  const fullHashCount = new Set(configHistory?.map(({ hash }) => hash)).size;
+  const hashCount = new Set(configHistory?.map(({ hash }) => hash.slice(0, 3)))
+    .size;
+  const nameCount = new Set(configHistory?.map(({ config }) => config.name))
+    .size;
+
+  // Don't show the hash (hashSize = null) if no two different configs have the same name.
+  // Show a 6-char hash if there is a collision in the first 3 chars.
+  // Otherwise, show a 3-char hash.
+  // Probability of a hash collision with the 3-char hash:
+  // 10 different configs: 1 %
+  // 30 different configs: 10 %
+  // 76 different configs: 50 %
+  // With the 6-char hash:
+  // 581 different configs: 1 %
+  const hashChars =
+    nameCount === fullHashCount ? null : hashCount === fullHashCount ? 3 : 6;
+
   const handleFileRead = (text: string) => {
     try {
       const body = JSON.parse(text);
@@ -341,7 +359,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     }}
                   >
                     <Typography flex={1}>{config.name}</Typography>
-                    <HashChip hash={hash.slice(0, 3)} />
+                    {hashChars && <HashChip hash={hash.slice(0, hashChars)} />}
                     <Typography
                       variant="body2"
                       sx={{ fontFamily: "Monospace" }}
