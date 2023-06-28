@@ -1,4 +1,4 @@
-import { Close, Download, Upload, Warning } from "@mui/icons-material";
+import { Close, Download, History, Upload, Warning } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -18,11 +18,14 @@ import {
   InputBaseComponentProps,
   inputClasses,
   inputLabelClasses,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
 import FileInputButton from "components/FileInputButton";
+import HashChip from "components/HashChip";
 import Loading from "components/Loading";
 import AutocompleteStringField from "components/Settings/AutocompleteStringField";
 import CustomObjectFields from "components/Settings/CustomObjectFields";
@@ -36,6 +39,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import {
   getConfigEndpoint,
+  getConfigHistoryEndpoint,
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
   validateConfigEndpoint,
@@ -53,6 +57,7 @@ import {
 import { PickByValue } from "types/models";
 import { downloadBlob } from "utils/api";
 import { UNKNOWN_ERROR } from "utils/const";
+import { formatDateISO } from "utils/format";
 import { raiseErrorToast } from "utils/helpers";
 
 type MetricState = MetricDefinition & { name: string };
@@ -223,6 +228,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     language: language ?? resultingConfig.language,
   });
 
+  const { data: configHistory } = getConfigHistoryEndpoint.useQuery({ jobId });
+
+  const [configHistoryAnchor, setConfigHistoryAnchor] =
+    React.useState<null | HTMLElement>(null);
+
   const updatePartialConfig = React.useCallback(
     (update: Partial<ConfigState>) =>
       setPartialConfig((partialConfig) => ({ ...partialConfig, ...update })),
@@ -272,6 +282,24 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     metricsNames.has("") ||
     resultingConfig.metrics.some(({ class_name }) => class_name.trim() === "");
 
+  const fullHashCount = new Set(configHistory?.map(({ hash }) => hash)).size;
+  const hashCount = new Set(configHistory?.map(({ hash }) => hash.slice(0, 3)))
+    .size;
+  const nameCount = new Set(configHistory?.map(({ config }) => config.name))
+    .size;
+
+  // Don't show the hash (hashSize = null) if no two different configs have the same name.
+  // Show a 6-char hash if there is a collision in the first 3 chars.
+  // Otherwise, show a 3-char hash.
+  // Probability of a hash collision with the 3-char hash:
+  // 10 different configs: 1 %
+  // 30 different configs: 10 %
+  // 76 different configs: 50 %
+  // With the 6-char hash:
+  // 581 different configs: 1 %
+  const hashChars =
+    nameCount === fullHashCount ? null : hashCount === fullHashCount ? 3 : 6;
+
   const handleFileRead = (text: string) => {
     try {
       const body = JSON.parse(text);
@@ -307,6 +335,42 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <Typography variant="inherit" flex={1}>
             Configuration
           </Typography>
+          {configHistory?.length && (
+            <>
+              <Button
+                disabled={areInputsDisabled}
+                startIcon={<History />}
+                onClick={(event) => setConfigHistoryAnchor(event.currentTarget)}
+              >
+                Load previous config
+              </Button>
+              <Menu
+                anchorEl={configHistoryAnchor}
+                open={Boolean(configHistoryAnchor)}
+                onClick={() => setConfigHistoryAnchor(null)}
+              >
+                {configHistory.map(({ config, created_on, hash }, index) => (
+                  <MenuItem
+                    key={index}
+                    sx={{ gap: 2 }}
+                    onClick={() => {
+                      setConfigHistoryAnchor(null);
+                      setPartialConfig(azimuthConfigToConfigState(config));
+                    }}
+                  >
+                    <Typography flex={1}>{config.name}</Typography>
+                    {hashChars && <HashChip hash={hash.slice(0, hashChars)} />}
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: "Monospace" }}
+                    >
+                      {formatDateISO(new Date(created_on))}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
+          )}
           <FileInputButton
             accept=".json"
             disabled={areInputsDisabled}

@@ -27,6 +27,7 @@ const tagTypes = [
   "DatasetInfo",
   "ConfidenceHistogram",
   "Config",
+  "ConfigHistory",
   "DefaultConfig",
   "Metrics",
   "OutcomeCountPerThreshold",
@@ -272,6 +273,13 @@ export const api = createApi({
         "Something went wrong fetching the config"
       ),
     }),
+    getConfigHistory: build.query({
+      providesTags: [{ type: "ConfigHistory" }],
+      queryFn: responseToData(
+        fetchApi({ path: "/config/history", method: "get" }),
+        "Something went wrong fetching the config history"
+      ),
+    }),
     getDefaultConfig: build.query({
       providesTags: [{ type: "DefaultConfig" }],
       queryFn: responseToData(
@@ -371,6 +379,7 @@ export const api = createApi({
 export const {
   getConfidenceHistogram: getConfidenceHistogramEndpoint,
   getConfig: getConfigEndpoint,
+  getConfigHistory: getConfigHistoryEndpoint,
   getDefaultConfig: getDefaultConfigEndpoint,
   getConfusionMatrix: getConfusionMatrixEndpoint,
   getDatasetInfo: getDatasetInfoEndpoint,
