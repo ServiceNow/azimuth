@@ -1,6 +1,7 @@
 export type FieldProps<T> = {
   value: T;
   originalValue: T | undefined;
+  disabled: boolean;
   onChange: (newValue: T) => void;
 };
 

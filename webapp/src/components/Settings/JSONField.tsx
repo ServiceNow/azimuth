@@ -57,23 +57,24 @@ const JSONField: React.FC<
       onBlur={(event) => handleBlur(event.target.value)}
       InputProps={{
         startAdornment: (
-          <>
-            {originalValue !== undefined && (
-              <DiscardButton
-                title={adornments.join(stringOriginalValue)}
-                disabled={props.disabled || stringValue === stringOriginalValue}
-                onClick={() => onChange(originalValue as any)}
-              />
-            )}
-            <Typography variant="inherit" alignSelf="start">
-              {adornments[0]}&nbsp;
-            </Typography>
-          </>
+          <Typography variant="inherit" alignSelf="start">
+            {adornments[0]}&nbsp;
+          </Typography>
         ),
         endAdornment: (
-          <Typography variant="inherit" alignSelf="end">
-            &nbsp;{adornments[1]}
-          </Typography>
+          <>
+            <Typography variant="inherit" alignSelf="end">
+              &nbsp;{adornments[1]}
+            </Typography>
+            {originalValue !== undefined &&
+              stringOriginalValue !== stringValue && (
+                <DiscardButton
+                  title={adornments.join(stringOriginalValue)}
+                  disabled={props.disabled}
+                  onClick={() => onChange(originalValue as any)}
+                />
+              )}
+          </>
         ),
       }}
       {...props}

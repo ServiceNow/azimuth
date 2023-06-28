@@ -25,11 +25,11 @@ const StringField = <T extends string | null>({
     required={!nullable && !options}
     {...(value?.trim() === "" && { error: true, helperText: "Set a value" })}
     InputProps={{
-      startAdornment:
-        originalValue === undefined ? null : (
+      endAdornment:
+        originalValue === undefined || originalValue === value ? null : (
           <DiscardButton
             title={String(originalValue)}
-            disabled={props.disabled || value === originalValue}
+            disabled={props.disabled}
             onClick={() => onChange(originalValue)}
           />
         ),

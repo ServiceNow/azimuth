@@ -42,16 +42,16 @@ const AutocompleteStringField: React.FC<
         {...params}
         InputProps={{
           ...params.InputProps,
-          startAdornment: (
+          endAdornment: (
             <>
-              {originalValue !== undefined && (
+              {params.InputProps.endAdornment}
+              {originalValue !== undefined && originalValue !== value && (
                 <DiscardButton
                   title={String(originalValue)}
-                  disabled={disabled || value === originalValue}
+                  disabled={disabled}
                   onClick={() => onChange(originalValue)}
                 />
               )}
-              {params.InputProps.startAdornment}
             </>
           ),
         }}

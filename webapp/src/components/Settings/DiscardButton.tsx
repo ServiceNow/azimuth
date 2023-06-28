@@ -6,9 +6,9 @@ export const DiscardButton: React.FC<{
   disabled: boolean;
   onClick: () => void;
 }> = ({ title, ...props }) => (
-  <InputAdornment position="start">
+  <InputAdornment position="end" sx={{ marginLeft: 0, marginRight: "-20px" }}>
     <Tooltip
-      placement="bottom-start"
+      placement="bottom-end"
       title={props.disabled ? "" : `Discard change, reset to ${title}`}
     >
       <IconButton color="secondary" sx={{ padding: 0 }} {...props}>

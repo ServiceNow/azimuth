@@ -50,20 +50,23 @@ const NumberField: React.FC<
       error={helperText !== undefined}
       helperText={helperText}
       InputProps={{
-        sx: { maxWidth: "15ch" },
-        startAdornment:
-          originalValue === undefined ? null : (
-            <DiscardButton
-              title={formatNumber(originalValue * scale)}
-              disabled={props.disabled || value === originalValue}
-              onClick={() => onChange(originalValue)}
-            />
-          ),
-        // If we put text in an <InputAdornment>, it gets a different font size and color (that doesn't get disabled).
-        endAdornment: units && (
-          <Typography variant="inherit" marginLeft={1}>
-            {units}
-          </Typography>
+        sx: { maxWidth: "12ch" },
+        endAdornment: (
+          <>
+            {units && (
+              // If we put text in an <InputAdornment>, it gets a different font size and color (that doesn't get disabled).
+              <Typography variant="inherit" marginLeft={1}>
+                {units}
+              </Typography>
+            )}
+            {originalValue !== undefined && originalValue !== value && (
+              <DiscardButton
+                title={formatNumber(originalValue * scale)}
+                disabled={props.disabled}
+                onClick={() => onChange(originalValue)}
+              />
+            )}
+          </>
         ),
       }}
       onChange={(event) => {

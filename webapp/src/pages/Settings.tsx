@@ -160,10 +160,11 @@ const Columns: React.FC<{ columns: number | string }> = ({
 }) => (
   <Box
     display="grid"
-    gap={4}
     gridTemplateColumns={
       typeof columns === "number" ? `repeat(${columns}, 1fr)` : columns
     }
+    columnGap={6}
+    rowGap={4}
   >
     {children}
   </Box>
@@ -975,7 +976,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
   const getAnalysesCustomization = (config: SubConfigKeys) => (
     <FormGroup>
       <Columns
-        columns={config === "behavioral_testing" ? "5fr 2fr 2fr 3fr" : 5}
+        columns={config === "behavioral_testing" ? "3fr 1fr 1fr 2fr" : 5}
       >
         {Object.entries(
           resultingConfig[config] ?? defaultConfig[config] ?? {}

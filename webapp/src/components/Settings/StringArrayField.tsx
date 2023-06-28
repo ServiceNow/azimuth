@@ -42,19 +42,17 @@ const StringArrayField: React.FC<
         }
         InputProps={{
           ...params.InputProps,
-          startAdornment: (
+          endAdornment: (
             <>
-              {originalValue !== undefined && (
-                <DiscardButton
-                  title={originalValue.join(", ")}
-                  disabled={
-                    disabled ||
-                    JSON.stringify(value) === JSON.stringify(originalValue)
-                  }
-                  onClick={() => onChange(originalValue)}
-                />
-              )}
-              {params.InputProps.startAdornment}
+              {params.InputProps.endAdornment}
+              {originalValue !== undefined &&
+                JSON.stringify(originalValue) !== JSON.stringify(value) && (
+                  <DiscardButton
+                    title={originalValue.join(", ")}
+                    disabled={disabled}
+                    onClick={() => onChange(originalValue)}
+                  />
+                )}
             </>
           ),
         }}
