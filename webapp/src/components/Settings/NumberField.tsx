@@ -1,4 +1,4 @@
-import { InputAdornment, TextField, TextFieldProps } from "@mui/material";
+import { TextField, TextFieldProps, Typography } from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
 
@@ -46,13 +46,16 @@ const NumberField: React.FC<
       helperText={helperText}
       InputProps={{
         sx: { maxWidth: "12ch" },
+        // If we put text in an <InputAdornment>, it gets a different font size and color (that doesn't get disabled).
         endAdornment: units && (
-          <InputAdornment position="end">{units}</InputAdornment>
+          <Typography variant="inherit" marginLeft={1}>
+            {units}
+          </Typography>
         ),
       }}
       onChange={(event) => {
         setStringValue(event.target.value);
-        onChange && onChange(Number(event.target.value) / scale);
+        onChange(Number(event.target.value) / scale);
       }}
       {...props}
     />

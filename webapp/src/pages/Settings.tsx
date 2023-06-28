@@ -1,6 +1,7 @@
 import { Close, Download, History, Upload, Warning } from "@mui/icons-material";
 import {
   Box,
+  BoxProps,
   Button,
   Checkbox,
   CircularProgress,
@@ -20,6 +21,7 @@ import {
   inputLabelClasses,
   Menu,
   MenuItem,
+  Theme,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
@@ -165,11 +167,34 @@ const displaySectionTitle = (section: string) => (
   </Typography>
 );
 
-const KeyValuePairs: React.FC = ({ children }) => (
-  <Box display="grid" gridTemplateColumns="max-content auto" gap={1}>
-    {children}
-  </Box>
-);
+const KeyValuePairs: React.FC<
+  {
+    label: string;
+    disabled: boolean;
+    keyValuePairs: [string, React.ReactNode][];
+  } & BoxProps
+> = ({ label, disabled, keyValuePairs, ...props }) => {
+  const sx = disabled
+    ? { color: (theme: Theme) => theme.palette.text.disabled }
+    : {};
+  return (
+    <Box display="flex" flexDirection="column" {...props}>
+      <Typography variant="caption" sx={sx}>
+        {label}
+      </Typography>
+      <Box display="grid" gridTemplateColumns="max-content auto" gap={1}>
+        {keyValuePairs.map(([key, value]) => (
+          <React.Fragment key={key}>
+            <Typography variant="body2" sx={sx}>
+              {key}:
+            </Typography>
+            {value}
+          </React.Fragment>
+        ))}
+      </Box>
+    </Box>
+  );
+};
 
 const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) =>
   splicedArray(array, index, 1, { ...array[index], ...update });
@@ -601,23 +626,20 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               updatePartialConfig({ rejection_class })
             }
           />
-          <Box display="flex" flexDirection="column">
-            <Typography variant="caption">columns</Typography>
-            <KeyValuePairs>
-              {COLUMNS.map((column) => (
-                <React.Fragment key={column}>
-                  <Typography variant="body2">{column}:</Typography>
-                  <StringField
-                    value={resultingConfig.columns[column]}
-                    disabled={areInputsDisabled}
-                    onChange={(newValue) =>
-                      updateSubConfig("columns", { [column]: newValue })
-                    }
-                  />
-                </React.Fragment>
-              ))}
-            </KeyValuePairs>
-          </Box>
+          <KeyValuePairs
+            label="columns"
+            disabled={areInputsDisabled}
+            keyValuePairs={COLUMNS.map((column) => [
+              column,
+              <StringField
+                value={resultingConfig.columns[column]}
+                disabled={areInputsDisabled}
+                onChange={(newValue) =>
+                  updateSubConfig("columns", { [column]: newValue })
+                }
+              />,
+            ])}
+          />
         </Columns>
       </FormGroup>
       {resultingConfig.dataset && (
@@ -660,29 +682,25 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               updatePartialConfig({ saliency_layer })
             }
           />
-          <Box display="flex" flexDirection="column">
-            <Typography variant="caption">uncertainty</Typography>
-            <KeyValuePairs>
-              {Object.entries(resultingConfig.uncertainty).map(
-                ([field, value], index) => (
-                  <React.Fragment key={index}>
-                    <Typography variant="body2">{field}:</Typography>
-                    <NumberField
-                      value={value}
-                      disabled={
-                        areInputsDisabled ||
-                        resultingConfig.uncertainty === null
-                      }
-                      onChange={(newValue) =>
-                        updateSubConfig("uncertainty", { [field]: newValue })
-                      }
-                      {...FIELDS[field]}
-                    />
-                  </React.Fragment>
-                )
-              )}
-            </KeyValuePairs>
-          </Box>
+          <KeyValuePairs
+            label="uncertainty"
+            disabled={areInputsDisabled || resultingConfig.uncertainty === null}
+            keyValuePairs={Object.entries(resultingConfig.uncertainty).map(
+              ([field, value]) => [
+                field,
+                <NumberField
+                  value={value}
+                  disabled={
+                    areInputsDisabled || resultingConfig.uncertainty === null
+                  }
+                  onChange={(newValue) =>
+                    updateSubConfig("uncertainty", { [field]: newValue })
+                  }
+                  {...FIELDS[field]}
+                />,
+              ]
+            )}
+          />
         </Columns>
       </FormGroup>
       {displaySectionTitle("Pipelines")}
@@ -921,49 +939,45 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               }
             />
           ) : typeof value === "object" ? (
-            <Box
+            <KeyValuePairs
               key={field}
-              display="flex"
-              flexDirection="column"
+              label={field}
+              disabled={areInputsDisabled || resultingConfig[config] === null}
               {...(field === "neutral_token" && {
                 sx: { gridColumnEnd: "span 2" },
               })}
-            >
-              <Typography variant="caption">{field}</Typography>
-              <KeyValuePairs>
-                {Object.entries(value).map(([objField, objValue], index) => (
-                  <React.Fragment key={index}>
-                    <Typography variant="body2">{objField}:</Typography>
-                    {Array.isArray(objValue) ? (
-                      <StringArrayField
-                        value={objValue}
-                        disabled={
-                          areInputsDisabled || resultingConfig[config] === null
-                        }
-                        onChange={(newValue) =>
-                          updateSubConfig(config, {
-                            [field]: { ...value, [objField]: newValue },
-                          })
-                        }
-                      />
-                    ) : (
-                      <NumberField
-                        value={objValue as number}
-                        disabled={
-                          areInputsDisabled || resultingConfig[config] === null
-                        }
-                        onChange={(newValue) =>
-                          updateSubConfig(config, {
-                            [field]: { ...value, [objField]: newValue },
-                          })
-                        }
-                        {...FIELDS[objField]}
-                      />
-                    )}
-                  </React.Fragment>
-                ))}
-              </KeyValuePairs>
-            </Box>
+              keyValuePairs={Object.entries(value).map(
+                ([objField, objValue]) => [
+                  objField,
+                  Array.isArray(objValue) ? (
+                    <StringArrayField
+                      value={objValue}
+                      disabled={
+                        areInputsDisabled || resultingConfig[config] === null
+                      }
+                      onChange={(newValue) =>
+                        updateSubConfig(config, {
+                          [field]: { ...value, [objField]: newValue },
+                        })
+                      }
+                    />
+                  ) : (
+                    <NumberField
+                      value={objValue as number}
+                      disabled={
+                        areInputsDisabled || resultingConfig[config] === null
+                      }
+                      onChange={(newValue) =>
+                        updateSubConfig(config, {
+                          [field]: { ...value, [objField]: newValue },
+                        })
+                      }
+                      {...FIELDS[objField]}
+                    />
+                  ),
+                ]
+              )}
+            />
           ) : config === "syntax" && field === "spacy_model" ? (
             <StringField
               key={field}
@@ -999,7 +1013,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <StringField
           label="artifact_path"
           value={resultingConfig.artifact_path}
+          disabled={areInputsDisabled}
           InputProps={{ readOnly: true, disableUnderline: true }}
+          onChange={() => {}}
         />
         <NumberField
           label="batch_size"
