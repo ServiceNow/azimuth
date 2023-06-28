@@ -1,7 +1,6 @@
 import { Close, Download, History, Upload, Warning } from "@mui/icons-material";
 import {
   Box,
-  BoxProps,
   Button,
   Checkbox,
   CircularProgress,
@@ -155,8 +154,17 @@ const KNOWN_POSTPROCESSORS: {
   "azimuth.utils.ml.postprocessing.Thresholding": { threshold: 0.5 },
 };
 
-const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
-  <Box display="grid" gap={4} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
+const Columns: React.FC<{ columns: number | string }> = ({
+  columns,
+  children,
+}) => (
+  <Box
+    display="grid"
+    gap={4}
+    gridTemplateColumns={
+      typeof columns === "number" ? `repeat(${columns}, 1fr)` : columns
+    }
+  >
     {children}
   </Box>
 );
@@ -167,18 +175,16 @@ const displaySectionTitle = (section: string) => (
   </Typography>
 );
 
-const KeyValuePairs: React.FC<
-  {
-    label: string;
-    disabled: boolean;
-    keyValuePairs: [string, React.ReactNode][];
-  } & BoxProps
-> = ({ label, disabled, keyValuePairs, ...props }) => {
+const KeyValuePairs: React.FC<{
+  label: string;
+  disabled: boolean;
+  keyValuePairs: [string, React.ReactNode][];
+}> = ({ label, disabled, keyValuePairs }) => {
   const sx = disabled
     ? { color: (theme: Theme) => theme.palette.text.disabled }
     : {};
   return (
-    <Box display="flex" flexDirection="column" {...props}>
+    <Box display="flex" flexDirection="column">
       <Typography variant="caption" sx={sx}>
         {label}
       </Typography>
@@ -968,7 +974,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
 
   const getAnalysesCustomization = (config: SubConfigKeys) => (
     <FormGroup>
-      <Columns columns={5}>
+      <Columns
+        columns={config === "behavioral_testing" ? "5fr 2fr 2fr 3fr" : 5}
+      >
         {Object.entries(
           resultingConfig[config] ?? defaultConfig[config] ?? {}
         ).map(([field, value]) =>
@@ -1004,9 +1012,6 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               disabled={areInputsDisabled || resultingConfig[config] === null}
-              {...(field === "neutral_token" && {
-                sx: { gridColumnEnd: "span 2" },
-              })}
               keyValuePairs={Object.entries(value).map(
                 ([objField, objValue]) => [
                   objField,
