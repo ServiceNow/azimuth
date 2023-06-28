@@ -21,6 +21,7 @@ import {
   inputLabelClasses,
   Menu,
   MenuItem,
+  Theme,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
@@ -169,16 +170,24 @@ const displaySectionTitle = (section: string) => (
 const KeyValuePairs: React.FC<
   {
     label: string;
+    disabled: boolean;
     keyValuePairs: [string, React.ReactNode][];
   } & BoxProps
-> = ({ label, keyValuePairs, ...props }) => {
+> = ({ label, disabled, keyValuePairs, ...props }) => {
+  const sx = disabled
+    ? { color: (theme: Theme) => theme.palette.text.disabled }
+    : {};
   return (
     <Box display="flex" flexDirection="column" {...props}>
-      <Typography variant="caption">{label}</Typography>
+      <Typography variant="caption" sx={sx}>
+        {label}
+      </Typography>
       <Box display="grid" gridTemplateColumns="max-content auto" gap={1}>
         {keyValuePairs.map(([key, value]) => (
           <React.Fragment key={key}>
-            <Typography variant="body2">{key}:</Typography>
+            <Typography variant="body2" sx={sx}>
+              {key}:
+            </Typography>
             {value}
           </React.Fragment>
         ))}
@@ -619,6 +628,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           />
           <KeyValuePairs
             label="columns"
+            disabled={areInputsDisabled}
             keyValuePairs={COLUMNS.map((column) => [
               column,
               <StringField
@@ -674,6 +684,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           />
           <KeyValuePairs
             label="uncertainty"
+            disabled={areInputsDisabled || resultingConfig.uncertainty === null}
             keyValuePairs={Object.entries(resultingConfig.uncertainty).map(
               ([field, value]) => [
                 field,
@@ -931,6 +942,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             <KeyValuePairs
               key={field}
               label={field}
+              disabled={areInputsDisabled || resultingConfig[config] === null}
               {...(field === "neutral_token" && {
                 sx: { gridColumnEnd: "span 2" },
               })}
@@ -1001,6 +1013,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <StringField
           label="artifact_path"
           value={resultingConfig.artifact_path}
+          disabled={areInputsDisabled}
           InputProps={{ readOnly: true, disableUnderline: true }}
           onChange={() => {}}
         />
