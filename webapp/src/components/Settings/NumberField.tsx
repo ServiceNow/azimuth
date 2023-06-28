@@ -1,11 +1,12 @@
 import { TextField, TextFieldProps, Typography } from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
+import { DiscardButton } from "./DiscardButton";
 
 const NumberField: React.FC<
   Omit<TextFieldProps, "onChange"> &
     FieldProps<number> & { scale?: number; units?: string }
-> = ({ value, scale = 1, units, onChange, ...props }) => {
+> = ({ value, originalValue, scale = 1, units, onChange, ...props }) => {
   // Control value with a `string` (and not with a `number`) so that for example
   // when hitting backspace at the end of `0.01`, you get `0.0` (and not `0`).
   const [stringValue, setStringValue] = React.useState(String(value * scale));
@@ -15,6 +16,12 @@ const NumberField: React.FC<
       setStringValue(String(value * scale));
     }
   }, [value, scale, stringValue]);
+
+  const formatNumber = React.useCallback(
+    (x: number) =>
+      `${x}${units ? ` ${x === 1 ? units.replace(/s$/, "") : units}` : ""}`,
+    [units]
+  );
 
   const helperText = React.useMemo(() => {
     if (props.inputProps === undefined) {
@@ -31,10 +38,8 @@ const NumberField: React.FC<
     }
 
     const limit = props.inputProps[prop];
-    return `Set ${prop}imum ${limit}${
-      units ? ` ${limit === 1 ? units.replace(/s$/, "") : units}` : ""
-    }`;
-  }, [props.inputProps, scale, units, value]);
+    return `Set ${prop}imum ${formatNumber(limit)}`;
+  }, [props.inputProps, scale, value, formatNumber]);
 
   return (
     <TextField
@@ -45,7 +50,15 @@ const NumberField: React.FC<
       error={helperText !== undefined}
       helperText={helperText}
       InputProps={{
-        sx: { maxWidth: "12ch" },
+        sx: { maxWidth: "15ch" },
+        startAdornment:
+          originalValue === undefined ? null : (
+            <DiscardButton
+              title={formatNumber(originalValue * scale)}
+              disabled={props.disabled || value === originalValue}
+              onClick={() => onChange(originalValue)}
+            />
+          ),
         // If we put text in an <InputAdornment>, it gets a different font size and color (that doesn't get disabled).
         endAdornment: units && (
           <Typography variant="inherit" marginLeft={1}>

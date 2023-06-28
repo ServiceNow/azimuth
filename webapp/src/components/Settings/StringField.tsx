@@ -1,8 +1,10 @@
 import { MenuItem, TextField, TextFieldProps } from "@mui/material";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
+import { DiscardButton } from "./DiscardButton";
 
 const StringField = <T extends string | null>({
   value,
+  originalValue,
   onChange,
   nullable,
   options,
@@ -22,6 +24,16 @@ const StringField = <T extends string | null>({
     value={value ?? ""}
     required={!nullable && !options}
     {...(value?.trim() === "" && { error: true, helperText: "Set a value" })}
+    InputProps={{
+      startAdornment:
+        originalValue === undefined ? null : (
+          <DiscardButton
+            title={String(originalValue)}
+            disabled={props.disabled || value === originalValue}
+            onClick={() => onChange(originalValue)}
+          />
+        ),
+    }}
     onChange={
       nullable
         ? (event) => onChange((event.target.value || null) as T)

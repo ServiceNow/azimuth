@@ -614,6 +614,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <StringField
             label="name"
             value={resultingConfig.name}
+            originalValue={azimuthConfig.name}
             disabled={areInputsDisabled}
             onChange={(name) => updatePartialConfig({ name })}
           />
@@ -621,6 +622,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="rejection_class"
             nullable
             value={resultingConfig.rejection_class}
+            originalValue={azimuthConfig.rejection_class}
             disabled={areInputsDisabled}
             onChange={(rejection_class) =>
               updatePartialConfig({ rejection_class })
@@ -633,6 +635,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               column,
               <StringField
                 value={resultingConfig.columns[column]}
+                originalValue={azimuthConfig.columns[column]}
                 disabled={areInputsDisabled}
                 onChange={(newValue) =>
                   updateSubConfig("columns", { [column]: newValue })
@@ -650,6 +653,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               <CustomObjectFields
                 disabled={areInputsDisabled}
                 value={resultingConfig.dataset}
+                originalValue={azimuthConfig.dataset ?? undefined}
                 onChange={(update) => updateSubConfig("dataset", update)}
               />
             </Columns>
@@ -668,6 +672,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="model_contract"
             options={SUPPORTED_MODEL_CONTRACTS}
             value={resultingConfig.model_contract}
+            originalValue={azimuthConfig.model_contract}
             disabled={areInputsDisabled}
             onChange={(model_contract) =>
               updatePartialConfig({ model_contract })
@@ -677,6 +682,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="saliency_layer"
             nullable
             value={resultingConfig.saliency_layer}
+            originalValue={azimuthConfig.saliency_layer}
             disabled={areInputsDisabled}
             onChange={(saliency_layer) =>
               updatePartialConfig({ saliency_layer })
@@ -690,6 +696,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 field,
                 <NumberField
                   value={value}
+                  originalValue={
+                    azimuthConfig.uncertainty[
+                      field as keyof AzimuthConfig["uncertainty"]
+                    ]
+                  }
                   disabled={
                     areInputsDisabled || resultingConfig.uncertainty === null
                   }
@@ -719,6 +730,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <StringField
                     label="name"
                     value={pipeline.name}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.name
+                    }
                     disabled={areInputsDisabled}
                     onChange={(name) => updatePipeline(pipelineIndex, { name })}
                   />
@@ -730,6 +744,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <StringField
                     label="class_name"
                     value={pipeline.model.class_name}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.class_name
+                    }
                     disabled={areInputsDisabled}
                     onChange={(class_name) =>
                       updateModel(pipelineIndex, { class_name })
@@ -739,6 +756,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     label="remote"
                     nullable
                     value={pipeline.model.remote}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.remote
+                    }
                     disabled={areInputsDisabled}
                     onChange={(remote) =>
                       updateModel(pipelineIndex, { remote })
@@ -748,12 +768,18 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     array
                     label="args"
                     value={pipeline.model.args}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.args
+                    }
                     disabled={areInputsDisabled}
                     onChange={(args) => updateModel(pipelineIndex, { args })}
                   />
                   <JSONField
                     label="kwargs"
                     value={pipeline.model.kwargs}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.kwargs
+                    }
                     disabled={areInputsDisabled}
                     onChange={(kwargs) =>
                       updateModel(pipelineIndex, { kwargs })
@@ -780,6 +806,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         label="class_name"
                         options={Object.keys(KNOWN_POSTPROCESSORS)}
                         value={postprocessor.class_name}
+                        originalValue={
+                          azimuthConfig.pipelines?.[pipelineIndex]
+                            ?.postprocessors?.[index]?.class_name
+                        }
                         autoFocus
                         disabled={
                           areInputsDisabled || pipeline.postprocessors === null
@@ -811,6 +841,14 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                           excludeClassName
                           disabled={areInputsDisabled}
                           value={postprocessor}
+                          originalValue={
+                            azimuthConfig.pipelines?.[pipelineIndex]
+                              ?.postprocessors?.[index]?.class_name ===
+                            postprocessor.class_name
+                              ? azimuthConfig.pipelines?.[pipelineIndex]
+                                  ?.postprocessors?.[index]
+                              : undefined
+                          }
                           onChange={(update) =>
                             updatePostprocessor(pipelineIndex, index, update)
                           }
@@ -820,6 +858,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         <NumberField
                           label="temperature"
                           value={postprocessor.temperature}
+                          originalValue={
+                            (
+                              azimuthConfig.pipelines?.[pipelineIndex]
+                                ?.postprocessors?.[index] as any
+                            )?.temperature
+                          }
                           disabled={
                             areInputsDisabled ||
                             pipeline.postprocessors === null
@@ -837,6 +881,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         <NumberField
                           label="threshold"
                           value={postprocessor.threshold}
+                          originalValue={
+                            (
+                              azimuthConfig.pipelines?.[pipelineIndex]
+                                ?.postprocessors?.[index] as any
+                            )?.threshold
+                          }
                           disabled={
                             areInputsDisabled ||
                             pipeline.postprocessors === null
@@ -879,6 +929,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 label="name"
                 options={Object.keys(defaultConfig.metrics)}
                 value={metric.name}
+                originalValue={undefined}
                 {...(splicedArray(resultingConfig.metrics, index, 1).some(
                   ({ name }) => name.trim() === metric.name.trim()
                 ) && {
@@ -894,11 +945,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               <CustomObjectFields
                 disabled={areInputsDisabled}
                 value={metric}
+                originalValue={azimuthConfig.metrics[metric.name]}
                 onChange={(update) => updateMetric(index, update)}
               />
               <JSONField
                 label="additional_kwargs"
                 value={metric.additional_kwargs}
+                originalValue={
+                  azimuthConfig.metrics[metric.name]?.additional_kwargs
+                }
                 disabled={areInputsDisabled}
                 onChange={(additional_kwargs) =>
                   updateMetric(index, { additional_kwargs })
@@ -922,6 +977,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
+              originalValue={
+                ((azimuthConfig[config] ?? defaultConfig[config]) as any)[field]
+              }
               disabled={areInputsDisabled || resultingConfig[config] === null}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
@@ -933,6 +991,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
+              originalValue={
+                ((azimuthConfig[config] ?? defaultConfig[config]) as any)[field]
+              }
               disabled={areInputsDisabled || resultingConfig[config] === null}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
@@ -952,6 +1013,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   Array.isArray(objValue) ? (
                     <StringArrayField
                       value={objValue}
+                      originalValue={
+                        (
+                          (azimuthConfig[config] ??
+                            defaultConfig[config]) as any
+                        )[field][objField]
+                      }
                       disabled={
                         areInputsDisabled || resultingConfig[config] === null
                       }
@@ -964,6 +1031,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   ) : (
                     <NumberField
                       value={objValue as number}
+                      originalValue={
+                        (
+                          (azimuthConfig[config] ??
+                            defaultConfig[config]) as any
+                        )[field][objField]
+                      }
                       disabled={
                         areInputsDisabled || resultingConfig[config] === null
                       }
@@ -984,6 +1057,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               label={field}
               options={SUPPORTED_SPACY_MODELS}
               value={resultingConfig.syntax.spacy_model}
+              originalValue={azimuthConfig.syntax.spacy_model}
               disabled={areInputsDisabled}
               onChange={(spacy_model) =>
                 updateSubConfig("syntax", { spacy_model })
@@ -995,6 +1069,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 key={field}
                 label={field}
                 value={value}
+                originalValue={
+                  ((azimuthConfig[config] ?? defaultConfig[config]) as any)[
+                    field
+                  ] as string
+                }
                 disabled={areInputsDisabled || resultingConfig[config] === null}
                 onChange={(newValue) =>
                   updateSubConfig(config, { [field]: newValue })
@@ -1013,6 +1092,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <StringField
           label="artifact_path"
           value={resultingConfig.artifact_path}
+          originalValue={undefined}
           disabled={areInputsDisabled}
           InputProps={{ readOnly: true, disableUnderline: true }}
           onChange={() => {}}
@@ -1020,6 +1100,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <NumberField
           label="batch_size"
           value={resultingConfig.batch_size}
+          originalValue={azimuthConfig.batch_size}
           disabled={areInputsDisabled}
           onChange={(batch_size) => updatePartialConfig({ batch_size })}
           {...INT}
@@ -1029,6 +1110,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           options={USE_CUDA_OPTIONS}
           className="fixedWidthInput"
           value={String(resultingConfig.use_cuda) as UseCUDAOption}
+          originalValue={String(azimuthConfig.use_cuda) as UseCUDAOption}
           disabled={areInputsDisabled}
           onChange={(use_cuda) =>
             updatePartialConfig({
@@ -1062,6 +1144,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           options={SUPPORTED_LANGUAGES}
           sx={{ width: "6ch" }}
           value={language ?? resultingConfig.language}
+          originalValue={azimuthConfig.language}
           disabled={areInputsDisabled}
           onChange={(newValue) => setLanguage(newValue)}
         />

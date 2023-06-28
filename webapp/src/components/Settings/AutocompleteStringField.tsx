@@ -6,12 +6,13 @@ import {
 } from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
+import { DiscardButton } from "./DiscardButton";
 
 const filterOptions = createFilterOptions<string>();
 
 const AutocompleteStringField: React.FC<
   Omit<TextFieldProps, "onChange"> & FieldProps<string> & { options: string[] }
-> = ({ value, onChange, options, disabled, ...props }) => (
+> = ({ value, originalValue, onChange, options, disabled, ...props }) => (
   <Autocomplete
     freeSolo
     disableClearable
@@ -39,6 +40,21 @@ const AutocompleteStringField: React.FC<
     renderInput={(params) => (
       <TextField
         {...params}
+        InputProps={{
+          ...params.InputProps,
+          startAdornment: (
+            <>
+              {originalValue !== undefined && (
+                <DiscardButton
+                  title={String(originalValue)}
+                  disabled={disabled || value === originalValue}
+                  onClick={() => onChange(originalValue)}
+                />
+              )}
+              {params.InputProps.startAdornment}
+            </>
+          ),
+        }}
         {...FIELD_COMMON_PROPS}
         {...props}
         {...(value.trim() === "" && { error: true, helperText: "Set a value" })}

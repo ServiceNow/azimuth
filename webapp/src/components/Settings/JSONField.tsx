@@ -1,6 +1,7 @@
 import { TextFieldProps, TextField, Typography } from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
+import { DiscardButton } from "./DiscardButton";
 
 const stringifyJSON = (value: unknown, spaces = 2) =>
   JSON.stringify(value, null, spaces)
@@ -13,12 +14,14 @@ const JSONField: React.FC<
       | ({ array: true } & FieldProps<any[]>)
       | ({ array?: false } & FieldProps<Record<string, unknown>>)
     )
-> = ({ value, onChange, array, ...props }) => {
+> = ({ value, originalValue, onChange, array, ...props }) => {
   const [stringValue, setStringValue] = React.useState(stringifyJSON(value));
 
   React.useEffect(() => setStringValue(stringifyJSON(value)), [value]);
 
   const [errorText, setErrorText] = React.useState("");
+
+  const stringOriginalValue = originalValue && stringifyJSON(originalValue);
 
   const adornments = array ? (["[", "]"] as const) : (["{", "}"] as const);
 
@@ -54,9 +57,18 @@ const JSONField: React.FC<
       onBlur={(event) => handleBlur(event.target.value)}
       InputProps={{
         startAdornment: (
-          <Typography variant="inherit" alignSelf="start">
-            {adornments[0]}&nbsp;
-          </Typography>
+          <>
+            {originalValue !== undefined && (
+              <DiscardButton
+                title={adornments.join(stringOriginalValue)}
+                disabled={props.disabled || stringValue === stringOriginalValue}
+                onClick={() => onChange(originalValue as any)}
+              />
+            )}
+            <Typography variant="inherit" alignSelf="start">
+              {adornments[0]}&nbsp;
+            </Typography>
+          </>
         ),
         endAdornment: (
           <Typography variant="inherit" alignSelf="end">
