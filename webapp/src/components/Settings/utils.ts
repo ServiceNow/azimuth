@@ -1,4 +1,9 @@
-export type FieldProps<T> = { value: T; onChange: (newValue: T) => void };
+export type FieldProps<T> = {
+  value: T;
+  originalValue: T | undefined;
+  disabled: boolean;
+  onChange: (newValue: T) => void;
+};
 
 export const FIELD_COMMON_PROPS = {
   size: "small",

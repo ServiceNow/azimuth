@@ -8,12 +8,14 @@ import {
 } from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
+import { DiscardButton } from "./DiscardButton";
 
 const StringArrayField: React.FC<
   Omit<TextFieldProps, "onChange"> &
     FieldProps<string[]> & { label?: string; units?: string }
 > = ({
   value,
+  originalValue,
   onChange,
   label,
   units = label || "token",
@@ -38,6 +40,22 @@ const StringArrayField: React.FC<
             Write a{/^[aeio]/.test(units) && "n"} {units} and press enter
           </>
         }
+        InputProps={{
+          ...params.InputProps,
+          endAdornment: (
+            <>
+              {params.InputProps.endAdornment}
+              {originalValue !== undefined &&
+                JSON.stringify(originalValue) !== JSON.stringify(value) && (
+                  <DiscardButton
+                    title={originalValue.join(", ")}
+                    disabled={disabled}
+                    onClick={() => onChange(originalValue)}
+                  />
+                )}
+            </>
+          ),
+        }}
         {...props}
       />
     )}
