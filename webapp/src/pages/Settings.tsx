@@ -1,4 +1,11 @@
-import { Close, Download, History, Upload, Warning } from "@mui/icons-material";
+import {
+  ArrowDropDown,
+  Close,
+  Download,
+  History,
+  Upload,
+  Warning,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -372,6 +379,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               <Button
                 disabled={areInputsDisabled}
                 startIcon={<History />}
+                endIcon={<ArrowDropDown />}
                 onClick={(event) => setConfigHistoryAnchor(event.currentTarget)}
               >
                 Load previous config
@@ -381,25 +389,29 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 open={Boolean(configHistoryAnchor)}
                 onClick={() => setConfigHistoryAnchor(null)}
               >
-                {configHistory.map(({ config, created_on, hash }, index) => (
-                  <MenuItem
-                    key={index}
-                    sx={{ gap: 2 }}
-                    onClick={() => {
-                      setConfigHistoryAnchor(null);
-                      setPartialConfig(azimuthConfigToConfigState(config));
-                    }}
-                  >
-                    <Typography flex={1}>{config.name}</Typography>
-                    {hashChars && <HashChip hash={hash.slice(0, hashChars)} />}
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: "Monospace" }}
+                {configHistory
+                  .map(({ config, created_on, hash }, index) => (
+                    <MenuItem
+                      key={index}
+                      sx={{ gap: 2 }}
+                      onClick={() => {
+                        setConfigHistoryAnchor(null);
+                        setPartialConfig(azimuthConfigToConfigState(config));
+                      }}
                     >
-                      {formatDateISO(new Date(created_on))}
-                    </Typography>
-                  </MenuItem>
-                ))}
+                      <Typography flex={1}>{config.name}</Typography>
+                      {hashChars && (
+                        <HashChip hash={hash.slice(0, hashChars)} />
+                      )}
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: "Monospace" }}
+                      >
+                        {formatDateISO(new Date(created_on))}
+                      </Typography>
+                    </MenuItem>
+                  ))
+                  .reverse()}
               </Menu>
             </>
           )}
