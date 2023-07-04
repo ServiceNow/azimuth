@@ -1,4 +1,11 @@
-import { Close, Download, History, Upload, Warning } from "@mui/icons-material";
+import {
+  ArrowDropDown,
+  Close,
+  Download,
+  History,
+  Upload,
+  Warning,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -372,6 +379,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               <Button
                 disabled={areInputsDisabled}
                 startIcon={<History />}
+                endIcon={<ArrowDropDown />}
                 onClick={(event) => setConfigHistoryAnchor(event.currentTarget)}
               >
                 Load previous config
