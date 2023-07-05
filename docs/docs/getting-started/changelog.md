@@ -6,7 +6,7 @@
 - Config UI:
   - Two buttons in the config UI to import/export a JSON config file.
   - Drop-down menu to load a previous config.
-  - Discard buttons to individual config fields.
+  - Discard buttons for individual config fields.
 - HF pipelines:
   - The saliency layer is now automatically detected and no longer needs to be specified in the config. To disable saliency maps, the user can still specify `null`.
 
