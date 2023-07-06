@@ -137,3 +137,6 @@ To contact us, join our [slack](https://join.slack.com/t/azimuth-org/shared_invi
 ## License
 
 The package is licensed by ServiceNow, Inc. under the Apache 2.0 license. See [LICENSE](LICENSE) for more details.
+
+## Vulnerability Reporting
+Please notify psirt-oss@servicenow.com regarding any vulnerability reports in addition to following current reporting procedure.
