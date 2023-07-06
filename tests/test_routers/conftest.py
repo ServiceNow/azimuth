@@ -58,7 +58,6 @@ def app() -> FastAPI:
         batch_size=16,
         use_cuda=False,
         model_contract="custom_text_classification",
-        saliency_layer="distilbert.embeddings.word_embeddings",
         rejection_class=None,
         behavioral_testing=SIMPLE_PERTURBATION_TESTING_CONFIG,
     )

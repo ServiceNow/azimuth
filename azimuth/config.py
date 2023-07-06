@@ -284,10 +284,14 @@ class ProjectConfig(AzimuthBaseSettings):
 
 class ArtifactsConfig(AzimuthBaseSettings, extra=Extra.ignore):
     artifact_path: str = Field(
-        "cache",
+        default_factory=lambda: os.path.abspath("cache"),
         description="Where to store artifacts (Azimuth config history, HDF5 files, HF datasets).",
         exclude_from_cache=True,
     )
+
+    @validator("artifact_path")
+    def validate_artifact_path(cls, artifact_path):
+        return os.path.abspath(artifact_path)
 
     def get_config_history_path(self):
         return f"{self.artifact_path}/config_history.jsonl"
@@ -329,7 +333,7 @@ class ModelContractConfig(CommonFieldsConfig):
     # Uncertainty configuration
     uncertainty: UncertaintyOptions = UncertaintyOptions()
     # Layer name where to calculate the gradients, normally the word embeddings layer.
-    saliency_layer: Optional[str] = Field(None, nullable=True)
+    saliency_layer: Union[Literal["auto"], str, None] = Field("auto", nullable=True)
 
     @validator("pipelines", pre=True)
     def _check_pipeline_names(cls, pipeline_definitions):

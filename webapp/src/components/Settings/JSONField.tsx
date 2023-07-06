@@ -1,6 +1,7 @@
 import { TextFieldProps, TextField, Typography } from "@mui/material";
 import React from "react";
 import { FieldProps, FIELD_COMMON_PROPS } from "./utils";
+import { DiscardButton } from "./DiscardButton";
 
 const stringifyJSON = (value: unknown, spaces = 2) =>
   JSON.stringify(value, null, spaces)
@@ -13,12 +14,14 @@ const JSONField: React.FC<
       | ({ array: true } & FieldProps<any[]>)
       | ({ array?: false } & FieldProps<Record<string, unknown>>)
     )
-> = ({ value, onChange, array, ...props }) => {
+> = ({ value, originalValue, onChange, array, ...props }) => {
   const [stringValue, setStringValue] = React.useState(stringifyJSON(value));
 
   React.useEffect(() => setStringValue(stringifyJSON(value)), [value]);
 
   const [errorText, setErrorText] = React.useState("");
+
+  const stringOriginalValue = originalValue && stringifyJSON(originalValue);
 
   const adornments = array ? (["[", "]"] as const) : (["{", "}"] as const);
 
@@ -35,15 +38,13 @@ const JSONField: React.FC<
     }
   };
 
-  const handleBlur =
-    onChange &&
-    ((newStringValue: string) => {
-      try {
-        onChange(JSON.parse(adornments.join(newStringValue)));
-      } catch (error) {
-        setErrorText((error as SyntaxError).message);
-      }
-    });
+  const handleBlur = (newStringValue: string) => {
+    try {
+      onChange(JSON.parse(adornments.join(newStringValue)));
+    } catch (error) {
+      setErrorText((error as SyntaxError).message);
+    }
+  };
 
   return (
     <TextField
@@ -53,7 +54,7 @@ const JSONField: React.FC<
       error={errorText !== ""}
       helperText={errorText}
       onChange={(event) => handleChange(event.target.value)}
-      onBlur={handleBlur && ((event) => handleBlur(event.target.value))}
+      onBlur={(event) => handleBlur(event.target.value)}
       InputProps={{
         startAdornment: (
           <Typography variant="inherit" alignSelf="start">
@@ -61,9 +62,19 @@ const JSONField: React.FC<
           </Typography>
         ),
         endAdornment: (
-          <Typography variant="inherit" alignSelf="end">
-            &nbsp;{adornments[1]}
-          </Typography>
+          <>
+            <Typography variant="inherit" alignSelf="end">
+              &nbsp;{adornments[1]}
+            </Typography>
+            {originalValue !== undefined &&
+              stringOriginalValue !== stringValue && (
+                <DiscardButton
+                  title={adornments.join(stringOriginalValue)}
+                  disabled={props.disabled}
+                  onClick={() => onChange(originalValue as any)}
+                />
+              )}
+          </>
         ),
       }}
       {...props}

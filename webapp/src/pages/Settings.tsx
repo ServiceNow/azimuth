@@ -1,4 +1,11 @@
-import { Close, Warning } from "@mui/icons-material";
+import {
+  ArrowDropDown,
+  Close,
+  Download,
+  History,
+  Upload,
+  Warning,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -18,10 +25,15 @@ import {
   InputBaseComponentProps,
   inputClasses,
   inputLabelClasses,
+  Menu,
+  MenuItem,
+  Theme,
   Typography,
 } from "@mui/material";
 import noData from "assets/void.svg";
 import AccordionLayout from "components/AccordionLayout";
+import FileInputButton from "components/FileInputButton";
+import HashChip from "components/HashChip";
 import Loading from "components/Loading";
 import AutocompleteStringField from "components/Settings/AutocompleteStringField";
 import CustomObjectFields from "components/Settings/CustomObjectFields";
@@ -35,8 +47,10 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import {
   getConfigEndpoint,
+  getConfigHistoryEndpoint,
   getDefaultConfigEndpoint,
   updateConfigEndpoint,
+  validateConfigEndpoint,
 } from "services/api";
 import {
   AzimuthConfig,
@@ -49,11 +63,32 @@ import {
   ThresholdConfig,
 } from "types/api";
 import { PickByValue } from "types/models";
+import { downloadBlob } from "utils/api";
 import { UNKNOWN_ERROR } from "utils/const";
+import { formatDateISO } from "utils/format";
+import { raiseErrorToast } from "utils/helpers";
 
 type MetricState = MetricDefinition & { name: string };
 
 type ConfigState = Omit<AzimuthConfig, "metrics"> & { metrics: MetricState[] };
+
+const azimuthConfigToConfigState = ({
+  metrics,
+  ...rest
+}: AzimuthConfig): ConfigState => ({
+  ...rest,
+  metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
+});
+
+const configStateToAzimuthConfig = ({
+  metrics,
+  ...rest
+}: Partial<ConfigState>): Partial<AzimuthConfig> => ({
+  ...rest,
+  ...(metrics && {
+    metrics: Object.fromEntries(metrics.map(({ name, ...m }) => [name, m])),
+  }),
+});
 
 const CONFIG_UPDATE_MESSAGE =
   "Please wait while the config changes are validated.";
@@ -102,13 +137,19 @@ const USE_CUDA_OPTIONS = ["auto", "true", "false"] as const;
 type UseCUDAOption = typeof USE_CUDA_OPTIONS[number];
 
 const FIELDS_TRIGGERING_STARTUP_TASKS: (keyof ConfigState)[] = [
+  "dataset",
+  "columns",
+  "rejection_class",
   "behavioral_testing",
   "similarity",
   "dataset_warnings",
   "syntax",
+  "model_contract",
   "pipelines",
   "uncertainty",
+  "saliency_layer",
   "metrics",
+  "language",
 ];
 
 type KnownPostprocessor = TemperatureScaling | ThresholdConfig;
@@ -120,8 +161,18 @@ const KNOWN_POSTPROCESSORS: {
   "azimuth.utils.ml.postprocessing.Thresholding": { threshold: 0.5 },
 };
 
-const Columns: React.FC<{ columns?: number }> = ({ columns = 1, children }) => (
-  <Box display="grid" gap={4} gridTemplateColumns={`repeat(${columns}, 1fr)`}>
+const Columns: React.FC<{ columns: number | string }> = ({
+  columns,
+  children,
+}) => (
+  <Box
+    display="grid"
+    gridTemplateColumns={
+      typeof columns === "number" ? `repeat(${columns}, 1fr)` : columns
+    }
+    columnGap={6}
+    rowGap={4}
+  >
     {children}
   </Box>
 );
@@ -132,11 +183,32 @@ const displaySectionTitle = (section: string) => (
   </Typography>
 );
 
-const KeyValuePairs: React.FC = ({ children }) => (
-  <Box display="grid" gridTemplateColumns="max-content auto" gap={1}>
-    {children}
-  </Box>
-);
+const KeyValuePairs: React.FC<{
+  label: string;
+  disabled: boolean;
+  keyValuePairs: [string, React.ReactNode][];
+}> = ({ label, disabled, keyValuePairs }) => {
+  const sx = disabled
+    ? { color: (theme: Theme) => theme.palette.text.disabled }
+    : {};
+  return (
+    <Box display="flex" flexDirection="column">
+      <Typography variant="caption" sx={sx}>
+        {label}
+      </Typography>
+      <Box display="grid" gridTemplateColumns="max-content auto" gap={1}>
+        {keyValuePairs.map(([key, value]) => (
+          <React.Fragment key={key}>
+            <Typography variant="body2" sx={sx}>
+              {key}:
+            </Typography>
+            {value}
+          </React.Fragment>
+        ))}
+      </Box>
+    </Box>
+  );
+};
 
 const updateArrayAt = <T,>(array: T[], index: number, update: Partial<T>) =>
   splicedArray(array, index, 1, { ...array[index], ...update });
@@ -152,17 +224,18 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     SupportedLanguage | undefined
   >();
   const { data: azimuthConfig } = getConfigEndpoint.useQuery({ jobId });
-  const config = React.useMemo(() => {
-    if (azimuthConfig === undefined) return undefined;
-    const { metrics, ...rest } = azimuthConfig;
-    return {
-      metrics: Object.entries(metrics).map(([name, m]) => ({ name, ...m })),
-      ...rest,
-    };
-  }, [azimuthConfig]);
+  const config = React.useMemo(
+    () => azimuthConfig && azimuthConfigToConfigState(azimuthConfig),
+    [azimuthConfig]
+  );
+
+  const [validateConfig, { isLoading: isValidatingConfig }] =
+    validateConfigEndpoint.useMutation();
 
   const [updateConfig, { isLoading: isUpdatingConfig }] =
     updateConfigEndpoint.useMutation();
+
+  const areInputsDisabled = isValidatingConfig || isUpdatingConfig;
 
   const [partialConfig, setPartialConfig] = React.useState<
     Partial<ConfigState>
@@ -193,6 +266,11 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     jobId,
     language: language ?? resultingConfig.language,
   });
+
+  const { data: configHistory } = getConfigHistoryEndpoint.useQuery({ jobId });
+
+  const [configHistoryAnchor, setConfigHistoryAnchor] =
+    React.useState<null | HTMLElement>(null);
 
   const updatePartialConfig = React.useCallback(
     (update: Partial<ConfigState>) =>
@@ -243,6 +321,47 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     metricsNames.has("") ||
     resultingConfig.metrics.some(({ class_name }) => class_name.trim() === "");
 
+  const fullHashCount = new Set(configHistory?.map(({ hash }) => hash)).size;
+  const hashCount = new Set(configHistory?.map(({ hash }) => hash.slice(0, 3)))
+    .size;
+  const nameCount = new Set(configHistory?.map(({ config }) => config.name))
+    .size;
+
+  // Don't show the hash (hashSize = null) if no two different configs have the same name.
+  // Show a 6-char hash if there is a collision in the first 3 chars.
+  // Otherwise, show a 3-char hash.
+  // Probability of a hash collision with the 3-char hash:
+  // 10 different configs: 1 %
+  // 30 different configs: 10 %
+  // 76 different configs: 50 %
+  // With the 6-char hash:
+  // 581 different configs: 1 %
+  const hashChars =
+    nameCount === fullHashCount ? null : hashCount === fullHashCount ? 3 : 6;
+
+  const handleFileRead = (text: string) => {
+    try {
+      const body = JSON.parse(text);
+      validateConfig({ jobId, body })
+        .unwrap()
+        .then((config) => setPartialConfig(azimuthConfigToConfigState(config)))
+        .catch(() => {}); // Avoid the uncaught error log. Toast already raised by `rtkQueryErrorInterceptor` middleware.
+    } catch (error) {
+      raiseErrorToast(
+        `Something went wrong parsing JSON file\n${
+          (error as SyntaxError).message
+        }`
+      );
+    }
+  };
+
+  const handleDownload = () => {
+    const azimuthConfig = configStateToAzimuthConfig(resultingConfig);
+    const text = JSON.stringify(azimuthConfig, null, 2);
+    const blob = new Blob([text], { type: "application/json" });
+    downloadBlob(blob, "config.json");
+  };
+
   const renderDialog = (children: React.ReactNode) => (
     <Dialog
       aria-labelledby="config-dialog-title"
@@ -251,16 +370,70 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       open={open}
     >
       <DialogTitle id="config-dialog-title">
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1">
-            View and edit certain fields from your config file. Once your
-            changes are saved, expect some delays for recomputing the affected
-            tasks.
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography variant="inherit" flex={1}>
+            Configuration
           </Typography>
+          {configHistory?.length && (
+            <>
+              <Button
+                disabled={areInputsDisabled}
+                startIcon={<History />}
+                endIcon={<ArrowDropDown />}
+                onClick={(event) => setConfigHistoryAnchor(event.currentTarget)}
+              >
+                Load previous config
+              </Button>
+              <Menu
+                anchorEl={configHistoryAnchor}
+                open={Boolean(configHistoryAnchor)}
+                onClick={() => setConfigHistoryAnchor(null)}
+              >
+                {configHistory
+                  .map(({ config, created_on, hash }, index) => (
+                    <MenuItem
+                      key={index}
+                      sx={{ gap: 2 }}
+                      onClick={() => {
+                        setConfigHistoryAnchor(null);
+                        setPartialConfig(azimuthConfigToConfigState(config));
+                      }}
+                    >
+                      <Typography flex={1}>{config.name}</Typography>
+                      {hashChars && (
+                        <HashChip hash={hash.slice(0, hashChars)} />
+                      )}
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: "Monospace" }}
+                      >
+                        {formatDateISO(new Date(created_on))}
+                      </Typography>
+                    </MenuItem>
+                  ))
+                  .reverse()}
+              </Menu>
+            </>
+          )}
+          <FileInputButton
+            accept=".json"
+            disabled={areInputsDisabled}
+            startIcon={<Upload />}
+            onFileRead={handleFileRead}
+          >
+            Import JSON config file
+          </FileInputButton>
+          <Button
+            disabled={areInputsDisabled}
+            startIcon={<Download />}
+            onClick={handleDownload}
+          >
+            Export JSON config file
+          </Button>
           <IconButton
             size="small"
             color="primary"
-            disabled={isUpdatingConfig}
+            disabled={areInputsDisabled}
             onClick={() => {
               if (
                 isEmptyPartialConfig ||
@@ -299,7 +472,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       <DialogActions>
         <Button
           variant="contained"
-          disabled={isEmptyPartialConfig || isUpdatingConfig}
+          disabled={areInputsDisabled || isEmptyPartialConfig}
           onClick={handleDiscard}
         >
           Discard
@@ -331,22 +504,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         </Box>
         <Button
           variant="contained"
-          disabled={isEmptyPartialConfig || isUpdatingConfig || hasErrors}
+          disabled={areInputsDisabled || isEmptyPartialConfig || hasErrors}
           onClick={() => {
             updateConfig({
               jobId,
-              body: {
-                ...partialConfig,
-                metrics: Object.fromEntries(
-                  resultingConfig.metrics.map(({ name, ...m }) => [name, m])
-                ),
-              },
+              body: configStateToAzimuthConfig(partialConfig),
             })
               .unwrap()
-              .then(
-                handleClose,
-                () => {} // Avoid the uncaught error log.
-              );
+              .then(handleClose)
+              .catch(() => {}); // Avoid the uncaught error log. Toast already raised by `rtkQueryErrorInterceptor` middleware.
           }}
         >
           Apply and close
@@ -422,7 +588,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <Checkbox
           size="small"
           checked={Boolean(resultingConfig[field])}
-          disabled={isUpdatingConfig}
+          disabled={areInputsDisabled}
           onChange={(...[, checked]) =>
             updatePartialConfig({
               [field]: checked ? defaultConfig[field] : null,
@@ -444,7 +610,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         <Checkbox
           size="small"
           checked={Boolean(pipeline.postprocessors)}
-          disabled={isUpdatingConfig}
+          disabled={areInputsDisabled}
           onChange={(...[, checked]) =>
             updatePipeline(pipelineIndex, {
               postprocessors: checked
@@ -459,7 +625,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     />
   );
 
-  const getProjectConfigSection = () => (
+  const projectConfigSection = (
     <>
       {displaySectionTitle("General")}
       <FormGroup>
@@ -467,35 +633,35 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <StringField
             label="name"
             value={resultingConfig.name}
-            disabled={isUpdatingConfig}
+            originalValue={azimuthConfig.name}
+            disabled={areInputsDisabled}
             onChange={(name) => updatePartialConfig({ name })}
           />
           <StringField
             label="rejection_class"
             nullable
             value={resultingConfig.rejection_class}
-            disabled={isUpdatingConfig}
+            originalValue={azimuthConfig.rejection_class}
+            disabled={areInputsDisabled}
             onChange={(rejection_class) =>
               updatePartialConfig({ rejection_class })
             }
           />
-          <Box display="flex" flexDirection="column">
-            <Typography variant="caption">columns</Typography>
-            <KeyValuePairs>
-              {COLUMNS.map((column) => (
-                <React.Fragment key={column}>
-                  <Typography variant="body2">{column}:</Typography>
-                  <StringField
-                    value={resultingConfig.columns[column]}
-                    disabled={isUpdatingConfig}
-                    onChange={(newValue) =>
-                      updateSubConfig("columns", { [column]: newValue })
-                    }
-                  />
-                </React.Fragment>
-              ))}
-            </KeyValuePairs>
-          </Box>
+          <KeyValuePairs
+            label="columns"
+            disabled={areInputsDisabled}
+            keyValuePairs={COLUMNS.map((column) => [
+              column,
+              <StringField
+                value={resultingConfig.columns[column]}
+                originalValue={azimuthConfig.columns[column]}
+                disabled={areInputsDisabled}
+                onChange={(newValue) =>
+                  updateSubConfig("columns", { [column]: newValue })
+                }
+              />,
+            ])}
+          />
         </Columns>
       </FormGroup>
       {resultingConfig.dataset && (
@@ -504,8 +670,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           <FormGroup>
             <Columns columns={2}>
               <CustomObjectFields
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 value={resultingConfig.dataset}
+                originalValue={azimuthConfig.dataset ?? undefined}
                 onChange={(update) => updateSubConfig("dataset", update)}
               />
             </Columns>
@@ -515,7 +682,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </>
   );
 
-  const getModelContractConfigSection = () => (
+  const modelContractConfigSection = (
     <>
       {displaySectionTitle("General")}
       <FormGroup>
@@ -524,7 +691,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="model_contract"
             options={SUPPORTED_MODEL_CONTRACTS}
             value={resultingConfig.model_contract}
-            disabled={isUpdatingConfig}
+            originalValue={azimuthConfig.model_contract}
+            disabled={areInputsDisabled}
             onChange={(model_contract) =>
               updatePartialConfig({ model_contract })
             }
@@ -533,39 +701,42 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
             label="saliency_layer"
             nullable
             value={resultingConfig.saliency_layer}
-            disabled={isUpdatingConfig}
+            originalValue={azimuthConfig.saliency_layer}
+            disabled={areInputsDisabled}
             onChange={(saliency_layer) =>
               updatePartialConfig({ saliency_layer })
             }
           />
-          <Box display="flex" flexDirection="column">
-            <Typography variant="caption">uncertainty</Typography>
-            <KeyValuePairs>
-              {Object.entries(resultingConfig.uncertainty).map(
-                ([field, value], index) => (
-                  <React.Fragment key={index}>
-                    <Typography variant="body2">{field}:</Typography>
-                    <NumberField
-                      value={value}
-                      disabled={
-                        resultingConfig.uncertainty === null || isUpdatingConfig
-                      }
-                      onChange={(newValue) =>
-                        updateSubConfig("uncertainty", { [field]: newValue })
-                      }
-                      {...FIELDS[field]}
-                    />
-                  </React.Fragment>
-                )
-              )}
-            </KeyValuePairs>
-          </Box>
+          <KeyValuePairs
+            label="uncertainty"
+            disabled={areInputsDisabled || resultingConfig.uncertainty === null}
+            keyValuePairs={Object.entries(resultingConfig.uncertainty).map(
+              ([field, value]) => [
+                field,
+                <NumberField
+                  value={value}
+                  originalValue={
+                    azimuthConfig.uncertainty[
+                      field as keyof AzimuthConfig["uncertainty"]
+                    ]
+                  }
+                  disabled={
+                    areInputsDisabled || resultingConfig.uncertainty === null
+                  }
+                  onChange={(newValue) =>
+                    updateSubConfig("uncertainty", { [field]: newValue })
+                  }
+                  {...FIELDS[field]}
+                />,
+              ]
+            )}
+          />
         </Columns>
       </FormGroup>
       {displaySectionTitle("Pipelines")}
       <EditableArray
         array={resultingConfig.pipelines ?? []}
-        disabled={isUpdatingConfig}
+        disabled={areInputsDisabled}
         title="pipeline"
         newItem={defaultConfig.pipelines![0]}
         onChange={(pipelines) => updatePartialConfig({ pipelines })}
@@ -578,7 +749,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <StringField
                     label="name"
                     value={pipeline.name}
-                    disabled={isUpdatingConfig}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.name
+                    }
+                    disabled={areInputsDisabled}
                     onChange={(name) => updatePipeline(pipelineIndex, { name })}
                   />
                 </Columns>
@@ -589,7 +763,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   <StringField
                     label="class_name"
                     value={pipeline.model.class_name}
-                    disabled={isUpdatingConfig}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.class_name
+                    }
+                    disabled={areInputsDisabled}
                     onChange={(class_name) =>
                       updateModel(pipelineIndex, { class_name })
                     }
@@ -598,7 +775,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     label="remote"
                     nullable
                     value={pipeline.model.remote}
-                    disabled={isUpdatingConfig}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.remote
+                    }
+                    disabled={areInputsDisabled}
                     onChange={(remote) =>
                       updateModel(pipelineIndex, { remote })
                     }
@@ -607,13 +787,19 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                     array
                     label="args"
                     value={pipeline.model.args}
-                    disabled={isUpdatingConfig}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.args
+                    }
+                    disabled={areInputsDisabled}
                     onChange={(args) => updateModel(pipelineIndex, { args })}
                   />
                   <JSONField
                     label="kwargs"
                     value={pipeline.model.kwargs}
-                    disabled={isUpdatingConfig}
+                    originalValue={
+                      azimuthConfig.pipelines?.[pipelineIndex]?.model.kwargs
+                    }
+                    disabled={areInputsDisabled}
                     onChange={(kwargs) =>
                       updateModel(pipelineIndex, { kwargs })
                     }
@@ -626,7 +812,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   pipeline.postprocessors ??
                   getDefaultPostprocessors(pipelineIndex)
                 }
-                disabled={isUpdatingConfig || pipeline.postprocessors === null}
+                disabled={areInputsDisabled || pipeline.postprocessors === null}
                 title="post-processor"
                 newItem={{ class_name: "", args: [], kwargs: {}, remote: null }}
                 onChange={(postprocessors) =>
@@ -639,9 +825,13 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         label="class_name"
                         options={Object.keys(KNOWN_POSTPROCESSORS)}
                         value={postprocessor.class_name}
+                        originalValue={
+                          azimuthConfig.pipelines?.[pipelineIndex]
+                            ?.postprocessors?.[index]?.class_name
+                        }
                         autoFocus
                         disabled={
-                          isUpdatingConfig || pipeline.postprocessors === null
+                          areInputsDisabled || pipeline.postprocessors === null
                         }
                         onChange={(class_name) =>
                           updatePipeline(pipelineIndex, {
@@ -668,8 +858,16 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                       {!(postprocessor.class_name in KNOWN_POSTPROCESSORS) && (
                         <CustomObjectFields
                           excludeClassName
-                          disabled={isUpdatingConfig}
+                          disabled={areInputsDisabled}
                           value={postprocessor}
+                          originalValue={
+                            azimuthConfig.pipelines?.[pipelineIndex]
+                              ?.postprocessors?.[index]?.class_name ===
+                            postprocessor.class_name
+                              ? azimuthConfig.pipelines?.[pipelineIndex]
+                                  ?.postprocessors?.[index]
+                              : undefined
+                          }
                           onChange={(update) =>
                             updatePostprocessor(pipelineIndex, index, update)
                           }
@@ -679,8 +877,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         <NumberField
                           label="temperature"
                           value={postprocessor.temperature}
+                          originalValue={
+                            (
+                              azimuthConfig.pipelines?.[pipelineIndex]
+                                ?.postprocessors?.[index] as any
+                            )?.temperature
+                          }
                           disabled={
-                            isUpdatingConfig || pipeline.postprocessors === null
+                            areInputsDisabled ||
+                            pipeline.postprocessors === null
                           }
                           onChange={(temperature) =>
                             updatePostprocessor(pipelineIndex, index, {
@@ -695,8 +900,15 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                         <NumberField
                           label="threshold"
                           value={postprocessor.threshold}
+                          originalValue={
+                            (
+                              azimuthConfig.pipelines?.[pipelineIndex]
+                                ?.postprocessors?.[index] as any
+                            )?.threshold
+                          }
                           disabled={
-                            isUpdatingConfig || pipeline.postprocessors === null
+                            areInputsDisabled ||
+                            pipeline.postprocessors === null
                           }
                           onChange={(threshold) =>
                             updatePostprocessor(pipelineIndex, index, {
@@ -718,7 +930,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
       {displaySectionTitle("Metrics")}
       <EditableArray
         array={resultingConfig.metrics}
-        disabled={isUpdatingConfig}
+        disabled={areInputsDisabled}
         title="metric"
         newItem={{
           name: "",
@@ -736,6 +948,7 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 label="name"
                 options={Object.keys(defaultConfig.metrics)}
                 value={metric.name}
+                originalValue={undefined}
                 {...(splicedArray(resultingConfig.metrics, index, 1).some(
                   ({ name }) => name.trim() === metric.name.trim()
                 ) && {
@@ -743,20 +956,24 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                   helperText: "Set a value that is unique across all metrics",
                 })}
                 autoFocus
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 onChange={(name) =>
                   updateMetric(index, { name, ...defaultConfig.metrics[name] })
                 }
               />
               <CustomObjectFields
-                disabled={isUpdatingConfig}
+                disabled={areInputsDisabled}
                 value={metric}
+                originalValue={azimuthConfig.metrics[metric.name]}
                 onChange={(update) => updateMetric(index, update)}
               />
               <JSONField
                 label="additional_kwargs"
                 value={metric.additional_kwargs}
-                disabled={isUpdatingConfig}
+                originalValue={
+                  azimuthConfig.metrics[metric.name]?.additional_kwargs
+                }
+                disabled={areInputsDisabled}
                 onChange={(additional_kwargs) =>
                   updateMetric(index, { additional_kwargs })
                 }
@@ -770,7 +987,9 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
 
   const getAnalysesCustomization = (config: SubConfigKeys) => (
     <FormGroup>
-      <Columns columns={5}>
+      <Columns
+        columns={config === "behavioral_testing" ? "3fr 1fr 1fr 2fr" : 5}
+      >
         {Object.entries(
           resultingConfig[config] ?? defaultConfig[config] ?? {}
         ).map(([field, value]) =>
@@ -779,7 +998,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
-              disabled={resultingConfig[config] === null || isUpdatingConfig}
+              originalValue={
+                ((azimuthConfig[config] ?? defaultConfig[config]) as any)[field]
+              }
+              disabled={areInputsDisabled || resultingConfig[config] === null}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
               }
@@ -790,62 +1012,71 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
               key={field}
               label={field}
               value={value}
-              disabled={resultingConfig[config] === null || isUpdatingConfig}
+              originalValue={
+                ((azimuthConfig[config] ?? defaultConfig[config]) as any)[field]
+              }
+              disabled={areInputsDisabled || resultingConfig[config] === null}
               onChange={(newValue) =>
                 updateSubConfig(config, { [field]: newValue })
               }
             />
           ) : typeof value === "object" ? (
-            <Box
+            <KeyValuePairs
               key={field}
-              display="flex"
-              flexDirection="column"
-              {...(field === "neutral_token" && {
-                sx: { gridColumnEnd: "span 2" },
-              })}
-            >
-              <Typography variant="caption">{field}</Typography>
-              <KeyValuePairs>
-                {Object.entries(value).map(([objField, objValue], index) => (
-                  <React.Fragment key={index}>
-                    <Typography variant="body2">{objField}:</Typography>
-                    {Array.isArray(objValue) ? (
-                      <StringArrayField
-                        value={objValue}
-                        disabled={
-                          resultingConfig[config] === null || isUpdatingConfig
-                        }
-                        onChange={(newValue) =>
-                          updateSubConfig(config, {
-                            [field]: { ...value, [objField]: newValue },
-                          })
-                        }
-                      />
-                    ) : (
-                      <NumberField
-                        value={objValue as number}
-                        disabled={
-                          resultingConfig[config] === null || isUpdatingConfig
-                        }
-                        onChange={(newValue) =>
-                          updateSubConfig(config, {
-                            [field]: { ...value, [objField]: newValue },
-                          })
-                        }
-                        {...FIELDS[objField]}
-                      />
-                    )}
-                  </React.Fragment>
-                ))}
-              </KeyValuePairs>
-            </Box>
+              label={field}
+              disabled={areInputsDisabled || resultingConfig[config] === null}
+              keyValuePairs={Object.entries(value).map(
+                ([objField, objValue]) => [
+                  objField,
+                  Array.isArray(objValue) ? (
+                    <StringArrayField
+                      value={objValue}
+                      originalValue={
+                        (
+                          (azimuthConfig[config] ??
+                            defaultConfig[config]) as any
+                        )[field][objField]
+                      }
+                      disabled={
+                        areInputsDisabled || resultingConfig[config] === null
+                      }
+                      onChange={(newValue) =>
+                        updateSubConfig(config, {
+                          [field]: { ...value, [objField]: newValue },
+                        })
+                      }
+                    />
+                  ) : (
+                    <NumberField
+                      value={objValue as number}
+                      originalValue={
+                        (
+                          (azimuthConfig[config] ??
+                            defaultConfig[config]) as any
+                        )[field][objField]
+                      }
+                      disabled={
+                        areInputsDisabled || resultingConfig[config] === null
+                      }
+                      onChange={(newValue) =>
+                        updateSubConfig(config, {
+                          [field]: { ...value, [objField]: newValue },
+                        })
+                      }
+                      {...FIELDS[objField]}
+                    />
+                  ),
+                ]
+              )}
+            />
           ) : config === "syntax" && field === "spacy_model" ? (
             <StringField
               key={field}
               label={field}
               options={SUPPORTED_SPACY_MODELS}
               value={resultingConfig.syntax.spacy_model}
-              disabled={isUpdatingConfig}
+              originalValue={azimuthConfig.syntax.spacy_model}
+              disabled={areInputsDisabled}
               onChange={(spacy_model) =>
                 updateSubConfig("syntax", { spacy_model })
               }
@@ -856,7 +1087,12 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
                 key={field}
                 label={field}
                 value={value}
-                disabled={resultingConfig[config] === null || isUpdatingConfig}
+                originalValue={
+                  ((azimuthConfig[config] ?? defaultConfig[config]) as any)[
+                    field
+                  ] as string
+                }
+                disabled={areInputsDisabled || resultingConfig[config] === null}
                 onChange={(newValue) =>
                   updateSubConfig(config, { [field]: newValue })
                 }
@@ -868,53 +1104,57 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
-  const getCommonFieldsConfigSection = () => (
-    <Box marginTop={2}>
-      <FormGroup>
-        <Columns columns={4}>
-          <StringField
-            label="artifact_path"
-            value={resultingConfig.artifact_path}
-            InputProps={{ readOnly: true, disableUnderline: true }}
-          />
-          <NumberField
-            label="batch_size"
-            value={resultingConfig.batch_size}
-            disabled={isUpdatingConfig}
-            onChange={(batch_size) => updatePartialConfig({ batch_size })}
-            {...INT}
-          />
-          <StringField
-            label="use_cuda"
-            options={USE_CUDA_OPTIONS}
-            className="fixedWidthInput"
-            value={String(resultingConfig.use_cuda) as UseCUDAOption}
-            disabled={isUpdatingConfig}
-            onChange={(use_cuda) =>
-              updatePartialConfig({
-                use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
-              })
-            }
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={resultingConfig.large_dask_cluster}
-                disabled={isUpdatingConfig}
-                onChange={(...[, large_dask_cluster]) =>
-                  updatePartialConfig({ large_dask_cluster })
-                }
-              />
-            }
-            label="large_dask_cluster"
-          />
-        </Columns>
-      </FormGroup>
-    </Box>
+  const commonFieldsConfigSection = (
+    <FormGroup sx={{ marginTop: 2 }}>
+      <Columns columns={4}>
+        <StringField
+          label="artifact_path"
+          value={resultingConfig.artifact_path}
+          originalValue={undefined}
+          disabled={areInputsDisabled}
+          InputProps={{ readOnly: true, disableUnderline: true }}
+          onChange={() => {}}
+        />
+        <NumberField
+          label="batch_size"
+          value={resultingConfig.batch_size}
+          originalValue={azimuthConfig.batch_size}
+          disabled={areInputsDisabled}
+          onChange={(batch_size) => updatePartialConfig({ batch_size })}
+          {...INT}
+        />
+        <StringField
+          label="use_cuda"
+          options={USE_CUDA_OPTIONS}
+          className="fixedWidthInput"
+          value={String(resultingConfig.use_cuda) as UseCUDAOption}
+          originalValue={String(azimuthConfig.use_cuda) as UseCUDAOption}
+          disabled={areInputsDisabled}
+          onChange={(use_cuda) =>
+            updatePartialConfig({
+              use_cuda: use_cuda === "auto" ? "auto" : use_cuda === "true",
+            })
+          }
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={resultingConfig.large_dask_cluster}
+              disabled={areInputsDisabled}
+              onChange={(...[, large_dask_cluster]) =>
+                updatePartialConfig({ large_dask_cluster })
+              }
+            />
+          }
+          label="large_dask_cluster"
+          sx={{ justifySelf: "start" }} // Make hit box tight on the component.
+        />
+      </Columns>
+    </FormGroup>
   );
 
-  const displayAnalysesCustomizationGeneralSection = () => (
+  const analysesCustomizationGeneralSection = (
     <FormGroup>
       <Box display="flex" gap={5} alignItems="center">
         <StringField
@@ -922,7 +1162,8 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
           options={SUPPORTED_LANGUAGES}
           sx={{ width: "6ch" }}
           value={language ?? resultingConfig.language}
-          disabled={isUpdatingConfig}
+          originalValue={azimuthConfig.language}
+          disabled={areInputsDisabled}
           onChange={(newValue) => setLanguage(newValue)}
         />
         <Box display="flex" gap={1}>
@@ -936,10 +1177,10 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
     </FormGroup>
   );
 
-  const getAnalysesCustomizationSection = () => (
+  const analysesCustomizationSection = (
     <>
       {displaySectionTitle("General")}
-      {displayAnalysesCustomizationGeneralSection()}
+      {analysesCustomizationGeneralSection}
       {displaySectionTitle("Dataset Warnings")}
       {getAnalysesCustomization("dataset_warnings")}
       {displaySectionTitle("Syntax")}
@@ -959,28 +1200,28 @@ const Settings: React.FC<Props> = ({ open, onClose }) => {
         link="reference/configuration/project/"
         defaultExpanded
       >
-        {getProjectConfigSection()}
+        {projectConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Model Contract Configuration"
         description="View and edit some fields that define the ML pipelines and the metrics."
         link="reference/configuration/model_contract/"
       >
-        {getModelContractConfigSection()}
+        {modelContractConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Common Fields Configuration"
         description="View and edit generic fields that can be adapted based on the user's machine."
         link="reference/configuration/common/"
       >
-        {getCommonFieldsConfigSection()}
+        {commonFieldsConfigSection}
       </AccordionLayout>
       <AccordionLayout
         name="Analyses Customization"
         description="Enable or disable some analyses and edit corresponding thresholds."
         link="reference/configuration/analyses/"
       >
-        {getAnalysesCustomizationSection()}
+        {analysesCustomizationSection}
       </AccordionLayout>
     </>
   );

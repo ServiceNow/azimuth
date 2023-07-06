@@ -1,5 +1,5 @@
 import { Theme } from "@emotion/react";
-import { createTheme } from "@mui/material";
+import { createTheme, formHelperTextClasses } from "@mui/material";
 import withStyles from "@mui/styles/withStyles";
 import "styles/typography/gilroy/gilroy.css";
 
@@ -165,6 +165,13 @@ const customTheme: Theme = createTheme({
       styleOverrides: {
         popper: {
           pointerEvents: "none",
+        },
+      },
+    },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          [`&:not(.${formHelperTextClasses.error})`]: { fontWeight: "unset" },
         },
       },
     },

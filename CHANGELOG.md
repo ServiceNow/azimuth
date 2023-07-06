@@ -19,5 +19,6 @@ Released changes are shown in the
 ### Removed
 
 ### Fixed
+- Fixed importing the same proposed actions CSV file twice
 
 ### Security

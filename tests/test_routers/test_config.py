@@ -1,5 +1,12 @@
+import os.path
+
 from fastapi import FastAPI
-from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
+from starlette.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 from starlette.testclient import TestClient
 
 from azimuth.config import SupportedLanguage, config_defaults_per_language
@@ -23,7 +30,7 @@ def test_get_default_config(app: FastAPI):
             "persistent_id": "row_idx",
         },
         "rejection_class": "REJECTION_CLASS",
-        "artifact_path": "cache",
+        "artifact_path": os.path.abspath("cache"),
         "batch_size": 32,
         "use_cuda": "auto",
         "large_dask_cluster": False,
@@ -64,7 +71,7 @@ def test_get_default_config(app: FastAPI):
             }
         ],
         "uncertainty": {"iterations": 1, "high_epistemic_threshold": 0.1},
-        "saliency_layer": None,
+        "saliency_layer": "auto",
         "behavioral_testing": {
             "neutral_token": {
                 "threshold": 1.0,
@@ -220,7 +227,7 @@ def test_get_config(app: FastAPI):
             }
         ],
         "rejection_class": None,
-        "saliency_layer": "distilbert.embeddings.word_embeddings",
+        "saliency_layer": "auto",
         "similarity": {
             "faiss_encoder": "all-MiniLM-L12-v2",
             "conflicting_neighbors_threshold": 0.9,
@@ -242,9 +249,18 @@ def test_get_config(app: FastAPI):
 def test_update_config(app: FastAPI, wait_for_startup_after):
     client = TestClient(app)
     initial_config = client.get("/config").json()
-    initial_contract = initial_config["model_contract"]
-    initial_pipelines = initial_config["pipelines"]
     initial_config_count = len(client.get("/config/history").json())
+
+    resp = client.patch("/config", json={"artifact_path": "something/else"})
+    assert resp.status_code == HTTP_403_FORBIDDEN, resp.text
+
+    relative_artifact_path = os.path.relpath(initial_config["artifact_path"])
+    assert relative_artifact_path != initial_config["artifact_path"]
+    resp = client.patch("/config", json={"artifact_path": relative_artifact_path})
+    assert resp.status_code == HTTP_200_OK, resp.text
+    assert resp.json() == initial_config
+    new_config_count = len(client.get("/config/history").json())
+    assert new_config_count == initial_config_count
 
     resp = client.patch(
         "/config",
@@ -309,9 +325,7 @@ def test_update_config(app: FastAPI, wait_for_startup_after):
     assert not loaded_configs[-1]["config"]["pipelines"]
 
     # Revert config change
-    _ = client.patch(
-        "/config", json={"model_contract": initial_contract, "pipelines": initial_pipelines}
-    )
+    _ = client.patch("/config", json=initial_config)
 
     loaded_configs = client.get("/config/history").json()
     assert loaded_configs[-1]["config"] == loaded_configs[initial_config_count - 1]["config"]

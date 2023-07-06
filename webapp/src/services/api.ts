@@ -27,6 +27,7 @@ const tagTypes = [
   "DatasetInfo",
   "ConfidenceHistogram",
   "Config",
+  "ConfigHistory",
   "DefaultConfig",
   "Metrics",
   "OutcomeCountPerThreshold",
@@ -269,14 +270,30 @@ export const api = createApi({
       providesTags: [{ type: "Config" }],
       queryFn: responseToData(
         fetchApi({ path: "/config", method: "get" }),
-        "Something went wrong fetching config"
+        "Something went wrong fetching the config"
+      ),
+    }),
+    getConfigHistory: build.query({
+      providesTags: [{ type: "ConfigHistory" }],
+      queryFn: responseToData(
+        fetchApi({ path: "/config/history", method: "get" }),
+        "Something went wrong fetching the config history"
       ),
     }),
     getDefaultConfig: build.query({
       providesTags: [{ type: "DefaultConfig" }],
       queryFn: responseToData(
         fetchApi({ path: "/config/default", method: "get" }),
-        "Something went wrong fetching default config"
+        "Something went wrong fetching the default config"
+      ),
+    }),
+    validateConfig: build.mutation<
+      AzimuthConfig,
+      { jobId: string; body: Partial<AzimuthConfig> }
+    >({
+      queryFn: responseToData(
+        fetchApi({ path: "/config/validate", method: "patch" }),
+        "Something went wrong validating the config"
       ),
     }),
     updateConfig: build.mutation<
@@ -285,7 +302,7 @@ export const api = createApi({
     >({
       queryFn: responseToData(
         fetchApi({ path: "/config", method: "patch" }),
-        "Something went wrong updating config"
+        "Something went wrong updating the config"
       ),
       // We invalidate Status first, so StatusCheck stops rendering the app if
       // necessary. We await queryFulfilled before invalidating the other tags.
@@ -353,7 +370,7 @@ export const api = createApi({
       providesTags: () => [{ type: "Status" }],
       queryFn: responseToData(
         fetchApi({ path: "/status", method: "get" }),
-        "Something went wrong fetching status"
+        "Something went wrong fetching the status"
       ),
     }),
   }),
@@ -362,6 +379,7 @@ export const api = createApi({
 export const {
   getConfidenceHistogram: getConfidenceHistogramEndpoint,
   getConfig: getConfigEndpoint,
+  getConfigHistory: getConfigHistoryEndpoint,
   getDefaultConfig: getDefaultConfigEndpoint,
   getConfusionMatrix: getConfusionMatrixEndpoint,
   getDatasetInfo: getDatasetInfoEndpoint,
@@ -380,6 +398,7 @@ export const {
   getStatus: getStatusEndpoint,
   getTopWords: getTopWordsEndpoint,
   getUtterances: getUtterancesEndpoint,
+  validateConfig: validateConfigEndpoint,
   updateConfig: updateConfigEndpoint,
   updateDataActions: updateDataActionsEndpoint,
 } = api.endpoints;
