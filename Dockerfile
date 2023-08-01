@@ -34,11 +34,11 @@ COPY poetry.lock pyproject.toml /app/
 
 WORKDIR /app
 RUN poetry config virtualenvs.create false && \
-  poetry install --extras ${DEVICE} --no-interaction --no-ansi --no-root $(/usr/bin/test $STAGE == production && echo "--no-dev")
+  poetry install --extras ${DEVICE} --no-interaction --no-ansi --no-root $(/usr/bin/test $STAGE == production && echo "--without dev,test,docs")
 
 # Install the project.
 COPY . /app/
-RUN poetry install --extras ${DEVICE} --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--no-dev")
+RUN poetry install --extras ${DEVICE} --no-interaction --no-ansi $(/usr/bin/test $STAGE == production && echo "--without dev,test,docs")
 ENV CFG_PATH=
 ENV LOAD_CONFIG_HISTORY=
 ENV PORT=
