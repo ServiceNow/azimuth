@@ -26,7 +26,7 @@ jobs:
       - run: poetry --version
       - name: Install dependencies
         run: |
-          poetry install --extras cpu --no-interaction --no-ansi
+          poetry install --without dev,docs --extras cpu --no-interaction --no-ansi
       - name: Test with pytest/flake8/mypy
         env:
           PYTEST_ADDOPTS: "--color=yes"
