@@ -92,6 +92,7 @@ def get_utterances(
     config: AzimuthConfig = Depends(get_config),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
+    use_bma: bool = Query(False, title="Use Bayesian Model Averaging for better estimation."),
     pagination: Optional[PaginationParams] = Depends(get_pagination),
     without_postprocessing: bool = Query(False, title="Without Postprocessing"),
 ) -> GetUtterancesResponse:
@@ -101,7 +102,7 @@ def get_utterances(
             if postprocessing_known(config, pipeline_index)
             else None
         )
-        table_key = PredictionTableKey.from_pipeline_index(pipeline_index, config)
+        table_key = PredictionTableKey.from_pipeline_index(pipeline_index, config, use_bma=use_bma)
     else:
         threshold, table_key = None, None
 
@@ -322,6 +323,7 @@ def get_similar(
     ),
     config: AzimuthConfig = Depends(get_config),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
+    use_bma: bool = Query(False, title="Use Bayesian Model Averaging for better estimation."),
 ) -> SimilarUtterancesResponse:
     if not similarity_available(config):
         return SimilarUtterancesResponse(utterances=[])
@@ -333,10 +335,7 @@ def get_similar(
     if neighbors_ds is None:
         raise HTTPException(HTTP_404_NOT_FOUND, detail="Dataset split not found.")
     table_key = (
-        PredictionTableKey.from_pipeline_index(
-            pipeline_index,
-            config,
-        )
+        PredictionTableKey.from_pipeline_index(pipeline_index, config, use_bma=use_bma)
         if pipeline_index is not None
         else None
     )

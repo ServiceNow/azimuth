@@ -41,7 +41,7 @@ class PredictionTableKey:
     pipeline_index: Optional[int]
 
     @classmethod
-    def from_pipeline_index(cls, index: int, config: AzimuthConfig, use_bma: bool = False):
+    def from_pipeline_index(cls, index: int, config: AzimuthConfig, *, use_bma: bool):
         pipelines = assert_not_none(config.pipelines)
         return PredictionTableKey(
             threshold=pipelines[index].threshold,

@@ -1925,6 +1925,7 @@ export interface operations {
         indices?: number[];
         sort?: components["schemas"]["UtterancesSortableColumn"];
         descending?: boolean;
+        use_bma?: boolean;
         without_postprocessing?: boolean;
         confidence_min?: number;
         confidence_max?: number;
@@ -2116,6 +2117,7 @@ export interface operations {
       query: {
         limit?: number;
         neighbors_dataset_split_name?: components["schemas"]["DatasetSplitName"];
+        use_bma?: boolean;
         pipeline_index?: number;
       };
     };
@@ -2171,6 +2173,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        use_bma?: boolean;
         pipeline_index?: number;
       };
     };
@@ -2318,6 +2321,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        use_bma?: boolean;
         pipeline_index: number;
       };
     };
