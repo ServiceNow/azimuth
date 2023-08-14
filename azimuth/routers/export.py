@@ -8,7 +8,7 @@ from os.path import join as pjoin
 from typing import Dict, Generator, List, Optional
 
 import pandas as pd
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -51,11 +51,12 @@ def export_dataset(
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: Optional[int] = Depends(query_pipeline_index),
     config: AzimuthConfig = Depends(get_config),
+    use_bma: bool = Query(False, title="Use Bayesian Model Averaging for better estimation."),
 ) -> FileResponse:
     table_key = (
         None
         if pipeline_index is None
-        else PredictionTableKey.from_pipeline_index(pipeline_index, config)
+        else PredictionTableKey.from_pipeline_index(pipeline_index, config, use_bma=use_bma)
     )
     path = dataset_split_manager.save_csv(table_key=table_key)
 
@@ -134,6 +135,7 @@ def get_export_perturbed_set(
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
     config: AzimuthConfig = Depends(get_config),
+    use_bma: bool = Query(False, title="Use Bayesian Model Averaging for better estimation."),
 ) -> FileResponse:
     pipeline_index_not_null = assert_not_none(pipeline_index)
     file_label = time.strftime("%Y%m%d_%H%M%S", time.localtime())
@@ -154,6 +156,7 @@ def get_export_perturbed_set(
             task_result,
             pipeline_index=pipeline_index_not_null,
             config=config,
+            use_bma=use_bma,
         )
     )
     with open(path, "w") as f:
@@ -166,6 +169,7 @@ def make_utterance_level_result(
     results: List[List[PerturbedUtteranceResult]],
     pipeline_index: int,
     config: AzimuthConfig,
+    use_bma: bool,
 ) -> Generator[Dict, None, None]:
     """Massage perturbation testing results for the frontend.
 
@@ -174,6 +178,7 @@ def make_utterance_level_result(
         results: Output of Perturbation Testing.
         pipeline_index: Index of the pipeline that made the results.
         config: Azimuth config
+        use_bma: Use Bayesian Model Averaging for better estimation.
 
     Returns:
         Generator that yield json-able object for the frontend.
@@ -182,10 +187,7 @@ def make_utterance_level_result(
     for idx, (utterance, test_results) in enumerate(
         zip(
             dm.get_dataset_split(
-                PredictionTableKey.from_pipeline_index(
-                    pipeline_index,
-                    config,
-                )
+                PredictionTableKey.from_pipeline_index(pipeline_index, config, use_bma=use_bma)
             ),
             results,
         )
