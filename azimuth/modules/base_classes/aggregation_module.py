@@ -31,7 +31,7 @@ class FilterableModule(AggregationModule[ConfigScope], ExpirableMixin, ABC):
     """Filterable Module are affected by filters in mod options."""
 
     required_mod_options = {"pipeline_index"}
-    optional_mod_options = {"filters", "without_postprocessing"}
+    optional_mod_options = {"filters", "without_postprocessing", "use_bma"}
 
     def get_dataset_split(self, name: DatasetSplitName = None) -> Dataset:
         """Get the specified dataset_split, filtered according to mod_options.

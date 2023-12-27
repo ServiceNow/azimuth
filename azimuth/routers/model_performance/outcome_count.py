@@ -35,10 +35,9 @@ def get_outcome_count_per_threshold(
     task_manager: TaskManager = Depends(get_task_manager),
     dataset_split_manager: DatasetSplitManager = Depends(get_dataset_split_manager),
     pipeline_index: int = Depends(require_pipeline_index),
+    use_bma: bool = Query(False, title="Use BMA"),
 ) -> OutcomeCountPerThresholdResponse:
-    mod_options = ModuleOptions(
-        pipeline_index=pipeline_index,
-    )
+    mod_options = ModuleOptions(pipeline_index=pipeline_index, use_bma=use_bma)
 
     try:
         task_result: List[OutcomeCountPerThresholdResponse] = get_standard_task_result(

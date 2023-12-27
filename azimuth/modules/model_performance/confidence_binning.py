@@ -22,6 +22,8 @@ CONFIDENCE_BINS_COUNT = 20
 class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
     """Return a confidence histogram of the predictions."""
 
+    optional_mod_options = FilterableModule.optional_mod_options | {"use_bma"}
+
     @staticmethod
     def get_outcome_mask(
         ds, outcome: OutcomeName, without_postprocessing: bool = False
@@ -114,7 +116,7 @@ class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig]):
     """Return confidence bin indices for the selected dataset split."""
 
     required_mod_options = {"pipeline_index"}
-    optional_mod_options = DatasetResultModule.optional_mod_options | {"threshold"}
+    optional_mod_options = DatasetResultModule.optional_mod_options | {"threshold", "use_bma"}
 
     def compute_on_dataset_split(self) -> List[int]:  # type: ignore
         """Get the bin indices for each utterance in the dataset split.
