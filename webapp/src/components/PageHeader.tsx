@@ -95,6 +95,7 @@ const PageHeader = () => {
     pagination,
     pipeline,
     postprocessing,
+    modelAveraging,
   } = useQueryState();
 
   // If present, preserve pipelineIndex when navigating, but nothing else
@@ -108,6 +109,7 @@ const PageHeader = () => {
         ...filters,
         ...pagination,
         ...postprocessing,
+        ...modelAveraging,
         pipelineIndex,
       })}`
     );

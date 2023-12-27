@@ -62,6 +62,7 @@ import {
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
+  QueryBMAState,
   QueryState,
 } from "types/models";
 import {
@@ -145,6 +146,7 @@ type Props = {
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
+  modelAveraging: QueryBMAState;
 };
 
 const UtterancesTable: React.FC<Props> = ({
@@ -157,6 +159,7 @@ const UtterancesTable: React.FC<Props> = ({
   pagination,
   pipeline,
   postprocessing,
+  modelAveraging,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -175,6 +178,7 @@ const UtterancesTable: React.FC<Props> = ({
     offset,
     ...pipeline,
     ...postprocessing,
+    ...modelAveraging,
   };
 
   const {
@@ -212,6 +216,7 @@ const UtterancesTable: React.FC<Props> = ({
         ...pagination,
         ...pipeline,
         ...postprocessing,
+        ...modelAveraging,
         ...update,
       }
     )}`;

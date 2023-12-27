@@ -104,6 +104,8 @@ def get_dataset_info(
             eval=eval_dm and eval_dm.num_rows, train=training_dm and training_dm.num_rows
         ),
         similarity_available=similarity_available(config),
+        model_averaging_available=config.uncertainty is not None
+        and config.uncertainty.iterations > 1,
         postprocessing_editable=None
         if config.pipelines is None
         else [postprocessing_editable(config, idx) for idx in range(len(config.pipelines))],

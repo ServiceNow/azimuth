@@ -7,6 +7,7 @@ import {
   QueryFilterState,
   QueryPipelineState,
   QueryPostprocessingState,
+  QueryBMAState,
 } from "types/models";
 import { ECE_TOOLTIP, OUTCOME_COLOR, OUTCOME_PRETTY_NAMES } from "utils/const";
 import { formatRatioAsPercentageString } from "utils/format";
@@ -38,6 +39,7 @@ type Props = {
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
   postprocessing: QueryPostprocessingState;
+  modelAveraging: QueryBMAState;
 };
 
 const Metrics: React.FC<Props> = ({
@@ -46,6 +48,7 @@ const Metrics: React.FC<Props> = ({
   filters,
   pipeline,
   postprocessing,
+  modelAveraging,
 }) => {
   const { data: metrics, isFetching } = getMetricsEndpoint.useQuery({
     jobId,
@@ -53,6 +56,7 @@ const Metrics: React.FC<Props> = ({
     ...filters,
     ...pipeline,
     ...postprocessing,
+    ...modelAveraging,
   });
 
   const { data: metricsInfo } = getCustomMetricInfoEndpoint.useQuery({ jobId });

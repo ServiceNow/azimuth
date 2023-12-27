@@ -10,6 +10,7 @@ import {
   QueryState,
   QueryConfusionMatrixState,
   QueryDetailsState,
+  QueryBMAState,
 } from "types/models";
 
 export const classNames = (...args: any[]) => args.filter(Boolean).join(" ");
@@ -82,6 +83,9 @@ export const parseSearchString = (searchString: string) => {
     }),
     postprocessing: convertSearchParams<QueryPostprocessingState>(q, {
       withoutPostprocessing: (s) => s !== null || undefined,
+    }),
+    modelAveraging: convertSearchParams<QueryBMAState>(q, {
+      useBma: (s) => s !== null || undefined,
     }),
   };
 };

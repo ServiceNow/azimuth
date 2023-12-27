@@ -33,6 +33,7 @@ import {
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
+  QueryBMAState,
   QueryConfusionMatrixState,
   QueryArrayFiltersState,
 } from "types/models";
@@ -56,6 +57,7 @@ type Props = {
   pagination: QueryPaginationState;
   pipeline: QueryPipelineState;
   postprocessing: QueryPostprocessingState;
+  modelAveraging: QueryBMAState;
   searchString: string;
 };
 
@@ -71,6 +73,7 @@ const Controls: React.FC<Props> = ({
   pagination,
   pipeline,
   postprocessing,
+  modelAveraging,
   searchString,
 }) => {
   const [searchValue, setSearchValue] = React.useState("");
@@ -94,6 +97,7 @@ const Controls: React.FC<Props> = ({
         ...filters,
         ...pipeline,
         ...postprocessing,
+        ...modelAveraging,
       })
     : getUtteranceCountPerFilterEndpoint.useQuery({
         jobId,
@@ -125,6 +129,7 @@ const Controls: React.FC<Props> = ({
         ...pagination,
         ...pipeline,
         ...postprocessing,
+        ...modelAveraging,
       })}`
     );
   };
@@ -137,6 +142,7 @@ const Controls: React.FC<Props> = ({
         ...pagination,
         ...pipeline,
         ...postprocessing,
+        ...modelAveraging,
       })}`
     );
 
@@ -162,7 +168,20 @@ const Controls: React.FC<Props> = ({
         ...filters,
         ...pagination,
         ...pipeline,
+        ...modelAveraging,
         withoutPostprocessing: checked || undefined,
+      })}`
+    );
+
+  const handleModelAveragingChange = (checked: boolean) =>
+    history.push(
+      `${baseUrl}${constructSearchString({
+        ...confusionMatrix,
+        ...filters,
+        ...pagination,
+        ...pipeline,
+        ...postprocessing,
+        useBma: checked || undefined,
       })}`
     );
 
@@ -267,6 +286,24 @@ const Controls: React.FC<Props> = ({
               />
             </Tooltip>
           </Box>
+          {datasetInfo?.modelAveragingAvailable && (
+            <Box margin={1}>
+              <Tooltip title="Enables Bayesian Model Averaging in predictions and any derived output. This only affects the Exploration Space, and won't affect the smart tags.">
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={modelAveraging.useBma ?? false}
+                      color="secondary"
+                      onChange={(_, checked) =>
+                        handleModelAveragingChange(checked)
+                      }
+                    />
+                  }
+                  label="Enable model averaging"
+                />
+              </Tooltip>
+            </Box>
+          )}
           <Box display="flex" justifyContent="space-between" marginX={1}>
             <Box display="flex" alignItems="center" gap={1} whiteSpace="nowrap">
               <Typography variant="subtitle2">Filters</Typography>

@@ -109,6 +109,7 @@ class TextClassificationModule(ModelContractModule, abc.ABC):
             mod_options=ModuleOptions(
                 model_contract_method_name=SupportedMethod.Predictions,
                 pipeline_index=self.mod_options.pipeline_index,
+                use_bma=self.mod_options.use_bma,
                 indices=cast(List[int], batch[DatasetColumn.row_idx]),
             ),
         )

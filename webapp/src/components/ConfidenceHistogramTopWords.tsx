@@ -15,6 +15,7 @@ import {
   QueryPaginationState,
   QueryPipelineState,
   QueryPostprocessingState,
+  QueryBMAState,
   WordCount,
 } from "types/models";
 import { ALL_OUTCOMES } from "utils/const";
@@ -26,6 +27,7 @@ type Props = {
   pagination: QueryPaginationState;
   pipeline: Required<QueryPipelineState>;
   postprocessing: QueryPostprocessingState;
+  modelAveraging: QueryBMAState;
 };
 
 const ConfidenceHistogramTopWords: React.FC<Props> = ({
@@ -35,6 +37,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
   pagination,
   pipeline,
   postprocessing,
+  modelAveraging,
 }) => {
   const { jobId, datasetSplitName } = useParams<{
     jobId: string;
@@ -58,6 +61,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
     ...filtersWithoutBins,
     ...pipeline,
     ...postprocessing,
+    ...modelAveraging,
   });
 
   const { data: topWords, isFetching: isFetchingTopWords } =
@@ -67,6 +71,7 @@ const ConfidenceHistogramTopWords: React.FC<Props> = ({
       ...filters,
       ...pipeline,
       ...postprocessing,
+      ...modelAveraging,
     });
 
   const topWordsCounts = topWords;

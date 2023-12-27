@@ -19,6 +19,7 @@ import {
   QueryFilterState,
   QueryPipelineState,
   QueryPostprocessingState,
+  QueryBMAState,
 } from "types/models";
 import { OUTCOME_COLOR, UNKNOWN_ERROR } from "utils/const";
 import { classNames, constructSearchString } from "utils/helpers";
@@ -36,6 +37,7 @@ type Props = {
   filters: QueryFilterState;
   pipeline: Required<QueryPipelineState>;
   postprocessing: QueryPostprocessingState;
+  modelAveraging: QueryBMAState;
   predictionFilters?: string[];
   labelFilters?: string[];
 };
@@ -93,6 +95,7 @@ const ConfusionMatrix: React.FC<Props> = ({
   filters,
   pipeline,
   postprocessing,
+  modelAveraging,
   predictionFilters,
   labelFilters,
 }) => {
@@ -114,6 +117,7 @@ const ConfusionMatrix: React.FC<Props> = ({
       ...filters,
       ...pipeline,
       ...postprocessing,
+      ...modelAveraging,
     });
 
   if (isLoading) {
@@ -140,6 +144,7 @@ const ConfusionMatrix: React.FC<Props> = ({
         ...filters,
         ...pipeline,
         ...postprocessing,
+        ...modelAveraging,
         ...newConfusionMatrix,
       })}`
     );
@@ -152,6 +157,7 @@ const ConfusionMatrix: React.FC<Props> = ({
         ...filters,
         ...pipeline,
         ...postprocessing,
+        ...modelAveraging,
         prediction: [data.classNames[columnIndex]],
         label: [data.classNames[rowIndex]],
       })}`}
@@ -299,6 +305,7 @@ const ConfusionMatrix: React.FC<Props> = ({
                 ...filters,
                 ...pipeline,
                 ...postprocessing,
+                ...modelAveraging,
                 prediction: [data.classNames[i]],
               })}`}
               key={`column-${i}`}
@@ -333,6 +340,7 @@ const ConfusionMatrix: React.FC<Props> = ({
                 ...filters,
                 ...pipeline,
                 ...postprocessing,
+                ...modelAveraging,
                 label: [data.classNames[i]],
               })}`}
               key={`row-${i}`}

@@ -54,6 +54,7 @@ const Exploration = () => {
     pagination,
     pipeline,
     postprocessing,
+    modelAveraging,
     searchString,
   } = useQueryState();
 
@@ -85,6 +86,7 @@ const Exploration = () => {
           pagination={pagination}
           pipeline={pipeline}
           postprocessing={postprocessing}
+          modelAveraging={modelAveraging}
           searchString={searchString}
         />
         <div className={classes.content}>
@@ -132,6 +134,7 @@ const Exploration = () => {
                     filters={filters}
                     pipeline={pipeline}
                     postprocessing={postprocessing}
+                    modelAveraging={modelAveraging}
                   />
                   <ConfidenceHistogramTopWords
                     baseUrl={baseUrl}
@@ -140,6 +143,7 @@ const Exploration = () => {
                     pagination={pagination}
                     pipeline={pipeline}
                     postprocessing={postprocessing}
+                    modelAveraging={modelAveraging}
                   />
                 </>
               )}
@@ -158,6 +162,7 @@ const Exploration = () => {
                   predictionFilters={filters.prediction}
                   labelFilters={filters.label}
                   postprocessing={postprocessing}
+                  modelAveraging={modelAveraging}
                 />
               </>
             )}
@@ -172,6 +177,7 @@ const Exploration = () => {
                 pagination={pagination}
                 pipeline={pipeline}
                 postprocessing={postprocessing}
+                modelAveraging={modelAveraging}
               />
             )}
           </Paper>

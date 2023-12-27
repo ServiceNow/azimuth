@@ -64,6 +64,7 @@ export const getDatasetInfoAPIResponse = rest.get(
       modelContract: "hf_text_classification",
       predictionAvailable: true,
       perturbationTestingAvailable: true,
+      modelAveragingAvailable: true,
       availableDatasetSplits: { train: true, eval: true },
       similarityAvailable: true,
       postprocessingEditable: [true],
