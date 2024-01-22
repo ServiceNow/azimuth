@@ -114,7 +114,7 @@ class ConfidenceBinIndexModule(DatasetResultModule[ModelContractConfig]):
     """Return confidence bin indices for the selected dataset split."""
 
     required_mod_options = {"pipeline_index"}
-    optional_mod_options = DatasetResultModule.optional_mod_options | {"threshold"}
+    optional_mod_options = DatasetResultModule.optional_mod_options | {"threshold", "use_bma"}
 
     def compute_on_dataset_split(self) -> List[int]:  # type: ignore
         """Get the bin indices for each utterance in the dataset split.

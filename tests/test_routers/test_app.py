@@ -52,6 +52,7 @@ def test_get_dataset_info(app: FastAPI) -> None:
         "dataActions": ALL_DATA_ACTION_FILTERS,
         "similarityAvailable": True,
         "smartTags": ALL_SMART_TAG_FILTERS,
+        "modelAveragingAvailable": False,
     }
 
 

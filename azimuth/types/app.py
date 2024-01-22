@@ -43,6 +43,7 @@ class DatasetInfoResponse(AliasModel):
         ..., title="Utterance count per dataset split."
     )
     similarity_available: bool = Field(..., title="Indicator if similarities are available.")
+    model_averaging_available: bool = Field(..., title="Indicator if model averaging is available.")
     postprocessing_editable: Optional[List[bool]] = Field(
         ..., title="Indicator if postprocessing can be overwritten.", nullable=True
     )

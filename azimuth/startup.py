@@ -65,7 +65,21 @@ BMA_PREDICTION_TASKS = [
         SupportedMethod.Predictions,
         mod_options={"use_bma": True},
         run_on_all_pipelines=True,
-    )
+    ),
+    Startup(
+        "outcomes_bma",
+        SupportedModule.Outcome,
+        dependency_names=["prediction_bma"],
+        mod_options={"use_bma": True},
+        run_on_all_pipelines=True,
+    ),
+    Startup(
+        "confidence_bins_bma",
+        SupportedModule.ConfidenceBinIndex,
+        dependency_names=["prediction_bma"],
+        mod_options={"use_bma": True},
+        run_on_all_pipelines=True,
+    ),
 ]
 
 PERTURBATION_TESTING_TASKS = [

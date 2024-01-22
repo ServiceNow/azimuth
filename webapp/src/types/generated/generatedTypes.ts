@@ -306,6 +306,7 @@ export interface components {
       availableDatasetSplits: components["schemas"]["AvailableDatasetSplits"];
       utteranceCountPerDatasetSplit: components["schemas"]["UtteranceCountPerDatasetSplit"];
       similarityAvailable: boolean;
+      modelAveragingAvailable: boolean;
       postprocessingEditable: boolean[] | null;
     };
     /** An enumeration. */
@@ -1488,6 +1489,7 @@ export interface operations {
       };
       query: {
         without_postprocessing?: boolean;
+        use_bma?: boolean;
         pipeline_index: number;
         confidence_min?: number;
         confidence_max?: number;
@@ -1605,6 +1607,7 @@ export interface operations {
       };
       query: {
         without_postprocessing?: boolean;
+        use_bma?: boolean;
         pipeline_index: number;
         confidence_min?: number;
         confidence_max?: number;
@@ -1729,6 +1732,7 @@ export interface operations {
         dataset_split_name: components["schemas"]["DatasetSplitName"];
       };
       query: {
+        use_bma?: boolean;
         pipeline_index: number;
       };
     };
@@ -2549,6 +2553,7 @@ export interface operations {
       };
       query: {
         without_postprocessing?: boolean;
+        use_bma?: boolean;
         normalize?: boolean;
         reorder_classes?: boolean;
         pipeline_index: number;

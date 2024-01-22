@@ -49,6 +49,10 @@ export type QueryPostprocessingState = {
   withoutPostprocessing?: true;
 };
 
+export type QueryBMAState = {
+  useBma?: boolean;
+};
+
 export type QueryConfusionMatrixState = {
   normalize?: false;
   reorderClasses?: false;
@@ -60,6 +64,7 @@ export type QueryState = QueryClassOverlapState &
   QueryPaginationState &
   QueryPipelineState &
   QueryPostprocessingState &
+  QueryBMAState &
   QueryConfusionMatrixState;
 
 export type Tags = { [Tag: string]: boolean };

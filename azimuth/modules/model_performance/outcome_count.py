@@ -178,7 +178,7 @@ class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
     """Compute the outcome count per threshold."""
 
     required_mod_options = {"pipeline_index"}
-    optional_mod_options = {"x_ticks_count"}
+    optional_mod_options = {"x_ticks_count", "use_bma"}
 
     def compute_on_dataset_split(self) -> List[OutcomeCountPerThresholdResponse]:  # type: ignore
         if not postprocessing_editable(self.config, self.mod_options.pipeline_index):
@@ -199,6 +199,7 @@ class OutcomeCountPerThresholdModule(AggregationModule[ModelContractConfig]):
                     # Convert to float instead of numpy.float64
                     threshold=float(th),
                     pipeline_index=self.mod_options.pipeline_index,
+                    use_bma=self.mod_options.use_bma,
                 ),
             )
             outcomes = outcomes_mod.compute_on_dataset_split()

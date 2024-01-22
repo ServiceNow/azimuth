@@ -11,6 +11,7 @@ Released changes are shown in the
 ## [Not released]
 
 ### Added
+* Prediction after BMA can now be displayed in the app.
 
 ### Changed
 
