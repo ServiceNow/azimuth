@@ -22,7 +22,6 @@ CONFIDENCE_BINS_COUNT = 20
 class ConfidenceHistogramModule(FilterableModule[ModelContractConfig]):
     """Return a confidence histogram of the predictions."""
 
-
     @staticmethod
     def get_outcome_mask(
         ds, outcome: OutcomeName, without_postprocessing: bool = False
