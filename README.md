@@ -35,10 +35,6 @@ analyses**. The application leverages different tools, including robustness test
 similarity analysis and saliency maps, unified by concepts such as **smart tags** and **proposed
 actions**. It currently only supports **text classification use cases**.
 
-### Live Demo
-
-Play with Azimuth on CLINC-OOS and a DistilBert model with a [live demo](https://azimuth-demo.net/).
-
 ### Published Paper at [EMNLP](https://2022.emnlp.org/)
 
 Our paper was accepted as a [system demo at EMNLP 2022](https://www.servicenow.com/research/publication/gabrielle-gauthier-melancon-azim-emnlp2022.html). It is available [here](https://arxiv.org/abs/2212.08216).
